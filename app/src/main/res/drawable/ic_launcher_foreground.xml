@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Logo ERP 360 : trois barres (tableau de bord / croissance) en blanc.
+  Viewport 108 = grille d'une icône adaptative ; contenu dans la zone
+  sûre centrale (env. 34 → 74).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,74 h6 a3,3 0 0 0 3,-3 v-14 a3,3 0 0 0 -3,-3 h-6 a3,3 0 0 0 -3,3 v14 a3,3 0 0 0 3,3 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,74 h6 a3,3 0 0 0 3,-3 v-24 a3,3 0 0 0 -3,-3 h-6 a3,3 0 0 0 -3,3 v24 a3,3 0 0 0 3,3 z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,74 h6 a3,3 0 0 0 3,-3 v-32 a3,3 0 0 0 -3,-3 h-6 a3,3 0 0 0 -3,3 v32 a3,3 0 0 0 3,3 z" />
+</vector>

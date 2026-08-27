@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Missa 360</string>
+
+    <!-- Navigation bas -->
+    <string name="nav_dashboard">Accueil</string>
+    <string name="nav_ventes">Ventes</string>
+    <string name="nav_stock">Stock</string>
+    <string name="nav_clients">Clients</string>
+    <string name="nav_parametres">Réglages</string>
+
+    <!-- Écrans -->
+    <string name="dashboard_title">Tableau de bord</string>
+    <string name="ventes_title">Ventes &amp; Facturation</string>
+    <string name="stock_title">Stock &amp; Inventaire</string>
+    <string name="clients_title">Clients &amp; CRM</string>
+    <string name="parametres_title">Réglages</string>
+    <string name="module_placeholder">Module en cours de conception — voir docs/</string>
+</resources>
