@@ -1,0 +1,26 @@
+# Fichiers générés par Gradle / Android Studio
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build/
+/build/
+
+# Sorties de build
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Keystore (ne jamais commiter de signatures)
+*.jks
+*.keystore
+
+# Logs
+*.log
