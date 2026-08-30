@@ -35,7 +35,7 @@ import com.missabusiness.app.R
  * juste après le splash système Android, puis bascule vers l'application.
  *
  * - Lecture vidéo via MediaPlayer + TextureView (aucune dépendance externe)
- * - La zone vidéo conserve strictement le format portrait 9:16, sans zoom,
+ * - La zone vidéo conserve strictement le format de la vidéo, sans zoom,
  *   recadrage ni déformation ; elle est centrée dans la surface disponible
  * - Masquée (fond blanc) jusqu'au rendu de la première frame : aucune image
  *   fantôme de fin de vidéo
@@ -53,6 +53,9 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
     val surfaceReady = remember { mutableStateOf(false) }
 
     // Lecteur préparé une seule fois ; démarré quand la surface est prête.
+    // Le ratio de la vue vidéo est pris sur les dimensions réelles du flux
+    // (pas un 9:16 supposé) : sans ça, un flux 720x1264 dans une vue 9:16
+    // génère des bandes noires (letterbox) en haut et en bas.
     val player = remember {
         MediaPlayer().apply {
             setAudioAttributes(
@@ -70,6 +73,9 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
         }
     }
 
+    // Dimensions réelles du flux vidéo, connues une fois le lecteur préparé.
+    val videoSize = remember { mutableStateOf<Pair<Int, Int>?>(null) }
+
     // Passe à true au rendu de la première frame : avant, la vue reste masquée
     // (fond blanc) pour ne montrer aucune image résiduelle.
     val firstFrameShown = remember { mutableStateOf(false) }
@@ -81,7 +87,8 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
             player.start()
         }
     }
-    player.setOnPreparedListener {
+    player.setOnPreparedListener { mp ->
+        videoSize.value = mp.videoWidth to mp.videoHeight
         prepared.value = true
         tryStart()
     }
@@ -113,10 +120,14 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
                 detectTapGestures { onFinished() }
             },
     ) {
-        // Un Pixel 8 est plus haut qu'un écran 9:16. La vue prend donc la plus
-        // grande taille 9:16 possible, reste centrée et laisse le fond blanc
-        // remplir l'espace restant : aucun bord de la vidéo n'est coupé.
-        val videoAspectRatio = 9f / 16f
+        // La vue vidéo adopte le ratio exact du flux (ex. 720x1264), pas un
+        // 9:16 supposé : la TextureView n'a donc aucune bande noire à dessiner.
+        // Elle prend la plus grande taille possible, reste centrée et laisse
+        // le fond blanc remplir l'espace restant : aucun bord n'est coupé.
+        val videoAspectRatio = videoSize.value
+            ?.takeIf { (w, h) -> w > 0 && h > 0 }
+            ?.let { (w, h) -> w.toFloat() / h.toFloat() }
+            ?: (9f / 16f)
         val screenAspectRatio = maxWidth / maxHeight
         val videoModifier = if (screenAspectRatio > videoAspectRatio) {
             Modifier
