@@ -74,15 +74,33 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
     // Applique le cadrage : la vidéo couvre tout l'écran (mode "cover").
     // Ratio préservé, mise à l'échelle pour remplir la vue, centrée ;
     // seul le débordement (haut/bas ou gauche/droite) est recadré.
-    // (Sans transform, TextureView étire son buffer aux dimensions de la vue.)
+    //
+    // TextureView applique la matrice au buffer vidéo, dont l'origine est en
+    // haut à gauche. Le scale doit donc être suivi d'une translation calculée
+    // à partir des dimensions *mises à l'échelle*. Un pivot au centre de la
+    // vue décale le buffer vers le bas et la droite, ce qui était la cause de
+    // la vidéo non centrée au démarrage.
     fun applyMatrix() {
-        val vw = player.videoWidth.toFloat()
-        val vh = player.videoHeight.toFloat()
-        if (vw <= 0f || vh <= 0f || textureView.width == 0) return
-        val scale = maxOf(textureView.width / vw, textureView.height / vh)
-        val matrix = Matrix()
-        matrix.setScale(scale, scale, textureView.width / 2f, textureView.height / 2f)
-        textureView.setTransform(matrix)
+        val videoWidth = player.videoWidth.toFloat()
+        val videoHeight = player.videoHeight.toFloat()
+        val viewWidth = textureView.width.toFloat()
+        val viewHeight = textureView.height.toFloat()
+        if (videoWidth <= 0f || videoHeight <= 0f || viewWidth <= 0f || viewHeight <= 0f) {
+            return
+        }
+
+        val scale = maxOf(viewWidth / videoWidth, viewHeight / videoHeight)
+        val scaledWidth = videoWidth * scale
+        val scaledHeight = videoHeight * scale
+        val offsetX = (viewWidth - scaledWidth) / 2f
+        val offsetY = (viewHeight - scaledHeight) / 2f
+
+        textureView.setTransform(
+            Matrix().apply {
+                setScale(scale, scale)
+                postTranslate(offsetX, offsetY)
+            },
+        )
     }
 
     // La lecture démarre uniquement quand le lecteur est préparé ET la surface
