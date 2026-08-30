@@ -1,6 +1,5 @@
 package com.missabusiness.app.ui.screens
 
-import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -10,12 +9,16 @@ import android.view.TextureView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -32,8 +35,8 @@ import com.missabusiness.app.R
  * juste après le splash système Android, puis bascule vers l'application.
  *
  * - Lecture vidéo via MediaPlayer + TextureView (aucune dépendance externe)
- * - La vidéo couvre tout l'écran (mode "cover") : ratio préservé, mise à
- *   l'échelle pour remplir la vue, centrée, débordement recadré
+ * - La zone vidéo conserve strictement le format portrait 9:16, sans zoom,
+ *   recadrage ni déformation ; elle est centrée dans la surface disponible
  * - Masquée (fond blanc) jusqu'au rendu de la première frame : aucune image
  *   fantôme de fin de vidéo
  * - Tap n'importe où = passer l'intro
@@ -71,43 +74,10 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
     // (fond blanc) pour ne montrer aucune image résiduelle.
     val firstFrameShown = remember { mutableStateOf(false) }
 
-    // Applique le cadrage : la vidéo couvre tout l'écran (mode "cover").
-    // Ratio préservé, mise à l'échelle pour remplir la vue, centrée ;
-    // seul le débordement (haut/bas ou gauche/droite) est recadré.
-    //
-    // TextureView applique la matrice au buffer vidéo, dont l'origine est en
-    // haut à gauche. Le scale doit donc être suivi d'une translation calculée
-    // à partir des dimensions *mises à l'échelle*. Un pivot au centre de la
-    // vue décale le buffer vers le bas et la droite, ce qui était la cause de
-    // la vidéo non centrée au démarrage.
-    fun applyMatrix() {
-        val videoWidth = player.videoWidth.toFloat()
-        val videoHeight = player.videoHeight.toFloat()
-        val viewWidth = textureView.width.toFloat()
-        val viewHeight = textureView.height.toFloat()
-        if (videoWidth <= 0f || videoHeight <= 0f || viewWidth <= 0f || viewHeight <= 0f) {
-            return
-        }
-
-        val scale = maxOf(viewWidth / videoWidth, viewHeight / videoHeight)
-        val scaledWidth = videoWidth * scale
-        val scaledHeight = videoHeight * scale
-        val offsetX = (viewWidth - scaledWidth) / 2f
-        val offsetY = (viewHeight - scaledHeight) / 2f
-
-        textureView.setTransform(
-            Matrix().apply {
-                setScale(scale, scale)
-                postTranslate(offsetX, offsetY)
-            },
-        )
-    }
-
     // La lecture démarre uniquement quand le lecteur est préparé ET la surface
     // disponible, pour que la première frame décodée soit immédiatement visible.
     fun tryStart() {
         if (prepared.value && surfaceReady.value) {
-            applyMatrix()
             player.start()
         }
     }
@@ -134,7 +104,7 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
@@ -143,6 +113,21 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
                 detectTapGestures { onFinished() }
             },
     ) {
+        // Un Pixel 8 est plus haut qu'un écran 9:16. La vue prend donc la plus
+        // grande taille 9:16 possible, reste centrée et laisse le fond blanc
+        // remplir l'espace restant : aucun bord de la vidéo n'est coupé.
+        val videoAspectRatio = 9f / 16f
+        val screenAspectRatio = maxWidth / maxHeight
+        val videoModifier = if (screenAspectRatio > videoAspectRatio) {
+            Modifier
+                .fillMaxHeight()
+                .aspectRatio(videoAspectRatio)
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(videoAspectRatio)
+        }
+
         AndroidView(
             factory = {
                 textureView.apply {
@@ -161,10 +146,7 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
                             surfaceTexture: SurfaceTexture,
                             width: Int,
                             height: Int,
-                        ) {
-                            // Recentre si la vue change de taille (ex. rotation).
-                            applyMatrix()
-                        }
+                        ) = Unit
 
                         override fun onSurfaceTextureDestroyed(
                             surfaceTexture: SurfaceTexture,
@@ -181,9 +163,10 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
                     }
                 }
             },
-            // Masqué jusqu'à la première frame réelle, puis plein écran.
-            modifier = Modifier
-                .fillMaxSize()
+            // La TextureView elle-même est au format 9:16 et centrée. Sans
+            // matrice de transformation, le buffer vidéo reste intégralement visible.
+            modifier = videoModifier
+                .align(Alignment.Center)
                 .alpha(if (firstFrameShown.value) 1f else 0f),
         )
     }
