@@ -25,9 +25,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var settingsStore: SettingsStore
 
     /**
-     * L'activité est recréée par AppCompat lors d'un changement de langue. Cette valeur
-     * évite de rejouer l'introduction vidéo — et donc son buffer vidéo noir — au milieu
-     * de l'onboarding ou des réglages.
+     * État de secours pour qu'une recréation exceptionnelle ne relance pas
+     * l'introduction vidéo au milieu de l'onboarding ou des réglages.
      */
     private var introTerminee = false
 
@@ -58,11 +57,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
-    /**
-     * Applique au démarrage la langue déjà enregistrée.
-     * AppCompat ne reçoit une nouvelle locale que lorsqu'elle diffère réellement,
-     * ce qui supprime une recréation inutile de l'activité.
-     */
+    /** Applique au démarrage la langue déjà enregistrée lorsqu'elle diffère réellement. */
     private fun applyStoredLocale() {
         val stored = runBlocking {
             withTimeoutOrNull(2_000) {

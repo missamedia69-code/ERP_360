@@ -84,11 +84,12 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
             }
         }
 
-        // Catalogue ISO complet : la saisie sert de recherche et un choix renseigne la taxe connue.
+        // Catalogue ISO complet : la saisie sert de recherche et un choix renseigne le taux connu.
         val locale = LocalConfiguration.current.locales[0]
         val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
         var paysOuvert by remember { mutableStateOf(false) }
-        var recherchePays by remember { mutableStateOf(viewModel.pays) }
+        // La requête reste distincte du pays choisi : rouvrir la liste montre tous les pays.
+        var recherchePays by remember { mutableStateOf("") }
         val paysFiltres = remember(paysListe, recherchePays) {
             val requete = recherchePays.trim()
             if (requete.isEmpty()) {
@@ -103,13 +104,16 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
 
         ExposedDropdownMenuBox(
             expanded = paysOuvert,
-            onExpandedChange = { paysOuvert = it },
+            onExpandedChange = { ouvert ->
+                paysOuvert = ouvert
+                if (ouvert) recherchePays = ""
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
         ) {
             OutlinedTextField(
-                value = recherchePays,
+                value = if (paysOuvert) recherchePays else viewModel.pays,
                 onValueChange = {
                     recherchePays = it
                     paysOuvert = true
@@ -126,8 +130,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                 expanded = paysOuvert,
                 onDismissRequest = {
                     paysOuvert = false
-                    // Un texte non sélectionné ne doit pas être enregistré comme pays.
-                    recherchePays = viewModel.pays
+                    recherchePays = ""
                 },
             ) {
                 if (paysFiltres.isEmpty()) {
@@ -140,15 +143,15 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                     paysFiltres.forEach { pays ->
                         DropdownMenuItem(
                             text = {
-                                val taxe = pays.tauxTaxeSuggere?.let {
-                                    " — ${stringResource(R.string.ob_taux_taxe)} $it %"
-                                }.orEmpty()
-                                Text("${pays.nom} (${pays.code})$taxe")
+                                Text(
+                                    "${pays.nom} (${pays.code}) — " +
+                                        "${stringResource(R.string.ob_taux_taxe)} ${pays.tauxTaxeSuggere} %",
+                                )
                             },
                             onClick = {
                                 viewModel.pays = pays.nom
-                                viewModel.tauxTaxe = pays.tauxTaxeSuggere ?: 0.0
-                                recherchePays = pays.nom
+                                viewModel.tauxTaxe = pays.tauxTaxeSuggere
+                                recherchePays = ""
                                 paysOuvert = false
                             },
                         )
@@ -158,7 +161,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
         }
 
         OutlinedTextField(
-            value = if (viewModel.tauxTaxe == 0.0) "" else viewModel.tauxTaxe.toString(),
+            value = viewModel.tauxTaxe.toString(),
             onValueChange = { viewModel.tauxTaxe = it.replace(',', '.').toDoubleOrNull() ?: 0.0 },
             label = { Text(stringResource(R.string.ob_taux_taxe)) },
             singleLine = true,

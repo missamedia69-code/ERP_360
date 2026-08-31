@@ -105,5 +105,6 @@ class SocleUseCasesTest {
         assertTrue(pays.size >= 200)
         val cameroun = pays.firstOrNull { it.code == "CM" }
         assertEquals(19.25, cameroun?.tauxTaxeSuggere ?: -1.0, 0.0)
+        assertTrue(pays.all { it.tauxTaxeSuggere >= 0.0 })
     }
 }

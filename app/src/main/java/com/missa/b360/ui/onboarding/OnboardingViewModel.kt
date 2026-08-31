@@ -38,7 +38,7 @@ class OnboardingViewModel @Inject constructor(
     var step by mutableStateOf(OnboardingStep.LANGUE)
         private set
 
-    // Étape langue — conserve le bouton coché après la recréation AppCompat.
+    // Étape langue — conserve le bouton coché en cas de recréation exceptionnelle.
     var langue by mutableStateOf(
         AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "fr" },
     )
@@ -75,9 +75,8 @@ class OnboardingViewModel @Inject constructor(
     /**
      * Enregistre d'abord le choix, puis applique la locale.
      *
-     * AppCompat recrée l'activité lors d'un changement de langue. Mettre DataStore à
-     * jour avant cette recréation évite qu'une nouvelle activité relise l'ancienne
-     * langue et déclenche un second changement visuel (flash noir / boucle de locale).
+     * L'activité gère les changements de locale elle-même : Compose se recompose sans
+     * être détruit, ce qui évite le flash noir tout en conservant la langue choisie.
      */
     fun choisirLangue(code: String) {
         if (langue == code && AppCompatDelegate.getApplicationLocales().toLanguageTags() == code) return

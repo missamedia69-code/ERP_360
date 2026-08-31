@@ -30,11 +30,11 @@ object MoneyUtils {
 object Iso4217 {
     data class Devise(val code: String, val nom: String)
 
-    /** Pays ISO 3166 proposé à l'onboarding, avec une taxe éventuellement suggérée. */
+    /** Pays ISO 3166 proposé à l'onboarding, avec un taux de taxe toujours renseigné. */
     data class Pays(
         val code: String,
         val nom: String,
-        val tauxTaxeSuggere: Double?,
+        val tauxTaxeSuggere: Double,
     )
 
     val DEFAUT = "USD"
@@ -53,6 +53,9 @@ object Iso4217 {
         Devise("BRL", "Réal brésilien"),
         Devise("INR", "Roupie indienne"),
     )
+
+    /** Taux utilisé lorsqu'aucun taux national n'est encore configuré dans le référentiel. */
+    const val TAUX_TAXE_PAR_DEFAUT = 0.0
 
     /**
      * Taux de taxe suggérés pour les pays pris en charge par le référentiel métier (D5).
@@ -93,7 +96,7 @@ object Iso4217 {
                     Pays(
                         code = code,
                         nom = it,
-                        tauxTaxeSuggere = TAXES_SUGGEREES[code],
+                        tauxTaxeSuggere = TAXES_SUGGEREES[code] ?: TAUX_TAXE_PAR_DEFAUT,
                     )
                 }
             }
