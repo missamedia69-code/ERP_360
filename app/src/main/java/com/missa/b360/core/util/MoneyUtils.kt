@@ -49,12 +49,24 @@ object Iso4217 {
 
     /** Taux de taxes suggérés par pays (D5) — configuration 9.1. */
     val TAXES_SUGGEREES = mapOf(
+        "Bénin" to 18.0,
+        "Burkina Faso" to 18.0,
         "Cameroun" to 19.25,
+        "Canada" to 5.0,
+        "Congo (Brazzaville)" to 18.0,
+        "Congo (Kinshasa)" to 16.0,
         "Côte d'Ivoire" to 18.0,
-        "Sénégal" to 18.0,
-        "France" to 20.0,
         "Espagne" to 21.0,
+        "France" to 20.0,
+        "Gabon" to 18.0,
+        "Guinée" to 18.0,
+        "Mali" to 18.0,
         "Maroc" to 20.0,
+        "Niger" to 19.0,
+        "Sénégal" to 18.0,
+        "Tchad" to 18.0,
+        "Togo" to 18.0,
+        "Tunisie" to 19.0,
     )
 }
 

@@ -5,7 +5,7 @@
       Aucune ActionBar (Compose gère toute l'UI) et couleurs gérées
       côté Jetpack Compose (ui/theme/Theme.kt).
     -->
-    <style name="Theme.ERP360" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.ERP360" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">?android:colorBackground</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

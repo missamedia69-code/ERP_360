@@ -48,6 +48,7 @@ fun SplashVideoScreen(onFinished: () -> Unit) {
         val mediaPlayer = MediaPlayer.create(context, R.raw.splash_intro)
         if (mediaPlayer != null) {
             player = mediaPlayer
+            mediaPlayer.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
             mediaPlayer.setOnPreparedListener {
                 prepared = true
                 tryStart()

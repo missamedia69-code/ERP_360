@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
 import com.missa.b360.core.data.datastore.SettingsStore
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
             Erp360Theme {
                 // Vidéo d'intro jouée juste après le splash système Android,
                 // puis bascule vers la coquille de navigation principale.
-                var showSplashVideo by remember { mutableStateOf(true) }
+                var showSplashVideo by rememberSaveable { mutableStateOf(true) }
                 if (showSplashVideo) {
                     SplashVideoScreen(onFinished = { showSplashVideo = false })
                 } else {
