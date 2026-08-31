@@ -6,7 +6,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +39,7 @@ fun ChampsCategorie(
             readOnly = true,
             label = { Text(stringResource(R.string.clients_categorie_optionnelle)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catOuvert) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(expanded = catOuvert, onDismissRequest = { onExpanded(false) }) {
             DropdownMenuItem(
@@ -78,7 +78,7 @@ fun ChampsBadge(
             readOnly = true,
             label = { Text(stringResource(R.string.clients_badge_optionnel)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = badgeOuvert) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(expanded = badgeOuvert, onDismissRequest = { onExpanded(false) }) {
             DropdownMenuItem(

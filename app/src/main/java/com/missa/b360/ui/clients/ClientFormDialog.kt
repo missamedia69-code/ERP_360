@@ -25,8 +25,18 @@ fun ClientFormDialog(
     categories: List<CategoryClientEntity>,
     badges: List<BadgeLoyaltyEntity>,
     onDismiss: () -> Unit,
-    onConfirm: (nom: String, tel: String, type: ClientType, email: String?, adresse: String?,
-        catId: Long?, remise: Double, limite: Double?, badgeId: Long?, notes: String?) -> Unit,
+    onConfirm: (
+        nom: String,
+        tel: String,
+        type: ClientType,
+        email: String?,
+        adresse: String?,
+        catId: Long?,
+        remise: Double,
+        limite: Double?,
+        badgeId: Long?,
+        notes: String?,
+    ) -> Unit,
 ) {
     var nom by remember { mutableStateOf(client?.nom ?: "") }
     var tel by remember { mutableStateOf(client?.telephone ?: "") }
@@ -34,7 +44,7 @@ fun ClientFormDialog(
     var email by remember { mutableStateOf(client?.email ?: "") }
     var adresse by remember { mutableStateOf(client?.adresse ?: "") }
     var catId by remember { mutableStateOf(client?.categorieId) }
-    var remise by remember { mutableStateOf(if (client != null) client.remiseDefautPct.toString() else "0") }
+    var remise by remember { mutableStateOf(client?.remiseDefautPct?.toString() ?: "0") }
     var limite by remember { mutableStateOf(client?.limiteCredit?.toString() ?: "") }
     var badgeId by remember { mutableStateOf(client?.badgeId) }
     var notes by remember { mutableStateOf(client?.notes ?: "") }
@@ -115,22 +125,21 @@ fun ClientFormDialog(
                         catId = it
                         catOuvert = false
                     },
-                    onClear = {
-                        catId = null
-                        catOuvert = false
-                    },
-                )
+                ) {
+                    catId = null
+                    catOuvert = false
+                }
 
                 OutlinedTextField(
                     value = remise,
-                    onValueChange = { remise = it.filter { c -> c.isDigit() || c == '.' } },
+                    onValueChange = { remise = it.filter { c -> (c.isDigit() || c == '.') } },
                     label = { Text(stringResource(R.string.clients_remise)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 OutlinedTextField(
                     value = limite,
-                    onValueChange = { limite = it.filter { c -> c.isDigit() || c == '.' } },
+                    onValueChange = { limite = it.filter { c -> (c.isDigit() || c == '.') } },
                     label = { Text(stringResource(R.string.clients_limite_credit)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -147,11 +156,10 @@ fun ClientFormDialog(
                         badgeId = it
                         badgeOuvert = false
                     },
-                    onClear = {
-                        badgeId = null
-                        badgeOuvert = false
-                    },
-                )
+                ) {
+                    badgeId = null
+                    badgeOuvert = false
+                }
             }
         },
         confirmButton = {

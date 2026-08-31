@@ -3,6 +3,7 @@ package com.missa.b360.ui.clients
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +65,7 @@ fun CategoriesDialog(
                 }
                 categories.forEach { cat ->
                     Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     ) {
                         Text(
@@ -78,6 +79,22 @@ fun CategoriesDialog(
                                 onSupprimer(cat.id)
                                 true
                             }.getOrDefault(false)
+                            if (!ok) message = "Catégorie utilisée"
+                        }) {
+                            Text(stringResource(R.string.clients_supprimer_categorie))
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.ob_terminer))
+            }
+        },
+    )
+}
+
 /** Dialog de gestion des badges de fidélité (RC-16). */
 @Composable
 fun BadgesDialog(
@@ -128,7 +145,7 @@ fun BadgesDialog(
                 }
                 badges.forEach { badge ->
                     Row(
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     ) {
                         Text(
@@ -141,21 +158,6 @@ fun BadgesDialog(
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.outline,
                         )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.ob_terminer))
-            }
-        },
-    )
-}
-                            if (!ok) message = ""
-                        }) {
-                            Text(stringResource(R.string.clients_supprimer_categorie))
-                        }
                     }
                 }
             }

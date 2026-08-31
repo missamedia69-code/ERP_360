@@ -14,10 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
-import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
@@ -55,10 +54,12 @@ fun ClientsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                clientEdite = null
-                formVisible = true
-            }) {
+            FloatingActionButton(
+                onClick = {
+                    clientEdite = null
+                    formVisible = true
+                },
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = null)
             }
         },
@@ -102,12 +103,8 @@ fun ClientsScreen(
                             client = client,
                             nomCategorie = categories.firstOrNull { it.id == client.categorieId }?.nom,
                             badge = badges.firstOrNull { it.id == client.badgeId },
-                            onClick = {
-                                clientEdite = client
-                                formVisible = true
-                            },
-                            onDesactiver = { viewModel.desactiver(client.id) },
-                        )
+                            onClick = { /* TODO: ouvrir fiche client */ }
+                        ) { viewModel.desactiver(client.id) }
                     }
                 }
             }
@@ -120,25 +117,29 @@ fun ClientsScreen(
             client = client,
             categories = categories,
             badges = badges,
-            onDismiss = { formVisible = false },
-            onConfirm = { nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes ->
-                if (client == null) {
-                    viewModel.creer(nom, tel, type, doublonConfirme = true)
-                } else {
-                    viewModel.modifier(
-                        client.id, nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes,
-                    )
-                }
-                formVisible = false
-            },
-        )
+            onDismiss = { formVisible = false }
+        ) { nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes ->
+            if (client == null) {
+                viewModel.creer(nom, tel, type, doublonConfirme = true)
+            } else {
+                viewModel.modifier(
+                    client.id, nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes,
+                )
+            }
+            formVisible = false
+        }
     }
     if (catVisible) CategoriesDialog(
         categories = categories,
         onCreer = { viewModel.creerCategorie(it) },
-        onSupprimer = { id -> viewModel.supprimerCategorie(id) },
-        onDismiss = { catVisible = false },
-    )
+        onSupprimer = { id -> viewModel.supprimerCategorie(id) }
+    ) { catVisible = false }
+    if (badgeVisible) BadgesDialog(
+        badges = badges,
+        onCreer = { nom, remise -> viewModel.creerBadge(nom, remise) }
+    ) { badgeVisible = false }
+}
+
 @Composable
 private fun ClientCard(
     client: ClientEntity,
@@ -188,10 +189,4 @@ private fun ClientCard(
             }
         }
     }
-}
-    if (badgeVisible) BadgesDialog(
-        badges = badges,
-        onCreer = { nom, remise -> viewModel.creerBadge(nom, remise) },
-        onDismiss = { badgeVisible = false },
-    )
 }

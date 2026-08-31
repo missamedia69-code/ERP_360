@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
-import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
