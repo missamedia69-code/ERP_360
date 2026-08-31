@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.missa.b360.R
@@ -83,9 +84,23 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
             }
         }
 
-        // Pays → taxe suggérée (verrou d'amont — D5)
+        // Catalogue ISO complet : la saisie sert de recherche et un choix renseigne la taxe connue.
+        val locale = LocalConfiguration.current.locales[0]
+        val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
         var paysOuvert by remember { mutableStateOf(false) }
-        val paysListe = Iso4217.TAXES_SUGGEREES.keys.toList()
+        var recherchePays by remember { mutableStateOf(viewModel.pays) }
+        val paysFiltres = remember(paysListe, recherchePays) {
+            val requete = recherchePays.trim()
+            if (requete.isEmpty()) {
+                paysListe
+            } else {
+                paysListe.filter { pays ->
+                    pays.nom.contains(requete, ignoreCase = true) ||
+                        pays.code.contains(requete, ignoreCase = true)
+                }
+            }
+        }
+
         ExposedDropdownMenuBox(
             expanded = paysOuvert,
             onExpandedChange = { paysOuvert = it },
@@ -94,25 +109,50 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                 .padding(top = 12.dp),
         ) {
             OutlinedTextField(
-                value = viewModel.pays,
-                onValueChange = {},
-                readOnly = true,
+                value = recherchePays,
+                onValueChange = {
+                    recherchePays = it
+                    paysOuvert = true
+                },
                 label = { Text(stringResource(R.string.ob_pays)) },
+                placeholder = { Text(stringResource(R.string.ob_pays_recherche)) },
+                singleLine = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = paysOuvert) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(),
             )
-            ExposedDropdownMenu(expanded = paysOuvert, onDismissRequest = { paysOuvert = false }) {
-                paysListe.forEach { pays ->
+            ExposedDropdownMenu(
+                expanded = paysOuvert,
+                onDismissRequest = {
+                    paysOuvert = false
+                    // Un texte non sélectionné ne doit pas être enregistré comme pays.
+                    recherchePays = viewModel.pays
+                },
+            ) {
+                if (paysFiltres.isEmpty()) {
                     DropdownMenuItem(
-                        text = { Text("$pays — TVA ${Iso4217.TAXES_SUGGEREES[pays]} %") },
-                        onClick = {
-                            viewModel.pays = pays
-                            viewModel.tauxTaxe = Iso4217.TAXES_SUGGEREES[pays] ?: 0.0
-                            paysOuvert = false
-                        },
+                        text = { Text(stringResource(R.string.ob_pays_aucun_resultat)) },
+                        onClick = {},
+                        enabled = false,
                     )
+                } else {
+                    paysFiltres.forEach { pays ->
+                        DropdownMenuItem(
+                            text = {
+                                val taxe = pays.tauxTaxeSuggere?.let {
+                                    " — ${stringResource(R.string.ob_taux_taxe)} $it %"
+                                }.orEmpty()
+                                Text("${pays.nom} (${pays.code})$taxe")
+                            },
+                            onClick = {
+                                viewModel.pays = pays.nom
+                                viewModel.tauxTaxe = pays.tauxTaxeSuggere ?: 0.0
+                                recherchePays = pays.nom
+                                paysOuvert = false
+                            },
+                        )
+                    }
                 }
             }
         }

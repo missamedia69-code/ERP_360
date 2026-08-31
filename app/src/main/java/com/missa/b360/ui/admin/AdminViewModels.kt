@@ -67,9 +67,14 @@ class ReglagesViewModel @Inject constructor(
     }
 
     fun changerLangue(code: String) {
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
-        viewModelScope.launch { settingsStore.set(SettingsStore.Keys.LANGUE, code) }
         _state.value = _state.value.copy(langue = code)
+        viewModelScope.launch {
+            // Persist first: AppCompat may recreate the activity immediately afterwards.
+            settingsStore.set(SettingsStore.Keys.LANGUE, code)
+            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != code) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+            }
+        }
     }
 
     fun changerProfil(p: ProfilActivite) {

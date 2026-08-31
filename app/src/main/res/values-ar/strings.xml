@@ -64,6 +64,8 @@
     <string name="ob_votre_nom">اسمك</string>
     <string name="ob_devise">العملة (ISO 4217)</string>
     <string name="ob_pays">البلد</string>
+    <string name="ob_pays_recherche">ابحث عن بلد</string>
+    <string name="ob_pays_aucun_resultat">لم يتم العثور على بلد</string>
     <string name="ob_taux_taxe">نسبة الضريبة (%)</string>
     <string name="ob_site_principal">اسم الموقع الرئيسي</string>
     <string name="ob_verrous_note">⚠ سيتم قفل العملة والضرائب والترقيم وطرق الدفع عند الاستخدام الأول (لا يمكن تعديلها لاحقاً).</string>

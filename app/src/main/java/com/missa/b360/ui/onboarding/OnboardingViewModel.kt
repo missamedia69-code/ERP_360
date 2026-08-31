@@ -38,8 +38,10 @@ class OnboardingViewModel @Inject constructor(
     var step by mutableStateOf(OnboardingStep.LANGUE)
         private set
 
-    // Étape langue
-    var langue by mutableStateOf("fr")
+    // Étape langue — conserve le bouton coché après la recréation AppCompat.
+    var langue by mutableStateOf(
+        AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "fr" },
+    )
         private set
 
     // Étape profil
@@ -70,10 +72,22 @@ class OnboardingViewModel @Inject constructor(
     var onboardingTermine by mutableStateOf(false)
         private set
 
+    /**
+     * Enregistre d'abord le choix, puis applique la locale.
+     *
+     * AppCompat recrée l'activité lors d'un changement de langue. Mettre DataStore à
+     * jour avant cette recréation évite qu'une nouvelle activité relise l'ancienne
+     * langue et déclenche un second changement visuel (flash noir / boucle de locale).
+     */
     fun choisirLangue(code: String) {
+        if (langue == code && AppCompatDelegate.getApplicationLocales().toLanguageTags() == code) return
         langue = code
-        viewModelScope.launch { settingsStore.set(SettingsStore.Keys.LANGUE, code) }
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.LANGUE, code)
+            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != code) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+            }
+        }
     }
 
     fun choisirProfil(p: ProfilActivite) {

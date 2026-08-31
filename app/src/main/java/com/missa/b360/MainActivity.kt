@@ -7,16 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.lifecycleScope
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.ui.navigation.AppNavHost
 import com.missa.b360.ui.screens.SplashVideoScreen
 import com.missa.b360.ui.theme.Erp360Theme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
@@ -27,17 +24,28 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsStore: SettingsStore
 
+    /**
+     * L'activité est recréée par AppCompat lors d'un changement de langue. Cette valeur
+     * évite de rejouer l'introduction vidéo — et donc son buffer vidéo noir — au milieu
+     * de l'onboarding ou des réglages.
+     */
+    private var introTerminee = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        introTerminee = savedInstanceState?.getBoolean(STATE_INTRO_TERMINEE, false) ?: false
         enableEdgeToEdge()
         applyStoredLocale()
         setContent {
             Erp360Theme {
-                // Vidéo d'intro jouée juste après le splash système Android,
-                // puis bascule vers la coquille de navigation principale.
-                var showSplashVideo by rememberSaveable { mutableStateOf(true) }
+                var showSplashVideo by remember { mutableStateOf(!introTerminee) }
                 if (showSplashVideo) {
-                    SplashVideoScreen(onFinished = { showSplashVideo = false })
+                    SplashVideoScreen(
+                        onFinished = {
+                            introTerminee = true
+                            showSplashVideo = false
+                        },
+                    )
                 } else {
                     AppNavHost()
                 }
@@ -45,9 +53,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(STATE_INTRO_TERMINEE, introTerminee)
+        super.onSaveInstanceState(outState)
+    }
+
     /**
-     * Applique la langue choisie à l'onboarding (RA-12 — 5 langues, arabe RTL).
-     * AppCompatDelegate déclenche une recréation d'activité si la locale change.
+     * Applique au démarrage la langue déjà enregistrée.
+     * AppCompat ne reçoit une nouvelle locale que lorsqu'elle diffère réellement,
+     * ce qui supprime une recréation inutile de l'activité.
      */
     private fun applyStoredLocale() {
         val stored = runBlocking {
@@ -62,5 +76,9 @@ class MainActivity : AppCompatActivity() {
                 androidx.core.os.LocaleListCompat.forLanguageTags(stored),
             )
         }
+    }
+
+    private companion object {
+        const val STATE_INTRO_TERMINEE = "intro_terminee"
     }
 }

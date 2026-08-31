@@ -68,6 +68,8 @@
     <string name="ob_votre_nom">Votre nom</string>
     <string name="ob_devise">Devise (ISO 4217)</string>
     <string name="ob_pays">Pays</string>
+    <string name="ob_pays_recherche">Rechercher un pays</string>
+    <string name="ob_pays_aucun_resultat">Aucun pays trouvé</string>
     <string name="ob_taux_taxe">Taux de taxe (%)</string>
     <string name="ob_site_principal">Nom du site principal</string>
     <string name="ob_verrous_note">⚠ Devise, taxes, numérotation et paiements seront verrouillés au premier usage (non modifiables ensuite).</string>

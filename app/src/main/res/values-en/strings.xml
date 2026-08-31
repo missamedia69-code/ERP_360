@@ -64,6 +64,8 @@
     <string name="ob_votre_nom">Your name</string>
     <string name="ob_devise">Currency (ISO 4217)</string>
     <string name="ob_pays">Country</string>
+    <string name="ob_pays_recherche">Search for a country</string>
+    <string name="ob_pays_aucun_resultat">No country found</string>
     <string name="ob_taux_taxe">Tax rate (%)</string>
     <string name="ob_site_principal">Main site name</string>
     <string name="ob_verrous_note">⚠ Currency, taxes, numbering and payments will be locked at first use (cannot be changed later).</string>

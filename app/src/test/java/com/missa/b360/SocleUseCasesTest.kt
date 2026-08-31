@@ -4,7 +4,9 @@ import com.missa.b360.core.domain.usecase.CheckCreditLimitUseCase
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.security.PinHasher
+import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -95,5 +97,13 @@ class SocleUseCasesTest {
         val formatted = MoneyUtils.format(1500.5, "USD")
         assertTrue(formatted.endsWith("USD"))
         assertTrue(formatted.contains("1"))
+    }
+
+    @Test
+    fun `la liste des pays couvre le catalogue ISO et suggere la taxe du Cameroun`() {
+        val pays = Iso4217.paysDisponibles(Locale.FRENCH)
+        assertTrue(pays.size >= 200)
+        val cameroun = pays.firstOrNull { it.code == "CM" }
+        assertEquals(19.25, cameroun?.tauxTaxeSuggere ?: -1.0, 0.0)
     }
 }

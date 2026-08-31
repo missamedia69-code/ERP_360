@@ -6,8 +6,11 @@
       côté Jetpack Compose (ui/theme/Theme.kt).
     -->
     <style name="Theme.ERP360" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">?android:colorBackground</item>
+        <!-- Évite un écran noir entre deux compositions, notamment lors d'un changement de langue. -->
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

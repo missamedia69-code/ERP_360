@@ -64,6 +64,8 @@
     <string name="ob_votre_nom">Su nombre</string>
     <string name="ob_devise">Moneda (ISO 4217)</string>
     <string name="ob_pays">País</string>
+    <string name="ob_pays_recherche">Buscar un país</string>
+    <string name="ob_pays_aucun_resultat">No se encontró ningún país</string>
     <string name="ob_taux_taxe">Tasa de impuesto (%)</string>
     <string name="ob_site_principal">Nombre de la sede principal</string>
     <string name="ob_verrous_note">⚠ La moneda, los impuestos, la numeración y los pagos se bloquearán en el primer uso (no modificables después).</string>

@@ -30,6 +30,13 @@ object MoneyUtils {
 object Iso4217 {
     data class Devise(val code: String, val nom: String)
 
+    /** Pays ISO 3166 proposé à l'onboarding, avec une taxe éventuellement suggérée. */
+    data class Pays(
+        val code: String,
+        val nom: String,
+        val tauxTaxeSuggere: Double?,
+    )
+
     val DEFAUT = "USD"
 
     val COMMUNES = listOf(
@@ -47,27 +54,50 @@ object Iso4217 {
         Devise("INR", "Roupie indienne"),
     )
 
-    /** Taux de taxes suggérés par pays (D5) — configuration 9.1. */
+    /**
+     * Taux de taxe suggérés pour les pays pris en charge par le référentiel métier (D5).
+     * Les clés ISO évitent de dépendre de la langue d'affichage des pays.
+     */
     val TAXES_SUGGEREES = mapOf(
-        "Bénin" to 18.0,
-        "Burkina Faso" to 18.0,
-        "Cameroun" to 19.25,
-        "Canada" to 5.0,
-        "Congo (Brazzaville)" to 18.0,
-        "Congo (Kinshasa)" to 16.0,
-        "Côte d'Ivoire" to 18.0,
-        "Espagne" to 21.0,
-        "France" to 20.0,
-        "Gabon" to 18.0,
-        "Guinée" to 18.0,
-        "Mali" to 18.0,
-        "Maroc" to 20.0,
-        "Niger" to 19.0,
-        "Sénégal" to 18.0,
-        "Tchad" to 18.0,
-        "Togo" to 18.0,
-        "Tunisie" to 19.0,
+        "BJ" to 18.0, // Bénin
+        "BF" to 18.0, // Burkina Faso
+        "CM" to 19.25, // Cameroun
+        "CA" to 5.0, // Canada
+        "CG" to 18.0, // Congo (Brazzaville)
+        "CD" to 16.0, // Congo (Kinshasa)
+        "CI" to 18.0, // Côte d'Ivoire
+        "ES" to 21.0, // Espagne
+        "FR" to 20.0, // France
+        "GA" to 18.0, // Gabon
+        "GN" to 18.0, // Guinée
+        "ML" to 18.0, // Mali
+        "MA" to 20.0, // Maroc
+        "NE" to 19.0, // Niger
+        "SN" to 18.0, // Sénégal
+        "TD" to 18.0, // Tchad
+        "TG" to 18.0, // Togo
+        "TN" to 19.0, // Tunisie
     )
+
+    /**
+     * Catalogue complet des pays et territoires ISO 3166-1 connus de l'appareil.
+     * Les noms et le tri suivent la langue active de l'interface ; les données stockées
+     * conservent le libellé choisi, tandis que les règles de taxe utilisent le code ISO.
+     */
+    fun paysDisponibles(locale: Locale): List<Pays> =
+        Locale.getISOCountries()
+            .mapNotNull { code ->
+                val countryLocale = Locale.Builder().setRegion(code).build()
+                val nom = countryLocale.getDisplayCountry(locale)
+                nom.takeIf { it.isNotBlank() }?.let {
+                    Pays(
+                        code = code,
+                        nom = it,
+                        tauxTaxeSuggere = TAXES_SUGGEREES[code],
+                    )
+                }
+            }
+            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.nom })
 }
 
 /** Utilitaires de dates (horodatages en epoch ms). */

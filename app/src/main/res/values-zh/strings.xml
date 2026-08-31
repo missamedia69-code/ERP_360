@@ -64,6 +64,8 @@
     <string name="ob_votre_nom">您的姓名</string>
     <string name="ob_devise">货币 (ISO 4217)</string>
     <string name="ob_pays">国家/地区</string>
+    <string name="ob_pays_recherche">搜索国家或地区</string>
+    <string name="ob_pays_aucun_resultat">未找到国家或地区</string>
     <string name="ob_taux_taxe">税率 (%)</string>
     <string name="ob_site_principal">主站点名称</string>
     <string name="ob_verrous_note">⚠ 货币、税率、编号和支付方式将在首次使用时锁定（之后无法更改）。</string>
