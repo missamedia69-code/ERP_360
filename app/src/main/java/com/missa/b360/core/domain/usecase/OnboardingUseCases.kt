@@ -22,11 +22,32 @@ import com.missa.b360.ui.navigation.AppModule
 import javax.inject.Inject
 
 /**
+ * Réapplique les prérequis hors base Room de façon idempotente.
+ *
+ * La création de l'entreprise est transactionnelle dans Room, alors que DataStore et la
+ * licence ne peuvent pas participer à cette transaction. Cet use case termine donc aussi
+ * une initialisation interrompue entre ces deux phases, sans recréer les données métier.
+ */
+class EnsureEnterprisePrerequisitesUseCase @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val licenceManager: LicenceManager,
+) {
+    suspend operator fun invoke(devise: String) {
+        settingsStore.set(SettingsStore.Keys.DEVISE, devise)
+        settingsStore.lock(SettingsStore.Keys.VERROU_DEVISE)
+        settingsStore.lock(SettingsStore.Keys.VERROU_TAXES)
+        settingsStore.lock(SettingsStore.Keys.VERROU_NUMEROTATION)
+        settingsStore.lock(SettingsStore.Keys.VERROU_PAIEMENTS)
+        licenceManager.ensureTrialStarted()
+    }
+}
+
+/**
  * **RA-19 / D4 / D5** — Configuration de l'entreprise au 1er lancement :
  * entreprise + site principal, taxes (suggérées par pays), modes de paiement,
  * 3 rôles système (D2), démarrage de l'essai licence (RA-04) — puis **pose des
  * 4 verrous d'amont** (devise, taxes, numérotation, paiements) : plus jamais
- * modifiables ensuite. Tout en une transaction Room.
+ * modifiables ensuite. Les entités Room sont créées dans une transaction unique.
  */
 class SetupEnterpriseUseCase @Inject constructor(
     private val database: AppDatabase,
@@ -36,7 +57,7 @@ class SetupEnterpriseUseCase @Inject constructor(
     private val paymentMethodDao: PaymentMethodDao,
     private val roleDao: RoleDao,
     private val settingsStore: SettingsStore,
-    private val licenceManager: LicenceManager,
+    private val ensureEnterprisePrerequisites: EnsureEnterprisePrerequisitesUseCase,
     private val journalManager: JournalManager,
 ) {
     data class Params(
@@ -48,10 +69,13 @@ class SetupEnterpriseUseCase @Inject constructor(
     )
 
     suspend operator fun invoke(params: Params): Boolean {
-        // Reprise d'un onboarding interrompu : l'entreprise, le site et les réglages
-        // initiaux ont été insérés dans la même transaction. On peut donc continuer
-        // vers le PIN au lieu de bloquer l'utilisateur sur le formulaire.
-        if (enterpriseDao.get() != null) return true
+        // Reprise d'un onboarding interrompu : les données Room existent déjà. Les
+        // prérequis DataStore/licence sont toutefois rejoués pour couvrir un arrêt entre
+        // les deux phases de l'initialisation.
+        enterpriseDao.get()?.let { entreprise ->
+            ensureEnterprisePrerequisites(entreprise.devise)
+            return true
+        }
 
         database.withTransaction {
             enterpriseDao.upsert(
@@ -81,15 +105,7 @@ class SetupEnterpriseUseCase @Inject constructor(
             seedSystemRoles()
         }
 
-        // RA-19 — pose des 4 verrous d'amont (devise/taxes/numérotation/paiements).
-        settingsStore.set(SettingsStore.Keys.DEVISE, params.devise)
-        settingsStore.lock(SettingsStore.Keys.VERROU_DEVISE)
-        settingsStore.lock(SettingsStore.Keys.VERROU_TAXES)
-        settingsStore.lock(SettingsStore.Keys.VERROU_NUMEROTATION)
-        settingsStore.lock(SettingsStore.Keys.VERROU_PAIEMENTS)
-
-        // RA-04 — démarrage de l'essai 7 jours.
-        licenceManager.ensureTrialStarted()
+        ensureEnterprisePrerequisites(params.devise)
 
         journalManager.log("ADMIN", "ONBOARDING_ENTREPRISE", "Entreprise ${params.nomEntreprise} configurée")
         return true
@@ -127,6 +143,7 @@ class GetOnboardingProgressUseCase @Inject constructor(
     private val taxDao: TaxDao,
     private val userDao: UserDao,
     private val pinManager: PinManager,
+    private val ensureEnterprisePrerequisites: EnsureEnterprisePrerequisitesUseCase,
 ) {
     data class Progress(
         val langue: String,
@@ -138,15 +155,21 @@ class GetOnboardingProgressUseCase @Inject constructor(
         val proprietaireCree: Boolean,
     )
 
-    suspend operator fun invoke(): Progress = Progress(
-        langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
-        profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
-        palier = settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
-        entreprise = enterpriseDao.get(),
-        tauxTaxe = taxDao.getParDefaut()?.taux,
-        pinConfigure = pinManager.isConfigured(),
-        proprietaireCree = userDao.count() > 0,
-    )
+    suspend operator fun invoke(): Progress {
+        val entreprise = enterpriseDao.get()
+        // La reprise démarre directement au PIN lorsque l'entreprise existe. On complète
+        // donc les prérequis hors Room avant de laisser l'utilisateur poursuivre.
+        entreprise?.let { ensureEnterprisePrerequisites(it.devise) }
+        return Progress(
+            langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
+            profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
+            palier = settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
+            entreprise = entreprise,
+            tauxTaxe = taxDao.getParDefaut()?.taux,
+            pinConfigure = pinManager.isConfigured(),
+            proprietaireCree = userDao.count() > 0,
+        )
+    }
 }
 
 /**
