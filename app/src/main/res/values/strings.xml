@@ -78,9 +78,9 @@
     <string name="ob_site_principal">Nom du site principal</string>
     <string name="ob_verrous_note">⚠ Devise, taxes, numérotation et paiements seront verrouillés au premier usage (non modifiables ensuite).</string>
     <string name="ob_erreur_nom">Veuillez renseigner le nom de l\'entreprise et du site principal.</string>
-    <string name="ob_erreur_nom_entreprise">Veuillez renseigner le nom de l'entreprise.</string>
+    <string name="ob_erreur_nom_entreprise">Veuillez renseigner le nom de l\'entreprise.</string>
     <string name="ob_erreur_site_principal">Veuillez renseigner le nom du site principal.</string>
-    <string name="ob_erreur_configuration_entreprise">La configuration de l'entreprise n'a pas pu être enregistrée. Réessayez.</string>
+    <string name="ob_erreur_configuration_entreprise">La configuration de l\'entreprise n\'a pas pu être enregistrée. Réessayez.</string>
 
     <string name="ob_pin_title">Créez votre code PIN</string>
     <string name="ob_pin_subtitle">4 à 6 chiffres — il sera demandé à chaque ouverture de l\'application.</string>
