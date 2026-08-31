@@ -58,6 +58,10 @@ class OnboardingViewModel @Inject constructor(
     var devise by mutableStateOf(Iso4217.DEFAUT)
     var pays by mutableStateOf("")
     var tauxTaxe by mutableStateOf(0.0)
+        private set
+    /** Texte conservé pendant la frappe afin de ne pas transformer « 19, » en « 19.0 ». */
+    var tauxTaxeTexte by mutableStateOf("0")
+        private set
     var nomSitePrincipal by mutableStateOf("")
     var enregistrementEnCours by mutableStateOf(false)
         private set
@@ -101,6 +105,7 @@ class OnboardingViewModel @Inject constructor(
                         devise = entreprise.devise
                         pays = entreprise.pays.orEmpty()
                     }
+                    progression.tauxTaxe?.let(::definirTauxTaxe)
                     step = when {
                         progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
                         progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.EMAIL
@@ -167,10 +172,37 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    /** Applique un pays du catalogue et rend son taux immédiatement modifiable. */
+    fun choisirPays(nom: String, tauxSuggere: Double) {
+        pays = nom
+        definirTauxTaxe(tauxSuggere)
+    }
+
+    /** Conserve fidèlement la saisie manuelle, y compris une virgule ou décimale en cours. */
+    fun modifierTauxTaxe(valeur: String) {
+        tauxTaxeTexte = valeur
+        tauxTaxeValide()?.let { tauxTaxe = it }
+    }
+
+    fun tauxTaxeEstValide(): Boolean = tauxTaxeValide() != null
+
+    private fun definirTauxTaxe(valeur: Double) {
+        tauxTaxe = valeur
+        tauxTaxeTexte = if (valeur % 1.0 == 0.0) valeur.toInt().toString() else valeur.toString()
+    }
+
+    /** Un taux de 0 % est admis : il couvre les pays ou activités sans TVA/GST. */
+    private fun tauxTaxeValide(): Double? = tauxTaxeTexte
+        .trim()
+        .replace(',', '.')
+        .toDoubleOrNull()
+        ?.takeIf { it in 0.0..100.0 }
+
     /** RA-19 / D4 / D5 — enregistre entreprise + verrous (UseCase transactionnel). */
     private fun enregistrerEntreprise() {
         val nomEntrepriseValide = nomEntreprise.trim()
         val nomSiteValide = nomSitePrincipal.trim()
+        val tauxTaxeValide = tauxTaxeValide()
         when {
             nomEntrepriseValide.isEmpty() -> {
                 erreurRes = R.string.ob_erreur_nom_entreprise
@@ -178,6 +210,10 @@ class OnboardingViewModel @Inject constructor(
             }
             nomSiteValide.isEmpty() -> {
                 erreurRes = R.string.ob_erreur_site_principal
+                return
+            }
+            tauxTaxeValide == null -> {
+                erreurRes = R.string.ob_erreur_taux_taxe
                 return
             }
             enregistrementEnCours -> return

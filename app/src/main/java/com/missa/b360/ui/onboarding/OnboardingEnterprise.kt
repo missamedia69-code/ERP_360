@@ -2,6 +2,7 @@ package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -18,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.missa.b360.R
 import com.missa.b360.core.util.Iso4217
@@ -152,8 +154,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                                 )
                             },
                             onClick = {
-                                viewModel.pays = pays.nom
-                                viewModel.tauxTaxe = pays.tauxTaxeSuggere
+                                viewModel.choisirPays(pays.nom, pays.tauxTaxeSuggere)
                                 recherchePays = ""
                                 paysOuvert = false
                             },
@@ -187,11 +188,19 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
             )
         }
 
+        val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
         OutlinedTextField(
-            value = viewModel.tauxTaxe.toString(),
-            onValueChange = { viewModel.tauxTaxe = it.replace(',', '.').toDoubleOrNull() ?: 0.0 },
+            value = viewModel.tauxTaxeTexte,
+            onValueChange = viewModel::modifierTauxTaxe,
             label = { Text(stringResource(R.string.ob_taux_taxe)) },
             singleLine = true,
+            isError = tauxTaxeInvalide,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            supportingText = if (tauxTaxeInvalide) {
+                { Text(stringResource(R.string.ob_erreur_taux_taxe)) }
+            } else {
+                null
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),

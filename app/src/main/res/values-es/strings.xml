@@ -76,6 +76,7 @@
     <string name="ob_erreur_nom">Introduzca el nombre de la empresa y de la sede principal.</string>
     <string name="ob_erreur_nom_entreprise">Introduzca el nombre de la empresa.</string>
     <string name="ob_erreur_site_principal">Introduzca el nombre de la sede principal.</string>
+    <string name="ob_erreur_taux_taxe">Introduzca una tasa de impuesto entre 0 y 100 %.</string>
     <string name="ob_erreur_configuration_entreprise">No se pudo guardar la configuración de la empresa. Inténtelo de nuevo.</string>
     <string name="ob_erreur_finalisation">No se pudo finalizar la configuración. Inténtelo de nuevo.</string>
 

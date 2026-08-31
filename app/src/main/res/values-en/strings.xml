@@ -76,6 +76,7 @@
     <string name="ob_erreur_nom">Please enter the company name and main site name.</string>
     <string name="ob_erreur_nom_entreprise">Please enter the company name.</string>
     <string name="ob_erreur_site_principal">Please enter the main site name.</string>
+    <string name="ob_erreur_taux_taxe">Enter a tax rate between 0 and 100%.</string>
     <string name="ob_erreur_configuration_entreprise">The company setup could not be saved. Please try again.</string>
     <string name="ob_erreur_finalisation">The setup could not be completed. Please try again.</string>
 

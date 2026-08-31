@@ -121,6 +121,10 @@ interface TaxDao {
     @Query("SELECT * FROM taxes")
     fun observeAll(): Flow<List<TaxEntity>>
 
+    /** Taxe proposée lors de l'onboarding, utilisée pour restaurer une reprise interrompue. */
+    @Query("SELECT * FROM taxes WHERE parDefaut = 1 LIMIT 1")
+    suspend fun getParDefaut(): TaxEntity?
+
     @Query("SELECT COUNT(*) FROM taxes")
     suspend fun count(): Int
 

@@ -124,6 +124,7 @@ class SetupEnterpriseUseCase @Inject constructor(
 class GetOnboardingProgressUseCase @Inject constructor(
     private val settingsStore: SettingsStore,
     private val enterpriseDao: EnterpriseDao,
+    private val taxDao: TaxDao,
     private val userDao: UserDao,
     private val pinManager: PinManager,
 ) {
@@ -132,6 +133,7 @@ class GetOnboardingProgressUseCase @Inject constructor(
         val profil: String?,
         val palier: String?,
         val entreprise: EnterpriseEntity?,
+        val tauxTaxe: Double?,
         val pinConfigure: Boolean,
         val proprietaireCree: Boolean,
     )
@@ -141,6 +143,7 @@ class GetOnboardingProgressUseCase @Inject constructor(
         profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
         palier = settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
         entreprise = enterpriseDao.get(),
+        tauxTaxe = taxDao.getParDefaut()?.taux,
         pinConfigure = pinManager.isConfigured(),
         proprietaireCree = userDao.count() > 0,
     )

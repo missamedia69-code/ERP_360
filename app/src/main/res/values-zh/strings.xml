@@ -76,6 +76,7 @@
     <string name="ob_erreur_nom">请填写公司名称和主站点名称。</string>
     <string name="ob_erreur_nom_entreprise">请填写公司名称。</string>
     <string name="ob_erreur_site_principal">请填写主站点名称。</string>
+    <string name="ob_erreur_taux_taxe">请输入介于 0 到 100% 之间的税率。</string>
     <string name="ob_erreur_configuration_entreprise">无法保存公司配置，请重试。</string>
     <string name="ob_erreur_finalisation">无法完成配置，请重试。</string>
 

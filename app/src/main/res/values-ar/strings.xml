@@ -76,6 +76,7 @@
     <string name="ob_erreur_nom">يرجى إدخال اسم الشركة والموقع الرئيسي.</string>
     <string name="ob_erreur_nom_entreprise">يرجى إدخال اسم الشركة.</string>
     <string name="ob_erreur_site_principal">يرجى إدخال اسم الموقع الرئيسي.</string>
+    <string name="ob_erreur_taux_taxe">أدخل معدل ضريبة بين 0 و100٪.</string>
     <string name="ob_erreur_configuration_entreprise">تعذر حفظ إعداد الشركة. يرجى المحاولة مرة أخرى.</string>
     <string name="ob_erreur_finalisation">تعذر إكمال الإعداد. يرجى المحاولة مرة أخرى.</string>
 
