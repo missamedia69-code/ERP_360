@@ -126,23 +126,36 @@ class OnboardingViewModel @Inject constructor(
 
     /** RA-19 / D4 / D5 — enregistre entreprise + verrous (UseCase transactionnel). */
     private fun enregistrerEntreprise() {
-        if (nomEntreprise.isBlank() || nomSitePrincipal.isBlank()) {
-            erreurRes = R.string.ob_erreur_nom
-            return
+        val nomEntrepriseValide = nomEntreprise.trim()
+        val nomSiteValide = nomSitePrincipal.trim()
+        when {
+            nomEntrepriseValide.isEmpty() -> {
+                erreurRes = R.string.ob_erreur_nom_entreprise
+                return
+            }
+            nomSiteValide.isEmpty() -> {
+                erreurRes = R.string.ob_erreur_site_principal
+                return
+            }
+            enregistrementEnCours -> return
         }
+
         enregistrementEnCours = true
         viewModelScope.launch {
-            val ok = setupEnterprise(
-                SetupEnterpriseUseCase.Params(
-                    nomEntreprise = nomEntreprise,
-                    devise = devise,
-                    pays = pays.ifBlank { null },
-                    tauxTaxe = tauxTaxe,
-                    nomSitePrincipal = nomSitePrincipal,
-                ),
-            )
+            val ok = runCatching {
+                setupEnterprise(
+                    SetupEnterpriseUseCase.Params(
+                        nomEntreprise = nomEntrepriseValide,
+                        devise = devise,
+                        pays = pays.trim().ifEmpty { null },
+                        tauxTaxe = tauxTaxe,
+                        nomSitePrincipal = nomSiteValide,
+                    ),
+                )
+            }.getOrDefault(false)
             enregistrementEnCours = false
-            if (ok) step = OnboardingStep.PIN else erreurRes = R.string.ob_erreur_nom
+            if (ok) step = OnboardingStep.PIN
+            else erreurRes = R.string.ob_erreur_configuration_entreprise
         }
     }
 

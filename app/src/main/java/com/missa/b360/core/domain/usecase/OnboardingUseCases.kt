@@ -46,8 +46,10 @@ class SetupEnterpriseUseCase @Inject constructor(
     )
 
     suspend operator fun invoke(params: Params): Boolean {
-        // id=1 unique : refus si déjà configurée (verrou d'amont global).
-        if (enterpriseDao.get() != null) return false
+        // Reprise d'un onboarding interrompu : l'entreprise, le site et les réglages
+        // initiaux ont été insérés dans la même transaction. On peut donc continuer
+        // vers le PIN au lieu de bloquer l'utilisateur sur le formulaire.
+        if (enterpriseDao.get() != null) return true
 
         database.withTransaction {
             enterpriseDao.upsert(

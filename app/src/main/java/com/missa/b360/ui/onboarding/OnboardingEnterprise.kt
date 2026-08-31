@@ -35,9 +35,19 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
         viewModel = viewModel,
         suivantActive = !viewModel.enregistrementEnCours,
     ) {
+        // Le site principal reprend le nom de l'entreprise tant que l'utilisateur ne l'a
+        // pas personnalisé. Un premier démarrage ne peut donc plus rester bloqué parce
+        // que ce champ situé en bas du formulaire n'a pas encore été rempli.
+        var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
         OutlinedTextField(
             value = viewModel.nomEntreprise,
-            onValueChange = { viewModel.nomEntreprise = it },
+            onValueChange = { nom ->
+                val ancienNom = viewModel.nomEntreprise
+                viewModel.nomEntreprise = nom
+                if (!siteModifieManuellement || viewModel.nomSitePrincipal == ancienNom) {
+                    viewModel.nomSitePrincipal = nom
+                }
+            },
             label = { Text(stringResource(R.string.ob_nom_entreprise)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
@@ -204,7 +214,10 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
 
         OutlinedTextField(
             value = viewModel.nomSitePrincipal,
-            onValueChange = { viewModel.nomSitePrincipal = it },
+            onValueChange = {
+                siteModifieManuellement = true
+                viewModel.nomSitePrincipal = it
+            },
             label = { Text(stringResource(R.string.ob_site_principal)) },
             singleLine = true,
             modifier = Modifier

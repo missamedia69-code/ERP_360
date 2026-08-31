@@ -74,6 +74,9 @@
     <string name="ob_site_principal">Nombre de la sede principal</string>
     <string name="ob_verrous_note">⚠ La moneda, los impuestos, la numeración y los pagos se bloquearán en el primer uso (no modificables después).</string>
     <string name="ob_erreur_nom">Introduzca el nombre de la empresa y de la sede principal.</string>
+    <string name="ob_erreur_nom_entreprise">Introduzca el nombre de la empresa.</string>
+    <string name="ob_erreur_site_principal">Introduzca el nombre de la sede principal.</string>
+    <string name="ob_erreur_configuration_entreprise">No se pudo guardar la configuración de la empresa. Inténtelo de nuevo.</string>
 
     <string name="ob_pin_title">Cree su PIN</string>
     <string name="ob_pin_subtitle">4 a 6 dígitos — se solicitará en cada inicio de la aplicación.</string>
