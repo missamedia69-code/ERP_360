@@ -31,12 +31,40 @@ fun ClientsScreen(
     val clients by viewModel.clients.collectAsState(initial = emptyList())
     val categories by viewModel.categoriesFlow.collectAsState(initial = emptyList())
     val badges by viewModel.badgesFlow.collectAsState(initial = emptyList())
+    val resultat by viewModel.resultat.collectAsState()
+    val erreurCategorie by viewModel.erreurCategorie.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var recherche by remember { mutableStateOf("") }
     var formVisible by remember { mutableStateOf(false) }
     var catVisible by remember { mutableStateOf(false) }
     var badgeVisible by remember { mutableStateOf(false) }
     var clientEdite by remember { mutableStateOf<ClientEntity?>(null) }
+
+    val messageRetour = resultat?.let { retour ->
+        when {
+            retour.erreur == "doublon" -> null
+            retour.code == "edit" -> stringResource(R.string.clients_client_modifie)
+            retour.code != null -> stringResource(R.string.clients_client_cree, retour.code)
+            retour.erreur == "licence" -> stringResource(R.string.clients_lecture_seule)
+            retour.erreur == "nom" -> stringResource(R.string.clients_nom_obligatoire)
+            retour.erreur == "telephone" -> stringResource(R.string.clients_telephone_obligatoire)
+            retour.erreur == "donnees" -> stringResource(R.string.clients_donnees_invalides)
+            else -> stringResource(R.string.clients_erreur_sauvegarde)
+        }
+    }
+    val messageCategorie = when (erreurCategorie) {
+        "utilisee" -> stringResource(R.string.clients_categorie_utilisee)
+        "licence" -> stringResource(R.string.clients_lecture_seule)
+        "err" -> stringResource(R.string.clients_erreur_sauvegarde)
+        else -> null
+    }
+
+    LaunchedEffect(messageRetour) {
+        messageRetour ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(messageRetour)
+        viewModel.acquitterResultat()
+    }
 
     val filtres = clients.filter {
         recherche.isBlank() ||
@@ -53,6 +81,7 @@ fun ClientsScreen(
                 },
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -103,8 +132,12 @@ fun ClientsScreen(
                             client = client,
                             nomCategorie = categories.firstOrNull { it.id == client.categorieId }?.nom,
                             badge = badges.firstOrNull { it.id == client.badgeId },
-                            onClick = { /* TODO: ouvrir fiche client */ }
-                        ) { viewModel.desactiver(client.id) }
+                            onClick = {
+                                clientEdite = client
+                                formVisible = true
+                            },
+                            onDesactiver = { viewModel.desactiver(client.id) },
+                        )
                     }
                 }
             }
@@ -117,27 +150,72 @@ fun ClientsScreen(
             client = client,
             categories = categories,
             badges = badges,
-            onDismiss = { formVisible = false }
+            onDismiss = { formVisible = false },
         ) { nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes ->
             if (client == null) {
-                viewModel.creer(nom, tel, type, doublonConfirme = true)
+                viewModel.creer(
+                    nom = nom,
+                    telephone = tel,
+                    type = type,
+                    email = email,
+                    adresse = adresse,
+                    categorieId = catId,
+                    remiseDefautPct = remise,
+                    limiteCredit = limite,
+                    badgeId = badgeId,
+                    notes = notes,
+                )
             } else {
                 viewModel.modifier(
-                    client.id, nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes,
+                    client.id,
+                    nom,
+                    tel,
+                    type,
+                    email,
+                    adresse,
+                    catId,
+                    remise,
+                    limite,
+                    badgeId,
+                    notes,
                 )
             }
             formVisible = false
         }
     }
-    if (catVisible) CategoriesDialog(
-        categories = categories,
-        onCreer = { viewModel.creerCategorie(it) },
-        onSupprimer = { id -> viewModel.supprimerCategorie(id) }
-    ) { catVisible = false }
-    if (badgeVisible) BadgesDialog(
-        badges = badges,
-        onCreer = { nom, remise -> viewModel.creerBadge(nom, remise) }
-    ) { badgeVisible = false }
+    if (resultat?.erreur == "doublon") {
+        AlertDialog(
+            onDismissRequest = viewModel::annulerDoublon,
+            title = { Text(stringResource(R.string.clients_doublon_titre)) },
+            text = { Text(stringResource(R.string.clients_doublon_message)) },
+            confirmButton = {
+                Button(onClick = viewModel::confirmerDoublon) {
+                    Text(stringResource(R.string.clients_creer_malgre_doublon))
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = viewModel::annulerDoublon) {
+                    Text(stringResource(R.string.ob_retour))
+                }
+            },
+        )
+    }
+    if (catVisible) {
+        CategoriesDialog(
+            categories = categories,
+            message = messageCategorie,
+            onCreer = viewModel::creerCategorie,
+            onSupprimer = viewModel::supprimerCategorie,
+            onDismiss = { catVisible = false },
+        )
+    }
+    if (badgeVisible) {
+        BadgesDialog(
+            badges = badges,
+            onCreer = viewModel::creerBadge,
+            onDismiss = { badgeVisible = false },
+        )
+    }
 }
 
 @Composable
@@ -162,12 +240,13 @@ private fun ClientCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,
                 )
-                val dettails = buildList {
+                val typeClient = stringResource(client.type.labelRes())
+                val details = buildList {
                     nomCategorie?.let { add(it) }
-                    if (client.type != ClientType.PARTICULIER) add(client.type.name)
+                    if (client.type != ClientType.PARTICULIER) add(typeClient)
                 }.joinToString(" · ")
-                if (dettails.isNotEmpty()) {
-                    Text(dettails, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                if (details.isNotEmpty()) {
+                    Text(details, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                 }
                 if (client.prospect) {
                     Text(

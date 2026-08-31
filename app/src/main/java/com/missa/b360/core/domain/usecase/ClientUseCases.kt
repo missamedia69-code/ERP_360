@@ -13,6 +13,25 @@ import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+/** Règles de saisie communes à la création et à l'édition d'un client. */
+object ClientValidation {
+    fun normaliseNom(nom: String): String = nom.trim()
+
+    fun normaliseTelephone(telephone: String): String = telephone.trim()
+
+    fun normaliseTexte(texte: String?): String? = texte?.trim()?.ifBlank { null }
+
+    fun coordonneesEtConditionsSontValides(
+        nom: String,
+        telephone: String,
+        remiseDefautPct: Double,
+        limiteCredit: Double?,
+    ): Boolean = normaliseNom(nom).isNotEmpty() &&
+        normaliseTelephone(telephone).isNotEmpty() &&
+        remiseDefautPct in 0.0..100.0 &&
+        (limiteCredit == null || limiteCredit >= 0.0)
+}
+
 /**
  * **RC-01** — Détection de doublons client : même téléphone OU nom proche.
  * Utilisée à la saisie du formulaire client (ClientFormScreen).
@@ -22,7 +41,7 @@ class DetectDuplicateClientUseCase @Inject constructor(
 ) {
     /** @return les clients existants pouvant être des doublons (vides si aucun). */
     suspend operator fun invoke(telephone: String, nom: String) =
-        clientDao.findDoublonsPotentiels(telephone, nom)
+        clientDao.findDoublonsPotentiels(ClientValidation.normaliseTelephone(telephone), ClientValidation.normaliseNom(nom))
 }
 
 /**
@@ -59,24 +78,39 @@ class CreateClientUseCase @Inject constructor(
         data class Succes(val clientId: Long, val code: String) : Result()
         data object LicenceExpiree : Result() // RA-05 : lecture seule
         data object DoublonPotentiel : Result() // RC-01 : confirmation requise
+        data object NomObligatoire : Result()
         data object TelephoneObligatoire : Result()
+        data object DonneesInvalides : Result()
     }
 
     suspend operator fun invoke(
         nom: String,
         telephone: String,
         type: ClientType = ClientType.PARTICULIER,
+        email: String? = null,
+        adresse: String? = null,
+        categorieId: Long? = null,
         remiseDefautPct: Double = 0.0,
         limiteCredit: Double? = null,
+        badgeId: Long? = null,
+        notes: String? = null,
         doublonConfirme: Boolean = false,
         now: Long = System.currentTimeMillis(),
     ): Result {
+        val nomNormalise = ClientValidation.normaliseNom(nom)
+        val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return Result.LicenceExpiree
-        if (telephone.isBlank()) return Result.TelephoneObligatoire
+        if (!ClientValidation.coordonneesEtConditionsSontValides(nom, telephone, remiseDefautPct, limiteCredit)) {
+            return when {
+                nomNormalise.isEmpty() -> Result.NomObligatoire
+                telephoneNormalise.isEmpty() -> Result.TelephoneObligatoire
+                else -> Result.DonneesInvalides
+            }
+        }
 
         // RC-01 — doublons : confirmation obligatoire si détectés
         if (!doublonConfirme) {
-            val doublons = clientDao.findDoublonsPotentiels(telephone, nom)
+            val doublons = clientDao.findDoublonsPotentiels(telephoneNormalise, nomNormalise)
             if (doublons.isNotEmpty()) return Result.DoublonPotentiel
         }
 
@@ -84,18 +118,23 @@ class CreateClientUseCase @Inject constructor(
         val id = clientDao.insert(
             ClientEntity(
                 code = code,
-                nom = nom.trim(),
+                nom = nomNormalise,
                 type = type,
-                telephone = telephone.trim(),
+                telephone = telephoneNormalise,
+                email = ClientValidation.normaliseTexte(email),
+                adresse = ClientValidation.normaliseTexte(adresse),
+                categorieId = categorieId,
                 remiseDefautPct = remiseDefautPct,
                 limiteCredit = limiteCredit,
+                badgeId = badgeId,
+                notes = ClientValidation.normaliseTexte(notes),
                 statut = ClientStatus.ACTIF,
                 prospect = type == ClientType.PROSPECT,
                 createdAt = now,
             ),
         )
-        journalManager.log("CLIENTS", "CREATION_CLIENT", "Client $code — $nom")
-return Result.Succes(id, code)
+        journalManager.log("CLIENTS", "CREATION_CLIENT", "Client $code — $nomNormalise")
+        return Result.Succes(id, code)
     }
 }
 /** Édition d'un client existant (jamais de suppression physique — C7). */
@@ -117,23 +156,28 @@ class UpdateClientUseCase @Inject constructor(
         badgeId: Long? = null,
         notes: String? = null,
     ): Boolean {
+        val nomNormalise = ClientValidation.normaliseNom(nom)
+        val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return false
+        if (!ClientValidation.coordonneesEtConditionsSontValides(nom, telephone, remiseDefautPct, limiteCredit)) {
+            return false
+        }
         val existant = clientDao.getById(id) ?: return false
         clientDao.update(
             existant.copy(
-                nom = nom.trim(),
-                telephone = telephone.trim(),
+                nom = nomNormalise,
+                telephone = telephoneNormalise,
                 type = type,
-                email = email?.trim()?.ifBlank { null },
-                adresse = adresse?.trim()?.ifBlank { null },
+                email = ClientValidation.normaliseTexte(email),
+                adresse = ClientValidation.normaliseTexte(adresse),
                 categorieId = categorieId,
                 remiseDefautPct = remiseDefautPct,
                 limiteCredit = limiteCredit,
                 badgeId = badgeId,
-                notes = notes?.trim()?.ifBlank { null },
+                notes = ClientValidation.normaliseTexte(notes),
             ),
         )
-        journalManager.log("CLIENTS", "MODIFICATION_CLIENT", "Client ${existant.code} — $nom")
+        journalManager.log("CLIENTS", "MODIFICATION_CLIENT", "Client ${existant.code} — $nomNormalise")
         return true
     }
 }
@@ -163,47 +207,74 @@ class ObserveClientsUseCase @Inject constructor(
 /** Gestion des catégories de clients (suppression verrouillée si rattachée). */
 class CategorieClientUseCases @Inject constructor(
     private val clientDao: ClientDao,
+    private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
 ) {
+    sealed class SuppressionResult {
+        data object Supprimee : SuppressionResult()
+        data object CategorieUtilisee : SuppressionResult()
+        data object LectureSeule : SuppressionResult()
+        data object Introuvable : SuppressionResult()
+    }
+
     fun observer(): Flow<List<CategoryClientEntity>> = clientDao.observeCategories()
 
-    suspend fun creer(nom: String): Long {
-        val id = clientDao.insertCategorie(CategoryClientEntity(nom = nom.trim()))
-        journalManager.log("CLIENTS", "CATEGORIE_CREEE", "Catégorie client : $nom")
+    /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
+    suspend fun creer(nom: String): Long? {
+        val nomNormalise = nom.trim()
+        if (licenceManager.isReadOnly() || nomNormalise.isEmpty()) return null
+        val id = clientDao.insertCategorie(CategoryClientEntity(nom = nomNormalise))
+        journalManager.log("CLIENTS", "CATEGORIE_CREEE", "Catégorie client : $nomNormalise")
         return id
     }
 
-    suspend fun renommer(id: Long, nom: String) {
-        val cat = clientDao.getCategorieById(id) ?: return
-        clientDao.updateCategorie(cat.copy(nom = nom.trim()))
-        journalManager.log("CLIENTS", "CATEGORIE_MODIFIEE", "Catégorie -> $nom")
+    suspend fun renommer(id: Long, nom: String): Boolean {
+        val nomNormalise = nom.trim()
+        if (licenceManager.isReadOnly() || nomNormalise.isEmpty()) return false
+        val cat = clientDao.getCategorieById(id) ?: return false
+        clientDao.updateCategorie(cat.copy(nom = nomNormalise))
+        journalManager.log("CLIENTS", "CATEGORIE_MODIFIEE", "Catégorie -> $nomNormalise")
+        return true
     }
 
-    /** @return false si la catégorie est rattachée à un client (suppression interdite). */
-    suspend fun supprimer(id: Long): Boolean {
-        if (clientDao.countClientsAvecCategorie(id) > 0) return false
+    /** Renvoie précisément pourquoi une suppression ne peut pas être effectuée. */
+    suspend fun supprimer(id: Long): SuppressionResult {
+        if (licenceManager.isReadOnly()) return SuppressionResult.LectureSeule
+        if (clientDao.getCategorieById(id) == null) return SuppressionResult.Introuvable
+        if (clientDao.countClientsAvecCategorie(id) > 0) return SuppressionResult.CategorieUtilisee
         clientDao.deleteCategorie(id)
         journalManager.log("CLIENTS", "CATEGORIE_SUPPRIMEE", "Catégorie id=$id supprimée")
-        return true
+        return SuppressionResult.Supprimee
     }
 }
 
 /** Gestion des badges de fidélité (RC-16, remise automatique à la vente). */
 class BadgeLoyaltyUseCases @Inject constructor(
     private val clientDao: ClientDao,
+    private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
 ) {
     fun observer(): Flow<List<BadgeLoyaltyEntity>> = clientDao.observeBadges()
 
-    suspend fun creer(nom: String, remisePct: Double): Long {
-        val id = clientDao.insertBadge(BadgeLoyaltyEntity(nom = nom.trim(), remisePct = remisePct))
-        journalManager.log("CLIENTS", "BADGE_CREE", "Badge fidélité : $nom ($remisePct%)")
+    /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
+    suspend fun creer(nom: String, remisePct: Double): Long? {
+        val nomNormalise = nom.trim()
+        if (licenceManager.isReadOnly() || nomNormalise.isEmpty() || remisePct !in 0.0..100.0) {
+            return null
+        }
+        val id = clientDao.insertBadge(BadgeLoyaltyEntity(nom = nomNormalise, remisePct = remisePct))
+        journalManager.log("CLIENTS", "BADGE_CREE", "Badge fidélité : $nomNormalise ($remisePct%)")
         return id
     }
 
-    suspend fun modifier(id: Long, nom: String, remisePct: Double, actif: Boolean = true) {
-        val badge = clientDao.getBadgeById(id) ?: return
-        clientDao.updateBadge(badge.copy(nom = nom.trim(), remisePct = remisePct, actif = actif))
-        journalManager.log("CLIENTS", "BADGE_MODIFIE", "Badge fidélité : $nom")
+    suspend fun modifier(id: Long, nom: String, remisePct: Double, actif: Boolean = true): Boolean {
+        val nomNormalise = nom.trim()
+        if (licenceManager.isReadOnly() || nomNormalise.isEmpty() || remisePct !in 0.0..100.0) {
+            return false
+        }
+        val badge = clientDao.getBadgeById(id) ?: return false
+        clientDao.updateBadge(badge.copy(nom = nomNormalise, remisePct = remisePct, actif = actif))
+        journalManager.log("CLIENTS", "BADGE_MODIFIE", "Badge fidélité : $nomNormalise")
+        return true
     }
 }

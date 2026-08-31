@@ -241,6 +241,28 @@
     <string name="clients_categorie_optionnelle">Catégorie (optionnelle)</string>
     <string name="clients_badge_optionnel">Badge de fidélité (optionnel)</string>
 
+
+    <!-- Clients (9.2) -->
+    <string name="clients_doublon_titre">Doublon potentiel</string>
+    <string name="clients_doublon_message">Un client portant ce nom ou ce numéro existe déjà. Voulez-vous tout de même le créer ?</string>
+    <string name="clients_creer_malgre_doublon">Créer malgré le doublon</string>
+    <string name="clients_client_cree">Client %1$s créé.</string>
+    <string name="clients_client_modifie">Client modifié.</string>
+    <string name="clients_lecture_seule">La licence est expirée : l’application est en lecture seule.</string>
+    <string name="clients_nom_obligatoire">Saisissez le nom du client.</string>
+    <string name="clients_telephone_obligatoire">Saisissez le téléphone du client.</string>
+    <string name="clients_donnees_invalides">Vérifiez la remise et la limite de crédit.</string>
+    <string name="clients_erreur_sauvegarde">L’enregistrement a échoué. Réessayez.</string>
+    <string name="clients_categorie_utilisee">Cette catégorie est utilisée par un ou plusieurs clients.</string>
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">Particulier</string>
+    <string name="clients_type_entreprise">Entreprise</string>
+    <string name="clients_type_administration">Administration</string>
+    <string name="clients_type_ong">ONG</string>
+    <string name="clients_type_revendeur">Revendeur</string>
+    <string name="clients_type_prospect">Prospect</string>
+
+
     <!-- Phase D — Fournisseurs (9.3) -->
     <string name="fournisseurs_recherche">Rechercher un fournisseur…</string>
     <string name="fournisseurs_total">%1$d fournisseur(s)</string>
@@ -250,5 +272,6 @@
     <string name="fournisseurs_nom">Nom</string>
     <string name="fournisseurs_telephone">Téléphone</string>
     <string name="fournisseurs_desactiver">Désactiver</string>
+
 
 </resources>

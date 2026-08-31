@@ -118,4 +118,54 @@
     <string name="lock_essais_restants">رمز PIN خاطئ — بقي %1$d محاولة قبل القفل.</string>
     <string name="lock_bloque">محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.</string>
     <string name="lock_deverrouiller">فتح</string>
+
+    <!-- Clients (9.2) -->
+    <string name="clients_recherche">البحث عن عميل…</string>
+    <string name="clients_total">%1$d عميل</string>
+    <string name="clients_vide">لا يوجد عملاء بعد. اضغط + لإضافة عميل.</string>
+    <string name="clients_ajouter">إضافة عميل</string>
+    <string name="clients_modifier">تعديل العميل</string>
+    <string name="clients_nom">الاسم</string>
+    <string name="clients_telephone">الهاتف</string>
+    <string name="clients_email">البريد الإلكتروني</string>
+    <string name="clients_adresse">العنوان</string>
+    <string name="clients_type">النوع</string>
+    <string name="clients_notes">ملاحظات</string>
+    <string name="clients_remise">الخصم الافتراضي (%)</string>
+    <string name="clients_limite_credit">حد الائتمان (فارغ = غير محدود)</string>
+    <string name="clients_categories">الفئات</string>
+    <string name="clients_badges">شارات الولاء</string>
+    <string name="clients_desactiver">تعطيل</string>
+    <string name="clients_prospect">عميل محتمل — يتحول تلقائياً عند أول عملية بيع</string>
+    <string name="clients_nom_categorie">اسم الفئة</string>
+    <string name="clients_ajouter_categorie">إضافة فئة</string>
+    <string name="clients_supprimer_categorie">حذف</string>
+    <string name="clients_categories_vide">لا توجد فئات.</string>
+    <string name="clients_nom_badge">اسم الشارة</string>
+    <string name="clients_remise_badge">الخصم (%)</string>
+    <string name="clients_ajouter_badge">إضافة شارة</string>
+    <string name="clients_badges_vide">لا توجد شارات.</string>
+    <string name="clients_actif">نشط</string>
+    <string name="clients_inactif">غير نشط</string>
+    <string name="clients_categorie_optionnelle">الفئة (اختياري)</string>
+    <string name="clients_badge_optionnel">شارة الولاء (اختياري)</string>
+    <string name="clients_doublon_titre">تكرار محتمل</string>
+    <string name="clients_doublon_message">يوجد عميل يحمل الاسم أو رقم الهاتف نفسه. هل تريد إنشاءه رغم ذلك؟</string>
+    <string name="clients_creer_malgre_doublon">إنشاء رغم التكرار</string>
+    <string name="clients_client_cree">تم إنشاء العميل %1$s.</string>
+    <string name="clients_client_modifie">تم تعديل العميل.</string>
+    <string name="clients_lecture_seule">انتهت صلاحية الترخيص: التطبيق في وضع القراءة فقط.</string>
+    <string name="clients_nom_obligatoire">أدخل اسم العميل.</string>
+    <string name="clients_telephone_obligatoire">أدخل هاتف العميل.</string>
+    <string name="clients_donnees_invalides">تحقق من الخصم وحد الائتمان.</string>
+    <string name="clients_erreur_sauvegarde">تعذر الحفظ. حاول مرة أخرى.</string>
+    <string name="clients_categorie_utilisee">تُستخدم هذه الفئة من قبل عميل واحد أو أكثر.</string>
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">فرد</string>
+    <string name="clients_type_entreprise">شركة</string>
+    <string name="clients_type_administration">إدارة حكومية</string>
+    <string name="clients_type_ong">منظمة غير حكومية</string>
+    <string name="clients_type_revendeur">موزع</string>
+    <string name="clients_type_prospect">عميل محتمل</string>
+
 </resources>

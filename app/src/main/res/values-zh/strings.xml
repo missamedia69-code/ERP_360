@@ -118,4 +118,54 @@
     <string name="lock_essais_restants">PIN 码错误 — 锁定前还剩 %1$d 次尝试机会。</string>
     <string name="lock_bloque">尝试次数过多。请几分钟后再试。</string>
     <string name="lock_deverrouiller">解锁</string>
+
+    <!-- Clients (9.2) -->
+    <string name="clients_recherche">搜索客户…</string>
+    <string name="clients_total">%1$d 位客户</string>
+    <string name="clients_vide">暂无客户。点击 + 新建客户。</string>
+    <string name="clients_ajouter">添加客户</string>
+    <string name="clients_modifier">编辑客户</string>
+    <string name="clients_nom">名称</string>
+    <string name="clients_telephone">电话</string>
+    <string name="clients_email">电子邮箱</string>
+    <string name="clients_adresse">地址</string>
+    <string name="clients_type">类型</string>
+    <string name="clients_notes">备注</string>
+    <string name="clients_remise">默认折扣 (%)</string>
+    <string name="clients_limite_credit">信用额度（留空表示不限）</string>
+    <string name="clients_categories">类别</string>
+    <string name="clients_badges">忠诚度徽章</string>
+    <string name="clients_desactiver">停用</string>
+    <string name="clients_prospect">潜在客户 — 首次销售时自动转换</string>
+    <string name="clients_nom_categorie">类别名称</string>
+    <string name="clients_ajouter_categorie">添加类别</string>
+    <string name="clients_supprimer_categorie">删除</string>
+    <string name="clients_categories_vide">暂无类别。</string>
+    <string name="clients_nom_badge">徽章名称</string>
+    <string name="clients_remise_badge">折扣 (%)</string>
+    <string name="clients_ajouter_badge">添加徽章</string>
+    <string name="clients_badges_vide">暂无徽章。</string>
+    <string name="clients_actif">启用</string>
+    <string name="clients_inactif">停用</string>
+    <string name="clients_categorie_optionnelle">类别（可选）</string>
+    <string name="clients_badge_optionnel">忠诚度徽章（可选）</string>
+    <string name="clients_doublon_titre">可能重复</string>
+    <string name="clients_doublon_message">已存在同名或同一电话号码的客户。仍要创建吗？</string>
+    <string name="clients_creer_malgre_doublon">仍然创建</string>
+    <string name="clients_client_cree">客户 %1$s 已创建。</string>
+    <string name="clients_client_modifie">客户已更新。</string>
+    <string name="clients_lecture_seule">许可证已过期：应用处于只读模式。</string>
+    <string name="clients_nom_obligatoire">请输入客户名称。</string>
+    <string name="clients_telephone_obligatoire">请输入客户电话。</string>
+    <string name="clients_donnees_invalides">请检查折扣和信用额度。</string>
+    <string name="clients_erreur_sauvegarde">保存失败，请重试。</string>
+    <string name="clients_categorie_utilisee">一个或多个客户正在使用此类别。</string>
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">个人</string>
+    <string name="clients_type_entreprise">企业</string>
+    <string name="clients_type_administration">政府机构</string>
+    <string name="clients_type_ong">非政府组织</string>
+    <string name="clients_type_revendeur">经销商</string>
+    <string name="clients_type_prospect">潜在客户</string>
+
 </resources>

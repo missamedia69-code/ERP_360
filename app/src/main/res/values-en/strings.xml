@@ -235,6 +235,28 @@
     <string name="clients_categorie_optionnelle">Category (optional)</string>
     <string name="clients_badge_optionnel">Loyalty badge (optional)</string>
 
+
+    <!-- Clients (9.2) -->
+    <string name="clients_doublon_titre">Potential duplicate</string>
+    <string name="clients_doublon_message">A client with this name or phone number already exists. Do you still want to create it?</string>
+    <string name="clients_creer_malgre_doublon">Create despite duplicate</string>
+    <string name="clients_client_cree">Client %1$s created.</string>
+    <string name="clients_client_modifie">Client updated.</string>
+    <string name="clients_lecture_seule">The licence has expired: the app is read-only.</string>
+    <string name="clients_nom_obligatoire">Enter the client name.</string>
+    <string name="clients_telephone_obligatoire">Enter the client phone number.</string>
+    <string name="clients_donnees_invalides">Check the discount and credit limit.</string>
+    <string name="clients_erreur_sauvegarde">Could not save. Please try again.</string>
+    <string name="clients_categorie_utilisee">This category is used by one or more clients.</string>
+
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">Individual</string>
+    <string name="clients_type_entreprise">Company</string>
+    <string name="clients_type_administration">Government</string>
+    <string name="clients_type_ong">NGO</string>
+    <string name="clients_type_revendeur">Reseller</string>
+    <string name="clients_type_prospect">Prospect</string>
+
     <!-- Phase D — Suppliers (9.3) -->
     <string name="fournisseurs_recherche">Search suppliers…</string>
     <string name="fournisseurs_total">%1$d supplier(s)</string>

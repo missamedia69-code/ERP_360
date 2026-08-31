@@ -118,4 +118,54 @@
     <string name="lock_essais_restants">PIN incorrecto — quedan %1$d intento(s) antes del bloqueo.</string>
     <string name="lock_bloque">Demasiados intentos. Vuelva a intentarlo en unos minutos.</string>
     <string name="lock_deverrouiller">Desbloquear</string>
+
+    <!-- Clients (9.2) -->
+    <string name="clients_recherche">Buscar un cliente…</string>
+    <string name="clients_total">%1$d cliente(s)</string>
+    <string name="clients_vide">No hay clientes. Toque + para crear uno.</string>
+    <string name="clients_ajouter">Añadir un cliente</string>
+    <string name="clients_modifier">Modificar el cliente</string>
+    <string name="clients_nom">Nombre</string>
+    <string name="clients_telephone">Teléfono</string>
+    <string name="clients_email">Correo electrónico</string>
+    <string name="clients_adresse">Dirección</string>
+    <string name="clients_type">Tipo</string>
+    <string name="clients_notes">Notas</string>
+    <string name="clients_remise">Descuento predeterminado (%)</string>
+    <string name="clients_limite_credit">Límite de crédito (vacío = ilimitado)</string>
+    <string name="clients_categories">Categorías</string>
+    <string name="clients_badges">Insignias de fidelidad</string>
+    <string name="clients_desactiver">Desactivar</string>
+    <string name="clients_prospect">Prospecto — convertido automáticamente en la primera venta</string>
+    <string name="clients_nom_categorie">Nombre de la categoría</string>
+    <string name="clients_ajouter_categorie">Añadir categoría</string>
+    <string name="clients_supprimer_categorie">Eliminar</string>
+    <string name="clients_categories_vide">No hay categorías.</string>
+    <string name="clients_nom_badge">Nombre de la insignia</string>
+    <string name="clients_remise_badge">Descuento (%)</string>
+    <string name="clients_ajouter_badge">Añadir insignia</string>
+    <string name="clients_badges_vide">No hay insignias.</string>
+    <string name="clients_actif">Activo</string>
+    <string name="clients_inactif">Inactivo</string>
+    <string name="clients_categorie_optionnelle">Categoría (opcional)</string>
+    <string name="clients_badge_optionnel">Insignia de fidelidad (opcional)</string>
+    <string name="clients_doublon_titre">Posible duplicado</string>
+    <string name="clients_doublon_message">Ya existe un cliente con este nombre o teléfono. ¿Desea crearlo de todos modos?</string>
+    <string name="clients_creer_malgre_doublon">Crear pese al duplicado</string>
+    <string name="clients_client_cree">Cliente %1$s creado.</string>
+    <string name="clients_client_modifie">Cliente modificado.</string>
+    <string name="clients_lecture_seule">La licencia ha expirado: la aplicación está en modo de solo lectura.</string>
+    <string name="clients_nom_obligatoire">Introduzca el nombre del cliente.</string>
+    <string name="clients_telephone_obligatoire">Introduzca el teléfono del cliente.</string>
+    <string name="clients_donnees_invalides">Compruebe el descuento y el límite de crédito.</string>
+    <string name="clients_erreur_sauvegarde">No se pudo guardar. Inténtelo de nuevo.</string>
+    <string name="clients_categorie_utilisee">Esta categoría la utiliza uno o más clientes.</string>
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">Particular</string>
+    <string name="clients_type_entreprise">Empresa</string>
+    <string name="clients_type_administration">Administración</string>
+    <string name="clients_type_ong">ONG</string>
+    <string name="clients_type_revendeur">Revendedor</string>
+    <string name="clients_type_prospect">Prospecto</string>
+
 </resources>

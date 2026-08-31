@@ -13,9 +13,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.annotation.StringRes
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientType
+
+@StringRes
+fun ClientType.labelRes(): Int = when (this) {
+    ClientType.PARTICULIER -> R.string.clients_type_particulier
+    ClientType.ENTREPRISE -> R.string.clients_type_entreprise
+    ClientType.ADMINISTRATION -> R.string.clients_type_administration
+    ClientType.ONG -> R.string.clients_type_ong
+    ClientType.REVENDEUR -> R.string.clients_type_revendeur
+    ClientType.PROSPECT -> R.string.clients_type_prospect
+}
 
 /** Menu déroulant catégorie client (RC). */
 @OptIn(ExperimentalMaterial3Api::class)

@@ -49,6 +49,11 @@ fun ClientFormDialog(
     var badgeId by remember { mutableStateOf(client?.badgeId) }
     var notes by remember { mutableStateOf(client?.notes ?: "") }
 
+    val remiseValeur = remise.replace(',', '.').toDoubleOrNull()
+    val limiteValeur = limite.replace(',', '.').toDoubleOrNull()
+    val remiseValide = remiseValeur != null && remiseValeur in 0.0..100.0
+    val limiteValide = limite.isBlank() || limiteValeur != null && limiteValeur >= 0.0
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -100,7 +105,7 @@ fun ClientFormDialog(
                         rangees.forEach { t ->
                             Row(Modifier.weight(1f)) {
                                 RadioButton(selected = type == t, onClick = { type = t })
-                                Text(t.name, style = MaterialTheme.typography.labelSmall)
+                                Text(stringResource(t.labelRes()), style = MaterialTheme.typography.labelSmall)
                             }
                         }
                     }
@@ -132,15 +137,17 @@ fun ClientFormDialog(
 
                 OutlinedTextField(
                     value = remise,
-                    onValueChange = { remise = it.filter { c -> (c.isDigit() || c == '.') } },
+                    onValueChange = { remise = it.filter { c -> (c.isDigit() || c == '.' || c == ',') } },
                     label = { Text(stringResource(R.string.clients_remise)) },
+                    isError = !remiseValide,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 OutlinedTextField(
                     value = limite,
-                    onValueChange = { limite = it.filter { c -> (c.isDigit() || c == '.') } },
+                    onValueChange = { limite = it.filter { c -> (c.isDigit() || c == '.' || c == ',') } },
                     label = { Text(stringResource(R.string.clients_limite_credit)) },
+                    isError = !limiteValide,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
@@ -170,13 +177,13 @@ fun ClientFormDialog(
                         email.ifBlank { null },
                         adresse.ifBlank { null },
                         catId,
-                        remise.toDoubleOrNull() ?: 0.0,
-                        limite.toDoubleOrNull(),
+                        remiseValeur ?: 0.0,
+                        limiteValeur,
                         badgeId,
                         notes.ifBlank { null },
                     )
                 },
-                enabled = nom.isNotBlank() && tel.isNotBlank(),
+                enabled = nom.isNotBlank() && tel.isNotBlank() && remiseValide && limiteValide,
             ) {
                 Text(
                     stringResource(
