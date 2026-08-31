@@ -105,6 +105,9 @@ class SocleUseCasesTest {
         assertTrue(pays.size >= 200)
         val cameroun = pays.firstOrNull { it.code == "CM" }
         assertEquals(19.25, cameroun?.tauxTaxeSuggere ?: -1.0, 0.0)
+        assertEquals(25.5, Iso4217.TAXES_SUGGEREES.getValue("FI").tauxParDefaut, 0.0)
+        assertEquals("5 % (GST) + HST 13–15 %", Iso4217.TAXES_SUGGEREES.getValue("CA").libelle)
+        assertEquals("Aucune (Sales Tax par État)", Iso4217.TAXES_SUGGEREES.getValue("US").libelle)
         assertTrue(pays.all { it.tauxTaxeSuggere >= 0.0 })
     }
 }

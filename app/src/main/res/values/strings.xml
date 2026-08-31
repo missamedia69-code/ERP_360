@@ -70,6 +70,10 @@
     <string name="ob_pays">Pays</string>
     <string name="ob_pays_recherche">Rechercher un pays</string>
     <string name="ob_pays_aucun_resultat">Aucun pays trouvé</string>
+    <string name="ob_pays_saisie_manuelle">Saisir un pays et son taux manuellement</string>
+    <string name="ob_pays_personnalise">Pays personnalisé</string>
+    <string name="ob_pays_saisie_manuelle_note">Saisissez un pays absent de la liste, puis ajustez le taux de TVA/GST ci-dessous.</string>
+    <string name="ob_tva_gst">TVA / GST</string>
     <string name="ob_taux_taxe">Taux de taxe (%)</string>
     <string name="ob_site_principal">Nom du site principal</string>
     <string name="ob_verrous_note">⚠ Devise, taxes, numérotation et paiements seront verrouillés au premier usage (non modifiables ensuite).</string>

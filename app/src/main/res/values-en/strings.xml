@@ -66,6 +66,10 @@
     <string name="ob_pays">Country</string>
     <string name="ob_pays_recherche">Search for a country</string>
     <string name="ob_pays_aucun_resultat">No country found</string>
+    <string name="ob_pays_saisie_manuelle">Enter a country and its rate manually</string>
+    <string name="ob_pays_personnalise">Custom country</string>
+    <string name="ob_pays_saisie_manuelle_note">Enter a country that is not listed, then adjust the VAT/GST rate below.</string>
+    <string name="ob_tva_gst">VAT / GST</string>
     <string name="ob_taux_taxe">Tax rate (%)</string>
     <string name="ob_site_principal">Main site name</string>
     <string name="ob_verrous_note">⚠ Currency, taxes, numbering and payments will be locked at first use (cannot be changed later).</string>

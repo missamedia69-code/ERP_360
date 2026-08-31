@@ -66,6 +66,10 @@
     <string name="ob_pays">国家/地区</string>
     <string name="ob_pays_recherche">搜索国家或地区</string>
     <string name="ob_pays_aucun_resultat">未找到国家或地区</string>
+    <string name="ob_pays_saisie_manuelle">手动输入国家或地区及其税率</string>
+    <string name="ob_pays_personnalise">自定义国家或地区</string>
+    <string name="ob_pays_saisie_manuelle_note">输入列表中没有的国家或地区，然后在下方调整增值税或 GST 税率。</string>
+    <string name="ob_tva_gst">增值税 / GST</string>
     <string name="ob_taux_taxe">税率 (%)</string>
     <string name="ob_site_principal">主站点名称</string>
     <string name="ob_verrous_note">⚠ 货币、税率、编号和支付方式将在首次使用时锁定（之后无法更改）。</string>

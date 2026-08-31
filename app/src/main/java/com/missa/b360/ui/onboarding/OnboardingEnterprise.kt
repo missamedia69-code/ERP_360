@@ -9,6 +9,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -88,6 +89,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
         val locale = LocalConfiguration.current.locales[0]
         val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
         var paysOuvert by remember { mutableStateOf(false) }
+        var saisiePaysManuelle by remember { mutableStateOf(false) }
         // La requête reste distincte du pays choisi : rouvrir la liste montre tous les pays.
         var recherchePays by remember { mutableStateOf("") }
         val paysFiltres = remember(paysListe, recherchePays) {
@@ -145,7 +147,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                             text = {
                                 Text(
                                     "${pays.nom} (${pays.code}) — " +
-                                        "${stringResource(R.string.ob_taux_taxe)} ${pays.tauxTaxeSuggere} %",
+                                        "${stringResource(R.string.ob_tva_gst)} ${pays.libelleTaxe}",
                                 )
                             },
                             onClick = {
@@ -158,6 +160,30 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                     }
                 }
             }
+        }
+
+        TextButton(
+            onClick = { saisiePaysManuelle = !saisiePaysManuelle },
+            modifier = Modifier.padding(top = 4.dp),
+        ) {
+            Text(stringResource(R.string.ob_pays_saisie_manuelle))
+        }
+        if (saisiePaysManuelle) {
+            OutlinedTextField(
+                value = viewModel.pays,
+                onValueChange = { viewModel.pays = it },
+                label = { Text(stringResource(R.string.ob_pays_personnalise)) },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+            )
+            Text(
+                stringResource(R.string.ob_pays_saisie_manuelle_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.padding(top = 4.dp),
+            )
         }
 
         OutlinedTextField(
