@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -85,6 +86,10 @@ internal fun StepScaffold(
             .padding(24.dp),
     ) {
         Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        if (viewModel.enregistrementEnCours) {
+            Spacer(Modifier.height(12.dp))
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
         viewModel.erreurRes?.let { erreur ->
             Spacer(Modifier.height(8.dp))
             Text(

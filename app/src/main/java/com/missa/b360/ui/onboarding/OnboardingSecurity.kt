@@ -35,6 +35,7 @@ internal fun PinSetupStep(viewModel: OnboardingViewModel) {
             onValueChange = { viewModel.pin = it.filter(Char::isDigit).take(6) },
             label = { Text(stringResource(R.string.ob_pin_title)) },
             singleLine = true,
+            enabled = !viewModel.enregistrementEnCours,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             modifier = Modifier
@@ -46,6 +47,7 @@ internal fun PinSetupStep(viewModel: OnboardingViewModel) {
             onValueChange = { viewModel.pinConfirmation = it.filter(Char::isDigit).take(6) },
             label = { Text(stringResource(R.string.ob_pin_confirmer)) },
             singleLine = true,
+            enabled = !viewModel.enregistrementEnCours,
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             modifier = Modifier
@@ -61,9 +63,10 @@ internal fun EmailStep(viewModel: OnboardingViewModel) {
     StepScaffold(
         title = stringResource(R.string.ob_email_title),
         viewModel = viewModel,
-        suivantActive = viewModel.emailSecours.isNotBlank(),
+        suivantActive = viewModel.emailEstValide(),
         navigationActive = !viewModel.enregistrementEnCours,
     ) {
+        val emailInvalide = viewModel.emailSecours.isNotBlank() && !viewModel.emailEstValide()
         Text(
             stringResource(R.string.ob_email_subtitle),
             style = MaterialTheme.typography.bodyMedium,
@@ -74,6 +77,7 @@ internal fun EmailStep(viewModel: OnboardingViewModel) {
             onValueChange = { viewModel.votreNom = it },
             label = { Text(stringResource(R.string.ob_votre_nom)) },
             singleLine = true,
+            enabled = !viewModel.enregistrementEnCours,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
@@ -83,7 +87,14 @@ internal fun EmailStep(viewModel: OnboardingViewModel) {
             onValueChange = { viewModel.emailSecours = it },
             label = { Text(stringResource(R.string.ob_email)) },
             singleLine = true,
+            enabled = !viewModel.enregistrementEnCours,
+            isError = emailInvalide,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            supportingText = if (emailInvalide) {
+                { Text(stringResource(R.string.ob_email_invalide)) }
+            } else {
+                null
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
@@ -111,6 +122,7 @@ internal fun LicenceStep(viewModel: OnboardingViewModel) {
             onValueChange = { viewModel.codeLicence = it.uppercase() },
             label = { Text(stringResource(R.string.ob_code_licence)) },
             singleLine = true,
+            enabled = !viewModel.enregistrementEnCours,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),

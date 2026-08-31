@@ -202,7 +202,10 @@ class OnboardingViewModel @Inject constructor(
     private fun enregistrerEntreprise() {
         val nomEntrepriseValide = nomEntreprise.trim()
         val nomSiteValide = nomSitePrincipal.trim()
-        val tauxTaxeValide = tauxTaxeValide()
+        val tauxTaxeValide = tauxTaxeValide() ?: run {
+            erreurRes = R.string.ob_erreur_taux_taxe
+            return
+        }
         when {
             nomEntrepriseValide.isEmpty() -> {
                 erreurRes = R.string.ob_erreur_nom_entreprise
@@ -212,12 +215,10 @@ class OnboardingViewModel @Inject constructor(
                 erreurRes = R.string.ob_erreur_site_principal
                 return
             }
-            tauxTaxeValide == null -> {
-                erreurRes = R.string.ob_erreur_taux_taxe
-                return
-            }
             enregistrementEnCours -> return
         }
+        val deviseSelectionnee = devise
+        val paysSelectionne = pays.trim().ifEmpty { null }
 
         enregistrementEnCours = true
         viewModelScope.launch {
@@ -225,9 +226,9 @@ class OnboardingViewModel @Inject constructor(
                 setupEnterprise(
                     SetupEnterpriseUseCase.Params(
                         nomEntreprise = nomEntrepriseValide,
-                        devise = devise,
-                        pays = pays.trim().ifEmpty { null },
-                        tauxTaxe = tauxTaxe,
+                        devise = deviseSelectionnee,
+                        pays = paysSelectionne,
+                        tauxTaxe = tauxTaxeValide,
                         nomSitePrincipal = nomSiteValide,
                     ),
                 )
@@ -241,6 +242,9 @@ class OnboardingViewModel @Inject constructor(
     /** Utilisé par l'UI pour ne rendre « Suivant » disponible qu'avec un PIN complet. */
     fun pinEstValide(): Boolean = PinHasher.isValidFormat(pin)
 
+    /** Règle partagée avec l'écriture du propriétaire. */
+    fun emailEstValide(): Boolean = CreateOwnerUserUseCase.emailEstValide(emailSecours)
+
     /** RA-01 — PIN 4–6 chiffres, saisi deux fois. */
     private fun validerPin() {
         if (!pinEstValide()) {
@@ -252,9 +256,10 @@ class OnboardingViewModel @Inject constructor(
             return
         }
         if (enregistrementEnCours) return
+        val pinValide = pin
         enregistrementEnCours = true
         viewModelScope.launch {
-            val ok = runCatching { validatePin.definirPin(pin) }.getOrDefault(false)
+            val ok = runCatching { validatePin.definirPin(pinValide) }.getOrDefault(false)
             enregistrementEnCours = false
             if (ok) step = OnboardingStep.EMAIL
             else erreurRes = R.string.ob_pin_invalide
@@ -263,14 +268,16 @@ class OnboardingViewModel @Inject constructor(
 
     /** RA-03 — email de secours obligatoire, création du Propriétaire (D1). */
     private fun enregistrerUtilisateur() {
-        if (emailSecours.isBlank()) {
+        if (!emailEstValide()) {
             erreurRes = R.string.ob_email_invalide
             return
         }
         if (enregistrementEnCours) return
+        val nomProprietaire = votreNom
+        val emailProprietaire = emailSecours.trim()
         enregistrementEnCours = true
         viewModelScope.launch {
-            val resultat = runCatching { createOwner(votreNom, emailSecours) }
+            val resultat = runCatching { createOwner(nomProprietaire, emailProprietaire) }
                 .getOrElse { CreateOwnerUserUseCase.Result.EmailInvalide }
             enregistrementEnCours = false
             when (resultat) {
@@ -283,10 +290,11 @@ class OnboardingViewModel @Inject constructor(
     /** RA-05 — activation d'un code licence (optionnel pendant l'onboarding). */
     fun activerCode() {
         if (codeLicence.isBlank() || enregistrementEnCours) return
+        val codeAActiver = codeLicence.trim()
         erreurRes = null
         enregistrementEnCours = true
         viewModelScope.launch {
-            val activee = runCatching { licenceManager.activer(codeLicence) }.getOrDefault(false)
+            val activee = runCatching { licenceManager.activer(codeAActiver) }.getOrDefault(false)
             enregistrementEnCours = false
             if (activee) licenceActive = true
             else erreurRes = R.string.ob_code_invalide

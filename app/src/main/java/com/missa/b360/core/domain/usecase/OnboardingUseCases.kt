@@ -189,9 +189,15 @@ class CreateOwnerUserUseCase @Inject constructor(
         data object EmailDejaUtilise : Result()
     }
 
+    companion object {
+        /** Même règle à l'écran et lors de l'écriture afin d'éviter une validation divergente. */
+        fun emailEstValide(email: String): Boolean =
+            android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+    }
+
     suspend operator fun invoke(nom: String, email: String): Result {
         val emailNormalise = email.trim().lowercase()
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailNormalise).matches()) {
+        if (!emailEstValide(emailNormalise)) {
             return Result.EmailInvalide
         }
         if (userDao.findByEmail(emailNormalise) != null) return Result.EmailDejaUtilise
