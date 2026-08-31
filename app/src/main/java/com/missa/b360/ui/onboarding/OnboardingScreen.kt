@@ -1,6 +1,7 @@
 package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
@@ -49,14 +51,20 @@ fun OnboardingScreen(
     }
 
     Surface(Modifier.fillMaxSize()) {
-        when (viewModel.step) {
-            OnboardingStep.LANGUE -> LanguageStep(viewModel)
-            OnboardingStep.PROFIL -> ProfileStep(viewModel)
-            OnboardingStep.ENTREPRISE -> EnterpriseStep(viewModel)
-            OnboardingStep.PIN -> PinSetupStep(viewModel)
-            OnboardingStep.EMAIL -> EmailStep(viewModel)
-            OnboardingStep.LICENCE -> LicenceStep(viewModel)
-            OnboardingStep.CHECKLIST -> ChecklistStep(viewModel)
+        if (!viewModel.initialisationTerminee) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            when (viewModel.step) {
+                OnboardingStep.LANGUE -> LanguageStep(viewModel)
+                OnboardingStep.PROFIL -> ProfileStep(viewModel)
+                OnboardingStep.ENTREPRISE -> EnterpriseStep(viewModel)
+                OnboardingStep.PIN -> PinSetupStep(viewModel)
+                OnboardingStep.EMAIL -> EmailStep(viewModel)
+                OnboardingStep.LICENCE -> LicenceStep(viewModel)
+                OnboardingStep.CHECKLIST -> ChecklistStep(viewModel)
+            }
         }
     }
 }

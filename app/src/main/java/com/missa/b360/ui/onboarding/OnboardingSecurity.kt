@@ -66,6 +66,15 @@ internal fun EmailStep(viewModel: OnboardingViewModel) {
             color = MaterialTheme.colorScheme.outline,
         )
         OutlinedTextField(
+            value = viewModel.votreNom,
+            onValueChange = { viewModel.votreNom = it },
+            label = { Text(stringResource(R.string.ob_votre_nom)) },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+        )
+        OutlinedTextField(
             value = viewModel.emailSecours,
             onValueChange = { viewModel.emailSecours = it },
             label = { Text(stringResource(R.string.ob_email)) },

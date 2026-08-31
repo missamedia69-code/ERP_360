@@ -13,6 +13,7 @@ import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
+import com.missa.b360.core.domain.usecase.GetOnboardingProgressUseCase
 import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
 import com.missa.b360.core.licensing.LicenceManager
@@ -29,6 +30,7 @@ enum class OnboardingStep { LANGUE, PROFIL, ENTREPRISE, PIN, EMAIL, LICENCE, CHE
 class OnboardingViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val setupEnterprise: SetupEnterpriseUseCase,
+    private val getOnboardingProgress: GetOnboardingProgressUseCase,
     private val createOwner: CreateOwnerUserUseCase,
     private val completeOnboarding: CompleteOnboardingUseCase,
     private val licenceManager: LicenceManager,
@@ -71,6 +73,46 @@ class OnboardingViewModel @Inject constructor(
         private set
     var onboardingTermine by mutableStateOf(false)
         private set
+    var initialisationTerminee by mutableStateOf(false)
+        private set
+
+    init {
+        restaurerProgression()
+    }
+
+    /**
+     * Reprend à l'étape réellement atteinte lorsque l'application a été fermée ou mise
+     * à jour au milieu de l'onboarding. Les champs enregistrés restent disponibles.
+     */
+    private fun restaurerProgression() {
+        viewModelScope.launch {
+            runCatching { getOnboardingProgress() }
+                .getOrNull()
+                ?.let { progression ->
+                    langue = progression.langue
+                    profil = progression.profil?.let {
+                        runCatching { ProfilActivite.valueOf(it) }.getOrNull()
+                    }
+                    palier = progression.palier?.let {
+                        runCatching { PalierTaille.valueOf(it) }.getOrNull()
+                    }
+                    progression.entreprise?.let { entreprise ->
+                        nomEntreprise = entreprise.nom
+                        devise = entreprise.devise
+                        pays = entreprise.pays.orEmpty()
+                    }
+                    step = when {
+                        progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
+                        progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.EMAIL
+                        progression.entreprise != null -> OnboardingStep.LICENCE
+                        profil != null && palier != null -> OnboardingStep.ENTREPRISE
+                        profil != null || palier != null -> OnboardingStep.PROFIL
+                        else -> OnboardingStep.LANGUE
+                    }
+                }
+            initialisationTerminee = true
+        }
+    }
 
     /**
      * Enregistre d'abord le choix, puis applique la locale.
@@ -101,6 +143,7 @@ class OnboardingViewModel @Inject constructor(
 
     /** Tente de passer à l'étape suivante avec les validations de chaque étape. */
     fun suivant() {
+        if (!initialisationTerminee) return
         erreurRes = null
         when (step) {
             OnboardingStep.LANGUE -> step = OnboardingStep.PROFIL

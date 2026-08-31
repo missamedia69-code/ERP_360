@@ -6,6 +6,7 @@ import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.TaxDao
+import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.EnterpriseEntity
@@ -16,6 +17,7 @@ import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.journal.JournalManager
+import com.missa.b360.core.security.PinManager
 import com.missa.b360.ui.navigation.AppModule
 import javax.inject.Inject
 
@@ -113,6 +115,35 @@ class SetupEnterpriseUseCase @Inject constructor(
         }
         roleDao.insertPermissions(permissions)
     }
+}
+
+/**
+ * Reconstitue l'étape atteinte après une fermeture ou une mise à jour de l'application.
+ * Les données réellement déjà créées priment toujours sur un simple état en mémoire.
+ */
+class GetOnboardingProgressUseCase @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val enterpriseDao: EnterpriseDao,
+    private val userDao: UserDao,
+    private val pinManager: PinManager,
+) {
+    data class Progress(
+        val langue: String,
+        val profil: String?,
+        val palier: String?,
+        val entreprise: EnterpriseEntity?,
+        val pinConfigure: Boolean,
+        val proprietaireCree: Boolean,
+    )
+
+    suspend operator fun invoke(): Progress = Progress(
+        langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
+        profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
+        palier = settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
+        entreprise = enterpriseDao.get(),
+        pinConfigure = pinManager.isConfigured(),
+        proprietaireCree = userDao.count() > 0,
+    )
 }
 
 /**

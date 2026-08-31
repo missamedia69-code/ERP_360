@@ -52,16 +52,6 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
         )
-        OutlinedTextField(
-            value = viewModel.votreNom,
-            onValueChange = { viewModel.votreNom = it },
-            label = { Text(stringResource(R.string.ob_votre_nom)) },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-        )
-
         // Devise ISO 4217 (verrou d'amont — D4)
         var deviseOuvert by remember { mutableStateOf(false) }
         val deviseChoisie = Iso4217.COMMUNES.firstOrNull { it.code == viewModel.devise }
