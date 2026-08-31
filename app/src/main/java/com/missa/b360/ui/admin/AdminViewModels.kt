@@ -50,6 +50,12 @@ class ReglagesViewModel @Inject constructor(
         viewModelScope.launch {
             val e = getEnterprise()
             val langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr"
+            // Les versions déjà installées ont pu enregistrer profil/palier uniquement
+            // dans DataStore pendant l'onboarding : ce repli conserve leur affichage.
+            val profilEnregistre = e?.profilActivite
+                ?: settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE)
+            val palierEnregistre = e?.palierTaille
+                ?: settingsStore.get(SettingsStore.Keys.PALIER_TAILLE)
             _state.value = UiState(
                 charge = true,
                 nomEntreprise = e?.nom ?: "",
@@ -59,8 +65,8 @@ class ReglagesViewModel @Inject constructor(
                 adresse = e?.adresse ?: "",
                 telephone = e?.telephone ?: "",
                 email = e?.email ?: "",
-                profil = e?.profilActivite?.let { runCatching { ProfilActivite.valueOf(it) }.getOrNull() },
-                palier = e?.palierTaille?.let { runCatching { PalierTaille.valueOf(it) }.getOrNull() },
+                profil = profilEnregistre?.let { runCatching { ProfilActivite.valueOf(it) }.getOrNull() },
+                palier = palierEnregistre?.let { runCatching { PalierTaille.valueOf(it) }.getOrNull() },
                 langue = langue,
             )
         }
@@ -79,12 +85,18 @@ class ReglagesViewModel @Inject constructor(
 
     fun changerProfil(p: ProfilActivite) {
         _state.value = _state.value.copy(profil = p)
-        viewModelScope.launch { updateEnterprise(profilActivite = p.name) }
+        viewModelScope.launch {
+            updateEnterprise(profilActivite = p.name)
+            settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name)
+        }
     }
 
     fun changerPalier(p: PalierTaille) {
         _state.value = _state.value.copy(palier = p)
-        viewModelScope.launch { updateEnterprise(palierTaille = p.name) }
+        viewModelScope.launch {
+            updateEnterprise(palierTaille = p.name)
+            settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, p.name)
+        }
     }
 
     fun changerSecteur(v: String) { _state.value = _state.value.copy(secteur = v) }

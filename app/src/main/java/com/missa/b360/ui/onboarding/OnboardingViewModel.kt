@@ -230,6 +230,8 @@ class OnboardingViewModel @Inject constructor(
                         pays = paysSelectionne,
                         tauxTaxe = tauxTaxeValide,
                         nomSitePrincipal = nomSiteValide,
+                        profilActivite = profil?.name,
+                        palierTaille = palier?.name,
                     ),
                 )
             }.getOrDefault(false)

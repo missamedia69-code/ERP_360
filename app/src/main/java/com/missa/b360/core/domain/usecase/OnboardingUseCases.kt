@@ -66,6 +66,8 @@ class SetupEnterpriseUseCase @Inject constructor(
         val pays: String?,
         val tauxTaxe: Double,
         val nomSitePrincipal: String,
+        val profilActivite: String? = null,
+        val palierTaille: String? = null,
     )
 
     suspend operator fun invoke(params: Params): Boolean {
@@ -84,6 +86,10 @@ class SetupEnterpriseUseCase @Inject constructor(
                     devise = params.devise,
                     langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
                     pays = params.pays,
+                    profilActivite = params.profilActivite
+                        ?: settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
+                    palierTaille = params.palierTaille
+                        ?: settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
                 ),
             )
             siteDao.insert(
