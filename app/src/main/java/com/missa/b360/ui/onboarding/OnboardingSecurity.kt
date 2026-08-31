@@ -22,6 +22,8 @@ internal fun PinSetupStep(viewModel: OnboardingViewModel) {
     StepScaffold(
         title = stringResource(R.string.ob_pin_title),
         viewModel = viewModel,
+        suivantActive = viewModel.pinEstValide() && viewModel.pin == viewModel.pinConfirmation,
+        navigationActive = !viewModel.enregistrementEnCours,
     ) {
         Text(
             stringResource(R.string.ob_pin_subtitle),
@@ -59,6 +61,8 @@ internal fun EmailStep(viewModel: OnboardingViewModel) {
     StepScaffold(
         title = stringResource(R.string.ob_email_title),
         viewModel = viewModel,
+        suivantActive = viewModel.emailSecours.isNotBlank(),
+        navigationActive = !viewModel.enregistrementEnCours,
     ) {
         Text(
             stringResource(R.string.ob_email_subtitle),
@@ -93,6 +97,7 @@ internal fun LicenceStep(viewModel: OnboardingViewModel) {
     StepScaffold(
         title = stringResource(R.string.ob_licence_title),
         viewModel = viewModel,
+        navigationActive = !viewModel.enregistrementEnCours,
     ) {
         Text(
             stringResource(
@@ -112,7 +117,7 @@ internal fun LicenceStep(viewModel: OnboardingViewModel) {
         )
         OutlinedButton(
             onClick = viewModel::activerCode,
-            enabled = viewModel.codeLicence.isNotBlank(),
+            enabled = viewModel.codeLicence.isNotBlank() && !viewModel.enregistrementEnCours,
             modifier = Modifier.padding(top = 8.dp),
         ) {
             Text(stringResource(R.string.ob_activer))

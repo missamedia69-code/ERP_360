@@ -76,6 +76,7 @@ internal fun StepScaffold(
     viewModel: OnboardingViewModel,
     boutonSuivantRes: Int = R.string.ob_suivant,
     suivantActive: Boolean = true,
+    navigationActive: Boolean = true,
     content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
 ) {
     Column(
@@ -105,12 +106,15 @@ internal fun StepScaffold(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (viewModel.step != OnboardingStep.LANGUE) {
-                OutlinedButton(onClick = viewModel::precedent) {
+                OutlinedButton(onClick = viewModel::precedent, enabled = navigationActive) {
                     Text(stringResource(R.string.ob_retour))
                 }
             }
             Spacer(Modifier.weight(1f))
-            Button(onClick = viewModel::suivant, enabled = suivantActive) {
+            Button(
+                onClick = viewModel::suivant,
+                enabled = suivantActive && navigationActive,
+            ) {
                 Text(stringResource(boutonSuivantRes))
             }
         }
@@ -149,7 +153,11 @@ private fun LanguageStep(viewModel: OnboardingViewModel) {
 @Composable
 private fun ProfileStep(viewModel: OnboardingViewModel) {
     Column(Modifier.fillMaxSize()) {
-        StepScaffold(title = stringResource(R.string.ob_profil_title), viewModel = viewModel) {
+        StepScaffold(
+            title = stringResource(R.string.ob_profil_title),
+            viewModel = viewModel,
+            suivantActive = viewModel.profil != null && viewModel.palier != null,
+        ) {
             LazyVerticalGrid(columns = GridCells.Fixed(2), modifier = Modifier.height(280.dp)) {
                 items(ProfilActivite.entries) { profil ->
                     Card(

@@ -202,9 +202,12 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    /** Utilisé par l'UI pour ne rendre « Suivant » disponible qu'avec un PIN complet. */
+    fun pinEstValide(): Boolean = PinHasher.isValidFormat(pin)
+
     /** RA-01 — PIN 4–6 chiffres, saisi deux fois. */
     private fun validerPin() {
-        if (!PinHasher.isValidFormat(pin)) {
+        if (!pinEstValide()) {
             erreurRes = R.string.ob_pin_invalide
             return
         }
@@ -212,16 +215,29 @@ class OnboardingViewModel @Inject constructor(
             erreurRes = R.string.ob_pin_differents
             return
         }
+        if (enregistrementEnCours) return
+        enregistrementEnCours = true
         viewModelScope.launch {
-            if (validatePin.definirPin(pin)) step = OnboardingStep.EMAIL
+            val ok = runCatching { validatePin.definirPin(pin) }.getOrDefault(false)
+            enregistrementEnCours = false
+            if (ok) step = OnboardingStep.EMAIL
             else erreurRes = R.string.ob_pin_invalide
         }
     }
 
     /** RA-03 — email de secours obligatoire, création du Propriétaire (D1). */
     private fun enregistrerUtilisateur() {
+        if (emailSecours.isBlank()) {
+            erreurRes = R.string.ob_email_invalide
+            return
+        }
+        if (enregistrementEnCours) return
+        enregistrementEnCours = true
         viewModelScope.launch {
-            when (createOwner(votreNom, emailSecours)) {
+            val resultat = runCatching { createOwner(votreNom, emailSecours) }
+                .getOrElse { CreateOwnerUserUseCase.Result.EmailInvalide }
+            enregistrementEnCours = false
+            when (resultat) {
                 is CreateOwnerUserUseCase.Result.Succes -> step = OnboardingStep.LICENCE
                 else -> erreurRes = R.string.ob_email_invalide
             }
@@ -230,16 +246,26 @@ class OnboardingViewModel @Inject constructor(
 
     /** RA-05 — activation d'un code licence (optionnel pendant l'onboarding). */
     fun activerCode() {
+        if (codeLicence.isBlank() || enregistrementEnCours) return
+        erreurRes = null
+        enregistrementEnCours = true
         viewModelScope.launch {
-            licenceActive = licenceManager.activer(codeLicence)
-            if (!licenceActive) erreurRes = R.string.ob_code_invalide
+            val activee = runCatching { licenceManager.activer(codeLicence) }.getOrDefault(false)
+            enregistrementEnCours = false
+            if (activee) licenceActive = true
+            else erreurRes = R.string.ob_code_invalide
         }
     }
 
     /** RA-11 — clôture de l'onboarding ; l'app démarrera sur le verrou PIN. */
     fun terminer() {
+        if (enregistrementEnCours) return
+        enregistrementEnCours = true
         viewModelScope.launch {
-            if (completeOnboarding()) onboardingTermine = true
+            val termine = runCatching { completeOnboarding() }.getOrDefault(false)
+            enregistrementEnCours = false
+            if (termine) onboardingTermine = true
+            else erreurRes = R.string.ob_erreur_finalisation
         }
     }
 }

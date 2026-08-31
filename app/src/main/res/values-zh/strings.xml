@@ -77,6 +77,7 @@
     <string name="ob_erreur_nom_entreprise">请填写公司名称。</string>
     <string name="ob_erreur_site_principal">请填写主站点名称。</string>
     <string name="ob_erreur_configuration_entreprise">无法保存公司配置，请重试。</string>
+    <string name="ob_erreur_finalisation">无法完成配置，请重试。</string>
 
     <string name="ob_pin_title">创建您的 PIN 码</string>
     <string name="ob_pin_subtitle">4 到 6 位数字 — 每次打开应用时都会要求输入。</string>

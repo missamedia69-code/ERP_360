@@ -37,6 +37,7 @@ internal fun ChecklistStep(viewModel: OnboardingViewModel) {
         title = stringResource(R.string.ob_checklist_title),
         viewModel = viewModel,
         boutonSuivantRes = R.string.ob_terminer,
+        navigationActive = !viewModel.enregistrementEnCours,
     ) {
         autres.forEach { item ->
             ListItem(

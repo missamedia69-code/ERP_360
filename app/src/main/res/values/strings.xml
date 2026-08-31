@@ -81,6 +81,7 @@
     <string name="ob_erreur_nom_entreprise">Veuillez renseigner le nom de l\'entreprise.</string>
     <string name="ob_erreur_site_principal">Veuillez renseigner le nom du site principal.</string>
     <string name="ob_erreur_configuration_entreprise">La configuration de l\'entreprise n\'a pas pu être enregistrée. Réessayez.</string>
+    <string name="ob_erreur_finalisation">La finalisation de la configuration a échoué. Réessayez.</string>
 
     <string name="ob_pin_title">Créez votre code PIN</string>
     <string name="ob_pin_subtitle">4 à 6 chiffres — il sera demandé à chaque ouverture de l\'application.</string>

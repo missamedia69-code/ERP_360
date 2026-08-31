@@ -34,6 +34,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
         title = stringResource(R.string.ob_entreprise_title),
         viewModel = viewModel,
         suivantActive = !viewModel.enregistrementEnCours,
+        navigationActive = !viewModel.enregistrementEnCours,
     ) {
         // Le site principal reprend le nom de l'entreprise tant que l'utilisateur ne l'a
         // pas personnalisé. Un premier démarrage ne peut donc plus rester bloqué parce
