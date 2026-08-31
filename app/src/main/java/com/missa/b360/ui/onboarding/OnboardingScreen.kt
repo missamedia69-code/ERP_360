@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -83,7 +84,9 @@ internal fun StepScaffold(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            // Le contenu ne passe jamais sous l'encoche ou la barre de navigation.
+            .safeDrawingPadding()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         if (viewModel.enregistrementEnCours) {
