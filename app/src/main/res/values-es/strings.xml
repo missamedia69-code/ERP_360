@@ -1,0 +1,107 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">¡Bienvenido! Cree sus primeros clientes y productos para comenzar.</string>
+    <string name="more_modules">Más módulos</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="mark_all_read">Marcar todo como leído</string>
+    <string name="no_notifications">Sin notificaciones</string>
+    <string name="module_placeholder">Próximamente — por implementar</string>
+    <string name="phase_c">Por implementar en la Fase C (módulo 9.1)</string>
+
+    <string name="drawer_admin">Administración &amp; Configuración</string>
+    <string name="admin_reglages">Configuración</string>
+    <string name="admin_licence">Licencia</string>
+    <string name="admin_sauvegarde">Copia de seguridad</string>
+    <string name="admin_journal">Registro de actividad</string>
+    <string name="admin_utilisateurs">Usuarios &amp; roles</string>
+    <string name="admin_multisite">Multi-sede</string>
+    <string name="admin_a_propos">Acerca de</string>
+
+    <string name="module_vente">Ventas</string>
+    <string name="module_stock">Inventario</string>
+    <string name="module_clients">Clientes</string>
+    <string name="module_finances">Finanzas</string>
+    <string name="module_fournisseurs">Proveedores</string>
+    <string name="module_achats">Compras</string>
+    <string name="module_livraison">Entrega</string>
+    <string name="module_production">Producción</string>
+    <string name="module_services">Servicios</string>
+    <string name="module_rh">RR. HH. y Nómina</string>
+    <string name="module_projets">Proyectos</string>
+    <string name="module_reporting">Informes</string>
+
+    <string name="ob_langue_title">Elija su idioma</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">Siguiente</string>
+    <string name="ob_retour">Atrás</string>
+
+    <string name="ob_profil_title">Su perfil de actividad</string>
+    <string name="profil_a">Microcomercio / independiente</string>
+    <string name="profil_b">Comercio minorista / tienda</string>
+    <string name="profil_c">Comercio multisucursal</string>
+    <string name="profil_d">Distribución / mayorista</string>
+    <string name="profil_e">Producción / industria ligera</string>
+    <string name="profil_f">Servicios &amp; contratos</string>
+    <string name="profil_g">Construcción / proyectos</string>
+    <string name="profil_h">Grupo multiactividad</string>
+
+    <string name="ob_palier_title">Personal de la empresa</string>
+    <string name="palier_p1">Solo / Nano (1)</string>
+    <string name="palier_p2">Micro (2–9)</string>
+    <string name="palier_p3">Pequeña (10–49)</string>
+    <string name="palier_p4">Mediana (50–249)</string>
+    <string name="palier_p5">Grande (250–999)</string>
+    <string name="palier_p6">Muy grande / Grupo (1000+)</string>
+
+    <string name="ob_entreprise_title">Su empresa</string>
+    <string name="ob_nom_entreprise">Nombre de la empresa</string>
+    <string name="ob_votre_nom">Su nombre</string>
+    <string name="ob_devise">Moneda (ISO 4217)</string>
+    <string name="ob_pays">País</string>
+    <string name="ob_taux_taxe">Tasa de impuesto (%)</string>
+    <string name="ob_site_principal">Nombre de la sede principal</string>
+    <string name="ob_verrous_note">⚠ La moneda, los impuestos, la numeración y los pagos se bloquearán en el primer uso (no modificables después).</string>
+    <string name="ob_erreur_nom">Introduzca el nombre de la empresa y de la sede principal.</string>
+
+    <string name="ob_pin_title">Cree su PIN</string>
+    <string name="ob_pin_subtitle">4 a 6 dígitos — se solicitará en cada inicio de la aplicación.</string>
+    <string name="ob_pin_confirmer">Confirme el PIN</string>
+    <string name="ob_pin_invalide">El PIN debe contener de 4 a 6 dígitos.</string>
+    <string name="ob_pin_differents">Los dos PIN no coinciden.</string>
+
+    <string name="ob_email_title">Correo de recuperación</string>
+    <string name="ob_email_subtitle">Obligatorio: se usará para recuperar el acceso si olvida su PIN.</string>
+    <string name="ob_email">Correo electrónico</string>
+    <string name="ob_email_invalide">Correo electrónico no válido o ya utilizado.</string>
+
+    <string name="ob_licence_title">Licencia</string>
+    <string name="ob_licence_essai">✓ Prueba gratuita de 7 días iniciada. Sin activación al finalizar la prueba, la aplicación pasará a modo de solo lectura.</string>
+    <string name="ob_licence_active">✓ Licencia activada — válida por 1 año en este dispositivo.</string>
+    <string name="ob_code_licence">Código de activación (opcional)</string>
+    <string name="ob_activer">Activar</string>
+    <string name="ob_code_invalide">Código no válido. Formato esperado: MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 código = 1 dispositivo = 1 año. Desvinculación posible 3 veces al año.</string>
+
+    <string name="ob_checklist_title">Configuración completada</string>
+    <string name="check_entreprise">Empresa y sede principal creadas</string>
+    <string name="check_devise">Moneda de la empresa</string>
+    <string name="check_taxes">Impuestos</string>
+    <string name="check_numerotation">Numeración de documentos</string>
+    <string name="check_paiements">Métodos de pago</string>
+    <string name="check_utilisateur">Usuario Propietario + PIN</string>
+    <string name="check_licence">Licencia (prueba de 7 días)</string>
+    <string name="check_verrouille">Bloqueado — no modificable</string>
+    <string name="ob_checklist_note">Podrá activar más módulos y añadir usuarios en Administración &amp; Configuración.</string>
+    <string name="ob_terminer">Empezar a usar Missa 360</string>
+
+    <string name="lock_title">Introduzca su PIN</string>
+    <string name="lock_essais_restants">PIN incorrecto — quedan %1$d intento(s) antes del bloqueo.</string>
+    <string name="lock_bloque">Demasiados intentos. Vuelva a intentarlo en unos minutos.</string>
+    <string name="lock_deverrouiller">Desbloquear</string>
+</resources>

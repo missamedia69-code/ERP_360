@@ -1,0 +1,107 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">مرحباً! أنشئ عملاءك ومنتجاتك الأولى للبدء.</string>
+    <string name="more_modules">المزيد من الوحدات</string>
+    <string name="notifications">الإشعارات</string>
+    <string name="mark_all_read">وضع علامة مقروء على الكل</string>
+    <string name="no_notifications">لا توجد إشعارات</string>
+    <string name="module_placeholder">قريباً — ليتم تنفيذه</string>
+    <string name="phase_c">ليتم تنفيذه في المرحلة C (الوحدة 9.1)</string>
+
+    <string name="drawer_admin">الإدارة والإعدادات</string>
+    <string name="admin_reglages">الإعدادات</string>
+    <string name="admin_licence">الترخيص</string>
+    <string name="admin_sauvegarde">النسخ الاحتياطي</string>
+    <string name="admin_journal">سجل النشاط</string>
+    <string name="admin_utilisateurs">المستخدمون والأدوار</string>
+    <string name="admin_multisite">متعدد المواقع</string>
+    <string name="admin_a_propos">حول</string>
+
+    <string name="module_vente">المبيعات</string>
+    <string name="module_stock">المخزون</string>
+    <string name="module_clients">العملاء</string>
+    <string name="module_finances">المالية</string>
+    <string name="module_fournisseurs">الموردون</string>
+    <string name="module_achats">المشتريات</string>
+    <string name="module_livraison">التوصيل</string>
+    <string name="module_production">الإنتاج</string>
+    <string name="module_services">الخدمات</string>
+    <string name="module_rh">الموارد البشرية والرواتب</string>
+    <string name="module_projets">المشاريع</string>
+    <string name="module_reporting">التقارير</string>
+
+    <string name="ob_langue_title">اختر لغتك</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">التالي</string>
+    <string name="ob_retour">رجوع</string>
+
+    <string name="ob_profil_title">ملف نشاطك</string>
+    <string name="profil_a">تجارة صغيرة / مستقل</string>
+    <string name="profil_b">تجارة تجزئة / متجر</string>
+    <string name="profil_c">تجارة متعددة الفروع</string>
+    <string name="profil_d">توزيع / جملة</string>
+    <string name="profil_e">إنتاج / صناعة خفيفة</string>
+    <string name="profil_f">خدمات ومقاولات</string>
+    <string name="profil_g">إنشاءات ومشاريع</string>
+    <string name="profil_h">مجموعة متعددة الأنشطة</string>
+
+    <string name="ob_palier_title">عدد الموظفين</string>
+    <string name="palier_p1">فردي / نانو (1)</string>
+    <string name="palier_p2">صغير جداً (2–9)</string>
+    <string name="palier_p3">صغير (10–49)</string>
+    <string name="palier_p4">متوسط (50–249)</string>
+    <string name="palier_p5">كبير (250–999)</string>
+    <string name="palier_p6">كبير جداً / مجموعة (1000+)</string>
+
+    <string name="ob_entreprise_title">شركتك</string>
+    <string name="ob_nom_entreprise">اسم الشركة</string>
+    <string name="ob_votre_nom">اسمك</string>
+    <string name="ob_devise">العملة (ISO 4217)</string>
+    <string name="ob_pays">البلد</string>
+    <string name="ob_taux_taxe">نسبة الضريبة (%)</string>
+    <string name="ob_site_principal">اسم الموقع الرئيسي</string>
+    <string name="ob_verrous_note">⚠ سيتم قفل العملة والضرائب والترقيم وطرق الدفع عند الاستخدام الأول (لا يمكن تعديلها لاحقاً).</string>
+    <string name="ob_erreur_nom">يرجى إدخال اسم الشركة والموقع الرئيسي.</string>
+
+    <string name="ob_pin_title">أنشئ رمز PIN الخاص بك</string>
+    <string name="ob_pin_subtitle">من 4 إلى 6 أرقام — سيُطلب في كل مرة تفتح فيها التطبيق.</string>
+    <string name="ob_pin_confirmer">تأكيد رمز PIN</string>
+    <string name="ob_pin_invalide">يجب أن يتكون رمز PIN من 4 إلى 6 أرقام.</string>
+    <string name="ob_pin_differents">رمزا PIN غير متطابقين.</string>
+
+    <string name="ob_email_title">البريد الإلكتروني للاسترداد</string>
+    <string name="ob_email_subtitle">إلزامي: يُستخدم لاستعادة الوصول إذا نسيت رمز PIN.</string>
+    <string name="ob_email">البريد الإلكتروني</string>
+    <string name="ob_email_invalide">بريد إلكتروني غير صالح أو مستخدم بالفعل.</string>
+
+    <string name="ob_licence_title">الترخيص</string>
+    <string name="ob_licence_essai">✓ بدأت تجربة مجانية لمدة 7 أيام. بدون تفعيل بعد انتهاء التجربة، سيتحول التطبيق إلى وضع القراءة فقط.</string>
+    <string name="ob_licence_active">✓ تم تفعيل الترخيص — صالح لمدة سنة على هذا الجهاز.</string>
+    <string name="ob_code_licence">رمز التفعيل (اختياري)</string>
+    <string name="ob_activer">تفعيل</string>
+    <string name="ob_code_invalide">رمز غير صالح. التنسيق المتوقع: MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 رمز = 1 جهاز = سنة واحدة. يمكن فك الارتباط 3 مرات في السنة.</string>
+
+    <string name="ob_checklist_title">اكتمل الإعداد</string>
+    <string name="check_entreprise">تم إنشاء الشركة والموقع الرئيسي</string>
+    <string name="check_devise">عملة الشركة</string>
+    <string name="check_taxes">الضرائب</string>
+    <string name="check_numerotation">ترقيم المستندات</string>
+    <string name="check_paiements">طرق الدفع</string>
+    <string name="check_utilisateur">مستخدم المالك + رمز PIN</string>
+    <string name="check_licence">الترخيص (تجربة 7 أيام)</string>
+    <string name="check_verrouille">مقفل — غير قابل للتعديل</string>
+    <string name="ob_checklist_note">يمكنك تفعيل وحدات أخرى وإضافة مستخدمين من الإدارة والإعدادات.</string>
+    <string name="ob_terminer">البدء في استخدام Missa 360</string>
+
+    <string name="lock_title">أدخل رمز PIN</string>
+    <string name="lock_essais_restants">رمز PIN خاطئ — بقي %1$d محاولة قبل القفل.</string>
+    <string name="lock_bloque">محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.</string>
+    <string name="lock_deverrouiller">فتح</string>
+</resources>
