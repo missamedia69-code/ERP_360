@@ -13,6 +13,9 @@
 
     <!-- Tiroir ☰ Administration & Paramétrage -->
     <string name="drawer_admin">Administration &amp; Paramétrage</string>
+    <string name="drawer_section_entreprise">Entreprise</string>
+    <string name="drawer_section_administration">Administration</string>
+    <string name="drawer_section_application">Application</string>
     <string name="admin_reglages">Réglages</string>
     <string name="admin_licence">Licence</string>
     <string name="admin_sauvegarde">Sauvegarde</string>

@@ -85,18 +85,12 @@ class ReglagesViewModel @Inject constructor(
 
     fun changerProfil(p: ProfilActivite) {
         _state.value = _state.value.copy(profil = p)
-        viewModelScope.launch {
-            updateEnterprise(profilActivite = p.name)
-            settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name)
-        }
+        viewModelScope.launch { updateEnterprise(profilActivite = p.name) }
     }
 
     fun changerPalier(p: PalierTaille) {
         _state.value = _state.value.copy(palier = p)
-        viewModelScope.launch {
-            updateEnterprise(palierTaille = p.name)
-            settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, p.name)
-        }
+        viewModelScope.launch { updateEnterprise(palierTaille = p.name) }
     }
 
     fun changerSecteur(v: String) { _state.value = _state.value.copy(secteur = v) }
@@ -108,10 +102,10 @@ class ReglagesViewModel @Inject constructor(
         val s = _state.value
         viewModelScope.launch {
             val ok = updateEnterprise(
-                secteur = s.secteur.ifBlank { null },
-                adresse = s.adresse.ifBlank { null },
-                telephone = s.telephone.ifBlank { null },
-                email = s.email.ifBlank { null },
+                secteur = s.secteur,
+                adresse = s.adresse,
+                telephone = s.telephone,
+                email = s.email,
             )
             _state.value = _state.value.copy(sauvegardeMsg = if (ok) "ok" else "err")
         }

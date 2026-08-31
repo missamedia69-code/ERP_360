@@ -11,6 +11,9 @@
     <string name="phase_c">将于 C 阶段实现（模块 9.1）</string>
 
     <string name="drawer_admin">管理与设置</string>
+    <string name="drawer_section_entreprise">企业</string>
+    <string name="drawer_section_administration">管理</string>
+    <string name="drawer_section_application">应用</string>
     <string name="admin_reglages">设置</string>
     <string name="admin_licence">许可证</string>
     <string name="admin_sauvegarde">备份</string>

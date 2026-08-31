@@ -2,8 +2,11 @@ package com.missa.b360.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -176,32 +180,60 @@ private fun HomeBottomBar(
     }
 }
 
-/** Tiroir ☰ — Administration & Paramétrage uniquement (RA-22). */
+/** Tiroir ☰ organisé par domaine, uniquement pour Administration & Paramétrage (RA-22). */
 @Composable
 private fun AdminDrawerContent(onNavigate: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 12.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            Icon(Icons.Outlined.Store, contentDescription = null, modifier = Modifier.size(28.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+        ) {
+            Icon(Icons.Outlined.Store, contentDescription = null, modifier = Modifier.size(24.dp))
             Spacer(Modifier.width(12.dp))
-            Text(
-                text = stringResource(R.string.drawer_admin),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
+            Column {
+                Text(
+                    text = stringResource(R.string.home_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(R.string.drawer_admin),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+            }
         }
-        Spacer(Modifier.height(8.dp))
+
+        DrawerSection(R.string.drawer_section_entreprise)
         DrawerItem(Icons.Outlined.Language, R.string.admin_reglages) { onNavigate(Routes.ADMIN_REGLAGES) }
+        DrawerItem(Icons.Outlined.Store, R.string.admin_multisite) { onNavigate(Routes.ADMIN_MULTISITE) }
+
+        DrawerSection(R.string.drawer_section_administration)
+        DrawerItem(Icons.Outlined.Badge, R.string.admin_utilisateurs) { onNavigate(Routes.ADMIN_UTILISATEURS) }
         DrawerItem(Icons.Outlined.CloudSync, R.string.admin_licence) { onNavigate(Routes.ADMIN_LICENCE) }
         DrawerItem(Icons.Outlined.Backup, R.string.admin_sauvegarde) { onNavigate(Routes.ADMIN_SAUVEGARDE) }
         DrawerItem(Icons.Outlined.History, R.string.admin_journal) { onNavigate(Routes.ADMIN_JOURNAL) }
-        DrawerItem(Icons.Outlined.Badge, R.string.admin_utilisateurs) { onNavigate(Routes.ADMIN_UTILISATEURS) }
-        DrawerItem(Icons.Outlined.Store, R.string.admin_multisite) { onNavigate(Routes.ADMIN_MULTISITE) }
+
+        DrawerSection(R.string.drawer_section_application)
         DrawerItem(Icons.Outlined.Info, R.string.admin_a_propos) { onNavigate(Routes.ADMIN_A_PROPOS) }
     }
+}
+
+@Composable
+private fun DrawerSection(titleRes: Int) {
+    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+    Text(
+        text = stringResource(titleRes),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+    )
 }
 
 @Composable
@@ -211,6 +243,6 @@ private fun DrawerItem(icon: androidx.compose.ui.graphics.vector.ImageVector, ti
         leadingContent = { Icon(icon, contentDescription = null) },
         modifier = Modifier
             .clickable(onClick = onClick)
-            .padding(vertical = 2.dp),
+            .padding(horizontal = 8.dp, vertical = 1.dp),
     )
 }

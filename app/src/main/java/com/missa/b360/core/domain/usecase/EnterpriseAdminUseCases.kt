@@ -30,17 +30,24 @@ class UpdateEnterpriseUseCase @Inject constructor(
         val entreprise = enterpriseDao.get() ?: return false
         enterpriseDao.upsert(
             entreprise.copy(
-                secteur = secteur,
-                adresse = adresse,
-                telephone = telephone,
-                email = email,
-                profilActivite = profilActivite,
-                palierTaille = palierTaille,
+                // null signifie « ne pas toucher au champ » ; une chaîne vide provenant
+                // du formulaire signifie au contraire que l'utilisateur veut l'effacer.
+                secteur = texteMisAJour(secteur, entreprise.secteur),
+                adresse = texteMisAJour(adresse, entreprise.adresse),
+                telephone = texteMisAJour(telephone, entreprise.telephone),
+                email = texteMisAJour(email, entreprise.email),
+                profilActivite = profilActivite ?: entreprise.profilActivite,
+                palierTaille = palierTaille ?: entreprise.palierTaille,
             ),
         )
         profilActivite?.let { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, it) }
         palierTaille?.let { settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, it) }
         journalManager.log("ADMIN", "REGLAGES_MODIFIES", "Informations entreprise mises à jour")
         return true
+    }
+
+    private fun texteMisAJour(nouveau: String?, actuel: String?): String? = when (nouveau) {
+        null -> actuel
+        else -> nouveau.ifBlank { null }
     }
 }

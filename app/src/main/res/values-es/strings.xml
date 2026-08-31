@@ -11,6 +11,9 @@
     <string name="phase_c">Por implementar en la Fase C (módulo 9.1)</string>
 
     <string name="drawer_admin">Administración &amp; Configuración</string>
+    <string name="drawer_section_entreprise">Empresa</string>
+    <string name="drawer_section_administration">Administración</string>
+    <string name="drawer_section_application">Aplicación</string>
     <string name="admin_reglages">Configuración</string>
     <string name="admin_licence">Licencia</string>
     <string name="admin_sauvegarde">Copia de seguridad</string>

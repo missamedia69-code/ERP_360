@@ -11,6 +11,9 @@
     <string name="phase_c">ليتم تنفيذه في المرحلة C (الوحدة 9.1)</string>
 
     <string name="drawer_admin">الإدارة والإعدادات</string>
+    <string name="drawer_section_entreprise">المؤسسة</string>
+    <string name="drawer_section_administration">الإدارة</string>
+    <string name="drawer_section_application">التطبيق</string>
     <string name="admin_reglages">الإعدادات</string>
     <string name="admin_licence">الترخيص</string>
     <string name="admin_sauvegarde">النسخ الاحتياطي</string>

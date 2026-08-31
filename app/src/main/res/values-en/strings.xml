@@ -11,6 +11,9 @@
     <string name="phase_c">To be implemented in Phase C (module 9.1)</string>
 
     <string name="drawer_admin">Administration &amp; Settings</string>
+    <string name="drawer_section_entreprise">Company</string>
+    <string name="drawer_section_administration">Administration</string>
+    <string name="drawer_section_application">Application</string>
     <string name="admin_reglages">Settings</string>
     <string name="admin_licence">Licence</string>
     <string name="admin_sauvegarde">Backup</string>
