@@ -48,6 +48,7 @@ class PinLockViewModel @Inject constructor(
         val essaisRestants: Int? = null,
         val bloqueJusquA: Long? = null,
         val erreur: Boolean = false,
+        val verificationEnCours: Boolean = false,
     )
 
     private val _state = MutableStateFlow(UiState())
@@ -56,19 +57,30 @@ class PinLockViewModel @Inject constructor(
     val saisie = MutableStateFlow("")
     val deverrouille = MutableStateFlow(false)
 
+    /**
+     * Saisie explicite : un PIN peut contenir 4, 5 ou 6 chiffres. La vérification ne
+     * démarre donc jamais automatiquement au 4e chiffre, ce qui empêchait les PIN longs.
+     */
     fun ajouterChiffre(chiffre: Char) {
-        if (_state.value.bloqueJusquA != null) return
-        if (saisie.value.length >= 6) return
+        if (!saisieAutorisee() || saisie.value.length >= 6) return
         saisie.value += chiffre
-        if (saisie.value.length in 4..6) verifier()
+        _state.value = _state.value.copy(erreur = false, essaisRestants = null)
     }
 
     fun effacer() {
+        if (!saisieAutorisee()) return
         saisie.value = saisie.value.dropLast(1)
+        _state.value = _state.value.copy(erreur = false, essaisRestants = null)
     }
 
     fun verifier() {
+        if (!saisieAutorisee() || saisie.value.length !in 4..6) return
         val pin = saisie.value
+        _state.value = _state.value.copy(
+            erreur = false,
+            essaisRestants = null,
+            verificationEnCours = true,
+        )
         viewModelScope.launch {
             when (val resultat = validatePin(pin)) {
                 is ValidatePinUseCase.Outcome.AccesAccorde,
@@ -86,6 +98,9 @@ class PinLockViewModel @Inject constructor(
             }
         }
     }
+
+    private fun saisieAutorisee(): Boolean =
+        _state.value.bloqueJusquA == null && !_state.value.verificationEnCours
 
     private suspend fun compterBloque(jusquA: Long) {
         while (System.currentTimeMillis() < jusquA) {
@@ -156,13 +171,25 @@ fun PinLockScreen(
             }
             Spacer(Modifier.height(24.dp))
 
-            Keypad(viewModel)
+            Keypad(
+                saisie = saisie,
+                interactionActive = state.bloqueJusquA == null && !state.verificationEnCours,
+                onDigit = viewModel::ajouterChiffre,
+                onErase = viewModel::effacer,
+                onVerify = viewModel::verifier,
+            )
         }
     }
 }
 
 @Composable
-private fun Keypad(viewModel: PinLockViewModel) {
+private fun Keypad(
+    saisie: String,
+    interactionActive: Boolean,
+    onDigit: (Char) -> Unit,
+    onErase: () -> Unit,
+    onVerify: () -> Unit,
+) {
     val lignes = listOf(
         listOf('1', '2', '3'),
         listOf('4', '5', '6'),
@@ -171,7 +198,11 @@ private fun Keypad(viewModel: PinLockViewModel) {
     lignes.forEach { ligne ->
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ligne.forEach { chiffre ->
-                KeypadButton(chiffre.toString()) { viewModel.ajouterChiffre(chiffre) }
+                KeypadButton(
+                    label = chiffre.toString(),
+                    enabled = interactionActive && saisie.length < 6,
+                    onClick = { onDigit(chiffre) },
+                )
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -181,9 +212,14 @@ private fun Keypad(viewModel: PinLockViewModel) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(Modifier.size(72.dp))
-        KeypadButton("0") { viewModel.ajouterChiffre('0') }
+        KeypadButton(
+            label = "0",
+            enabled = interactionActive && saisie.length < 6,
+            onClick = { onDigit('0') },
+        )
         OutlinedButton(
-            onClick = viewModel::effacer,
+            onClick = onErase,
+            enabled = interactionActive && saisie.isNotEmpty(),
             modifier = Modifier.size(72.dp),
         ) {
             Text("⌫")
@@ -191,16 +227,20 @@ private fun Keypad(viewModel: PinLockViewModel) {
     }
     Spacer(Modifier.height(24.dp))
     Button(
-        onClick = viewModel::verifier,
-        enabled = viewModel.saisie.value.length in 4..6,
+        onClick = onVerify,
+        enabled = interactionActive && saisie.length in 4..6,
     ) {
         Text(stringResource(R.string.lock_deverrouiller))
     }
 }
 
 @Composable
-private fun KeypadButton(label: String, onClick: () -> Unit) {
-    FilledTonalButton(onClick = onClick, modifier = Modifier.size(72.dp)) {
+private fun KeypadButton(
+    label: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    FilledTonalButton(onClick = onClick, enabled = enabled, modifier = Modifier.size(72.dp)) {
         Text(label, style = MaterialTheme.typography.titleLarge)
     }
 }
