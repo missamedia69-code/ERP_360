@@ -26,6 +26,8 @@ import com.missa.b360.core.data.entity.ClientType
 @Composable
 fun ClientsScreen(
     onBack: () -> Unit,
+    /** Vrai lorsqu'une action rapide de l'accueil demande directement la création. */
+    openCreate: Boolean = false,
     viewModel: ClientsViewModel = hiltViewModel(),
 ) {
     val clients by viewModel.clients.collectAsState(initial = emptyList())
@@ -43,6 +45,13 @@ fun ClientsScreen(
     var catVisible by remember { mutableStateOf(false) }
     var badgeVisible by remember { mutableStateOf(false) }
     var clientEdite by remember { mutableStateOf<ClientEntity?>(null) }
+
+    LaunchedEffect(openCreate) {
+        if (openCreate) {
+            clientEdite = null
+            formVisible = true
+        }
+    }
 
     val messageRetour = resultat?.let { retour ->
         when {

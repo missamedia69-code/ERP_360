@@ -620,14 +620,17 @@ private data class QuickAction(
     val route: String,
 )
 
+/** Ouvre le formulaire en plus de la liste depuis une action rapide de l'accueil. */
+private fun AppModule.createRoute(): String = "$route?create=true"
+
 @Composable
 private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
     val rows = listOf(
         listOf(
             QuickAction(R.string.home_new_sale, Icons.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.route),
             QuickAction(R.string.home_new_purchase, Icons.Outlined.AddShoppingCart, HomeGreen, AppModule.ACHATS.route),
-            QuickAction(R.string.home_new_client, Icons.Outlined.PersonAdd, HomePurple, AppModule.CLIENTS.route),
-            QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.route),
+            QuickAction(R.string.home_new_client, Icons.Outlined.PersonAdd, HomePurple, AppModule.CLIENTS.createRoute()),
+            QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.createRoute()),
         ),
         listOf(
             QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.route),

@@ -21,12 +21,21 @@ import com.missa.b360.core.data.entity.FournisseurEntity
 @Composable
 fun FournisseursScreen(
     onBack: () -> Unit,
+    /** Vrai lorsqu'une action rapide de l'accueil demande directement la création. */
+    openCreate: Boolean = false,
     viewModel: FournisseursViewModel = hiltViewModel(),
 ) {
     val fournisseurs by viewModel.fournisseurs.collectAsState(initial = emptyList())
     var recherche by remember { mutableStateOf("") }
     var formVisible by remember { mutableStateOf(false) }
     var fournisseurEdite by remember { mutableStateOf<FournisseurEntity?>(null) }
+
+    LaunchedEffect(openCreate) {
+        if (openCreate) {
+            fournisseurEdite = null
+            formVisible = true
+        }
+    }
 
     val filtres = fournisseurs.filter {
         recherche.isBlank() ||

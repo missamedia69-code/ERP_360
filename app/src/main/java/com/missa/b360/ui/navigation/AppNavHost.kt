@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -82,11 +84,33 @@ private fun MainNavHost() {
         }
 
 // Phase D — Clients & Fournisseurs (9.2/9.3)
-        composable(AppModule.CLIENTS.route) {
-            ClientsScreen(onBack = { navController.popBackStack() })
+        composable(
+            route = "${AppModule.CLIENTS.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) { entry ->
+            ClientsScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
         }
-        composable(AppModule.FOURNISSEURS.route) {
-            FournisseursScreen(onBack = { navController.popBackStack() })
+        composable(
+            route = "${AppModule.FOURNISSEURS.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) { entry ->
+            FournisseursScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
         }
         // 12 modules métier — implémentés phases D → K (ceux-ci sont exclus du placeholder)
         val modulesImplementes = setOf(AppModule.CLIENTS, AppModule.FOURNISSEURS)
