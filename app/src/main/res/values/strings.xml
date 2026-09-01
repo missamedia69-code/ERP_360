@@ -466,7 +466,7 @@
     <string name="sales_new_customer">Nouveau client</string>
     <string name="sales_search_product">Rechercher un produit ou scanner</string>
     <string name="sales_scan">Scanner un code-barres</string>
-    <string name="sales_scanner_unavailable">Aucune application de scan compatible n&apos;est disponible. Saisissez ou ajoutez un produit libre.</string>
+    <string name="sales_scanner_unavailable">Aucune application de scan compatible n\'est disponible. Saisissez ou ajoutez un produit libre.</string>
     <string name="sales_free_product">Produit libre</string>
     <string name="sales_empty_cart">Votre panier est vide</string>
     <string name="sales_empty_cart_description">Ajoutez un produit libre pour commencer cette vente.</string>
@@ -498,10 +498,10 @@
     <string name="sales_free_product_title">Ajouter un produit libre</string>
     <string name="sales_product_name">Nom du produit</string>
     <string name="sales_add_to_cart">Ajouter au panier</string>
-    <string name="sales_customer_required">Sélectionnez un client avant d&apos;enregistrer la vente.</string>
+    <string name="sales_customer_required">Sélectionnez un client avant d\'enregistrer la vente.</string>
     <string name="sales_cart_required">Ajoutez au moins un produit au panier.</string>
     <string name="sales_invalid_amount">Vérifiez les montants saisis et le paiement.</string>
-    <string name="sales_saved_and_printing">Vente %1$s enregistrée. Ouverture de l&apos;impression…</string>
+    <string name="sales_saved_and_printing">Vente %1$s enregistrée. Ouverture de l\'impression…</string>
     <string name="sales_draft_saved">Brouillon %1$s enregistré.</string>
     <string name="sales_history_description">Factures et brouillons enregistrés sur cet appareil.</string>
     <string name="sales_history_empty">Aucune vente enregistrée pour le moment.</string>
