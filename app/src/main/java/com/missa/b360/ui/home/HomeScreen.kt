@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Backup
@@ -101,7 +101,6 @@ import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaBrandMark
-import com.missa.b360.ui.theme.Blue40
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.MissaBorder
@@ -115,7 +114,6 @@ import kotlinx.coroutines.launch
 
 /* Palette du tableau de bord mobile. */
 private val HomeBlue = BrandBlue
-private val HomeBlueDark = Blue40
 private val HomeBlueSoft = MissaSoftBlue
 private val HomeGreen = Green60
 private val HomeGreenSoft = Color(0xFFEAF8EF)
@@ -188,6 +186,7 @@ fun HomeScreen(
             topBar = {
                 HomeHeader(
                     companyName = companyName,
+                    companyLogoUri = uiState.entrepriseLogoUri,
                     profileLabel = profileLabel,
                     sizeLabel = sizeLabel,
                     greeting = greeting,
@@ -296,6 +295,7 @@ fun HomeScreen(
 @Composable
 private fun HomeHeader(
     companyName: String,
+    companyLogoUri: String?,
     profileLabel: String,
     sizeLabel: String,
     greeting: String,
@@ -306,72 +306,115 @@ private fun HomeHeader(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = HomeBlueDark,
+        color = Color.White,
         shadowElevation = 0.dp,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onMenuClick, modifier = Modifier.size(42.dp)) {
+                IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
                     Icon(
                         imageVector = Icons.Outlined.Menu,
                         contentDescription = stringResource(R.string.drawer_admin),
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-                Spacer(Modifier.width(7.dp))
-                MissaBrandMark(size = 36.dp)
-                Spacer(Modifier.width(8.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "MISSA BUSINESS",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = "360",
-                        color = Color(0xFFB6E52B),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
-                }
-                Column(
-                    modifier = Modifier.widthIn(max = 118.dp),
-                    horizontalAlignment = Alignment.End,
-                ) {
-                    Text(
-                        text = companyName,
-                        color = Color.White,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = profileLabel,
-                        color = Color(0xFFD5DEFF),
-                        fontSize = 9.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        tint = HomeTextDark,
+                        modifier = Modifier.size(25.dp),
                     )
                 }
                 Spacer(Modifier.width(6.dp))
-                IconButton(onClick = onNotificationClick, modifier = Modifier.size(42.dp)) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MissaBrandMark(size = 36.dp)
+                    Spacer(Modifier.width(6.dp))
+                    Column {
+                        Text(
+                            text = "MISSA",
+                            color = HomeTextDark,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            maxLines = 1,
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "BUSINESS",
+                                color = HomeTextDark,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                            )
+                            Text(
+                                text = "360",
+                                color = Color(0xFF4BAE27),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                }
+                Surface(
+                    modifier = Modifier
+                        .width(122.dp)
+                        .clickable(onClick = onProfileClick),
+                    shape = RoundedCornerShape(14.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, HomeBorder),
+                    shadowElevation = 3.dp,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CompanyLogo(
+                            logoUri = companyLogoUri,
+                            contentDescription = null,
+                            fallbackIcon = Icons.Outlined.Business,
+                            modifier = Modifier.size(28.dp),
+                            size = 28.dp,
+                            shape = RoundedCornerShape(8.dp),
+                            fallbackTint = HomeGreen,
+                            fallbackBackground = HomeGreenSoft,
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = companyName,
+                                color = HomeTextDark,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = profileLabel,
+                                color = HomeTextMuted,
+                                fontSize = 7.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowDropDown,
+                            contentDescription = null,
+                            tint = HomeTextDark,
+                            modifier = Modifier.size(17.dp),
+                        )
+                    }
+                }
+                IconButton(onClick = onNotificationClick, modifier = Modifier.size(40.dp)) {
                     BadgedBox(
                         badge = {
                             if (notificationCount > 0) {
-                                NotificationBadge(containerColor = Color(0xFF9AD72B)) {
-                                    Text(notificationCount.coerceAtMost(99).toString())
+                                NotificationBadge(containerColor = Color(0xFFEF4444)) {
+                                    Text(notificationCount.coerceAtMost(99).toString(), fontSize = 8.sp)
                                 }
                             }
                         },
@@ -379,67 +422,76 @@ private fun HomeHeader(
                         Icon(
                             imageVector = Icons.Outlined.Notifications,
                             contentDescription = stringResource(R.string.notifications),
-                            tint = Color.White,
-                            modifier = Modifier.size(27.dp),
+                            tint = HomeTextDark,
+                            modifier = Modifier.size(25.dp),
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(15.dp))
             Text(
                 text = greeting,
-                color = Color.White,
-                fontSize = 22.sp,
+                color = HomeTextDark,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(3.dp))
             Text(
                 text = stringResource(R.string.home_overview),
-                color = Color(0xFFDCE5FF),
-                fontSize = 13.sp,
+                color = HomeTextMuted,
+                fontSize = 11.sp,
             )
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(12.dp))
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onProfileClick),
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White.copy(alpha = 0.10f),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+                shape = RoundedCornerShape(15.dp),
+                color = Color.White,
+                border = BorderStroke(1.dp, HomeBorder),
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Store,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp),
-                    )
-                    Spacer(Modifier.width(9.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.home_profile_format, profileLabel),
-                            color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = stringResource(R.string.home_size_format, sizeLabel),
-                            color = Color(0xFFD9E2FF),
-                            fontSize = 10.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
+                    Surface(
+                        modifier = Modifier.size(26.dp),
+                        shape = RoundedCornerShape(7.dp),
+                        color = HomeBlueSoft,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Business,
+                            contentDescription = null,
+                            tint = HomeBlue,
+                            modifier = Modifier.padding(5.dp),
                         )
                     }
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.home_profile_format, profileLabel),
+                        color = HomeTextMuted,
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Text(
+                        text = "  •  ",
+                        color = HomeTextMuted,
+                        fontSize = 10.sp,
+                    )
+                    Text(
+                        text = stringResource(R.string.home_size_format, sizeLabel),
+                        color = HomeTextMuted,
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
                     Icon(
-                        imageVector = Icons.Outlined.ArrowForward,
+                        imageVector = Icons.Outlined.ChevronRight,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = HomeTextDark,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -476,10 +528,10 @@ private fun HomeDashboard(
                 )
                 MetricCard(
                     modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.module_fournisseurs),
-                    value = state.nombreFournisseurs.toString(),
-                    subtitle = stringResource(R.string.home_total),
-                    icon = Icons.Outlined.AddBusiness,
+                    title = stringResource(R.string.module_achats),
+                    value = MoneyUtils.format(state.achats, currency),
+                    subtitle = stringResource(R.string.home_today),
+                    icon = Icons.Outlined.AddShoppingCart,
                     iconColor = HomeGreen,
                     iconBackground = HomeGreenSoft,
                 )
@@ -516,6 +568,7 @@ private fun HomeDashboard(
             DashboardSectionHeader(
                 title = stringResource(R.string.home_activity_summary),
                 action = stringResource(R.string.home_today),
+                actionHasDropDown = true,
             )
             Spacer(Modifier.height(7.dp))
             ActivitySummary(
@@ -555,25 +608,27 @@ private fun MetricCard(
     iconBackground: Color,
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.height(112.dp),
         shape = RoundedCornerShape(15.dp),
         color = Color.White,
         border = BorderStroke(1.dp, HomeBorder),
     ) {
         Column(modifier = Modifier.padding(horizontal = 9.dp, vertical = 10.dp)) {
             Surface(
-                modifier = Modifier.size(36.dp),
-                shape = CircleShape,
+                modifier = Modifier.fillMaxWidth().height(42.dp),
+                shape = RoundedCornerShape(11.dp),
                 color = iconBackground,
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.padding(8.dp),
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = iconColor,
+                        modifier = Modifier.size(27.dp),
+                    )
+                }
             }
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = title,
                 color = HomeTextDark,
@@ -586,7 +641,7 @@ private fun MetricCard(
             Text(
                 text = value,
                 color = HomeTextDark,
-                fontSize = 13.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -606,6 +661,7 @@ private fun DashboardSectionHeader(
     title: String,
     action: String,
     onAction: (() -> Unit)? = null,
+    actionHasDropDown: Boolean = false,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -618,13 +674,25 @@ private fun DashboardSectionHeader(
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
         )
-        Text(
-            text = action,
-            color = HomeBlue,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
+        Row(
             modifier = if (onAction == null) Modifier else Modifier.clickable(onClick = onAction),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = action,
+                color = HomeBlue,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+            if (actionHasDropDown) {
+                Icon(
+                    imageVector = Icons.Outlined.ArrowDropDown,
+                    contentDescription = null,
+                    tint = HomeBlue,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 }
 
@@ -700,15 +768,21 @@ private fun QuickActionCard(
         border = BorderStroke(1.dp, HomeBorder),
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 11.dp, horizontal = 4.dp),
+            modifier = Modifier.padding(vertical = 9.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(26.dp),
-            )
+            Surface(
+                modifier = Modifier.size(31.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = color.copy(alpha = 0.12f),
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.padding(6.dp),
+                )
+            }
             Spacer(Modifier.height(5.dp))
             Text(
                 text = title,

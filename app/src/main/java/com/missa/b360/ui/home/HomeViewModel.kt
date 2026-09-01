@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import java.util.Calendar
 import javax.inject.Inject
 
 /** Données de synthèse disponibles dès les modules actuellement implémentés. */
@@ -82,8 +83,17 @@ class HomeViewModel @Inject constructor(
 
     val uiState: StateFlow<HomeUiState> = combine(baseState, operations.observeAll()) { base, records ->
         val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
-        val ventes = validated.amountFor(OperationModule.VENTE)
-        val achats = validated.amountFor(OperationModule.ACHATS)
+        // Les deux cartes libellées « Aujourd’hui » ne doivent jamais agréger les
+        // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
+        val startOfToday = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val validatedToday = validated.filter { it.createdAt >= startOfToday }
+        val ventes = validatedToday.amountFor(OperationModule.VENTE)
+        val achats = validatedToday.amountFor(OperationModule.ACHATS)
         val tresorerie = validated
             .filter { it.module == OperationModule.FINANCES.name }
             .sumOf { record ->
