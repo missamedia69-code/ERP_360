@@ -47,13 +47,19 @@ data class SalesUiState(
     )
 }
 
+/** Facture créée ou reprise, avec les éléments nécessaires aux écrans de succès et aperçu. */
 data class SaleReceipt(
+    val recordId: Long,
     val reference: String,
-    val clientName: String,
-    val total: Double,
-    val paidAmount: Double,
-    val paymentMethod: String,
-)
+    val payload: SaleRecordPayload,
+    /** Date de la pièce persistante, pas la date à laquelle la facture est rouverte. */
+    val createdAt: Long = System.currentTimeMillis(),
+) {
+    val clientName: String get() = payload.clientName
+    val total: Double get() = payload.total
+    val paidAmount: Double get() = payload.paidAmount
+    val paymentMethod: String get() = payload.paymentMethod
+}
 
 @HiltViewModel
 class SalesViewModel @Inject constructor(
@@ -243,11 +249,9 @@ class SalesViewModel @Inject constructor(
                     }
                     _saveResult.value = SaveResult.Saved(
                         receipt = SaleReceipt(
+                            recordId = id,
                             reference = reference,
-                            clientName = client.nom,
-                            total = totals.total,
-                            paidAmount = paidAmount,
-                            paymentMethod = paymentMethod,
+                            payload = payload,
                         ),
                         shouldPrint = !draft,
                     )
@@ -269,6 +273,33 @@ class SalesViewModel @Inject constructor(
                         OperationUseCases.UpdateDraftResult.NotDraft -> _saveResult.value = SaveResult.Error
                     }
                 }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                _saveResult.value = SaveResult.Error
+            }
+        }
+    }
+
+    /** Prépare une nouvelle vente à partir d'une facture existante sans réutiliser sa référence. */
+    fun duplicate(payload: SaleRecordPayload, availableClients: List<ClientEntity>): Boolean {
+        val client = availableClients.firstOrNull { it.id == payload.clientId } ?: return false
+        nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
+        _uiState.value = SalesUiState(
+            selectedClient = client,
+            lines = payload.lines.map { it.copy(id = nextLineId++) },
+            discountInput = payload.discount.toInputAmount(),
+            deliveryInput = payload.delivery.toInputAmount(),
+            paidInput = payload.paidAmount.toInputAmount(),
+            note = payload.note.orEmpty(),
+        )
+        return true
+    }
+
+    fun cancelSale(id: Long) {
+        viewModelScope.launch {
+            try {
+                if (!operations.setStatus(id, OperationStatus.CANCELLED)) _saveResult.value = SaveResult.Error
             } catch (exception: CancellationException) {
                 throw exception
             } catch (_: Exception) {

@@ -126,7 +126,7 @@ private val SaleRed = Color(0xFFEC5A67)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SalesScreen(
+private fun LegacySalesScreen(
     onNavigate: (String) -> Unit,
     onOpenClientCreate: () -> Unit,
     viewModel: SalesViewModel = hiltViewModel(),
@@ -1202,7 +1202,7 @@ private fun SalesHistorySheet(
     }
 }
 
-private fun Context.printSaleReceipt(receipt: SaleReceipt, devise: String) {
+internal fun Context.printSaleReceipt(receipt: SaleReceipt, devise: String) {
     val printManager = getSystemService(PrintManager::class.java) ?: return
     printManager.print(
         "${getString(R.string.sales_receipt_name)}-${receipt.reference}",
@@ -1259,11 +1259,22 @@ private class SalePrintAdapter(
                 textSize = 13f
             }
             canvas.drawText("MISSA BUSINESS 360", 48f, 68f, titlePaint)
-            canvas.drawText(receipt.reference, 48f, 110f, bodyPaint)
-            canvas.drawText(receipt.clientName, 48f, 142f, bodyPaint)
-            canvas.drawText("Total : ${saleMoney(receipt.total, devise)}", 48f, 188f, bodyPaint)
-            canvas.drawText("Payé : ${saleMoney(receipt.paidAmount, devise)}", 48f, 214f, bodyPaint)
-            canvas.drawText(receipt.paymentMethod, 48f, 240f, bodyPaint)
+            canvas.drawText(receipt.reference, 48f, 108f, bodyPaint)
+            canvas.drawText(DateUtils.formatDateHeure(receipt.createdAt), 48f, 132f, bodyPaint)
+            canvas.drawText(receipt.clientName, 48f, 156f, bodyPaint)
+            var y = 195f
+            receipt.payload.lines.take(22).forEach { line ->
+                canvas.drawText("${line.name.take(30)} × ${line.quantity.saleQuantity()}  ${saleMoney(line.total, devise)}", 48f, y, bodyPaint)
+                y += 23f
+            }
+            y += 15f
+            canvas.drawText("TVA ${receipt.payload.taxRate.saleRate()}% : ${saleMoney(receipt.payload.taxAmount, devise)}", 48f, y, bodyPaint)
+            y += 27f
+            canvas.drawText("Total : ${saleMoney(receipt.total, devise)}", 48f, y, titlePaint)
+            y += 27f
+            canvas.drawText("Payé : ${saleMoney(receipt.paidAmount, devise)}", 48f, y, bodyPaint)
+            y += 25f
+            canvas.drawText(receipt.paymentMethod, 48f, y, bodyPaint)
             document.finishPage(page)
             ParcelFileDescriptor.AutoCloseOutputStream(destination).use { output -> document.writeTo(output) }
             callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
@@ -1275,7 +1286,7 @@ private class SalePrintAdapter(
     }
 }
 
-private fun saleMoney(amount: Double, devise: String): String {
+internal fun saleMoney(amount: Double, devise: String): String {
     val fractionDigits = runCatching { Currency.getInstance(devise).defaultFractionDigits }.getOrDefault(2)
     val pattern = if (fractionDigits == 0) "#,##0" else "#,##0.${"0".repeat(fractionDigits.coerceAtMost(2))}"
     val formatter = DecimalFormat(pattern, DecimalFormatSymbols(Locale.getDefault()))

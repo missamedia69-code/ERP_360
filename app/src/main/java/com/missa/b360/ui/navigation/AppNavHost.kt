@@ -125,12 +125,13 @@ private fun MainNavHost() {
                     defaultValue = false
                 },
             ),
-        ) {
+        ) { entry ->
             SalesScreen(
                 onNavigate = { route -> navController.navigate(route) },
                 onOpenClientCreate = {
                     navController.navigate("${AppModule.CLIENTS.route}?create=true")
                 },
+                openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
         operationDestination(AppModule.ACHATS, OperationModule.ACHATS, navController)
