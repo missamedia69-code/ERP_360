@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.verticalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -133,17 +133,17 @@ fun ClientFormDialog(
 
     fun sauvegarder() {
         onConfirm(
-            nom = nom,
-            tel = telephoneComplet,
-            type = type,
-            email = email.ifBlank { null },
-            adresse = adresse.ifBlank { null },
-            catId = catId,
-            siteId = siteId,
-            remise = remiseValeur,
-            limite = limiteValeur,
-            badgeId = badgeId,
-            notes = notes.ifBlank { null },
+            nom,
+            telephoneComplet,
+            type,
+            email.ifBlank { null },
+            adresse.ifBlank { null },
+            catId,
+            siteId,
+            remiseValeur,
+            limiteValeur,
+            badgeId,
+            notes.ifBlank { null },
         )
     }
 
