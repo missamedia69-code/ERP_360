@@ -47,9 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,6 +79,7 @@ fun OperationModuleScreen(
     val records by viewModel.records(module).collectAsState(initial = emptyList())
     val devise by viewModel.devise.collectAsState()
     val result by viewModel.result.collectAsState()
+    val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var formVisible by remember { mutableStateOf(false) }
 
@@ -88,19 +90,19 @@ fun OperationModuleScreen(
         when (val current = result) {
             is OperationsViewModel.Result.Created -> {
                 formVisible = false
-                snackbar.showSnackbar(stringResource(R.string.ops_created, current.reference))
+                snackbar.showSnackbar(context.getString(R.string.ops_created, current.reference))
                 viewModel.clearResult()
             }
             OperationsViewModel.Result.Invalid -> {
-                snackbar.showSnackbar(stringResource(R.string.ops_invalid))
+                snackbar.showSnackbar(context.getString(R.string.ops_invalid))
                 viewModel.clearResult()
             }
             OperationsViewModel.Result.ReadOnly -> {
-                snackbar.showSnackbar(stringResource(R.string.ops_read_only))
+                snackbar.showSnackbar(context.getString(R.string.ops_read_only))
                 viewModel.clearResult()
             }
             OperationsViewModel.Result.Error -> {
-                snackbar.showSnackbar(stringResource(R.string.ops_error))
+                snackbar.showSnackbar(context.getString(R.string.ops_error))
                 viewModel.clearResult()
             }
             null -> Unit
