@@ -48,7 +48,10 @@ fun ClientsScreen(
             retour.code != null -> stringResource(R.string.clients_client_cree, retour.code)
             retour.erreur == "licence" -> stringResource(R.string.clients_lecture_seule)
             retour.erreur == "nom" -> stringResource(R.string.clients_nom_obligatoire)
+            retour.erreur == "nom_invalide" -> stringResource(R.string.clients_nom_invalide)
             retour.erreur == "telephone" -> stringResource(R.string.clients_telephone_obligatoire)
+            retour.erreur == "telephone_invalide" -> stringResource(R.string.clients_telephone_invalide)
+            retour.erreur == "email_invalide" -> stringResource(R.string.clients_email_invalide)
             retour.erreur == "donnees" -> stringResource(R.string.clients_donnees_invalides)
             else -> stringResource(R.string.clients_erreur_sauvegarde)
         }

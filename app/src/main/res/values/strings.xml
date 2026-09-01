@@ -254,6 +254,13 @@
     <string name="clients_donnees_invalides">Vérifiez la remise et la limite de crédit.</string>
     <string name="clients_erreur_sauvegarde">L’enregistrement a échoué. Réessayez.</string>
     <string name="clients_categorie_utilisee">Cette catégorie est utilisée par un ou plusieurs clients.</string>
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">Saisissez un nom de 2 à 120 caractères.</string>
+    <string name="clients_telephone_invalide">Saisissez un numéro valide de 7 à 15 chiffres.</string>
+    <string name="clients_email_invalide">Saisissez une adresse email valide ou laissez ce champ vide.</string>
+    <string name="clients_remise_invalide">La remise doit être comprise entre 0 et 100 %.</string>
+    <string name="clients_limite_credit_invalide">Saisissez une limite de crédit positive.</string>
+
     <!-- Types de clients -->
     <string name="clients_type_particulier">Particulier</string>
     <string name="clients_type_entreprise">Entreprise</string>

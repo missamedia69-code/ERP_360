@@ -160,6 +160,13 @@
     <string name="clients_donnees_invalides">تحقق من الخصم وحد الائتمان.</string>
     <string name="clients_erreur_sauvegarde">تعذر الحفظ. حاول مرة أخرى.</string>
     <string name="clients_categorie_utilisee">تُستخدم هذه الفئة من قبل عميل واحد أو أكثر.</string>
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">أدخل اسماً بين حرفين و120 حرفاً.</string>
+    <string name="clients_telephone_invalide">أدخل رقم هاتف صالحاً من 7 إلى 15 رقماً.</string>
+    <string name="clients_email_invalide">أدخل بريداً إلكترونياً صالحاً أو اترك الحقل فارغاً.</string>
+    <string name="clients_remise_invalide">يجب أن يكون الخصم بين 0 و100٪.</string>
+    <string name="clients_limite_credit_invalide">أدخل حد ائتمان موجباً.</string>
+
     <!-- Types de clients -->
     <string name="clients_type_particulier">فرد</string>
     <string name="clients_type_entreprise">شركة</string>

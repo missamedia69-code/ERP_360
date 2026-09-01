@@ -17,6 +17,28 @@ class ClientValidationTest {
     }
 
     @Test
+    fun `le téléphone accepte les formats internationaux et rejette les lettres`() {
+        assertTrue(ClientValidation.telephoneEstValide("690 00-00-00"))
+        assertTrue(ClientValidation.telephoneEstValide("+237 (690) 00-00-00"))
+        assertEquals("+237690000000", ClientValidation.normaliseTelephone("+237 (690) 00-00-00"))
+        assertEquals("690000000", ClientValidation.filtrerTelephonePourSaisie("690abc000000"))
+        assertFalse(ClientValidation.telephoneEstValide("690abc000000"))
+        assertFalse(ClientValidation.telephoneEstValide("12345"))
+        assertFalse(ClientValidation.telephoneEstValide("1234567890123456"))
+    }
+
+    @Test
+    fun `email facultatif doit être valide lorsqu il est renseigné`() {
+        assertTrue(ClientValidation.emailEstValide(null))
+        assertTrue(ClientValidation.emailEstValide(" contact@example.com "))
+        assertEquals("contact@example.com", ClientValidation.normaliseEmail(" Contact@Example.com "))
+        assertFalse(ClientValidation.emailEstValide("contact@"))
+        assertFalse(ClientValidation.emailEstValide("contact exemple.com"))
+        assertFalse(ClientValidation.emailEstValide("contact@@example.com"))
+        assertFalse(ClientValidation.emailEstValide(".contact@example.com"))
+    }
+
+    @Test
     fun `nom téléphone remise et limite doivent être valides`() {
         assertTrue(
             ClientValidation.coordonneesEtConditionsSontValides(

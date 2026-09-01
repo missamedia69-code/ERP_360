@@ -160,6 +160,13 @@
     <string name="clients_donnees_invalides">Compruebe el descuento y el límite de crédito.</string>
     <string name="clients_erreur_sauvegarde">No se pudo guardar. Inténtelo de nuevo.</string>
     <string name="clients_categorie_utilisee">Esta categoría la utiliza uno o más clientes.</string>
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">Introduzca un nombre de entre 2 y 120 caracteres.</string>
+    <string name="clients_telephone_invalide">Introduzca un teléfono válido de 7 a 15 dígitos.</string>
+    <string name="clients_email_invalide">Introduzca un correo electrónico válido o deje este campo vacío.</string>
+    <string name="clients_remise_invalide">El descuento debe estar entre 0 y 100%.</string>
+    <string name="clients_limite_credit_invalide">Introduzca un límite de crédito positivo.</string>
+
     <!-- Types de clients -->
     <string name="clients_type_particulier">Particular</string>
     <string name="clients_type_entreprise">Empresa</string>

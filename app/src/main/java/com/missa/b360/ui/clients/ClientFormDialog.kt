@@ -1,18 +1,22 @@
 package com.missa.b360.ui.clients
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.domain.usecase.ClientValidation
 
 /**
  * Formulaire client (9.2) — création/édition.
@@ -49,6 +53,11 @@ fun ClientFormDialog(
     var badgeId by remember { mutableStateOf(client?.badgeId) }
     var notes by remember { mutableStateOf(client?.notes ?: "") }
 
+    val nomValide = ClientValidation.nomEstValide(nom)
+    val telephoneValide = ClientValidation.telephoneEstValide(tel)
+    val emailValide = ClientValidation.emailEstValide(email)
+    val adresseValide = ClientValidation.adresseEstValide(adresse)
+    val notesValides = ClientValidation.notesSontValides(notes)
     val remiseValeur = remise.replace(',', '.').toDoubleOrNull()
     val limiteValeur = limite.replace(',', '.').toDoubleOrNull()
     val remiseValide = remiseValeur != null && remiseValeur in 0.0..100.0
@@ -70,29 +79,58 @@ fun ClientFormDialog(
             ) {
                 OutlinedTextField(
                     value = nom,
-                    onValueChange = { nom = it },
+                    onValueChange = { nom = it.take(ClientValidation.LONGUEUR_NOM_MAX) },
                     label = { Text(stringResource(R.string.clients_nom)) },
+                    isError = nom.isNotEmpty() && !nomValide,
+                    supportingText = {
+                        if (nom.isNotEmpty() && !nomValide) {
+                            Text(stringResource(R.string.clients_nom_invalide))
+                        }
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 OutlinedTextField(
                     value = tel,
-                    onValueChange = { tel = it },
+                    onValueChange = { tel = ClientValidation.filtrerTelephonePourSaisie(it).take(25) },
                     label = { Text(stringResource(R.string.clients_telephone)) },
+                    isError = tel.isNotEmpty() && !telephoneValide,
+                    supportingText = {
+                        if (tel.isNotEmpty() && !telephoneValide) {
+                            Text(stringResource(R.string.clients_telephone_invalide))
+                        }
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next,
+                    ),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it.take(ClientValidation.LONGUEUR_EMAIL_MAX) },
                     label = { Text(stringResource(R.string.clients_email)) },
+                    isError = email.isNotEmpty() && !emailValide,
+                    supportingText = {
+                        if (email.isNotEmpty() && !emailValide) {
+                            Text(stringResource(R.string.clients_email_invalide))
+                        }
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next,
+                    ),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 OutlinedTextField(
                     value = adresse,
-                    onValueChange = { adresse = it },
+                    onValueChange = { adresse = it.take(ClientValidation.LONGUEUR_ADRESSE_MAX) },
                     label = { Text(stringResource(R.string.clients_adresse)) },
+                    isError = !adresseValide,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 Text(
@@ -113,9 +151,12 @@ fun ClientFormDialog(
 
                 OutlinedTextField(
                     value = notes,
-                    onValueChange = { notes = it },
+                    onValueChange = { notes = it.take(ClientValidation.LONGUEUR_NOTES_MAX) },
                     label = { Text(stringResource(R.string.clients_notes)) },
-                    singleLine = true,
+                    isError = !notesValides,
+                    minLines = 2,
+                    maxLines = 4,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
 // Champs optionnels
@@ -137,18 +178,32 @@ fun ClientFormDialog(
 
                 OutlinedTextField(
                     value = remise,
-                    onValueChange = { remise = it.filter { c -> (c.isDigit() || c == '.' || c == ',') } },
+                    onValueChange = { remise = it.filter { c -> (c.isDigit() || c == '.' || c == ',') }.take(8) },
                     label = { Text(stringResource(R.string.clients_remise)) },
                     isError = !remiseValide,
+                    supportingText = {
+                        if (!remiseValide) Text(stringResource(R.string.clients_remise_invalide))
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next,
+                    ),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
                 OutlinedTextField(
                     value = limite,
-                    onValueChange = { limite = it.filter { c -> (c.isDigit() || c == '.' || c == ',') } },
+                    onValueChange = { limite = it.filter { c -> (c.isDigit() || c == '.' || c == ',') }.take(15) },
                     label = { Text(stringResource(R.string.clients_limite_credit)) },
                     isError = !limiteValide,
+                    supportingText = {
+                        if (!limiteValide) Text(stringResource(R.string.clients_limite_credit_invalide))
+                    },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done,
+                    ),
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 )
 
@@ -183,7 +238,8 @@ fun ClientFormDialog(
                         notes.ifBlank { null },
                     )
                 },
-                enabled = nom.isNotBlank() && tel.isNotBlank() && remiseValide && limiteValide,
+                enabled = nomValide && telephoneValide && emailValide && adresseValide &&
+                    notesValides && remiseValide && limiteValide,
             ) {
                 Text(
                     stringResource(

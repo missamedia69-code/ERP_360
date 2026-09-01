@@ -249,6 +249,13 @@
     <string name="clients_erreur_sauvegarde">Could not save. Please try again.</string>
     <string name="clients_categorie_utilisee">This category is used by one or more clients.</string>
 
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">Enter a name between 2 and 120 characters.</string>
+    <string name="clients_telephone_invalide">Enter a valid phone number with 7 to 15 digits.</string>
+    <string name="clients_email_invalide">Enter a valid email address or leave this field blank.</string>
+    <string name="clients_remise_invalide">The discount must be between 0 and 100%.</string>
+    <string name="clients_limite_credit_invalide">Enter a positive credit limit.</string>
+
     <!-- Types de clients -->
     <string name="clients_type_particulier">Individual</string>
     <string name="clients_type_entreprise">Company</string>

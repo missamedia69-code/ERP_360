@@ -15,19 +15,96 @@ import javax.inject.Inject
 
 /** Règles de saisie communes à la création et à l'édition d'un client. */
 object ClientValidation {
+    const val LONGUEUR_NOM_MAX = 120
+    const val LONGUEUR_EMAIL_MAX = 254
+    const val LONGUEUR_ADRESSE_MAX = 250
+    const val LONGUEUR_NOTES_MAX = 1_000
+    private const val NOMBRE_CHIFFRES_TELEPHONE_MIN = 7
+    private const val NOMBRE_CHIFFRES_TELEPHONE_MAX = 15
+
     fun normaliseNom(nom: String): String = nom.trim()
 
-    fun normaliseTelephone(telephone: String): String = telephone.trim()
+    /**
+     * Conserve uniquement les caractères compatibles avec un numéro international
+     * lisible : chiffres, espaces, tirets, parenthèses et un `+` initial.
+     */
+    fun filtrerTelephonePourSaisie(saisie: String): String = buildString {
+        saisie.forEachIndexed { index, caractere ->
+            when {
+                caractere in '0'..'9' || caractere == ' ' || caractere == '-' ||
+                    caractere == '(' || caractere == ')' -> append(caractere)
+                caractere == '+' && index == 0 -> append(caractere)
+            }
+        }
+    }
+
+    /** Stockage canonique afin que 690 00-00-00 et 690000000 soient identiques. */
+    fun normaliseTelephone(telephone: String): String {
+        val saisie = telephone.trim()
+        val chiffres = saisie.filter { it in '0'..'9' }
+        return if (saisie.startsWith('+')) "+$chiffres" else chiffres
+    }
+
+    fun telephoneEstValide(telephone: String): Boolean {
+        val saisie = telephone.trim()
+        if (saisie.isEmpty()) return false
+        if (saisie != filtrerTelephonePourSaisie(saisie)) return false
+        val normalise = normaliseTelephone(saisie)
+        val chiffres = normalise.removePrefix("+")
+        return chiffres.length in NOMBRE_CHIFFRES_TELEPHONE_MIN..NOMBRE_CHIFFRES_TELEPHONE_MAX
+    }
+
+    fun normaliseEmail(email: String?): String? = email?.trim()?.lowercase()?.ifBlank { null }
+
+    /** Validation volontairement stricte des erreurs manifestes, sans imposer un domaine. */
+    fun emailEstValide(email: String?): Boolean {
+        val normalise = normaliseEmail(email) ?: return true
+        if (normalise.length > LONGUEUR_EMAIL_MAX || normalise.any { it.isWhitespace() }) return false
+        val arobase = normalise.indexOf('@')
+        if (arobase !in 1..64 || arobase != normalise.lastIndexOf('@')) return false
+        val local = normalise.substring(0, arobase)
+        if (local.startsWith('.') || local.endsWith('.') || ".." in local ||
+            !local.all { it.isLetterOrDigit() || it in ".!#\$%&'*+/=?^_`{|}~-" }
+        ) {
+            return false
+        }
+        val domaine = normalise.substring(arobase + 1)
+        return domaine.length in 3..253 &&
+            '.' in domaine &&
+            !domaine.startsWith('.') &&
+            !domaine.endsWith('.') &&
+            domaine.split('.').all { etiquette ->
+                etiquette.isNotEmpty() &&
+                    etiquette.length <= 63 &&
+                    !etiquette.startsWith('-') &&
+                    !etiquette.endsWith('-') &&
+                    etiquette.all { it.isLetterOrDigit() || it == '-' }
+            }
+    }
 
     fun normaliseTexte(texte: String?): String? = texte?.trim()?.ifBlank { null }
+
+    fun nomEstValide(nom: String): Boolean = normaliseNom(nom).length in 2..LONGUEUR_NOM_MAX
+
+    fun adresseEstValide(adresse: String?): Boolean =
+        normaliseTexte(adresse)?.length?.let { it <= LONGUEUR_ADRESSE_MAX } ?: true
+
+    fun notesSontValides(notes: String?): Boolean =
+        normaliseTexte(notes)?.length?.let { it <= LONGUEUR_NOTES_MAX } ?: true
 
     fun coordonneesEtConditionsSontValides(
         nom: String,
         telephone: String,
         remiseDefautPct: Double,
         limiteCredit: Double?,
-    ): Boolean = normaliseNom(nom).isNotEmpty() &&
-        normaliseTelephone(telephone).isNotEmpty() &&
+        email: String? = null,
+        adresse: String? = null,
+        notes: String? = null,
+    ): Boolean = nomEstValide(nom) &&
+        telephoneEstValide(telephone) &&
+        emailEstValide(email) &&
+        adresseEstValide(adresse) &&
+        notesSontValides(notes) &&
         remiseDefautPct in 0.0..100.0 &&
         (limiteCredit == null || limiteCredit >= 0.0)
 }
@@ -79,7 +156,10 @@ class CreateClientUseCase @Inject constructor(
         data object LicenceExpiree : Result() // RA-05 : lecture seule
         data object DoublonPotentiel : Result() // RC-01 : confirmation requise
         data object NomObligatoire : Result()
+        data object NomInvalide : Result()
         data object TelephoneObligatoire : Result()
+        data object TelephoneInvalide : Result()
+        data object EmailInvalide : Result()
         data object DonneesInvalides : Result()
     }
 
@@ -100,10 +180,22 @@ class CreateClientUseCase @Inject constructor(
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return Result.LicenceExpiree
-        if (!ClientValidation.coordonneesEtConditionsSontValides(nom, telephone, remiseDefautPct, limiteCredit)) {
+        val saisieValide = ClientValidation.coordonneesEtConditionsSontValides(
+            nom = nom,
+            telephone = telephone,
+            remiseDefautPct = remiseDefautPct,
+            limiteCredit = limiteCredit,
+            email = email,
+            adresse = adresse,
+            notes = notes,
+        )
+        if (!saisieValide) {
             return when {
                 nomNormalise.isEmpty() -> Result.NomObligatoire
+                !ClientValidation.nomEstValide(nom) -> Result.NomInvalide
                 telephoneNormalise.isEmpty() -> Result.TelephoneObligatoire
+                !ClientValidation.telephoneEstValide(telephone) -> Result.TelephoneInvalide
+                !ClientValidation.emailEstValide(email) -> Result.EmailInvalide
                 else -> Result.DonneesInvalides
             }
         }
@@ -121,7 +213,7 @@ class CreateClientUseCase @Inject constructor(
                 nom = nomNormalise,
                 type = type,
                 telephone = telephoneNormalise,
-                email = ClientValidation.normaliseTexte(email),
+                email = ClientValidation.normaliseEmail(email),
                 adresse = ClientValidation.normaliseTexte(adresse),
                 categorieId = categorieId,
                 remiseDefautPct = remiseDefautPct,
@@ -159,16 +251,23 @@ class UpdateClientUseCase @Inject constructor(
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return false
-        if (!ClientValidation.coordonneesEtConditionsSontValides(nom, telephone, remiseDefautPct, limiteCredit)) {
-            return false
-        }
+        val saisieValide = ClientValidation.coordonneesEtConditionsSontValides(
+            nom = nom,
+            telephone = telephone,
+            remiseDefautPct = remiseDefautPct,
+            limiteCredit = limiteCredit,
+            email = email,
+            adresse = adresse,
+            notes = notes,
+        )
+        if (!saisieValide) return false
         val existant = clientDao.getById(id) ?: return false
         clientDao.update(
             existant.copy(
                 nom = nomNormalise,
                 telephone = telephoneNormalise,
                 type = type,
-                email = ClientValidation.normaliseTexte(email),
+                email = ClientValidation.normaliseEmail(email),
                 adresse = ClientValidation.normaliseTexte(adresse),
                 categorieId = categorieId,
                 remiseDefautPct = remiseDefautPct,
@@ -222,7 +321,7 @@ class CategorieClientUseCases @Inject constructor(
     /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
     suspend fun creer(nom: String): Long? {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || nomNormalise.isEmpty()) return null
+        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom)) return null
         val id = clientDao.insertCategorie(CategoryClientEntity(nom = nomNormalise))
         journalManager.log("CLIENTS", "CATEGORIE_CREEE", "Catégorie client : $nomNormalise")
         return id
@@ -230,7 +329,7 @@ class CategorieClientUseCases @Inject constructor(
 
     suspend fun renommer(id: Long, nom: String): Boolean {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || nomNormalise.isEmpty()) return false
+        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom)) return false
         val cat = clientDao.getCategorieById(id) ?: return false
         clientDao.updateCategorie(cat.copy(nom = nomNormalise))
         journalManager.log("CLIENTS", "CATEGORIE_MODIFIEE", "Catégorie -> $nomNormalise")
@@ -259,7 +358,7 @@ class BadgeLoyaltyUseCases @Inject constructor(
     /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
     suspend fun creer(nom: String, remisePct: Double): Long? {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || nomNormalise.isEmpty() || remisePct !in 0.0..100.0) {
+        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom) || remisePct !in 0.0..100.0) {
             return null
         }
         val id = clientDao.insertBadge(BadgeLoyaltyEntity(nom = nomNormalise, remisePct = remisePct))
@@ -269,7 +368,7 @@ class BadgeLoyaltyUseCases @Inject constructor(
 
     suspend fun modifier(id: Long, nom: String, remisePct: Double, actif: Boolean = true): Boolean {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || nomNormalise.isEmpty() || remisePct !in 0.0..100.0) {
+        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom) || remisePct !in 0.0..100.0) {
             return false
         }
         val badge = clientDao.getBadgeById(id) ?: return false

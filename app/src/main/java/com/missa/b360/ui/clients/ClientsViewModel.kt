@@ -137,8 +137,14 @@ class ClientsViewModel @Inject constructor(
                         _resultat.value = Resultat(erreur = "licence")
                     is CreateClientUseCase.Result.NomObligatoire ->
                         _resultat.value = Resultat(erreur = "nom")
+                    is CreateClientUseCase.Result.NomInvalide ->
+                        _resultat.value = Resultat(erreur = "nom_invalide")
                     is CreateClientUseCase.Result.TelephoneObligatoire ->
                         _resultat.value = Resultat(erreur = "telephone")
+                    is CreateClientUseCase.Result.TelephoneInvalide ->
+                        _resultat.value = Resultat(erreur = "telephone_invalide")
+                    is CreateClientUseCase.Result.EmailInvalide ->
+                        _resultat.value = Resultat(erreur = "email_invalide")
                     is CreateClientUseCase.Result.DonneesInvalides ->
                         _resultat.value = Resultat(erreur = "donnees")
                 }

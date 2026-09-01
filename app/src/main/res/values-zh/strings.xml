@@ -160,6 +160,13 @@
     <string name="clients_donnees_invalides">请检查折扣和信用额度。</string>
     <string name="clients_erreur_sauvegarde">保存失败，请重试。</string>
     <string name="clients_categorie_utilisee">一个或多个客户正在使用此类别。</string>
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">请输入 2 到 120 个字符的名称。</string>
+    <string name="clients_telephone_invalide">请输入由 7 到 15 位数字组成的有效电话号码。</string>
+    <string name="clients_email_invalide">请输入有效的电子邮箱，或将此字段留空。</string>
+    <string name="clients_remise_invalide">折扣必须在 0 到 100% 之间。</string>
+    <string name="clients_limite_credit_invalide">请输入正的信用额度。</string>
+
     <!-- Types de clients -->
     <string name="clients_type_particulier">个人</string>
     <string name="clients_type_entreprise">企业</string>
