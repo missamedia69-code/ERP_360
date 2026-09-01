@@ -1,7 +1,6 @@
 package com.missa.b360.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -47,8 +46,11 @@ private val DarkColors = darkColorScheme(
 
 @Composable
 fun Erp360Theme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    // La maquette de référence est une interface claire, y compris si l'appareil est en sombre.
+    darkTheme: Boolean = false,
+    // Le bleu Missa est une composante de la direction artistique : ne pas le remplacer
+    // silencieusement par la palette Monet de l'appareil.
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {

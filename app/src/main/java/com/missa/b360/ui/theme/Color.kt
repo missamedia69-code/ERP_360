@@ -2,25 +2,32 @@ package com.missa.b360.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Palette Missa 360 — extraite du logo (bleu dégradé + vert accent)
-// Bleu principal
-val Blue90 = Color(0xFFE8F1FE)
-val Blue80 = Color(0xFFBBD7FB)
-val Blue60 = Color(0xFF2274E8)
-val Blue40 = Color(0xFF0A47A8)
-val Blue20 = Color(0xFF072E6B)
+/** Palette lumineuse Missa Business 360 : blanc, bleu cobalt et accents métier. */
+val BrandBlue = Color(0xFF0759F5)
+val Blue90 = Color(0xFFF0F5FF)
+val Blue80 = Color(0xFFB9D0FF)
+val Blue60 = BrandBlue
+val Blue40 = Color(0xFF0847C9)
+val Blue20 = Color(0xFF101B3D)
 
-// Vert accent (action / succès)
-val Green90 = Color(0xFFF2FBD9)
-val Green60 = Color(0xFF86C90B)
-val Green40 = Color(0xFF5F9205)
+// Vert accent : action positive / producteur.
+val Green90 = Color(0xFFEAF8EF)
+val Green60 = Color(0xFF24A148)
+val Green40 = Color(0xFF167A35)
 
-// Alerte
-val Red40 = Color(0xFFC0392B)
-val Red80 = Color(0xFFF5B8B8)
+// Accents des profils d'activité et composants informatifs.
+val ProfileGreen = Color(0xFF20934A)
+val ProfileCommerceBlue = BrandBlue
+val ProfilePurple = Color(0xFF7638D7)
+val ProfileOrange = Color(0xFFF28A16)
 
-// Neutres
-val LightBackground = Color(0xFFF5F8FF)
+// Alerte.
+val Red40 = Color(0xFFC8382D)
+val Red80 = Color(0xFFFFDAD6)
+
+// Neutres très clairs de la maquette.
+val OnboardingBorder = Color(0xFFE4E8F0)
+val LightBackground = Color(0xFFFFFFFF)
 val LightSurface = Color(0xFFFFFFFF)
 val DarkBackground = Color(0xFF0A1B3D)
 val DarkSurface = Color(0xFF14264A)

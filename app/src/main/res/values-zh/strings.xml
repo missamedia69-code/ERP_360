@@ -195,4 +195,24 @@
     <string name="clients_devise">货币</string>
     <string name="clients_enregistrer">保存</string>
 
+
+    <!-- 视觉规范：移动端引导 -->
+    <string name="ob_plus_tard">稍后</string>
+    <string name="ob_langue_subtitle">您可以随时在设置中修改。</string>
+    <string name="ob_profil_subtitle">此选择可让应用适配您的需要。</string>
+    <string name="ob_entreprise_subtitle">填写公司的基本信息。</string>
+    <string name="ob_informations_entreprise">公司信息</string>
+    <string name="ob_nouveau_pin">新 PIN 码</string>
+    <string name="ob_pin_securite_titre">您的访问已受保护</string>
+    <string name="ob_pin_securite_note">每次打开应用时都需要输入此 PIN 码。</string>
+    <string name="ob_licence_subtitle">现在激活许可证，或继续使用免费试用。</string>
+    <string name="ob_jours">天</string>
+    <string name="ob_licence_hero_title">您可享受 7 天免费试用期</string>
+    <string name="ob_licence_avantage_fonctions">所有功能均可免费使用 7 天</string>
+    <string name="ob_licence_avantage_sans_carte">无需银行卡</string>
+    <string name="ob_licence_avantage_securite">您的数据受到 100% 保护</string>
+    <string name="ob_checklist_subtitle">您的工作空间已准备好。开始前请检查已配置项目。</string>
+    <string name="ob_checklist_bienvenue">配置已成功完成</string>
+    <string name="ob_selectionne">已选择</string>
+
 </resources>

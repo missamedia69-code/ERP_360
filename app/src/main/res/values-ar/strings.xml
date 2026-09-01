@@ -195,4 +195,24 @@
     <string name="clients_devise">العملة</string>
     <string name="clients_enregistrer">حفظ</string>
 
+
+    <!-- التوجيه الفني: إعداد التطبيق على الهاتف -->
+    <string name="ob_plus_tard">لاحقاً</string>
+    <string name="ob_langue_subtitle">يمكنك تغييرها في أي وقت من الإعدادات.</string>
+    <string name="ob_profil_subtitle">يساعد هذا الاختيار على تكييف التطبيق مع احتياجاتك.</string>
+    <string name="ob_entreprise_subtitle">أدخل المعلومات الأساسية لشركتك.</string>
+    <string name="ob_informations_entreprise">معلومات الشركة</string>
+    <string name="ob_nouveau_pin">رمز PIN جديد</string>
+    <string name="ob_pin_securite_titre">وصولك محمي</string>
+    <string name="ob_pin_securite_note">سيُطلب رمز PIN هذا عند كل فتح للتطبيق.</string>
+    <string name="ob_licence_subtitle">فعّل ترخيصك الآن أو تابع باستخدام التجربة المجانية.</string>
+    <string name="ob_jours">أيام</string>
+    <string name="ob_licence_hero_title">لديك فترة تجربة مجانية لمدة 7 أيام</string>
+    <string name="ob_licence_avantage_fonctions">كل الوظائف متاحة لمدة 7 أيام</string>
+    <string name="ob_licence_avantage_sans_carte">لا حاجة إلى بطاقة بنكية</string>
+    <string name="ob_licence_avantage_securite">بياناتك مؤمنة بنسبة 100٪</string>
+    <string name="ob_checklist_subtitle">مساحة عملك جاهزة. راجع العناصر المضبوطة قبل البدء.</string>
+    <string name="ob_checklist_bienvenue">اكتمل الإعداد بنجاح</string>
+    <string name="ob_selectionne">محدد</string>
+
 </resources>

@@ -195,4 +195,24 @@
     <string name="clients_devise">Moneda</string>
     <string name="clients_enregistrer">Guardar</string>
 
+
+    <!-- Dirección artística: onboarding móvil -->
+    <string name="ob_plus_tard">Más tarde</string>
+    <string name="ob_langue_subtitle">Podrá cambiarlo en cualquier momento desde los ajustes.</string>
+    <string name="ob_profil_subtitle">Esta elección adapta la aplicación a sus necesidades.</string>
+    <string name="ob_entreprise_subtitle">Introduzca la información básica de su empresa.</string>
+    <string name="ob_informations_entreprise">Información de la empresa</string>
+    <string name="ob_nouveau_pin">Nuevo código PIN</string>
+    <string name="ob_pin_securite_titre">Su acceso está protegido</string>
+    <string name="ob_pin_securite_note">Este código PIN se solicitará cada vez que abra la aplicación.</string>
+    <string name="ob_licence_subtitle">Active su licencia ahora o continúe con la prueba gratuita.</string>
+    <string name="ob_jours">días</string>
+    <string name="ob_licence_hero_title">Dispone de un periodo de prueba gratuito de 7 días</string>
+    <string name="ob_licence_avantage_fonctions">Todas las funciones están disponibles durante 7 días</string>
+    <string name="ob_licence_avantage_sans_carte">No se requiere tarjeta bancaria</string>
+    <string name="ob_licence_avantage_securite">Sus datos están 100% protegidos</string>
+    <string name="ob_checklist_subtitle">Su espacio está listo. Revise los elementos configurados antes de empezar.</string>
+    <string name="ob_checklist_bienvenue">La configuración se completó correctamente</string>
+    <string name="ob_selectionne">Seleccionado</string>
+
 </resources>

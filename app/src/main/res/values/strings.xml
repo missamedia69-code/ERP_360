@@ -301,4 +301,24 @@
     <string name="clients_devise">Devise</string>
     <string name="clients_enregistrer">Enregistrer</string>
 
+
+    <!-- Direction artistique : onboarding mobile -->
+    <string name="ob_plus_tard">Plus tard</string>
+    <string name="ob_langue_subtitle">Vous pourrez la modifier à tout moment dans les paramètres.</string>
+    <string name="ob_profil_subtitle">Ce choix permet d’adapter l’application à vos besoins.</string>
+    <string name="ob_entreprise_subtitle">Renseignez les informations de base de votre entreprise.</string>
+    <string name="ob_informations_entreprise">Informations de l’entreprise</string>
+    <string name="ob_nouveau_pin">Nouveau code PIN</string>
+    <string name="ob_pin_securite_titre">Votre accès est protégé</string>
+    <string name="ob_pin_securite_note">Ce code PIN sera demandé à chaque ouverture de l’application.</string>
+    <string name="ob_licence_subtitle">Activez votre licence maintenant ou poursuivez avec l’essai gratuit.</string>
+    <string name="ob_jours">jours</string>
+    <string name="ob_licence_hero_title">Vous bénéficiez d’une période d’essai gratuite de 7 jours</string>
+    <string name="ob_licence_avantage_fonctions">Toutes les fonctionnalités sont disponibles pendant 7 jours</string>
+    <string name="ob_licence_avantage_sans_carte">Aucune carte bancaire n’est requise</string>
+    <string name="ob_licence_avantage_securite">Vos données sont 100 % sécurisées</string>
+    <string name="ob_checklist_subtitle">Votre espace est prêt. Vérifiez les éléments configurés avant de commencer.</string>
+    <string name="ob_checklist_bienvenue">Configuration terminée avec succès</string>
+    <string name="ob_selectionne">Sélectionné</string>
+
 </resources>

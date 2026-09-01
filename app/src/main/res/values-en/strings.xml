@@ -294,4 +294,24 @@
     <string name="clients_devise">Currency</string>
     <string name="clients_enregistrer">Save</string>
 
+
+    <!-- Art direction: mobile onboarding -->
+    <string name="ob_plus_tard">Later</string>
+    <string name="ob_langue_subtitle">You can change it at any time in settings.</string>
+    <string name="ob_profil_subtitle">This choice tailors the app to your needs.</string>
+    <string name="ob_entreprise_subtitle">Enter your company’s essential information.</string>
+    <string name="ob_informations_entreprise">Company information</string>
+    <string name="ob_nouveau_pin">New PIN code</string>
+    <string name="ob_pin_securite_titre">Your access is protected</string>
+    <string name="ob_pin_securite_note">This PIN code will be requested each time you open the app.</string>
+    <string name="ob_licence_subtitle">Activate your licence now or continue with the free trial.</string>
+    <string name="ob_jours">days</string>
+    <string name="ob_licence_hero_title">You have a free 7-day trial period</string>
+    <string name="ob_licence_avantage_fonctions">All features are available for 7 days</string>
+    <string name="ob_licence_avantage_sans_carte">No bank card is required</string>
+    <string name="ob_licence_avantage_securite">Your data is 100% secure</string>
+    <string name="ob_checklist_subtitle">Your workspace is ready. Review the configured items before you begin.</string>
+    <string name="ob_checklist_bienvenue">Configuration completed successfully</string>
+    <string name="ob_selectionne">Selected</string>
+
 </resources>
