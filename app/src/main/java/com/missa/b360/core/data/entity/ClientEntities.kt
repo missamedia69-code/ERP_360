@@ -48,6 +48,12 @@ data class ClientEntity(
     val telephone2: String? = null,
     val email: String? = null,
     val adresse: String? = null,
+    /** Identifiant fiscal / NIF indiqué par le client. */
+    val nif: String? = null,
+    /** Commercial référent, saisi ou choisi selon l'organisation. */
+    val commercial: String? = null,
+    /** Délai de règlement convenu, en jours. */
+    val conditionPaiementJours: Int = 30,
     val categorieId: Long? = null,
     /** Remise par défaut en % (pré-remplie à la vente, RC-06). */
     val remiseDefautPct: Double = 0.0,
@@ -78,4 +84,34 @@ data class PriceClientEntity(
     val clientId: Long,
     val produitId: Long,
     val prix: Double,
+)
+
+
+/** Contact rattaché au client. Le principal est choisi par l'utilisateur, sans donnée fictive. */
+@Entity(
+    tableName = "client_contacts",
+    indices = [Index(value = ["clientId"])],
+)
+data class ClientContactEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long,
+    val nom: String,
+    val fonction: String? = null,
+    val telephone: String? = null,
+    val email: String? = null,
+    val principal: Boolean = false,
+)
+
+/** Une adresse de livraison ou de facturation rattachée au client. */
+@Entity(
+    tableName = "client_addresses",
+    indices = [Index(value = ["clientId"])],
+)
+data class ClientAddressEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val clientId: Long,
+    val libelle: String = "",
+    val adresse: String,
+    val ville: String? = null,
+    val principale: Boolean = false,
 )

@@ -24,7 +24,7 @@ import com.missa.b360.core.data.entity.ClientType
 /** Écran Clients (9.2) : liste + recherche + catégories + badges + désactivation. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClientsScreen(
+private fun LegacyClientsScreen(
     onBack: () -> Unit,
     /** Vrai lorsqu'une action rapide de l'accueil demande directement la création. */
     openCreate: Boolean = false,

@@ -99,6 +99,7 @@ private fun MainNavHost() {
             ClientsScreen(
                 onBack = { navController.popBackStack() },
                 openCreate = entry.arguments?.getBoolean("create") == true,
+                onNavigate = { route -> navController.navigate(route) },
             )
         }
         composable(

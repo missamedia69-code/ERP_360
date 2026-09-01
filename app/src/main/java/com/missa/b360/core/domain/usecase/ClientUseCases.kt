@@ -3,6 +3,8 @@ package com.missa.b360.core.domain.usecase
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
@@ -12,6 +14,17 @@ import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+
+/** Informations détaillées persistées avec un client, y compris ses contacts et adresses. */
+data class ClientProfileInput(
+    val nif: String? = null,
+    val commercial: String? = null,
+    val conditionPaiementJours: Int = 30,
+    val contacts: List<ClientContactEntity> = emptyList(),
+    val addresses: List<ClientAddressEntity> = emptyList(),
+    /** L'édition simple conserve les relations jusqu'à ce que leurs écrans soient validés. */
+    val replaceRelations: Boolean = true,
+)
 
 /** Règles de saisie communes à la création et à l'édition d'un client. */
 object ClientValidation {
@@ -119,6 +132,21 @@ object ClientValidation {
     fun notesSontValides(notes: String?): Boolean =
         normaliseTexte(notes)?.length?.let { it <= LONGUEUR_NOTES_MAX } ?: true
 
+    fun profilEstValide(profil: ClientProfileInput): Boolean =
+        (profil.nif?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.commercial?.trim()?.length?.let { it <= LONGUEUR_NOM_MAX } ?: true) &&
+            profil.conditionPaiementJours in 0..365 &&
+            profil.contacts.all { contact ->
+                nomEstValide(contact.nom) &&
+                    (contact.telephone.isNullOrBlank() || telephoneEstValide(contact.telephone)) &&
+                    emailEstValide(contact.email)
+            } &&
+            profil.addresses.all { address ->
+                address.adresse.trim().length in 2..LONGUEUR_ADRESSE_MAX &&
+                    address.libelle.trim().length <= 60 &&
+                    (address.ville?.trim()?.length?.let { it <= 100 } ?: true)
+            }
+
     fun coordonneesEtConditionsSontValides(
         nom: String,
         telephone: String,
@@ -202,6 +230,7 @@ class CreateClientUseCase @Inject constructor(
         limiteCredit: Double? = null,
         badgeId: Long? = null,
         notes: String? = null,
+        profile: ClientProfileInput = ClientProfileInput(),
         doublonConfirme: Boolean = false,
         now: Long = System.currentTimeMillis(),
     ): Result {
@@ -216,7 +245,7 @@ class CreateClientUseCase @Inject constructor(
             email = email,
             adresse = adresse,
             notes = notes,
-        )
+        ) && ClientValidation.profilEstValide(profile)
         if (!saisieValide) {
             return when {
                 nomNormalise.isEmpty() -> Result.NomObligatoire
@@ -235,14 +264,17 @@ class CreateClientUseCase @Inject constructor(
         }
 
         val code = sequenceManager.next(DocType.CLIENT)
-        val id = clientDao.insert(
-            ClientEntity(
+        val id = clientDao.insertClientProfile(
+            client = ClientEntity(
                 code = code,
                 nom = nomNormalise,
                 type = type,
                 telephone = telephoneNormalise,
                 email = ClientValidation.normaliseEmail(email),
                 adresse = ClientValidation.normaliseTexte(adresse),
+                nif = ClientValidation.normaliseTexte(profile.nif),
+                commercial = ClientValidation.normaliseTexte(profile.commercial),
+                conditionPaiementJours = profile.conditionPaiementJours,
                 categorieId = categorieId,
                 siteId = siteId,
                 remiseDefautPct = remiseDefautPct,
@@ -253,6 +285,8 @@ class CreateClientUseCase @Inject constructor(
                 prospect = type == ClientType.PROSPECT,
                 createdAt = now,
             ),
+            contacts = profile.contacts,
+            addresses = profile.addresses,
         )
         journalManager.log("CLIENTS", "CREATION_CLIENT", "Client $code — $nomNormalise")
         return Result.Succes(id, code)
@@ -277,6 +311,8 @@ class UpdateClientUseCase @Inject constructor(
         limiteCredit: Double? = null,
         badgeId: Long? = null,
         notes: String? = null,
+        /** Null préserve les relations existantes, pour compatibilité avec les anciens formulaires. */
+        profile: ClientProfileInput? = null,
     ): Boolean {
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
@@ -289,24 +325,34 @@ class UpdateClientUseCase @Inject constructor(
             email = email,
             adresse = adresse,
             notes = notes,
-        )
+        ) && (profile?.let(ClientValidation::profilEstValide) ?: true)
         if (!saisieValide) return false
         val existant = clientDao.getById(id) ?: return false
-        clientDao.update(
-            existant.copy(
-                nom = nomNormalise,
-                telephone = telephoneNormalise,
-                type = type,
-                email = ClientValidation.normaliseEmail(email),
-                adresse = ClientValidation.normaliseTexte(adresse),
-                categorieId = categorieId,
-                siteId = siteId,
-                remiseDefautPct = remiseDefautPct,
-                limiteCredit = limiteCredit,
-                badgeId = badgeId,
-                notes = ClientValidation.normaliseTexte(notes),
-            ),
+        val clientMisAJour = existant.copy(
+            nom = nomNormalise,
+            telephone = telephoneNormalise,
+            type = type,
+            email = ClientValidation.normaliseEmail(email),
+            adresse = ClientValidation.normaliseTexte(adresse),
+            nif = profile?.let { ClientValidation.normaliseTexte(it.nif) } ?: existant.nif,
+            commercial = profile?.let { ClientValidation.normaliseTexte(it.commercial) } ?: existant.commercial,
+            conditionPaiementJours = profile?.conditionPaiementJours ?: existant.conditionPaiementJours,
+            categorieId = categorieId,
+            siteId = siteId,
+            remiseDefautPct = remiseDefautPct,
+            limiteCredit = limiteCredit,
+            badgeId = badgeId,
+            notes = ClientValidation.normaliseTexte(notes),
         )
+        if (profile == null || !profile.replaceRelations) {
+            clientDao.update(clientMisAJour)
+        } else {
+            clientDao.updateClientProfile(
+                client = clientMisAJour,
+                contacts = profile.contacts,
+                addresses = profile.addresses,
+            )
+        }
         journalManager.log("CLIENTS", "MODIFICATION_CLIENT", "Client ${existant.code} — $nomNormalise")
         return true
     }
@@ -332,6 +378,13 @@ class ObserveClientsUseCase @Inject constructor(
     private val clientDao: ClientDao,
 ) {
     operator fun invoke(): Flow<List<ClientEntity>> = clientDao.observeAll()
+}
+
+/** Liste pour l'administration client, incluant les comptes désactivés conservés en historique. */
+class ObserveAllClientsUseCase @Inject constructor(
+    private val clientDao: ClientDao,
+) {
+    operator fun invoke(): Flow<List<ClientEntity>> = clientDao.observeAllIncludingInactive()
 }
 
 /** Gestion des catégories de clients (suppression verrouillée si rattachée). */
@@ -407,4 +460,14 @@ class BadgeLoyaltyUseCases @Inject constructor(
         journalManager.log("CLIENTS", "BADGE_MODIFIE", "Badge fidélité : $nomNormalise")
         return true
     }
+}
+
+
+/** Accès au profil détaillé client sans exposer le DAO à l'interface Compose. */
+class ClientProfileUseCase @Inject constructor(
+    private val clientDao: ClientDao,
+) {
+    fun observeContacts(clientId: Long): Flow<List<ClientContactEntity>> = clientDao.observeContacts(clientId)
+
+    fun observeAddresses(clientId: Long): Flow<List<ClientAddressEntity>> = clientDao.observeAddresses(clientId)
 }

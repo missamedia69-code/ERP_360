@@ -5,15 +5,22 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
+import com.missa.b360.core.domain.usecase.ClientProfileInput
+import com.missa.b360.core.domain.usecase.ClientProfileUseCase
 import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
-import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
+import com.missa.b360.core.domain.usecase.ObserveAllClientsUseCase
+import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UpdateClientUseCase
 import com.missa.b360.core.util.Iso4217
@@ -22,6 +29,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,16 +38,20 @@ import javax.inject.Inject
 class ClientsViewModel @Inject constructor(
     private val getEnterprise: GetEnterpriseUseCase,
     private val settingsStore: SettingsStore,
-    private val observeClients: ObserveClientsUseCase,
+    private val observeAllClients: ObserveAllClientsUseCase,
     private val createClient: CreateClientUseCase,
     private val updateClient: UpdateClientUseCase,
     private val desactiverClient: DesactiverClientUseCase,
+    private val clientProfile: ClientProfileUseCase,
+    private val operations: OperationUseCases,
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
     private val siteUseCases: SiteUseCases,
 ) : ViewModel() {
 
-    val clients: Flow<List<ClientEntity>> = observeClients()
+    /** Le module Client montre aussi les comptes désactivés, contrairement au sélecteur Vente. */
+    val clients: Flow<List<ClientEntity>> = observeAllClients()
+    val salesHistory: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.VENTE)
     val categoriesFlow: Flow<List<CategoryClientEntity>> = categories.observer()
     val badgesFlow: Flow<List<BadgeLoyaltyEntity>> = badges.observer()
     val sitesFlow: Flow<List<SiteEntity>> = siteUseCases.observerSites()
@@ -50,7 +62,13 @@ class ClientsViewModel @Inject constructor(
     private val _codePaysParDefaut = MutableStateFlow<String?>(null)
     val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
 
-    data class Resultat(val code: String? = null, val erreur: String? = null)
+    data class Resultat(
+        val code: String? = null,
+        val erreur: String? = null,
+        val clientId: Long? = null,
+        val imports: Int? = null,
+        val ignoredImports: Int = 0,
+    )
 
     private data class DemandeCreation(
         val nom: String,
@@ -64,6 +82,7 @@ class ClientsViewModel @Inject constructor(
         val limiteCredit: Double?,
         val badgeId: Long?,
         val notes: String?,
+        val profile: ClientProfileInput,
     )
 
     private val _resultat = MutableStateFlow<Resultat?>(null)
@@ -98,6 +117,7 @@ class ClientsViewModel @Inject constructor(
         limiteCredit: Double?,
         badgeId: Long?,
         notes: String?,
+        profile: ClientProfileInput = ClientProfileInput(),
     ) {
         lancerCreation(
             DemandeCreation(
@@ -112,6 +132,7 @@ class ClientsViewModel @Inject constructor(
                 limiteCredit = limiteCredit,
                 badgeId = badgeId,
                 notes = notes,
+                profile = profile,
             ),
             doublonConfirme = false,
         )
@@ -152,12 +173,13 @@ class ClientsViewModel @Inject constructor(
                         limiteCredit = demande.limiteCredit,
                         badgeId = demande.badgeId,
                         notes = demande.notes,
+                        profile = demande.profile,
                         doublonConfirme = doublonConfirme,
                     )
                 ) {
                     is CreateClientUseCase.Result.Succes -> {
                         demandeDoublon = null
-                        _resultat.value = Resultat(code = resultat.code)
+                        _resultat.value = Resultat(code = resultat.code, clientId = resultat.clientId)
                     }
                     is CreateClientUseCase.Result.DoublonPotentiel -> {
                         demandeDoublon = demande
@@ -201,6 +223,7 @@ class ClientsViewModel @Inject constructor(
         limiteCredit: Double?,
         badgeId: Long?,
         notes: String?,
+        profile: ClientProfileInput? = null,
     ) {
         viewModelScope.launch {
             val ok = try {
@@ -217,6 +240,7 @@ class ClientsViewModel @Inject constructor(
                     limiteCredit = limiteCredit,
                     badgeId = badgeId,
                     notes = notes,
+                    profile = profile,
                 )
             } catch (exception: CancellationException) {
                 throw exception
@@ -224,6 +248,43 @@ class ClientsViewModel @Inject constructor(
                 false
             }
             _resultat.value = if (ok) Resultat(code = "edit") else Resultat(erreur = "err")
+        }
+    }
+
+    fun contacts(clientId: Long?): Flow<List<ClientContactEntity>> =
+        if (clientId == null) flowOf(emptyList()) else clientProfile.observeContacts(clientId)
+
+    fun addresses(clientId: Long?): Flow<List<ClientAddressEntity>> =
+        if (clientId == null) flowOf(emptyList()) else clientProfile.observeAddresses(clientId)
+
+    /** Importe uniquement des lignes valides; les doublons et lignes incomplètes sont ignorés. */
+    fun importer(rows: List<ImportedClientRow>) {
+        if (rows.isEmpty()) {
+            _resultat.value = Resultat(erreur = "import")
+            return
+        }
+        viewModelScope.launch {
+            var imported = 0
+            var ignored = 0
+            try {
+                rows.forEach { row ->
+                    when (createClient(
+                        nom = row.nom,
+                        telephone = row.telephone,
+                        email = row.email,
+                        adresse = row.adresse,
+                        doublonConfirme = false,
+                    )) {
+                        is CreateClientUseCase.Result.Succes -> imported++
+                        else -> ignored++
+                    }
+                }
+                _resultat.value = Resultat(imports = imported, ignoredImports = ignored)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                _resultat.value = Resultat(erreur = "import")
+            }
         }
     }
 
@@ -284,3 +345,11 @@ class ClientsViewModel @Inject constructor(
         }
     }
 }
+
+/** Ligne CSV normalisée par l'interface avant import local. */
+data class ImportedClientRow(
+    val nom: String,
+    val telephone: String,
+    val email: String? = null,
+    val adresse: String? = null,
+)

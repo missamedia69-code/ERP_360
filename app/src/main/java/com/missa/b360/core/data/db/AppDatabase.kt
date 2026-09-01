@@ -22,6 +22,8 @@ import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
@@ -59,13 +61,15 @@ import com.missa.b360.core.data.entity.UserEntity
         JournalEntryEntity::class,
         NotificationEntity::class,
         ClientEntity::class,
+        ClientContactEntity::class,
+        ClientAddressEntity::class,
         CategoryClientEntity::class,
         PriceClientEntity::class,
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
         OperationRecordEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -137,6 +141,37 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_operation_records_createdAt` " +
                         "ON `operation_records` (`createdAt`)",
+                )
+            }
+        }
+
+        /** v4 → v5 : profil client détaillé (NIF, contacts et adresses multiples). */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `clients` ADD COLUMN `nif` TEXT")
+                db.execSQL("ALTER TABLE `clients` ADD COLUMN `commercial` TEXT")
+                db.execSQL(
+                    "ALTER TABLE `clients` ADD COLUMN `conditionPaiementJours` INTEGER NOT NULL DEFAULT 30",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `client_contacts` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`clientId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `fonction` TEXT, " +
+                        "`telephone` TEXT, `email` TEXT, `principal` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_client_contacts_clientId` " +
+                        "ON `client_contacts` (`clientId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `client_addresses` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`clientId` INTEGER NOT NULL, `libelle` TEXT NOT NULL, `adresse` TEXT NOT NULL, " +
+                        "`ville` TEXT, `principale` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_client_addresses_clientId` " +
+                        "ON `client_addresses` (`clientId`)",
                 )
             }
         }

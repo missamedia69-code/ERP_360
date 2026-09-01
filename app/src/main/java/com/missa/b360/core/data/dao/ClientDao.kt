@@ -3,9 +3,12 @@ package com.missa.b360.core.data.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +21,10 @@ import kotlinx.coroutines.flow.Flow
 interface ClientDao {
     @Query("SELECT * FROM clients WHERE active = 1 ORDER BY nom")
     fun observeAll(): Flow<List<ClientEntity>>
+
+    /** Liste complète destinée au module Client, y compris les comptes désactivés. */
+    @Query("SELECT * FROM clients ORDER BY nom")
+    fun observeAllIncludingInactive(): Flow<List<ClientEntity>>
 
     @Query("SELECT * FROM clients WHERE id = :id")
     fun observeById(id: Long): Flow<ClientEntity?>
@@ -91,4 +98,60 @@ interface ClientDao {
 
     @Insert
     suspend fun insertPrix(prix: PriceClientEntity): Long
+
+
+    // --- Contacts et adresses du profil client ---
+    @Query("SELECT * FROM client_contacts WHERE clientId = :clientId ORDER BY principal DESC, nom")
+    fun observeContacts(clientId: Long): Flow<List<ClientContactEntity>>
+
+    @Query("SELECT * FROM client_addresses WHERE clientId = :clientId ORDER BY principale DESC, libelle")
+    fun observeAddresses(clientId: Long): Flow<List<ClientAddressEntity>>
+
+    @Insert
+    suspend fun insertContacts(contacts: List<ClientContactEntity>)
+
+    @Insert
+    suspend fun insertAddresses(addresses: List<ClientAddressEntity>)
+
+    @Query("DELETE FROM client_contacts WHERE clientId = :clientId")
+    suspend fun deleteContacts(clientId: Long)
+
+    @Query("DELETE FROM client_addresses WHERE clientId = :clientId")
+    suspend fun deleteAddresses(clientId: Long)
+
+    /** Remplace le sous-profil de façon atomique en conservant le client lui-même. */
+    @Transaction
+    suspend fun replaceProfileRelations(
+        clientId: Long,
+        contacts: List<ClientContactEntity>,
+        addresses: List<ClientAddressEntity>,
+    ) {
+        deleteContacts(clientId)
+        deleteAddresses(clientId)
+        if (contacts.isNotEmpty()) insertContacts(contacts.map { it.copy(id = 0, clientId = clientId) })
+        if (addresses.isNotEmpty()) insertAddresses(addresses.map { it.copy(id = 0, clientId = clientId) })
+    }
+
+    /** Crée le client et ses données liées dans la même transaction Room. */
+    @Transaction
+    suspend fun insertClientProfile(
+        client: ClientEntity,
+        contacts: List<ClientContactEntity>,
+        addresses: List<ClientAddressEntity>,
+    ): Long {
+        val id = insert(client)
+        replaceProfileRelations(id, contacts, addresses)
+        return id
+    }
+
+    /** Met à jour le client et remplace ses relations sans laisser de données orphelines. */
+    @Transaction
+    suspend fun updateClientProfile(
+        client: ClientEntity,
+        contacts: List<ClientContactEntity>,
+        addresses: List<ClientAddressEntity>,
+    ) {
+        update(client)
+        replaceProfileRelations(client.id, contacts, addresses)
+    }
 }
