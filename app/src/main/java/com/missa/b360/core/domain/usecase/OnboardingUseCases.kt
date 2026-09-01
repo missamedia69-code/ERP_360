@@ -18,6 +18,7 @@ import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.security.PinManager
+import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.navigation.AppModule
 import javax.inject.Inject
 
@@ -64,6 +65,8 @@ class SetupEnterpriseUseCase @Inject constructor(
         val nomEntreprise: String,
         val devise: String,
         val pays: String?,
+        /** ISO 3166-1 alpha-2 conservé pour les choix par défaut liés au pays. */
+        val codePays: String? = null,
         val tauxTaxe: Double,
         val nomSitePrincipal: String,
         val profilActivite: String? = null,
@@ -76,6 +79,8 @@ class SetupEnterpriseUseCase @Inject constructor(
         // les deux phases de l'initialisation.
         enterpriseDao.get()?.let { entreprise ->
             ensureEnterprisePrerequisites(entreprise.devise)
+            // Couvre aussi une interruption après Room mais avant l'écriture DataStore.
+            settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
             return true
         }
 
@@ -112,6 +117,9 @@ class SetupEnterpriseUseCase @Inject constructor(
         }
 
         ensureEnterprisePrerequisites(params.devise)
+        // Le libellé pays est localisé dans Room ; le code ISO stable permet de
+        // préremplir l'indicatif téléphonique dans les formulaires métier.
+        settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
 
         journalManager.log("ADMIN", "ONBOARDING_ENTREPRISE", "Entreprise ${params.nomEntreprise} configurée")
         return true
@@ -165,7 +173,16 @@ class GetOnboardingProgressUseCase @Inject constructor(
         val entreprise = enterpriseDao.get()
         // La reprise démarre directement au PIN lorsque l'entreprise existe. On complète
         // donc les prérequis hors Room avant de laisser l'utilisateur poursuivre.
-        entreprise?.let { ensureEnterprisePrerequisites(it.devise) }
+        entreprise?.let {
+            ensureEnterprisePrerequisites(it.devise)
+            // Mise à niveau idempotente des installations créées avant l'indicatif pays.
+            if (settingsStore.get(SettingsStore.Keys.PAYS).isNullOrBlank()) {
+                settingsStore.set(
+                    SettingsStore.Keys.PAYS,
+                    Iso4217.codePaysDepuisNom(it.pays).orEmpty(),
+                )
+            }
+        }
         return Progress(
             langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
             profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),

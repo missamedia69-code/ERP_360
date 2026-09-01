@@ -160,6 +160,12 @@
     <string name="clients_donnees_invalides">请检查折扣和信用额度。</string>
     <string name="clients_erreur_sauvegarde">保存失败，请重试。</string>
     <string name="clients_categorie_utilisee">一个或多个客户正在使用此类别。</string>
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">国家区号</string>
+    <string name="clients_rechercher_indicatif">搜索国家或区号</string>
+    <string name="clients_indicatif_obligatoire">请选择客户的国家区号。</string>
+    <string name="clients_aucun_indicatif">未找到国家或区号。</string>
+
     <!-- Validation des saisies client -->
     <string name="clients_nom_invalide">请输入 2 到 120 个字符的名称。</string>
     <string name="clients_telephone_invalide">请输入由 7 到 15 位数字组成的有效电话号码。</string>

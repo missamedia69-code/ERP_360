@@ -57,6 +57,9 @@ class OnboardingViewModel @Inject constructor(
     var votreNom by mutableStateOf("")
     var devise by mutableStateOf(Iso4217.DEFAUT)
     var pays by mutableStateOf("")
+    /** Code ISO conservé avec le libellé localisé du pays, notamment pour l'indicatif téléphone. */
+    var codePays by mutableStateOf<String?>(null)
+        private set
     var tauxTaxe by mutableStateOf(0.0)
         private set
     /** Texte conservé pendant la frappe afin de ne pas transformer « 19, » en « 19.0 ». */
@@ -104,6 +107,7 @@ class OnboardingViewModel @Inject constructor(
                         nomEntreprise = entreprise.nom
                         devise = entreprise.devise
                         pays = entreprise.pays.orEmpty()
+                        codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
                     }
                     progression.tauxTaxe?.let(::definirTauxTaxe)
                     step = when {
@@ -173,9 +177,16 @@ class OnboardingViewModel @Inject constructor(
     }
 
     /** Applique un pays du catalogue et rend son taux immédiatement modifiable. */
-    fun choisirPays(nom: String, tauxSuggere: Double) {
+    fun choisirPays(nom: String, code: String, tauxSuggere: Double) {
         pays = nom
+        codePays = code
         definirTauxTaxe(tauxSuggere)
+    }
+
+    /** Une saisie libre n'a pas de code ISO ni d'indicatif téléphonique supposé. */
+    fun modifierPaysManuel(nom: String) {
+        pays = nom
+        codePays = null
     }
 
     /** Conserve fidèlement la saisie manuelle, y compris une virgule ou décimale en cours. */
@@ -228,6 +239,7 @@ class OnboardingViewModel @Inject constructor(
                         nomEntreprise = nomEntrepriseValide,
                         devise = deviseSelectionnee,
                         pays = paysSelectionne,
+                        codePays = codePays,
                         tauxTaxe = tauxTaxeValide,
                         nomSitePrincipal = nomSiteValide,
                         profilActivite = profil?.name,

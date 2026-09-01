@@ -154,7 +154,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
                                 )
                             },
                             onClick = {
-                                viewModel.choisirPays(pays.nom, pays.tauxTaxeSuggere)
+                                viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
                                 recherchePays = ""
                                 paysOuvert = false
                             },
@@ -173,7 +173,7 @@ internal fun EnterpriseStep(viewModel: OnboardingViewModel) {
         if (saisiePaysManuelle) {
             OutlinedTextField(
                 value = viewModel.pays,
-                onValueChange = { viewModel.pays = it },
+                onValueChange = viewModel::modifierPaysManuel,
                 label = { Text(stringResource(R.string.ob_pays_personnalise)) },
                 singleLine = true,
                 modifier = Modifier

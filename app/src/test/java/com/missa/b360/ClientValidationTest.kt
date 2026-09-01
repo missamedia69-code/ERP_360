@@ -1,6 +1,8 @@
 package com.missa.b360
 
 import com.missa.b360.core.domain.usecase.ClientValidation
+import com.missa.b360.core.util.Iso4217
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -25,6 +27,22 @@ class ClientValidationTest {
         assertFalse(ClientValidation.telephoneEstValide("690abc000000"))
         assertFalse(ClientValidation.telephoneEstValide("12345"))
         assertFalse(ClientValidation.telephoneEstValide("1234567890123456"))
+    }
+
+    @Test
+    fun `un indicatif pays par défaut est appliqué au numéro local`() {
+        assertEquals("+237", Iso4217.indicatifTelephone("CM"))
+        assertEquals("CM", Iso4217.codePaysDepuisNom("Cameroun"))
+        assertEquals("CM", Iso4217.codePaysDepuisTelephone("+237690000000"))
+        assertEquals(
+            "+237690000000",
+            ClientValidation.telephoneAvecIndicatif("690 00-00-00", "+237"),
+        )
+        assertEquals(
+            "690000000",
+            ClientValidation.telephoneSansIndicatif("+237690000000", "+237"),
+        )
+        assertTrue(Iso4217.paysAvecIndicatif(Locale.FRENCH).size >= 240)
     }
 
     @Test

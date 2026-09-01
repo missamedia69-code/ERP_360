@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -17,6 +18,7 @@ import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.domain.usecase.ClientValidation
+import com.missa.b360.core.util.Iso4217
 
 /**
  * Formulaire client (9.2) — création/édition.
@@ -28,6 +30,7 @@ fun ClientFormDialog(
     client: ClientEntity?,
     categories: List<CategoryClientEntity>,
     badges: List<BadgeLoyaltyEntity>,
+    codePaysParDefaut: String?,
     onDismiss: () -> Unit,
     onConfirm: (
         nom: String,
@@ -42,8 +45,31 @@ fun ClientFormDialog(
         notes: String?,
     ) -> Unit,
 ) {
+    val locale = LocalConfiguration.current.locales[0]
+    val paysAvecIndicatif = remember(locale) { Iso4217.paysAvecIndicatif(locale) }
+    val codePaysInitial = client?.telephone?.let(Iso4217::codePaysDepuisTelephone)
+        ?: codePaysParDefaut
+    var codePays by remember(client?.id) { mutableStateOf(codePaysInitial) }
+    val indicatif = Iso4217.indicatifTelephone(codePays)
+    var tel by remember(client?.id) {
+        mutableStateOf(ClientValidation.telephoneSansIndicatif(client?.telephone.orEmpty(), indicatif))
+    }
+    LaunchedEffect(codePaysParDefaut) {
+        if (codePays == null && codePaysParDefaut != null) codePays = codePaysParDefaut
+    }
+    var indicatifOuvert by remember { mutableStateOf(false) }
+    var rechercheIndicatif by remember { mutableStateOf("") }
+    val paysIndicatifFiltres = remember(paysAvecIndicatif, rechercheIndicatif) {
+        val requete = rechercheIndicatif.trim()
+        if (requete.isEmpty()) paysAvecIndicatif else paysAvecIndicatif.filter { pays ->
+            pays.nom.contains(requete, ignoreCase = true) ||
+                pays.code.contains(requete, ignoreCase = true) ||
+                pays.indicatif.contains(requete)
+        }
+    }
+    val paysSelectionne = paysAvecIndicatif.firstOrNull { it.code == codePays }
+
     var nom by remember { mutableStateOf(client?.nom ?: "") }
-    var tel by remember { mutableStateOf(client?.telephone ?: "") }
     var type by remember { mutableStateOf(client?.type ?: ClientType.PARTICULIER) }
     var email by remember { mutableStateOf(client?.email ?: "") }
     var adresse by remember { mutableStateOf(client?.adresse ?: "") }
@@ -53,8 +79,9 @@ fun ClientFormDialog(
     var badgeId by remember { mutableStateOf(client?.badgeId) }
     var notes by remember { mutableStateOf(client?.notes ?: "") }
 
+    val telephoneComplet = ClientValidation.telephoneAvecIndicatif(tel, indicatif)
     val nomValide = ClientValidation.nomEstValide(nom)
-    val telephoneValide = ClientValidation.telephoneEstValide(tel)
+    val telephoneValide = indicatif != null && ClientValidation.telephoneEstValide(telephoneComplet)
     val emailValide = ClientValidation.emailEstValide(email)
     val adresseValide = ClientValidation.adresseEstValide(adresse)
     val notesValides = ClientValidation.notesSontValides(notes)
@@ -91,14 +118,72 @@ fun ClientFormDialog(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
                 )
+                ExposedDropdownMenuBox(
+                    expanded = indicatifOuvert,
+                    onExpandedChange = { ouvert ->
+                        indicatifOuvert = ouvert
+                        if (ouvert) rechercheIndicatif = ""
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                ) {
+                    OutlinedTextField(
+                        value = if (indicatifOuvert) {
+                            rechercheIndicatif
+                        } else {
+                            paysSelectionne?.let { "${it.indicatif} — ${it.nom} (${it.code})" }.orEmpty()
+                        },
+                        onValueChange = {
+                            rechercheIndicatif = it
+                            indicatifOuvert = true
+                        },
+                        label = { Text(stringResource(R.string.clients_indicatif_pays)) },
+                        placeholder = { Text(stringResource(R.string.clients_rechercher_indicatif)) },
+                        singleLine = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = indicatifOuvert)
+                        },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = indicatifOuvert,
+                        onDismissRequest = {
+                            indicatifOuvert = false
+                            rechercheIndicatif = ""
+                        },
+                    ) {
+                        if (paysIndicatifFiltres.isEmpty()) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.clients_aucun_indicatif)) },
+                                onClick = {},
+                                enabled = false,
+                            )
+                        } else {
+                            paysIndicatifFiltres.forEach { pays ->
+                                DropdownMenuItem(
+                                    text = { Text("${pays.nom} (${pays.code}) — ${pays.indicatif}") },
+                                    onClick = {
+                                        codePays = pays.code
+                                        rechercheIndicatif = ""
+                                        indicatifOuvert = false
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = tel,
-                    onValueChange = { tel = ClientValidation.filtrerTelephonePourSaisie(it).take(25) },
+                    onValueChange = {
+                        tel = ClientValidation.filtrerTelephoneLocalPourSaisie(it).take(25)
+                    },
                     label = { Text(stringResource(R.string.clients_telephone)) },
-                    isError = tel.isNotEmpty() && !telephoneValide,
+                    isError = indicatif == null || tel.isNotEmpty() && !telephoneValide,
                     supportingText = {
-                        if (tel.isNotEmpty() && !telephoneValide) {
-                            Text(stringResource(R.string.clients_telephone_invalide))
+                        when {
+                            indicatif == null -> Text(stringResource(R.string.clients_indicatif_obligatoire))
+                            tel.isNotEmpty() && !telephoneValide -> {
+                                Text(stringResource(R.string.clients_telephone_invalide))
+                            }
                         }
                     },
                     singleLine = true,
@@ -228,7 +313,7 @@ fun ClientFormDialog(
             Button(
                 onClick = {
                     onConfirm(
-                        nom, tel, type,
+                        nom, telephoneComplet, type,
                         email.ifBlank { null },
                         adresse.ifBlank { null },
                         catId,

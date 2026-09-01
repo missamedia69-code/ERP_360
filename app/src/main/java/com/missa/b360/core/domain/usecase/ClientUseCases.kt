@@ -38,11 +38,38 @@ object ClientValidation {
         }
     }
 
+    /** Numéro sans indicatif : le sélecteur de pays gère le `+` séparément. */
+    fun filtrerTelephoneLocalPourSaisie(saisie: String): String = buildString {
+        saisie.forEach { caractere ->
+            if (caractere in '0'..'9' || caractere == ' ' || caractere == '-' ||
+                caractere == '(' || caractere == ')'
+            ) {
+                append(caractere)
+            }
+        }
+    }
+
     /** Stockage canonique afin que 690 00-00-00 et 690000000 soient identiques. */
     fun normaliseTelephone(telephone: String): String {
         val saisie = telephone.trim()
         val chiffres = saisie.filter { it in '0'..'9' }
         return if (saisie.startsWith('+')) "+$chiffres" else chiffres
+    }
+
+    /** Assemble l'indicatif choisi et le numéro local avant validation/persistance. */
+    fun telephoneAvecIndicatif(telephoneLocal: String, indicatif: String?): String {
+        val chiffres = telephoneLocal.filter { it in '0'..'9' }
+        val indicatifNormalise = indicatif
+            ?.takeIf { it.startsWith('+') && it.drop(1).all { chiffre -> chiffre in '0'..'9' } }
+        return if (indicatifNormalise == null) chiffres else "$indicatifNormalise$chiffres"
+    }
+
+    /** Retire l'indicatif du numéro stocké afin de préremplir le champ local. */
+    fun telephoneSansIndicatif(telephone: String, indicatif: String?): String {
+        val normalise = normaliseTelephone(telephone)
+        return indicatif?.takeIf { normalise.startsWith(it) }
+            ?.let { normalise.removePrefix(it) }
+            ?: normalise.removePrefix("+")
     }
 
     fun telephoneEstValide(telephone: String): Boolean {

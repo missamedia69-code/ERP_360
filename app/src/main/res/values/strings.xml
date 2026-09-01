@@ -254,6 +254,12 @@
     <string name="clients_donnees_invalides">Vérifiez la remise et la limite de crédit.</string>
     <string name="clients_erreur_sauvegarde">L’enregistrement a échoué. Réessayez.</string>
     <string name="clients_categorie_utilisee">Cette catégorie est utilisée par un ou plusieurs clients.</string>
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">Indicatif pays</string>
+    <string name="clients_rechercher_indicatif">Rechercher un pays ou un indicatif</string>
+    <string name="clients_indicatif_obligatoire">Sélectionnez l’indicatif pays du client.</string>
+    <string name="clients_aucun_indicatif">Aucun pays ou indicatif trouvé.</string>
+
     <!-- Validation des saisies client -->
     <string name="clients_nom_invalide">Saisissez un nom de 2 à 120 caractères.</string>
     <string name="clients_telephone_invalide">Saisissez un numéro valide de 7 à 15 chiffres.</string>

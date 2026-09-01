@@ -160,6 +160,12 @@
     <string name="clients_donnees_invalides">Compruebe el descuento y el límite de crédito.</string>
     <string name="clients_erreur_sauvegarde">No se pudo guardar. Inténtelo de nuevo.</string>
     <string name="clients_categorie_utilisee">Esta categoría la utiliza uno o más clientes.</string>
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">Prefijo de país</string>
+    <string name="clients_rechercher_indicatif">Buscar un país o prefijo</string>
+    <string name="clients_indicatif_obligatoire">Seleccione el prefijo de país del cliente.</string>
+    <string name="clients_aucun_indicatif">No se encontró ningún país ni prefijo.</string>
+
     <!-- Validation des saisies client -->
     <string name="clients_nom_invalide">Introduzca un nombre de entre 2 y 120 caracteres.</string>
     <string name="clients_telephone_invalide">Introduzca un teléfono válido de 7 a 15 dígitos.</string>

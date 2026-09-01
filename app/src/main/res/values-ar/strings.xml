@@ -160,6 +160,12 @@
     <string name="clients_donnees_invalides">تحقق من الخصم وحد الائتمان.</string>
     <string name="clients_erreur_sauvegarde">تعذر الحفظ. حاول مرة أخرى.</string>
     <string name="clients_categorie_utilisee">تُستخدم هذه الفئة من قبل عميل واحد أو أكثر.</string>
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">مفتاح الدولة</string>
+    <string name="clients_rechercher_indicatif">ابحث عن دولة أو مفتاح اتصال</string>
+    <string name="clients_indicatif_obligatoire">اختر مفتاح دولة العميل.</string>
+    <string name="clients_aucun_indicatif">لم يتم العثور على دولة أو مفتاح اتصال.</string>
+
     <!-- Validation des saisies client -->
     <string name="clients_nom_invalide">أدخل اسماً بين حرفين و120 حرفاً.</string>
     <string name="clients_telephone_invalide">أدخل رقم هاتف صالحاً من 7 إلى 15 رقماً.</string>

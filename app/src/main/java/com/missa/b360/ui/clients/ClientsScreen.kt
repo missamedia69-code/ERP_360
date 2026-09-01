@@ -31,6 +31,7 @@ fun ClientsScreen(
     val clients by viewModel.clients.collectAsState(initial = emptyList())
     val categories by viewModel.categoriesFlow.collectAsState(initial = emptyList())
     val badges by viewModel.badgesFlow.collectAsState(initial = emptyList())
+    val codePaysParDefaut by viewModel.codePaysParDefaut.collectAsState()
     val resultat by viewModel.resultat.collectAsState()
     val erreurCategorie by viewModel.erreurCategorie.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -153,6 +154,7 @@ fun ClientsScreen(
             client = client,
             categories = categories,
             badges = badges,
+            codePaysParDefaut = codePaysParDefaut,
             onDismiss = { formVisible = false },
         ) { nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes ->
             if (client == null) {

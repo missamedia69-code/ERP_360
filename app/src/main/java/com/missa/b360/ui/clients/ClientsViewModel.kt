@@ -2,6 +2,7 @@ package com.missa.b360.ui.clients
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
@@ -10,7 +11,9 @@ import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
 import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
+import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
+import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.domain.usecase.UpdateClientUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -23,6 +26,8 @@ import javax.inject.Inject
 /** ViewModel Clients (9.2) : liste + formulaire et confirmation explicite RC-01. */
 @HiltViewModel
 class ClientsViewModel @Inject constructor(
+    private val getEnterprise: GetEnterpriseUseCase,
+    private val settingsStore: SettingsStore,
     private val observeClients: ObserveClientsUseCase,
     private val createClient: CreateClientUseCase,
     private val updateClient: UpdateClientUseCase,
@@ -34,6 +39,9 @@ class ClientsViewModel @Inject constructor(
     val clients: Flow<List<ClientEntity>> = observeClients()
     val categoriesFlow: Flow<List<CategoryClientEntity>> = categories.observer()
     val badgesFlow: Flow<List<BadgeLoyaltyEntity>> = badges.observer()
+
+    private val _codePaysParDefaut = MutableStateFlow<String?>(null)
+    val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
 
     data class Resultat(val code: String? = null, val erreur: String? = null)
 
@@ -58,6 +66,16 @@ class ClientsViewModel @Inject constructor(
 
     private var demandeDoublon: DemandeCreation? = null
     private var creationEnCours = false
+
+    init {
+        viewModelScope.launch {
+            val entreprise = getEnterprise()
+            val codeEnregistre = settingsStore.get(SettingsStore.Keys.PAYS)
+                ?.takeIf { Iso4217.indicatifTelephone(it) != null }
+            _codePaysParDefaut.value = codeEnregistre
+                ?: Iso4217.codePaysDepuisNom(entreprise?.pays)
+        }
+    }
 
     fun creer(
         nom: String,
