@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.ui.components.MissaPanel
 
 /** Multi-site (RA-21) : liste des sites + ajout. Le site principal est protégé. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,8 +35,9 @@ fun AdminSitesScreen(
     )
 
     AdminScaffold(titreRes = R.string.admin_multisite, onBack = onBack) {
-        Text(
-            stringResource(R.string.adm_sites_ajouter),
+        MissaPanel(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                stringResource(R.string.adm_sites_ajouter),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -44,21 +46,21 @@ fun AdminSitesScreen(
             onValueChange = { nom = it },
             label = { Text(stringResource(R.string.adm_sites_nom)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
             value = adresse,
             onValueChange = { adresse = it },
             label = { Text(stringResource(R.string.adm_sites_adresse)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         var typeOuvert by remember { mutableStateOf(false) }
         ExposedDropdownMenuBox(
             expanded = typeOuvert,
             onExpandedChange = { typeOuvert = it },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             OutlinedTextField(
                 value = type,
@@ -88,17 +90,18 @@ fun AdminSitesScreen(
                 adresse = ""
             },
             enabled = nom.isNotBlank(),
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.adm_sites_ajouter))
         }
-        when (message) {
-            "ok" -> Message(stringResource(R.string.adm_sites_msg_ok), isError = false)
-            "principal" -> Message(stringResource(R.string.adm_sites_msg_principal), isError = true)
-            "supprime" -> Message(stringResource(R.string.adm_sites_msg_supprime), isError = false)
+            when (message) {
+                "ok" -> Message(stringResource(R.string.adm_sites_msg_ok), isError = false)
+                "principal" -> Message(stringResource(R.string.adm_sites_msg_principal), isError = true)
+                "supprime" -> Message(stringResource(R.string.adm_sites_msg_supprime), isError = false)
+            }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
             stringResource(R.string.admin_multisite),
             style = MaterialTheme.typography.titleMedium,
@@ -112,10 +115,10 @@ fun AdminSitesScreen(
 
 @Composable
 private fun SiteCard(site: SiteEntity, onDelete: () -> Unit) {
-    Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    MissaPanel(modifier = Modifier.fillMaxWidth()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.weight(1f)) {
                 Text(site.nom, fontWeight = FontWeight.Bold)
@@ -125,7 +128,7 @@ private fun SiteCard(site: SiteEntity, onDelete: () -> Unit) {
                         else stringResource(R.string.adm_sites_secondaire)
                     }",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             if (!site.principal) {

@@ -32,6 +32,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
+import com.missa.b360.ui.components.MissaBrandMark
+import com.missa.b360.ui.theme.MissaCanvas
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,21 +127,23 @@ fun PinLockScreen(
         if (deverrouille) onUnlocked()
     }
 
-    Surface(Modifier.fillMaxSize()) {
+    Surface(Modifier.fillMaxSize(), color = MissaCanvas) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
+            MissaBrandMark(size = 58.dp)
+            Spacer(Modifier.height(14.dp))
             Text(
                 stringResource(R.string.lock_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(18.dp))
 
             // Points de saisie (6 positions max)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

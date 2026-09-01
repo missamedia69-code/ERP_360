@@ -98,21 +98,32 @@ import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.ui.theme.Blue40
+import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.Green60
+import com.missa.b360.ui.theme.Green90
+import com.missa.b360.ui.theme.MissaBorder
+import com.missa.b360.ui.theme.MissaCanvas
+import com.missa.b360.ui.theme.MissaInk
+import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaSoftBlue
+import com.missa.b360.ui.theme.Red40
+import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 
 private enum class SalesStep { LIST, CLIENT, PRODUCTS, CART, PAYMENT, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
 
-private val FlowBlue = Color(0xFF1554E8)
-private val FlowBlueDark = Color(0xFF073DBB)
-private val FlowBlueSoft = Color(0xFFF0F5FF)
-private val FlowGreen = Color(0xFF16803C)
-private val FlowGreenSoft = Color(0xFFEAF8EF)
-private val FlowInk = Color(0xFF101C43)
-private val FlowMuted = Color(0xFF65718F)
-private val FlowBorder = Color(0xFFE2E7F2)
-private val FlowBackground = Color(0xFFF8F9FD)
-private val FlowRed = Color(0xFFEC5A67)
+private val FlowBlue = BrandBlue
+private val FlowBlueDark = Blue40
+private val FlowBlueSoft = MissaSoftBlue
+private val FlowGreen = Green60
+private val FlowGreenSoft = Green90
+private val FlowInk = MissaInk
+private val FlowMuted = MissaMuted
+private val FlowBorder = MissaBorder
+private val FlowBackground = MissaCanvas
+private val FlowRed = Red40
 
 /**
  * Parcours de vente en dix écrans : liste, client, produits, panier, paiement, résumé,
@@ -453,6 +464,15 @@ fun SalesScreen(
     }
 }
 
+@Composable
+private fun SalesPageTitle(title: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        MissaBrandMark(size = 22.dp)
+        Spacer(Modifier.width(7.dp))
+        Text(title, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
 private data class FlowAction(val label: String, val enabled: Boolean, val onClick: () -> Unit)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -468,7 +488,7 @@ private fun FlowScaffold(
         containerColor = FlowBackground,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(title, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 14.sp) },
+                title = { SalesPageTitle(title) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back), tint = FlowInk)
@@ -568,7 +588,7 @@ private fun SalesListScreen(
         containerColor = FlowBackground,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.sales_list_title), color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 15.sp) },
+                title = { SalesPageTitle(stringResource(R.string.sales_list_title)) },
                 navigationIcon = {
                     IconButton(onClick = { onNavigate(Routes.HOME) }) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back))
@@ -967,7 +987,7 @@ private fun SummaryStepContent(client: ClientEntity?, lines: List<SaleLine>, tot
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SuccessStepScreen(receipt: SaleReceipt, devise: String, onViewInvoice: () -> Unit, onNewSale: () -> Unit, onBackList: () -> Unit) {
-    Scaffold(containerColor = Color.White, topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_success_title), fontWeight = FontWeight.Bold, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBackList) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }) }) { padding ->
+    Scaffold(containerColor = Color.White, topBar = { CenterAlignedTopAppBar(title = { SalesPageTitle(stringResource(R.string.sales_success_title)) }, navigationIcon = { IconButton(onClick = onBackList) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }) }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Surface(modifier = Modifier.size(84.dp), shape = CircleShape, color = FlowGreen) { Icon(Icons.Outlined.Check, null, tint = Color.White, modifier = Modifier.padding(18.dp)) }
             Spacer(Modifier.height(18.dp))
@@ -1001,7 +1021,7 @@ private fun InvoiceInfoCard(receipt: SaleReceipt, devise: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InvoicePreviewScreen(receipt: SaleReceipt, devise: String, onBack: () -> Unit, onShare: () -> Unit, onOptions: () -> Unit) {
-    Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_invoice_preview), fontWeight = FontWeight.Bold, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }, actions = { IconButton(onClick = onShare) { Icon(Icons.Outlined.Share, stringResource(R.string.sales_share_invoice)) } }) }) { padding ->
+    Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { SalesPageTitle(stringResource(R.string.sales_invoice_preview)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }, actions = { IconButton(onClick = onShare) { Icon(Icons.Outlined.Share, stringResource(R.string.sales_share_invoice)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { InvoicePaper(receipt, devise) }
             item { Button(onClick = onOptions, modifier = Modifier.fillMaxWidth().height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = FlowBlue)) { Text(stringResource(R.string.sales_invoice_options)) } }
@@ -1056,7 +1076,7 @@ private fun InvoiceOptionsScreen(
     receipt: SaleReceipt, devise: String, onBack: () -> Unit, onPrint: () -> Unit, onShare: () -> Unit,
     onDownload: () -> Unit, onEmail: () -> Unit, onView: () -> Unit, onDuplicate: () -> Unit, onCancel: () -> Unit,
 ) {
-    Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_invoice_options), fontWeight = FontWeight.Bold, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }) }) { padding ->
+    Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { SalesPageTitle(stringResource(R.string.sales_invoice_options)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             item { InvoiceOption(Icons.Outlined.Print, R.string.sales_print_invoice, R.string.sales_print_invoice_description, onPrint) }
             item { InvoiceOption(Icons.Outlined.Share, R.string.sales_share_invoice, R.string.sales_share_invoice_description, onShare) }

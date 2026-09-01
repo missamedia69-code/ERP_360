@@ -2,39 +2,48 @@ package com.missa.b360.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/** Palette lumineuse Missa Business 360 : blanc, bleu cobalt et accents métier. */
+/** Palette de référence Missa Business 360 : cobalt, vert signature et surfaces lumineuses. */
 val BrandBlue = Color(0xFF1554E8)
 val Blue90 = Color(0xFFF0F5FF)
 val Blue80 = Color(0xFFB9D0FF)
 val Blue60 = BrandBlue
 val Blue40 = Color(0xFF0847C9)
-val Blue20 = Color(0xFF101B3D)
+val Blue20 = Color(0xFF101C43)
 
-// Vert accent : action positive / producteur.
+// Vert signature utilisé pour les confirmations, montants positifs et le « 360 » de la marque.
 val Green90 = Color(0xFFEAF8EF)
-val Green60 = Color(0xFF24A148)
-val Green40 = Color(0xFF167A35)
+val Green60 = Color(0xFF16803C)
+val Green40 = Color(0xFF126B32)
 
-// Accents des profils d'activité et composants informatifs.
+// Accents réservés aux regroupements métier ; ils restent assourdis afin de ne pas concurrencer le bleu.
 val ProfileGreen = Color(0xFF20934A)
 val ProfileCommerceBlue = BrandBlue
-val ProfilePurple = Color(0xFF7638D7)
+val ProfilePurple = Color(0xFF7047E8)
 val ProfileOrange = Color(0xFFF28A16)
 
 // Alerte.
-val Red40 = Color(0xFFC8382D)
-val Red80 = Color(0xFFFFDAD6)
+val Red40 = Color(0xFFEC5A67)
+val Red80 = Color(0xFFFFE8EA)
 
-// Neutres très clairs de la maquette et de l'onboarding structuré.
+// Neutres de la direction artistique mobile : grand fond clair, cartes blanches, traits fins.
+val MissaCanvas = Color(0xFFF8F9FD)
+val MissaSurface = Color(0xFFFFFFFF)
+val MissaSoftBlue = Color(0xFFF0F5FF)
+val MissaInk = Color(0xFF101C43)
+val MissaMuted = Color(0xFF65718F)
+val MissaBorder = Color(0xFFE2E7F2)
+val MissaLime = Color(0xFFB6E52B)
+
+// Alias de compatibilité des écrans d'onboarding.
 val OnboardingPrimary = BrandBlue
-val OnboardingPrimaryDark = Color(0xFF103CB0)
-val OnboardingTextPrimary = Color(0xFF101C43)
-val OnboardingTextSecondary = Color(0xFF65718F)
-val OnboardingBackground = Color(0xFFF8F9FD)
-val OnboardingBorder = Color(0xFFE2E7F2)
+val OnboardingPrimaryDark = Blue40
+val OnboardingTextPrimary = MissaInk
+val OnboardingTextSecondary = MissaMuted
+val OnboardingBackground = MissaCanvas
+val OnboardingBorder = MissaBorder
 val OnboardingStepGray = Color(0xFFDCE1EC)
-val LightBackground = Color(0xFFFFFFFF)
-val LightSurface = Color(0xFFFFFFFF)
+val LightBackground = MissaCanvas
+val LightSurface = MissaSurface
 val DarkBackground = Color(0xFF0A1B3D)
 val DarkSurface = Color(0xFF14264A)
 val White = Color(0xFFFFFFFF)

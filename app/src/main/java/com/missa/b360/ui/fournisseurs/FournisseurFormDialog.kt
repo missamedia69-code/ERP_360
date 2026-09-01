@@ -29,7 +29,7 @@ fun FournisseurFormDialog(
             )
         },
         text = {
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = nom,
                     onValueChange = { nom = it },
@@ -42,7 +42,7 @@ fun FournisseurFormDialog(
                     onValueChange = { tel = it },
                     label = { Text(stringResource(R.string.fournisseurs_telephone)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         },

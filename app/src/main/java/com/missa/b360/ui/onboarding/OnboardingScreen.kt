@@ -31,9 +31,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.HelpOutline
-import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -71,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.OnboardingBackground
 import com.missa.b360.ui.theme.OnboardingBorder
@@ -151,13 +149,6 @@ internal fun StepScaffold(
 ) {
     val stepNumber = viewModel.step.progressNumber()
     var aideVisible by rememberSaveable(title) { mutableStateOf(false) }
-    val icon = when (viewModel.step) {
-        OnboardingStep.LANGUE -> Icons.Outlined.Language
-        OnboardingStep.PROFIL, OnboardingStep.ENTREPRISE -> Icons.Outlined.Business
-        OnboardingStep.PIN, OnboardingStep.EMAIL -> Icons.Outlined.Security
-        OnboardingStep.LICENCE, OnboardingStep.CHECKLIST -> Icons.Outlined.Tune
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -185,19 +176,8 @@ internal fun StepScaffold(
             } else {
                 Spacer(Modifier.size(42.dp))
             }
-            Surface(
-                modifier = Modifier.size(46.dp),
-                shape = RoundedCornerShape(13.dp),
-                color = OnboardingPrimary,
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.padding(11.dp),
-                )
-            }
-            Spacer(Modifier.width(12.dp))
+            MissaBrandMark(size = 38.dp)
+            Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "$stepNumber. $title",

@@ -12,23 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -61,7 +55,13 @@ import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.ui.components.MissaEmptyState
+import com.missa.b360.ui.components.MissaLayout
+import com.missa.b360.ui.components.MissaPanel
+import com.missa.b360.ui.components.MissaSectionTitle
+import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.theme.MissaCanvas
 
 /**
  * Ecran commun aux modules opérationnels livrés progressivement. Chaque module possède sa
@@ -111,21 +111,19 @@ fun OperationModuleScreen(
 
     val titleRes = module.appModule().titleRes
     Scaffold(
+        containerColor = MissaCanvas,
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(titleRes), fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.ob_retour),
-                        )
-                    }
-                },
+            MissaTopAppBar(
+                title = stringResource(titleRes),
+                onBack = onBack,
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { formVisible = true }) {
+            FloatingActionButton(
+                onClick = { formVisible = true },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Add,
                     contentDescription = stringResource(R.string.ops_add),
@@ -138,14 +136,16 @@ fun OperationModuleScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                horizontal = MissaLayout.screenHorizontal,
+                vertical = MissaLayout.screenVertical,
+            ),
+            verticalArrangement = Arrangement.spacedBy(MissaLayout.itemGap),
         ) {
             item {
-                Text(
-                    text = stringResource(module.hintRes()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                MissaSectionTitle(
+                    title = stringResource(titleRes),
+                    subtitle = stringResource(module.hintRes()),
                 )
             }
             if (records.isEmpty()) {
@@ -180,31 +180,11 @@ fun OperationModuleScreen(
 
 @Composable
 private fun EmptyOperationState(module: OperationModule, onCreate: () -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-    ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(
-                imageVector = module.appModule().icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(34.dp),
-            )
-            Text(
-                text = stringResource(R.string.ops_empty, stringResource(module.appModule().titleRes)),
-                fontWeight = FontWeight.SemiBold,
-            )
-            TextButton(onClick = onCreate) {
-                Text(stringResource(R.string.ops_add))
-            }
-        }
-    }
+    MissaEmptyState(
+        icon = module.appModule().icon,
+        title = stringResource(R.string.ops_empty, stringResource(module.appModule().titleRes)),
+        action = { TextButton(onClick = onCreate) { Text(stringResource(R.string.ops_add)) } },
+    )
 }
 
 @Composable
@@ -215,16 +195,9 @@ private fun OperationRecordCard(
     onCancel: () -> Unit,
 ) {
     val status = OperationStatus.entries.firstOrNull { it.name == record.status } ?: OperationStatus.DRAFT
-    Card(
+    MissaPanel(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(record.title, fontWeight = FontWeight.Bold)
@@ -280,7 +253,6 @@ private fun OperationRecordCard(
                     }
                 }
             }
-        }
     }
 }
 

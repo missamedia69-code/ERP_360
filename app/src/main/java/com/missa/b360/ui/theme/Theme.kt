@@ -1,13 +1,16 @@
 package com.missa.b360.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 
 private val LightColors = lightColorScheme(
     primary = Blue60,
@@ -22,9 +25,13 @@ private val LightColors = lightColorScheme(
     onError = White,
     errorContainer = Red80,
     background = LightBackground,
-    onBackground = Blue20,
+    onBackground = MissaInk,
     surface = LightSurface,
-    onSurface = Blue20,
+    onSurface = MissaInk,
+    surfaceVariant = MissaSoftBlue,
+    onSurfaceVariant = MissaMuted,
+    outline = MissaBorder,
+    outlineVariant = MissaBorder,
 )
 
 private val DarkColors = darkColorScheme(
@@ -44,9 +51,21 @@ private val DarkColors = darkColorScheme(
     onSurface = Blue90,
 )
 
+/**
+ * Rayon et hiérarchie visuelle homogènes : boutons et champs doux, cartes compactes.
+ * Les écrans sont volontairement maintenus dans une direction claire pour correspondre
+ * aux maquettes mobiles de référence, même si l'appareil utilise un thème sombre.
+ */
+private val MissaShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(14.dp),
+    large = RoundedCornerShape(18.dp),
+    extraLarge = RoundedCornerShape(24.dp),
+)
+
 @Composable
 fun Erp360Theme(
-    // La maquette de référence est une interface claire, y compris si l'appareil est en sombre.
     darkTheme: Boolean = false,
     // Le bleu Missa est une composante de la direction artistique : ne pas le remplacer
     // silencieusement par la palette Monet de l'appareil.
@@ -66,6 +85,7 @@ fun Erp360Theme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = MissaShapes,
         content = content,
     )
 }

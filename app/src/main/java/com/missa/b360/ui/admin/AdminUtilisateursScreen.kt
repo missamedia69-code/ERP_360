@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.RoleEntity
 import com.missa.b360.core.data.entity.UserEntity
+import com.missa.b360.ui.components.MissaPanel
 
 /** Utilisateurs & rôles (D1/D2, RA-14) : création d'utilisateurs, liste, rôles. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +31,9 @@ fun AdminUtilisateursScreen(
 
     AdminScaffold(titreRes = R.string.admin_utilisateurs, onBack = onBack) {
         // --- Ajout d'un utilisateur ---
-        Text(
-            stringResource(R.string.adm_users_add),
+        MissaPanel(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                stringResource(R.string.adm_users_add),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
         )
@@ -40,14 +42,14 @@ fun AdminUtilisateursScreen(
             onValueChange = { nom = it },
             label = { Text(stringResource(R.string.adm_users_nom)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.adm_users_email)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         var roleOuvert by remember { mutableStateOf(false) }
@@ -55,7 +57,7 @@ fun AdminUtilisateursScreen(
         ExposedDropdownMenuBox(
             expanded = roleOuvert,
             onExpandedChange = { roleOuvert = it },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             OutlinedTextField(
                 value = roleChoisi?.nom ?: "",
@@ -85,21 +87,22 @@ fun AdminUtilisateursScreen(
                 email = ""
             },
             enabled = nom.isNotBlank() && email.isNotBlank() && roleId != null,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.adm_users_creer))
         }
-        resultat?.let {
-            Text(
-                if (it.ok) stringResource(R.string.adm_users_resultat_ok) else it.message.orEmpty(),
-                color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 4.dp),
-            )
+            resultat?.let {
+                Text(
+                    if (it.ok) stringResource(R.string.adm_users_resultat_ok) else it.message.orEmpty(),
+                    color = if (it.ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
         }
 
         // --- Liste des utilisateurs ---
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
             stringResource(R.string.admin_utilisateurs),
             style = MaterialTheme.typography.titleMedium,
@@ -117,32 +120,27 @@ private fun UserRow(
     roles: List<RoleEntity>,
     onDesactiver: () -> Unit,
 ) {
-    Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Column(Modifier.padding(12.dp)) {
-            Text(user.nom, fontWeight = FontWeight.Bold)
-            Text(
-                user.emailSecours,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 4.dp),
-            ) {
-                val role = roles.firstOrNull { it.id == user.roleId }
-                Text("${stringResource(R.string.adm_users_role)}: ${role?.nom ?: "—"}")
-                Spacer(Modifier.weight(1f))
-                if (user.actif) {
-                    OutlinedButton(onClick = onDesactiver) {
-                        Text(stringResource(R.string.adm_users_desactiver))
-                    }
-                } else {
-                    Text(
-                        stringResource(R.string.adm_users_inactif),
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+    MissaPanel(modifier = Modifier.fillMaxWidth()) {
+        Text(user.nom, fontWeight = FontWeight.Bold)
+        Text(
+            user.emailSecours,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            val role = roles.firstOrNull { it.id == user.roleId }
+            Text("${stringResource(R.string.adm_users_role)}: ${role?.nom ?: "—"}", style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.weight(1f))
+            if (user.actif) {
+                OutlinedButton(onClick = onDesactiver) {
+                    Text(stringResource(R.string.adm_users_desactiver))
                 }
+            } else {
+                Text(
+                    stringResource(R.string.adm_users_inactif),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
     }

@@ -1,11 +1,7 @@
 package com.missa.b360.ui.admin
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -20,8 +16,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.ui.components.MissaPanel
 
-/** Journal (RA-18) : consultation immuable + purge des entrées > 12 mois. */
+/** Journal (RA-18) : consultation immuable avec listes homogènes et compactes. */
 @Composable
 fun AdminJournalScreen(
     onBack: () -> Unit,
@@ -40,7 +37,7 @@ fun AdminJournalScreen(
             Text(
                 stringResource(R.string.adm_journal_purge_ok),
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier.padding(top = 2.dp),
             )
         }
 
@@ -49,38 +46,31 @@ fun AdminJournalScreen(
                 stringResource(R.string.adm_journal_vide),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = 6.dp),
             )
         } else {
-            Spacer(Modifier.height(12.dp))
-            entries.forEach { entry ->
-                JournalRow(entry)
-            }
+            entries.forEach { entry -> JournalRow(entry) }
         }
     }
 }
 
 @Composable
 private fun JournalRow(entry: JournalEntryEntity) {
-    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-        ) {
-            Text(
-                "${entry.module} · ${entry.action}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                entry.details,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                DateUtils.formatDateHeure(entry.horodatage),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.outline,
-            )
-        }
+    MissaPanel(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            "${entry.module} · ${entry.action}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            entry.details,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            DateUtils.formatDateHeure(entry.horodatage),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline,
+        )
     }
 }

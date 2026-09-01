@@ -100,25 +100,34 @@ import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
+import com.missa.b360.ui.components.MissaBrandMark
+import com.missa.b360.ui.theme.Blue40
+import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.Green60
+import com.missa.b360.ui.theme.MissaBorder
+import com.missa.b360.ui.theme.MissaCanvas
+import com.missa.b360.ui.theme.MissaInk
+import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import kotlinx.coroutines.launch
 
 /* Palette du tableau de bord mobile. */
-private val HomeBlue = Color(0xFF1247E8)
-private val HomeBlueDark = Color(0xFF0738B8)
-private val HomeBlueSoft = Color(0xFFEFF4FF)
-private val HomeGreen = Color(0xFF20A83E)
-private val HomeGreenSoft = Color(0xFFEAF8EE)
-private val HomeOrange = Color(0xFFFF9418)
+private val HomeBlue = BrandBlue
+private val HomeBlueDark = Blue40
+private val HomeBlueSoft = MissaSoftBlue
+private val HomeGreen = Green60
+private val HomeGreenSoft = Color(0xFFEAF8EF)
+private val HomeOrange = Color(0xFFF28A16)
 private val HomeOrangeSoft = Color(0xFFFFF1DF)
 private val HomePurple = Color(0xFF7047E8)
 private val HomePurpleSoft = Color(0xFFF1ECFF)
 private val HomeTeal = Color(0xFF00A5A5)
-private val HomeTextDark = Color(0xFF111B3D)
-private val HomeTextMuted = Color(0xFF68738F)
-private val HomeBackground = Color(0xFFF7F9FD)
-private val HomeBorder = Color(0xFFE4E9F3)
+private val HomeTextDark = MissaInk
+private val HomeTextMuted = MissaMuted
+private val HomeBackground = MissaCanvas
+private val HomeBorder = MissaBorder
 
 /**
  * Accueil mobile : tableau de bord sans données de démonstration. Les métriques sont
@@ -304,7 +313,7 @@ private fun HomeHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 20.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -318,27 +327,21 @@ private fun HomeHeader(
                         modifier = Modifier.size(28.dp),
                     )
                 }
+                Spacer(Modifier.width(7.dp))
+                MissaBrandMark(size = 36.dp)
                 Spacer(Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "MISSA",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                        Spacer(Modifier.width(5.dp))
-                        Text(
-                            text = "BUSINESS",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
-                    }
+                    Text(
+                        text = "MISSA BUSINESS",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                    )
                     Text(
                         text = "360",
                         color = Color(0xFFB6E52B),
-                        fontSize = 14.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold,
                     )
                 }
@@ -383,11 +386,11 @@ private fun HomeHeader(
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
             Text(
                 text = greeting,
                 color = Color.White,
-                fontSize = 25.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(3.dp))
@@ -454,8 +457,8 @@ private fun HomeDashboard(
     val currency = state.devise
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(13.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
             Row(

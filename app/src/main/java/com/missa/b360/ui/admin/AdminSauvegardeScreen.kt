@@ -1,12 +1,10 @@
 package com.missa.b360.ui.admin
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +18,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.ui.components.MissaPanel
 import java.io.File
 
 /** Sauvegarde (RA-13) : sauvegarde locale (VACUUM INTO) + historique. */
@@ -48,7 +47,7 @@ fun AdminSauvegardeScreen(
             "err" -> Message(stringResource(R.string.adm_sauvegarde_err), isError = true)
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
             stringResource(R.string.adm_sauvegarde_historique),
             style = MaterialTheme.typography.titleMedium,
@@ -72,8 +71,16 @@ fun AdminSauvegardeScreen(
 @Composable
 private fun BackupRow(backup: BackupEntity) {
     val nom = File(backup.chemin).name
-    ListItem(
-        headlineContent = { Text("${DateUtils.formatDateHeure(backup.date)} — ${backup.type}") },
-        supportingContent = { Text("${stringResource(R.string.adm_sauvegarde_type)} · $nom") },
-    )
+    MissaPanel(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            "${DateUtils.formatDateHeure(backup.date)} — ${backup.type}",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            "${stringResource(R.string.adm_sauvegarde_type)} · $nom",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }

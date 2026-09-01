@@ -11,6 +11,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.LicenceStatus
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.ui.components.MissaPanel
+import com.missa.b360.ui.components.MissaSectionTitle
 
 /** Licence (9.1 — RA-04..06) : statut, activation, désassociation (3/an). */
 @Composable
@@ -27,13 +29,8 @@ fun AdminLicenceScreen(
             LicenceStatus.EXPIRED -> R.string.adm_licence_statut_expire
             null -> null
         }
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(16.dp)) {
-                Text(
-                    stringResource(R.string.adm_licence_statut),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
+        MissaPanel(modifier = Modifier.fillMaxWidth(), accent = MaterialTheme.colorScheme.primary) {
+            MissaSectionTitle(title = stringResource(R.string.adm_licence_statut))
                 statutRes?.let {
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -88,17 +85,16 @@ fun AdminLicenceScreen(
                 ) {
                     Text(stringResource(R.string.adm_licence_desassoc))
                 }
-            }
         }
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(8.dp))
         HorizontalDivider()
 
         Text(
             stringResource(R.string.adm_licence_code_field),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 2.dp),
         )
         OutlinedTextField(
             value = state.codeSaisi,
