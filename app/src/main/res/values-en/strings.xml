@@ -337,4 +337,18 @@
     <string name="ob_profil_voir_details">Show detailed profiles</string>
     <string name="ob_profil_masquer_details">Hide detailed profiles</string>
 
+
+    <!-- Onboarding structure: header, help and progress -->
+    <string name="ob_aide">Help</string>
+    <string name="ob_fermer">Close</string>
+    <string name="ob_progress_langue">Language</string>
+    <string name="ob_progress_profil">Profile</string>
+    <string name="ob_progress_entreprise">Company</string>
+    <string name="ob_progress_securite">Security</string>
+    <string name="ob_progress_validation">Confirm</string>
+    <string name="ob_langue_note">French is selected by default for users in Cameroon.</string>
+    <string name="ob_activite_title">Your business</string>
+    <string name="ob_activite_subtitle">Select the profile that best matches your company.</string>
+    <string name="ob_effectif_subtitle">This information tailors the available features.</string>
+
 </resources>

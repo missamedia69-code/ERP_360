@@ -9,14 +9,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +30,11 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
@@ -62,7 +72,12 @@ import com.missa.b360.R
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.OnboardingBackground
 import com.missa.b360.ui.theme.OnboardingBorder
+import com.missa.b360.ui.theme.OnboardingPrimary
+import com.missa.b360.ui.theme.OnboardingStepGray
+import com.missa.b360.ui.theme.OnboardingTextPrimary
+import com.missa.b360.ui.theme.OnboardingTextSecondary
 import com.missa.b360.ui.theme.ProfileCommerceBlue
 import com.missa.b360.ui.theme.ProfileGreen
 import com.missa.b360.ui.theme.ProfileOrange
@@ -86,7 +101,7 @@ fun OnboardingScreen(
     var presentationPage by rememberSaveable { mutableStateOf(0) }
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White,
+        color = OnboardingBackground,
     ) {
         if (!viewModel.initialisationTerminee) {
             Box(
@@ -119,8 +134,8 @@ fun OnboardingScreen(
 }
 
 /**
- * Gabarit mobile du parcours : zones système protégées, en-tête léger, contenu défilable,
- * progression et action primaire toujours visible en bas d'écran.
+ * Gabarit structuré de l'onboarding : en-tête de contexte, progression, contenu défilable
+ * et navigation fixe. Les libellés de navigation restent entièrement localisés.
  */
 @Composable
 internal fun StepScaffold(
@@ -134,129 +149,274 @@ internal fun StepScaffold(
     onSkip: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val stepNumber = viewModel.step.progressNumber()
+    var aideVisible by rememberSaveable(title) { mutableStateOf(false) }
+    val icon = when (viewModel.step) {
+        OnboardingStep.LANGUE -> Icons.Outlined.Language
+        OnboardingStep.PROFIL, OnboardingStep.ENTREPRISE -> Icons.Outlined.Business
+        OnboardingStep.PIN, OnboardingStep.EMAIL -> Icons.Outlined.Security
+        OnboardingStep.LICENCE, OnboardingStep.CHECKLIST -> Icons.Outlined.Tune
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(OnboardingBackground)
+            .windowInsetsPadding(WindowInsets.safeDrawing),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding()
-                .height(52.dp)
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (viewModel.step != OnboardingStep.LANGUE) {
                 IconButton(
                     onClick = viewModel::precedent,
                     enabled = navigationActive,
+                    modifier = Modifier.size(42.dp),
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = stringResource(R.string.ob_retour),
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = OnboardingTextPrimary,
                     )
                 }
             } else {
-                Spacer(Modifier.size(48.dp))
+                Spacer(Modifier.size(42.dp))
             }
-            Spacer(Modifier.weight(1f))
+            Surface(
+                modifier = Modifier.size(46.dp),
+                shape = RoundedCornerShape(13.dp),
+                color = OnboardingPrimary,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.padding(11.dp),
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "$stepNumber. $title",
+                    color = OnboardingTextPrimary,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+                subtitle?.let {
+                    Text(
+                        text = it,
+                        color = OnboardingTextSecondary,
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                    )
+                }
+            }
             if (showSkip) {
                 TextButton(
                     onClick = onSkip ?: viewModel::suivant,
                     enabled = navigationActive,
+                    modifier = Modifier.height(42.dp),
                 ) {
-                    Text(
-                        text = stringResource(R.string.ob_plus_tard),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
+                    Text(stringResource(R.string.ob_plus_tard), style = MaterialTheme.typography.labelMedium)
                 }
             } else {
-                Spacer(Modifier.size(48.dp))
+                IconButton(
+                    onClick = { aideVisible = true },
+                    modifier = Modifier.size(42.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.HelpOutline,
+                        contentDescription = stringResource(R.string.ob_aide),
+                        tint = OnboardingTextPrimary,
+                    )
+                }
             }
+        }
+
+        Spacer(Modifier.height(10.dp))
+        OnboardingProgress(currentStep = stepNumber)
+
+        viewModel.erreurRes?.let { erreur ->
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.errorContainer,
+            ) {
+                Text(
+                    text = stringResource(erreur),
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(10.dp),
+                )
+            }
+        }
+        if (viewModel.enregistrementEnCours) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                color = OnboardingPrimary,
+            )
         }
 
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            content = content,
+        )
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White,
+            shadowElevation = 5.dp,
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            subtitle?.let {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            if (viewModel.enregistrementEnCours) {
-                Spacer(Modifier.height(12.dp))
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = BrandBlue,
-                )
-            }
-            viewModel.erreurRes?.let { erreur ->
-                Spacer(Modifier.height(12.dp))
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.errorContainer,
-                    modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (viewModel.step != OnboardingStep.LANGUE) {
+                    OutlinedButton(
+                        onClick = viewModel::precedent,
+                        enabled = navigationActive,
+                        modifier = Modifier
+                            .weight(0.8f)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, OnboardingBorder),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.ob_retour),
+                            color = OnboardingTextSecondary,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+                Button(
+                    onClick = viewModel::suivant,
+                    enabled = suivantActive && navigationActive,
+                    modifier = Modifier
+                        .weight(if (viewModel.step == OnboardingStep.LANGUE) 1f else 1.4f)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = OnboardingPrimary,
+                        disabledContainerColor = OnboardingPrimary.copy(alpha = 0.35f),
+                    ),
                 ) {
                     Text(
-                        text = stringResource(erreur),
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(12.dp),
+                        text = stringResource(boutonSuivantRes),
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.width(7.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             }
-            Spacer(Modifier.height(20.dp))
-            content()
-            Spacer(Modifier.height(20.dp))
         }
+    }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+    if (aideVisible) {
+        AlertDialog(
+            onDismissRequest = { aideVisible = false },
+            title = { Text(stringResource(R.string.ob_aide)) },
+            text = { Text(subtitle ?: title) },
+            confirmButton = {
+                TextButton(onClick = { aideVisible = false }) {
+                    Text(stringResource(R.string.ob_fermer))
+                }
+            },
+        )
+    }
+}
+
+/** Regroupe les 7 étapes métier en 5 repères compréhensibles dans la barre de progression. */
+private fun OnboardingStep.progressNumber(): Int = when (this) {
+    OnboardingStep.LANGUE -> 1
+    OnboardingStep.PROFIL -> 2
+    OnboardingStep.ENTREPRISE -> 3
+    OnboardingStep.PIN, OnboardingStep.EMAIL -> 4
+    OnboardingStep.LICENCE, OnboardingStep.CHECKLIST -> 5
+}
+
+@Composable
+private fun OnboardingProgress(currentStep: Int) {
+    val labels = listOf(
+        stringResource(R.string.ob_progress_langue),
+        stringResource(R.string.ob_progress_profil),
+        stringResource(R.string.ob_progress_entreprise),
+        stringResource(R.string.ob_progress_securite),
+        stringResource(R.string.ob_progress_validation),
+    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            OnboardingProgress(step = viewModel.step)
-            Spacer(Modifier.height(14.dp))
-            Button(
-                onClick = viewModel::suivant,
-                enabled = suivantActive && navigationActive,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BrandBlue,
-                    disabledContainerColor = BrandBlue.copy(alpha = 0.35f),
-                ),
-            ) {
+            labels.forEachIndexed { index, _ ->
+                val number = index + 1
+                val selected = number == currentStep
+                val completed = number < currentStep
+                Surface(
+                    modifier = Modifier.size(30.dp),
+                    shape = CircleShape,
+                    color = if (selected || completed) OnboardingPrimary else OnboardingStepGray,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        if (completed) {
+                            Icon(
+                                imageVector = Icons.Outlined.CheckCircle,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(17.dp),
+                            )
+                        } else {
+                            Text(
+                                text = number.toString(),
+                                color = if (selected) Color.White else OnboardingTextSecondary,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                }
+                if (index < labels.lastIndex) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(1.dp)
+                            .background(if (number < currentStep) OnboardingPrimary else OnboardingStepGray),
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(6.dp))
+        Row(Modifier.fillMaxWidth()) {
+            labels.forEachIndexed { index, label ->
                 Text(
-                    text = stringResource(boutonSuivantRes),
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                    contentDescription = null,
+                    text = label,
+                    modifier = Modifier.weight(1f),
+                    color = if (index + 1 == currentStep) OnboardingTextPrimary else OnboardingTextSecondary,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = if (index + 1 == currentStep) FontWeight.Bold else FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
                 )
             }
         }
@@ -264,20 +424,53 @@ internal fun StepScaffold(
 }
 
 @Composable
-private fun OnboardingProgress(step: OnboardingStep) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(9.dp),
-        verticalAlignment = Alignment.CenterVertically,
+private fun SectionHeader(title: String, subtitle: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            text = title,
+            color = OnboardingTextPrimary,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = subtitle,
+            color = OnboardingTextSecondary,
+            style = MaterialTheme.typography.labelSmall,
+        )
+    }
+}
+
+@Composable
+private fun InfoCard(text: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = OnboardingPrimary.copy(alpha = 0.07f),
     ) {
-        OnboardingStep.entries.forEachIndexed { index, _ ->
-            val active = index == step.ordinal
-            Box(
-                modifier = Modifier
-                    .size(if (active) 8.dp else 7.dp)
-                    .background(
-                        color = if (active) BrandBlue else OnboardingBorder,
-                        shape = CircleShape,
-                    ),
+        Row(
+            modifier = Modifier.padding(11.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                modifier = Modifier.size(28.dp),
+                shape = CircleShape,
+                color = Color.White,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "i",
+                        color = OnboardingPrimary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
+            }
+            Spacer(Modifier.width(9.dp))
+            Text(
+                text = text,
+                color = OnboardingTextSecondary,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.weight(1f),
             )
         }
     }
@@ -298,6 +491,10 @@ private fun LanguageStep(viewModel: OnboardingViewModel) {
         subtitle = stringResource(R.string.ob_langue_subtitle),
         viewModel = viewModel,
     ) {
+        SectionHeader(
+            title = stringResource(R.string.ob_langue_title),
+            subtitle = stringResource(R.string.ob_langue_subtitle),
+        )
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -310,6 +507,7 @@ private fun LanguageStep(viewModel: OnboardingViewModel) {
                 )
             }
         }
+        InfoCard(text = stringResource(R.string.ob_langue_note))
     }
 }
 
@@ -399,6 +597,10 @@ private fun ProfileStep(viewModel: OnboardingViewModel) {
         viewModel = viewModel,
         suivantActive = viewModel.profil != null && viewModel.palier != null,
     ) {
+        SectionHeader(
+            title = stringResource(R.string.ob_activite_title),
+            subtitle = stringResource(R.string.ob_activite_subtitle),
+        )
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -436,10 +638,9 @@ private fun ProfileStep(viewModel: OnboardingViewModel) {
                 )
             }
             Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.ob_palier_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+            SectionHeader(
+                title = stringResource(R.string.ob_palier_title),
+                subtitle = stringResource(R.string.ob_effectif_subtitle),
             )
             PalierTaille.entries.toList().chunked(2).forEach { row ->
                 Row(

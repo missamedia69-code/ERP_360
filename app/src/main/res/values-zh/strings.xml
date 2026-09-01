@@ -238,4 +238,18 @@
     <string name="ob_profil_voir_details">显示详细业务类型</string>
     <string name="ob_profil_masquer_details">隐藏详细业务类型</string>
 
+
+    <!-- 引导结构：标题、帮助和进度 -->
+    <string name="ob_aide">帮助</string>
+    <string name="ob_fermer">关闭</string>
+    <string name="ob_progress_langue">语言</string>
+    <string name="ob_progress_profil">类型</string>
+    <string name="ob_progress_entreprise">企业</string>
+    <string name="ob_progress_securite">安全</string>
+    <string name="ob_progress_validation">确认</string>
+    <string name="ob_langue_note">为喀麦隆用户默认选择法语。</string>
+    <string name="ob_activite_title">您的业务</string>
+    <string name="ob_activite_subtitle">选择最符合您企业的业务类型。</string>
+    <string name="ob_effectif_subtitle">此信息将调整可用功能。</string>
+
 </resources>

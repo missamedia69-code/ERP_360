@@ -344,4 +344,18 @@
     <string name="ob_profil_voir_details">Afficher les profils détaillés</string>
     <string name="ob_profil_masquer_details">Masquer les profils détaillés</string>
 
+
+    <!-- Structure d'onboarding : en-tête, aide et progression -->
+    <string name="ob_aide">Aide</string>
+    <string name="ob_fermer">Fermer</string>
+    <string name="ob_progress_langue">Langue</string>
+    <string name="ob_progress_profil">Profil</string>
+    <string name="ob_progress_entreprise">Entreprise</string>
+    <string name="ob_progress_securite">Sécurité</string>
+    <string name="ob_progress_validation">Validation</string>
+    <string name="ob_langue_note">Le français est sélectionné par défaut pour les utilisateurs au Cameroun.</string>
+    <string name="ob_activite_title">Votre activité</string>
+    <string name="ob_activite_subtitle">Sélectionnez le profil qui correspond le mieux à votre entreprise.</string>
+    <string name="ob_effectif_subtitle">Cette information ajuste les fonctionnalités proposées.</string>
+
 </resources>

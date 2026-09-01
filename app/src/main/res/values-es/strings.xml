@@ -238,4 +238,18 @@
     <string name="ob_profil_voir_details">Mostrar perfiles detallados</string>
     <string name="ob_profil_masquer_details">Ocultar perfiles detallados</string>
 
+
+    <!-- Estructura de onboarding: encabezado, ayuda y progreso -->
+    <string name="ob_aide">Ayuda</string>
+    <string name="ob_fermer">Cerrar</string>
+    <string name="ob_progress_langue">Idioma</string>
+    <string name="ob_progress_profil">Perfil</string>
+    <string name="ob_progress_entreprise">Empresa</string>
+    <string name="ob_progress_securite">Seguridad</string>
+    <string name="ob_progress_validation">Validación</string>
+    <string name="ob_langue_note">El francés se selecciona por defecto para los usuarios de Camerún.</string>
+    <string name="ob_activite_title">Su actividad</string>
+    <string name="ob_activite_subtitle">Seleccione el perfil que mejor corresponda a su empresa.</string>
+    <string name="ob_effectif_subtitle">Esta información ajusta las funciones disponibles.</string>
+
 </resources>

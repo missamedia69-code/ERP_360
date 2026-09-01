@@ -238,4 +238,18 @@
     <string name="ob_profil_voir_details">إظهار الملفات التفصيلية</string>
     <string name="ob_profil_masquer_details">إخفاء الملفات التفصيلية</string>
 
+
+    <!-- هيكل الإعداد: الرأس والمساعدة والتقدم -->
+    <string name="ob_aide">مساعدة</string>
+    <string name="ob_fermer">إغلاق</string>
+    <string name="ob_progress_langue">اللغة</string>
+    <string name="ob_progress_profil">الملف</string>
+    <string name="ob_progress_entreprise">الشركة</string>
+    <string name="ob_progress_securite">الأمان</string>
+    <string name="ob_progress_validation">التأكيد</string>
+    <string name="ob_langue_note">تُختار الفرنسية افتراضياً للمستخدمين في الكاميرون.</string>
+    <string name="ob_activite_title">نشاطك</string>
+    <string name="ob_activite_subtitle">اختر الملف الذي يناسب شركتك بشكل أفضل.</string>
+    <string name="ob_effectif_subtitle">تضبط هذه المعلومات الميزات المقترحة.</string>
+
 </resources>
