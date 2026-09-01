@@ -314,4 +314,27 @@
     <string name="ob_checklist_bienvenue">Configuration completed successfully</string>
     <string name="ob_selectionne">Selected</string>
 
+
+    <!-- Discovery pages and profile families from the onboarding design -->
+    <string name="ob_passer">Skip</string>
+    <string name="ob_intro_tagline">Your business at your fingertips.</string>
+    <string name="ob_intro_title">Manage, track and grow your business with ease.</string>
+    <string name="ob_intro_dashboard_label">Dashboard</string>
+    <string name="ob_intro_business_title">All your business in one place</string>
+    <string name="ob_intro_business_description">Sales, purchases, stock, clients and finance: manage every aspect of your business.</string>
+    <string name="ob_intro_secure_title">Secure and 100% private</string>
+    <string name="ob_intro_secure_description">Your data is stored locally on your device.</string>
+    <string name="ob_intro_offline_title">Works even offline</string>
+    <string name="ob_intro_offline_description">Work anywhere, at any time, even without a connection.</string>
+    <string name="ob_profil_producteur">Producer</string>
+    <string name="ob_profil_producteur_description">Agriculture, farming, fishing, production…</string>
+    <string name="ob_profil_commercant">Merchant</string>
+    <string name="ob_profil_commercant_description">Retail, wholesale, distribution…</string>
+    <string name="ob_profil_prestataire">Service provider</string>
+    <string name="ob_profil_prestataire_description">Services, consulting, maintenance…</string>
+    <string name="ob_profil_autre">Other activity</string>
+    <string name="ob_profil_autre_description">Other types of business</string>
+    <string name="ob_profil_voir_details">Show detailed profiles</string>
+    <string name="ob_profil_masquer_details">Hide detailed profiles</string>
+
 </resources>

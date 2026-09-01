@@ -215,4 +215,27 @@
     <string name="ob_checklist_bienvenue">اكتمل الإعداد بنجاح</string>
     <string name="ob_selectionne">محدد</string>
 
+
+    <!-- صفحات التعريف وفئات النشاط من تصميم الإعداد -->
+    <string name="ob_passer">تخطي</string>
+    <string name="ob_intro_tagline">عملك بين يديك.</string>
+    <string name="ob_intro_title">أدر وتابع وطوّر نشاطك بكل سهولة.</string>
+    <string name="ob_intro_dashboard_label">لوحة التحكم</string>
+    <string name="ob_intro_business_title">كل أعمالك في مكان واحد</string>
+    <string name="ob_intro_business_description">المبيعات والمشتريات والمخزون والعملاء والمالية: أدِر كل جوانب شركتك.</string>
+    <string name="ob_intro_secure_title">آمن وخاص بنسبة 100٪</string>
+    <string name="ob_intro_secure_description">بياناتك مخزنة محلياً على جهازك.</string>
+    <string name="ob_intro_offline_title">يعمل حتى دون اتصال</string>
+    <string name="ob_intro_offline_description">اعمل في أي مكان وفي أي وقت، حتى دون اتصال.</string>
+    <string name="ob_profil_producteur">منتج</string>
+    <string name="ob_profil_producteur_description">زراعة، تربية، صيد، إنتاج…</string>
+    <string name="ob_profil_commercant">تاجر</string>
+    <string name="ob_profil_commercant_description">تجارة تجزئة أو جملة أو توزيع…</string>
+    <string name="ob_profil_prestataire">مقدم خدمات</string>
+    <string name="ob_profil_prestataire_description">خدمات، استشارات، صيانة…</string>
+    <string name="ob_profil_autre">نشاط آخر</string>
+    <string name="ob_profil_autre_description">أنواع أنشطة أخرى</string>
+    <string name="ob_profil_voir_details">إظهار الملفات التفصيلية</string>
+    <string name="ob_profil_masquer_details">إخفاء الملفات التفصيلية</string>
+
 </resources>

@@ -215,4 +215,27 @@
     <string name="ob_checklist_bienvenue">配置已成功完成</string>
     <string name="ob_selectionne">已选择</string>
 
+
+    <!-- 引导页与业务类型设计 -->
+    <string name="ob_passer">跳过</string>
+    <string name="ob_intro_tagline">您的企业，尽在指尖。</string>
+    <string name="ob_intro_title">轻松管理、追踪并发展您的业务。</string>
+    <string name="ob_intro_dashboard_label">仪表盘</string>
+    <string name="ob_intro_business_title">一处管理您的全部业务</string>
+    <string name="ob_intro_business_description">销售、采购、库存、客户和财务：管理企业的每个方面。</string>
+    <string name="ob_intro_secure_title">安全且 100% 私密</string>
+    <string name="ob_intro_secure_description">您的数据存储在本地设备上。</string>
+    <string name="ob_intro_offline_title">离线时也能使用</string>
+    <string name="ob_intro_offline_description">无论何时何地，即使没有网络也可工作。</string>
+    <string name="ob_profil_producteur">生产者</string>
+    <string name="ob_profil_producteur_description">农业、畜牧、渔业、生产…</string>
+    <string name="ob_profil_commercant">商户</string>
+    <string name="ob_profil_commercant_description">零售、批发、分销…</string>
+    <string name="ob_profil_prestataire">服务提供商</string>
+    <string name="ob_profil_prestataire_description">服务、咨询、维护…</string>
+    <string name="ob_profil_autre">其他业务</string>
+    <string name="ob_profil_autre_description">其他业务类型</string>
+    <string name="ob_profil_voir_details">显示详细业务类型</string>
+    <string name="ob_profil_masquer_details">隐藏详细业务类型</string>
+
 </resources>

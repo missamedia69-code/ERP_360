@@ -321,4 +321,27 @@
     <string name="ob_checklist_bienvenue">Configuration terminée avec succès</string>
     <string name="ob_selectionne">Sélectionné</string>
 
+
+    <!-- Pages de découverte et profils de la maquette d'onboarding -->
+    <string name="ob_passer">Passer</string>
+    <string name="ob_intro_tagline">Votre entreprise, au bout des doigts.</string>
+    <string name="ob_intro_title">Gérez, suivez, développez votre activité en toute simplicité.</string>
+    <string name="ob_intro_dashboard_label">Tableau de bord</string>
+    <string name="ob_intro_business_title">Tout votre business au même endroit</string>
+    <string name="ob_intro_business_description">Ventes, achats, stock, clients et finances : pilotez chaque aspect de votre entreprise.</string>
+    <string name="ob_intro_secure_title">Sécurisé et 100 % privé</string>
+    <string name="ob_intro_secure_description">Vos données sont stockées localement sur votre appareil.</string>
+    <string name="ob_intro_offline_title">Fonctionne même hors ligne</string>
+    <string name="ob_intro_offline_description">Travaillez partout, à tout moment, même sans connexion.</string>
+    <string name="ob_profil_producteur">Producteur</string>
+    <string name="ob_profil_producteur_description">Agriculture, élevage, pêche, production…</string>
+    <string name="ob_profil_commercant">Commerçant</string>
+    <string name="ob_profil_commercant_description">Commerce de détail, grossiste, distribution…</string>
+    <string name="ob_profil_prestataire">Prestataire de services</string>
+    <string name="ob_profil_prestataire_description">Services, consulting, maintenance…</string>
+    <string name="ob_profil_autre">Autre activité</string>
+    <string name="ob_profil_autre_description">Autres types d’activités</string>
+    <string name="ob_profil_voir_details">Afficher les profils détaillés</string>
+    <string name="ob_profil_masquer_details">Masquer les profils détaillés</string>
+
 </resources>
