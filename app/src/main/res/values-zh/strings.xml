@@ -181,4 +181,18 @@
     <string name="clients_type_revendeur">经销商</string>
     <string name="clients_type_prospect">潜在客户</string>
 
+    <!-- 客户表单：主要信息 -->
+    <string name="clients_nouveau">新建客户</string>
+    <string name="clients_informations_principales">主要信息</string>
+    <string name="clients_informations_principales_aide">填写客户的基本信息。</string>
+    <string name="clients_nom_exemple">例如：Marie Ndongo</string>
+    <string name="clients_telephone_exemple">例如：699 12 34 56</string>
+    <string name="clients_email_exemple">例如：name@company.com</string>
+    <string name="clients_aucune_categorie">无类别</string>
+    <string name="clients_site">地点 / 销售点</string>
+    <string name="clients_aucun_site">无地点</string>
+    <string name="clients_statut">状态</string>
+    <string name="clients_devise">货币</string>
+    <string name="clients_enregistrer">保存</string>
+
 </resources>

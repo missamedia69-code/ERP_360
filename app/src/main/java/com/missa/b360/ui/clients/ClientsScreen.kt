@@ -31,6 +31,8 @@ fun ClientsScreen(
     val clients by viewModel.clients.collectAsState(initial = emptyList())
     val categories by viewModel.categoriesFlow.collectAsState(initial = emptyList())
     val badges by viewModel.badgesFlow.collectAsState(initial = emptyList())
+    val sites by viewModel.sitesFlow.collectAsState(initial = emptyList())
+    val deviseEntreprise by viewModel.deviseEntreprise.collectAsState()
     val codePaysParDefaut by viewModel.codePaysParDefaut.collectAsState()
     val resultat by viewModel.resultat.collectAsState()
     val erreurCategorie by viewModel.erreurCategorie.collectAsState()
@@ -153,10 +155,11 @@ fun ClientsScreen(
         ClientFormDialog(
             client = client,
             categories = categories,
-            badges = badges,
+            sites = sites,
+            deviseEntreprise = deviseEntreprise,
             codePaysParDefaut = codePaysParDefaut,
             onDismiss = { formVisible = false },
-        ) { nom, tel, type, email, adresse, catId, remise, limite, badgeId, notes ->
+        ) { nom, tel, type, email, adresse, catId, siteId, remise, limite, badgeId, notes ->
             if (client == null) {
                 viewModel.creer(
                     nom = nom,
@@ -165,6 +168,7 @@ fun ClientsScreen(
                     email = email,
                     adresse = adresse,
                     categorieId = catId,
+                    siteId = siteId,
                     remiseDefautPct = remise,
                     limiteCredit = limite,
                     badgeId = badgeId,
@@ -179,6 +183,7 @@ fun ClientsScreen(
                     email,
                     adresse,
                     catId,
+                    siteId,
                     remise,
                     limite,
                     badgeId,

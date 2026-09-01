@@ -287,4 +287,18 @@
     <string name="fournisseurs_desactiver">Désactiver</string>
 
 
+    <!-- Formulaire client : informations principales -->
+    <string name="clients_nouveau">Nouveau client</string>
+    <string name="clients_informations_principales">Informations principales</string>
+    <string name="clients_informations_principales_aide">Renseignez les informations essentielles du client.</string>
+    <string name="clients_nom_exemple">Ex. : Marie Ndongo</string>
+    <string name="clients_telephone_exemple">Ex. : 6 99 12 34 56</string>
+    <string name="clients_email_exemple">Ex. : nom@entreprise.com</string>
+    <string name="clients_aucune_categorie">Aucune catégorie</string>
+    <string name="clients_site">Site / Point de vente</string>
+    <string name="clients_aucun_site">Aucun site</string>
+    <string name="clients_statut">Statut</string>
+    <string name="clients_devise">Devise</string>
+    <string name="clients_enregistrer">Enregistrer</string>
+
 </resources>

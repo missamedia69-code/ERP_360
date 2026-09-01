@@ -7,14 +7,16 @@ import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
 import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
-import com.missa.b360.core.util.Iso4217
+import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UpdateClientUseCase
+import com.missa.b360.core.util.Iso4217
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -34,11 +36,16 @@ class ClientsViewModel @Inject constructor(
     private val desactiverClient: DesactiverClientUseCase,
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
+    private val siteUseCases: SiteUseCases,
 ) : ViewModel() {
 
     val clients: Flow<List<ClientEntity>> = observeClients()
     val categoriesFlow: Flow<List<CategoryClientEntity>> = categories.observer()
     val badgesFlow: Flow<List<BadgeLoyaltyEntity>> = badges.observer()
+    val sitesFlow: Flow<List<SiteEntity>> = siteUseCases.observerSites()
+
+    private val _deviseEntreprise = MutableStateFlow<String?>(null)
+    val deviseEntreprise: StateFlow<String?> = _deviseEntreprise
 
     private val _codePaysParDefaut = MutableStateFlow<String?>(null)
     val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
@@ -52,6 +59,7 @@ class ClientsViewModel @Inject constructor(
         val email: String?,
         val adresse: String?,
         val categorieId: Long?,
+        val siteId: Long?,
         val remiseDefautPct: Double,
         val limiteCredit: Double?,
         val badgeId: Long?,
@@ -70,6 +78,7 @@ class ClientsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val entreprise = getEnterprise()
+            _deviseEntreprise.value = entreprise?.devise
             val codeEnregistre = settingsStore.get(SettingsStore.Keys.PAYS)
                 ?.takeIf { Iso4217.indicatifTelephone(it) != null }
             _codePaysParDefaut.value = codeEnregistre
@@ -84,6 +93,7 @@ class ClientsViewModel @Inject constructor(
         email: String?,
         adresse: String?,
         categorieId: Long?,
+        siteId: Long?,
         remiseDefautPct: Double,
         limiteCredit: Double?,
         badgeId: Long?,
@@ -97,6 +107,7 @@ class ClientsViewModel @Inject constructor(
                 email = email,
                 adresse = adresse,
                 categorieId = categorieId,
+                siteId = siteId,
                 remiseDefautPct = remiseDefautPct,
                 limiteCredit = limiteCredit,
                 badgeId = badgeId,
@@ -136,6 +147,7 @@ class ClientsViewModel @Inject constructor(
                         email = demande.email,
                         adresse = demande.adresse,
                         categorieId = demande.categorieId,
+                        siteId = demande.siteId,
                         remiseDefautPct = demande.remiseDefautPct,
                         limiteCredit = demande.limiteCredit,
                         badgeId = demande.badgeId,
@@ -184,6 +196,7 @@ class ClientsViewModel @Inject constructor(
         email: String?,
         adresse: String?,
         categorieId: Long?,
+        siteId: Long?,
         remiseDefautPct: Double,
         limiteCredit: Double?,
         badgeId: Long?,
@@ -199,6 +212,7 @@ class ClientsViewModel @Inject constructor(
                     email = email,
                     adresse = adresse,
                     categorieId = categorieId,
+                    siteId = siteId,
                     remiseDefautPct = remiseDefautPct,
                     limiteCredit = limiteCredit,
                     badgeId = badgeId,

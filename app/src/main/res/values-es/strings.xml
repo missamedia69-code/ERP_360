@@ -181,4 +181,18 @@
     <string name="clients_type_revendeur">Revendedor</string>
     <string name="clients_type_prospect">Prospecto</string>
 
+    <!-- Formulario de cliente: información principal -->
+    <string name="clients_nouveau">Nuevo cliente</string>
+    <string name="clients_informations_principales">Información principal</string>
+    <string name="clients_informations_principales_aide">Introduzca la información esencial del cliente.</string>
+    <string name="clients_nom_exemple">Ej.: Marie Ndongo</string>
+    <string name="clients_telephone_exemple">Ej.: 699 12 34 56</string>
+    <string name="clients_email_exemple">Ej.: nombre@empresa.com</string>
+    <string name="clients_aucune_categorie">Sin categoría</string>
+    <string name="clients_site">Sede / Punto de venta</string>
+    <string name="clients_aucun_site">Sin sede</string>
+    <string name="clients_statut">Estado</string>
+    <string name="clients_devise">Moneda</string>
+    <string name="clients_enregistrer">Guardar</string>
+
 </resources>

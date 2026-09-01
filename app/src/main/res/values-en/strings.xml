@@ -280,4 +280,18 @@
     <string name="fournisseurs_telephone">Phone</string>
     <string name="fournisseurs_desactiver">Disable</string>
 
+    <!-- Client form: main information -->
+    <string name="clients_nouveau">New client</string>
+    <string name="clients_informations_principales">Main information</string>
+    <string name="clients_informations_principales_aide">Enter the client’s essential information.</string>
+    <string name="clients_nom_exemple">E.g. Marie Ndongo</string>
+    <string name="clients_telephone_exemple">E.g. 699 12 34 56</string>
+    <string name="clients_email_exemple">E.g. name@company.com</string>
+    <string name="clients_aucune_categorie">No category</string>
+    <string name="clients_site">Site / Point of sale</string>
+    <string name="clients_aucun_site">No site</string>
+    <string name="clients_statut">Status</string>
+    <string name="clients_devise">Currency</string>
+    <string name="clients_enregistrer">Save</string>
+
 </resources>

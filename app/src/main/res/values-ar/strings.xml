@@ -181,4 +181,18 @@
     <string name="clients_type_revendeur">موزع</string>
     <string name="clients_type_prospect">عميل محتمل</string>
 
+    <!-- نموذج العميل: المعلومات الرئيسية -->
+    <string name="clients_nouveau">عميل جديد</string>
+    <string name="clients_informations_principales">المعلومات الرئيسية</string>
+    <string name="clients_informations_principales_aide">أدخل المعلومات الأساسية للعميل.</string>
+    <string name="clients_nom_exemple">مثال: ماري ندونغو</string>
+    <string name="clients_telephone_exemple">مثال: 699 12 34 56</string>
+    <string name="clients_email_exemple">مثال: name@company.com</string>
+    <string name="clients_aucune_categorie">بدون فئة</string>
+    <string name="clients_site">الموقع / نقطة البيع</string>
+    <string name="clients_aucun_site">لا يوجد موقع</string>
+    <string name="clients_statut">الحالة</string>
+    <string name="clients_devise">العملة</string>
+    <string name="clients_enregistrer">حفظ</string>
+
 </resources>
