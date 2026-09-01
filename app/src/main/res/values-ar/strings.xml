@@ -297,4 +297,20 @@
     <string name="home_company_active">شركة نشطة</string>
     <string name="home_drawer_primary">الرئيسي</string>
     <string name="home_drawer_other">أخرى</string>
+
+    <!-- Navigation latérale détaillée -->
+    <string name="home_active">نشط</string>
+    <string name="home_close">إغلاق</string>
+    <string name="home_settings">الإعدادات</string>
+    <string name="home_licence_activation">الترخيص والتفعيل</string>
+    <string name="home_sites_sales">المواقع ونقاط البيع</string>
+    <string name="home_drawer_tools">الأدوات</string>
+    <string name="home_drawer_support">الدعم</string>
+    <string name="home_help_assistance">المساعدة والدعم</string>
+    <string name="home_data_secured">البيانات مؤمّنة</string>
+    <string name="home_backup_date">آخر نسخة احتياطية: %1$s</string>
+    <string name="home_backup_never">لا توجد نسخة احتياطية مسجلة</string>
+    <string name="home_version_format">MISSA BUSINESS 360 • الإصدار %1$s</string>
+    <string name="home_support_title">المساعدة والدعم</string>
+    <string name="home_support_message">سيصبح الدعم متاحاً قريباً من هذا القسم. راجع الإعدادات أو شاشة حول التطبيق لمعلومات عن تثبيتك.</string>
 </resources>

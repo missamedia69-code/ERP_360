@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,24 +32,31 @@ import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.CloudSync
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material.icons.outlined.TransferWithinAStation
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge as NotificationBadge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerValue
@@ -62,6 +71,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -82,7 +92,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.missa.b360.BuildConfig
 import com.missa.b360.R
+import com.missa.b360.core.util.DateUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -118,6 +130,7 @@ fun HomeScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showMoreModules by remember { mutableStateOf(false) }
+    var showSupport by remember { mutableStateOf(false) }
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -134,16 +147,26 @@ fun HomeScreen(
     val greeting = uiState.prenomUtilisateur?.let {
         stringResource(R.string.home_greeting, it)
     } ?: stringResource(R.string.home_greeting_anonymous)
+    val backupStatus = uiState.derniereSauvegarde?.let { date ->
+        stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(date))
+    } ?: stringResource(R.string.home_backup_never)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            AdminDrawerContent(
+            MissaBusinessDrawer(
                 companyName = companyName,
                 logoUri = uiState.entrepriseLogoUri,
+                backupStatus = backupStatus,
+                currentRoute = currentRoute,
+                onClose = { scope.launch { drawerState.close() } },
                 onNavigate = { route ->
                     scope.launch { drawerState.close() }
                     navController.navigate(route)
+                },
+                onSupport = {
+                    scope.launch { drawerState.close() }
+                    showSupport = true
                 },
             )
         },
@@ -242,6 +265,19 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (showSupport) {
+        AlertDialog(
+            onDismissRequest = { showSupport = false },
+            title = { Text(stringResource(R.string.home_support_title)) },
+            text = { Text(stringResource(R.string.home_support_message)) },
+            confirmButton = {
+                TextButton(onClick = { showSupport = false }) {
+                    Text(stringResource(R.string.home_close))
+                }
+            },
+        )
     }
 }
 
@@ -899,124 +935,215 @@ private fun HomeBottomBar(
 }
 
 @Composable
-private fun AdminDrawerContent(
+private fun MissaBusinessDrawer(
     companyName: String,
     logoUri: String?,
+    backupStatus: String,
+    currentRoute: String?,
+    onClose: () -> Unit,
     onNavigate: (String) -> Unit,
+    onSupport: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
             .fillMaxHeight()
-            .width(320.dp)
-            .windowInsetsPadding(WindowInsets.safeDrawing),
+            .width(320.dp),
         color = Color.White,
+        shape = RoundedCornerShape(topEnd = 24.dp, bottomEnd = 24.dp),
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(start = 15.dp, end = 15.dp, top = 25.dp, bottom = 25.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(horizontal = 16.dp, vertical = 20.dp),
         ) {
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        modifier = Modifier.size(46.dp),
-                        shape = RoundedCornerShape(13.dp),
-                        color = HomeBlue,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Store,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.padding(10.dp),
-                        )
-                    }
-                    Spacer(Modifier.width(11.dp))
-                    Column {
-                        Text(
-                            text = "MISSA BUSINESS",
-                            color = HomeTextDark,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                        )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    color = HomeBlue,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Business,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.padding(11.dp),
+                    )
+                }
+                Spacer(Modifier.width(11.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "MISSA BUSINESS",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = HomeTextDark,
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = "360",
-                            color = HomeBlue,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
+                            color = HomeBlue,
                         )
-                    }
-                }
-                Spacer(Modifier.height(18.dp))
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onNavigate(Routes.ADMIN_REGLAGES) },
-                    shape = RoundedCornerShape(15.dp),
-                    color = HomeBlueSoft,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        CompanyLogo(
-                            logoUri = logoUri,
-                            contentDescription = null,
-                            fallbackIcon = Icons.Outlined.Store,
-                            modifier = Modifier.size(40.dp),
-                            size = 30.dp,
-                            shape = CircleShape,
-                            fallbackTint = HomeBlue,
-                            fallbackBackground = Color.White,
-                        )
-                        Spacer(Modifier.width(9.dp))
-                        Column(modifier = Modifier.weight(1f)) {
+                        Spacer(Modifier.width(5.dp))
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = HomeGreenSoft,
+                        ) {
                             Text(
-                                text = companyName,
-                                color = HomeTextDark,
-                                fontSize = 12.sp,
+                                text = stringResource(R.string.home_active),
+                                fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = stringResource(R.string.home_company_active),
-                                color = HomeTextMuted,
-                                fontSize = 10.sp,
+                                color = Color(0xFF16A34A),
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
                             )
                         }
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowForwardIos,
-                            contentDescription = null,
-                            tint = HomeTextMuted,
-                            modifier = Modifier.size(14.dp),
-                        )
                     }
                 }
-                Spacer(Modifier.height(16.dp))
-                DrawerSection(stringResource(R.string.home_drawer_primary))
-                DrawerItem(Icons.Outlined.Store, R.string.home_title, selected = true) {
-                    onNavigate(Routes.HOME)
+                IconButton(onClick = onClose, modifier = Modifier.size(38.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = stringResource(R.string.home_close),
+                        tint = HomeTextMuted,
+                    )
                 }
-                DrawerSection(stringResource(R.string.drawer_section_administration))
-                DrawerItem(Icons.Outlined.Settings, R.string.admin_reglages) {
-                    onNavigate(Routes.ADMIN_REGLAGES)
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigate(Routes.ADMIN_REGLAGES) },
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFFF0F4FF),
+                border = BorderStroke(1.dp, Color(0xFFE0E7FA)),
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CompanyLogo(
+                        logoUri = logoUri,
+                        contentDescription = null,
+                        fallbackIcon = Icons.Outlined.Store,
+                        modifier = Modifier.size(42.dp),
+                        size = 30.dp,
+                        shape = CircleShape,
+                        fallbackTint = HomeBlue,
+                        fallbackBackground = Color.White,
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = companyName,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HomeTextDark,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = stringResource(R.string.home_company_active),
+                            fontSize = 10.sp,
+                            color = HomeTextMuted,
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = null,
+                        tint = HomeTextMuted,
+                        modifier = Modifier.size(18.dp),
+                    )
                 }
-                DrawerItem(Icons.Outlined.CloudSync, R.string.admin_licence) {
-                    onNavigate(Routes.ADMIN_LICENCE)
-                }
-                DrawerItem(Icons.Outlined.Backup, R.string.admin_sauvegarde) {
-                    onNavigate(Routes.ADMIN_SAUVEGARDE)
-                }
-                DrawerItem(Icons.Outlined.History, R.string.admin_journal) {
-                    onNavigate(Routes.ADMIN_JOURNAL)
-                }
-                DrawerItem(Icons.Outlined.Badge, R.string.admin_utilisateurs) {
-                    onNavigate(Routes.ADMIN_UTILISATEURS)
-                }
-                DrawerItem(Icons.Outlined.Store, R.string.admin_multisite) {
-                    onNavigate(Routes.ADMIN_MULTISITE)
-                }
-                DrawerSection(stringResource(R.string.home_drawer_other))
-                DrawerItem(Icons.Outlined.Info, R.string.admin_a_propos) {
-                    onNavigate(Routes.ADMIN_A_PROPOS)
+            }
+
+            DrawerSectionTitle(stringResource(R.string.home_drawer_primary))
+            DrawerMenuItem(
+                icon = Icons.Outlined.Home,
+                title = stringResource(R.string.home_title),
+                selected = currentRoute == Routes.HOME,
+            ) {
+                onNavigate(Routes.HOME)
+            }
+
+            DrawerSectionTitle(stringResource(R.string.drawer_section_administration))
+            DrawerMenuItem(Icons.Outlined.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {
+                onNavigate(Routes.ADMIN_REGLAGES)
+            }
+            DrawerMenuItem(Icons.Outlined.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {
+                onNavigate(Routes.ADMIN_LICENCE)
+            }
+            DrawerMenuItem(Icons.Outlined.People, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
+                onNavigate(Routes.ADMIN_UTILISATEURS)
+            }
+            DrawerMenuItem(Icons.Outlined.Store, stringResource(R.string.home_sites_sales), currentRoute == Routes.ADMIN_MULTISITE) {
+                onNavigate(Routes.ADMIN_MULTISITE)
+            }
+
+            DrawerSectionTitle(stringResource(R.string.home_drawer_tools))
+            DrawerMenuItem(Icons.Outlined.Backup, stringResource(R.string.admin_sauvegarde), currentRoute == Routes.ADMIN_SAUVEGARDE) {
+                onNavigate(Routes.ADMIN_SAUVEGARDE)
+            }
+            DrawerMenuItem(Icons.Outlined.History, stringResource(R.string.admin_journal), currentRoute == Routes.ADMIN_JOURNAL) {
+                onNavigate(Routes.ADMIN_JOURNAL)
+            }
+            DrawerMenuItem(Icons.Outlined.Notifications, stringResource(R.string.notifications), currentRoute == Routes.NOTIFICATIONS) {
+                onNavigate(Routes.NOTIFICATIONS)
+            }
+
+            DrawerSectionTitle(stringResource(R.string.home_drawer_support))
+            DrawerMenuItem(Icons.Outlined.HelpOutline, stringResource(R.string.home_help_assistance)) {
+                onSupport()
+            }
+            DrawerMenuItem(Icons.Outlined.Info, stringResource(R.string.admin_a_propos), currentRoute == Routes.ADMIN_A_PROPOS) {
+                onNavigate(Routes.ADMIN_A_PROPOS)
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                color = Color(0xFFF7F8FC),
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            modifier = Modifier.size(30.dp),
+                            shape = CircleShape,
+                            color = HomeGreenSoft,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.CloudDone,
+                                contentDescription = null,
+                                tint = Color(0xFF16A34A),
+                                modifier = Modifier.padding(7.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                text = stringResource(R.string.home_data_secured),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = HomeTextDark,
+                            )
+                            Text(
+                                text = backupStatus,
+                                fontSize = 9.sp,
+                                color = HomeTextMuted,
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(10.dp))
+                    Text(
+                        text = stringResource(R.string.home_version_format, BuildConfig.VERSION_NAME),
+                        fontSize = 9.sp,
+                        color = Color(0xFF9AA3B8),
+                    )
                 }
             }
         }
@@ -1024,20 +1151,21 @@ private fun AdminDrawerContent(
 }
 
 @Composable
-private fun DrawerSection(title: String) {
+private fun DrawerSectionTitle(title: String) {
     Text(
         text = title,
-        color = HomeTextMuted,
-        fontSize = 10.sp,
+        color = Color(0xFF8A94AA),
+        fontSize = 9.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(start = 10.dp, top = 13.dp, bottom = 5.dp),
+        letterSpacing = 0.8.sp,
+        modifier = Modifier.padding(start = 10.dp, top = 18.dp, bottom = 5.dp),
     )
 }
 
 @Composable
-private fun DrawerItem(
+private fun DrawerMenuItem(
     icon: ImageVector,
-    @StringRes titleRes: Int,
+    title: String,
     selected: Boolean = false,
     onClick: () -> Unit,
 ) {
@@ -1049,29 +1177,37 @@ private fun DrawerItem(
         color = if (selected) HomeBlueSoft else Color.Transparent,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 11.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (selected) HomeBlue else HomeTextMuted,
-                modifier = Modifier.size(21.dp),
-            )
-            Spacer(Modifier.width(12.dp))
+            Surface(
+                modifier = Modifier.size(34.dp),
+                shape = RoundedCornerShape(9.dp),
+                color = if (selected) Color.White else Color.Transparent,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (selected) HomeBlue else HomeTextMuted,
+                    modifier = Modifier.padding(7.dp),
+                )
+            }
+            Spacer(Modifier.width(10.dp))
             Text(
-                text = stringResource(titleRes),
+                text = title,
                 modifier = Modifier.weight(1f),
-                color = if (selected) HomeBlue else HomeTextDark,
-                fontSize = 13.sp,
+                color = if (selected) HomeBlue else Color(0xFF17213F),
+                fontSize = 12.sp,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
             )
-            Icon(
-                imageVector = Icons.Outlined.ArrowForwardIos,
-                contentDescription = null,
-                tint = HomeTextMuted,
-                modifier = Modifier.size(12.dp),
-            )
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .width(3.dp)
+                        .height(22.dp)
+                        .background(HomeBlue, RoundedCornerShape(10.dp)),
+                )
+            }
         }
     }
 }

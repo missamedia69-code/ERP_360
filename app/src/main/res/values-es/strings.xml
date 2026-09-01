@@ -297,4 +297,20 @@
     <string name="home_company_active">Empresa activa</string>
     <string name="home_drawer_primary">PRINCIPAL</string>
     <string name="home_drawer_other">OTROS</string>
+
+    <!-- Navigation latérale détaillée -->
+    <string name="home_active">ACTIVA</string>
+    <string name="home_close">Cerrar</string>
+    <string name="home_settings">Ajustes</string>
+    <string name="home_licence_activation">Licencia y activación</string>
+    <string name="home_sites_sales">Sitios y puntos de venta</string>
+    <string name="home_drawer_tools">HERRAMIENTAS</string>
+    <string name="home_drawer_support">SOPORTE</string>
+    <string name="home_help_assistance">Ayuda y asistencia</string>
+    <string name="home_data_secured">Datos protegidos</string>
+    <string name="home_backup_date">Última copia de seguridad: %1$s</string>
+    <string name="home_backup_never">No hay copias de seguridad registradas</string>
+    <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
+    <string name="home_support_title">Ayuda y asistencia</string>
+    <string name="home_support_message">La asistencia estará disponible próximamente desde esta sección. Consulte Ajustes o la pantalla Acerca de para conocer los datos de su instalación.</string>
 </resources>

@@ -2,6 +2,7 @@ package com.missa.b360.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
 import com.missa.b360.core.domain.usecase.ObserveFournisseursUseCase
@@ -25,6 +26,7 @@ data class HomeUiState(
     val prenomUtilisateur: String? = null,
     val nombreClients: Int = 0,
     val nombreFournisseurs: Int = 0,
+    val derniereSauvegarde: Long? = null,
 )
 
 /**
@@ -39,6 +41,7 @@ class HomeViewModel @Inject constructor(
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
     observeFournisseurs: ObserveFournisseursUseCase,
+    backups: BackupUseCases,
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
@@ -48,7 +51,8 @@ class HomeViewModel @Inject constructor(
         users.observerUtilisateurs(),
         observeClients(),
         observeFournisseurs(),
-    ) { entreprise, utilisateurs, clients, fournisseurs ->
+        backups.historique(),
+    ) { entreprise, utilisateurs, clients, fournisseurs, historiqueSauvegardes ->
         HomeUiState(
             entrepriseNom = entreprise?.nom.orEmpty(),
             devise = entreprise?.devise ?: "XAF",
@@ -62,6 +66,7 @@ class HomeViewModel @Inject constructor(
                 ?.takeIf { it.isNotBlank() },
             nombreClients = clients.size,
             nombreFournisseurs = fournisseurs.size,
+            derniereSauvegarde = historiqueSauvegardes.firstOrNull()?.date,
         )
     }.stateIn(
         scope = viewModelScope,
