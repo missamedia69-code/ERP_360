@@ -351,4 +351,12 @@
     <string name="ob_activite_subtitle">Select the profile that best matches your company.</string>
     <string name="ob_effectif_subtitle">This information tailors the available features.</string>
 
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">Company logo</string>
+    <string name="ob_logo_facultatif">Optional · PNG, JPG or WebP</string>
+    <string name="ob_logo_ajouter">Add a logo</string>
+    <string name="ob_logo_modifier">Change logo</string>
+    <string name="ob_logo_supprimer">Remove</string>
+    <string name="ob_logo_apercu">Company logo preview</string>
 </resources>

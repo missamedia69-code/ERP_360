@@ -252,4 +252,12 @@
     <string name="ob_activite_subtitle">Seleccione el perfil que mejor corresponda a su empresa.</string>
     <string name="ob_effectif_subtitle">Esta información ajusta las funciones disponibles.</string>
 
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">Logotipo de la empresa</string>
+    <string name="ob_logo_facultatif">Opcional · PNG, JPG o WebP</string>
+    <string name="ob_logo_ajouter">Añadir un logotipo</string>
+    <string name="ob_logo_modifier">Cambiar el logotipo</string>
+    <string name="ob_logo_supprimer">Eliminar</string>
+    <string name="ob_logo_apercu">Vista previa del logotipo de la empresa</string>
 </resources>

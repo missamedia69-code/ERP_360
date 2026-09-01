@@ -62,7 +62,7 @@ import com.missa.b360.core.data.entity.UserEntity
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -101,6 +101,13 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_fournisseurs_nom` ON `fournisseurs` (`nom`)",
                 )
+            }
+        }
+
+        /** v2 → v3 : conserve le logo choisi pour l'entreprise. */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `logoUri` TEXT")
             }
         }
     }

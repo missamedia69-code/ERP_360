@@ -66,6 +66,8 @@ class OnboardingViewModel @Inject constructor(
     var tauxTaxeTexte by mutableStateOf("0")
         private set
     var nomSitePrincipal by mutableStateOf("")
+    var logoUri by mutableStateOf<String?>(null)
+        private set
     var enregistrementEnCours by mutableStateOf(false)
         private set
 
@@ -107,6 +109,7 @@ class OnboardingViewModel @Inject constructor(
                         nomEntreprise = entreprise.nom
                         devise = entreprise.devise
                         pays = entreprise.pays.orEmpty()
+                        logoUri = entreprise.logoUri
                         codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
                     }
                     progression.tauxTaxe?.let(::definirTauxTaxe)
@@ -189,6 +192,11 @@ class OnboardingViewModel @Inject constructor(
         codePays = null
     }
 
+    /** Le logo est facultatif, mais son URI est conservée avec l'entreprise après l'onboarding. */
+    fun definirLogoUri(uri: String?) {
+        logoUri = uri
+    }
+
     /** Conserve fidèlement la saisie manuelle, y compris une virgule ou décimale en cours. */
     fun modifierTauxTaxe(valeur: String) {
         tauxTaxeTexte = valeur
@@ -240,6 +248,7 @@ class OnboardingViewModel @Inject constructor(
                         devise = deviseSelectionnee,
                         pays = paysSelectionne,
                         codePays = codePays,
+                        logoUri = logoUri,
                         tauxTaxe = tauxTaxeValide,
                         nomSitePrincipal = nomSiteValide,
                         profilActivite = profil?.name,

@@ -26,6 +26,8 @@ data class EnterpriseEntity(
     val langue: String,
     /** Pays suggérant taxes + référentiels comptable/paie. */
     val pays: String? = null,
+    /** URI du logo choisi durant l'onboarding, avec droit de lecture persistant. */
+    val logoUri: String? = null,
     /** Profil d'activité A–H (RA-20, modifiable). */
     val profilActivite: String? = null,
     /** Palier de taille P1–P6. */

@@ -252,4 +252,12 @@
     <string name="ob_activite_subtitle">اختر الملف الذي يناسب شركتك بشكل أفضل.</string>
     <string name="ob_effectif_subtitle">تضبط هذه المعلومات الميزات المقترحة.</string>
 
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">شعار الشركة</string>
+    <string name="ob_logo_facultatif">اختياري · PNG أو JPG أو WebP</string>
+    <string name="ob_logo_ajouter">إضافة شعار</string>
+    <string name="ob_logo_modifier">تغيير الشعار</string>
+    <string name="ob_logo_supprimer">حذف</string>
+    <string name="ob_logo_apercu">معاينة شعار الشركة</string>
 </resources>

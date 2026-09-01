@@ -252,4 +252,12 @@
     <string name="ob_activite_subtitle">选择最符合您企业的业务类型。</string>
     <string name="ob_effectif_subtitle">此信息将调整可用功能。</string>
 
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">企业标志</string>
+    <string name="ob_logo_facultatif">可选 · PNG、JPG 或 WebP</string>
+    <string name="ob_logo_ajouter">添加标志</string>
+    <string name="ob_logo_modifier">更换标志</string>
+    <string name="ob_logo_supprimer">删除</string>
+    <string name="ob_logo_apercu">企业标志预览</string>
 </resources>
