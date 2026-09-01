@@ -38,6 +38,13 @@ class OperationUseCases @Inject constructor(
         data object Invalid : CreateResult()
     }
 
+    sealed class UpdateDraftResult {
+        data class Success(val id: Long, val reference: String) : UpdateDraftResult()
+        data object ReadOnly : UpdateDraftResult()
+        data object Invalid : UpdateDraftResult()
+        data object NotDraft : UpdateDraftResult()
+    }
+
     fun observe(module: OperationModule): Flow<List<OperationRecordEntity>> =
         dao.observeByModule(module.name)
 
@@ -74,6 +81,40 @@ class OperationUseCases @Inject constructor(
             details = "${params.module.name} $reference — $title",
         )
         return CreateResult.Success(id, reference)
+    }
+
+    /**
+     * Met à jour un brouillon existant sans changer sa référence. Les pièces validées ou
+     * annulées restent immuables : une correction doit passer par une nouvelle pièce.
+     */
+    suspend fun updateDraft(id: Long, params: CreateParams): UpdateDraftResult {
+        if (!OperationValidation.isValid(params)) return UpdateDraftResult.Invalid
+        if (licenceManager.isReadOnly()) return UpdateDraftResult.ReadOnly
+        val existing = dao.getById(id) ?: return UpdateDraftResult.NotDraft
+        if (existing.status != OperationStatus.DRAFT.name || existing.module != params.module.name) {
+            return UpdateDraftResult.NotDraft
+        }
+        val title = params.title.trim()
+        dao.update(
+            existing.copy(
+                title = title,
+                counterpart = params.counterpart?.trim()?.ifBlank { null },
+                amount = params.amount,
+                quantity = params.quantity,
+                direction = if (params.module == OperationModule.FINANCES) {
+                    params.direction.name
+                } else {
+                    OperationDirection.NONE.name
+                },
+                notes = params.notes?.trim()?.ifBlank { null },
+            ),
+        )
+        journalManager.log(
+            module = params.module.name,
+            action = "MODIFICATION_BROUILLON",
+            details = "${params.module.name} ${existing.reference} — $title",
+        )
+        return UpdateDraftResult.Success(existing.id, existing.reference)
     }
 
     /** Validation ou annulation compensatoire sans supprimer la pièce créée. */

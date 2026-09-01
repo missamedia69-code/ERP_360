@@ -28,6 +28,7 @@ import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
+import com.missa.b360.ui.sales.SalesScreen
 import com.missa.b360.ui.onboarding.OnboardingScreen
 import com.missa.b360.ui.onboarding.PinLockScreen
 
@@ -116,7 +117,22 @@ private fun MainNavHost() {
         }
         // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
         operationDestination(AppModule.STOCK, OperationModule.STOCK, navController)
-        operationDestination(AppModule.VENTE, OperationModule.VENTE, navController)
+        composable(
+            route = "${AppModule.VENTE.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) {
+            SalesScreen(
+                onNavigate = { route -> navController.navigate(route) },
+                onOpenClientCreate = {
+                    navController.navigate("${AppModule.CLIENTS.route}?create=true")
+                },
+            )
+        }
         operationDestination(AppModule.ACHATS, OperationModule.ACHATS, navController)
         operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
         operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
