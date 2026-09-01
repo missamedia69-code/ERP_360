@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.missa.b360.R
+import com.missa.b360.core.data.entity.OperationDirection
+import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.ui.admin.AdminAProposScreen
 import com.missa.b360.ui.admin.AdminJournalScreen
 import com.missa.b360.ui.admin.AdminLicenceScreen
@@ -22,10 +23,11 @@ import com.missa.b360.ui.admin.AdminSauvegardeScreen
 import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
 import com.missa.b360.ui.clients.ClientsScreen
-import com.missa.b360.ui.components.PlaceholderScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
+import com.missa.b360.ui.operations.OperationModuleScreen
+import com.missa.b360.ui.operations.ReportingScreen
 import com.missa.b360.ui.onboarding.OnboardingScreen
 import com.missa.b360.ui.onboarding.PinLockScreen
 
@@ -112,12 +114,48 @@ private fun MainNavHost() {
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
-        // 12 modules métier — implémentés phases D → K (ceux-ci sont exclus du placeholder)
-        val modulesImplementes = setOf(AppModule.CLIENTS, AppModule.FOURNISSEURS)
-        AppModule.entries.filterNot { it in modulesImplementes }.forEach { module ->
-            composable(module.route) {
-                PlaceholderScreen(module.titleRes, R.string.module_placeholder)
-            }
+        // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
+        operationDestination(AppModule.STOCK, OperationModule.STOCK, navController)
+        operationDestination(AppModule.VENTE, OperationModule.VENTE, navController)
+        operationDestination(AppModule.ACHATS, OperationModule.ACHATS, navController)
+        operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
+        operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
+        operationDestination(AppModule.PRODUCTION, OperationModule.PRODUCTION, navController)
+        operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
+        operationDestination(AppModule.RH, OperationModule.RH, navController)
+        operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
+        composable(AppModule.REPORTING.route) {
+            ReportingScreen(onBack = { navController.popBackStack() })
         }
+    }
+}
+
+/** Route commune aux opérations : le paramètre crée un document immédiatement si demandé. */
+private fun NavGraphBuilder.operationDestination(
+    appModule: AppModule,
+    operationModule: OperationModule,
+    navController: androidx.navigation.NavController,
+) {
+    composable(
+        route = "${appModule.route}?create={create}&direction={direction}",
+        arguments = listOf(
+            navArgument("create") {
+                type = NavType.BoolType
+                defaultValue = false
+            },
+            navArgument("direction") {
+                type = NavType.StringType
+                defaultValue = "NONE"
+            },
+        ),
+    ) { entry ->
+        OperationModuleScreen(
+            module = operationModule,
+            onBack = { navController.popBackStack() },
+            openCreate = entry.arguments?.getBoolean("create") == true,
+            initialDirection = OperationDirection.entries.firstOrNull {
+                it.name == entry.arguments?.getString("direction")
+            } ?: OperationDirection.NONE,
+        )
     }
 }

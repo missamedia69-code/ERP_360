@@ -313,4 +313,43 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">帮助与支持</string>
     <string name="home_support_message">支持功能即将从此处提供。请查看“设置”或“关于”页面以获取安装信息。</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">已创建单据 %1$s。</string>
+    <string name="ops_invalid">请检查描述、金额和数量。</string>
+    <string name="ops_read_only">许可证已过期：此模块为只读模式。</string>
+    <string name="ops_error">无法保存操作，请重试。</string>
+    <string name="ops_add">添加</string>
+    <string name="ops_empty">%1$s 中尚无记录。</string>
+    <string name="ops_quantity_value">数量：%1$s</string>
+    <string name="ops_cancel">取消</string>
+    <string name="ops_validate">确认</string>
+    <string name="ops_status_draft">草稿</string>
+    <string name="ops_status_validated">已确认</string>
+    <string name="ops_status_cancelled">已取消</string>
+    <string name="ops_new">新建：%1$s</string>
+    <string name="ops_title">描述</string>
+    <string name="ops_counterpart">客户、供应商或往来方</string>
+    <string name="ops_amount">金额</string>
+    <string name="ops_quantity">数量</string>
+    <string name="ops_income">收入</string>
+    <string name="ops_expense">支出</string>
+    <string name="ops_notes">备注</string>
+    <string name="ops_save">保存</string>
+    <string name="ops_hint_stock">记录商品、盘点和库存调整。</string>
+    <string name="ops_hint_sales">创建并确认销售和客户发票。</string>
+    <string name="ops_hint_purchases">记录采购和供应商发票。</string>
+    <string name="ops_hint_finances">跟踪收款和资金支出。</string>
+    <string name="ops_hint_delivery">准备并跟踪待完成的交付。</string>
+    <string name="ops_hint_production">计划生产订单和数量。</string>
+    <string name="ops_hint_services">集中管理服务订单和现场服务。</string>
+    <string name="ops_hint_hr">跟踪与员工相关的运营信息。</string>
+    <string name="ops_hint_projects">组织项目活动、预算和跟进。</string>
+    <string name="reporting_subtitle">对已确认操作进行本地分析。</string>
+    <string name="reporting_module_activity">按模块统计活动</string>
+    <string name="reporting_empty">目前没有可分析的操作。</string>
+    <string name="reporting_current_totals">当前总计</string>
+    <string name="reporting_records_count">%1$d 条记录</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
 </resources>

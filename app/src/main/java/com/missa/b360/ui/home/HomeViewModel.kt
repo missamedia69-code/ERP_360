@@ -6,7 +6,12 @@ import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
 import com.missa.b360.core.domain.usecase.ObserveFournisseursUseCase
+import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
+import com.missa.b360.core.data.entity.OperationDirection
+import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.OperationRecordEntity
+import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.notifications.AppNotifier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -27,12 +32,16 @@ data class HomeUiState(
     val nombreClients: Int = 0,
     val nombreFournisseurs: Int = 0,
     val derniereSauvegarde: Long? = null,
+    val ventes: Double = 0.0,
+    val achats: Double = 0.0,
+    val tresorerie: Double = 0.0,
+    val quantiteStock: Double = 0.0,
+    val recentOperations: List<OperationRecordEntity> = emptyList(),
 )
 
 /**
  * ViewModel de l'accueil : badge (RA-23) et résumé réactif de l'entreprise.
- * Les montants Vente/Achat/Trésorerie restent volontairement à zéro tant que leurs
- * modules transactionnels ne sont pas encore livrés ; aucune donnée fictive n'est affichée.
+ * Les indicateurs reposent exclusivement sur les pièces locales validées, sans données fictives.
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -42,11 +51,12 @@ class HomeViewModel @Inject constructor(
     observeClients: ObserveClientsUseCase,
     observeFournisseurs: ObserveFournisseursUseCase,
     backups: BackupUseCases,
+    operations: OperationUseCases,
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
 
-    val uiState: StateFlow<HomeUiState> = combine(
+    private val baseState = combine(
         getEnterprise.observer(),
         users.observerUtilisateurs(),
         observeClients(),
@@ -68,9 +78,37 @@ class HomeViewModel @Inject constructor(
             nombreFournisseurs = fournisseurs.size,
             derniereSauvegarde = historiqueSauvegardes.firstOrNull()?.date,
         )
+    }
+
+    val uiState: StateFlow<HomeUiState> = combine(baseState, operations.observeAll()) { base, records ->
+        val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
+        val ventes = validated.amountFor(OperationModule.VENTE)
+        val achats = validated.amountFor(OperationModule.ACHATS)
+        val tresorerie = validated
+            .filter { it.module == OperationModule.FINANCES.name }
+            .sumOf { record ->
+                when (record.direction) {
+                    OperationDirection.IN.name -> record.amount ?: 0.0
+                    OperationDirection.OUT.name -> -(record.amount ?: 0.0)
+                    else -> 0.0
+                }
+            }
+        val quantiteStock = validated
+            .filter { it.module == OperationModule.STOCK.name }
+            .sumOf { it.quantity ?: 0.0 }
+        base.copy(
+            ventes = ventes,
+            achats = achats,
+            tresorerie = tresorerie,
+            quantiteStock = quantiteStock,
+            recentOperations = records.take(3),
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeUiState(),
     )
 }
+
+private fun List<OperationRecordEntity>.amountFor(module: OperationModule): Double =
+    filter { it.module == module.name }.sumOf { it.amount ?: 0.0 }

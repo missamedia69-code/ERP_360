@@ -412,4 +412,43 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Help &amp; support</string>
     <string name="home_support_message">Support will be available from this section soon. Check Settings or the About screen for information about your installation.</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">Record %1$s created.</string>
+    <string name="ops_invalid">Check the description, amount and quantity.</string>
+    <string name="ops_read_only">Licence expired: this module is read-only.</string>
+    <string name="ops_error">The operation could not be saved. Please try again.</string>
+    <string name="ops_add">Add</string>
+    <string name="ops_empty">No records in %1$s yet.</string>
+    <string name="ops_quantity_value">Quantity: %1$s</string>
+    <string name="ops_cancel">Cancel</string>
+    <string name="ops_validate">Validate</string>
+    <string name="ops_status_draft">Draft</string>
+    <string name="ops_status_validated">Validated</string>
+    <string name="ops_status_cancelled">Cancelled</string>
+    <string name="ops_new">New: %1$s</string>
+    <string name="ops_title">Description</string>
+    <string name="ops_counterpart">Customer, supplier or third party</string>
+    <string name="ops_amount">Amount</string>
+    <string name="ops_quantity">Quantity</string>
+    <string name="ops_income">Income</string>
+    <string name="ops_expense">Expense</string>
+    <string name="ops_notes">Notes</string>
+    <string name="ops_save">Save</string>
+    <string name="ops_hint_stock">Record your items, inventories and stock adjustments.</string>
+    <string name="ops_hint_sales">Create and validate your sales and customer invoices.</string>
+    <string name="ops_hint_purchases">Record your purchases and supplier invoices.</string>
+    <string name="ops_hint_finances">Track cash inflows and expenses.</string>
+    <string name="ops_hint_delivery">Prepare and track deliveries to be made.</string>
+    <string name="ops_hint_production">Plan your production orders and quantities.</string>
+    <string name="ops_hint_services">Centralize your service jobs and interventions.</string>
+    <string name="ops_hint_hr">Track operational information related to your staff.</string>
+    <string name="ops_hint_projects">Organize activities, budgets and project follow-up.</string>
+    <string name="reporting_subtitle">Local analysis of your validated operations.</string>
+    <string name="reporting_module_activity">Activity by module</string>
+    <string name="reporting_empty">There are no operations to analyze yet.</string>
+    <string name="reporting_current_totals">Current totals</string>
+    <string name="reporting_records_count">%1$d record(s)</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
 </resources>

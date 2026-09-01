@@ -11,6 +11,7 @@ import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.NotificationDao
+import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SequenceDao
@@ -27,6 +28,7 @@ import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
 import com.missa.b360.core.data.entity.NotificationEntity
+import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.PaymentMethodEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.RoleEntity
@@ -61,8 +63,9 @@ import com.missa.b360.core.data.entity.UserEntity
         PriceClientEntity::class,
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
+        OperationRecordEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -80,6 +83,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun clientDao(): ClientDao
     abstract fun fournisseurDao(): FournisseurDao
+    abstract fun operationRecordDao(): OperationRecordDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -108,6 +112,32 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `logoUri` TEXT")
+            }
+        }
+
+        /** v3 → v4 : pièces opérationnelles des modules Stock à Projets. */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `operation_records` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`module` TEXT NOT NULL, `reference` TEXT NOT NULL, `title` TEXT NOT NULL, " +
+                        "`counterpart` TEXT, `amount` REAL, `quantity` REAL, " +
+                        "`direction` TEXT NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, " +
+                        "`createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_operation_records_reference` " +
+                        "ON `operation_records` (`reference`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_operation_records_module` " +
+                        "ON `operation_records` (`module`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_operation_records_createdAt` " +
+                        "ON `operation_records` (`createdAt`)",
+                )
             }
         }
     }

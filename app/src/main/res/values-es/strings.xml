@@ -313,4 +313,43 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Ayuda y asistencia</string>
     <string name="home_support_message">La asistencia estará disponible próximamente desde esta sección. Consulte Ajustes o la pantalla Acerca de para conocer los datos de su instalación.</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">Documento %1$s creado.</string>
+    <string name="ops_invalid">Revise la descripción, el importe y la cantidad.</string>
+    <string name="ops_read_only">La licencia ha caducado: este módulo es de solo lectura.</string>
+    <string name="ops_error">No se pudo guardar la operación. Inténtelo de nuevo.</string>
+    <string name="ops_add">Añadir</string>
+    <string name="ops_empty">Aún no hay operaciones registradas en %1$s.</string>
+    <string name="ops_quantity_value">Cantidad: %1$s</string>
+    <string name="ops_cancel">Cancelar</string>
+    <string name="ops_validate">Validar</string>
+    <string name="ops_status_draft">Borrador</string>
+    <string name="ops_status_validated">Validado</string>
+    <string name="ops_status_cancelled">Cancelado</string>
+    <string name="ops_new">Nuevo: %1$s</string>
+    <string name="ops_title">Descripción</string>
+    <string name="ops_counterpart">Cliente, proveedor o tercero</string>
+    <string name="ops_amount">Importe</string>
+    <string name="ops_quantity">Cantidad</string>
+    <string name="ops_income">Ingreso</string>
+    <string name="ops_expense">Gasto</string>
+    <string name="ops_notes">Notas</string>
+    <string name="ops_save">Guardar</string>
+    <string name="ops_hint_stock">Registre sus artículos, inventarios y ajustes de existencias.</string>
+    <string name="ops_hint_sales">Cree y valide sus ventas y facturas de clientes.</string>
+    <string name="ops_hint_purchases">Registre sus compras y facturas de proveedores.</string>
+    <string name="ops_hint_finances">Controle los cobros y gastos de tesorería.</string>
+    <string name="ops_hint_delivery">Prepare y siga las entregas que debe realizar.</string>
+    <string name="ops_hint_production">Planifique sus órdenes y cantidades de producción.</string>
+    <string name="ops_hint_services">Centralice sus intervenciones y prestaciones de servicio.</string>
+    <string name="ops_hint_hr">Siga la información operativa relacionada con su personal.</string>
+    <string name="ops_hint_projects">Organice las actividades, presupuestos y seguimiento de sus proyectos.</string>
+    <string name="reporting_subtitle">Análisis local de sus operaciones validadas.</string>
+    <string name="reporting_module_activity">Actividad por módulo</string>
+    <string name="reporting_empty">Aún no hay operaciones para analizar.</string>
+    <string name="reporting_current_totals">Totales actuales</string>
+    <string name="reporting_records_count">%1$d documento(s)</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
 </resources>

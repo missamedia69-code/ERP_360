@@ -313,4 +313,43 @@
     <string name="home_version_format">MISSA BUSINESS 360 • الإصدار %1$s</string>
     <string name="home_support_title">المساعدة والدعم</string>
     <string name="home_support_message">سيصبح الدعم متاحاً قريباً من هذا القسم. راجع الإعدادات أو شاشة حول التطبيق لمعلومات عن تثبيتك.</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">تم إنشاء السجل %1$s.</string>
+    <string name="ops_invalid">تحقق من الوصف والمبلغ والكمية.</string>
+    <string name="ops_read_only">انتهت صلاحية الترخيص: هذه الوحدة للقراءة فقط.</string>
+    <string name="ops_error">تعذر حفظ العملية. حاول مرة أخرى.</string>
+    <string name="ops_add">إضافة</string>
+    <string name="ops_empty">لا توجد عمليات مسجلة في %1$s حتى الآن.</string>
+    <string name="ops_quantity_value">الكمية: %1$s</string>
+    <string name="ops_cancel">إلغاء</string>
+    <string name="ops_validate">اعتماد</string>
+    <string name="ops_status_draft">مسودة</string>
+    <string name="ops_status_validated">معتمد</string>
+    <string name="ops_status_cancelled">ملغى</string>
+    <string name="ops_new">جديد: %1$s</string>
+    <string name="ops_title">الوصف</string>
+    <string name="ops_counterpart">عميل أو مورد أو طرف آخر</string>
+    <string name="ops_amount">المبلغ</string>
+    <string name="ops_quantity">الكمية</string>
+    <string name="ops_income">إيراد</string>
+    <string name="ops_expense">مصروف</string>
+    <string name="ops_notes">ملاحظات</string>
+    <string name="ops_save">حفظ</string>
+    <string name="ops_hint_stock">سجل أصنافك وجردك وتسويات المخزون.</string>
+    <string name="ops_hint_sales">أنشئ واعتمد مبيعاتك وفواتير العملاء.</string>
+    <string name="ops_hint_purchases">سجل مشترياتك وفواتير الموردين.</string>
+    <string name="ops_hint_finances">تابع المقبوضات ومصروفات الخزينة.</string>
+    <string name="ops_hint_delivery">حضّر وتابع عمليات التسليم المطلوب تنفيذها.</string>
+    <string name="ops_hint_production">خطط لأوامر وكميات الإنتاج.</string>
+    <string name="ops_hint_services">اجمع تدخلاتك وخدماتك في مكان واحد.</string>
+    <string name="ops_hint_hr">تابع المعلومات التشغيلية المتعلقة بموظفيك.</string>
+    <string name="ops_hint_projects">نظم أنشطة وميزانيات ومتابعة مشاريعك.</string>
+    <string name="reporting_subtitle">تحليل محلي لعملياتك المعتمدة.</string>
+    <string name="reporting_module_activity">النشاط حسب الوحدة</string>
+    <string name="reporting_empty">لا توجد عمليات لتحليلها حالياً.</string>
+    <string name="reporting_current_totals">الإجماليات الحالية</string>
+    <string name="reporting_records_count">%1$d سجل</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
 </resources>

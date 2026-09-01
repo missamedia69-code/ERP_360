@@ -94,7 +94,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.missa.b360.BuildConfig
 import com.missa.b360.R
+import com.missa.b360.core.data.entity.OperationDirection
+import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -117,9 +121,8 @@ private val HomeBackground = Color(0xFFF7F9FD)
 private val HomeBorder = Color(0xFFE4E9F3)
 
 /**
- * Accueil mobile : un tableau de bord utile dès les premiers modules réels, sans données
- * de démonstration. Les métriques de ventes/achats restent à 0 tant que ces modules ne
- * disposent pas encore de transactions à agréger.
+ * Accueil mobile : tableau de bord sans données de démonstration. Les métriques sont
+ * recalculées à partir des pièces opérationnelles réellement validées.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -462,7 +465,7 @@ private fun HomeDashboard(
                 MetricCard(
                     modifier = Modifier.weight(1f),
                     title = stringResource(R.string.module_vente),
-                    value = "0 $currency",
+                    value = MoneyUtils.format(state.ventes, currency),
                     subtitle = stringResource(R.string.home_today),
                     icon = Icons.Outlined.ReceiptLong,
                     iconColor = HomeBlue,
@@ -480,7 +483,7 @@ private fun HomeDashboard(
                 MetricCard(
                     modifier = Modifier.weight(1f),
                     title = stringResource(R.string.home_cash),
-                    value = "0 $currency",
+                    value = MoneyUtils.format(state.tresorerie, currency),
                     subtitle = stringResource(R.string.home_available),
                     icon = Icons.Outlined.Payments,
                     iconColor = HomeOrange,
@@ -512,7 +515,12 @@ private fun HomeDashboard(
                 action = stringResource(R.string.home_today),
             )
             Spacer(Modifier.height(7.dp))
-            ActivitySummary(currency = currency)
+            ActivitySummary(
+                currency = currency,
+                sales = state.ventes,
+                purchases = state.achats,
+                stockQuantity = state.quantiteStock,
+            )
         }
         item {
             ReminderCard(onClick = { onNavigate(Routes.NOTIFICATIONS) })
@@ -521,10 +529,14 @@ private fun HomeDashboard(
             DashboardSectionHeader(
                 title = stringResource(R.string.home_recent_documents),
                 action = stringResource(R.string.home_see_all),
-                onAction = { onNavigate(AppModule.VENTE.route) },
+                onAction = { onNavigate(AppModule.REPORTING.route) },
             )
             Spacer(Modifier.height(7.dp))
-            RecentDocuments(onClick = { onNavigate(AppModule.VENTE.route) })
+            RecentDocuments(
+                records = state.recentOperations,
+                devise = currency,
+                onClick = { record -> onNavigate(record.module.appModuleRoute()) },
+            )
         }
     }
 }
@@ -621,22 +633,33 @@ private data class QuickAction(
 )
 
 /** Ouvre le formulaire en plus de la liste depuis une action rapide de l'accueil. */
-private fun AppModule.createRoute(): String = "$route?create=true"
+private fun AppModule.createRoute(direction: OperationDirection? = null): String =
+    "$route?create=true" + direction?.let { "&direction=${it.name}" }.orEmpty()
 
 @Composable
 private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
     val rows = listOf(
         listOf(
-            QuickAction(R.string.home_new_sale, Icons.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.route),
-            QuickAction(R.string.home_new_purchase, Icons.Outlined.AddShoppingCart, HomeGreen, AppModule.ACHATS.route),
+            QuickAction(R.string.home_new_sale, Icons.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.createRoute()),
+            QuickAction(R.string.home_new_purchase, Icons.Outlined.AddShoppingCart, HomeGreen, AppModule.ACHATS.createRoute()),
             QuickAction(R.string.home_new_client, Icons.Outlined.PersonAdd, HomePurple, AppModule.CLIENTS.createRoute()),
             QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.createRoute()),
         ),
         listOf(
-            QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.route),
-            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, AppModule.STOCK.route),
-            QuickAction(R.string.home_payment_received, Icons.Outlined.Payments, HomeGreen, AppModule.FINANCES.route),
-            QuickAction(R.string.home_expense, Icons.Outlined.Description, HomeOrange, AppModule.FINANCES.route),
+            QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.createRoute()),
+            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, AppModule.STOCK.createRoute()),
+            QuickAction(
+                R.string.home_payment_received,
+                Icons.Outlined.Payments,
+                HomeGreen,
+                AppModule.FINANCES.createRoute(OperationDirection.IN),
+            ),
+            QuickAction(
+                R.string.home_expense,
+                Icons.Outlined.Description,
+                HomeOrange,
+                AppModule.FINANCES.createRoute(OperationDirection.OUT),
+            ),
         ),
     )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -697,7 +720,12 @@ private fun QuickActionCard(
 }
 
 @Composable
-private fun ActivitySummary(currency: String) {
+private fun ActivitySummary(
+    currency: String,
+    sales: Double,
+    purchases: Double,
+    stockQuantity: Double,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(17.dp),
@@ -712,7 +740,7 @@ private fun ActivitySummary(currency: String) {
             SummaryItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.module_vente),
-                value = "0 $currency",
+                value = MoneyUtils.format(sales, currency),
                 icon = Icons.Outlined.BarChart,
                 color = HomeBlue,
             )
@@ -720,7 +748,7 @@ private fun ActivitySummary(currency: String) {
             SummaryItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.module_achats),
-                value = "0 $currency",
+                value = MoneyUtils.format(purchases, currency),
                 icon = Icons.Outlined.ShoppingCart,
                 color = HomeGreen,
             )
@@ -728,7 +756,7 @@ private fun ActivitySummary(currency: String) {
             SummaryItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.module_stock),
-                value = "0",
+                value = stockQuantity.displayQuantity(),
                 icon = Icons.Outlined.Inventory2,
                 color = HomeOrange,
             )
@@ -736,7 +764,7 @@ private fun ActivitySummary(currency: String) {
             SummaryItem(
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.home_gross_margin),
-                value = "0 $currency",
+                value = MoneyUtils.format(sales - purchases, currency),
                 icon = Icons.Outlined.Payments,
                 color = HomePurple,
             )
@@ -840,56 +868,129 @@ private fun ReminderCard(onClick: () -> Unit) {
 }
 
 @Composable
-private fun RecentDocuments(onClick: () -> Unit) {
+private fun RecentDocuments(
+    records: List<OperationRecordEntity>,
+    devise: String,
+    onClick: (OperationRecordEntity) -> Unit,
+) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = Color.White,
         border = BorderStroke(1.dp, HomeBorder),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.size(43.dp),
-                shape = CircleShape,
-                color = HomeBlueSoft,
+        if (records.isEmpty()) {
+            Row(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Description,
-                    contentDescription = null,
-                    tint = HomeBlue,
-                    modifier = Modifier.padding(10.dp),
-                )
+                Surface(
+                    modifier = Modifier.size(43.dp),
+                    shape = CircleShape,
+                    color = HomeBlueSoft,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Description,
+                        contentDescription = null,
+                        tint = HomeBlue,
+                        modifier = Modifier.padding(10.dp),
+                    )
+                }
+                Spacer(Modifier.width(11.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.home_no_documents),
+                        color = HomeTextDark,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(R.string.home_no_documents_description),
+                        color = HomeTextMuted,
+                        fontSize = 10.sp,
+                        maxLines = 2,
+                    )
+                }
             }
-            Spacer(Modifier.width(11.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.home_no_documents),
-                    color = HomeTextDark,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.home_no_documents_description),
-                    color = HomeTextMuted,
-                    fontSize = 10.sp,
-                    maxLines = 2,
-                )
+        } else {
+            Column {
+                records.forEachIndexed { index, record ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onClick(record) }
+                            .padding(horizontal = 14.dp, vertical = 11.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(38.dp),
+                            shape = CircleShape,
+                            color = HomeBlueSoft,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Description,
+                                contentDescription = null,
+                                tint = HomeBlue,
+                                modifier = Modifier.padding(9.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = record.title,
+                                color = HomeTextDark,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.home_recent_record_detail,
+                                    record.reference,
+                                    DateUtils.formatDateHeure(record.createdAt),
+                                ),
+                                color = HomeTextMuted,
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        record.amount?.let { amount ->
+                            Text(
+                                text = MoneyUtils.format(amount, devise),
+                                color = HomeBlue,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                    if (index < records.lastIndex) {
+                        androidx.compose.material3.HorizontalDivider(color = HomeBorder)
+                    }
+                }
             }
-            Icon(
-                imageVector = Icons.Outlined.ArrowForwardIos,
-                contentDescription = null,
-                tint = HomeTextMuted,
-                modifier = Modifier.size(14.dp),
-            )
         }
     }
 }
+
+private fun String.appModuleRoute(): String = when (this) {
+    OperationModule.STOCK.name -> AppModule.STOCK.route
+    OperationModule.VENTE.name -> AppModule.VENTE.route
+    OperationModule.ACHATS.name -> AppModule.ACHATS.route
+    OperationModule.FINANCES.name -> AppModule.FINANCES.route
+    OperationModule.LIVRAISON.name -> AppModule.LIVRAISON.route
+    OperationModule.PRODUCTION.name -> AppModule.PRODUCTION.route
+    OperationModule.SERVICES.name -> AppModule.SERVICES.route
+    OperationModule.RH.name -> AppModule.RH.route
+    OperationModule.PROJETS.name -> AppModule.PROJETS.route
+    else -> Routes.HOME
+}
+
+private fun Double.displayQuantity(): String =
+    if (this % 1.0 == 0.0) toInt().toString() else toString()
 
 @Composable
 private fun HomeBottomBar(
