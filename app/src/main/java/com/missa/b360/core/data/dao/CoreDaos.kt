@@ -25,6 +25,10 @@ interface EnterpriseDao {
     @Query("SELECT * FROM enterprise WHERE id = 1")
     suspend fun get(): EnterpriseEntity?
 
+    /** Flux réactif des informations affichées dans l'en-tête et le tableau de bord. */
+    @Query("SELECT * FROM enterprise WHERE id = 1")
+    fun observe(): Flow<EnterpriseEntity?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(enterprise: EnterpriseEntity)
 }

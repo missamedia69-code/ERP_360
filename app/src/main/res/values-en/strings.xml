@@ -359,4 +359,41 @@
     <string name="ob_logo_modifier">Change logo</string>
     <string name="ob_logo_supprimer">Remove</string>
     <string name="ob_logo_apercu">Company logo preview</string>
+
+    <!-- Tableau de bord d’accueil -->
+    <string name="home_company_placeholder">Your company</string>
+    <string name="home_not_configured">Not set up</string>
+    <string name="home_greeting">Hello, %1$s 👋</string>
+    <string name="home_greeting_anonymous">Hello 👋</string>
+    <string name="home_more_modules_description">Access the additional features of your ERP.</string>
+    <string name="home_overview">Here is an overview of your business.</string>
+    <string name="home_profile_format">Profile: %1$s</string>
+    <string name="home_size_format">Size: %1$s</string>
+    <string name="home_today">Today</string>
+    <string name="home_total">Total</string>
+    <string name="home_cash">Cash flow</string>
+    <string name="home_available">Available</string>
+    <string name="home_quick_actions">Quick actions</string>
+    <string name="home_personalize">Customize</string>
+    <string name="home_activity_summary">Activity summary</string>
+    <string name="home_reminders">Important reminders</string>
+    <string name="home_no_pending_tasks">• No pending tasks</string>
+    <string name="home_no_overdue_invoices">• No overdue customer invoices</string>
+    <string name="home_recent_documents">Recent documents</string>
+    <string name="home_see_all">View all</string>
+    <string name="home_no_documents">No documents generated</string>
+    <string name="home_no_documents_description">Your invoices, delivery notes and receipts will appear here.</string>
+    <string name="home_new_sale">New sale</string>
+    <string name="home_new_purchase">New purchase</string>
+    <string name="home_new_client">New customer</string>
+    <string name="home_new_supplier">Supplier</string>
+    <string name="home_stock_entry">Stock entry</string>
+    <string name="home_transfer">Transfer</string>
+    <string name="home_payment_received">Payment received</string>
+    <string name="home_expense">Expense</string>
+    <string name="home_gross_margin">Gross margin</string>
+    <string name="home_more_short">More</string>
+    <string name="home_company_active">Active company</string>
+    <string name="home_drawer_primary">MAIN</string>
+    <string name="home_drawer_other">OTHER</string>
 </resources>

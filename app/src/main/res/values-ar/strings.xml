@@ -260,4 +260,41 @@
     <string name="ob_logo_modifier">تغيير الشعار</string>
     <string name="ob_logo_supprimer">حذف</string>
     <string name="ob_logo_apercu">معاينة شعار الشركة</string>
+
+    <!-- Tableau de bord d’accueil -->
+    <string name="home_company_placeholder">شركتك</string>
+    <string name="home_not_configured">غير مُعدّ</string>
+    <string name="home_greeting">مرحباً، %1$s 👋</string>
+    <string name="home_greeting_anonymous">مرحباً 👋</string>
+    <string name="home_more_modules_description">يمكنك الوصول إلى الوظائف الإضافية لنظام ERP الخاص بك.</string>
+    <string name="home_overview">إليك نظرة عامة على نشاطك.</string>
+    <string name="home_profile_format">الملف: %1$s</string>
+    <string name="home_size_format">الحجم: %1$s</string>
+    <string name="home_today">اليوم</string>
+    <string name="home_total">الإجمالي</string>
+    <string name="home_cash">الخزينة</string>
+    <string name="home_available">المتاح</string>
+    <string name="home_quick_actions">إجراءات سريعة</string>
+    <string name="home_personalize">تخصيص</string>
+    <string name="home_activity_summary">ملخص النشاط</string>
+    <string name="home_reminders">تذكيرات مهمة</string>
+    <string name="home_no_pending_tasks">• لا توجد مهام معلّقة</string>
+    <string name="home_no_overdue_invoices">• لا توجد فواتير عملاء متأخرة</string>
+    <string name="home_recent_documents">المستندات الأخيرة</string>
+    <string name="home_see_all">عرض الكل</string>
+    <string name="home_no_documents">لم يتم إنشاء أي مستند</string>
+    <string name="home_no_documents_description">ستظهر فواتيرك وإيصالاتك ومستنداتك هنا.</string>
+    <string name="home_new_sale">عملية بيع جديدة</string>
+    <string name="home_new_purchase">عملية شراء جديدة</string>
+    <string name="home_new_client">عميل جديد</string>
+    <string name="home_new_supplier">مورد</string>
+    <string name="home_stock_entry">إدخال مخزون</string>
+    <string name="home_transfer">تحويل</string>
+    <string name="home_payment_received">دفعة مستلمة</string>
+    <string name="home_expense">مصروف</string>
+    <string name="home_gross_margin">الهامش الإجمالي</string>
+    <string name="home_more_short">المزيد</string>
+    <string name="home_company_active">شركة نشطة</string>
+    <string name="home_drawer_primary">الرئيسي</string>
+    <string name="home_drawer_other">أخرى</string>
 </resources>

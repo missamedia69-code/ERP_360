@@ -1,14 +1,10 @@
 package com.missa.b360.ui.onboarding
 
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,17 +33,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -55,11 +46,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.missa.b360.R
+import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.OnboardingBorder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * Étape identité entreprise : les verrous métier D4/D5 et le catalogue pays restent
@@ -303,7 +293,6 @@ private fun EnterpriseLogoPicker(
     onLogoCleared: () -> Unit,
 ) {
     val context = LocalContext.current
-    val logoBitmap = rememberLogoBitmap(logoUri)
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
     ) { uri ->
@@ -330,31 +319,16 @@ private fun EnterpriseLogoPicker(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(
+            CompanyLogo(
+                logoUri = logoUri,
+                contentDescription = stringResource(R.string.ob_logo_apercu),
+                fallbackIcon = Icons.Outlined.AddPhotoAlternate,
                 modifier = Modifier.size(72.dp),
+                size = 56.dp,
                 shape = RoundedCornerShape(12.dp),
-                color = BrandBlue.copy(alpha = 0.07f),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    if (logoBitmap != null) {
-                        Image(
-                            bitmap = logoBitmap,
-                            contentDescription = stringResource(R.string.ob_logo_apercu),
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Outlined.AddPhotoAlternate,
-                            contentDescription = null,
-                            tint = BrandBlue,
-                            modifier = Modifier.size(28.dp),
-                        )
-                    }
-                }
-            }
+                fallbackTint = BrandBlue,
+                fallbackBackground = BrandBlue.copy(alpha = 0.07f),
+            )
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -404,33 +378,4 @@ private fun EnterpriseLogoPicker(
     }
 }
 
-@Composable
-private fun rememberLogoBitmap(logoUri: String?): ImageBitmap? {
-    val context = LocalContext.current
-    var bitmap by remember(logoUri) { mutableStateOf<ImageBitmap?>(null) }
-
-    LaunchedEffect(logoUri) {
-        bitmap = logoUri?.let { uriText ->
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    val uri = Uri.parse(uriText)
-                    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                    context.contentResolver.openInputStream(uri)?.use { stream ->
-                        BitmapFactory.decodeStream(stream, null, bounds)
-                    }
-                    val largestSide = maxOf(bounds.outWidth, bounds.outHeight).coerceAtLeast(1)
-                    var sampleSize = 1
-                    while (largestSide / sampleSize > LOGO_PREVIEW_MAX_SIDE) sampleSize *= 2
-                    val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
-                    context.contentResolver.openInputStream(uri)?.use { stream ->
-                        BitmapFactory.decodeStream(stream, null, options)?.asImageBitmap()
-                    }
-                }.getOrNull()
-            }
-        }
-    }
-    return bitmap
-}
-
 private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
-private const val LOGO_PREVIEW_MAX_SIDE = 640

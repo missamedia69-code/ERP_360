@@ -4,6 +4,7 @@ import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.journal.JournalManager
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 /** D4 / RA-19 — Lecture de l'entreprise (réglages 9.1). */
@@ -11,6 +12,9 @@ class GetEnterpriseUseCase @Inject constructor(
     private val enterpriseDao: EnterpriseDao,
 ) {
     suspend operator fun invoke(): EnterpriseEntity? = enterpriseDao.get()
+
+    /** Permet aux écrans de synthèse de refléter immédiatement toute mise à jour entreprise. */
+    fun observer(): Flow<EnterpriseEntity?> = enterpriseDao.observe()
 }
 
 /** D4 / RA-19 — Mise à jour des infos entreprise (devise verrouillée). */
