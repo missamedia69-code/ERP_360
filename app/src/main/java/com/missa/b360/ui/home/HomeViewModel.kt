@@ -7,6 +7,7 @@ import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
 import com.missa.b360.core.domain.usecase.ObserveFournisseursUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
+import com.missa.b360.core.domain.usecase.StockUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
@@ -53,6 +54,7 @@ class HomeViewModel @Inject constructor(
     observeFournisseurs: ObserveFournisseursUseCase,
     backups: BackupUseCases,
     operations: OperationUseCases,
+    private val stock: StockUseCases,
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
@@ -81,7 +83,11 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    val uiState: StateFlow<HomeUiState> = combine(baseState, operations.observeAll()) { base, records ->
+    val uiState: StateFlow<HomeUiState> = combine(
+        baseState,
+        operations.observeAll(),
+        stock.observeProducts(),
+    ) { base, records, produitsStock ->
         val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
         // Les deux cartes libellées « Aujourd’hui » ne doivent jamais agréger les
         // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
@@ -103,9 +109,7 @@ class HomeViewModel @Inject constructor(
                     else -> 0.0
                 }
             }
-        val quantiteStock = validated
-            .filter { it.module == OperationModule.STOCK.name }
-            .sumOf { it.quantity ?: 0.0 }
+        val quantiteStock = produitsStock.sumOf { it.quantite }
         base.copy(
             ventes = ventes,
             achats = achats,

@@ -717,8 +717,8 @@ private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
             QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.createRoute()),
         ),
         listOf(
-            QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.createRoute()),
-            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, AppModule.STOCK.createRoute()),
+            QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, "${AppModule.STOCK.route}?create=true&stock=ENTRY"),
+            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, "${AppModule.STOCK.route}?create=true&stock=TRANSFER"),
             QuickAction(
                 R.string.home_payment_received,
                 Icons.Outlined.Payments,
