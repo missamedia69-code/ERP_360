@@ -1,0 +1,107 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">欢迎！创建您的第一批客户和产品即可开始。</string>
+    <string name="more_modules">更多模块</string>
+    <string name="notifications">通知</string>
+    <string name="mark_all_read">全部标为已读</string>
+    <string name="no_notifications">暂无通知</string>
+    <string name="module_placeholder">即将推出 — 待实现</string>
+    <string name="phase_c">将于 C 阶段实现（模块 9.1）</string>
+
+    <string name="drawer_admin">管理与设置</string>
+    <string name="admin_reglages">设置</string>
+    <string name="admin_licence">许可证</string>
+    <string name="admin_sauvegarde">备份</string>
+    <string name="admin_journal">活动日志</string>
+    <string name="admin_utilisateurs">用户与角色</string>
+    <string name="admin_multisite">多站点</string>
+    <string name="admin_a_propos">关于</string>
+
+    <string name="module_vente">销售</string>
+    <string name="module_stock">库存</string>
+    <string name="module_clients">客户</string>
+    <string name="module_finances">财务</string>
+    <string name="module_fournisseurs">供应商</string>
+    <string name="module_achats">采购</string>
+    <string name="module_livraison">配送</string>
+    <string name="module_production">生产</string>
+    <string name="module_services">服务</string>
+    <string name="module_rh">人力资源与薪资</string>
+    <string name="module_projets">项目</string>
+    <string name="module_reporting">报表</string>
+
+    <string name="ob_langue_title">选择您的语言</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">下一步</string>
+    <string name="ob_retour">返回</string>
+
+    <string name="ob_profil_title">您的业务类型</string>
+    <string name="profil_a">微型商业 / 个体经营</string>
+    <string name="profil_b">零售店 / 商店</string>
+    <string name="profil_c">多分支零售</string>
+    <string name="profil_d">分销 / 批发</string>
+    <string name="profil_e">生产 / 轻工业</string>
+    <string name="profil_f">服务与承包</string>
+    <string name="profil_g">建筑 / 项目</string>
+    <string name="profil_h">多业务集团</string>
+
+    <string name="ob_palier_title">公司人数</string>
+    <string name="palier_p1">个人 / 纳米 (1)</string>
+    <string name="palier_p2">微型 (2–9)</string>
+    <string name="palier_p3">小型 (10–49)</string>
+    <string name="palier_p4">中型 (50–249)</string>
+    <string name="palier_p5">大型 (250–999)</string>
+    <string name="palier_p6">特大型 / 集团 (1000+)</string>
+
+    <string name="ob_entreprise_title">您的公司</string>
+    <string name="ob_nom_entreprise">公司名称</string>
+    <string name="ob_votre_nom">您的姓名</string>
+    <string name="ob_devise">货币 (ISO 4217)</string>
+    <string name="ob_pays">国家/地区</string>
+    <string name="ob_taux_taxe">税率 (%)</string>
+    <string name="ob_site_principal">主站点名称</string>
+    <string name="ob_verrous_note">⚠ 货币、税率、编号和支付方式将在首次使用时锁定（之后无法更改）。</string>
+    <string name="ob_erreur_nom">请填写公司名称和主站点名称。</string>
+
+    <string name="ob_pin_title">创建您的 PIN 码</string>
+    <string name="ob_pin_subtitle">4 到 6 位数字 — 每次打开应用时都会要求输入。</string>
+    <string name="ob_pin_confirmer">确认 PIN 码</string>
+    <string name="ob_pin_invalide">PIN 码必须为 4 到 6 位数字。</string>
+    <string name="ob_pin_differents">两次输入的 PIN 码不一致。</string>
+
+    <string name="ob_email_title">恢复邮箱</string>
+    <string name="ob_email_subtitle">必填：忘记 PIN 码时用于恢复访问。</string>
+    <string name="ob_email">电子邮箱</string>
+    <string name="ob_email_invalide">邮箱无效或已被使用。</string>
+
+    <string name="ob_licence_title">许可证</string>
+    <string name="ob_licence_essai">✓ 7 天免费试用已开始。试用结束后如未激活，应用将转为只读模式。</string>
+    <string name="ob_licence_active">✓ 许可证已激活 — 在本设备上有效 1 年。</string>
+    <string name="ob_code_licence">激活码（可选）</string>
+    <string name="ob_activer">激活</string>
+    <string name="ob_code_invalide">激活码无效。预期格式：MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 个激活码 = 1 台设备 = 1 年。每年可解绑设备 3 次。</string>
+
+    <string name="ob_checklist_title">设置完成</string>
+    <string name="check_entreprise">公司和主站点已创建</string>
+    <string name="check_devise">公司货币</string>
+    <string name="check_taxes">税费</string>
+    <string name="check_numerotation">单据编号</string>
+    <string name="check_paiements">支付方式</string>
+    <string name="check_utilisateur">所有者用户 + PIN 码</string>
+    <string name="check_licence">许可证（7 天试用）</string>
+    <string name="check_verrouille">已锁定 — 不可更改</string>
+    <string name="ob_checklist_note">您可以在管理与设置中启用更多模块并添加用户。</string>
+    <string name="ob_terminer">开始使用 Missa 360</string>
+
+    <string name="lock_title">输入您的 PIN 码</string>
+    <string name="lock_essais_restants">PIN 码错误 — 锁定前还剩 %1$d 次尝试机会。</string>
+    <string name="lock_bloque">尝试次数过多。请几分钟后再试。</string>
+    <string name="lock_deverrouiller">解锁</string>
+</resources>

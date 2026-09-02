@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Règles de sauvegarde cloud (Android 12+/API 31+) : fullBackupContent les remplace. -->
+<full-backup-content>
+    <!-- Aucune exclusion pour l'instant : à compléter quand la base de données
+         et les préférences utilisateur seront ajoutées (ex. room.db, *.prefs). -->
+</full-backup-content>

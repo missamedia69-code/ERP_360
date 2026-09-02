@@ -1,0 +1,240 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <!-- Accueil -->
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">Bienvenue ! Créez vos premiers clients et produits pour démarrer.</string>
+    <string name="more_modules">Plus de modules</string>
+    <string name="notifications">Notifications</string>
+    <string name="mark_all_read">Tout marquer comme lu</string>
+    <string name="no_notifications">Aucune notification</string>
+    <string name="module_placeholder">Module à venir — à implémenter</string>
+    <string name="phase_c">À implémenter en Phase C (module 9.1)</string>
+
+    <!-- Tiroir ☰ Administration & Paramétrage -->
+    <string name="drawer_admin">Administration &amp; Paramétrage</string>
+    <string name="admin_reglages">Réglages</string>
+    <string name="admin_licence">Licence</string>
+    <string name="admin_sauvegarde">Sauvegarde</string>
+    <string name="admin_journal">Journal d\'activité</string>
+    <string name="admin_utilisateurs">Utilisateurs &amp; rôles</string>
+    <string name="admin_multisite">Multi-site</string>
+    <string name="admin_a_propos">À propos</string>
+
+    <!-- Modules (barre du bas + ➕) -->
+    <string name="module_vente">Vente</string>
+    <string name="module_stock">Stock</string>
+    <string name="module_clients">Clients</string>
+    <string name="module_finances">Finances</string>
+    <string name="module_fournisseurs">Fournisseurs</string>
+    <string name="module_achats">Achats</string>
+    <string name="module_livraison">Livraison</string>
+    <string name="module_production">Production</string>
+    <string name="module_services">Services</string>
+    <string name="module_rh">RH &amp; Paie</string>
+    <string name="module_projets">Projets</string>
+    <string name="module_reporting">Reporting</string>
+
+    <!-- Onboarding (Phase B) -->
+    <string name="ob_langue_title">Choisissez votre langue</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">Suivant</string>
+    <string name="ob_retour">Retour</string>
+
+    <string name="ob_profil_title">Votre profil d\'activité</string>
+    <string name="profil_a">Micro-commerce / indépendant</string>
+    <string name="profil_b">Commerce de détail / boutique</string>
+    <string name="profil_c">Commerce multi-points (succursales)</string>
+    <string name="profil_d">Distribution / grossiste</string>
+    <string name="profil_e">Production / industrie légère</string>
+    <string name="profil_f">Services &amp; prestations</string>
+    <string name="profil_g">BTP / projets</string>
+    <string name="profil_h">Groupe multi-activités</string>
+
+    <string name="ob_palier_title">Effectif de l\'entreprise</string>
+    <string name="palier_p1">Solo / Nano (1)</string>
+    <string name="palier_p2">Micro (2–9)</string>
+    <string name="palier_p3">Petite (10–49)</string>
+    <string name="palier_p4">Moyenne (50–249)</string>
+    <string name="palier_p5">Grande (250–999)</string>
+    <string name="palier_p6">Très grande / Groupe (1000+)</string>
+
+    <string name="ob_entreprise_title">Votre entreprise</string>
+    <string name="ob_nom_entreprise">Nom de l\'entreprise</string>
+    <string name="ob_votre_nom">Votre nom</string>
+    <string name="ob_devise">Devise (ISO 4217)</string>
+    <string name="ob_pays">Pays</string>
+    <string name="ob_taux_taxe">Taux de taxe (%)</string>
+    <string name="ob_site_principal">Nom du site principal</string>
+    <string name="ob_verrous_note">⚠ Devise, taxes, numérotation et paiements seront verrouillés au premier usage (non modifiables ensuite).</string>
+    <string name="ob_erreur_nom">Veuillez renseigner le nom de l\'entreprise et du site principal.</string>
+
+    <string name="ob_pin_title">Créez votre code PIN</string>
+    <string name="ob_pin_subtitle">4 à 6 chiffres — il sera demandé à chaque ouverture de l\'application.</string>
+    <string name="ob_pin_confirmer">Confirmez le PIN</string>
+    <string name="ob_pin_invalide">Le PIN doit contenir 4 à 6 chiffres.</string>
+    <string name="ob_pin_differents">Les deux PIN ne correspondent pas.</string>
+
+    <string name="ob_email_title">Email de secours</string>
+    <string name="ob_email_subtitle">Obligatoire : il servira à récupérer l\'accès si vous oubliez votre PIN.</string>
+    <string name="ob_email">Email</string>
+    <string name="ob_email_invalide">Adresse email invalide ou déjà utilisée.</string>
+
+    <string name="ob_licence_title">Licence</string>
+    <string name="ob_licence_essai">✓ Essai gratuit de 7 jours démarré. Sans activation au terme de l\'essai, l\'application passera en lecture seule.</string>
+    <string name="ob_licence_active">✓ Licence activée — valable 1 an sur cet appareil.</string>
+    <string name="ob_code_licence">Code d\'activation (optionnel)</string>
+    <string name="ob_activer">Activer</string>
+    <string name="ob_code_invalide">Code invalide. Format attendu : MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 code = 1 appareil = 1 an. Désassociation possible 3 fois par an.</string>
+
+    <string name="ob_checklist_title">Configuration terminée</string>
+    <string name="check_entreprise">Entreprise et site principal créés</string>
+    <string name="check_devise">Devise de l\'entreprise</string>
+    <string name="check_taxes">Taxes</string>
+    <string name="check_numerotation">Numérotation des documents</string>
+    <string name="check_paiements">Modes de paiement</string>
+    <string name="check_utilisateur">Utilisateur Propriétaire + PIN</string>
+    <string name="check_licence">Licence (essai 7 jours)</string>
+    <string name="check_verrouille">Verrouillé — non modifiable</string>
+    <string name="ob_checklist_note">Vous pourrez activer d\'autres modules et ajouter des utilisateurs dans Administration &amp; Paramétrage.</string>
+    <string name="ob_terminer">Commencer à utiliser Missa 360</string>
+
+    <!-- Verrou PIN -->
+    <string name="lock_title">Entrez votre PIN</string>
+    <string name="lock_essais_restants">PIN incorrect — %1$d essai(s) restant(s) avant blocage.</string>
+    <string name="lock_bloque">Trop de tentatives. Réessayez dans quelques minutes.</string>
+    <string name="lock_deverrouiller">Déverrouiller</string>
+
+<!-- Phase C — Administration & Paramétrage (module 9.1) -->
+
+    <!-- Réglages (D4 / RA-19) -->
+    <string name="adm_reglages_subtitle">Langue, profil d\'activité, effectif et informations de l\'entreprise.</string>
+    <string name="adm_langue">Langue de l\'interface</string>
+    <string name="adm_profil">Profil d\'activité</string>
+    <string name="adm_palier">Effectif de l\'entreprise</string>
+    <string name="adm_infos_entreprise">Informations de l\'entreprise</string>
+    <string name="adm_secteur">Secteur d\'activité</string>
+    <string name="adm_adresse">Adresse</string>
+    <string name="adm_telephone">Téléphone</string>
+    <string name="adm_email">Email</string>
+    <string name="adm_devise_locked">Devise (verrouillée au premier usage)</string>
+    <string name="adm_sauvegarder">Sauvegarder</string>
+    <string name="adm_save_ok">Informations enregistrées.</string>
+    <string name="adm_save_err">Échec de l\'enregistrement.</string>
+
+    <!-- Licence (RA-04..06) -->
+    <string name="adm_licence_statut">Statut de la licence</string>
+    <string name="adm_licence_statut_essai">Essai gratuit (7 jours)</string>
+    <string name="adm_licence_statut_actif">Licence active</string>
+    <string name="adm_licence_statut_expire">Expirée — lecture seule</string>
+    <string name="adm_licence_date_debut">Début de l\'essai</string>
+    <string name="adm_licence_date_expiration">Expire le</string>
+    <string name="adm_licence_code_actif">Code actif</string>
+    <string name="adm_licence_appareil">Appareil associé</string>
+    <string name="adm_licence_desassoc">Désassocier cet appareil</string>
+    <string name="adm_licence_desassoc_count">Désassociations utilisées : %1$d / %2$d par an</string>
+    <string name="adm_licence_code_field">Code d\'activation</string>
+    <string name="adm_licence_activer">Activer</string>
+    <string name="adm_licence_msg_ok">Licence activée — valable 1 an.</string>
+    <string name="adm_licence_msg_err">Code invalide. Format : MB360-XXXX-XXXX-XXXX</string>
+    <string name="adm_licence_msg_max">Maximum de désassociations atteint (3/an).</string>
+    <string name="adm_licence_msg_none">Aucune licence à désassocier.</string>
+
+    <!-- Sauvegarde (RA-13) -->
+    <string name="adm_sauvegarde_btn">Sauvegarder maintenant</string>
+    <string name="adm_sauvegarde_en_cours">Sauvegarde en cours…</string>
+    <string name="adm_sauvegarde_ok">Sauvegarde locale réussie.</string>
+    <string name="adm_sauvegarde_err">Échec de la sauvegarde.</string>
+    <string name="adm_sauvegarde_historique">Historique des sauvegardes</string>
+    <string name="adm_sauvegarde_vide">Aucune sauvegarde pour le moment.</string>
+    <string name="adm_sauvegarde_type">Local</string>
+
+    <!-- Journal (RA-18) -->
+    <string name="adm_journal_purge">Purger les entrées de plus de 12 mois</string>
+    <string name="adm_journal_purge_ok">Purge effectuée.</string>
+    <string name="adm_journal_vide">Aucune entrée de journal.</string>
+    <string name="adm_journal_module">Module</string>
+    <string name="adm_journal_action">Action</string>
+    <string name="adm_journal_details">Détails</string>
+
+    <!-- Utilisateurs & rôles (D1/D2, RA-14) -->
+    <string name="adm_users_add">Ajouter un utilisateur</string>
+    <string name="adm_users_nom">Nom</string>
+    <string name="adm_users_email">Email de secours</string>
+    <string name="adm_users_role">Rôle</string>
+    <string name="adm_users_creer">Créer l\'utilisateur</string>
+    <string name="adm_users_actif">Actif</string>
+    <string name="adm_users_inactif">Désactivé</string>
+    <string name="adm_users_desactiver">Désactiver</string>
+    <string name="adm_users_resultat_ok">Utilisateur créé.</string>
+    <string name="adm_roles_titre">Rôles disponibles</string>
+
+    <!-- Multi-site (RA-21) -->
+    <string name="adm_sites_ajouter">Ajouter un site</string>
+    <string name="adm_sites_nom">Nom du site</string>
+    <string name="adm_sites_type">Type</string>
+    <string name="adm_sites_adresse">Adresse</string>
+    <string name="adm_sites_principal">Principal</string>
+    <string name="adm_sites_secondaire">Secondaire</string>
+    <string name="adm_sites_supprimer">Supprimer</string>
+    <string name="adm_sites_msg_ok">Site ajouté.</string>
+    <string name="adm_sites_msg_principal">Le site principal ne peut pas être supprimé.</string>
+    <string name="adm_sites_msg_supprime">Site supprimé.</string>
+    <string name="adm_site_type_boutique">Boutique</string>
+    <string name="adm_site_type_entrepot">Entrepôt</string>
+    <string name="adm_site_type_usine">Usine</string>
+    <string name="adm_site_type_bureau">Bureau</string>
+
+    <!-- À propos -->
+    <string name="adm_apropos_version">Version</string>
+    <string name="adm_apropos_appareil">Appareil</string>
+    <string name="adm_apropos_societe">Missa Business 360 — ERP Android</string>
+    <string name="adm_apropos_mentions">Données stockées localement sur cet appareil. Licence et sauvegarde gérées dans Administration &amp; Paramétrage.</string>
+
+<!-- Phase D — Clients (9.2) -->
+    <string name="clients_recherche">Rechercher un client…</string>
+    <string name="clients_total">%1$d client(s)</string>
+    <string name="clients_vide">Aucun client. Touchez + pour en créer.</string>
+    <string name="clients_ajouter">Ajouter un client</string>
+    <string name="clients_modifier">Modifier le client</string>
+    <string name="clients_nom">Nom</string>
+    <string name="clients_telephone">Téléphone</string>
+    <string name="clients_email">Email</string>
+    <string name="clients_adresse">Adresse</string>
+    <string name="clients_type">Type</string>
+    <string name="clients_notes">Notes</string>
+    <string name="clients_remise">Remise par défaut (%)</string>
+    <string name="clients_limite_credit">Limite de crédit (vide = illimitée)</string>
+    <string name="clients_categories">Catégories</string>
+    <string name="clients_badges">Badges fidélité</string>
+    <string name="clients_desactiver">Désactiver</string>
+    <string name="clients_prospect">Prospect — auto-converti à la 1re vente</string>
+    <string name="clients_nom_categorie">Nom de la catégorie</string>
+    <string name="clients_ajouter_categorie">Ajouter la catégorie</string>
+    <string name="clients_supprimer_categorie">Supprimer</string>
+    <string name="clients_categories_vide">Aucune catégorie.</string>
+    <string name="clients_nom_badge">Nom du badge</string>
+    <string name="clients_remise_badge">Remise (%)</string>
+    <string name="clients_ajouter_badge">Ajouter le badge</string>
+    <string name="clients_badges_vide">Aucun badge.</string>
+    <string name="clients_actif">Actif</string>
+    <string name="clients_inactif">Inactif</string>
+    <string name="clients_categorie_optionnelle">Catégorie (optionnelle)</string>
+    <string name="clients_badge_optionnel">Badge de fidélité (optionnel)</string>
+
+    <!-- Phase D — Fournisseurs (9.3) -->
+    <string name="fournisseurs_recherche">Rechercher un fournisseur…</string>
+    <string name="fournisseurs_total">%1$d fournisseur(s)</string>
+    <string name="fournisseurs_vide">Aucun fournisseur. Touchez + pour en créer.</string>
+    <string name="fournisseurs_ajouter">Ajouter un fournisseur</string>
+    <string name="fournisseurs_modifier">Modifier le fournisseur</string>
+    <string name="fournisseurs_nom">Nom</string>
+    <string name="fournisseurs_telephone">Téléphone</string>
+    <string name="fournisseurs_desactiver">Désactiver</string>
+
+</resources>

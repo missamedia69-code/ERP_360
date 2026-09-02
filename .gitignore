@@ -9,6 +9,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin/
 /app/build/
 /build/
 
@@ -21,6 +22,9 @@ local.properties
 # Keystore (ne jamais commiter de signatures)
 *.jks
 *.keystore
+
+# Vidéos de travail (sources d'intro) — seules celles de res/raw sont suivies
+/*.mp4
 
 # Logs
 *.log
