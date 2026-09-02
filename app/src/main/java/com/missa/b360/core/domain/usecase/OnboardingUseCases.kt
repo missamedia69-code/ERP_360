@@ -1,0 +1,265 @@
+package com.missa.b360.core.domain.usecase
+
+import androidx.room.withTransaction
+import com.missa.b360.core.data.dao.EnterpriseDao
+import com.missa.b360.core.data.dao.PaymentMethodDao
+import com.missa.b360.core.data.dao.RoleDao
+import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.TaxDao
+import com.missa.b360.core.data.dao.UserDao
+import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.db.AppDatabase
+import com.missa.b360.core.data.entity.EnterpriseEntity
+import com.missa.b360.core.data.entity.PaymentMethodEntity
+import com.missa.b360.core.data.entity.RoleEntity
+import com.missa.b360.core.data.entity.RolePermissionEntity
+import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.data.entity.TaxEntity
+import com.missa.b360.core.licensing.LicenceManager
+import com.missa.b360.core.journal.JournalManager
+import com.missa.b360.core.security.PinManager
+import com.missa.b360.core.util.Iso4217
+import com.missa.b360.ui.navigation.AppModule
+import javax.inject.Inject
+
+/**
+ * Réapplique les prérequis hors base Room de façon idempotente.
+ *
+ * La création de l'entreprise est transactionnelle dans Room, alors que DataStore et la
+ * licence ne peuvent pas participer à cette transaction. Cet use case termine donc aussi
+ * une initialisation interrompue entre ces deux phases, sans recréer les données métier.
+ */
+class EnsureEnterprisePrerequisitesUseCase @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val licenceManager: LicenceManager,
+) {
+    suspend operator fun invoke(devise: String) {
+        settingsStore.set(SettingsStore.Keys.DEVISE, devise)
+        settingsStore.lock(SettingsStore.Keys.VERROU_DEVISE)
+        settingsStore.lock(SettingsStore.Keys.VERROU_TAXES)
+        settingsStore.lock(SettingsStore.Keys.VERROU_NUMEROTATION)
+        settingsStore.lock(SettingsStore.Keys.VERROU_PAIEMENTS)
+        licenceManager.ensureTrialStarted()
+    }
+}
+
+/**
+ * **RA-19 / D4 / D5** — Configuration de l'entreprise au 1er lancement :
+ * entreprise + site principal, taxes (suggérées par pays), modes de paiement,
+ * 3 rôles système (D2), démarrage de l'essai licence (RA-04) — puis **pose des
+ * 4 verrous d'amont** (devise, taxes, numérotation, paiements) : plus jamais
+ * modifiables ensuite. Les entités Room sont créées dans une transaction unique.
+ */
+class SetupEnterpriseUseCase @Inject constructor(
+    private val database: AppDatabase,
+    private val enterpriseDao: EnterpriseDao,
+    private val siteDao: SiteDao,
+    private val taxDao: TaxDao,
+    private val paymentMethodDao: PaymentMethodDao,
+    private val roleDao: RoleDao,
+    private val settingsStore: SettingsStore,
+    private val ensureEnterprisePrerequisites: EnsureEnterprisePrerequisitesUseCase,
+    private val journalManager: JournalManager,
+) {
+    data class Params(
+        val nomEntreprise: String,
+        val devise: String,
+        val pays: String?,
+        /** ISO 3166-1 alpha-2 conservé pour les choix par défaut liés au pays. */
+        val codePays: String? = null,
+        val tauxTaxe: Double,
+        val nomSitePrincipal: String,
+        val profilActivite: String? = null,
+        val palierTaille: String? = null,
+        /** URI du logo image sélectionné pendant l'onboarding. */
+        val logoUri: String? = null,
+    )
+
+    suspend operator fun invoke(params: Params): Boolean {
+        // Reprise d'un onboarding interrompu : les données Room existent déjà. Les
+        // prérequis DataStore/licence sont toutefois rejoués pour couvrir un arrêt entre
+        // les deux phases de l'initialisation.
+        enterpriseDao.get()?.let { entreprise ->
+            ensureEnterprisePrerequisites(entreprise.devise)
+            // Couvre aussi une interruption après Room mais avant l'écriture DataStore.
+            settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
+            return true
+        }
+
+        database.withTransaction {
+            enterpriseDao.upsert(
+                EnterpriseEntity(
+                    nom = params.nomEntreprise.trim(),
+                    devise = params.devise,
+                    langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
+                    pays = params.pays,
+                    logoUri = params.logoUri,
+                    profilActivite = params.profilActivite
+                        ?: settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
+                    palierTaille = params.palierTaille
+                        ?: settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
+                ),
+            )
+            siteDao.insert(
+                SiteEntity(nom = params.nomSitePrincipal.trim(), type = "principal", principal = true),
+            )
+            taxDao.insertAll(
+                listOf(TaxEntity(nom = "TVA", taux = params.tauxTaxe, parDefaut = true)),
+            )
+            // D13 — Mobile Money = moyen générique unique, parmi les modes figés.
+            paymentMethodDao.insertAll(
+                listOf(
+                    PaymentMethodEntity(nom = "Espèces"),
+                    PaymentMethodEntity(nom = "Mobile Money"),
+                    PaymentMethodEntity(nom = "Virement bancaire"),
+                    PaymentMethodEntity(nom = "Chèque"),
+                    PaymentMethodEntity(nom = "Carte bancaire"),
+                ),
+            )
+            seedSystemRoles()
+        }
+
+        ensureEnterprisePrerequisites(params.devise)
+        // Le libellé pays est localisé dans Room ; le code ISO stable permet de
+        // préremplir l'indicatif téléphonique dans les formulaires métier.
+        settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
+
+        journalManager.log("ADMIN", "ONBOARDING_ENTREPRISE", "Entreprise ${params.nomEntreprise} configurée")
+        return true
+    }
+    private suspend fun seedSystemRoles() {
+        val actions = listOf("VIEW", "CREATE", "EDIT", "DELETE", "VALIDATE")
+        val modules = AppModule.entries.map { it.name } + "ADMIN"
+
+        val proprietaire = roleDao.insert(RoleEntity(nom = "Propriétaire", type = "SYSTEM"))
+        val gerant = roleDao.insert(RoleEntity(nom = "Gérant", type = "SYSTEM"))
+        val consultation = roleDao.insert(RoleEntity(nom = "Consultation seule", type = "SYSTEM"))
+
+        val permissions = buildList {
+            modules.forEach { module ->
+                // Propriétaire : tous les droits (le UseCase le bypass aussi).
+                actions.forEach { action ->
+                    add(RolePermissionEntity(proprietaire, module, action, granted = true))
+                    add(RolePermissionEntity(gerant, module, action, granted = true))
+                }
+                // Consultation seule : uniquement « Voir ».
+                add(RolePermissionEntity(consultation, module, "VIEW", granted = true))
+            }
+        }
+        roleDao.insertPermissions(permissions)
+    }
+}
+
+/**
+ * Reconstitue l'étape atteinte après une fermeture ou une mise à jour de l'application.
+ * Les données réellement déjà créées priment toujours sur un simple état en mémoire.
+ */
+class GetOnboardingProgressUseCase @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val enterpriseDao: EnterpriseDao,
+    private val taxDao: TaxDao,
+    private val userDao: UserDao,
+    private val pinManager: PinManager,
+    private val ensureEnterprisePrerequisites: EnsureEnterprisePrerequisitesUseCase,
+) {
+    data class Progress(
+        val langue: String,
+        val profil: String?,
+        val palier: String?,
+        val entreprise: EnterpriseEntity?,
+        val tauxTaxe: Double?,
+        val pinConfigure: Boolean,
+        val proprietaireCree: Boolean,
+    )
+
+    suspend operator fun invoke(): Progress {
+        val entreprise = enterpriseDao.get()
+        // La reprise démarre directement au PIN lorsque l'entreprise existe. On complète
+        // donc les prérequis hors Room avant de laisser l'utilisateur poursuivre.
+        entreprise?.let {
+            ensureEnterprisePrerequisites(it.devise)
+            // Mise à niveau idempotente des installations créées avant l'indicatif pays.
+            if (settingsStore.get(SettingsStore.Keys.PAYS).isNullOrBlank()) {
+                settingsStore.set(
+                    SettingsStore.Keys.PAYS,
+                    Iso4217.codePaysDepuisNom(it.pays).orEmpty(),
+                )
+            }
+        }
+        return Progress(
+            langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
+            profil = settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
+            palier = settingsStore.get(SettingsStore.Keys.PALIER_TAILLE),
+            entreprise = entreprise,
+            tauxTaxe = taxDao.getParDefaut()?.taux,
+            pinConfigure = pinManager.isConfigured(),
+            proprietaireCree = userDao.count() > 0,
+        )
+    }
+}
+
+/**
+ * **D1 / RA-03** — Création du premier utilisateur (Propriétaire) avec email de
+ * secours obligatoire. Le hash du PIN (déjà configuré à l'étape précédente)
+ * est copié dans la fiche utilisateur — jamais le PIN en clair.
+ */
+class CreateOwnerUserUseCase @Inject constructor(
+    private val userDao: com.missa.b360.core.data.dao.UserDao,
+    private val roleDao: RoleDao,
+    private val settingsStore: SettingsStore,
+    private val journalManager: JournalManager,
+) {
+    sealed class Result {
+        data class Succes(val userId: Long) : Result()
+        data object EmailInvalide : Result()
+        data object EmailDejaUtilise : Result()
+    }
+
+    companion object {
+        /** Même règle à l'écran et lors de l'écriture afin d'éviter une validation divergente. */
+        fun emailEstValide(email: String): Boolean =
+            android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
+    }
+
+    suspend operator fun invoke(nom: String, email: String): Result {
+        val emailNormalise = email.trim().lowercase()
+        if (!emailEstValide(emailNormalise)) {
+            return Result.EmailInvalide
+        }
+        if (userDao.findByEmail(emailNormalise) != null) return Result.EmailDejaUtilise
+
+        val proprietaire = roleDao.getByNom("Propriétaire")
+        val userId = userDao.insert(
+            com.missa.b360.core.data.entity.UserEntity(
+                nom = nom.trim().ifEmpty { "Propriétaire" },
+                emailSecours = emailNormalise,
+                pinHash = settingsStore.get(SettingsStore.Keys.PIN_HASH),
+                roleId = proprietaire?.id,
+                createdAt = System.currentTimeMillis(),
+            ),
+        )
+        settingsStore.set(SettingsStore.Keys.CURRENT_USER_ID, userId.toString())
+        journalManager.log("ADMIN", "ONBOARDING_UTILISATEUR", "Propriétaire créé (email de secours enregistré)")
+        return Result.Succes(userId)
+    }
+}
+
+/**
+ * **RA-11** — Clôture de l'onboarding : le drapeau `onboarding_termine` est posé
+ * (l'app démarrera désormais sur le verrou PIN) et l'action est tracée au journal.
+ */
+class CompleteOnboardingUseCase @Inject constructor(
+    private val enterpriseDao: EnterpriseDao,
+    private val settingsStore: SettingsStore,
+    private val journalManager: JournalManager,
+) {
+    suspend operator fun invoke(): Boolean {
+        val entreprise = enterpriseDao.get() ?: return false
+        if (settingsStore.get(SettingsStore.Keys.ONBOARDING_TERMINE) == "true") return true
+        settingsStore.set(SettingsStore.Keys.ONBOARDING_TERMINE, "true")
+        settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE) ?: "B")
+        enterpriseDao.upsert(entreprise.copy(onboardingTermine = true))
+        journalManager.log("ADMIN", "ONBOARDING_TERMINE", "Configuration initiale terminée")
+        return true
+    }
+}

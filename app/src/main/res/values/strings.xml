@@ -1,0 +1,658 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <!-- Accueil -->
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">Bienvenue ! Créez vos premiers clients et produits pour démarrer.</string>
+    <string name="more_modules">Plus de modules</string>
+    <string name="notifications">Notifications</string>
+    <string name="mark_all_read">Tout marquer comme lu</string>
+    <string name="no_notifications">Aucune notification</string>
+    <string name="module_placeholder">Module à venir — à implémenter</string>
+    <string name="phase_c">À implémenter en Phase C (module 9.1)</string>
+
+    <!-- Tiroir ☰ Administration & Paramétrage -->
+    <string name="drawer_admin">Administration &amp; Paramétrage</string>
+    <string name="drawer_section_entreprise">Entreprise</string>
+    <string name="drawer_section_administration">Administration</string>
+    <string name="drawer_section_application">Application</string>
+    <string name="admin_reglages">Réglages</string>
+    <string name="admin_licence">Licence</string>
+    <string name="admin_sauvegarde">Sauvegarde</string>
+    <string name="admin_journal">Journal d\'activité</string>
+    <string name="admin_utilisateurs">Utilisateurs &amp; rôles</string>
+    <string name="admin_multisite">Multi-site</string>
+    <string name="admin_a_propos">À propos</string>
+
+    <!-- Modules (barre du bas + ➕) -->
+    <string name="module_vente">Vente</string>
+    <string name="module_stock">Stock</string>
+    <string name="module_clients">Clients</string>
+    <string name="module_finances">Finances</string>
+    <string name="module_fournisseurs">Fournisseurs</string>
+    <string name="module_achats">Achats</string>
+    <string name="module_livraison">Livraison</string>
+    <string name="module_production">Production</string>
+    <string name="module_services">Services</string>
+    <string name="module_rh">RH &amp; Paie</string>
+    <string name="module_projets">Projets</string>
+    <string name="module_reporting">Reporting</string>
+
+    <!-- Onboarding (Phase B) -->
+    <string name="ob_langue_title">Choisissez votre langue</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">Suivant</string>
+    <string name="ob_retour">Retour</string>
+
+    <string name="ob_profil_title">Votre profil d\'activité</string>
+    <string name="profil_a">Micro-commerce / indépendant</string>
+    <string name="profil_b">Commerce de détail / boutique</string>
+    <string name="profil_c">Commerce multi-points (succursales)</string>
+    <string name="profil_d">Distribution / grossiste</string>
+    <string name="profil_e">Production / industrie légère</string>
+    <string name="profil_f">Services &amp; prestations</string>
+    <string name="profil_g">BTP / projets</string>
+    <string name="profil_h">Groupe multi-activités</string>
+
+    <string name="ob_palier_title">Effectif de l\'entreprise</string>
+    <string name="palier_p1">Solo / Nano (1)</string>
+    <string name="palier_p2">Micro (2–9)</string>
+    <string name="palier_p3">Petite (10–49)</string>
+    <string name="palier_p4">Moyenne (50–249)</string>
+    <string name="palier_p5">Grande (250–999)</string>
+    <string name="palier_p6">Très grande / Groupe (1000+)</string>
+
+    <string name="ob_entreprise_title">Votre entreprise</string>
+    <string name="ob_nom_entreprise">Nom de l\'entreprise</string>
+    <string name="ob_votre_nom">Votre nom</string>
+    <string name="ob_devise">Devise (ISO 4217)</string>
+    <string name="ob_pays">Pays</string>
+    <string name="ob_pays_recherche">Rechercher un pays</string>
+    <string name="ob_pays_aucun_resultat">Aucun pays trouvé</string>
+    <string name="ob_pays_saisie_manuelle">Saisir un pays et son taux manuellement</string>
+    <string name="ob_pays_personnalise">Pays personnalisé</string>
+    <string name="ob_pays_saisie_manuelle_note">Saisissez un pays absent de la liste, puis ajustez le taux de TVA/GST ci-dessous.</string>
+    <string name="ob_tva_gst">TVA / GST</string>
+    <string name="ob_taux_taxe">Taux de taxe (%)</string>
+    <string name="ob_site_principal">Nom du site principal</string>
+    <string name="ob_verrous_note">⚠ Devise, taxes, numérotation et paiements seront verrouillés au premier usage (non modifiables ensuite).</string>
+    <string name="ob_erreur_nom">Veuillez renseigner le nom de l\'entreprise et du site principal.</string>
+    <string name="ob_erreur_nom_entreprise">Veuillez renseigner le nom de l\'entreprise.</string>
+    <string name="ob_erreur_site_principal">Veuillez renseigner le nom du site principal.</string>
+    <string name="ob_erreur_taux_taxe">Saisissez un taux de taxe compris entre 0 et 100 %.</string>
+    <string name="ob_erreur_configuration_entreprise">La configuration de l\'entreprise n\'a pas pu être enregistrée. Réessayez.</string>
+    <string name="ob_erreur_finalisation">La finalisation de la configuration a échoué. Réessayez.</string>
+
+    <string name="ob_pin_title">Créez votre code PIN</string>
+    <string name="ob_pin_subtitle">4 à 6 chiffres — il sera demandé à chaque ouverture de l\'application.</string>
+    <string name="ob_pin_confirmer">Confirmez le PIN</string>
+    <string name="ob_pin_invalide">Le PIN doit contenir 4 à 6 chiffres.</string>
+    <string name="ob_pin_differents">Les deux PIN ne correspondent pas.</string>
+
+    <string name="ob_email_title">Email de secours</string>
+    <string name="ob_email_subtitle">Obligatoire : il servira à récupérer l\'accès si vous oubliez votre PIN.</string>
+    <string name="ob_email">Email</string>
+    <string name="ob_email_invalide">Adresse email invalide ou déjà utilisée.</string>
+
+    <string name="ob_licence_title">Licence</string>
+    <string name="ob_licence_essai">✓ Essai gratuit de 7 jours démarré. Sans activation au terme de l\'essai, l\'application passera en lecture seule.</string>
+    <string name="ob_licence_active">✓ Licence activée — valable 1 an sur cet appareil.</string>
+    <string name="ob_code_licence">Code d\'activation (optionnel)</string>
+    <string name="ob_activer">Activer</string>
+    <string name="ob_code_invalide">Code invalide. Format attendu : MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 code = 1 appareil = 1 an. Désassociation possible 3 fois par an.</string>
+
+    <string name="ob_checklist_title">Configuration terminée</string>
+    <string name="check_entreprise">Entreprise et site principal créés</string>
+    <string name="check_devise">Devise de l\'entreprise</string>
+    <string name="check_taxes">Taxes</string>
+    <string name="check_numerotation">Numérotation des documents</string>
+    <string name="check_paiements">Modes de paiement</string>
+    <string name="check_utilisateur">Utilisateur Propriétaire + PIN</string>
+    <string name="check_licence">Licence (essai 7 jours)</string>
+    <string name="check_verrouille">Verrouillé — non modifiable</string>
+    <string name="ob_checklist_note">Vous pourrez activer d\'autres modules et ajouter des utilisateurs dans Administration &amp; Paramétrage.</string>
+    <string name="ob_terminer">Commencer à utiliser Missa 360</string>
+
+    <!-- Verrou PIN -->
+    <string name="lock_title">Entrez votre PIN</string>
+    <string name="lock_essais_restants">PIN incorrect — %1$d essai(s) restant(s) avant blocage.</string>
+    <string name="lock_bloque">Trop de tentatives. Réessayez dans quelques minutes.</string>
+    <string name="lock_deverrouiller">Déverrouiller</string>
+
+<!-- Phase C — Administration & Paramétrage (module 9.1) -->
+
+    <!-- Réglages (D4 / RA-19) -->
+    <string name="adm_reglages_subtitle">Langue, profil d\'activité, effectif et informations de l\'entreprise.</string>
+    <string name="adm_langue">Langue de l\'interface</string>
+    <string name="adm_profil">Profil d\'activité</string>
+    <string name="adm_palier">Effectif de l\'entreprise</string>
+    <string name="adm_infos_entreprise">Informations de l\'entreprise</string>
+    <string name="adm_secteur">Secteur d\'activité</string>
+    <string name="adm_adresse">Adresse</string>
+    <string name="adm_telephone">Téléphone</string>
+    <string name="adm_email">Email</string>
+    <string name="adm_devise_locked">Devise (verrouillée au premier usage)</string>
+    <string name="adm_sauvegarder">Sauvegarder</string>
+    <string name="adm_save_ok">Informations enregistrées.</string>
+    <string name="adm_save_err">Échec de l\'enregistrement.</string>
+
+    <!-- Licence (RA-04..06) -->
+    <string name="adm_licence_statut">Statut de la licence</string>
+    <string name="adm_licence_statut_essai">Essai gratuit (7 jours)</string>
+    <string name="adm_licence_statut_actif">Licence active</string>
+    <string name="adm_licence_statut_expire">Expirée — lecture seule</string>
+    <string name="adm_licence_date_debut">Début de l\'essai</string>
+    <string name="adm_licence_date_expiration">Expire le</string>
+    <string name="adm_licence_code_actif">Code actif</string>
+    <string name="adm_licence_appareil">Appareil associé</string>
+    <string name="adm_licence_desassoc">Désassocier cet appareil</string>
+    <string name="adm_licence_desassoc_count">Désassociations utilisées : %1$d / %2$d par an</string>
+    <string name="adm_licence_code_field">Code d\'activation</string>
+    <string name="adm_licence_activer">Activer</string>
+    <string name="adm_licence_msg_ok">Licence activée — valable 1 an.</string>
+    <string name="adm_licence_msg_err">Code invalide. Format : MB360-XXXX-XXXX-XXXX</string>
+    <string name="adm_licence_msg_max">Maximum de désassociations atteint (3/an).</string>
+    <string name="adm_licence_msg_none">Aucune licence à désassocier.</string>
+
+    <!-- Sauvegarde (RA-13) -->
+    <string name="adm_sauvegarde_btn">Sauvegarder maintenant</string>
+    <string name="adm_sauvegarde_en_cours">Sauvegarde en cours…</string>
+    <string name="adm_sauvegarde_ok">Sauvegarde locale réussie.</string>
+    <string name="adm_sauvegarde_err">Échec de la sauvegarde.</string>
+    <string name="adm_sauvegarde_historique">Historique des sauvegardes</string>
+    <string name="adm_sauvegarde_vide">Aucune sauvegarde pour le moment.</string>
+    <string name="adm_sauvegarde_type">Local</string>
+
+    <!-- Journal (RA-18) -->
+    <string name="adm_journal_purge">Purger les entrées de plus de 12 mois</string>
+    <string name="adm_journal_purge_ok">Purge effectuée.</string>
+    <string name="adm_journal_vide">Aucune entrée de journal.</string>
+    <string name="adm_journal_module">Module</string>
+    <string name="adm_journal_action">Action</string>
+    <string name="adm_journal_details">Détails</string>
+
+    <!-- Utilisateurs & rôles (D1/D2, RA-14) -->
+    <string name="adm_users_add">Ajouter un utilisateur</string>
+    <string name="adm_users_nom">Nom</string>
+    <string name="adm_users_email">Email de secours</string>
+    <string name="adm_users_role">Rôle</string>
+    <string name="adm_users_creer">Créer l\'utilisateur</string>
+    <string name="adm_users_actif">Actif</string>
+    <string name="adm_users_inactif">Désactivé</string>
+    <string name="adm_users_desactiver">Désactiver</string>
+    <string name="adm_users_resultat_ok">Utilisateur créé.</string>
+    <string name="adm_roles_titre">Rôles disponibles</string>
+
+    <!-- Multi-site (RA-21) -->
+    <string name="adm_sites_ajouter">Ajouter un site</string>
+    <string name="adm_sites_nom">Nom du site</string>
+    <string name="adm_sites_type">Type</string>
+    <string name="adm_sites_adresse">Adresse</string>
+    <string name="adm_sites_principal">Principal</string>
+    <string name="adm_sites_secondaire">Secondaire</string>
+    <string name="adm_sites_supprimer">Supprimer</string>
+    <string name="adm_sites_msg_ok">Site ajouté.</string>
+    <string name="adm_sites_msg_principal">Le site principal ne peut pas être supprimé.</string>
+    <string name="adm_sites_msg_supprime">Site supprimé.</string>
+    <string name="adm_site_type_boutique">Boutique</string>
+    <string name="adm_site_type_entrepot">Entrepôt</string>
+    <string name="adm_site_type_usine">Usine</string>
+    <string name="adm_site_type_bureau">Bureau</string>
+
+    <!-- À propos -->
+    <string name="adm_apropos_version">Version</string>
+    <string name="adm_apropos_appareil">Appareil</string>
+    <string name="adm_apropos_societe">Missa Business 360 — ERP Android</string>
+    <string name="adm_apropos_mentions">Données stockées localement sur cet appareil. Licence et sauvegarde gérées dans Administration &amp; Paramétrage.</string>
+
+<!-- Phase D — Clients (9.2) -->
+    <string name="clients_recherche">Rechercher un client…</string>
+    <string name="clients_total">%1$d client(s)</string>
+    <string name="clients_vide">Aucun client. Touchez + pour en créer.</string>
+    <string name="clients_ajouter">Ajouter un client</string>
+    <string name="clients_modifier">Modifier le client</string>
+    <string name="clients_nom">Nom</string>
+    <string name="clients_telephone">Téléphone</string>
+    <string name="clients_email">Email</string>
+    <string name="clients_adresse">Adresse</string>
+    <string name="clients_type">Type</string>
+    <string name="clients_notes">Notes</string>
+    <string name="clients_remise">Remise par défaut (%)</string>
+    <string name="clients_limite_credit">Limite de crédit (vide = illimitée)</string>
+    <string name="clients_categories">Catégories</string>
+    <string name="clients_badges">Badges fidélité</string>
+    <string name="clients_desactiver">Désactiver</string>
+    <string name="clients_prospect">Prospect — auto-converti à la 1re vente</string>
+    <string name="clients_nom_categorie">Nom de la catégorie</string>
+    <string name="clients_ajouter_categorie">Ajouter la catégorie</string>
+    <string name="clients_supprimer_categorie">Supprimer</string>
+    <string name="clients_categories_vide">Aucune catégorie.</string>
+    <string name="clients_nom_badge">Nom du badge</string>
+    <string name="clients_remise_badge">Remise (%)</string>
+    <string name="clients_ajouter_badge">Ajouter le badge</string>
+    <string name="clients_badges_vide">Aucun badge.</string>
+    <string name="clients_actif">Actif</string>
+    <string name="clients_inactif">Inactif</string>
+    <string name="clients_categorie_optionnelle">Catégorie (optionnelle)</string>
+    <string name="clients_badge_optionnel">Badge de fidélité (optionnel)</string>
+
+
+    <!-- Clients (9.2) -->
+    <string name="clients_doublon_titre">Doublon potentiel</string>
+    <string name="clients_doublon_message">Un client portant ce nom ou ce numéro existe déjà. Voulez-vous tout de même le créer ?</string>
+    <string name="clients_creer_malgre_doublon">Créer malgré le doublon</string>
+    <string name="clients_client_cree">Client %1$s créé.</string>
+    <string name="clients_client_modifie">Client modifié.</string>
+    <string name="clients_lecture_seule">La licence est expirée : l’application est en lecture seule.</string>
+    <string name="clients_nom_obligatoire">Saisissez le nom du client.</string>
+    <string name="clients_telephone_obligatoire">Saisissez le téléphone du client.</string>
+    <string name="clients_donnees_invalides">Vérifiez la remise et la limite de crédit.</string>
+    <string name="clients_erreur_sauvegarde">L’enregistrement a échoué. Réessayez.</string>
+    <string name="clients_categorie_utilisee">Cette catégorie est utilisée par un ou plusieurs clients.</string>
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">Indicatif pays</string>
+    <string name="clients_rechercher_indicatif">Rechercher un pays ou un indicatif</string>
+    <string name="clients_indicatif_obligatoire">Sélectionnez l’indicatif pays du client.</string>
+    <string name="clients_aucun_indicatif">Aucun pays ou indicatif trouvé.</string>
+
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">Saisissez un nom de 2 à 120 caractères.</string>
+    <string name="clients_telephone_invalide">Saisissez un numéro valide de 7 à 15 chiffres.</string>
+    <string name="clients_email_invalide">Saisissez une adresse email valide ou laissez ce champ vide.</string>
+    <string name="clients_remise_invalide">La remise doit être comprise entre 0 et 100 %.</string>
+    <string name="clients_limite_credit_invalide">Saisissez une limite de crédit positive.</string>
+
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">Particulier</string>
+    <string name="clients_type_entreprise">Entreprise</string>
+    <string name="clients_type_administration">Administration</string>
+    <string name="clients_type_ong">ONG</string>
+    <string name="clients_type_revendeur">Revendeur</string>
+    <string name="clients_type_prospect">Prospect</string>
+
+
+    <!-- Phase D — Fournisseurs (9.3) -->
+    <string name="fournisseurs_recherche">Rechercher un fournisseur…</string>
+    <string name="fournisseurs_total">%1$d fournisseur(s)</string>
+    <string name="fournisseurs_vide">Aucun fournisseur. Touchez + pour en créer.</string>
+    <string name="fournisseurs_ajouter">Ajouter un fournisseur</string>
+    <string name="fournisseurs_modifier">Modifier le fournisseur</string>
+    <string name="fournisseurs_nom">Nom</string>
+    <string name="fournisseurs_telephone">Téléphone</string>
+    <string name="fournisseurs_desactiver">Désactiver</string>
+
+
+    <!-- Formulaire client : informations principales -->
+    <string name="clients_nouveau">Nouveau client</string>
+    <string name="clients_informations_principales">Informations principales</string>
+    <string name="clients_informations_principales_aide">Renseignez les informations essentielles du client.</string>
+    <string name="clients_nom_exemple">Ex. : Marie Ndongo</string>
+    <string name="clients_telephone_exemple">Ex. : 6 99 12 34 56</string>
+    <string name="clients_email_exemple">Ex. : nom@entreprise.com</string>
+    <string name="clients_aucune_categorie">Aucune catégorie</string>
+    <string name="clients_site">Site / Point de vente</string>
+    <string name="clients_aucun_site">Aucun site</string>
+    <string name="clients_statut">Statut</string>
+    <string name="clients_devise">Devise</string>
+    <string name="clients_enregistrer">Enregistrer</string>
+
+
+    <!-- Direction artistique : onboarding mobile -->
+    <string name="ob_plus_tard">Plus tard</string>
+    <string name="ob_langue_subtitle">Vous pourrez la modifier à tout moment dans les paramètres.</string>
+    <string name="ob_profil_subtitle">Ce choix permet d’adapter l’application à vos besoins.</string>
+    <string name="ob_entreprise_subtitle">Renseignez les informations de base de votre entreprise.</string>
+    <string name="ob_informations_entreprise">Informations de l’entreprise</string>
+    <string name="ob_nouveau_pin">Nouveau code PIN</string>
+    <string name="ob_pin_securite_titre">Votre accès est protégé</string>
+    <string name="ob_pin_securite_note">Ce code PIN sera demandé à chaque ouverture de l’application.</string>
+    <string name="ob_licence_subtitle">Activez votre licence maintenant ou poursuivez avec l’essai gratuit.</string>
+    <string name="ob_jours">jours</string>
+    <string name="ob_licence_hero_title">Vous bénéficiez d’une période d’essai gratuite de 7 jours</string>
+    <string name="ob_licence_avantage_fonctions">Toutes les fonctionnalités sont disponibles pendant 7 jours</string>
+    <string name="ob_licence_avantage_sans_carte">Aucune carte bancaire n’est requise</string>
+    <string name="ob_licence_avantage_securite">Vos données sont 100 % sécurisées</string>
+    <string name="ob_checklist_subtitle">Votre espace est prêt. Vérifiez les éléments configurés avant de commencer.</string>
+    <string name="ob_checklist_bienvenue">Configuration terminée avec succès</string>
+    <string name="ob_selectionne">Sélectionné</string>
+
+
+    <!-- Pages de découverte et profils de la maquette d'onboarding -->
+    <string name="ob_passer">Passer</string>
+    <string name="ob_intro_tagline">Votre entreprise, au bout des doigts.</string>
+    <string name="ob_intro_title">Gérez, suivez, développez votre activité en toute simplicité.</string>
+    <string name="ob_intro_dashboard_label">Tableau de bord</string>
+    <string name="ob_intro_business_title">Tout votre business au même endroit</string>
+    <string name="ob_intro_business_description">Ventes, achats, stock, clients et finances : pilotez chaque aspect de votre entreprise.</string>
+    <string name="ob_intro_secure_title">Sécurisé et 100 % privé</string>
+    <string name="ob_intro_secure_description">Vos données sont stockées localement sur votre appareil.</string>
+    <string name="ob_intro_offline_title">Fonctionne même hors ligne</string>
+    <string name="ob_intro_offline_description">Travaillez partout, à tout moment, même sans connexion.</string>
+    <string name="ob_profil_producteur">Producteur</string>
+    <string name="ob_profil_producteur_description">Agriculture, élevage, pêche, production…</string>
+    <string name="ob_profil_commercant">Commerçant</string>
+    <string name="ob_profil_commercant_description">Commerce de détail, grossiste, distribution…</string>
+    <string name="ob_profil_prestataire">Prestataire de services</string>
+    <string name="ob_profil_prestataire_description">Services, consulting, maintenance…</string>
+    <string name="ob_profil_autre">Autre activité</string>
+    <string name="ob_profil_autre_description">Autres types d’activités</string>
+    <string name="ob_profil_voir_details">Afficher les profils détaillés</string>
+    <string name="ob_profil_masquer_details">Masquer les profils détaillés</string>
+
+
+    <!-- Structure d'onboarding : en-tête, aide et progression -->
+    <string name="ob_aide">Aide</string>
+    <string name="ob_fermer">Fermer</string>
+    <string name="ob_progress_langue">Langue</string>
+    <string name="ob_progress_profil">Profil</string>
+    <string name="ob_progress_entreprise">Entreprise</string>
+    <string name="ob_progress_securite">Sécurité</string>
+    <string name="ob_progress_validation">Validation</string>
+    <string name="ob_langue_note">Le français est sélectionné par défaut pour les utilisateurs au Cameroun.</string>
+    <string name="ob_activite_title">Votre activité</string>
+    <string name="ob_activite_subtitle">Sélectionnez le profil qui correspond le mieux à votre entreprise.</string>
+    <string name="ob_effectif_subtitle">Cette information ajuste les fonctionnalités proposées.</string>
+
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">Logo de l’entreprise</string>
+    <string name="ob_logo_facultatif">Facultatif · PNG, JPG ou WebP</string>
+    <string name="ob_logo_ajouter">Ajouter un logo</string>
+    <string name="ob_logo_modifier">Modifier le logo</string>
+    <string name="ob_logo_supprimer">Supprimer</string>
+    <string name="ob_logo_apercu">Aperçu du logo de l’entreprise</string>
+
+    <!-- Tableau de bord d’accueil -->
+    <string name="home_company_placeholder">Votre entreprise</string>
+    <string name="home_not_configured">À configurer</string>
+    <string name="home_greeting">Bonjour, %1$s 👋</string>
+    <string name="home_greeting_anonymous">Bonjour 👋</string>
+    <string name="home_more_modules_description">Accédez aux fonctions complémentaires de votre ERP.</string>
+    <string name="home_overview">Voici la vue d’ensemble de votre activité.</string>
+    <string name="home_profile_format">Profil : %1$s</string>
+    <string name="home_size_format">Taille : %1$s</string>
+    <string name="home_today">Aujourd’hui</string>
+    <string name="home_total">Total</string>
+    <string name="home_cash">Trésorerie</string>
+    <string name="home_available">Disponible</string>
+    <string name="home_quick_actions">Actions rapides</string>
+    <string name="home_personalize">Personnaliser</string>
+    <string name="home_activity_summary">Résumé de l’activité</string>
+    <string name="home_reminders">Rappels importants</string>
+    <string name="home_no_pending_tasks">• Aucune tâche en attente</string>
+    <string name="home_no_overdue_invoices">• Aucune facture client en retard</string>
+    <string name="home_recent_documents">Documents récents</string>
+    <string name="home_see_all">Voir tout</string>
+    <string name="home_no_documents">Aucun document généré</string>
+    <string name="home_no_documents_description">Vos factures, bons et reçus apparaîtront ici.</string>
+    <string name="home_new_sale">Nouvelle vente</string>
+    <string name="home_new_purchase">Nouvel achat</string>
+    <string name="home_new_client">Nouveau client</string>
+    <string name="home_new_supplier">Fournisseur</string>
+    <string name="home_stock_entry">Entrée stock</string>
+    <string name="home_transfer">Transfert</string>
+    <string name="home_payment_received">Paiement reçu</string>
+    <string name="home_expense">Dépense</string>
+    <string name="home_gross_margin">Marge brute</string>
+    <string name="home_more_short">Plus</string>
+    <string name="home_company_active">Entreprise active</string>
+    <string name="home_drawer_primary">PRINCIPAL</string>
+    <string name="home_drawer_other">AUTRE</string>
+
+    <!-- Navigation latérale détaillée -->
+    <string name="home_active">ACTIF</string>
+    <string name="home_close">Fermer</string>
+    <string name="home_settings">Paramètres</string>
+    <string name="home_licence_activation">Licence &amp; activation</string>
+    <string name="home_sites_sales">Sites &amp; points de vente</string>
+    <string name="home_drawer_tools">OUTILS</string>
+    <string name="home_drawer_support">SUPPORT</string>
+    <string name="home_help_assistance">Aide &amp; assistance</string>
+    <string name="home_data_secured">Données sécurisées</string>
+    <string name="home_backup_date">Dernière sauvegarde : %1$s</string>
+    <string name="home_backup_never">Aucune sauvegarde enregistrée</string>
+    <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
+    <string name="home_support_title">Aide &amp; assistance</string>
+    <string name="home_support_message">Notre assistance sera bientôt disponible depuis cette rubrique. Consultez les réglages ou l’écran À propos pour les informations de votre installation.</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">Pièce %1$s créée.</string>
+    <string name="ops_invalid">Vérifiez le libellé, le montant et la quantité.</string>
+    <string name="ops_read_only">Licence expirée : ce module est en lecture seule.</string>
+    <string name="ops_error">L’opération n’a pas pu être enregistrée. Réessayez.</string>
+    <string name="ops_add">Ajouter</string>
+    <string name="ops_empty">Aucune opération enregistrée dans %1$s.</string>
+    <string name="ops_quantity_value">Quantité : %1$s</string>
+    <string name="ops_cancel">Annuler</string>
+    <string name="ops_validate">Valider</string>
+    <string name="ops_status_draft">Brouillon</string>
+    <string name="ops_status_validated">Validé</string>
+    <string name="ops_status_cancelled">Annulé</string>
+    <string name="ops_new">Nouveau : %1$s</string>
+    <string name="ops_title">Libellé</string>
+    <string name="ops_counterpart">Client, fournisseur ou tiers</string>
+    <string name="ops_amount">Montant</string>
+    <string name="ops_quantity">Quantité</string>
+    <string name="ops_income">Entrée</string>
+    <string name="ops_expense">Sortie</string>
+    <string name="ops_notes">Notes</string>
+    <string name="ops_save">Enregistrer</string>
+    <string name="ops_hint_stock">Enregistrez vos articles, inventaires et ajustements de stock.</string>
+    <string name="ops_hint_sales">Créez et validez vos ventes et factures client.</string>
+    <string name="ops_hint_purchases">Enregistrez vos achats et factures fournisseur.</string>
+    <string name="ops_hint_finances">Suivez les encaissements et les dépenses de trésorerie.</string>
+    <string name="ops_hint_delivery">Préparez et suivez les livraisons à effectuer.</string>
+    <string name="ops_hint_production">Planifiez vos ordres et quantités de production.</string>
+    <string name="ops_hint_services">Centralisez vos interventions et prestations de service.</string>
+    <string name="ops_hint_hr">Suivez les éléments opérationnels liés à vos collaborateurs.</string>
+    <string name="ops_hint_projects">Organisez les activités, budgets et suivis de vos projets.</string>
+    <string name="reporting_subtitle">Analyse locale de vos opérations validées.</string>
+    <string name="reporting_module_activity">Activité par module</string>
+    <string name="reporting_empty">Aucune opération à analyser pour le moment.</string>
+    <string name="reporting_current_totals">Totaux actuels</string>
+    <string name="reporting_records_count">%1$d pièce(s)</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
+    <string name="sales_new_sale">Nouvelle vente</string>
+    <string name="sales_create_invoice">Créez une facture client</string>
+    <string name="sales_history">Historique</string>
+    <string name="sales_customer">Client</string>
+    <string name="sales_select_customer">Sélectionner un client</string>
+    <string name="sales_new_customer">Nouveau client</string>
+    <string name="sales_search_product">Rechercher un produit ou scanner</string>
+    <string name="sales_scan">Scanner un code-barres</string>
+    <string name="sales_scanner_unavailable">Aucune application de scan compatible n\'est disponible. Saisissez ou ajoutez un produit libre.</string>
+    <string name="sales_free_product">Produit libre</string>
+    <string name="sales_empty_cart">Votre panier est vide</string>
+    <string name="sales_empty_cart_description">Ajoutez un produit libre pour commencer cette vente.</string>
+    <string name="sales_product">PRODUIT</string>
+    <string name="sales_qty">QTÉ</string>
+    <string name="sales_unit_price">PRIX UNIT.</string>
+    <string name="sales_total">TOTAL</string>
+    <string name="sales_free_item">Produit libre</string>
+    <string name="sales_add_note">Ajouter une note</string>
+    <string name="sales_clear_cart">Vider le panier</string>
+    <string name="sales_summary">RÉSUMÉ</string>
+    <string name="sales_subtotal">Sous-total</string>
+    <string name="sales_discount">Remise</string>
+    <string name="sales_delivery">Livraison</string>
+    <string name="sales_tax_included">Dont TVA (%1$s%%)</string>
+    <string name="sales_payment">PAIEMENT</string>
+    <string name="sales_payment_method">Mode de paiement</string>
+    <string name="sales_paid_amount">Montant payé</string>
+    <string name="sales_remaining">Reste à payer</string>
+    <string name="sales_loyalty_points">Points de fidélité</string>
+    <string name="sales_points_pending">Calcul à la validation</string>
+    <string name="sales_points_description">pour cette vente</string>
+    <string name="sales_current_balance">Solde client actuel</string>
+    <string name="sales_no_amount_due">Aucun solde dû</string>
+    <string name="sales_amount_due">Solde dû</string>
+    <string name="sales_save_draft">Enregistrer le brouillon</string>
+    <string name="sales_save_print">Enregistrer et imprimer</string>
+    <string name="sales_remove_item">Retirer le produit</string>
+    <string name="sales_free_product_title">Ajouter un produit libre</string>
+    <string name="sales_product_name">Nom du produit</string>
+    <string name="sales_add_to_cart">Ajouter au panier</string>
+    <string name="sales_customer_required">Sélectionnez un client avant d\'enregistrer la vente.</string>
+    <string name="sales_cart_required">Ajoutez au moins un produit au panier.</string>
+    <string name="sales_invalid_amount">Vérifiez les montants saisis et le paiement.</string>
+    <string name="sales_saved_and_printing">Vente %1$s enregistrée. Ouverture de l\'impression…</string>
+    <string name="sales_draft_saved">Brouillon %1$s enregistré.</string>
+    <string name="sales_history_description">Factures et brouillons enregistrés sur cet appareil.</string>
+    <string name="sales_history_empty">Aucune vente enregistrée pour le moment.</string>
+    <string name="sales_no_customer">Aucun client ne correspond à cette recherche.</string>
+    <string name="sales_clear_title">Vider le panier ?</string>
+    <string name="sales_clear_message">Les produits et la note en cours seront retirés du panier.</string>
+    <string name="sales_cash">Espèces</string>
+    <string name="sales_receipt_name">Facture</string>
+    <string name="sales_no_product">Aucun produit trouvé</string>
+    <string name="sales_no_product_description">Modifiez votre recherche ou ajoutez un produit libre.</string>
+    <string name="sales_home">Accueil</string>
+    <string name="sales_nav_sales">Ventes</string>
+
+    <!-- Parcours Vente : liste, facture, options et impression -->
+    <string name="sales_all">Toutes</string>
+    <string name="sales_articles">Articles</string>
+    <string name="sales_back">Retour</string>
+    <string name="sales_back_list">Retour à la liste</string>
+    <string name="sales_cancel_sale">Annuler la vente</string>
+    <string name="sales_cancel_sale_description">Annule cette facture de façon persistante</string>
+    <string name="sales_cancelled">Annulées</string>
+    <string name="sales_cart">Panier</string>
+    <string name="sales_cart_count">%1$d article(s)</string>
+    <string name="sales_customer_step_hint">Choisissez le client auquel cette vente sera attribuée.</string>
+    <string name="sales_download_pdf">Télécharger en PDF</string>
+    <string name="sales_download_pdf_description">Enregistre une copie PDF de la facture</string>
+    <string name="sales_drafts">Brouillons (%1$d)</string>
+    <string name="sales_duplicate_sale">Dupliquer la vente</string>
+    <string name="sales_duplicate_sale_description">Crée une nouvelle vente à partir de cette facture</string>
+    <string name="sales_edit">Modifier</string>
+    <string name="sales_email_invoice">Envoyer par e-mail</string>
+    <string name="sales_email_invoice_description">Ouvre votre application e-mail avec le résumé</string>
+    <string name="sales_email_subject">Facture</string>
+    <string name="sales_invoice_customer">FACTURE CLIENT</string>
+    <string name="sales_invoice_date">Date</string>
+    <string name="sales_invoice_number">N° facture</string>
+    <string name="sales_invoice_options">Options de la facture</string>
+    <string name="sales_invoice_preview">Aperçu de la facture</string>
+    <string name="sales_invoice_thanks">Merci pour votre confiance !</string>
+    <string name="sales_invoice_total">Total de la facture</string>
+    <string name="sales_list_title">Liste des ventes</string>
+    <string name="sales_next">Suivant</string>
+    <string name="sales_no_sales">Aucune vente pour le moment</string>
+    <string name="sales_no_sales_description">Créez votre première vente pour retrouver ici vos factures et brouillons.</string>
+    <string name="sales_print">Imprimer</string>
+    <string name="sales_print_invoice">Imprimer la facture</string>
+    <string name="sales_print_invoice_description">Ouvre le service d\'impression Android</string>
+    <string name="sales_print_ready">Votre facture est prête à être imprimée.</string>
+    <string name="sales_print_title">Impression</string>
+    <string name="sales_products_empty">Aucun produit dans cette vente</string>
+    <string name="sales_products_empty_description">Ajoutez un produit libre ou recherchez une ligne déjà ajoutée.</string>
+    <string name="sales_products_title">Ajout des produits</string>
+    <string name="sales_sale_date">Vente du %1$s</string>
+    <string name="sales_save_sale">Enregistrer la vente</string>
+    <string name="sales_search_sales">Rechercher par référence ou client</string>
+    <string name="sales_share_invoice">Partager la facture</string>
+    <string name="sales_share_invoice_description">Partage le résumé de la facture</string>
+    <string name="sales_share_subject">Facture</string>
+    <string name="sales_status">Statut</string>
+    <string name="sales_status_paid">Payée</string>
+    <string name="sales_status_pending">En attente</string>
+    <string name="sales_step_client">Client</string>
+    <string name="sales_step_payment">Paiement</string>
+    <string name="sales_step_products">Produits</string>
+    <string name="sales_step_summary">Résumé</string>
+    <string name="sales_success_description">La vente a été enregistrée et la facture est disponible.</string>
+    <string name="sales_success_title">Vente enregistrée avec succès</string>
+    <string name="sales_total_due">Total à payer</string>
+    <string name="sales_validated">Validées</string>
+    <string name="sales_view_cart">Voir le panier (%1$d)</string>
+    <string name="sales_view_invoice">Voir la facture</string>
+    <string name="sales_view_invoice_description">Retourne à l\'aperçu de la facture</string>
+
+    <!-- Parcours détaillé du module Client -->
+    <string name="clients_flow_account">État de compte</string>
+    <string name="clients_flow_account_title">État de compte</string>
+    <string name="clients_flow_active">Actifs (%1$d)</string>
+    <string name="clients_flow_active_short">Clients actifs</string>
+    <string name="clients_flow_add_address">Ajouter une adresse</string>
+    <string name="clients_flow_add_contact">Ajouter un contact</string>
+    <string name="clients_flow_address">Adresse</string>
+    <string name="clients_flow_address_label">Libellé de l\'adresse</string>
+    <string name="clients_flow_addresses">Adresses</string>
+    <string name="clients_flow_addresses_count">Adresses (%1$d)</string>
+    <string name="clients_flow_all">Tous (%1$d)</string>
+    <string name="clients_flow_all_status">Tous</string>
+    <string name="clients_flow_back">Retour</string>
+    <string name="clients_flow_city">Ville</string>
+    <string name="clients_flow_client_code">Code client</string>
+    <string name="clients_flow_company_name">Raison sociale ou nom</string>
+    <string name="clients_flow_consequence_1">Le client sera marqué comme inactif.</string>
+    <string name="clients_flow_consequence_2">Son historique de ventes reste conservé.</string>
+    <string name="clients_flow_consequences">Conséquences</string>
+    <string name="clients_flow_contact">Contact</string>
+    <string name="clients_flow_contacts">Contacts</string>
+    <string name="clients_flow_contacts_count">Contacts (%1$d)</string>
+    <string name="clients_flow_contacts_hint">Ajoutez les personnes à joindre pour ce client.</string>
+    <string name="clients_flow_credit_usage">Utilisation du crédit</string>
+    <string name="clients_flow_customer_due">Encours client : %1$s</string>
+    <string name="clients_flow_days_short">jours</string>
+    <string name="clients_flow_days_value">%1$d jours</string>
+    <string name="clients_flow_deactivate_description">Le client %1$s ne sera plus proposé dans les nouvelles ventes.</string>
+    <string name="clients_flow_deactivate_due">Ce client a un encours de %1$s.</string>
+    <string name="clients_flow_deactivate_question">Désactiver ce client ?</string>
+    <string name="clients_flow_deactivate_title">Désactiver le client</string>
+    <string name="clients_flow_debit_credit">Débit %1$s · Crédit %2$s</string>
+    <string name="clients_flow_detail_title">Détail client</string>
+    <string name="clients_flow_download_pdf">Télécharger en PDF</string>
+    <string name="clients_flow_due">Encours</string>
+    <string name="clients_flow_due_short">Reste : %1$s</string>
+    <string name="clients_flow_edit">Modifier</string>
+    <string name="clients_flow_empty_description">Créez un client pour gérer ses contacts, adresses et ventes.</string>
+    <string name="clients_flow_empty_title">Aucun client enregistré</string>
+    <string name="clients_flow_filters">Filtres</string>
+    <string name="clients_flow_from">Du</string>
+    <string name="clients_flow_general_information">Informations générales</string>
+    <string name="clients_flow_generated_on_save">Généré à l\'enregistrement</string>
+    <string name="clients_flow_history">Historique</string>
+    <string name="clients_flow_import">Importer</string>
+    <string name="clients_flow_import_error">Import impossible. Utilisez un CSV avec nom et téléphone.</string>
+    <string name="clients_flow_import_result">%1$d client(s) importé(s), %2$d ligne(s) ignorée(s).</string>
+    <string name="clients_flow_inactive">Inactifs (%1$d)</string>
+    <string name="clients_flow_information">Informations</string>
+    <string name="clients_flow_list_title">Liste des clients</string>
+    <string name="clients_flow_manage">Gérer</string>
+    <string name="clients_flow_next">Suivant</string>
+    <string name="clients_flow_nif">NIF</string>
+    <string name="clients_flow_no_account_entries">Aucune écriture pour ce compte.</string>
+    <string name="clients_flow_no_addresses">Aucune adresse enregistrée.</string>
+    <string name="clients_flow_no_badge">Aucun badge</string>
+    <string name="clients_flow_no_contacts">Aucun contact enregistré.</string>
+    <string name="clients_flow_no_notes">Aucune note.</string>
+    <string name="clients_flow_no_sales">Aucune vente enregistrée pour ce client.</string>
+    <string name="clients_flow_other_information">Autres informations</string>
+    <string name="clients_flow_outstanding">Encours clients</string>
+    <string name="clients_flow_outstanding_value">Encours : %1$s</string>
+    <string name="clients_flow_payment_terms">Condition de paiement</string>
+    <string name="clients_flow_primary">Principal</string>
+    <string name="clients_flow_registered">Date d\'inscription</string>
+    <string name="clients_flow_required_hint">Les champs essentiels sont requis pour enregistrer le client.</string>
+    <string name="clients_flow_results">Résultats (%1$d)</string>
+    <string name="clients_flow_role">Fonction</string>
+    <string name="clients_flow_sales_history">Historique des ventes</string>
+    <string name="clients_flow_sales_rep">Commercial</string>
+    <string name="clients_flow_sales_total">Total ventes</string>
+    <string name="clients_flow_search">Rechercher</string>
+    <string name="clients_flow_search_title">Rechercher des clients</string>
+    <string name="clients_flow_step_addresses">Adresses</string>
+    <string name="clients_flow_step_contacts">Contacts</string>
+    <string name="clients_flow_step_information">Informations</string>
+    <string name="clients_flow_to">Au</string>
+    <string name="clients_flow_total_clients">Total clients</string>
+    <string name="clients_flow_unlimited">Illimitée</string>
+</resources>

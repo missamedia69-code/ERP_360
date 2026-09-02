@@ -1,0 +1,355 @@
+package com.missa.b360.ui.clients
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
+import com.missa.b360.core.data.entity.CategoryClientEntity
+import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientContactEntity
+import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.OperationRecordEntity
+import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
+import com.missa.b360.core.domain.usecase.CategorieClientUseCases
+import com.missa.b360.core.domain.usecase.ClientProfileInput
+import com.missa.b360.core.domain.usecase.ClientProfileUseCase
+import com.missa.b360.core.domain.usecase.CreateClientUseCase
+import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
+import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
+import com.missa.b360.core.domain.usecase.ObserveAllClientsUseCase
+import com.missa.b360.core.domain.usecase.OperationUseCases
+import com.missa.b360.core.domain.usecase.SiteUseCases
+import com.missa.b360.core.domain.usecase.UpdateClientUseCase
+import com.missa.b360.core.util.Iso4217
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+/** ViewModel Clients (9.2) : liste + formulaire et confirmation explicite RC-01. */
+@HiltViewModel
+class ClientsViewModel @Inject constructor(
+    private val getEnterprise: GetEnterpriseUseCase,
+    private val settingsStore: SettingsStore,
+    private val observeAllClients: ObserveAllClientsUseCase,
+    private val createClient: CreateClientUseCase,
+    private val updateClient: UpdateClientUseCase,
+    private val desactiverClient: DesactiverClientUseCase,
+    private val clientProfile: ClientProfileUseCase,
+    private val operations: OperationUseCases,
+    private val categories: CategorieClientUseCases,
+    private val badges: BadgeLoyaltyUseCases,
+    private val siteUseCases: SiteUseCases,
+) : ViewModel() {
+
+    /** Le module Client montre aussi les comptes désactivés, contrairement au sélecteur Vente. */
+    val clients: Flow<List<ClientEntity>> = observeAllClients()
+    val salesHistory: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.VENTE)
+    val categoriesFlow: Flow<List<CategoryClientEntity>> = categories.observer()
+    val badgesFlow: Flow<List<BadgeLoyaltyEntity>> = badges.observer()
+    val sitesFlow: Flow<List<SiteEntity>> = siteUseCases.observerSites()
+
+    private val _deviseEntreprise = MutableStateFlow<String?>(null)
+    val deviseEntreprise: StateFlow<String?> = _deviseEntreprise
+
+    private val _codePaysParDefaut = MutableStateFlow<String?>(null)
+    val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
+
+    data class Resultat(
+        val code: String? = null,
+        val erreur: String? = null,
+        val clientId: Long? = null,
+        val imports: Int? = null,
+        val ignoredImports: Int = 0,
+    )
+
+    private data class DemandeCreation(
+        val nom: String,
+        val telephone: String,
+        val type: ClientType,
+        val email: String?,
+        val adresse: String?,
+        val categorieId: Long?,
+        val siteId: Long?,
+        val remiseDefautPct: Double,
+        val limiteCredit: Double?,
+        val badgeId: Long?,
+        val notes: String?,
+        val profile: ClientProfileInput,
+    )
+
+    private val _resultat = MutableStateFlow<Resultat?>(null)
+    val resultat: StateFlow<Resultat?> = _resultat
+
+    private val _erreurCategorie = MutableStateFlow<String?>(null)
+    val erreurCategorie: StateFlow<String?> = _erreurCategorie
+
+    private var demandeDoublon: DemandeCreation? = null
+    private var creationEnCours = false
+
+    init {
+        viewModelScope.launch {
+            val entreprise = getEnterprise()
+            _deviseEntreprise.value = entreprise?.devise
+            val codeEnregistre = settingsStore.get(SettingsStore.Keys.PAYS)
+                ?.takeIf { Iso4217.indicatifTelephone(it) != null }
+            _codePaysParDefaut.value = codeEnregistre
+                ?: Iso4217.codePaysDepuisNom(entreprise?.pays)
+        }
+    }
+
+    fun creer(
+        nom: String,
+        telephone: String,
+        type: ClientType,
+        email: String?,
+        adresse: String?,
+        categorieId: Long?,
+        siteId: Long?,
+        remiseDefautPct: Double,
+        limiteCredit: Double?,
+        badgeId: Long?,
+        notes: String?,
+        profile: ClientProfileInput = ClientProfileInput(),
+    ) {
+        lancerCreation(
+            DemandeCreation(
+                nom = nom,
+                telephone = telephone,
+                type = type,
+                email = email,
+                adresse = adresse,
+                categorieId = categorieId,
+                siteId = siteId,
+                remiseDefautPct = remiseDefautPct,
+                limiteCredit = limiteCredit,
+                badgeId = badgeId,
+                notes = notes,
+                profile = profile,
+            ),
+            doublonConfirme = false,
+        )
+    }
+
+    /** RC-01 : cette méthode n'est appelée qu'après l'accord explicite dans le dialogue. */
+    fun confirmerDoublon() {
+        val demande = demandeDoublon ?: return
+        demandeDoublon = null
+        _resultat.value = null
+        lancerCreation(demande, doublonConfirme = true)
+    }
+
+    fun annulerDoublon() {
+        demandeDoublon = null
+        _resultat.value = null
+    }
+
+    fun acquitterResultat() {
+        _resultat.value = null
+    }
+
+    private fun lancerCreation(demande: DemandeCreation, doublonConfirme: Boolean) {
+        if (creationEnCours) return
+        creationEnCours = true
+        viewModelScope.launch {
+            try {
+                when (
+                    val resultat = createClient(
+                        nom = demande.nom,
+                        telephone = demande.telephone,
+                        type = demande.type,
+                        email = demande.email,
+                        adresse = demande.adresse,
+                        categorieId = demande.categorieId,
+                        siteId = demande.siteId,
+                        remiseDefautPct = demande.remiseDefautPct,
+                        limiteCredit = demande.limiteCredit,
+                        badgeId = demande.badgeId,
+                        notes = demande.notes,
+                        profile = demande.profile,
+                        doublonConfirme = doublonConfirme,
+                    )
+                ) {
+                    is CreateClientUseCase.Result.Succes -> {
+                        demandeDoublon = null
+                        _resultat.value = Resultat(code = resultat.code, clientId = resultat.clientId)
+                    }
+                    is CreateClientUseCase.Result.DoublonPotentiel -> {
+                        demandeDoublon = demande
+                        _resultat.value = Resultat(erreur = "doublon")
+                    }
+                    is CreateClientUseCase.Result.LicenceExpiree ->
+                        _resultat.value = Resultat(erreur = "licence")
+                    is CreateClientUseCase.Result.NomObligatoire ->
+                        _resultat.value = Resultat(erreur = "nom")
+                    is CreateClientUseCase.Result.NomInvalide ->
+                        _resultat.value = Resultat(erreur = "nom_invalide")
+                    is CreateClientUseCase.Result.TelephoneObligatoire ->
+                        _resultat.value = Resultat(erreur = "telephone")
+                    is CreateClientUseCase.Result.TelephoneInvalide ->
+                        _resultat.value = Resultat(erreur = "telephone_invalide")
+                    is CreateClientUseCase.Result.EmailInvalide ->
+                        _resultat.value = Resultat(erreur = "email_invalide")
+                    is CreateClientUseCase.Result.DonneesInvalides ->
+                        _resultat.value = Resultat(erreur = "donnees")
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                _resultat.value = Resultat(erreur = "err")
+            } finally {
+                creationEnCours = false
+            }
+        }
+    }
+
+    fun modifier(
+        id: Long,
+        nom: String,
+        telephone: String,
+        type: ClientType,
+        email: String?,
+        adresse: String?,
+        categorieId: Long?,
+        siteId: Long?,
+        remiseDefautPct: Double,
+        limiteCredit: Double?,
+        badgeId: Long?,
+        notes: String?,
+        profile: ClientProfileInput? = null,
+    ) {
+        viewModelScope.launch {
+            val ok = try {
+                updateClient(
+                    id = id,
+                    nom = nom,
+                    telephone = telephone,
+                    type = type,
+                    email = email,
+                    adresse = adresse,
+                    categorieId = categorieId,
+                    siteId = siteId,
+                    remiseDefautPct = remiseDefautPct,
+                    limiteCredit = limiteCredit,
+                    badgeId = badgeId,
+                    notes = notes,
+                    profile = profile,
+                )
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                false
+            }
+            _resultat.value = if (ok) Resultat(code = "edit") else Resultat(erreur = "err")
+        }
+    }
+
+    fun contacts(clientId: Long?): Flow<List<ClientContactEntity>> =
+        if (clientId == null) flowOf(emptyList()) else clientProfile.observeContacts(clientId)
+
+    fun addresses(clientId: Long?): Flow<List<ClientAddressEntity>> =
+        if (clientId == null) flowOf(emptyList()) else clientProfile.observeAddresses(clientId)
+
+    /** Importe uniquement des lignes valides; les doublons et lignes incomplètes sont ignorés. */
+    fun importer(rows: List<ImportedClientRow>) {
+        if (rows.isEmpty()) {
+            _resultat.value = Resultat(erreur = "import")
+            return
+        }
+        viewModelScope.launch {
+            var imported = 0
+            var ignored = 0
+            try {
+                rows.forEach { row ->
+                    when (createClient(
+                        nom = row.nom,
+                        telephone = row.telephone,
+                        email = row.email,
+                        adresse = row.adresse,
+                        doublonConfirme = false,
+                    )) {
+                        is CreateClientUseCase.Result.Succes -> imported++
+                        else -> ignored++
+                    }
+                }
+                _resultat.value = Resultat(imports = imported, ignoredImports = ignored)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                _resultat.value = Resultat(erreur = "import")
+            }
+        }
+    }
+
+    fun desactiver(id: Long) {
+        viewModelScope.launch {
+            val ok = try {
+                desactiverClient(id)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                false
+            }
+            if (!ok) _resultat.value = Resultat(erreur = "err")
+        }
+    }
+
+    fun creerCategorie(nom: String) {
+        _erreurCategorie.value = null
+        viewModelScope.launch {
+            _erreurCategorie.value = try {
+                if (categories.creer(nom) == null) "licence" else null
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                "err"
+            }
+        }
+    }
+
+    fun supprimerCategorie(id: Long) {
+        _erreurCategorie.value = null
+        viewModelScope.launch {
+            _erreurCategorie.value = try {
+                when (categories.supprimer(id)) {
+                    CategorieClientUseCases.SuppressionResult.Supprimee -> null
+                    CategorieClientUseCases.SuppressionResult.CategorieUtilisee -> "utilisee"
+                    CategorieClientUseCases.SuppressionResult.LectureSeule -> "licence"
+                    CategorieClientUseCases.SuppressionResult.Introuvable -> "err"
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                "err"
+            }
+        }
+    }
+
+    fun creerBadge(nom: String, remisePct: Double) {
+        viewModelScope.launch {
+            val cree = try {
+                badges.creer(nom, remisePct)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                null
+            }
+            if (cree == null) _resultat.value = Resultat(erreur = "err")
+        }
+    }
+}
+
+/** Ligne CSV normalisée par l'interface avant import local. */
+data class ImportedClientRow(
+    val nom: String,
+    val telephone: String,
+    val email: String? = null,
+    val adresse: String? = null,
+)

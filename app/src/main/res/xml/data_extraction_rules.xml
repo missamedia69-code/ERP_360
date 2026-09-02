@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Règles de transfert d'appareil à appareil (Android 12+/API 31+). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Aucune exclusion pour l'instant : à compléter avec les données
+             sensibles (identifiants, jetons…) quand elles existeront. -->
+    </cloud-backup>
+    <device-transfer>
+        <!-- Idem pour les transferts directs entre appareils. -->
+    </device-transfer>
+</data-extraction-rules>

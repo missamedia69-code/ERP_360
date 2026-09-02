@@ -1,0 +1,651 @@
+<resources>
+    <string name="app_name">Missa Business 360</string>
+
+    <string name="home_title">Missa Business 360</string>
+    <string name="home_subtitle">Welcome! Create your first customers and products to get started.</string>
+    <string name="more_modules">More modules</string>
+    <string name="notifications">Notifications</string>
+    <string name="mark_all_read">Mark all as read</string>
+    <string name="no_notifications">No notifications</string>
+    <string name="module_placeholder">Coming soon — to be implemented</string>
+    <string name="phase_c">To be implemented in Phase C (module 9.1)</string>
+
+    <string name="drawer_admin">Administration &amp; Settings</string>
+    <string name="drawer_section_entreprise">Company</string>
+    <string name="drawer_section_administration">Administration</string>
+    <string name="drawer_section_application">Application</string>
+    <string name="admin_reglages">Settings</string>
+    <string name="admin_licence">Licence</string>
+    <string name="admin_sauvegarde">Backup</string>
+    <string name="admin_journal">Activity log</string>
+    <string name="admin_utilisateurs">Users &amp; roles</string>
+    <string name="admin_multisite">Multi-site</string>
+    <string name="admin_a_propos">About</string>
+
+    <string name="module_vente">Sales</string>
+    <string name="module_stock">Inventory</string>
+    <string name="module_clients">Customers</string>
+    <string name="module_finances">Finance</string>
+    <string name="module_fournisseurs">Suppliers</string>
+    <string name="module_achats">Purchases</string>
+    <string name="module_livraison">Delivery</string>
+    <string name="module_production">Production</string>
+    <string name="module_services">Services</string>
+    <string name="module_rh">HR &amp; Payroll</string>
+    <string name="module_projets">Projects</string>
+    <string name="module_reporting">Reporting</string>
+
+    <string name="ob_langue_title">Choose your language</string>
+    <string name="langue_fr">Français</string>
+    <string name="langue_en">English</string>
+    <string name="langue_es">Español</string>
+    <string name="langue_ar">العربية</string>
+    <string name="langue_zh">中文</string>
+    <string name="ob_suivant">Next</string>
+    <string name="ob_retour">Back</string>
+
+    <string name="ob_profil_title">Your business profile</string>
+    <string name="profil_a">Micro-commerce / independent</string>
+    <string name="profil_b">Retail store / shop</string>
+    <string name="profil_c">Multi-branch retail</string>
+    <string name="profil_d">Distribution / wholesale</string>
+    <string name="profil_e">Production / light industry</string>
+    <string name="profil_f">Services &amp; contracting</string>
+    <string name="profil_g">Construction / projects</string>
+    <string name="profil_h">Multi-activity group</string>
+
+    <string name="ob_palier_title">Company headcount</string>
+    <string name="palier_p1">Solo / Nano (1)</string>
+    <string name="palier_p2">Micro (2–9)</string>
+    <string name="palier_p3">Small (10–49)</string>
+    <string name="palier_p4">Medium (50–249)</string>
+    <string name="palier_p5">Large (250–999)</string>
+    <string name="palier_p6">Very large / Group (1000+)</string>
+
+    <string name="ob_entreprise_title">Your company</string>
+    <string name="ob_nom_entreprise">Company name</string>
+    <string name="ob_votre_nom">Your name</string>
+    <string name="ob_devise">Currency (ISO 4217)</string>
+    <string name="ob_pays">Country</string>
+    <string name="ob_pays_recherche">Search for a country</string>
+    <string name="ob_pays_aucun_resultat">No country found</string>
+    <string name="ob_pays_saisie_manuelle">Enter a country and its rate manually</string>
+    <string name="ob_pays_personnalise">Custom country</string>
+    <string name="ob_pays_saisie_manuelle_note">Enter a country that is not listed, then adjust the VAT/GST rate below.</string>
+    <string name="ob_tva_gst">VAT / GST</string>
+    <string name="ob_taux_taxe">Tax rate (%)</string>
+    <string name="ob_site_principal">Main site name</string>
+    <string name="ob_verrous_note">⚠ Currency, taxes, numbering and payments will be locked at first use (cannot be changed later).</string>
+    <string name="ob_erreur_nom">Please enter the company name and main site name.</string>
+    <string name="ob_erreur_nom_entreprise">Please enter the company name.</string>
+    <string name="ob_erreur_site_principal">Please enter the main site name.</string>
+    <string name="ob_erreur_taux_taxe">Enter a tax rate between 0 and 100%.</string>
+    <string name="ob_erreur_configuration_entreprise">The company setup could not be saved. Please try again.</string>
+    <string name="ob_erreur_finalisation">The setup could not be completed. Please try again.</string>
+
+    <string name="ob_pin_title">Create your PIN</string>
+    <string name="ob_pin_subtitle">4 to 6 digits — required at every app start.</string>
+    <string name="ob_pin_confirmer">Confirm PIN</string>
+    <string name="ob_pin_invalide">The PIN must contain 4 to 6 digits.</string>
+    <string name="ob_pin_differents">The two PINs do not match.</string>
+
+    <string name="ob_email_title">Recovery email</string>
+    <string name="ob_email_subtitle">Required: used to recover access if you forget your PIN.</string>
+    <string name="ob_email">Email</string>
+    <string name="ob_email_invalide">Invalid or already used email address.</string>
+
+    <string name="ob_licence_title">Licence</string>
+    <string name="ob_licence_essai">✓ Free 7-day trial started. Without activation after the trial, the app switches to read-only mode.</string>
+    <string name="ob_licence_active">✓ Licence activated — valid for 1 year on this device.</string>
+    <string name="ob_code_licence">Activation code (optional)</string>
+    <string name="ob_activer">Activate</string>
+    <string name="ob_code_invalide">Invalid code. Expected format: MB360-XXXX-XXXX-XXXX</string>
+    <string name="ob_licence_note">1 code = 1 device = 1 year. Device can be unlinked 3 times a year.</string>
+
+    <string name="ob_checklist_title">Setup complete</string>
+    <string name="check_entreprise">Company and main site created</string>
+    <string name="check_devise">Company currency</string>
+    <string name="check_taxes">Taxes</string>
+    <string name="check_numerotation">Document numbering</string>
+    <string name="check_paiements">Payment methods</string>
+    <string name="check_utilisateur">Owner user + PIN</string>
+    <string name="check_licence">Licence (7-day trial)</string>
+    <string name="check_verrouille">Locked — cannot be changed</string>
+    <string name="ob_checklist_note">You can enable more modules and add users in Administration &amp; Settings.</string>
+    <string name="ob_terminer">Start using Missa 360</string>
+
+    <string name="lock_title">Enter your PIN</string>
+    <string name="lock_essais_restants">Wrong PIN — %1$d attempt(s) left before lockout.</string>
+    <string name="lock_bloque">Too many attempts. Try again in a few minutes.</string>
+    <string name="lock_deverrouiller">Unlock</string>
+<!-- Phase C — Administration & Settings (module 9.1) -->
+
+    <!-- Settings (D4 / RA-19) -->
+    <string name="adm_reglages_subtitle">Language, activity profile, headcount and company information.</string>
+    <string name="adm_langue">Interface language</string>
+    <string name="adm_profil">Activity profile</string>
+    <string name="adm_palier">Company headcount</string>
+    <string name="adm_infos_entreprise">Company information</string>
+    <string name="adm_secteur">Business sector</string>
+    <string name="adm_adresse">Address</string>
+    <string name="adm_telephone">Phone</string>
+    <string name="adm_email">Email</string>
+    <string name="adm_devise_locked">Currency (locked after first use)</string>
+    <string name="adm_sauvegarder">Save</string>
+    <string name="adm_save_ok">Information saved.</string>
+    <string name="adm_save_err">Could not save.</string>
+
+    <!-- Licence (RA-04..06) -->
+    <string name="adm_licence_statut">Licence status</string>
+    <string name="adm_licence_statut_essai">Free trial (7 days)</string>
+    <string name="adm_licence_statut_actif">Active licence</string>
+    <string name="adm_licence_statut_expire">Expired — read-only</string>
+    <string name="adm_licence_date_debut">Trial started</string>
+    <string name="adm_licence_date_expiration">Expires on</string>
+    <string name="adm_licence_code_actif">Active code</string>
+    <string name="adm_licence_appareil">Associated device</string>
+    <string name="adm_licence_desassoc">Dissociate this device</string>
+    <string name="adm_licence_desassoc_count">Dissociations used: %1$d / %2$d per year</string>
+    <string name="adm_licence_code_field">Activation code</string>
+    <string name="adm_licence_activer">Activate</string>
+    <string name="adm_licence_msg_ok">Licence activated — valid for 1 year.</string>
+    <string name="adm_licence_msg_err">Invalid code. Format: MB360-XXXX-XXXX-XXXX</string>
+    <string name="adm_licence_msg_max">Maximum dissociations reached (3/year).</string>
+    <string name="adm_licence_msg_none">No licence to dissociate.</string>
+
+    <!-- Backup (RA-13) -->
+    <string name="adm_sauvegarde_btn">Back up now</string>
+    <string name="adm_sauvegarde_en_cours">Backup in progress…</string>
+    <string name="adm_sauvegarde_ok">Local backup successful.</string>
+    <string name="adm_sauvegarde_err">Backup failed.</string>
+    <string name="adm_sauvegarde_historique">Backup history</string>
+    <string name="adm_sauvegarde_vide">No backup yet.</string>
+    <string name="adm_sauvegarde_type">Local</string>
+
+    <!-- Journal (RA-18) -->
+    <string name="adm_journal_purge">Purge entries older than 12 months</string>
+    <string name="adm_journal_purge_ok">Purge done.</string>
+    <string name="adm_journal_vide">No journal entries.</string>
+    <string name="adm_journal_module">Module</string>
+    <string name="adm_journal_action">Action</string>
+    <string name="adm_journal_details">Details</string>
+
+    <!-- Users & roles (D1/D2, RA-14) -->
+    <string name="adm_users_add">Add a user</string>
+    <string name="adm_users_nom">Name</string>
+    <string name="adm_users_email">Recovery email</string>
+    <string name="adm_users_role">Role</string>
+    <string name="adm_users_creer">Create user</string>
+    <string name="adm_users_actif">Active</string>
+    <string name="adm_users_inactif">Disabled</string>
+    <string name="adm_users_desactiver">Disable</string>
+    <string name="adm_users_resultat_ok">User created.</string>
+    <string name="adm_roles_titre">Available roles</string>
+
+    <!-- Multi-site (RA-21) -->
+    <string name="adm_sites_ajouter">Add a site</string>
+    <string name="adm_sites_nom">Site name</string>
+    <string name="adm_sites_type">Type</string>
+    <string name="adm_sites_adresse">Address</string>
+    <string name="adm_sites_principal">Primary</string>
+    <string name="adm_sites_secondaire">Secondary</string>
+    <string name="adm_sites_supprimer">Delete</string>
+    <string name="adm_sites_msg_ok">Site added.</string>
+    <string name="adm_sites_msg_principal">The primary site cannot be deleted.</string>
+    <string name="adm_sites_msg_supprime">Site deleted.</string>
+    <string name="adm_site_type_boutique">Shop</string>
+    <string name="adm_site_type_entrepot">Warehouse</string>
+    <string name="adm_site_type_usine">Factory</string>
+    <string name="adm_site_type_bureau">Office</string>
+
+    <!-- About -->
+    <string name="adm_apropos_version">Version</string>
+    <string name="adm_apropos_appareil">Device</string>
+    <string name="adm_apropos_societe">Missa Business 360 — Android ERP</string>
+    <string name="adm_apropos_mentions">Data is stored locally on this device. Licence and backup are managed under Administration &amp; Settings.</string>
+
+<!-- Phase D — Clients (9.2) -->
+    <string name="clients_recherche">Search clients…</string>
+    <string name="clients_total">%1$d client(s)</string>
+    <string name="clients_vide">No clients yet. Tap + to add one.</string>
+    <string name="clients_ajouter">Add client</string>
+    <string name="clients_modifier">Edit client</string>
+    <string name="clients_nom">Name</string>
+    <string name="clients_telephone">Phone</string>
+    <string name="clients_email">Email</string>
+    <string name="clients_adresse">Address</string>
+    <string name="clients_type">Type</string>
+    <string name="clients_notes">Notes</string>
+    <string name="clients_remise">Default discount (%)</string>
+    <string name="clients_limite_credit">Credit limit (blank = unlimited)</string>
+    <string name="clients_categories">Categories</string>
+    <string name="clients_badges">Loyalty badges</string>
+    <string name="clients_desactiver">Disable</string>
+    <string name="clients_prospect">Prospect — auto-converted at first sale</string>
+    <string name="clients_nom_categorie">Category name</string>
+    <string name="clients_ajouter_categorie">Add category</string>
+    <string name="clients_supprimer_categorie">Delete</string>
+    <string name="clients_categories_vide">No categories.</string>
+    <string name="clients_nom_badge">Badge name</string>
+    <string name="clients_remise_badge">Discount (%)</string>
+    <string name="clients_ajouter_badge">Add badge</string>
+    <string name="clients_badges_vide">No badges.</string>
+    <string name="clients_actif">Active</string>
+    <string name="clients_inactif">Inactive</string>
+    <string name="clients_categorie_optionnelle">Category (optional)</string>
+    <string name="clients_badge_optionnel">Loyalty badge (optional)</string>
+
+
+    <!-- Clients (9.2) -->
+    <string name="clients_doublon_titre">Potential duplicate</string>
+    <string name="clients_doublon_message">A client with this name or phone number already exists. Do you still want to create it?</string>
+    <string name="clients_creer_malgre_doublon">Create despite duplicate</string>
+    <string name="clients_client_cree">Client %1$s created.</string>
+    <string name="clients_client_modifie">Client updated.</string>
+    <string name="clients_lecture_seule">The licence has expired: the app is read-only.</string>
+    <string name="clients_nom_obligatoire">Enter the client name.</string>
+    <string name="clients_telephone_obligatoire">Enter the client phone number.</string>
+    <string name="clients_donnees_invalides">Check the discount and credit limit.</string>
+    <string name="clients_erreur_sauvegarde">Could not save. Please try again.</string>
+    <string name="clients_categorie_utilisee">This category is used by one or more clients.</string>
+
+    <!-- Indicatifs téléphoniques pays -->
+    <string name="clients_indicatif_pays">Country calling code</string>
+    <string name="clients_rechercher_indicatif">Search for a country or calling code</string>
+    <string name="clients_indicatif_obligatoire">Select the customer country calling code.</string>
+    <string name="clients_aucun_indicatif">No country or calling code found.</string>
+
+    <!-- Validation des saisies client -->
+    <string name="clients_nom_invalide">Enter a name between 2 and 120 characters.</string>
+    <string name="clients_telephone_invalide">Enter a valid phone number with 7 to 15 digits.</string>
+    <string name="clients_email_invalide">Enter a valid email address or leave this field blank.</string>
+    <string name="clients_remise_invalide">The discount must be between 0 and 100%.</string>
+    <string name="clients_limite_credit_invalide">Enter a positive credit limit.</string>
+
+    <!-- Types de clients -->
+    <string name="clients_type_particulier">Individual</string>
+    <string name="clients_type_entreprise">Company</string>
+    <string name="clients_type_administration">Government</string>
+    <string name="clients_type_ong">NGO</string>
+    <string name="clients_type_revendeur">Reseller</string>
+    <string name="clients_type_prospect">Prospect</string>
+
+    <!-- Phase D — Suppliers (9.3) -->
+    <string name="fournisseurs_recherche">Search suppliers…</string>
+    <string name="fournisseurs_total">%1$d supplier(s)</string>
+    <string name="fournisseurs_vide">No suppliers yet. Tap + to add one.</string>
+    <string name="fournisseurs_ajouter">Add supplier</string>
+    <string name="fournisseurs_modifier">Edit supplier</string>
+    <string name="fournisseurs_nom">Name</string>
+    <string name="fournisseurs_telephone">Phone</string>
+    <string name="fournisseurs_desactiver">Disable</string>
+
+    <!-- Client form: main information -->
+    <string name="clients_nouveau">New client</string>
+    <string name="clients_informations_principales">Main information</string>
+    <string name="clients_informations_principales_aide">Enter the client’s essential information.</string>
+    <string name="clients_nom_exemple">E.g. Marie Ndongo</string>
+    <string name="clients_telephone_exemple">E.g. 699 12 34 56</string>
+    <string name="clients_email_exemple">E.g. name@company.com</string>
+    <string name="clients_aucune_categorie">No category</string>
+    <string name="clients_site">Site / Point of sale</string>
+    <string name="clients_aucun_site">No site</string>
+    <string name="clients_statut">Status</string>
+    <string name="clients_devise">Currency</string>
+    <string name="clients_enregistrer">Save</string>
+
+
+    <!-- Art direction: mobile onboarding -->
+    <string name="ob_plus_tard">Later</string>
+    <string name="ob_langue_subtitle">You can change it at any time in settings.</string>
+    <string name="ob_profil_subtitle">This choice tailors the app to your needs.</string>
+    <string name="ob_entreprise_subtitle">Enter your company’s essential information.</string>
+    <string name="ob_informations_entreprise">Company information</string>
+    <string name="ob_nouveau_pin">New PIN code</string>
+    <string name="ob_pin_securite_titre">Your access is protected</string>
+    <string name="ob_pin_securite_note">This PIN code will be requested each time you open the app.</string>
+    <string name="ob_licence_subtitle">Activate your licence now or continue with the free trial.</string>
+    <string name="ob_jours">days</string>
+    <string name="ob_licence_hero_title">You have a free 7-day trial period</string>
+    <string name="ob_licence_avantage_fonctions">All features are available for 7 days</string>
+    <string name="ob_licence_avantage_sans_carte">No bank card is required</string>
+    <string name="ob_licence_avantage_securite">Your data is 100% secure</string>
+    <string name="ob_checklist_subtitle">Your workspace is ready. Review the configured items before you begin.</string>
+    <string name="ob_checklist_bienvenue">Configuration completed successfully</string>
+    <string name="ob_selectionne">Selected</string>
+
+
+    <!-- Discovery pages and profile families from the onboarding design -->
+    <string name="ob_passer">Skip</string>
+    <string name="ob_intro_tagline">Your business at your fingertips.</string>
+    <string name="ob_intro_title">Manage, track and grow your business with ease.</string>
+    <string name="ob_intro_dashboard_label">Dashboard</string>
+    <string name="ob_intro_business_title">All your business in one place</string>
+    <string name="ob_intro_business_description">Sales, purchases, stock, clients and finance: manage every aspect of your business.</string>
+    <string name="ob_intro_secure_title">Secure and 100% private</string>
+    <string name="ob_intro_secure_description">Your data is stored locally on your device.</string>
+    <string name="ob_intro_offline_title">Works even offline</string>
+    <string name="ob_intro_offline_description">Work anywhere, at any time, even without a connection.</string>
+    <string name="ob_profil_producteur">Producer</string>
+    <string name="ob_profil_producteur_description">Agriculture, farming, fishing, production…</string>
+    <string name="ob_profil_commercant">Merchant</string>
+    <string name="ob_profil_commercant_description">Retail, wholesale, distribution…</string>
+    <string name="ob_profil_prestataire">Service provider</string>
+    <string name="ob_profil_prestataire_description">Services, consulting, maintenance…</string>
+    <string name="ob_profil_autre">Other activity</string>
+    <string name="ob_profil_autre_description">Other types of business</string>
+    <string name="ob_profil_voir_details">Show detailed profiles</string>
+    <string name="ob_profil_masquer_details">Hide detailed profiles</string>
+
+
+    <!-- Onboarding structure: header, help and progress -->
+    <string name="ob_aide">Help</string>
+    <string name="ob_fermer">Close</string>
+    <string name="ob_progress_langue">Language</string>
+    <string name="ob_progress_profil">Profile</string>
+    <string name="ob_progress_entreprise">Company</string>
+    <string name="ob_progress_securite">Security</string>
+    <string name="ob_progress_validation">Confirm</string>
+    <string name="ob_langue_note">French is selected by default for users in Cameroon.</string>
+    <string name="ob_activite_title">Your business</string>
+    <string name="ob_activite_subtitle">Select the profile that best matches your company.</string>
+    <string name="ob_effectif_subtitle">This information tailors the available features.</string>
+
+
+    <!-- Logo de l’entreprise pendant l’onboarding -->
+    <string name="ob_logo_entreprise">Company logo</string>
+    <string name="ob_logo_facultatif">Optional · PNG, JPG or WebP</string>
+    <string name="ob_logo_ajouter">Add a logo</string>
+    <string name="ob_logo_modifier">Change logo</string>
+    <string name="ob_logo_supprimer">Remove</string>
+    <string name="ob_logo_apercu">Company logo preview</string>
+
+    <!-- Tableau de bord d’accueil -->
+    <string name="home_company_placeholder">Your company</string>
+    <string name="home_not_configured">Not set up</string>
+    <string name="home_greeting">Hello, %1$s 👋</string>
+    <string name="home_greeting_anonymous">Hello 👋</string>
+    <string name="home_more_modules_description">Access the additional features of your ERP.</string>
+    <string name="home_overview">Here is an overview of your business.</string>
+    <string name="home_profile_format">Profile: %1$s</string>
+    <string name="home_size_format">Size: %1$s</string>
+    <string name="home_today">Today</string>
+    <string name="home_total">Total</string>
+    <string name="home_cash">Cash flow</string>
+    <string name="home_available">Available</string>
+    <string name="home_quick_actions">Quick actions</string>
+    <string name="home_personalize">Customize</string>
+    <string name="home_activity_summary">Activity summary</string>
+    <string name="home_reminders">Important reminders</string>
+    <string name="home_no_pending_tasks">• No pending tasks</string>
+    <string name="home_no_overdue_invoices">• No overdue customer invoices</string>
+    <string name="home_recent_documents">Recent documents</string>
+    <string name="home_see_all">View all</string>
+    <string name="home_no_documents">No documents generated</string>
+    <string name="home_no_documents_description">Your invoices, delivery notes and receipts will appear here.</string>
+    <string name="home_new_sale">New sale</string>
+    <string name="home_new_purchase">New purchase</string>
+    <string name="home_new_client">New customer</string>
+    <string name="home_new_supplier">Supplier</string>
+    <string name="home_stock_entry">Stock entry</string>
+    <string name="home_transfer">Transfer</string>
+    <string name="home_payment_received">Payment received</string>
+    <string name="home_expense">Expense</string>
+    <string name="home_gross_margin">Gross margin</string>
+    <string name="home_more_short">More</string>
+    <string name="home_company_active">Active company</string>
+    <string name="home_drawer_primary">MAIN</string>
+    <string name="home_drawer_other">OTHER</string>
+
+    <!-- Navigation latérale détaillée -->
+    <string name="home_active">ACTIVE</string>
+    <string name="home_close">Close</string>
+    <string name="home_settings">Settings</string>
+    <string name="home_licence_activation">Licence &amp; activation</string>
+    <string name="home_sites_sales">Sites &amp; points of sale</string>
+    <string name="home_drawer_tools">TOOLS</string>
+    <string name="home_drawer_support">SUPPORT</string>
+    <string name="home_help_assistance">Help &amp; support</string>
+    <string name="home_data_secured">Data secured</string>
+    <string name="home_backup_date">Latest backup: %1$s</string>
+    <string name="home_backup_never">No backup recorded</string>
+    <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
+    <string name="home_support_title">Help &amp; support</string>
+    <string name="home_support_message">Support will be available from this section soon. Check Settings or the About screen for information about your installation.</string>
+
+    <!-- Modules opérationnels et reporting -->
+    <string name="ops_record_detail">%1$s · %2$s</string>
+    <string name="ops_created">Record %1$s created.</string>
+    <string name="ops_invalid">Check the description, amount and quantity.</string>
+    <string name="ops_read_only">Licence expired: this module is read-only.</string>
+    <string name="ops_error">The operation could not be saved. Please try again.</string>
+    <string name="ops_add">Add</string>
+    <string name="ops_empty">No records in %1$s yet.</string>
+    <string name="ops_quantity_value">Quantity: %1$s</string>
+    <string name="ops_cancel">Cancel</string>
+    <string name="ops_validate">Validate</string>
+    <string name="ops_status_draft">Draft</string>
+    <string name="ops_status_validated">Validated</string>
+    <string name="ops_status_cancelled">Cancelled</string>
+    <string name="ops_new">New: %1$s</string>
+    <string name="ops_title">Description</string>
+    <string name="ops_counterpart">Customer, supplier or third party</string>
+    <string name="ops_amount">Amount</string>
+    <string name="ops_quantity">Quantity</string>
+    <string name="ops_income">Income</string>
+    <string name="ops_expense">Expense</string>
+    <string name="ops_notes">Notes</string>
+    <string name="ops_save">Save</string>
+    <string name="ops_hint_stock">Record your items, inventories and stock adjustments.</string>
+    <string name="ops_hint_sales">Create and validate your sales and customer invoices.</string>
+    <string name="ops_hint_purchases">Record your purchases and supplier invoices.</string>
+    <string name="ops_hint_finances">Track cash inflows and expenses.</string>
+    <string name="ops_hint_delivery">Prepare and track deliveries to be made.</string>
+    <string name="ops_hint_production">Plan your production orders and quantities.</string>
+    <string name="ops_hint_services">Centralize your service jobs and interventions.</string>
+    <string name="ops_hint_hr">Track operational information related to your staff.</string>
+    <string name="ops_hint_projects">Organize activities, budgets and project follow-up.</string>
+    <string name="reporting_subtitle">Local analysis of your validated operations.</string>
+    <string name="reporting_module_activity">Activity by module</string>
+    <string name="reporting_empty">There are no operations to analyze yet.</string>
+    <string name="reporting_current_totals">Current totals</string>
+    <string name="reporting_records_count">%1$d record(s)</string>
+    <string name="home_recent_record_detail">%1$s · %2$s</string>
+    <string name="sales_new_sale">New sale</string>
+    <string name="sales_create_invoice">Create a customer invoice</string>
+    <string name="sales_history">History</string>
+    <string name="sales_customer">Customer</string>
+    <string name="sales_select_customer">Select a customer</string>
+    <string name="sales_new_customer">New customer</string>
+    <string name="sales_search_product">Search for a product or scan</string>
+    <string name="sales_scan">Scan a barcode</string>
+    <string name="sales_scanner_unavailable">No compatible scanner app is available. Enter or add a free product.</string>
+    <string name="sales_free_product">Free product</string>
+    <string name="sales_empty_cart">Your cart is empty</string>
+    <string name="sales_empty_cart_description">Add a free product to start this sale.</string>
+    <string name="sales_product">PRODUCT</string>
+    <string name="sales_qty">QTY</string>
+    <string name="sales_unit_price">UNIT PRICE</string>
+    <string name="sales_total">TOTAL</string>
+    <string name="sales_free_item">Free product</string>
+    <string name="sales_add_note">Add a note</string>
+    <string name="sales_clear_cart">Clear cart</string>
+    <string name="sales_summary">SUMMARY</string>
+    <string name="sales_subtotal">Subtotal</string>
+    <string name="sales_discount">Discount</string>
+    <string name="sales_delivery">Delivery</string>
+    <string name="sales_tax_included">Including tax (%1$s%%)</string>
+    <string name="sales_payment">PAYMENT</string>
+    <string name="sales_payment_method">Payment method</string>
+    <string name="sales_paid_amount">Amount paid</string>
+    <string name="sales_remaining">Amount due</string>
+    <string name="sales_loyalty_points">Loyalty points</string>
+    <string name="sales_points_pending">Calculated on validation</string>
+    <string name="sales_points_description">for this sale</string>
+    <string name="sales_current_balance">Current customer balance</string>
+    <string name="sales_no_amount_due">No amount due</string>
+    <string name="sales_amount_due">Amount due</string>
+    <string name="sales_save_draft">Save draft</string>
+    <string name="sales_save_print">Save and print</string>
+    <string name="sales_remove_item">Remove product</string>
+    <string name="sales_free_product_title">Add a free product</string>
+    <string name="sales_product_name">Product name</string>
+    <string name="sales_add_to_cart">Add to cart</string>
+    <string name="sales_customer_required">Select a customer before saving the sale.</string>
+    <string name="sales_cart_required">Add at least one product to the cart.</string>
+    <string name="sales_invalid_amount">Check the entered amounts and payment.</string>
+    <string name="sales_saved_and_printing">Sale %1$s saved. Opening print…</string>
+    <string name="sales_draft_saved">Draft %1$s saved.</string>
+    <string name="sales_history_description">Invoices and drafts saved on this device.</string>
+    <string name="sales_history_empty">No sales have been saved yet.</string>
+    <string name="sales_no_customer">No customer matches this search.</string>
+    <string name="sales_clear_title">Clear the cart?</string>
+    <string name="sales_clear_message">The products and current note will be removed from the cart.</string>
+    <string name="sales_cash">Cash</string>
+    <string name="sales_receipt_name">Invoice</string>
+    <string name="sales_no_product">No product found</string>
+    <string name="sales_no_product_description">Change your search or add a free product.</string>
+    <string name="sales_home">Home</string>
+    <string name="sales_nav_sales">Sales</string>
+
+    <!-- Sales flow: list, invoice, options and print -->
+    <string name="sales_all">All</string>
+    <string name="sales_articles">Items</string>
+    <string name="sales_back">Back</string>
+    <string name="sales_back_list">Back to list</string>
+    <string name="sales_cancel_sale">Cancel sale</string>
+    <string name="sales_cancel_sale_description">Persistently cancels this invoice</string>
+    <string name="sales_cancelled">Cancelled</string>
+    <string name="sales_cart">Cart</string>
+    <string name="sales_cart_count">%1$d item(s)</string>
+    <string name="sales_customer_step_hint">Choose the customer this sale belongs to.</string>
+    <string name="sales_download_pdf">Download PDF</string>
+    <string name="sales_download_pdf_description">Saves a PDF copy of the invoice</string>
+    <string name="sales_drafts">Drafts (%1$d)</string>
+    <string name="sales_duplicate_sale">Duplicate sale</string>
+    <string name="sales_duplicate_sale_description">Creates a new sale from this invoice</string>
+    <string name="sales_edit">Edit</string>
+    <string name="sales_email_invoice">Send by email</string>
+    <string name="sales_email_invoice_description">Opens your email app with the summary</string>
+    <string name="sales_email_subject">Invoice</string>
+    <string name="sales_invoice_customer">CUSTOMER INVOICE</string>
+    <string name="sales_invoice_date">Date</string>
+    <string name="sales_invoice_number">Invoice no.</string>
+    <string name="sales_invoice_options">Invoice options</string>
+    <string name="sales_invoice_preview">Invoice preview</string>
+    <string name="sales_invoice_thanks">Thank you for your business!</string>
+    <string name="sales_invoice_total">Invoice total</string>
+    <string name="sales_list_title">Sales list</string>
+    <string name="sales_next">Next</string>
+    <string name="sales_no_sales">No sales yet</string>
+    <string name="sales_no_sales_description">Create your first sale to find invoices and drafts here.</string>
+    <string name="sales_print">Print</string>
+    <string name="sales_print_invoice">Print invoice</string>
+    <string name="sales_print_invoice_description">Opens the Android print service</string>
+    <string name="sales_print_ready">Your invoice is ready to print.</string>
+    <string name="sales_print_title">Print</string>
+    <string name="sales_products_empty">No products in this sale</string>
+    <string name="sales_products_empty_description">Add a free item or search for an item already added.</string>
+    <string name="sales_products_title">Add products</string>
+    <string name="sales_sale_date">Sale on %1$s</string>
+    <string name="sales_save_sale">Save sale</string>
+    <string name="sales_search_sales">Search by reference or customer</string>
+    <string name="sales_share_invoice">Share invoice</string>
+    <string name="sales_share_invoice_description">Shares the invoice summary</string>
+    <string name="sales_share_subject">Invoice</string>
+    <string name="sales_status">Status</string>
+    <string name="sales_status_paid">Paid</string>
+    <string name="sales_status_pending">Pending</string>
+    <string name="sales_step_client">Customer</string>
+    <string name="sales_step_payment">Payment</string>
+    <string name="sales_step_products">Products</string>
+    <string name="sales_step_summary">Summary</string>
+    <string name="sales_success_description">The sale has been saved and the invoice is available.</string>
+    <string name="sales_success_title">Sale saved successfully</string>
+    <string name="sales_total_due">Total due</string>
+    <string name="sales_validated">Validated</string>
+    <string name="sales_view_cart">View cart (%1$d)</string>
+    <string name="sales_view_invoice">View invoice</string>
+    <string name="sales_view_invoice_description">Returns to the invoice preview</string>
+
+    <!-- Detailed customer module flow -->
+    <string name="clients_flow_account">Account statement</string>
+    <string name="clients_flow_account_title">Account statement</string>
+    <string name="clients_flow_active">Active (%1$d)</string>
+    <string name="clients_flow_active_short">Active customers</string>
+    <string name="clients_flow_add_address">Add address</string>
+    <string name="clients_flow_add_contact">Add contact</string>
+    <string name="clients_flow_address">Address</string>
+    <string name="clients_flow_address_label">Address label</string>
+    <string name="clients_flow_addresses">Addresses</string>
+    <string name="clients_flow_addresses_count">Addresses (%1$d)</string>
+    <string name="clients_flow_all">All (%1$d)</string>
+    <string name="clients_flow_all_status">All</string>
+    <string name="clients_flow_back">Back</string>
+    <string name="clients_flow_city">City</string>
+    <string name="clients_flow_client_code">Customer code</string>
+    <string name="clients_flow_company_name">Company or customer name</string>
+    <string name="clients_flow_consequence_1">The customer will be marked as inactive.</string>
+    <string name="clients_flow_consequence_2">Sales history remains available.</string>
+    <string name="clients_flow_consequences">Consequences</string>
+    <string name="clients_flow_contact">Contact</string>
+    <string name="clients_flow_contacts">Contacts</string>
+    <string name="clients_flow_contacts_count">Contacts (%1$d)</string>
+    <string name="clients_flow_contacts_hint">Add the people to contact for this customer.</string>
+    <string name="clients_flow_credit_usage">Credit usage</string>
+    <string name="clients_flow_customer_due">Customer balance: %1$s</string>
+    <string name="clients_flow_days_short">days</string>
+    <string name="clients_flow_days_value">%1$d days</string>
+    <string name="clients_flow_deactivate_description">%1$s will no longer be offered in new sales.</string>
+    <string name="clients_flow_deactivate_due">This customer has a balance of %1$s.</string>
+    <string name="clients_flow_deactivate_question">Deactivate this customer?</string>
+    <string name="clients_flow_deactivate_title">Deactivate customer</string>
+    <string name="clients_flow_debit_credit">Debit %1$s · Credit %2$s</string>
+    <string name="clients_flow_detail_title">Customer details</string>
+    <string name="clients_flow_download_pdf">Download PDF</string>
+    <string name="clients_flow_due">Balance due</string>
+    <string name="clients_flow_due_short">Due: %1$s</string>
+    <string name="clients_flow_edit">Edit</string>
+    <string name="clients_flow_empty_description">Create a customer to manage contacts, addresses and sales.</string>
+    <string name="clients_flow_empty_title">No customers yet</string>
+    <string name="clients_flow_filters">Filters</string>
+    <string name="clients_flow_from">From</string>
+    <string name="clients_flow_general_information">General information</string>
+    <string name="clients_flow_generated_on_save">Generated when saved</string>
+    <string name="clients_flow_history">History</string>
+    <string name="clients_flow_import">Import</string>
+    <string name="clients_flow_import_error">Import failed. Use a CSV containing name and phone.</string>
+    <string name="clients_flow_import_result">%1$d customer(s) imported, %2$d row(s) skipped.</string>
+    <string name="clients_flow_inactive">Inactive (%1$d)</string>
+    <string name="clients_flow_information">Information</string>
+    <string name="clients_flow_list_title">Customer list</string>
+    <string name="clients_flow_manage">Manage</string>
+    <string name="clients_flow_next">Next</string>
+    <string name="clients_flow_nif">Tax ID</string>
+    <string name="clients_flow_no_account_entries">No entries for this account.</string>
+    <string name="clients_flow_no_addresses">No saved addresses.</string>
+    <string name="clients_flow_no_badge">No loyalty badge</string>
+    <string name="clients_flow_no_contacts">No saved contacts.</string>
+    <string name="clients_flow_no_notes">No notes.</string>
+    <string name="clients_flow_no_sales">No saved sales for this customer.</string>
+    <string name="clients_flow_other_information">Other information</string>
+    <string name="clients_flow_outstanding">Customer balances</string>
+    <string name="clients_flow_outstanding_value">Balance: %1$s</string>
+    <string name="clients_flow_payment_terms">Payment terms</string>
+    <string name="clients_flow_primary">Primary</string>
+    <string name="clients_flow_registered">Registration date</string>
+    <string name="clients_flow_required_hint">Essential fields are required to save the customer.</string>
+    <string name="clients_flow_results">Results (%1$d)</string>
+    <string name="clients_flow_role">Position</string>
+    <string name="clients_flow_sales_history">Sales history</string>
+    <string name="clients_flow_sales_rep">Sales representative</string>
+    <string name="clients_flow_sales_total">Total sales</string>
+    <string name="clients_flow_search">Search</string>
+    <string name="clients_flow_search_title">Search customers</string>
+    <string name="clients_flow_step_addresses">Addresses</string>
+    <string name="clients_flow_step_contacts">Contacts</string>
+    <string name="clients_flow_step_information">Information</string>
+    <string name="clients_flow_to">To</string>
+    <string name="clients_flow_total_clients">Total customers</string>
+    <string name="clients_flow_unlimited">Unlimited</string>
+</resources>
