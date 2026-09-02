@@ -1150,7 +1150,13 @@ private fun StockMovementFormContent(
 }
 
 @Composable
-private fun AmountField(label: String, value: String, onValueChange: (String) -> Unit, isError: Boolean = false, modifier: Modifier = Modifier) {
+private fun AmountField(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    onValueChange: (String) -> Unit,
+) {
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it.filterAmountInput()) },
