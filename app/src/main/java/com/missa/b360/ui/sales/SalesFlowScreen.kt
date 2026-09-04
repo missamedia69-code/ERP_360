@@ -112,7 +112,7 @@ import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 
-private enum class SalesStep { LIST, CREATE, CLIENT, PRODUCTS, CART, PAYMENT, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
+private enum class SalesStep { LIST, CREATE, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
 
 private val FlowBlue = BrandBlue
 private val FlowBlueDark = Blue40
