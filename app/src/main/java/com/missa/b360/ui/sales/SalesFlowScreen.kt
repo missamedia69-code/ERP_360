@@ -112,7 +112,7 @@ import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 
-private enum class SalesStep { LIST, CLIENT, PRODUCTS, CART, PAYMENT, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
+private enum class SalesStep { LIST, CREATE, CLIENT, PRODUCTS, CART, PAYMENT, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
 
 private val FlowBlue = BrandBlue
 private val FlowBlueDark = Blue40
@@ -149,7 +149,7 @@ fun SalesScreen(
     val snackbar = remember { SnackbarHostState() }
 
     var stepName by rememberSaveable(openCreate) {
-        mutableStateOf(if (openCreate) SalesStep.CLIENT.name else SalesStep.LIST.name)
+        mutableStateOf(if (openCreate) SalesStep.CREATE.name else SalesStep.LIST.name)
     }
     var activeReceipt by remember { mutableStateOf<SaleReceipt?>(null) }
     var customerPickerVisible by remember { mutableStateOf(false) }
@@ -198,12 +198,12 @@ fun SalesScreen(
             }
             SalesViewModel.SaveResult.MissingClient -> {
                 snackbar.showSnackbar(context.getString(R.string.sales_customer_required))
-                stepName = SalesStep.CLIENT.name
+                stepName = SalesStep.CREATE.name
                 viewModel.clearSaveResult()
             }
             SalesViewModel.SaveResult.EmptyCart -> {
                 snackbar.showSnackbar(context.getString(R.string.sales_cart_required))
-                stepName = SalesStep.PRODUCTS.name
+                stepName = SalesStep.CREATE.name
                 viewModel.clearSaveResult()
             }
             SalesViewModel.SaveResult.InvalidAmount -> {
@@ -238,7 +238,7 @@ fun SalesScreen(
             onNewSale = {
                 viewModel.clearCart()
                 activeReceipt = null
-                stepName = SalesStep.CLIENT.name
+                stepName = SalesStep.CREATE.name
             },
             onOpenRecord = { record ->
                 val payload = SaleRecordCodec.decode(record.notes)
@@ -246,7 +246,7 @@ fun SalesScreen(
                     viewModel.loadDraft(record, clients)
                 ) {
                     activeReceipt = SaleReceipt(record.id, record.reference, payload, record.createdAt)
-                    stepName = SalesStep.CLIENT.name
+                    stepName = SalesStep.CREATE.name
                 } else if (payload != null) {
                     activeReceipt = SaleReceipt(record.id, record.reference, payload, record.createdAt)
                     stepName = SalesStep.INVOICE.name
@@ -254,53 +254,19 @@ fun SalesScreen(
             },
             onNavigate = onNavigate,
         )
-        SalesStep.CLIENT -> FlowScaffold(
+        SalesStep.CREATE -> FlowScaffold(
             title = stringResource(R.string.sales_new_sale),
             step = 0,
-            onBack = { stepName = if (sale.editingRecordId == null) SalesStep.LIST.name else SalesStep.CART.name },
-            bottomAction = FlowAction(stringResource(R.string.sales_next), sale.selectedClient != null) {
-                stepName = SalesStep.PRODUCTS.name
-            },
-        ) { padding ->
-            ClientStepContent(
-                client = sale.selectedClient,
-                onSelect = { customerPickerVisible = true },
-                onNew = onOpenClientCreate,
-                modifier = Modifier.padding(padding),
-            )
-        }
-        SalesStep.PRODUCTS -> FlowScaffold(
-            title = stringResource(R.string.sales_new_sale),
-            step = 1,
-            onBack = { stepName = SalesStep.CLIENT.name },
+            onBack = { stepName = SalesStep.LIST.name },
             bottomAction = FlowAction(
-                stringResource(R.string.sales_view_cart, sale.lines.size),
-                sale.lines.isNotEmpty(),
-            ) { stepName = SalesStep.CART.name },
-        ) { padding ->
-            ProductsStepContent(
-                client = sale.selectedClient,
-                lines = sale.lines,
-                query = productSearch,
-                onQueryChange = { productSearch = it },
-                onAddFree = { freeProductVisible = true },
-                onScan = {
-                    val intent = Intent("com.google.zxing.client.android.SCAN")
-                    if (intent.resolveActivity(context.packageManager) != null) scannerLauncher.launch(intent) else scannerUnavailable = true
-                },
-                devise = devise,
-                modifier = Modifier.padding(padding),
-            )
-        }
-        SalesStep.CART -> FlowScaffold(
-            title = stringResource(R.string.sales_cart),
-            step = 1,
-            onBack = { stepName = SalesStep.PRODUCTS.name },
-            bottomAction = FlowAction(stringResource(R.string.sales_next), sale.lines.isNotEmpty()) {
-                stepName = SalesStep.PAYMENT.name
+                stringResource(R.string.sales_next),
+                sale.selectedClient != null,
+            ) {
+                stepName = SalesStep.SUMMARY.name
             },
         ) { padding ->
-            CartStepContent(
+            CreateSaleContent(
+                client = sale.selectedClient,
                 lines = sale.lines,
                 totals = totals,
                 taxRate = taxRate,
@@ -308,37 +274,31 @@ fun SalesScreen(
                 note = sale.note,
                 discount = sale.discountInput,
                 delivery = sale.deliveryInput,
+                paidInput = sale.paidInput,
+                paymentMethod = selectedPayment,
+                query = productSearch,
+                onQueryChange = { productSearch = it },
+                onSelectCustomer = { customerPickerVisible = true },
+                onNewCustomer = onOpenClientCreate,
+                onAddFree = { freeProductVisible = true },
+                onScan = {
+                    val intent = Intent("com.google.zxing.client.android.SCAN")
+                    if (intent.resolveActivity(context.packageManager) != null) scannerLauncher.launch(intent) else scannerUnavailable = true
+                },
                 onNoteChange = viewModel::updateNote,
                 onDiscountChange = viewModel::updateDiscount,
                 onDeliveryChange = viewModel::updateDelivery,
+                onPaidChange = viewModel::updatePaid,
                 onQuantityChange = viewModel::changeQuantity,
                 onRemove = viewModel::removeLine,
-                modifier = Modifier.padding(padding),
-            )
-        }
-        SalesStep.PAYMENT -> FlowScaffold(
-            title = stringResource(R.string.sales_payment),
-            step = 2,
-            onBack = { stepName = SalesStep.CART.name },
-            bottomAction = FlowAction(stringResource(R.string.sales_next), sale.lines.isNotEmpty()) {
-                stepName = SalesStep.SUMMARY.name
-            },
-        ) { padding ->
-            PaymentStepContent(
-                client = sale.selectedClient,
-                totals = totals,
-                paymentMethod = selectedPayment,
-                paidInput = sale.paidInput,
-                devise = devise,
                 onChoosePayment = { paymentPickerVisible = true },
-                onPaidChange = viewModel::updatePaid,
                 modifier = Modifier.padding(padding),
             )
         }
         SalesStep.SUMMARY -> FlowScaffold(
             title = stringResource(R.string.sales_summary),
-            step = 3,
-            onBack = { stepName = SalesStep.PAYMENT.name },
+            step = 1,
+            onBack = { stepName = SalesStep.CREATE.name },
             bottomAction = FlowAction(stringResource(R.string.sales_save_sale), sale.selectedClient != null && sale.lines.isNotEmpty()) {
                 viewModel.save(selectedPayment, draft = false)
             },
@@ -362,7 +322,7 @@ fun SalesScreen(
                 onNewSale = {
                     viewModel.clearCart()
                     activeReceipt = null
-                    stepName = SalesStep.CLIENT.name
+                    stepName = SalesStep.CREATE.name
                 },
                 onBackList = { stepName = SalesStep.LIST.name },
             )
@@ -387,7 +347,7 @@ fun SalesScreen(
                 onEmail = { context.emailInvoice(receipt, devise) },
                 onView = { stepName = SalesStep.INVOICE.name },
                 onDuplicate = {
-                    if (viewModel.duplicate(receipt.payload, clients)) stepName = SalesStep.CLIENT.name
+                    if (viewModel.duplicate(receipt.payload, clients)) stepName = SalesStep.CREATE.name
                 },
                 onCancel = { cancelVisible = true },
             )
@@ -509,14 +469,14 @@ private fun FlowScaffold(
                 enabled = bottomAction.enabled,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 15.dp, vertical = 10.dp)
-                    .height(48.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .height(42.dp),
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = FlowBlue),
             ) {
-                Text(bottomAction.label, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.width(8.dp))
-                Text("→", fontSize = 18.sp)
+                Text(bottomAction.label, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(6.dp))
+                Text("→", fontSize = 16.sp)
             }
         },
     ) { padding ->
@@ -532,32 +492,37 @@ private fun FlowScaffold(
 @Composable
 private fun SaleProgress(current: Int) {
     val labels = listOf(
-        stringResource(R.string.sales_step_client),
-        stringResource(R.string.sales_step_products),
-        stringResource(R.string.sales_step_payment),
+        stringResource(R.string.sales_step_entry),
         stringResource(R.string.sales_step_summary),
     )
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(horizontal = 22.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.Top,
+            .padding(horizontal = 28.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         labels.forEachIndexed { index, label ->
-            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                Surface(
-                    modifier = Modifier.size(18.dp),
-                    shape = CircleShape,
-                    color = if (index <= current) FlowBlue else FlowBorder,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(if (index < current) "✓" else (index + 1).toString(), color = Color.White, fontSize = 10.sp)
-                    }
-                }
-                Spacer(Modifier.height(3.dp))
-                Text(label, color = if (index == current) FlowBlue else FlowMuted, fontSize = 8.sp, maxLines = 1)
+            if (index > 0) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(2.dp)
+                        .padding(horizontal = 3.dp)
+                        .background(if (index <= current) FlowBlue else FlowBorder, RoundedCornerShape(2.dp)),
+                )
             }
+            Surface(
+                modifier = Modifier.size(16.dp),
+                shape = CircleShape,
+                color = if (index <= current) FlowBlue else FlowBorder,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(if (index < current) "✓" else (index + 1).toString(), color = Color.White, fontSize = 9.sp)
+                }
+            }
+            Spacer(Modifier.width(4.dp))
+            Text(label, color = if (index == current) FlowBlue else FlowMuted, fontSize = 9.sp, maxLines = 1)
         }
     }
 }
@@ -602,29 +567,30 @@ private fun SalesListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(horizontal = 15.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(9.dp),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item {
                 Button(
                     onClick = onNewSale,
-                    modifier = Modifier.fillMaxWidth().height(43.dp),
+                    modifier = Modifier.fillMaxWidth().height(40.dp),
                     shape = RoundedCornerShape(7.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = FlowBlue),
                 ) {
-                    Icon(Icons.Outlined.Add, null, modifier = Modifier.size(19.dp))
+                    Icon(Icons.Outlined.Add, null, modifier = Modifier.size(17.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.sales_new_sale), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.sales_new_sale), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
             }
             item {
                 OutlinedTextField(
                     value = search,
                     onValueChange = { search = it },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(44.dp),
                     singleLine = true,
-                    leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                    placeholder = { Text(stringResource(R.string.sales_search_sales), fontSize = 12.sp) },
+                    textStyle = MaterialTheme.typography.bodySmall,
+                    leadingIcon = { Icon(Icons.Outlined.Search, null, modifier = Modifier.size(17.dp)) },
+                    placeholder = { Text(stringResource(R.string.sales_search_sales), fontSize = 11.sp) },
                 )
             }
             item { SalesFilterRow(selected = selectedFilter, records = records, onSelect = { selectedFilter = it }) }
@@ -696,15 +662,15 @@ private fun SaleListRow(record: OperationRecordEntity, devise: String, onClick: 
         color = Color.White,
         border = BorderStroke(1.dp, FlowBorder),
     ) {
-        Row(modifier = Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(35.dp), shape = CircleShape, color = FlowBlueSoft) {
-                Icon(Icons.Outlined.PersonOutline, null, tint = FlowBlue, modifier = Modifier.padding(8.dp))
+        Row(modifier = Modifier.padding(9.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(modifier = Modifier.size(31.dp), shape = CircleShape, color = FlowBlueSoft) {
+                Icon(Icons.Outlined.PersonOutline, null, tint = FlowBlue, modifier = Modifier.padding(7.dp))
             }
-            Spacer(Modifier.width(9.dp))
+            Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(record.reference, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 11.sp)
-                Text(record.counterpart ?: record.title, color = FlowMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(DateUtils.formatDateHeure(record.createdAt), color = FlowMuted, fontSize = 9.sp)
+                Text(record.reference, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                Text(record.counterpart ?: record.title, color = FlowMuted, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(DateUtils.formatDateHeure(record.createdAt), color = FlowMuted, fontSize = 8.sp)
             }
             Column(horizontalAlignment = Alignment.End) {
                 AssistChip(
@@ -713,6 +679,231 @@ private fun SaleListRow(record: OperationRecordEntity, devise: String, onClick: 
                 )
                 Text(saleMoney(record.amount ?: 0.0, devise), color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 10.sp)
             }
+        }
+    }
+}
+
+@Composable
+private fun CreateSaleContent(
+    client: ClientEntity?,
+    lines: List<SaleLine>,
+    totals: SaleTotals,
+    taxRate: Double,
+    devise: String,
+    note: String,
+    discount: String,
+    delivery: String,
+    paidInput: String,
+    paymentMethod: String,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSelectCustomer: () -> Unit,
+    onNewCustomer: () -> Unit,
+    onAddFree: () -> Unit,
+    onScan: () -> Unit,
+    onNoteChange: (String) -> Unit,
+    onDiscountChange: (String) -> Unit,
+    onDeliveryChange: (String) -> Unit,
+    onPaidChange: (String) -> Unit,
+    onQuantityChange: (Long, Double) -> Unit,
+    onRemove: (Long) -> Unit,
+    onChoosePayment: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val visible = lines.filter { it.name.contains(query, ignoreCase = true) }
+    val paid = paidInput.toSaleValue() ?: totals.total
+    val remaining = (totals.total - paid).coerceAtLeast(0.0)
+
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        item { CompactSectionTitle(stringResource(R.string.sales_customer)) }
+        item { CompactClientSelector(client, onSelectCustomer, onNewCustomer) }
+
+        item { CompactSectionTitle(stringResource(R.string.sales_products_title)) }
+        item {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = onQueryChange,
+                    modifier = Modifier.weight(1f).height(42.dp),
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodySmall,
+                    leadingIcon = { Icon(Icons.Outlined.Search, null, modifier = Modifier.size(17.dp)) },
+                    trailingIcon = {
+                        IconButton(onClick = onScan, modifier = Modifier.size(36.dp)) {
+                            Icon(Icons.Outlined.Search, stringResource(R.string.sales_scan), tint = FlowBlue, modifier = Modifier.size(17.dp))
+                        }
+                    },
+                    placeholder = { Text(stringResource(R.string.sales_search_product), fontSize = 11.sp) },
+                )
+                OutlinedButton(
+                    onClick = onAddFree,
+                    modifier = Modifier.height(42.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                ) {
+                    Icon(Icons.Outlined.Add, null, modifier = Modifier.size(15.dp))
+                    Text(stringResource(R.string.sales_free_product), fontSize = 9.sp)
+                }
+            }
+        }
+
+        if (visible.isEmpty()) {
+            item {
+                CompactEmptySurface(
+                    title = stringResource(R.string.sales_products_empty),
+                    description = stringResource(R.string.sales_products_empty_description),
+                )
+            }
+        } else {
+            item { CompactSectionTitle(stringResource(R.string.sales_cart_count, lines.size)) }
+            items(visible, key = { it.id }) { line ->
+                CompactCartLine(line, devise, onQuantityChange, onRemove)
+            }
+        }
+
+        item { CompactSectionTitle(stringResource(R.string.sales_summary)) }
+        item {
+            Card(shape = RoundedCornerShape(11.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, FlowBorder), modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    FlowAmountLine(stringResource(R.string.sales_subtotal), saleMoney(totals.subtotal, devise))
+                    CompactMoneyInput(stringResource(R.string.sales_discount), "−", discount, devise, onDiscountChange)
+                    CompactMoneyInput(stringResource(R.string.sales_delivery), "+", delivery, devise, onDeliveryChange)
+                    HorizontalDivider(color = FlowBorder)
+                    FlowAmountLine(stringResource(R.string.sales_total), saleMoney(totals.total, devise), strong = true)
+                    FlowAmountLine(stringResource(R.string.sales_tax_included, taxRate.saleRate()), saleMoney(totals.taxAmount, devise))
+                }
+            }
+        }
+        item {
+            OutlinedTextField(
+                value = note,
+                onValueChange = onNoteChange,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.sales_add_note), fontSize = 11.sp) },
+                leadingIcon = { Icon(Icons.Outlined.ReceiptLong, null, modifier = Modifier.size(17.dp)) },
+                minLines = 1,
+                maxLines = 2,
+                textStyle = MaterialTheme.typography.bodySmall,
+            )
+        }
+
+        item { CompactSectionTitle(stringResource(R.string.sales_payment_method)) }
+        item { CompactPaymentCard(paymentMethod, onChoosePayment) }
+        item {
+            OutlinedTextField(
+                value = paidInput,
+                onValueChange = onPaidChange,
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodySmall,
+                placeholder = { Text(saleMoney(totals.total, devise), fontSize = 11.sp) },
+                suffix = { Text(devise, fontSize = 10.sp) },
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            )
+        }
+        item {
+            Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(9.dp), color = FlowGreenSoft, border = BorderStroke(1.dp, FlowGreen.copy(alpha = .55f))) {
+                Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Outlined.CheckCircle, null, tint = FlowGreen, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(7.dp))
+                    Text(stringResource(R.string.sales_remaining), modifier = Modifier.weight(1f), color = FlowGreen, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text(saleMoney(remaining, devise), color = FlowGreen, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                }
+            }
+        }
+        item {
+            Text(stringResource(R.string.sales_sale_date, DateUtils.formatDateHeure(System.currentTimeMillis())), color = FlowMuted, fontSize = 9.sp)
+        }
+        item { Spacer(Modifier.height(16.dp)) }
+    }
+}
+
+@Composable
+private fun CompactSectionTitle(title: String) {
+    Text(title, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+}
+
+@Composable
+private fun CompactClientSelector(client: ClientEntity?, onSelect: () -> Unit, onNew: () -> Unit) {
+    if (client == null) {
+        Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onSelect), shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder)) {
+            Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(32.dp), shape = CircleShape, color = FlowBlueSoft) { Icon(Icons.Outlined.PersonOutline, null, tint = FlowBlue, modifier = Modifier.size(16.dp)) }
+                Spacer(Modifier.width(9.dp))
+                Text(stringResource(R.string.sales_select_customer), modifier = Modifier.weight(1f), color = FlowMuted, fontSize = 12.sp)
+                Icon(Icons.Outlined.ArrowDropDown, null, tint = FlowInk, modifier = Modifier.size(18.dp))
+            }
+        }
+    } else {
+        Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onSelect), shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder)) {
+            Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(32.dp), shape = CircleShape, color = FlowBlueSoft) { Icon(Icons.Outlined.PersonOutline, null, tint = FlowBlue, modifier = Modifier.size(16.dp)) }
+                Spacer(Modifier.width(9.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.sales_customer), color = FlowMuted, fontSize = 9.sp)
+                    Text(client.nom, color = FlowInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                }
+                Text(stringResource(R.string.sales_edit), color = FlowBlue, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+    TextButton(onClick = onNew, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)) {
+        Icon(Icons.Outlined.Add, null, modifier = Modifier.size(15.dp), tint = FlowBlue)
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.sales_new_customer), color = FlowBlue, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun CompactEmptySurface(title: String, description: String) {
+    Surface(shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder), modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 15.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(Icons.Outlined.Inventory2, null, tint = FlowBlue, modifier = Modifier.size(26.dp))
+            Spacer(Modifier.height(5.dp))
+            Text(title, color = FlowInk, fontWeight = FontWeight.SemiBold, fontSize = 11.sp)
+            Text(description, color = FlowMuted, fontSize = 9.sp, textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+private fun CompactCartLine(line: SaleLine, devise: String, onQuantityChange: (Long, Double) -> Unit, onRemove: (Long) -> Unit) {
+    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder)) {
+        Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(modifier = Modifier.size(28.dp), shape = RoundedCornerShape(6.dp), color = FlowBlueSoft) { Icon(Icons.Outlined.Inventory2, null, tint = FlowBlue, modifier = Modifier.size(15.dp)) }
+            Spacer(Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(line.name, color = FlowInk, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(saleMoney(line.unitPrice, devise), color = FlowMuted, fontSize = 9.sp)
+            }
+            TinyQuantity(line.quantity, Modifier.width(54.dp), onMinus = { onQuantityChange(line.id, -1.0) }, onPlus = { onQuantityChange(line.id, 1.0) })
+            Text(saleMoney(line.total, devise), color = FlowInk, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp), textAlign = TextAlign.End, maxLines = 1)
+            IconButton(onClick = { onRemove(line.id) }, modifier = Modifier.size(26.dp)) { Icon(Icons.Outlined.DeleteOutline, stringResource(R.string.sales_remove_item), tint = FlowRed, modifier = Modifier.size(16.dp)) }
+        }
+    }
+}
+
+@Composable
+private fun CompactMoneyInput(label: String, prefix: String, value: String, devise: String, onChange: (String) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, modifier = Modifier.weight(1f), color = FlowMuted, fontSize = 10.sp)
+        Text(prefix, color = FlowMuted)
+        OutlinedTextField(value = value, onValueChange = onChange, modifier = Modifier.width(68.dp).height(38.dp).padding(start = 4.dp), singleLine = true, textStyle = MaterialTheme.typography.bodySmall.copy(textAlign = TextAlign.Center), keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal))
+        Text(devise, modifier = Modifier.padding(start = 4.dp), color = FlowMuted, fontSize = 9.sp)
+    }
+}
+
+@Composable
+private fun CompactPaymentCard(paymentMethod: String, onClick: () -> Unit) {
+    Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder)) {
+        Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.PointOfSale, null, tint = FlowGreen, modifier = Modifier.size(17.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(paymentMethod, modifier = Modifier.weight(1f), color = FlowInk, fontWeight = FontWeight.SemiBold, fontSize = 11.sp)
+            Icon(Icons.Outlined.ArrowDropDown, null, tint = FlowInk, modifier = Modifier.size(18.dp))
         }
     }
 }

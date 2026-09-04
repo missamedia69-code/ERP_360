@@ -567,6 +567,7 @@
     <string name="sales_step_payment">Paiement</string>
     <string name="sales_step_products">Produits</string>
     <string name="sales_step_summary">Résumé</string>
+    <string name="sales_step_entry">Saisie</string>
     <string name="sales_success_description">La vente a été enregistrée et la facture est disponible.</string>
     <string name="sales_success_title">Vente enregistrée avec succès</string>
     <string name="sales_total_due">Total à payer</string>
