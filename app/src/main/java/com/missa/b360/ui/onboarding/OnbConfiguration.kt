@@ -16,7 +16,6 @@ import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -173,9 +172,9 @@ private fun OnbZones(): List<String> {
 
 private fun OnbZoneLibelle(id: String): String {
     val ville = id.substringAfter('/', missingDelimiterValue = "UTC")
-    val heures = TimeZone(id).rawOffset / 3_600_000
-    val minutes = Math.abs(TimeZone(id).rawOffset % 3_600_000) / 60_000
-    val decalage = if (minutes == 0L) {
+    val heures = TimeZone.getTimeZone(id).rawOffset / 3_600_000
+    val minutes = Math.abs(TimeZone.getTimeZone(id).rawOffset % 3_600_000) / 60_000
+    val decalage = if (minutes == 0) {
         if (heures >= 0) "+$heures" else "$heures"
     } else {
         if (heures >= 0) "+$heures:${minutes.toString().padStart(2, '0')}"
@@ -247,7 +246,6 @@ private fun <T> OnbConfigLigne(
                             fontSize = 13.sp,
                         )
                     },
-                    selected = optionKey(option) == selectedKey,
                     onClick = {
                         onPick(option)
                         ouvert = false

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,7 +27,6 @@ import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +47,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
@@ -544,14 +543,18 @@ private fun Modifier.dashedBorder(width: androidx.compose.ui.unit.Dp, color: and
         val r = radius.toPx()
         val path = Path().apply {
             addRoundRect(
-                androidx.compose.ui.geometry.Rect(Offset.Zero, Offset(size.width, size.height)),
-                r,
-                r,
+                androidx.compose.ui.geometry.RoundRect(
+                    Offset.Zero,
+                    Offset(size.width, size.height),
+                    r,
+                    r,
+                ),
+                Path.Direction.CW,
             )
         }
         drawPath(
             path = path,
-            color = SolidColor(color),
+            color = color,
             style = Stroke(
                 width = width.toPx(),
                 pathEffect = PathEffect.dashPathEffect(

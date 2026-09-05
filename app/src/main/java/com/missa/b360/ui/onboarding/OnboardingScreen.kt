@@ -213,10 +213,18 @@ internal fun OnbScaffold(
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                OnbDots(
-                    total = OnboardingStep.TERMINE.ordinal,
-                    active = viewModel.step.ordinal,
-                )
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OnbDots(
+                        total = OnboardingStep.TERMINE.ordinal,
+                        active = viewModel.step.ordinal,
+                    )
+                }
                 Button(
                     onClick = viewModel::suivant,
                     enabled = boutonActive && !viewModel.enregistrementEnCours,
@@ -255,18 +263,12 @@ internal fun OnbScaffold(
 /** Points de progression bas d'écran : le point actif est agrandi et bleu. */
 @Composable
 internal fun OnbDots(total: Int, active: Int) {
-    Row(
-        modifier = Modifier.weight(1f).padding(end = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        repeat(total) { index ->
-            Box(
-                modifier = Modifier
-                    .size(if (index == active) 9.dp else 7.dp)
-                    .background(if (index == active) BrandBlue else OnboardingStepGray, CircleShape),
-            )
-        }
+    for (index in 0 until total) {
+        Box(
+            modifier = Modifier
+                .size(if (index == active) 9.dp else 7.dp)
+                .background(if (index == active) BrandBlue else OnboardingStepGray, CircleShape),
+        )
     }
 }
 
