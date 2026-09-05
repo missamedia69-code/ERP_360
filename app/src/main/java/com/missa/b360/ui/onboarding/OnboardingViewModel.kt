@@ -17,6 +17,7 @@ import com.missa.b360.core.domain.usecase.GetOnboardingProgressUseCase
 import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
 import com.missa.b360.core.security.PinHasher
+import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.core.util.Iso4217
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,15 +25,17 @@ import java.util.TimeZone
 import javax.inject.Inject
 
 /**
- * Étapes de l'onboarding (maquette) : bienvenue → profil → taille → entreprise (+logo)
- * → configuration → PIN → récapitulatif.
+ * Étapes de l'onboarding (maquette) : bienvenue → configuration initiale → profil
+ * → taille → entreprise (+logo) → PIN → récapitulatif.
  *
  * Toute la logique métier reste identique : entreprise transactionnelle (RA-19 / D4 / D5),
  * PIN (RA-01), propriétaire avec email de secours (RA-03 / D1), clôture (RA-11).
  * L'essai licence (RA-04) est créé automatiquement au premier lancement ; l'activation
  * d'un code reste possible ensuite depuis les réglages administrateur.
+ * La configuration (langue, fuseau, formats, sauvegardes) est appliquée en direct
+ * via FormatPrefs pour toute l'application.
  */
-enum class OnboardingStep { BIENVENUE, PROFIL, TAILLE, ENTREPRISE, CONFIGURATION, PIN, TERMINE }
+enum class OnboardingStep { BIENVENUE, CONFIGURATION, PROFIL, TAILLE, ENTREPRISE, PIN, TERMINE }
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -128,14 +131,19 @@ class OnboardingViewModel @Inject constructor(
                 formatNombres = settingsStore.get(SettingsStore.Keys.FORMAT_NOMBRES) ?: "fr"
                 sauvegardesActives = settingsStore.get(SettingsStore.Keys.FREQUENCE_SAUVGARDE) != "off"
                 pinDejaConfigure = progression.pinConfigure
+                val configurationTerminee =
+                    settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE) != null
                 step = when {
                     progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
                     progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.PIN
                     progression.entreprise != null -> OnboardingStep.TERMINE
                     profil != null && palier != null -> OnboardingStep.ENTREPRISE
                     profil != null -> OnboardingStep.TAILLE
-                    else -> OnboardingStep.BIENVENUE
+                    !configurationTerminee -> OnboardingStep.CONFIGURATION
+                    else -> OnboardingStep.PROFIL
                 }
+                // Les préférences déjà enregistrées rechargent l'affichage global.
+                FormatPrefs.charger(settingsStore)
             }
             initialisationTerminee = true
         }
@@ -148,14 +156,14 @@ class OnboardingViewModel @Inject constructor(
         if (!initialisationTerminee) return
         erreurRes = null
         when (step) {
-            OnboardingStep.BIENVENUE -> step = OnboardingStep.PROFIL
+            OnboardingStep.BIENVENUE -> step = OnboardingStep.CONFIGURATION
+            OnboardingStep.CONFIGURATION -> {
+                appliquerConfiguration()
+                step = OnboardingStep.PROFIL
+            }
             OnboardingStep.PROFIL -> if (profil != null) step = OnboardingStep.TAILLE
             OnboardingStep.TAILLE -> if (palier != null) step = OnboardingStep.ENTREPRISE
             OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
-            OnboardingStep.CONFIGURATION -> {
-                appliquerConfiguration()
-                step = OnboardingStep.PIN
-            }
             OnboardingStep.PIN -> validerPinEtProprietaire()
             OnboardingStep.TERMINE -> terminer()
         }
@@ -164,11 +172,11 @@ class OnboardingViewModel @Inject constructor(
     fun precedent() {
         erreurRes = null
         step = when (step) {
-            OnboardingStep.PROFIL -> OnboardingStep.BIENVENUE
+            OnboardingStep.CONFIGURATION -> OnboardingStep.BIENVENUE
+            OnboardingStep.PROFIL -> OnboardingStep.CONFIGURATION
             OnboardingStep.TAILLE -> OnboardingStep.PROFIL
             OnboardingStep.ENTREPRISE -> OnboardingStep.TAILLE
-            OnboardingStep.CONFIGURATION -> OnboardingStep.ENTREPRISE
-            OnboardingStep.PIN -> OnboardingStep.CONFIGURATION
+            OnboardingStep.PIN -> OnboardingStep.ENTREPRISE
             else -> step
         }
     }
@@ -285,6 +293,9 @@ class OnboardingViewModel @Inject constructor(
         val formatJoursCible = formatJours
         val formatNombresCible = formatNombres
         val sauvegardesCibles = if (sauvegardesActives) "auto" else "off"
+        // Application immédiate : la langue recompose l'interface, les formats
+        // d'affichage (fuseau, date, nombres) pilotent MoneyUtils/DateUtils partout.
+        FormatPrefs.appliquer(fuseauCible, formatJoursCible, formatNombresCible)
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.LANGUE, langueCible)
             if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != langueCible) {

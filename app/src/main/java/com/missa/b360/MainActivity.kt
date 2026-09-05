@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.ui.navigation.AppNavHost
 import com.missa.b360.ui.screens.SplashVideoScreen
 import com.missa.b360.ui.theme.Erp360Theme
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         introTerminee = savedInstanceState?.getBoolean(STATE_INTRO_TERMINEE, false) ?: false
         enableEdgeToEdge()
         applyStoredLocale()
+        applyStoredFormats()
         setContent {
             Erp360Theme {
                 var showSplashVideo by remember { mutableStateOf(!introTerminee) }
@@ -71,6 +73,20 @@ class MainActivity : AppCompatActivity() {
                 androidx.core.os.LocaleListCompat.forLanguageTags(stored),
             )
         }
+    }
+
+    /** Charge les préférences d'affichage (fuseau, format date, nombres) pour toute l'app. */
+    private fun applyStoredFormats() {
+        val result = runBlocking {
+            withTimeoutOrNull(2_000) {
+                listOf(
+                    settingsStore.observe(SettingsStore.Keys.FUSEAU_HORAIRE).first(),
+                    settingsStore.observe(SettingsStore.Keys.FORMAT_DATE).first(),
+                    settingsStore.observe(SettingsStore.Keys.FORMAT_NOMBRES).first(),
+                )
+            }
+        } ?: return
+        FormatPrefs.appliquer(result[0], result[1], result[2])
     }
 
     private companion object {

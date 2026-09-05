@@ -2,6 +2,7 @@ package com.missa.b360.ui.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.backup.BackupManager
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.security.PinManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,10 +29,14 @@ sealed class StartupState {
 class StartupViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val pinManager: PinManager,
+    private val backupManager: BackupManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<StartupState>(StartupState.Chargement)
     val state: StateFlow<StartupState> = _state
+
+    /** La sauvegarde automatique ne se déclenche qu'une fois par ouverture. */
+    private var sauvegardeAutoLancee = false
 
     init {
         evaluer()
@@ -44,13 +49,32 @@ class StartupViewModel @Inject constructor(
             _state.value = when {
                 !termine -> StartupState.Onboarding
                 pinConfigure -> StartupState.VerrouPin
-                else -> StartupState.Pret
+                else -> {
+                    entrerApplication()
+                    StartupState.Pret
+                }
             }
         }
     }
 
     /** Appelé après saisie réussie du PIN. */
     fun deverrouiller() {
+        entrerApplication()
         _state.value = StartupState.Pret
+    }
+
+    /**
+     * Entrée dans l'application : sauvegarde automatique (RA-13) lorsque
+     * l'onboarding a activé les sauvegardes — une fois par ouverture, via le
+     * même BackupManager que l'écran d'administration (harmonie RA-13).
+     */
+    private fun entrerApplication() {
+        if (sauvegardeAutoLancee) return
+        sauvegardeAutoLancee = true
+        viewModelScope.launch {
+            if (settingsStore.get(SettingsStore.Keys.FREQUENCE_SAUVGARDE) == "auto") {
+                backupManager.sauvegarderLocalement("AUTO")
+            }
+        }
     }
 }

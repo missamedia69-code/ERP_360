@@ -92,10 +92,10 @@ fun OnboardingScreen(
         } else {
             when (viewModel.step) {
                 OnboardingStep.BIENVENUE -> WelcomeStep(onCommencer = viewModel::suivant)
+                OnboardingStep.CONFIGURATION -> OnbConfigurationStep(viewModel)
                 OnboardingStep.PROFIL -> OnbProfilStep(viewModel)
                 OnboardingStep.TAILLE -> OnbTailleStep(viewModel)
                 OnboardingStep.ENTREPRISE -> OnbEntrepriseStep(viewModel)
-                OnboardingStep.CONFIGURATION -> OnbConfigurationStep(viewModel)
                 OnboardingStep.PIN -> OnbPinStep(viewModel)
                 OnboardingStep.TERMINE -> OnbTermineStep(viewModel)
             }

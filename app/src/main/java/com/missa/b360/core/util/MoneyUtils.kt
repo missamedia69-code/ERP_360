@@ -14,8 +14,7 @@ object MoneyUtils {
 
     /** Formate un montant : séparateurs de milliers, 2 décimales, symbole devise. */
     fun format(montant: Double, devise: String): String {
-        val symbols = DecimalFormatSymbols(Locale.getDefault())
-        val df = DecimalFormat("#,##0.00", symbols)
+        val df = DecimalFormat("#,##0.00", FormatPrefs.symboles())
         return "${df.format(montant)} $devise"
     }
 
@@ -326,10 +325,16 @@ object Iso4217 {
 
 /** Utilitaires de dates (horodatages en epoch ms). */
 object DateUtils {
-    private val FORMAT_DATE = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    private val FORMAT_DATE_HEURE = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    private fun formatteur(avecHeure: Boolean): SimpleDateFormat {
+        val motif = if (avecHeure) "${FormatPrefs.motifDate} HH:mm" else FormatPrefs.motifDate
+        return SimpleDateFormat(motif, Locale.getDefault()).apply {
+            timeZone = FormatPrefs.fuseau
+        }
+    }
 
-    fun formatDate(timestamp: Long): String = FORMAT_DATE.format(Date(timestamp))
+    /** Date au format choisi à l'onboarding, dans le fuseau choisi. */
+    fun formatDate(timestamp: Long): String = formatteur(false).format(Date(timestamp))
 
-    fun formatDateHeure(timestamp: Long): String = FORMAT_DATE_HEURE.format(Date(timestamp))
+    /** Date + heure au format choisi à l'onboarding, dans le fuseau choisi. */
+    fun formatDateHeure(timestamp: Long): String = formatteur(true).format(Date(timestamp))
 }
