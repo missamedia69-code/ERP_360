@@ -931,7 +931,7 @@
     <string name="refer_default">Par défaut</string>
     <string name="refer_unites_hint">Unités proposées dans les fiches produits et stocks.</string>
     <string name="refer_unites_empty">Aucune unité définie.</string>
-    <string name="refer_unite_name">Nom de l'unité</string>
+    <string name="refer_unite_name">Nom de l\'unité</string>
     <string name="rh_title">Ressources humaines</string>
     <string name="rh_tab_employes">Employés</string>
     <string name="rh_tab_absences">Absences</string>
@@ -969,7 +969,7 @@
     <string name="rh_absence_empty">Aucune absence enregistrée.</string>
     <string name="rh_absence_type">Absence</string>
     <string name="rh_absence_jours">%d jour(s)</string>
-    <string name="rh_absence_delete">Supprimer l'absence</string>
+    <string name="rh_absence_delete">Supprimer l\'absence</string>
     <string name="rh_absence_deleted">Absence supprimée.</string>
     <string name="rh_paie_mois">Mois (1-12)</string>
     <string name="rh_paie_annee">Année</string>

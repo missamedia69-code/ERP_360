@@ -105,11 +105,11 @@ class ReferentielsViewModel @Inject constructor(
     val result: StateFlow<Result?> = _result
 
     fun addMethod(nom: String) {
-        if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return }
-        val clean = nom.trim()
-        if (clean.isEmpty()) { _result.value = Result.Invalid; return }
-        if (methods.value.any { it.nom.equals(clean, ignoreCase = true) }) { _result.value = Result.Exists; return }
         viewModelScope.launch {
+            if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return@launch }
+            val clean = nom.trim()
+            if (clean.isEmpty()) { _result.value = Result.Invalid; return@launch }
+            if (methods.value.any { it.nom.equals(clean, ignoreCase = true) }) { _result.value = Result.Exists; return@launch }
             _busy.value = true
             try {
                 paymentMethodDao.insert(PaymentMethodEntity(nom = clean))
@@ -125,8 +125,8 @@ class ReferentielsViewModel @Inject constructor(
     }
 
     fun toggleMethod(method: PaymentMethodEntity) {
-        if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return }
         viewModelScope.launch {
+            if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return@launch }
             _busy.value = true
             try {
                 paymentMethodDao.update(method.copy(actif = !method.actif))
@@ -138,10 +138,10 @@ class ReferentielsViewModel @Inject constructor(
     }
 
     fun addTax(nom: String, taux: Double) {
-        if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return }
-        val clean = nom.trim()
-        if (clean.isEmpty() || taux < 0.0 || taux > 100.0) { _result.value = Result.Invalid; return }
         viewModelScope.launch {
+            if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return@launch }
+            val clean = nom.trim()
+            if (clean.isEmpty() || taux < 0.0 || taux > 100.0) { _result.value = Result.Invalid; return@launch }
             _busy.value = true
             try {
                 taxDao.insert(TaxEntity(nom = clean, taux = taux))
@@ -158,18 +158,17 @@ class ReferentielsViewModel @Inject constructor(
 
     /** Une seule taxe par défaut : bascule exclusive. */
     fun setParDefaut(tax: TaxEntity) {
-        if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return }
-        if (!tax.parDefaut) {
-            viewModelScope.launch {
-                _busy.value = true
-                try {
-                    taxDao.resetParDefaut()
-                    taxDao.update(tax.copy(parDefaut = true))
-                    _result.value = Result.Saved
-                } catch (_: Exception) {
-                } finally {
-                    _busy.value = false
-                }
+        if (tax.parDefaut) return
+        viewModelScope.launch {
+            if (licenceManager.isReadOnly()) { _result.value = Result.ReadOnly; return@launch }
+            _busy.value = true
+            try {
+                taxDao.resetParDefaut()
+                taxDao.update(tax.copy(parDefaut = true))
+                _result.value = Result.Saved
+            } catch (_: Exception) {
+            } finally {
+                _busy.value = false
             }
         }
     }

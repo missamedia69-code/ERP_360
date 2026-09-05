@@ -9,6 +9,7 @@ import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.usecase.CategorieProduitUseCases
+import com.missa.b360.core.domain.usecase.ChangerStatutProduitUseCase
 import com.missa.b360.core.domain.usecase.CreateProductUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.GetProductUseCase
