@@ -8,7 +8,7 @@ import java.util.Locale
 
 /**
  * MoneyUtils — formatage des montants dans la devise de l'entreprise (RA-07).
- * Les montants ne sont **jamais convertis** (RA-07) : Double + devise ISO 4217.
+ * Les montants ne sont **jamais convertis** (RA-07) : Long (centimes) ou Double + devise ISO 4217.
  */
 object MoneyUtils {
 
@@ -19,11 +19,22 @@ object MoneyUtils {
         return "${df.format(montant)} $devise"
     }
 
-    /** Formate sans symbole (saisis, exports CSV/Excel). */
-    fun formatBrut(montant: Double): String {
-        val df = DecimalFormat("0.00", DecimalFormatSymbols(Locale.ROOT))
-        return df.format(montant)
+    /** Formate des centimes avec le nombre de décimales monétaires de la devise (XAF/XOF = 0). */
+    fun formatCents(centimes: Long, devise: String): String {
+        val decimals = decimalsFor(devise)
+        val symbols = DecimalFormatSymbols(Locale.getDefault())
+        val pattern = if (decimals == 0) "#,##0" else "#,##0.00"
+        val df = DecimalFormat(pattern, symbols)
+        val major = centimes / SCALE.toDouble()
+        return "${df.format(major)} $devise"
     }
+
+    private const val SCALE = 100L
+    private val DEVISE_SANS_CENTIMES = setOf("XAF", "XOF")
+
+    /** Nombre de décimales d'affichage pour une devise ISO 4217 courante. */
+    fun decimalsFor(devise: String): Int =
+        if (devise.uppercase(Locale.ROOT) in DEVISE_SANS_CENTIMES) 0 else 2
 }
 
 /** Devises ISO 4217 courantes (réglage 9.1, verrou au premier usage — D4, défaut USD). */

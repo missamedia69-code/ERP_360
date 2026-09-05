@@ -11,6 +11,11 @@ data class SaleLine(
     val name: String,
     val unitPrice: Double,
     val quantity: Double,
+    val productId: Long? = null,
+    val sku: String? = null,
+    val unit: String = "unité",
+    val discountPct: Double = 0.0,
+    val freeProduct: Boolean = false,
 ) {
     val total: Double get() = unitPrice * quantity
 }
@@ -55,7 +60,9 @@ object SaleCalculator {
  */
 @Serializable
 data class SaleRecordPayload(
-    val schemaVersion: Int = 1,
+    val schemaVersion: Int = 2,
+    val saleId: Long? = null,
+    val reference: String? = null,
     val clientId: Long,
     val clientName: String,
     val lines: List<SaleLine>,
@@ -68,6 +75,16 @@ data class SaleRecordPayload(
     val paymentMethod: String,
     val paidAmount: Double,
     val note: String? = null,
+    /** Représentation monétaire exacte persistée (centimes) pour les ventes réelles. */
+    val subtotalCents: Long = 0,
+    val discountCents: Long = 0,
+    val deliveryCents: Long = 0,
+    val taxAmountCents: Long = 0,
+    val totalCents: Long = 0,
+    val paidCents: Long = 0,
+    val remainingCents: Long = 0,
+    val changeCents: Long = 0,
+    val isCredit: Boolean = false,
 )
 
 object SaleRecordCodec {

@@ -22,8 +22,8 @@ d'activité A–H**. Implémentation du cahier de charge **E9** (`e9-cahier-de-c
 | Module | Barre du bas | Description |
 |---|:---:|---|
 | **9.1 Administration & Paramétrage** | ☰ | Réglages verrouillables, licence, sauvegarde, journal d'audit, utilisateurs & rôles, multi-site |
-| **Vente** | ✅ | Devis → commande → facture, numérotation automatique, calculs taxes |
-| **Stock** | ✅ | Produits, mouvements, alertes de seuil (écriture unique via `StockMovementWriter`) |
+| **Vente** | ✅ | Formulaire unique transactionnel : client, produits, totaux/TVA, paiement, facture PDF, annulation compensatoire |
+| **Stock** | ✅ | Produits, mouvements, alertes de seuil (écriture unique via `StockUseCases`) |
 | **Clients** | ✅ | Fiches détaillées (NIF, contacts & adresses multiples, conditions de paiement), catégories, tarifs, fidélité |
 | **Finances** | ✅ | Encaissements, dépenses, moyens de paiement |
 | **Fournisseurs** | ➕ | Référentiel fournisseurs |
@@ -57,7 +57,7 @@ AppCompatDelegate).
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle Kotlin DSL (version catalog) |
 | UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
-| Persistance | **Room 2.8 (KSP)** — 26 entités, schémas exportés, migrations manuelles |
+| Persistance | **Room 2.8 (KSP)** — 31 entités, schémas exportés, migrations manuelles |
 | Réglages | **DataStore** (préférences + verrous d'amont) |
 | Injection | **Hilt 2.60** (+ `hilt-navigation-compose`, `@HiltWorker`) |
 | Tâches de fond | **WorkManager** (purge du journal à 12 mois, sauvegarde auto) |
@@ -71,7 +71,7 @@ AppCompatDelegate).
 app/src/main/java/com/missa/b360/
 ├── MissaApp.kt / MainActivity.kt          # Application Hilt + splash vidéo
 ├── core/
-│   ├── data/          # Room : db (26 entités, v6), dao, entity, datastore (SettingsStore + verrous)
+│   ├── data/          # Room : db (31 entités, v7), dao, entity, datastore (SettingsStore + verrous)
 │   ├── domain/        # model + usecase (1 règle métier = 1 UseCase, commentée // RA-xx)
 │   ├── security/      # PinHasher (PBKDF2), PinManager (verrou RA-02)
 │   ├── licensing/     # LicenceManager (essai 7 j RA-04, activation RA-05/06)
@@ -95,7 +95,7 @@ app/src/main/java/com/missa/b360/
 
 | Phase | Contenu | État |
 |---|---|---|
-| **A — Socle** | Gradle, Hilt, Room (schéma v6, migrations 1→6), DAOs, SettingsStore + verrous, services transverses (Pin, Licence, Journal, Séquences, Notifications, Sauvegarde, Permissions), navigation (RA-22), WorkManager purge (RA-18), 5 langues, tests unitaires | ✅ |
+| **A — Socle** | Gradle, Hilt, Room (schéma v7, migrations 1→7), DAOs, SettingsStore + verrous, services transverses (Pin, Licence, Journal, Séquences, Notifications, Sauvegarde, Permissions), navigation (RA-22), WorkManager purge (RA-18), 5 langues, tests unitaires | ✅ |
 | **B — Onboarding** | langue → profil A–H → entreprise/défauts → PIN (RA-01) → email (RA-03) → licence essai 7 j (RA-04) → checklist (RA-11), verrou PIN (RA-02) | ✅ |
 | **C — 9.1 Admin** | réglages (D4/RA-19), licence (RA-05/06), sauvegarde (RA-13), journal (RA-18), utilisateurs & rôles (D1/D2), multi-site (RA-21), à propos | ✅ |
 | **D → K** | Clients · Stock · Vente · Fournisseurs/Achats · Finances · Livraison/Production/Services · RH/Projets · Reporting | ⏳ En cours |
