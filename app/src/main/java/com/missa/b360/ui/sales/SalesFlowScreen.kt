@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.Print
 import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.outlined.Rollback
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -420,6 +421,7 @@ fun SalesScreen(
                 onDuplicate = {
                     if (viewModel.duplicate(receipt.payload, clients)) stepName = SalesStep.CLIENT.name
                 },
+                onReturn = { onNavigate("${Routes.SALES_RETURN}?recordId=${receipt.recordId}") },
                 onCancel = { cancelVisible = true },
             )
         } ?: Unit
@@ -1270,7 +1272,7 @@ private fun InvoicePaper(receipt: SaleReceipt, devise: String) {
 @Composable
 private fun InvoiceOptionsScreen(
     receipt: SaleReceipt, devise: String, onBack: () -> Unit, onPrint: () -> Unit, onShare: () -> Unit,
-    onDownload: () -> Unit, onEmail: () -> Unit, onView: () -> Unit, onDuplicate: () -> Unit, onCancel: () -> Unit,
+    onDownload: () -> Unit, onEmail: () -> Unit, onView: () -> Unit, onDuplicate: () -> Unit, onReturn: () -> Unit, onCancel: () -> Unit,
 ) {
     Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { SalesPageTitle(stringResource(R.string.sales_invoice_options)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -1280,6 +1282,7 @@ private fun InvoiceOptionsScreen(
             item { InvoiceOption(Icons.Outlined.Email, R.string.sales_email_invoice, R.string.sales_email_invoice_description, onEmail) }
             item { InvoiceOption(Icons.Outlined.ReceiptLong, R.string.sales_view_invoice, R.string.sales_view_invoice_description, onView) }
             item { InvoiceOption(Icons.Outlined.ContentCopy, R.string.sales_duplicate_sale, R.string.sales_duplicate_sale_description, onDuplicate) }
+            item { InvoiceOption(Icons.Outlined.Rollback, R.string.sales_return_sale, R.string.sales_return_sale_description, onReturn) }
             item { InvoiceOption(Icons.Outlined.Cancel, R.string.sales_cancel_sale, R.string.sales_cancel_sale_description, onCancel, destructive = true) }
             item { Text(saleMoney(receipt.total, devise), color = FlowMuted, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
         }

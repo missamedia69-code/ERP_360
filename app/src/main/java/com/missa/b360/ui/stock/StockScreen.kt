@@ -157,6 +157,13 @@ fun StockScreen(
                         Text(stringResource(R.string.stock_new_transfer))
                     }
                 }
+                if (tab == "PRODUITS") {
+                    OutlinedButton(onClick = { onNavigate(Routes.STOCK_INVENTORY) }) {
+                        Icon(Icons.Outlined.Search, contentDescription = null)
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.stock_new_inventory))
+                    }
+                }
             }
             if (tab == "PRODUITS") {
                 ProductsTabContent(

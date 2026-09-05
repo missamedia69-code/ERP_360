@@ -25,12 +25,15 @@ import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
 import com.missa.b360.ui.clients.ClientsScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.purchases.PurchasesScreen
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
 import com.missa.b360.ui.operations.OperationFormScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
+import com.missa.b360.ui.sales.ReturnSaleScreen
 import com.missa.b360.ui.sales.SalesScreen
+import com.missa.b360.ui.stock.InventoryScreen
 import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockScreen
@@ -183,6 +186,9 @@ private fun MainNavHost() {
         composable(Routes.STOCK_TRANSFER_FORM) {
             StockTransferFormScreen(onBack = { navController.popBackStack() })
         }
+        composable(Routes.STOCK_INVENTORY) {
+            InventoryScreen(onBack = { navController.popBackStack() })
+        }
         // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
         composable(
             route = "${AppModule.VENTE.route}?create={create}",
@@ -201,7 +207,36 @@ private fun MainNavHost() {
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
-        operationDestination(AppModule.ACHATS, OperationModule.ACHATS, navController)
+        // Achat — écran dédié (spec §6) : facture fournisseur, réception de stock et passif.
+        composable(
+            route = "${AppModule.ACHATS.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) { entry ->
+            PurchasesScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
+        }
+        // Retour de vente + avoir (spec §22) — recordId optionnel : 0 = liste des factures retournables.
+        composable(
+            route = "${Routes.SALES_RETURN}?recordId={recordId}",
+            arguments = listOf(
+                navArgument("recordId") {
+                    type = NavType.LongType
+                    defaultValue = 0L
+                },
+            ),
+        ) { entry ->
+            ReturnSaleScreen(
+                onBack = { navController.popBackStack() },
+                recordId = entry.arguments?.getLong("recordId")?.takeIf { it > 0L },
+            )
+        }
         operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
         operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
         operationDestination(AppModule.PRODUCTION, OperationModule.PRODUCTION, navController)

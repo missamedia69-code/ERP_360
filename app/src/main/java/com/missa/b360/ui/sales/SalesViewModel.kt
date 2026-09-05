@@ -390,7 +390,10 @@ class SalesViewModel @Inject constructor(
     }
 }
 
-/** Total encore dû sur les ventes validées ayant un détail de facture structuré. */
+/**
+ * Total encore dû sur les ventes validées ayant un détail de facture structuré.
+ * Les avoirs de retour (`sourceRecordId` renseigné) **réduisent** le solde (spec §22).
+ */
 fun outstandingBalance(records: List<OperationRecordEntity>, clientId: Long?): Double {
     if (clientId == null) return 0.0
     return records
@@ -398,7 +401,10 @@ fun outstandingBalance(records: List<OperationRecordEntity>, clientId: Long?): D
         .filter { it.status == OperationStatus.VALIDATED.name }
         .mapNotNull { SaleRecordCodec.decode(it.notes) }
         .filter { it.clientId == clientId }
-        .sumOf { (it.total - it.paidAmount).coerceAtLeast(0.0) }
+        .sumOf {
+            val solde = (it.total - it.paidAmount).coerceAtLeast(0.0)
+            if (it.sourceRecordId != null) -solde else solde
+        }
 }
 
 private fun String.toMoneyOrNull(): Double? = trim()

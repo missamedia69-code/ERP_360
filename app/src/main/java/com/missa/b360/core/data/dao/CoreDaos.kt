@@ -44,6 +44,10 @@ interface SiteDao {
     @Query("SELECT nom FROM sites WHERE id = :id LIMIT 1")
     suspend fun getNomById(id: Long): String?
 
+    /** Site principal de l'entreprise (réception d'achat sans site principal produit). */
+    @Query("SELECT id FROM sites WHERE principal = 1 LIMIT 1")
+    suspend fun idPrincipal(): Long?
+
     @Insert
     suspend fun insert(site: SiteEntity): Long
 

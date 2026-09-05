@@ -19,6 +19,10 @@ interface OperationRecordDao {
     @Query("SELECT * FROM operation_records WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): OperationRecordEntity?
 
+    /** Lecture ponctuelle (calculs de solde, retours) — pas de Flow pour rester léger. */
+    @Query("SELECT * FROM operation_records WHERE module = :module ORDER BY createdAt DESC")
+    suspend fun getByModule(module: String): List<OperationRecordEntity>
+
     @Insert
     suspend fun insert(record: OperationRecordEntity): Long
 

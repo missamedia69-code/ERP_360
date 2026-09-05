@@ -9,7 +9,11 @@ object Routes {
     const val STOCK_PRODUCT_FORM = "stock_product_form"
     const val STOCK_MOVEMENT_FORM = "stock_movement_form"
     const val STOCK_TRANSFER_FORM = "stock_transfer_form"
+    const val STOCK_INVENTORY = "stock_inventory"
     const val OPERATION_FORM = "operation_form"
+
+    // Module Vente — retour de vente et avoir (spec §22)
+    const val SALES_RETURN = "sales_return"
 
     // ☰ Administration & Paramétrage (module 9.1, Phase C)
     const val ADMIN_REGLAGES = "admin_reglages"

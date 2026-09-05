@@ -86,6 +86,8 @@ data class SaleRecordPayload(
     val paymentMethod: String,
     val paidAmount: Double,
     val note: String? = null,
+    /** Id de la facture d'origine — renseigné pour les avoirs de retour (spec §22). */
+    val sourceRecordId: Long? = null,
 )
 
 object SaleRecordCodec {
