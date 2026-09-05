@@ -74,6 +74,7 @@ import com.missa.b360.ui.components.MissaPanel
 import com.missa.b360.ui.components.MissaSectionTitle
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
+import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.Red40

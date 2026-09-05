@@ -72,8 +72,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ReferentielsViewModel @Inject constructor(
-    paymentMethodDao: PaymentMethodDao,
-    taxDao: TaxDao,
+    private val paymentMethodDao: PaymentMethodDao,
+    private val taxDao: TaxDao,
     private val settingDao: SettingDao,
     private val licenceManager: LicenceManager,
 ) : ViewModel() {

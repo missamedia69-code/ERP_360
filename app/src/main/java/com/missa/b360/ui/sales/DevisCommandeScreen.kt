@@ -43,7 +43,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -1030,7 +1029,7 @@ fun DevisCommandeScreen(
                             onClick = { cancelVisible = true },
                             enabled = !busy,
                             modifier = Modifier.fillMaxWidth().height(44.dp),
-                            colors = OutlinedButtonDefaults.outlinedButtonColors(contentColor = Red40),
+                            colors = ButtonDefaults.buttonColors(contentColor = Red40),
                         ) { Text(stringResource(R.string.dc_cancel_piece)) }
                     }
                 }

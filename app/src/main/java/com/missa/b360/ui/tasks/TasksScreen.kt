@@ -167,7 +167,7 @@ fun TasksScreen(
     fun echeance(): Long? {
         val j = echeanceJour.toIntOrNull() ?: return null
         val m = echeanceMois.toIntOrNull() ?: return null
-        val a = echeanceAnnee.toIntOrNull() ?: return aujourdhui.get(Calendar.YEAR)
+        val a = echeanceAnnee.toIntOrNull() ?: aujourdhui.get(Calendar.YEAR)
         if (j < 1 || j > 31 || m < 1 || m > 12) return null
         return Calendar.getInstance().apply {
             clear()

@@ -16,6 +16,7 @@ import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlin.math.abs
 
 /** Tolérance de comparaison des quantités (jamais de test d'égalité stricte sur des Double). */
 const val QUANTITE_EPSILON = 1e-9
@@ -50,7 +51,7 @@ sealed class StockMovementResult {
     data object ProduitIntrouvable : StockMovementResult()
     /** Aucun site de sortie résolvable (ni site principal ni stock ailleurs). */
     data object SiteIntrouvable : StockMovementResult()
-    data object StockInsuffisant(val disponible: Double, val demande: Double) : StockMovementResult()
+    data class StockInsuffisant(val disponible: Double, val demande: Double) : StockMovementResult()
 }
 
 /**
@@ -160,7 +161,7 @@ class TransferStockUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object Invalid : Result()
         data object ProduitIntrouvable : Result()
-        data object StockInsuffisant(val disponible: Double, val demande: Double) : Result()
+        data class StockInsuffisant(val disponible: Double, val demande: Double) : Result()
     }
 
     suspend operator fun invoke(

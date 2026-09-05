@@ -111,6 +111,9 @@ fun StockMovementFormScreen(
     val produit = products.firstOrNull { it.product.id == produitId }
     val isAdjustment = typeEnum == StockMovementType.AJUSTEMENT
     val quantiteValue = quantite.toQuantityOrNull()
+    val isInvalidQuantity: () -> Boolean = {
+        if (quantiteValue == null) false else if (isAdjustment) quantiteValue == 0.0 else quantiteValue <= 0.0
+    }
     val delta = when {
         quantiteValue == null -> 0.0
         isAdjustment -> quantiteValue
@@ -120,11 +123,6 @@ fun StockMovementFormScreen(
     val avant = produit?.stock ?: 0.0
     val apres = (avant + delta).coerceAtLeast(0.0)
     val canConfirm = produit != null && quantiteValue != null && !isInvalidQuantity() && !busy
-
-    fun isInvalidQuantity(): Boolean {
-        if (quantiteValue == null) return false
-        return if (isAdjustment) quantiteValue == 0.0 else quantiteValue <= 0.0
-    }
 
     LaunchedEffect(outcome) {
         when (val current = outcome) {
@@ -166,12 +164,13 @@ fun StockMovementFormScreen(
         }
     }
 
-    fun onConfirm() {
-        if (!canConfirm || produitId == null) return
+    val onConfirm: () -> Unit = {
+        val pid = produitId
+        if (!canConfirm || pid == null) return@onConfirm
         val motifFinal = if (motif == "AUTRE") motifAutre.trim() else motif
         error = null
         viewModel.record(
-            produitId = produitId,
+            produitId = pid,
             type = typeEnum,
             quantite = quantiteValue!!,
             motif = motifFinal,
@@ -532,13 +531,16 @@ fun StockTransferFormScreen(
         }
     }
 
-    fun onConfirm() {
-        if (!canConfirm || produitId == null || siteSourceId == null || siteDestId == null) return
+    val onConfirm: () -> Unit = {
+        val pid = produitId
+        val srcId = siteSourceId
+        val dstId = siteDestId
+        if (!canConfirm || pid == null || srcId == null || dstId == null) return@onConfirm
         error = null
         viewModel.transfer(
-            produitId = produitId,
-            siteSourceId = siteSourceId,
-            siteDestId = siteDestId,
+            produitId = pid,
+            siteSourceId = srcId,
+            siteDestId = dstId,
             quantite = quantiteValue!!,
             motif = motif,
             commentaire = commentaire,
@@ -710,7 +712,7 @@ fun StockTransferFormScreen(
                     Text(
                         text = stringResource(
                             R.string.stock_move_delta_label,
-                            -(quantiteValue ?: 0.0).signedDisplayQuantity(),
+                            (-(quantiteValue ?: 0.0)).signedDisplayQuantity(),
                         ),
                         color = Red40,
                         fontWeight = FontWeight.Bold,

@@ -23,11 +23,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Barcode
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -246,7 +246,7 @@ fun ProductFormScreen(
         }
     }
 
-    fun onSave() {
+    val onSave: () -> Unit = {
         val errors = mutableMapOf<String, String>()
         val invalid = context.getString(R.string.product_amount_invalid)
         if (nom.trim().length < 2) errors["nom"] = context.getString(R.string.product_name_required)
@@ -255,17 +255,23 @@ fun ProductFormScreen(
             "prixMinimum" to prixMinimum, "stockMin" to stockMin, "stockMax" to stockMax,
             "stockSecurite" to stockSecurite, "poids" to poids, "volume" to volume,
         ).forEach { (key, text) ->
-            text.toAmountOrNull()?.let { if (it < 0.0) errors[key] = invalid }
-                ?: if (text.isNotBlank()) errors[key] = invalid
+            val montant = text.toAmountOrNull()
+            when {
+                montant == null && text.isNotBlank() -> errors[key] = invalid
+                montant != null && montant < 0.0 -> errors[key] = invalid
+            }
         }
-        stockInitial.toAmountOrNull()?.let { if (it < 0.0) errors["stockInitial"] = invalid }
-            ?: if (stockInitial.isNotBlank()) errors["stockInitial"] = invalid
+        val stockInitialValue = stockInitial.toAmountOrNull()
+        when {
+            stockInitialValue == null && stockInitial.isNotBlank() -> errors["stockInitial"] = invalid
+            stockInitialValue != null && stockInitialValue < 0.0 -> errors["stockInitial"] = invalid
+        }
         val remise = remiseMax.toAmountOrNull()
         if (remise == null && remiseMax.isNotBlank()) errors["remiseMax"] = invalid
         else if (remise != null && remise !in 0.0..100.0) errors["remiseMax"] = invalid
         if (errors.isNotEmpty()) {
             fieldErrors = errors
-            return
+            return@onSave
         }
         fieldErrors = emptyMap()
         viewModel.save(
@@ -399,7 +405,7 @@ fun ProductFormScreen(
                                 }
                             }) {
                                 Icon(
-                                    Icons.Outlined.Barcode,
+                                    Icons.Outlined.Search,
                                     contentDescription = stringResource(R.string.product_scan),
                                 )
                             }
@@ -845,7 +851,7 @@ private fun PickerSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(action)
+                        .clickable(onClick = action)
                         .padding(vertical = 12.dp),
                 ) {
                     Text(clearLabel, color = MissaMuted)
@@ -856,7 +862,7 @@ private fun PickerSheet(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(action)
+                        .clickable(onClick = action)
                         .padding(vertical = 12.dp),
                 ) {
                     Icon(Icons.Outlined.Add, null, tint = BrandBlue, modifier = Modifier.size(18.dp))

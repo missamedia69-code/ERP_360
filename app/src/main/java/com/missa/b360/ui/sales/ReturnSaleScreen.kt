@@ -319,7 +319,8 @@ fun ReturnSaleScreen(
         }
     }
 
-    if (vente == null) {
+    val venteActuelle = vente
+    if (venteActuelle == null) {
         // Mode liste : factures de vente candidates au retour.
         Scaffold(
             containerColor = MissaCanvas,
@@ -347,7 +348,7 @@ fun ReturnSaleScreen(
         }
     } else {
         ReturnFormContent(
-            vente = vente,
+            vente = venteActuelle,
             items = items,
             avoirsCount = avoirsCount,
             busy = busy,

@@ -44,8 +44,8 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.Print
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.ReceiptLong
-import androidx.compose.material.icons.outlined.Rollback
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -521,10 +521,8 @@ private fun SalesPageTitle(title: String) {
     }
 }
 
-private data class FlowAction(val label: String, val enabled: Boolean, val onClick: () -> Unit)
-
 /** Action de bas de parcours : libellé, disponibilité et action (spec §3.2). */
-data class FlowAction(
+private data class FlowAction(
     val label: String,
     val enabled: Boolean,
     val onClick: () -> Unit,
@@ -1302,7 +1300,7 @@ private fun InvoiceOptionsScreen(
             item { InvoiceOption(Icons.Outlined.Email, R.string.sales_email_invoice, R.string.sales_email_invoice_description, onEmail) }
             item { InvoiceOption(Icons.Outlined.ReceiptLong, R.string.sales_view_invoice, R.string.sales_view_invoice_description, onView) }
             item { InvoiceOption(Icons.Outlined.ContentCopy, R.string.sales_duplicate_sale, R.string.sales_duplicate_sale_description, onDuplicate) }
-            item { InvoiceOption(Icons.Outlined.Rollback, R.string.sales_return_sale, R.string.sales_return_sale_description, onReturn) }
+            item { InvoiceOption(Icons.Outlined.History, R.string.sales_return_sale, R.string.sales_return_sale_description, onReturn) }
             item { InvoiceOption(Icons.Outlined.Cancel, R.string.sales_cancel_sale, R.string.sales_cancel_sale_description, onCancel, destructive = true) }
             item { Text(saleMoney(receipt.total, devise), color = FlowMuted, fontSize = 10.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
         }

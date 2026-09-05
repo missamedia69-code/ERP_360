@@ -351,11 +351,11 @@ private fun MovementRow(movement: StockMovementView) {
     val type = runCatching { StockMovementType.valueOf(movement.type) }.getOrDefault(StockMovementType.ENTREE)
     val (icon, sign, color) = when (type) {
         StockMovementType.ENTREE, StockMovementType.TRANSFERT_ENTREE ->
-            Icons.Outlined.TrendingUp to "+" to Green60
+            Triple(Icons.Outlined.TrendingUp, "+", Green60)
         StockMovementType.SORTIE, StockMovementType.TRANSFERT_SORTIE ->
-            Icons.Outlined.TrendingDown to "−" to Red40
+            Triple(Icons.Outlined.TrendingDown, "−", Red40)
         StockMovementType.AJUSTEMENT ->
-            Icons.Outlined.SwapVert to if (movement.quantite >= 0) "+" else "−" to ProfileOrange
+            Triple(Icons.Outlined.SwapVert, if (movement.quantite >= 0) "+" else "−", ProfileOrange)
     }
     MissaPanel(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {

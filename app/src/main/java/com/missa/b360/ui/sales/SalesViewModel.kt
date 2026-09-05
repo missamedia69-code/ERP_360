@@ -407,7 +407,7 @@ fun outstandingBalance(records: List<OperationRecordEntity>, clientId: Long?): D
         }
 }
 
-private fun String.toMoneyOrNull(): Double? = trim()
+internal fun String.toMoneyOrNull(): Double? = trim()
     .takeIf { it.isNotEmpty() }
     ?.replace(',', '.')
     ?.toDoubleOrNull()
@@ -415,7 +415,7 @@ private fun String.toMoneyOrNull(): Double? = trim()
 
 private fun String.toMoneyOrZero(): Double = toMoneyOrNull()?.coerceAtLeast(0.0) ?: 0.0
 
-private fun String.filterMoneyInput(): String = filter { it.isDigit() || it == ',' || it == '.' }
+internal fun String.filterMoneyInput(): String = filter { it.isDigit() || it == ',' || it == '.' }
 
-private fun Double.toInputAmount(): String =
+internal fun Double.toInputAmount(): String =
     if (this % 1.0 == 0.0) toInt().toString() else toString()

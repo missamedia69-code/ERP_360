@@ -68,20 +68,19 @@ private fun LegacyClientsScreen(
         viewModel.acquitterRappel()
     }
 
-    val messageRetour = resultat?.let { retour ->
-        when {
-            retour.erreur == "doublon" -> null
-            retour.code == "edit" -> stringResource(R.string.clients_client_modifie)
-            retour.code != null -> stringResource(R.string.clients_client_cree, retour.code)
-            retour.erreur == "licence" -> stringResource(R.string.clients_lecture_seule)
-            retour.erreur == "nom" -> stringResource(R.string.clients_nom_obligatoire)
-            retour.erreur == "nom_invalide" -> stringResource(R.string.clients_nom_invalide)
-            retour.erreur == "telephone" -> stringResource(R.string.clients_telephone_obligatoire)
-            retour.erreur == "telephone_invalide" -> stringResource(R.string.clients_telephone_invalide)
-            retour.erreur == "email_invalide" -> stringResource(R.string.clients_email_invalide)
-            retour.erreur == "donnees" -> stringResource(R.string.clients_donnees_invalides)
-            else -> stringResource(R.string.clients_erreur_sauvegarde)
-        }
+    val retourActuel = resultat
+    val messageRetour = when {
+        retourActuel == null || retourActuel.erreur == "doublon" -> null
+        retourActuel.code == "edit" -> stringResource(R.string.clients_client_modifie)
+        retourActuel.code != null -> stringResource(R.string.clients_client_cree, retourActuel.code)
+        retourActuel.erreur == "licence" -> stringResource(R.string.clients_lecture_seule)
+        retourActuel.erreur == "nom" -> stringResource(R.string.clients_nom_obligatoire)
+        retourActuel.erreur == "nom_invalide" -> stringResource(R.string.clients_nom_invalide)
+        retourActuel.erreur == "telephone" -> stringResource(R.string.clients_telephone_obligatoire)
+        retourActuel.erreur == "telephone_invalide" -> stringResource(R.string.clients_telephone_invalide)
+        retourActuel.erreur == "email_invalide" -> stringResource(R.string.clients_email_invalide)
+        retourActuel.erreur == "donnees" -> stringResource(R.string.clients_donnees_invalides)
+        else -> stringResource(R.string.clients_erreur_sauvegarde)
     }
     val messageCategorie = when (erreurCategorie) {
         "utilisee" -> stringResource(R.string.clients_categorie_utilisee)
