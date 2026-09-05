@@ -43,6 +43,8 @@ data class OperationRecordEntity(
 enum class OperationModule {
     STOCK,
     VENTE,
+    DEVIS,
+    COMMANDE,
     ACHATS,
     FINANCES,
     LIVRAISON,

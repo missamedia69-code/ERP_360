@@ -134,6 +134,8 @@ class OperationUseCases @Inject constructor(
     private fun OperationModule.docType(): DocType = when (this) {
         OperationModule.STOCK -> DocType.INVENTAIRE
         OperationModule.VENTE -> DocType.FACTURE
+        OperationModule.DEVIS -> DocType.DEVIS
+        OperationModule.COMMANDE -> DocType.COMMANDE_CLIENT
         OperationModule.ACHATS -> DocType.FACTURE_FOURNISSEUR
         OperationModule.FINANCES -> DocType.TICKET
         OperationModule.LIVRAISON -> DocType.LIVRAISON

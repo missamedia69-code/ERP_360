@@ -178,6 +178,7 @@ private fun List<OperationRecordEntity>.amountFor(module: OperationModule): Doub
 
 private fun OperationModule.appModuleForReport(): AppModule = when (this) {
     OperationModule.STOCK -> AppModule.STOCK
+    OperationModule.DEVIS, OperationModule.COMMANDE -> AppModule.VENTE
     OperationModule.VENTE -> AppModule.VENTE
     OperationModule.ACHATS -> AppModule.ACHATS
     OperationModule.FINANCES -> AppModule.FINANCES

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Email
@@ -669,6 +670,25 @@ private fun SalesListScreen(
                     Icon(Icons.Outlined.Add, null, modifier = Modifier.size(19.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.sales_new_sale), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            // Cycle commercial (spec §20) : devis → commande → facture.
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.DEVIS_COMMANDE) },
+                    shape = RoundedCornerShape(7.dp),
+                    color = Color.White,
+                    border = BorderStroke(1.dp, FlowBorder),
+                ) {
+                    Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Description, null, tint = FlowBlue, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.sales_devis_entry), color = FlowInk, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.sales_devis_entry_desc), color = FlowMuted, fontSize = 10.sp)
+                        }
+                        Text("›", color = FlowMuted, fontSize = 18.sp)
+                    }
                 }
             }
             item {

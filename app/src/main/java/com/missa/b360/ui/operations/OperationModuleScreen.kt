@@ -585,6 +585,7 @@ private fun StatusChip(status: OperationStatus) {
 
 private fun OperationModule.appModule(): AppModule = when (this) {
     OperationModule.STOCK -> AppModule.STOCK
+    OperationModule.DEVIS, OperationModule.COMMANDE -> AppModule.VENTE
     OperationModule.VENTE -> AppModule.VENTE
     OperationModule.ACHATS -> AppModule.ACHATS
     OperationModule.FINANCES -> AppModule.FINANCES
@@ -597,6 +598,7 @@ private fun OperationModule.appModule(): AppModule = when (this) {
 
 private fun OperationModule.hintRes(): Int = when (this) {
     OperationModule.STOCK -> R.string.ops_hint_stock
+    OperationModule.DEVIS, OperationModule.COMMANDE -> R.string.ops_hint_sales
     OperationModule.VENTE -> R.string.ops_hint_sales
     OperationModule.ACHATS -> R.string.ops_hint_purchases
     OperationModule.FINANCES -> R.string.ops_hint_finances

@@ -15,6 +15,9 @@ object Routes {
     // Module Vente — retour de vente et avoir (spec §22)
     const val SALES_RETURN = "sales_return"
 
+    // Module Vente — devis & commandes (spec §20 : devis → commande → facture)
+    const val DEVIS_COMMANDE = "devis_commande"
+
     // ☰ Administration & Paramétrage (module 9.1, Phase C)
     const val ADMIN_REGLAGES = "admin_reglages"
     const val ADMIN_LICENCE = "admin_licence"

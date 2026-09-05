@@ -31,6 +31,7 @@ import com.missa.b360.ui.notifications.NotificationsScreen
 import com.missa.b360.ui.operations.OperationFormScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
+import com.missa.b360.ui.sales.DevisCommandeScreen
 import com.missa.b360.ui.sales.ReturnSaleScreen
 import com.missa.b360.ui.sales.SalesScreen
 import com.missa.b360.ui.stock.InventoryScreen
@@ -221,6 +222,10 @@ private fun MainNavHost() {
                 onBack = { navController.popBackStack() },
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
+        }
+        // Devis & commandes (spec §20) — cycle commercial avant facturation.
+        composable(Routes.DEVIS_COMMANDE) {
+            DevisCommandeScreen(onBack = { navController.popBackStack() })
         }
         // Retour de vente + avoir (spec §22) — recordId optionnel : 0 = liste des factures retournables.
         composable(

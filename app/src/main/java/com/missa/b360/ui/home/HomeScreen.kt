@@ -1055,6 +1055,7 @@ private fun RecentDocuments(
 
 private fun String.appModuleRoute(): String = when (this) {
     OperationModule.STOCK.name -> AppModule.STOCK.route
+    OperationModule.DEVIS.name, OperationModule.COMMANDE.name -> Routes.DEVIS_COMMANDE
     OperationModule.VENTE.name -> AppModule.VENTE.route
     OperationModule.ACHATS.name -> AppModule.ACHATS.route
     OperationModule.FINANCES.name -> AppModule.FINANCES.route
