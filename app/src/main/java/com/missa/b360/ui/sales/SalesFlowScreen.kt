@@ -140,6 +140,7 @@ fun SalesScreen(
 ) {
     val sale by viewModel.uiState.collectAsState()
     val clients by viewModel.clients.collectAsState(initial = emptyList())
+    val products by viewModel.products.collectAsState(initial = emptyList())
     val taxRate by viewModel.taxRate.collectAsState()
     val paymentMethods by viewModel.paymentMethods.collectAsState()
     val devise by viewModel.devise.collectAsState()
@@ -156,6 +157,7 @@ fun SalesScreen(
     var freeProductVisible by remember { mutableStateOf(false) }
     var paymentPickerVisible by remember { mutableStateOf(false) }
     var cancelVisible by remember { mutableStateOf(false) }
+    var editLine by remember { mutableStateOf<com.missa.b360.core.domain.model.SaleLine?>(null) }
     var productSearch by rememberSaveable { mutableStateOf("") }
     var paymentMethod by rememberSaveable { mutableStateOf("") }
     var scannerUnavailable by remember { mutableStateOf(false) }
@@ -212,6 +214,24 @@ fun SalesScreen(
             }
             SalesViewModel.SaveResult.ReadOnly -> {
                 snackbar.showSnackbar(context.getString(R.string.ops_read_only))
+                viewModel.clearSaveResult()
+            }
+            is SalesViewModel.SaveResult.StockInsuffisant -> {
+                snackbar.showSnackbar(
+                    context.getString(
+                        R.string.sales_stock_insufficient,
+                        result.produitNom,
+                        result.disponible.saleQty(),
+                        result.demande.saleQty(),
+                    ),
+                )
+                stepName = SalesStep.PRODUCTS.name
+                viewModel.clearSaveResult()
+            }
+            SalesViewModel.SaveResult.Cancelled -> {
+                snackbar.showSnackbar(context.getString(R.string.sales_cancelled))
+                activeReceipt = null
+                stepName = SalesStep.LIST.name
                 viewModel.clearSaveResult()
             }
             SalesViewModel.SaveResult.Error -> {
@@ -281,6 +301,7 @@ fun SalesScreen(
             ProductsStepContent(
                 client = sale.selectedClient,
                 lines = sale.lines,
+                products = products,
                 query = productSearch,
                 onQueryChange = { productSearch = it },
                 onAddFree = { freeProductVisible = true },
@@ -288,6 +309,7 @@ fun SalesScreen(
                     val intent = Intent("com.google.zxing.client.android.SCAN")
                     if (intent.resolveActivity(context.packageManager) != null) scannerLauncher.launch(intent) else scannerUnavailable = true
                 },
+                onAddCatalog = { viewModel.addCatalogProduct(it) },
                 devise = devise,
                 modifier = Modifier.padding(padding),
             )
@@ -302,6 +324,7 @@ fun SalesScreen(
         ) { padding ->
             CartStepContent(
                 lines = sale.lines,
+                products = products,
                 totals = totals,
                 taxRate = taxRate,
                 devise = devise,
@@ -312,6 +335,7 @@ fun SalesScreen(
                 onDiscountChange = viewModel::updateDiscount,
                 onDeliveryChange = viewModel::updateDelivery,
                 onQuantityChange = viewModel::changeQuantity,
+                onEditLine = { editLine = it },
                 onRemove = viewModel::removeLine,
                 modifier = Modifier.padding(padding),
             )
@@ -449,12 +473,22 @@ fun SalesScreen(
                     onClick = {
                         viewModel.cancelSale(activeReceipt!!.recordId)
                         cancelVisible = false
-                        stepName = SalesStep.LIST.name
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = FlowRed),
                 ) { Text(stringResource(R.string.sales_cancel_sale)) }
             },
             dismissButton = { TextButton(onClick = { cancelVisible = false }) { Text(stringResource(R.string.ops_cancel)) } },
+        )
+    }
+    editLine?.let { line ->
+        LineEditDialog(
+            line = line,
+            stock = products.firstOrNull { it.product.id == line.productId }?.stock,
+            onDismiss = { editLine = null },
+            onConfirm = { quantity, price ->
+                viewModel.updateLine(line.id, quantity, price)
+                editLine = null
+            },
         )
     }
     SnackbarHost(
@@ -768,10 +802,20 @@ private fun SelectedCustomerCard(client: ClientEntity, onClick: () -> Unit) {
 
 @Composable
 private fun ProductsStepContent(
-    client: ClientEntity?, lines: List<SaleLine>, query: String, onQueryChange: (String) -> Unit,
-    onAddFree: () -> Unit, onScan: () -> Unit, devise: String, modifier: Modifier = Modifier,
+    client: ClientEntity?, lines: List<SaleLine>, products: List<com.missa.b360.ui.stock.ProductWithStock>,
+    query: String, onQueryChange: (String) -> Unit,
+    onAddFree: () -> Unit, onScan: () -> Unit,
+    onAddCatalog: (com.missa.b360.ui.stock.ProductWithStock) -> Unit,
+    devise: String, modifier: Modifier = Modifier,
 ) {
-    val visible = lines.filter { it.name.contains(query, ignoreCase = true) }
+    // Recherche locale sur le catalogue (nom, code, référence, code-barres — spec §9/§47).
+    val visible = products.filter { product ->
+        query.isBlank() ||
+            product.nom.contains(query, ignoreCase = true) ||
+            product.code.contains(query, ignoreCase = true) ||
+            (product.reference?.contains(query, ignoreCase = true) ?: false) ||
+            (product.barcode?.contains(query, ignoreCase = true) ?: false)
+    }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(15.dp),
@@ -797,13 +841,34 @@ private fun ProductsStepContent(
                     Column(modifier = Modifier.padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(Icons.Outlined.Inventory2, null, tint = FlowBlue, modifier = Modifier.size(32.dp))
                         Spacer(Modifier.height(7.dp))
-                        Text(stringResource(R.string.sales_products_empty), color = FlowInk, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
-                        Text(stringResource(R.string.sales_products_empty_description), color = FlowMuted, fontSize = 10.sp, textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(
+                                if (products.isEmpty()) R.string.sales_catalog_empty else R.string.sales_no_results,
+                            ),
+                            color = FlowInk,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 12.sp,
+                        )
+                        if (products.isEmpty()) {
+                            Text(
+                                stringResource(R.string.sales_catalog_empty_description),
+                                color = FlowMuted,
+                                fontSize = 10.sp,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }
         } else {
-            items(visible, key = { it.id }) { line -> ProductMiniRow(line) }
+            items(visible, key = { it.product.id }) { product ->
+                CatalogRow(
+                    product = product,
+                    inCart = lines.count { it.productId == product.product.id },
+                    onAdd = { onAddCatalog(product) },
+                    devise = devise,
+                )
+            }
         }
         item {
             Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = FlowBlueSoft) {
@@ -818,26 +883,61 @@ private fun ProductsStepContent(
     }
 }
 
+/** Ligne du catalogue : produit, stock disponible, prix et ajout rapide (spec §9). */
 @Composable
-private fun ProductMiniRow(line: SaleLine) {
+private fun CatalogRow(
+    product: com.missa.b360.ui.stock.ProductWithStock,
+    inCart: Int,
+    onAdd: () -> Unit,
+    devise: String,
+) {
     Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, FlowBorder)) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(7.dp), color = FlowBlueSoft) { Icon(Icons.Outlined.Inventory2, null, tint = FlowBlue, modifier = Modifier.padding(8.dp)) }
             Spacer(Modifier.width(9.dp))
-            Text(line.name, modifier = Modifier.weight(1f), color = FlowInk, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-            Text("× ${line.quantity.saleQty()}", color = FlowMuted, fontSize = 11.sp)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(product.nom, color = FlowInk, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    stringResource(R.string.sales_stock_available, product.stock.saleQty()),
+                    color = if (product.stock <= 0.0) FlowRed else FlowMuted,
+                    fontSize = 9.sp,
+                )
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                product.prixVente?.let {
+                    Text(saleMoney(it, devise), color = FlowInk, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+                if (inCart > 0) {
+                    Text(stringResource(R.string.sales_in_cart, inCart), color = FlowBlue, fontSize = 9.sp)
+                }
+            }
+            Spacer(Modifier.width(8.dp))
+            Button(
+                onClick = onAdd,
+                modifier = Modifier.size(30.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = FlowBlue),
+                contentPadding = PaddingValues(0.dp),
+            ) {
+                Icon(Icons.Outlined.Add, stringResource(R.string.sales_add_product), tint = Color.White, modifier = Modifier.size(18.dp))
+            }
         }
     }
 }
 
 @Composable
 private fun CartStepContent(
-    lines: List<SaleLine>, totals: SaleTotals, taxRate: Double, devise: String, note: String, discount: String, delivery: String,
+    lines: List<SaleLine>, products: List<com.missa.b360.ui.stock.ProductWithStock>,
+    totals: SaleTotals, taxRate: Double, devise: String, note: String, discount: String, delivery: String,
     onNoteChange: (String) -> Unit, onDiscountChange: (String) -> Unit, onDeliveryChange: (String) -> Unit,
-    onQuantityChange: (Long, Double) -> Unit, onRemove: (Long) -> Unit, modifier: Modifier = Modifier,
+    onQuantityChange: (Long, Double) -> Unit, onEditLine: (SaleLine) -> Unit,
+    onRemove: (Long) -> Unit, modifier: Modifier = Modifier,
 ) {
+    val stockOf: (SaleLine) -> Double? = { line ->
+        line.productId?.let { id -> products.firstOrNull { it.product.id == id }?.stock }
+    }
     LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
-        item { CartTable(lines, devise, onQuantityChange, onRemove) }
+        item { CartTable(lines, devise, stockOf, onQuantityChange, onEditLine, onRemove) }
         item {
             OutlinedTextField(value = note, onValueChange = onNoteChange, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.sales_add_note)) }, leadingIcon = { Icon(Icons.Outlined.ReceiptLong, null) }, minLines = 1, maxLines = 2)
         }
@@ -846,7 +946,14 @@ private fun CartStepContent(
 }
 
 @Composable
-private fun CartTable(lines: List<SaleLine>, devise: String, onQuantityChange: (Long, Double) -> Unit, onRemove: (Long) -> Unit) {
+private fun CartTable(
+    lines: List<SaleLine>,
+    devise: String,
+    stockOf: (SaleLine) -> Double?,
+    onQuantityChange: (Long, Double) -> Unit,
+    onEditLine: (SaleLine) -> Unit,
+    onRemove: (Long) -> Unit,
+) {
     Card(shape = RoundedCornerShape(13.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, FlowBorder), modifier = Modifier.fillMaxWidth()) {
         Column {
             Row(modifier = Modifier.fillMaxWidth().background(FlowBlueSoft).padding(horizontal = 10.dp, vertical = 8.dp)) {
@@ -857,10 +964,25 @@ private fun CartTable(lines: List<SaleLine>, devise: String, onQuantityChange: (
                 Spacer(Modifier.width(22.dp))
             }
             lines.forEach { line ->
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                val stock = stockOf(line)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onEditLine(line) }
+                        .padding(horizontal = 10.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(line.name, color = FlowInk, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                        Text(stringResource(R.string.sales_free_item), color = FlowBlue, fontSize = 9.sp)
+                        if (line.productId != null) {
+                            Text(
+                                stringResource(R.string.sales_stock_available, stock?.saleQty() ?: "—"),
+                                color = if (stock != null && line.quantity > stock) FlowRed else FlowMuted,
+                                fontSize = 9.sp,
+                            )
+                        } else {
+                            Text(stringResource(R.string.sales_free_item), color = FlowBlue, fontSize = 9.sp)
+                        }
                     }
                     TinyQuantity(line.quantity, Modifier.width(62.dp), onMinus = { onQuantityChange(line.id, -1.0) }, onPlus = { onQuantityChange(line.id, 1.0) })
                     Text(saleMoney(line.unitPrice, devise), Modifier.width(58.dp), color = FlowInk, fontSize = 9.sp, textAlign = TextAlign.End, maxLines = 1)
@@ -871,6 +993,62 @@ private fun CartTable(lines: List<SaleLine>, devise: String, onQuantityChange: (
             }
         }
     }
+}
+
+/** Modification d'une ligne du panier : quantité et prix unitaire (spec §9 PANIER). */
+@Composable
+private fun LineEditDialog(
+    line: SaleLine,
+    stock: Double?,
+    onDismiss: () -> Unit,
+    onConfirm: (Double, Double) -> Unit,
+) {
+    var quantity by rememberSaveable { mutableStateOf(line.quantity.saleQty()) }
+    var price by rememberSaveable { mutableStateOf(line.unitPrice.toInputAmount()) }
+    val quantityValue = quantity.toSaleValue()
+    val priceValue = price.toSaleValue()
+    val valid = (quantityValue != null && quantityValue > 0.0) && (priceValue != null && priceValue >= 0.0)
+    val exceedsStock = stock != null && quantityValue != null && quantityValue > stock
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.sales_edit_line)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(line.name, color = FlowInk, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                OutlinedTextField(
+                    value = quantity,
+                    onValueChange = { quantity = it.moneyChars() },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.sales_qty)) },
+                    singleLine = true,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                )
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it.moneyChars() },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.sales_unit_price)) },
+                    singleLine = true,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                )
+                if (exceedsStock) {
+                    Text(
+                        stringResource(R.string.sales_line_exceeds_stock, stock.saleQty()),
+                        color = FlowRed,
+                        fontSize = 11.sp,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(quantityValue ?: 0.0, priceValue ?: 0.0) }, enabled = valid) {
+                Text(stringResource(R.string.ops_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.ops_cancel)) }
+        },
+    )
 }
 
 @Composable

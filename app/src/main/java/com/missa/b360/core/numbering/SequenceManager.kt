@@ -37,6 +37,9 @@ enum class DocType(val prefix: String) {
 
     // Séquence dédiée fournisseur (module 9.3)
     FOURNISSEUR("FRN"),
+
+    // Séquence dédiée produit (module Stock, spec §7)
+    PRODUIT("PRD"),
 }
 
 /**

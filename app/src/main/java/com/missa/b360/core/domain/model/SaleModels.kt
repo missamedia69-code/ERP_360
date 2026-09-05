@@ -11,8 +11,26 @@ data class SaleLine(
     val name: String,
     val unitPrice: Double,
     val quantity: Double,
+    /**
+     * Produit du catalogue rattaché (spec §9/§43) — null pour les « produits libres ».
+     * Seules les lignes rattachées génèrent des mouvements de stock à la validation.
+     */
+    val productId: Long? = null,
 ) {
     val total: Double get() = unitPrice * quantity
+}
+
+/**
+ * Agrégation pure des besoins de stock d'un panier de vente (spec §43/§44) :
+ * la somme des quantités par produit du catalogue. Les lignes sans produit
+ * (« produits libres ») n'affectent pas le stock physique.
+ */
+object SaleStockEffects {
+    fun besoinsParProduit(lines: List<SaleLine>): Map<Long, Double> =
+        lines
+            .filter { it.productId != null && it.quantity > 0.0 }
+            .groupBy { it.productId!! }
+            .mapValues { (_, group) -> group.sumOf { it.quantity } }
 }
 
 /** Montants calculés localement pour le panier de vente. Les prix sont considérés TTC. */

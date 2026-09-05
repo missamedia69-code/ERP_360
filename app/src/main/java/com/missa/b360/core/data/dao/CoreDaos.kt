@@ -41,6 +41,9 @@ interface SiteDao {
     @Query("SELECT COUNT(*) FROM sites")
     suspend fun count(): Int
 
+    @Query("SELECT nom FROM sites WHERE id = :id LIMIT 1")
+    suspend fun getNomById(id: Long): String?
+
     @Insert
     suspend fun insert(site: SiteEntity): Long
 

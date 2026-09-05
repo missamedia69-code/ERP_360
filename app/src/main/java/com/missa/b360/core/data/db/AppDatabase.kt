@@ -13,6 +13,9 @@ import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
+import com.missa.b360.core.data.dao.ProductDao
+import com.missa.b360.core.data.dao.ProductStockDao
+import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
@@ -32,6 +35,10 @@ import com.missa.b360.core.data.entity.LicenceEntity
 import com.missa.b360.core.data.entity.NotificationEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.PaymentMethodEntity
+import com.missa.b360.core.data.entity.ProductCategoryEntity
+import com.missa.b360.core.data.entity.ProductEntity
+import com.missa.b360.core.data.entity.ProductStockEntity
+import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.RoleEntity
 import com.missa.b360.core.data.entity.RolePermissionEntity
@@ -68,8 +75,12 @@ import com.missa.b360.core.data.entity.UserEntity
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
         OperationRecordEntity::class,
+        ProductCategoryEntity::class,
+        ProductEntity::class,
+        ProductStockEntity::class,
+        StockMovementEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -88,6 +99,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun clientDao(): ClientDao
     abstract fun fournisseurDao(): FournisseurDao
     abstract fun operationRecordDao(): OperationRecordDao
+    abstract fun productDao(): ProductDao
+    abstract fun productStockDao(): ProductStockDao
+    abstract fun stockMovementDao(): StockMovementDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -172,6 +186,63 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_client_addresses_clientId` " +
                         "ON `client_addresses` (`clientId`)",
+                )
+            }
+        }
+
+        /** v5 → v6 : produits, catégories, stock courant et mouvements de stock. */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_categories` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, " +
+                        "`type` TEXT NOT NULL, `parentId` INTEGER, `description` TEXT, " +
+                        "`actif` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `products` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, " +
+                        "`nom` TEXT NOT NULL, `type` TEXT NOT NULL, `reference` TEXT, `barcode` TEXT, " +
+                        "`sku` TEXT, `categorieId` INTEGER, `marque` TEXT, `unite` TEXT, `photoPath` TEXT, " +
+                        "`prixAchat` REAL, `prixVente` REAL, `prixRevient` REAL, `prixMinimum` REAL, " +
+                        "`remiseMaxPct` REAL NOT NULL, `stockMin` REAL NOT NULL, `stockMax` REAL, " +
+                        "`stockSecurite` REAL NOT NULL, `siteId` INTEGER, `emplacement` TEXT, " +
+                        "`fournisseurId` INTEGER, `refFournisseur` TEXT, `description` TEXT, " +
+                        "`poids` REAL, `volume` REAL, `origine` TEXT, `notes` TEXT, " +
+                        "`statut` TEXT NOT NULL, `active` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_products_code` ON `products` (`code`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_products_barcode` ON `products` (`barcode`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_products_nom` ON `products` (`nom`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_stock` (" +
+                        "`produitId` INTEGER NOT NULL, `siteId` INTEGER NOT NULL, " +
+                        "`quantite` REAL NOT NULL, PRIMARY KEY (`produitId`, `siteId`))",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_movements` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `produitId` INTEGER NOT NULL, " +
+                        "`siteId` INTEGER NOT NULL, `type` TEXT NOT NULL, `quantite` REAL NOT NULL, " +
+                        "`motif` TEXT NOT NULL, `reference` TEXT, `commentaire` TEXT, " +
+                        "`horodatage` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_produitId` " +
+                        "ON `stock_movements` (`produitId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_siteId` " +
+                        "ON `stock_movements` (`siteId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_horodatage` " +
+                        "ON `stock_movements` (`horodatage`)",
                 )
             }
         }

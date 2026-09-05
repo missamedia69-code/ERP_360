@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.ui.admin.AdminAProposScreen
 import com.missa.b360.ui.admin.AdminJournalScreen
 import com.missa.b360.ui.admin.AdminLicenceScreen
@@ -29,6 +30,10 @@ import com.missa.b360.ui.notifications.NotificationsScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
 import com.missa.b360.ui.sales.SalesScreen
+import com.missa.b360.ui.stock.ProductFormScreen
+import com.missa.b360.ui.stock.StockMovementFormScreen
+import com.missa.b360.ui.stock.StockScreen
+import com.missa.b360.ui.stock.StockTransferFormScreen
 import com.missa.b360.ui.onboarding.OnboardingScreen
 import com.missa.b360.ui.onboarding.PinLockScreen
 
@@ -116,8 +121,68 @@ private fun MainNavHost() {
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
+        // Phase E — Module Stock : produits, mouvements et transferts (spec §7/§11/§13).
+        composable(
+            route = "${AppModule.STOCK.route}?create={create}&direction={direction}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument("direction") {
+                    type = NavType.StringType
+                    defaultValue = "NONE"
+                },
+            ),
+        ) { entry ->
+            val direction = OperationDirection.entries.firstOrNull {
+                it.name == entry.arguments?.getString("direction")
+            } ?: OperationDirection.NONE
+            StockScreen(
+                onBack = { navController.popBackStack() },
+                onNavigate = { route -> navController.navigate(route) },
+                initialMovement = if (entry.arguments?.getBoolean("create") == true) {
+                    if (direction == OperationDirection.OUT) StockMovementType.SORTIE else StockMovementType.ENTREE
+                } else {
+                    null
+                },
+            )
+        }
+        composable(
+            route = "${Routes.STOCK_PRODUCT_FORM}?productId={productId}",
+            arguments = listOf(
+                navArgument("productId") {
+                    type = NavType.LongType
+                    defaultValue = 0L
+                },
+            ),
+        ) { entry ->
+            ProductFormScreen(
+                onBack = { navController.popBackStack() },
+                productId = entry.arguments?.getLong("productId")?.takeIf { it > 0L },
+            )
+        }
+        composable(
+            route = "${Routes.STOCK_MOVEMENT_FORM}?type={type}",
+            arguments = listOf(
+                navArgument("type") {
+                    type = NavType.StringType
+                    defaultValue = "ENTREE"
+                },
+            ),
+        ) { entry ->
+            StockMovementFormScreen(
+                onBack = { navController.popBackStack() },
+                initialDirection = runCatching {
+                    StockMovementType.valueOf(entry.arguments?.getString("type") ?: "ENTREE")
+                }.getOrDefault(StockMovementType.ENTREE),
+                onOpenTransfer = { navController.navigate(Routes.STOCK_TRANSFER_FORM) },
+            )
+        }
+        composable(Routes.STOCK_TRANSFER_FORM) {
+            StockTransferFormScreen(onBack = { navController.popBackStack() })
+        }
         // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
-        operationDestination(AppModule.STOCK, OperationModule.STOCK, navController)
         composable(
             route = "${AppModule.VENTE.route}?create={create}",
             arguments = listOf(

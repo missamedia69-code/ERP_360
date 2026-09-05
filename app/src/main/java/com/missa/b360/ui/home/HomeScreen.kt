@@ -718,7 +718,7 @@ private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
         ),
         listOf(
             QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.createRoute()),
-            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, AppModule.STOCK.createRoute()),
+            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, Routes.STOCK_TRANSFER_FORM),
             QuickAction(
                 R.string.home_payment_received,
                 Icons.Outlined.Payments,
