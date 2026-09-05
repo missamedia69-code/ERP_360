@@ -14,9 +14,11 @@ import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.RoleDao
+import com.missa.b360.core.data.dao.SaleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.StockDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.entity.BackupEntity
@@ -35,9 +37,19 @@ import com.missa.b360.core.data.entity.PaymentMethodEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.RoleEntity
 import com.missa.b360.core.data.entity.RolePermissionEntity
+import com.missa.b360.core.data.entity.SaleEntity
+import com.missa.b360.core.data.entity.SaleLineEntity
+import com.missa.b360.core.data.entity.SalePaymentEntity
+import com.missa.b360.core.data.entity.SaleReceivableEntity
 import com.missa.b360.core.data.entity.SequenceEntity
 import com.missa.b360.core.data.entity.SettingEntity
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.data.entity.StockCategoryEntity
+import com.missa.b360.core.data.entity.StockInventoryEntity
+import com.missa.b360.core.data.entity.StockInventoryLineEntity
+import com.missa.b360.core.data.entity.StockMovementEntity
+import com.missa.b360.core.data.entity.StockProductEntity
+import com.missa.b360.core.data.entity.StockWarehouseEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.data.entity.UserEntity
 
@@ -68,8 +80,18 @@ import com.missa.b360.core.data.entity.UserEntity
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
         OperationRecordEntity::class,
+        StockCategoryEntity::class,
+        StockWarehouseEntity::class,
+        StockProductEntity::class,
+        StockMovementEntity::class,
+        StockInventoryEntity::class,
+        StockInventoryLineEntity::class,
+        SaleEntity::class,
+        SaleLineEntity::class,
+        SalePaymentEntity::class,
+        SaleReceivableEntity::class,
     ],
-    version = 5,
+    version = 7,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -88,6 +110,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun clientDao(): ClientDao
     abstract fun fournisseurDao(): FournisseurDao
     abstract fun operationRecordDao(): OperationRecordDao
+    abstract fun stockDao(): StockDao
+    abstract fun saleDao(): SaleDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -173,6 +197,173 @@ abstract class AppDatabase : RoomDatabase() {
                     "CREATE INDEX IF NOT EXISTS `index_client_addresses_clientId` " +
                         "ON `client_addresses` (`clientId`)",
                 )
+            }
+        }
+
+        /** v5 → v6 : module Stock dédié (catégories, entrepôts, produits, mouvements, inventaires). */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_categories` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, " +
+                        "`couleur` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_categories_nom` " +
+                        "ON `stock_categories` (`nom`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_warehouses` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, " +
+                        "`adresse` TEXT, `principal` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_warehouses_nom` " +
+                        "ON `stock_warehouses` (`nom`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_products` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, " +
+                        "`nom` TEXT NOT NULL, `categorieId` INTEGER, `warehouseId` INTEGER, " +
+                        "`unite` TEXT NOT NULL, `prixAchat` REAL NOT NULL, `prixVente` REAL NOT NULL, " +
+                        "`seuilMin` REAL NOT NULL, `seuilMax` REAL NOT NULL, " +
+                        "`quantiteInitiale` REAL NOT NULL, `quantite` REAL NOT NULL, " +
+                        "`actif` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_products_code` " +
+                        "ON `stock_products` (`code`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_products_categorieId` " +
+                        "ON `stock_products` (`categorieId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_products_warehouseId` " +
+                        "ON `stock_products` (`warehouseId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_products_nom` " +
+                        "ON `stock_products` (`nom`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_movements` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, " +
+                        "`type` TEXT NOT NULL, `productId` INTEGER NOT NULL, " +
+                        "`sourceWarehouseId` INTEGER, `targetWarehouseId` INTEGER, " +
+                        "`quantity` REAL NOT NULL, `delta` REAL NOT NULL, `price` REAL, " +
+                        "`counterpart` TEXT, `status` TEXT NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_movements_reference` " +
+                        "ON `stock_movements` (`reference`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_productId` " +
+                        "ON `stock_movements` (`productId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_type` " +
+                        "ON `stock_movements` (`type`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_movements_date` " +
+                        "ON `stock_movements` (`date`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_inventories` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, " +
+                        "`warehouseId` INTEGER, `status` TEXT NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL, `validatedAt` INTEGER, " +
+                        "`completedAt` INTEGER)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_inventories_reference` " +
+                        "ON `stock_inventories` (`reference`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_inventories_status` " +
+                        "ON `stock_inventories` (`status`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_inventories_date` " +
+                        "ON `stock_inventories` (`date`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `stock_inventory_lines` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inventoryId` INTEGER NOT NULL, " +
+                        "`productId` INTEGER NOT NULL, `expectedQuantity` REAL NOT NULL, " +
+                        "`countedQuantity` REAL NOT NULL, `ecart` REAL NOT NULL, `notes` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_inventory_lines_inventoryId` " +
+                        "ON `stock_inventory_lines` (`inventoryId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_stock_inventory_lines_productId` " +
+                        "ON `stock_inventory_lines` (`productId`)",
+                )
+            }
+        }
+
+        /** v6 → v7 : module Vente transactionnel (factures, lignes, paiements et créances). */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `sales` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`operationRecordId` INTEGER, `reference` TEXT NOT NULL, " +
+                        "`clientId` INTEGER, `clientName` TEXT NOT NULL, " +
+                        "`walkIn` INTEGER NOT NULL, `status` TEXT NOT NULL, " +
+                        "`subtotalCents` INTEGER NOT NULL, `discountCents` INTEGER NOT NULL, " +
+                        "`deliveryCents` INTEGER NOT NULL, `taxRate` REAL NOT NULL, " +
+                        "`taxAmountCents` INTEGER NOT NULL, `totalCents` INTEGER NOT NULL, " +
+                        "`paymentMethod` TEXT NOT NULL, `isCredit` INTEGER NOT NULL, " +
+                        "`paidCents` INTEGER NOT NULL, `changeCents` INTEGER NOT NULL, " +
+                        "`remainingCents` INTEGER NOT NULL, `note` TEXT, `internalReference` TEXT, " +
+                        "`sellerName` TEXT, `siteName` TEXT, `devise` TEXT NOT NULL, " +
+                        "`createdAt` INTEGER NOT NULL, `validatedAt` INTEGER, `cancelledAt` INTEGER)",
+                )
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_sales_reference` ON `sales` (`reference`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sales_clientId` ON `sales` (`clientId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sales_status` ON `sales` (`status`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sales_createdAt` ON `sales` (`createdAt`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sales_operationRecordId` ON `sales` (`operationRecordId`)")
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `sale_lines` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `saleId` INTEGER NOT NULL, " +
+                        "`productId` INTEGER, `sku` TEXT, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, " +
+                        "`unitPriceCents` INTEGER NOT NULL, `quantity` REAL NOT NULL, " +
+                        "`discountPct` REAL NOT NULL, `netCents` INTEGER NOT NULL, " +
+                        "`freeProduct` INTEGER NOT NULL)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sale_lines_saleId` ON `sale_lines` (`saleId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sale_lines_productId` ON `sale_lines` (`productId`)")
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `sale_payments` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `saleId` INTEGER NOT NULL, " +
+                        "`method` TEXT NOT NULL, `amountCents` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sale_payments_saleId` ON `sale_payments` (`saleId`)")
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `sale_receivables` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `saleId` INTEGER NOT NULL, " +
+                        "`clientId` INTEGER, `totalCents` INTEGER NOT NULL, `paidCents` INTEGER NOT NULL, " +
+                        "`remainingCents` INTEGER NOT NULL, `status` TEXT NOT NULL, " +
+                        "`createdAt` INTEGER NOT NULL, `settledAt` INTEGER)",
+                )
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_sale_receivables_saleId` ON `sale_receivables` (`saleId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sale_receivables_clientId` ON `sale_receivables` (`clientId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sale_receivables_status` ON `sale_receivables` (`status`)")
             }
         }
     }

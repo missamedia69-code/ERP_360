@@ -34,6 +34,7 @@ enum class DocType(val prefix: String) {
     ORDRE_SERVICE("OS"),
     AVANCE_SALAIRE("AV"),
     PROJET("PRJ"),
+    PRODUIT("PRD"),
 
     // Séquence dédiée fournisseur (module 9.3)
     FOURNISSEUR("FRN"),

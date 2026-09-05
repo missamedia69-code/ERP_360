@@ -12,9 +12,11 @@ import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.RoleDao
+import com.missa.b360.core.data.dao.SaleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.StockDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.db.AppDatabase
@@ -34,8 +36,10 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "missa_b360.db")
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
-                AppDatabase.MIGRATION_4_5)
+            .addMigrations(
+                AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
+                AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7,
+            )
             .fallbackToDestructiveMigration(false)
             .build()
 
@@ -54,4 +58,6 @@ object DatabaseModule {
     @Provides fun provideClientDao(db: AppDatabase): ClientDao = db.clientDao()
     @Provides fun provideFournisseurDao(db: AppDatabase): FournisseurDao = db.fournisseurDao()
     @Provides fun provideOperationRecordDao(db: AppDatabase): OperationRecordDao = db.operationRecordDao()
+    @Provides fun provideStockDao(db: AppDatabase): StockDao = db.stockDao()
+    @Provides fun provideSaleDao(db: AppDatabase): SaleDao = db.saleDao()
 }
