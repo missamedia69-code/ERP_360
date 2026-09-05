@@ -1081,16 +1081,6 @@
     <string name="obn_commencer">Commencer</string>
     <string name="obn_profil_titre">Choisissez votre profil d\'activité</string>
     <string name="obn_profil_sous">Nous adapterons Missa Business 360 à vos besoins.</string>
-    <string name="obn_profil_commerce">Commerce</string>
-    <string name="obn_profil_commerce_sous">Achat &amp; Vente</string>
-    <string name="obn_profil_comstock">Commerce &amp; Stock</string>
-    <string name="obn_profil_comstock_sous">Achat, Stock &amp; Vente</string>
-    <string name="obn_profil_production">Production</string>
-    <string name="obn_profil_production_sous">Production &amp; Vente</string>
-    <string name="obn_profil_services">Services</string>
-    <string name="obn_profil_services_sous">Prestations de services</string>
-    <string name="obn_profil_autre">Autre</string>
-    <string name="obn_profil_autre_sous">Activité personnalisée</string>
     <string name="obn_taille_titre">Quelle est la taille de votre entreprise ?</string>
     <string name="obn_taille_sous">Nous ajustons les fonctionnalités selon vos besoins.</string>
     <string name="obn_entreprise_titre">Informations sur votre entreprise</string>

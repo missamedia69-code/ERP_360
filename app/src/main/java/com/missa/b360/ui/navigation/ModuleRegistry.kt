@@ -10,7 +10,6 @@ import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.LineWeight
 import androidx.compose.material.icons.outlined.LocalShipping
-import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.RequestQuote
