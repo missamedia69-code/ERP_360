@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -119,6 +120,7 @@ import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.Red40
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 private val FlowBlue = BrandBlue
 private val FlowBlueDark = Blue40
@@ -510,7 +512,7 @@ fun SalesScreen(
     }
     SnackbarHost(
         hostState = snackbar,
-        modifier = Modifier.eralign(Alignment.BottomCenter).padding(bottom = 120.dp),
+        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.BottomCenter).padding(bottom = 120.dp),
     )
 }
 
@@ -1594,9 +1596,8 @@ private fun Context.printSaleReceipt(receipt: SaleReceipt, devise: String) {
  * Adaptateur d'impression minimal : génère le PDF A4 de la facture la plus récente.
  * L'impression 80/58 mm reste possible via le réseau/adapter papier du service Android.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 private class SalePdfAdapter(private val receipt: SaleReceipt, private val devise: String) : android.print.PrintDocumentAdapter() {
-    override fun onLayout(oldAttributes: android.print.PrintAttributes?, newAttributes: android.print.PrintAttributes, cancellationSignal: android.os.CancellationSignal?, callback: android.print.LayoutResultCallback, extras: android.os.Bundle?) {
+    override fun onLayout(oldAttributes: android.print.PrintAttributes?, newAttributes: android.print.PrintAttributes, cancellationSignal: android.os.CancellationSignal?, callback: android.print.PrintDocumentAdapter.LayoutResultCallback, extras: android.os.Bundle?) {
         callback.onLayoutFinished(
             android.print.PrintDocumentInfo.Builder(receipt.reference)
                 .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
@@ -1606,7 +1607,7 @@ private class SalePdfAdapter(private val receipt: SaleReceipt, private val devis
         )
     }
 
-    override fun onWrite(pages: Array<android.print.PageRange>, destination: android.os.ParcelFileDescriptor, cancellationSignal: android.os.CancellationSignal?, callback: android.print.WriteResultCallback) {
+    override fun onWrite(pages: Array<android.print.PageRange>, destination: android.os.ParcelFileDescriptor, cancellationSignal: android.os.CancellationSignal?, callback: android.print.PrintDocumentAdapter.WriteResultCallback) {
         val document = PdfDocument()
         try {
             val page = document.startPage(PdfDocument.PageInfo.Builder(595, 842, 1).create())
@@ -1641,8 +1642,8 @@ private class SalePdfAdapter(private val receipt: SaleReceipt, private val devis
     }
 }
 
-private fun Double.saleQty(): String = if (this % 1.0 == 0.0) toInt().toString() else DecimalFormat("0.##", DecimalFormatSymbols.getDefault()).format(this)
-private fun Double.saleRate(): String = DecimalFormat("0.##", DecimalFormatSymbols.getDefault()).format(this)
+private fun Double.saleQty(): String = if (this % 1.0 == 0.0) toInt().toString() else DecimalFormat("0.##", DecimalFormatSymbols(Locale.getDefault())).format(this)
+private fun Double.saleRate(): String = DecimalFormat("0.##", DecimalFormatSymbols(Locale.getDefault())).format(this)
 private fun Long.toDoubleMoney(): Double = this / 100.0
 private fun String.toSaleValue(): Double? = trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
 private fun String.moneyChars(): String = filter { it.isDigit() || it == ',' || it == '.' }
