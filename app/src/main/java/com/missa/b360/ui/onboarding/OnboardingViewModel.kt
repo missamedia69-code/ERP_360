@@ -16,15 +16,23 @@ import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
 import com.missa.b360.core.domain.usecase.GetOnboardingProgressUseCase
 import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
-import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.security.PinHasher
 import com.missa.b360.core.util.Iso4217
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.TimeZone
 import javax.inject.Inject
 
-/** Étapes de l'onboarding (Phase B) : langue → profil → entreprise → PIN → email → licence → checklist. */
-enum class OnboardingStep { LANGUE, PROFIL, ENTREPRISE, PIN, EMAIL, LICENCE, CHECKLIST }
+/**
+ * Étapes de l'onboarding (maquette) : bienvenue → profil → taille → entreprise (+logo)
+ * → configuration → PIN → récapitulatif.
+ *
+ * Toute la logique métier reste identique : entreprise transactionnelle (RA-19 / D4 / D5),
+ * PIN (RA-01), propriétaire avec email de secours (RA-03 / D1), clôture (RA-11).
+ * L'essai licence (RA-04) est créé automatiquement au premier lancement ; l'activation
+ * d'un code reste possible ensuite depuis les réglages administrateur.
+ */
+enum class OnboardingStep { BIENVENUE, PROFIL, TAILLE, ENTREPRISE, CONFIGURATION, PIN, TERMINE }
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -33,52 +41,54 @@ class OnboardingViewModel @Inject constructor(
     private val getOnboardingProgress: GetOnboardingProgressUseCase,
     private val createOwner: CreateOwnerUserUseCase,
     private val completeOnboarding: CompleteOnboardingUseCase,
-    private val licenceManager: LicenceManager,
     private val validatePin: ValidatePinUseCase,
 ) : ViewModel() {
 
-    var step by mutableStateOf(OnboardingStep.LANGUE)
+    var step by mutableStateOf(OnboardingStep.BIENVENUE)
         private set
 
-    // Étape langue — conserve le bouton coché en cas de recréation exceptionnelle.
-    var langue by mutableStateOf(
-        AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "fr" },
-    )
-        private set
-
-    // Étape profil
+    // --- Étape profil ---
     var profil by mutableStateOf<ProfilActivite?>(null)
         private set
     var palier by mutableStateOf<PalierTaille?>(null)
         private set
 
-    // Étape entreprise
+    // --- Étape entreprise (informations + logo) ---
     var nomEntreprise by mutableStateOf("")
-    var votreNom by mutableStateOf("")
-    var devise by mutableStateOf(Iso4217.DEFAUT)
+    var secteur by mutableStateOf("")
+    var devise by mutableStateOf("XAF")
     var pays by mutableStateOf("")
     /** Code ISO conservé avec le libellé localisé du pays, notamment pour l'indicatif téléphone. */
     var codePays by mutableStateOf<String?>(null)
         private set
-    var tauxTaxe by mutableStateOf(0.0)
-        private set
-    /** Texte conservé pendant la frappe afin de ne pas transformer « 19, » en « 19.0 ». */
+    /** Taux proposé par le pays, modifiable ; texte conservé pendant la frappe. */
     var tauxTaxeTexte by mutableStateOf("0")
+        private set
+    var tauxTaxe by mutableStateOf(0.0)
         private set
     var nomSitePrincipal by mutableStateOf("")
     var logoUri by mutableStateOf<String?>(null)
         private set
-    var enregistrementEnCours by mutableStateOf(false)
+
+    // --- Étape configuration initiale ---
+    var langue by mutableStateOf(
+        AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "fr" },
+    )
+    var fuseau by mutableStateOf(TimeZone.getDefault().id)
+    var formatJours by mutableStateOf("dd/MM/yyyy")
+    var formatNombres by mutableStateOf("fr")
+    var sauvegardesActives by mutableStateOf(true)
+
+    // --- Étape PIN + contact de récupération (propriétaire) ---
+    var pin by mutableStateOf("")
+    var votreNom by mutableStateOf("")
+    var emailSecours by mutableStateOf("")
+    var pinDejaConfigure by mutableStateOf(false)
         private set
 
-    // Étapes PIN / email / licence
-    var pin by mutableStateOf("")
-    var pinConfirmation by mutableStateOf("")
-    var emailSecours by mutableStateOf("")
-    var codeLicence by mutableStateOf("")
     var erreurRes by mutableStateOf<Int?>(null)
         private set
-    var licenceActive by mutableStateOf(false)
+    var enregistrementEnCours by mutableStateOf(false)
         private set
     var onboardingTermine by mutableStateOf(false)
         private set
@@ -95,53 +105,75 @@ class OnboardingViewModel @Inject constructor(
      */
     private fun restaurerProgression() {
         viewModelScope.launch {
-            runCatching { getOnboardingProgress() }
-                .getOrNull()
-                ?.let { progression ->
-                    langue = progression.langue
-                    profil = progression.profil?.let {
-                        runCatching { ProfilActivite.valueOf(it) }.getOrNull()
-                    }
-                    palier = progression.palier?.let {
-                        runCatching { PalierTaille.valueOf(it) }.getOrNull()
-                    }
-                    progression.entreprise?.let { entreprise ->
-                        nomEntreprise = entreprise.nom
-                        devise = entreprise.devise
-                        pays = entreprise.pays.orEmpty()
-                        logoUri = entreprise.logoUri
-                        codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
-                    }
-                    progression.tauxTaxe?.let(::definirTauxTaxe)
-                    step = when {
-                        progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
-                        progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.EMAIL
-                        progression.entreprise != null -> OnboardingStep.LICENCE
-                        profil != null && palier != null -> OnboardingStep.ENTREPRISE
-                        profil != null || palier != null -> OnboardingStep.PROFIL
-                        else -> OnboardingStep.LANGUE
-                    }
+            runCatching { getOnboardingProgress() }.getOrNull()?.let { progression ->
+                langue = progression.langue
+                profil = progression.profil?.let {
+                    runCatching { ProfilActivite.valueOf(it) }.getOrNull()
                 }
+                palier = progression.palier?.let {
+                    runCatching { PalierTaille.valueOf(it) }.getOrNull()
+                }
+                progression.entreprise?.let { entreprise ->
+                    nomEntreprise = entreprise.nom
+                    secteur = entreprise.secteur.orEmpty()
+                    devise = entreprise.devise
+                    pays = entreprise.pays.orEmpty()
+                    logoUri = entreprise.logoUri
+                    codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
+                    if (nomSitePrincipal.isBlank()) nomSitePrincipal = entreprise.nom
+                }
+                progression.tauxTaxe?.let { definirTauxTaxe(it) }
+                fuseau = settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE) ?: TimeZone.getDefault().id
+                formatJours = settingsStore.get(SettingsStore.Keys.FORMAT_DATE) ?: "dd/MM/yyyy"
+                formatNombres = settingsStore.get(SettingsStore.Keys.FORMAT_NOMBRES) ?: "fr"
+                sauvegardesActives = settingsStore.get(SettingsStore.Keys.FREQUENCE_SAUVGARDE) != "off"
+                pinDejaConfigure = progression.pinConfigure
+                step = when {
+                    progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
+                    progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.PIN
+                    progression.entreprise != null -> OnboardingStep.TERMINE
+                    profil != null && palier != null -> OnboardingStep.ENTREPRISE
+                    profil != null -> OnboardingStep.TAILLE
+                    else -> OnboardingStep.BIENVENUE
+                }
+            }
             initialisationTerminee = true
         }
     }
 
-    /**
-     * Enregistre d'abord le choix, puis applique la locale.
-     *
-     * L'activité gère les changements de locale elle-même : Compose se recompose sans
-     * être détruit, ce qui évite le flash noir tout en conservant la langue choisie.
-     */
-    fun choisirLangue(code: String) {
-        if (langue == code && AppCompatDelegate.getApplicationLocales().toLanguageTags() == code) return
-        langue = code
-        viewModelScope.launch {
-            settingsStore.set(SettingsStore.Keys.LANGUE, code)
-            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != code) {
-                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+    // --- Navigation ---
+
+    /** Tente de passer à l'étape suivante avec les validations de chaque étape. */
+    fun suivant() {
+        if (!initialisationTerminee) return
+        erreurRes = null
+        when (step) {
+            OnboardingStep.BIENVENUE -> step = OnboardingStep.PROFIL
+            OnboardingStep.PROFIL -> if (profil != null) step = OnboardingStep.TAILLE
+            OnboardingStep.TAILLE -> if (palier != null) step = OnboardingStep.ENTREPRISE
+            OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
+            OnboardingStep.CONFIGURATION -> {
+                appliquerConfiguration()
+                step = OnboardingStep.PIN
             }
+            OnboardingStep.PIN -> validerPinEtProprietaire()
+            OnboardingStep.TERMINE -> terminer()
         }
     }
+
+    fun precedent() {
+        erreurRes = null
+        step = when (step) {
+            OnboardingStep.PROFIL -> OnboardingStep.BIENVENUE
+            OnboardingStep.TAILLE -> OnboardingStep.PROFIL
+            OnboardingStep.ENTREPRISE -> OnboardingStep.TAILLE
+            OnboardingStep.CONFIGURATION -> OnboardingStep.ENTREPRISE
+            OnboardingStep.PIN -> OnboardingStep.CONFIGURATION
+            else -> step
+        }
+    }
+
+    // --- Profil / taille ---
 
     fun choisirProfil(p: ProfilActivite) {
         profil = p
@@ -153,31 +185,7 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, p.name) }
     }
 
-    /** Tente de passer à l'étape suivante avec les validations de chaque étape. */
-    fun suivant() {
-        if (!initialisationTerminee) return
-        erreurRes = null
-        when (step) {
-            OnboardingStep.LANGUE -> step = OnboardingStep.PROFIL
-            OnboardingStep.PROFIL -> if (profil != null && palier != null) step = OnboardingStep.ENTREPRISE
-            OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
-            OnboardingStep.PIN -> validerPin()
-            OnboardingStep.EMAIL -> enregistrerUtilisateur()
-            OnboardingStep.LICENCE -> step = OnboardingStep.CHECKLIST
-            OnboardingStep.CHECKLIST -> terminer()
-        }
-    }
-
-    fun precedent() {
-        erreurRes = null
-        step = when (step) {
-            OnboardingStep.PROFIL -> OnboardingStep.LANGUE
-            OnboardingStep.ENTREPRISE -> OnboardingStep.PROFIL
-            OnboardingStep.PIN -> OnboardingStep.ENTREPRISE
-            OnboardingStep.EMAIL -> OnboardingStep.PIN
-            else -> step
-        }
-    }
+    // --- Entreprise ---
 
     /** Applique un pays du catalogue et rend son taux immédiatement modifiable. */
     fun choisirPays(nom: String, code: String, tauxSuggere: Double) {
@@ -238,6 +246,8 @@ class OnboardingViewModel @Inject constructor(
         }
         val deviseSelectionnee = devise
         val paysSelectionne = pays.trim().ifEmpty { null }
+        val secteurValide = secteur.trim().ifEmpty { null }
+        val logoUriSelectionnee = logoUri
 
         enregistrementEnCours = true
         viewModelScope.launch {
@@ -248,84 +258,96 @@ class OnboardingViewModel @Inject constructor(
                         devise = deviseSelectionnee,
                         pays = paysSelectionne,
                         codePays = codePays,
-                        logoUri = logoUri,
                         tauxTaxe = tauxTaxeValide,
                         nomSitePrincipal = nomSiteValide,
                         profilActivite = profil?.name,
                         palierTaille = palier?.name,
+                        secteur = secteurValide,
+                        logoUri = logoUriSelectionnee,
                     ),
                 )
             }.getOrDefault(false)
             enregistrementEnCours = false
-            if (ok) step = OnboardingStep.PIN
+            if (ok) step = OnboardingStep.CONFIGURATION
             else erreurRes = R.string.ob_erreur_configuration_entreprise
         }
     }
 
-    /** Utilisé par l'UI pour ne rendre « Suivant » disponible qu'avec un PIN complet. */
-    fun pinEstValide(): Boolean = PinHasher.isValidFormat(pin)
+    // --- Configuration initiale ---
+
+    /**
+     * Enregistre la configuration (langue appliquée immédiatement, fuseau, formats et
+     * sauvegardes conservés dans les réglages) avant l'étape de sécurité.
+     */
+    private fun appliquerConfiguration() {
+        val langueCible = langue
+        val fuseauCible = fuseau
+        val formatJoursCible = formatJours
+        val formatNombresCible = formatNombres
+        val sauvegardesCibles = if (sauvegardesActives) "auto" else "off"
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.LANGUE, langueCible)
+            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != langueCible) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(langueCible))
+            }
+            settingsStore.set(SettingsStore.Keys.FUSEAU_HORAIRE, fuseauCible)
+            settingsStore.set(SettingsStore.Keys.FORMAT_DATE, formatJoursCible)
+            settingsStore.set(SettingsStore.Keys.FORMAT_NOMBRES, formatNombresCible)
+            settingsStore.set(SettingsStore.Keys.FREQUENCE_SAUVGARDE, sauvegardesCibles)
+        }
+    }
+
+    // --- PIN + propriétaire ---
+
+    /** Écran : le bouton « Suivant » n'est actif qu'avec un PIN de 4 chiffres saisis. */
+    fun pinEcranValide(): Boolean = pinDejaConfigure || PinHasher.isValidFormat(pin)
 
     /** Règle partagée avec l'écriture du propriétaire. */
     fun emailEstValide(): Boolean = CreateOwnerUserUseCase.emailEstValide(emailSecours)
 
-    /** RA-01 — PIN 4–6 chiffres, saisi deux fois. */
-    private fun validerPin() {
-        if (!pinEstValide()) {
-            erreurRes = R.string.ob_pin_invalide
+    /**
+     * RA-01 + RA-03 — configure le PIN (4 chiffres de la maquette) puis crée le
+     * Propriétaire avec son email de secours ; le hash du PIN est copié sur la fiche.
+     */
+    private fun validerPinEtProprietaire() {
+        if (!pinDejaConfigure && !PinHasher.isValidFormat(pin)) {
+            erreurRes = R.string.obn_pin_incomplet
             return
         }
-        if (pin != pinConfirmation) {
-            erreurRes = R.string.ob_pin_differents
-            return
-        }
-        if (enregistrementEnCours) return
-        val pinValide = pin
-        enregistrementEnCours = true
-        viewModelScope.launch {
-            val ok = runCatching { validatePin.definirPin(pinValide) }.getOrDefault(false)
-            enregistrementEnCours = false
-            if (ok) step = OnboardingStep.EMAIL
-            else erreurRes = R.string.ob_pin_invalide
-        }
-    }
-
-    /** RA-03 — email de secours obligatoire, création du Propriétaire (D1). */
-    private fun enregistrerUtilisateur() {
-        if (!emailEstValide()) {
+        if (!CreateOwnerUserUseCase.emailEstValide(emailSecours)) {
             erreurRes = R.string.ob_email_invalide
             return
         }
         if (enregistrementEnCours) return
+        val pinACreer = pin
         val nomProprietaire = votreNom
         val emailProprietaire = emailSecours.trim()
         enregistrementEnCours = true
         viewModelScope.launch {
+            val pinOk = if (pinDejaConfigure) {
+                true
+            } else {
+                runCatching { validatePin.definirPin(pinACreer) }.getOrDefault(false)
+            }
+            if (!pinOk) {
+                enregistrementEnCours = false
+                erreurRes = R.string.ob_pin_invalide
+                return@launch
+            }
             val resultat = runCatching { createOwner(nomProprietaire, emailProprietaire) }
                 .getOrElse { CreateOwnerUserUseCase.Result.EmailInvalide }
             enregistrementEnCours = false
             when (resultat) {
-                is CreateOwnerUserUseCase.Result.Succes -> step = OnboardingStep.LICENCE
-                else -> erreurRes = R.string.ob_email_invalide
+                is CreateOwnerUserUseCase.Result.Succes -> step = OnboardingStep.TERMINE
+                // L'utilisateur existe déjà (reprise) : l'onboarding peut se terminer.
+                is CreateOwnerUserUseCase.Result.EmailDejaUtilise -> step = OnboardingStep.TERMINE
+                CreateOwnerUserUseCase.Result.EmailInvalide -> erreurRes = R.string.ob_email_invalide
             }
         }
     }
 
-    /** RA-05 — activation d'un code licence (optionnel pendant l'onboarding). */
-    fun activerCode() {
-        if (codeLicence.isBlank() || enregistrementEnCours) return
-        val codeAActiver = codeLicence.trim()
-        erreurRes = null
-        enregistrementEnCours = true
-        viewModelScope.launch {
-            val activee = runCatching { licenceManager.activer(codeAActiver) }.getOrDefault(false)
-            enregistrementEnCours = false
-            if (activee) licenceActive = true
-            else erreurRes = R.string.ob_code_invalide
-        }
-    }
-
     /** RA-11 — clôture de l'onboarding ; l'app démarrera sur le verrou PIN. */
-    fun terminer() {
+    private fun terminer() {
         if (enregistrementEnCours) return
         enregistrementEnCours = true
         viewModelScope.launch {

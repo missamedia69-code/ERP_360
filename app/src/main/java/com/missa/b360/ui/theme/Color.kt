@@ -34,6 +34,10 @@ val MissaMuted = Color(0xFF65718F)
 val MissaBorder = Color(0xFFE2E7F2)
 val MissaLime = Color(0xFFB6E52B)
 
+// Écrans d'onboarding « maquette » : bleu roi d'accueil et fond vert clair du récapitulatif.
+val OnboardingHeroBlue = Color(0xFF1E2EC8)
+val OnboardingHeroGreen = Color(0xFFEFF8F1)
+
 // Alias de compatibilité des écrans d'onboarding.
 val OnboardingPrimary = BrandBlue
 val OnboardingPrimaryDark = Blue40

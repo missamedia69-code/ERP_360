@@ -71,6 +71,8 @@ class SetupEnterpriseUseCase @Inject constructor(
         val nomSitePrincipal: String,
         val profilActivite: String? = null,
         val palierTaille: String? = null,
+        /** Secteur d'activité libre (champ existant de l'entreprise, optionnel). */
+        val secteur: String? = null,
         /** URI du logo image sélectionné pendant l'onboarding. */
         val logoUri: String? = null,
     )
@@ -91,6 +93,7 @@ class SetupEnterpriseUseCase @Inject constructor(
                 EnterpriseEntity(
                     nom = params.nomEntreprise.trim(),
                     devise = params.devise,
+                    secteur = params.secteur?.trim()?.ifEmpty { null },
                     langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
                     pays = params.pays,
                     logoUri = params.logoUri,
