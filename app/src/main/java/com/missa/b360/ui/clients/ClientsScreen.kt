@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
@@ -20,6 +22,7 @@ import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.util.MoneyUtils
 
 /** Écran Clients (9.2) : liste + recherche + catégories + badges + désactivation. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +41,8 @@ private fun LegacyClientsScreen(
     val codePaysParDefaut by viewModel.codePaysParDefaut.collectAsState()
     val resultat by viewModel.resultat.collectAsState()
     val erreurCategorie by viewModel.erreurCategorie.collectAsState()
+    val soldes by viewModel.soldes.collectAsState()
+    val rappelMessage by viewModel.rappelMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     var recherche by remember { mutableStateOf("") }
@@ -51,6 +56,16 @@ private fun LegacyClientsScreen(
             clientEdite = null
             formVisible = true
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.rafraichirSoldes()
+    }
+
+    LaunchedEffect(rappelMessage) {
+        val ref = rappelMessage ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(stringResource(R.string.rappel_envoye, ref))
+        viewModel.acquitterRappel()
     }
 
     val messageRetour = resultat?.let { retour ->
@@ -147,11 +162,14 @@ private fun LegacyClientsScreen(
                             client = client,
                             nomCategorie = categories.firstOrNull { it.id == client.categorieId }?.nom,
                             badge = badges.firstOrNull { it.id == client.badgeId },
+                            solde = soldes[client.id] ?: 0.0,
+                            devise = deviseEntreprise ?: "XAF",
                             onClick = {
                                 clientEdite = client
                                 formVisible = true
                             },
                             onDesactiver = { viewModel.desactiver(client.id) },
+                            onRappel = { viewModel.rappelPaiement(client.id) },
                         )
                     }
                 }
@@ -242,8 +260,11 @@ private fun ClientCard(
     client: ClientEntity,
     nomCategorie: String?,
     badge: BadgeLoyaltyEntity?,
+    solde: Double,
+    devise: String,
     onClick: () -> Unit,
     onDesactiver: () -> Unit,
+    onRappel: () -> Unit,
 ) {
     Card(
         Modifier
@@ -274,11 +295,28 @@ private fun ClientCard(
                         color = MaterialTheme.colorScheme.tertiary,
                     )
                 }
+                if (solde > 0.001) {
+                    Text(
+                        stringResource(R.string.rappel_solde, MoneyUtils.format(solde, devise)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 11.sp,
+                    )
+                }
             }
             badge?.let {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.Star, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Text("${it.remisePct}%", style = MaterialTheme.typography.labelSmall)
+                }
+            }
+            if (solde > 0.001 && client.statut != ClientStatus.DESACTIVE) {
+                IconButton(onClick = onRappel) {
+                    Icon(
+                        Icons.Outlined.Notifications,
+                        contentDescription = stringResource(R.string.rappel_bell_cd),
+                        tint = MaterialTheme.colorScheme.tertiary,
+                    )
                 }
             }
             if (client.statut == ClientStatus.DESACTIVE) return@Card

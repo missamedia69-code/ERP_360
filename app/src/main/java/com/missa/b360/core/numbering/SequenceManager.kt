@@ -40,6 +40,10 @@ enum class DocType(val prefix: String) {
 
     // Séquence dédiée produit (module Stock, spec §7)
     PRODUIT("PRD"),
+
+    // RH — employés, rappels de paiement (spec §RH/§22)
+    EMPLOYE("EMP"),
+    RAPPEL("RPP"),
 }
 
 /**

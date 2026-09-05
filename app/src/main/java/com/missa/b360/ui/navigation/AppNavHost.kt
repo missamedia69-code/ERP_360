@@ -23,10 +23,14 @@ import com.missa.b360.ui.admin.AdminReglagesScreen
 import com.missa.b360.ui.admin.AdminSauvegardeScreen
 import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
+import com.missa.b360.ui.admin.ReferentielsScreen
 import com.missa.b360.ui.clients.ClientsScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.production.ProductionScreen
 import com.missa.b360.ui.purchases.PurchasesScreen
 import com.missa.b360.ui.home.HomeScreen
+import com.missa.b360.ui.rh.RhScreen
+import com.missa.b360.ui.tasks.TasksScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
 import com.missa.b360.ui.operations.OperationFormScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
@@ -190,6 +194,44 @@ private fun MainNavHost() {
         composable(Routes.STOCK_INVENTORY) {
             InventoryScreen(onBack = { navController.popBackStack() })
         }
+        // RH (spec §RH/§Paie) — écran dédié : employés, absences, paie, avances.
+        composable(
+            route = "${AppModule.RH.route}?create={create}&direction={direction}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument("direction") {
+                    type = NavType.StringType
+                    defaultValue = "NONE"
+                },
+            ),
+        ) { entry ->
+            RhScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
+        }
+        // Production (spec §Production) — écran dédié : ordres de production (OP).
+        composable(
+            route = "${AppModule.PRODUCTION.route}?create={create}&direction={direction}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+                navArgument("direction") {
+                    type = NavType.StringType
+                    defaultValue = "NONE"
+                },
+            ),
+        ) { entry ->
+            ProductionScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
+        }
         // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
         composable(
             route = "${AppModule.VENTE.route}?create={create}",
@@ -244,10 +286,16 @@ private fun MainNavHost() {
         }
         operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
         operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
-        operationDestination(AppModule.PRODUCTION, OperationModule.PRODUCTION, navController)
         operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
-        operationDestination(AppModule.RH, OperationModule.RH, navController)
         operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
+        // Référentiels (spec §30) — moyens de paiement, taxes, unités.
+        composable(Routes.ADMIN_REFERENTIELS) {
+            ReferentielsScreen(onBack = { navController.popBackStack() })
+        }
+        // Tâches de suivi (spec §Tâches).
+        composable(Routes.TASKS) {
+            TasksScreen(onBack = { navController.popBackStack() })
+        }
         // Formulaire d'opération — page dédiée unique (spec §3.2) : [Retour | Titre] ... [Annuler][Enregistrer].
         composable(
             route = "${Routes.OPERATION_FORM}?module={module}&direction={direction}",

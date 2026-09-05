@@ -18,14 +18,64 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 /**
- * Cycle commercial devis → commande → facture (spec §20).
+ * Cycle commercial (spec §20) : devis → commande → facture, pour les ventes
+ * (D/C) ET les prestations de service (DP/OS).
  *
- * **Aucun effet stock, aucun effet trésorerie** : un devis ou une commande est
- * une pièce commerciale. Seule la conversion commande → facture déclenche les
- * mouvements (via [SaveSaleUseCase], qui garde l'autorité sur le stock).
- * Aucune écriture de caisse non plus — le paiement de la facture est sa propre
- * opération (spec §6/§44).
+ * **Aucun effet stock, aucun effet trésorerie** : ce sont des pièces
+ * commerciales. Seule la conversion commande → facture déclenche les
+ * mouvements (via [SaveSaleUseCase], autorité sur le stock ; les lignes de
+ * prestation sans produit du catalogue n'ont d'ailleurs aucun effet).
  */
+
+/** Famille commerciale — dérive le module, le type de document et le libellé. */
+sealed interface CommercialTarget {
+    val module: OperationModule
+    val docType: DocType
+    val label: String
+    val isDevis: Boolean
+
+    data object Devis : CommercialTarget {
+        override val module = OperationModule.DEVIS
+        override val docType = DocType.DEVIS
+        override val label = "Devis"
+        override val isDevis = true
+    }
+    data object Commande : CommercialTarget {
+        override val module = OperationModule.COMMANDE
+        override val docType = DocType.COMMANDE_CLIENT
+        override val label = "Commande"
+        override val isDevis = false
+    }
+    data object DevisPrestation : CommercialTarget {
+        override val module = OperationModule.SERVICES
+        override val docType = DocType.DEVIS_PRESTATION
+        override val label = "Devis prestation"
+        override val isDevis = true
+    }
+    data object CommandePrestation : CommercialTarget {
+        override val module = OperationModule.SERVICES
+        override val docType = DocType.ORDRE_SERVICE
+        override val label = "Commande prestation"
+        override val isDevis = false
+    }
+}
+
+/** Résolution de la cible d'une pièce à partir de sa pièce stockée. */
+object CommercialTargets {
+    fun fromRecord(record: OperationRecordEntity): CommercialTarget? = when (record.module) {
+        OperationModule.DEVIS.name -> CommercialTarget.Devis
+        OperationModule.COMMANDE.name -> CommercialTarget.Commande
+        OperationModule.SERVICES.name -> when {
+            record.reference.startsWith("DP") -> CommercialTarget.DevisPrestation
+            record.reference.startsWith("OS") -> CommercialTarget.CommandePrestation
+            else -> null
+        }
+        else -> null
+    }
+
+    fun fromTarget(target: CommercialTarget): CommercialTarget = target
+}
+
 class SaveDevisCommandeUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val clientDao: ClientDao,
@@ -41,29 +91,30 @@ class SaveDevisCommandeUseCase @Inject constructor(
         data object PiecIntrouvable : Result()
     }
 
-    /** module : [OperationModule.DEVIS] ou [OperationModule.COMMANDE]. */
     suspend operator fun invoke(
-        module: OperationModule,
+        target: CommercialTarget,
         recordId: Long?,
         payload: SaleRecordPayload,
         now: Long = System.currentTimeMillis(),
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         if (payload.lines.isEmpty() || payload.total <= 0.0) return Result.DonneesInvalides
+        // Même règle que SaleCalculator (prix TTC) : total = max(0, sous-total − remise + livraison).
         val subtotal = payload.lines.sumOf { it.total }.coerceAtLeast(0.0)
-        if (abs(subtotal - payload.total) > 0.01) return Result.DonneesInvalides
+        val attendu = max(
+            0.0,
+            subtotal - payload.discount.coerceIn(0.0, subtotal) + payload.delivery.coerceAtLeast(0.0),
+        )
+        if (abs(attendu - payload.total) > 0.01) return Result.DonneesInvalides
         if (clientDao.getById(payload.clientId) == null) return Result.ClientIntrouvable
 
-        val prefix = if (module == OperationModule.DEVIS) "Devis" else "Commande"
-        val docType = if (module == OperationModule.DEVIS) DocType.DEVIS else DocType.COMMANDE_CLIENT
-
         if (recordId == null) {
-            val reference = sequenceManager.next(docType)
+            val reference = sequenceManager.next(target.docType)
             val id = operationDao.insert(
                 OperationRecordEntity(
-                    module = module.name,
+                    module = target.module.name,
                     reference = reference,
-                    title = "$prefix $reference — ${payload.clientName}",
+                    title = "${target.label} $reference — ${payload.clientName}",
                     counterpart = payload.clientName,
                     amount = payload.total,
                     direction = OperationDirection.NONE.name,
@@ -73,36 +124,34 @@ class SaveDevisCommandeUseCase @Inject constructor(
                 ),
             )
             journalManager.log(
-                module.name,
-                if (module == OperationModule.DEVIS) "DEVIS_CREER" else "COMMANDE_CREER",
-                "$prefix $reference — ${payload.clientName} (${payload.total})",
+                target.module.name,
+                if (target.isDevis) "DEVIS_CREER" else "COMMANDE_CREER",
+                "${target.label} $reference — ${payload.clientName} (${payload.total})",
             )
             return Result.Succes(id, reference)
         }
 
         val existant = operationDao.getById(recordId)
-        if (existant == null || existant.module != module.name ||
-            existant.status == OperationStatus.CANCELLED.name
-        ) {
+        val cible = CommercialTargets.fromRecord(existant ?: return Result.PiecIntrouvable)
+        if (existant == null || cible != target || existant.status == OperationStatus.CANCELLED.name) {
             return Result.PiecIntrouvable
         }
         operationDao.update(
             existant.copy(
-                title = "$prefix ${existant.reference} — ${payload.clientName}",
+                title = "${target.label} ${existant.reference} — ${payload.clientName}",
                 counterpart = payload.clientName,
                 amount = payload.total,
                 notes = SaleRecordCodec.encode(payload),
             ),
         )
-        journalManager.log(module.name, "PIECE_MODIFIEE", "${existant.reference} mis à jour")
+        journalManager.log(target.module.name, "PIECE_MODIFIEE", "${existant.reference} mis à jour")
         return Result.Succes(recordId, existant.reference)
     }
 }
 
 /**
- * Conversion devis → commande (spec §20) : la commande reprend exactement le
- * contenu du devis (même client, mêmes lignes, mêmes montants), liée par
- * `sourceRecordId`. Transactionnelle, journalisée.
+ * Conversion devis → commande (ventes ET prestations) : la commande reprend
+ * exactement le contenu du devis, liée par `sourceRecordId`.
  */
 class ConvertDevisToOrderUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
@@ -119,14 +168,24 @@ class ConvertDevisToOrderUseCase @Inject constructor(
         data object DonneesInvalides : Result()
     }
 
+    /**
+     * @param targetDevis la famille source (ventes ou prestations).
+     */
     suspend operator fun invoke(
         devisRecordId: Long,
+        targetDevis: CommercialTarget,
         now: Long = System.currentTimeMillis(),
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
+        val targetOrder: CommercialTarget = if (targetDevis == CommercialTarget.Devis) {
+            CommercialTarget.Commande
+        } else {
+            CommercialTarget.CommandePrestation
+        }
+
         return database.withTransaction {
             val devis = operationDao.getById(devisRecordId)
-            if (devis == null || devis.module != OperationModule.DEVIS.name) {
+            if (CommercialTargets.fromRecord(devis ?: return@withTransaction Result.Introuvable) != targetDevis) {
                 return@withTransaction Result.Introuvable
             }
             if (devis.status == OperationStatus.CANCELLED.name) {
@@ -135,12 +194,12 @@ class ConvertDevisToOrderUseCase @Inject constructor(
             val payload = SaleRecordCodec.decode(devis.notes)
                 ?: return@withTransaction Result.DonneesInvalides
 
-            val reference = sequenceManager.next(DocType.COMMANDE_CLIENT)
+            val reference = sequenceManager.next(targetOrder.docType)
             val commandeId = operationDao.insert(
                 OperationRecordEntity(
-                    module = OperationModule.COMMANDE.name,
+                    module = targetOrder.module.name,
                     reference = reference,
-                    title = "Commande $reference — ${payload.clientName}",
+                    title = "${targetOrder.label} $reference — ${payload.clientName}",
                     counterpart = payload.clientName,
                     amount = payload.total,
                     direction = OperationDirection.NONE.name,
@@ -152,7 +211,7 @@ class ConvertDevisToOrderUseCase @Inject constructor(
                 ),
             )
             journalManager.log(
-                OperationModule.COMMANDE.name,
+                targetOrder.module.name,
                 "DEVIS_CONVERTI",
                 "$reference créée depuis ${devis.reference}",
             )
@@ -162,9 +221,9 @@ class ConvertDevisToOrderUseCase @Inject constructor(
 }
 
 /**
- * Conversion commande → facture (spec §20) : délègue à [SaveSaleUseCase] qui
- * reste l'autorité transactionnelle sur le stock, les mouvements et la caisse.
- * La commande déjà facturationnée (pièce de vente rattachée via
+ * Conversion commande → facture (ventes ET prestations) : délègue à
+ * [SaveSaleUseCase] (autorité transactionnelle sur stock + caisse). La
+ * commande déjà facturationnée (pièce de vente rattachée via
  * `sourceRecordId`) refuse la double facturation.
  */
 class ConvertOrderToSaleUseCase @Inject constructor(
@@ -195,7 +254,9 @@ class ConvertOrderToSaleUseCase @Inject constructor(
 
         return database.withTransaction {
             val commande = operationDao.getById(commandeRecordId)
-            if (commande == null || commande.module != OperationModule.COMMANDE.name) {
+            val cible = CommercialTargets.fromRecord(commande ?: return@withTransaction Result.Introuvable)
+            // Seules les commandes (ventes ou prestations) sont facturables.
+            if (cible != CommercialTarget.Commande && cible != CommercialTarget.CommandePrestation) {
                 return@withTransaction Result.Introuvable
             }
             if (commande.status == OperationStatus.CANCELLED.name) {
@@ -226,7 +287,7 @@ class ConvertOrderToSaleUseCase @Inject constructor(
             when (facturation) {
                 is SaveSaleUseCase.Result.Succes -> {
                     journalManager.log(
-                        OperationModule.COMMANDE.name,
+                        cible.module.name,
                         "COMMANDE_FACTUREE",
                         "${commande.reference} → ${facturation.reference}",
                     )

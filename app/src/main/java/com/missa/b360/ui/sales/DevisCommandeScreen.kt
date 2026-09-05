@@ -77,13 +77,14 @@ import com.missa.b360.R
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.ClientEntity
-import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
+import com.missa.b360.core.domain.usecase.CommercialTarget
+import com.missa.b360.core.domain.usecase.CommercialTargets
 import com.missa.b360.core.domain.usecase.ConvertDevisToOrderUseCase
 import com.missa.b360.core.domain.usecase.ConvertOrderToSaleUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
@@ -119,9 +120,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/** Famille d'écran : « vente » (D/C) ou « prestations » (DP/OS) — même moteur. */
+enum class DcFamily { VENTE, PRESTATIONS }
+
 /**
- * Cycle commercial devis → commande → facture (spec §20) — UNE page :
- * liste des pièces (onglets Devis / Commandes), formulaire commun, conversions.
+ * Cycle commercial (spec §20) — UNE page, deux familles :
+ * ventes (devis → commande → facture) et prestations (DP → OS → facture).
  * Aucune donnée fictive ; le stock n'est touché qu'à la facturation.
  */
 @HiltViewModel
@@ -155,19 +159,33 @@ class DevisCommandeViewModel @Inject constructor(
         data object Cancelled : Result
     }
 
+    // --- Famille ventes (D / C) ---
     val devis: StateFlow<List<OperationRecordEntity>> =
-        operations.observe(OperationModule.DEVIS).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
+        operations.observe(com.missa.b360.core.data.entity.OperationModule.DEVIS)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val commandes: StateFlow<List<OperationRecordEntity>> =
-        operations.observe(OperationModule.COMMANDE).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+        operations.observe(com.missa.b360.core.data.entity.OperationModule.COMMANDE)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    /** Commandes déjà rattachées à une facture (interdiction de double facturation). */
+    // --- Famille prestations (DP / OS, module SERVICES) ---
+    private val services: StateFlow<List<OperationRecordEntity>> =
+        operations.observe(com.missa.b360.core.data.entity.OperationModule.SERVICES)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val prestationsDevis: StateFlow<List<OperationRecordEntity>> = services
+        .map { list -> list.filter { it.reference.startsWith("DP") } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val prestationsCommandes: StateFlow<List<OperationRecordEntity>> = services
+        .map { list -> list.filter { it.reference.startsWith("OS") } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Commandes déjà rattachées à une facture — interdiction de double facturation. */
     val facturees: StateFlow<Set<Long>> = combine(
-        operations.observe(OperationModule.COMMANDE),
-        operations.observe(OperationModule.VENTE),
-    ) { commandees, ventes ->
+        commandes,
+        prestationsCommandes,
+        operations.observe(com.missa.b360.core.data.entity.OperationModule.VENTE),
+    ) { commandees, commandesPrestations, ventes ->
         val payloads = ventes.mapNotNull { SaleRecordCodec.decode(it.notes) }
-        commandees.filter { commande ->
+        (commandees + commandesPrestations).filter { commande ->
             com.missa.b360.core.domain.model.DevisCommandeRules.estFacturee(payloads, commande.id)
         }.map { it.id }.toSet()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
@@ -190,7 +208,7 @@ class DevisCommandeViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
 
     data class DcUiState(
-        val target: OperationModule = OperationModule.DEVIS,
+        val target: CommercialTarget = CommercialTarget.Devis,
         val client: ClientEntity? = null,
         val lines: List<SaleLine> = emptyList(),
         val discountInput: String = "",
@@ -219,17 +237,18 @@ class DevisCommandeViewModel @Inject constructor(
         )
     }
 
-    fun startNew(target: OperationModule) {
+    fun startNew(target: CommercialTarget) {
         _uiState.value = DcUiState(target = target)
     }
 
     /** Recharge une pièce dans le formulaire (édition). */
     fun loadForEdit(record: OperationRecordEntity): Boolean {
         val payload = SaleRecordCodec.decode(record.notes) ?: return false
+        val target = CommercialTargets.fromRecord(record) ?: return false
         val client = clients.value.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = DcUiState(
-            target = if (record.module == OperationModule.DEVIS.name) OperationModule.DEVIS else OperationModule.COMMANDE,
+            target = target,
             client = client,
             lines = payload.lines,
             discountInput = payload.discount.toInputAmount(),
@@ -243,10 +262,11 @@ class DevisCommandeViewModel @Inject constructor(
     /** Duplique le contenu dans une pièce vierge (nouvelle référence). */
     fun duplicate(record: OperationRecordEntity): Boolean {
         val payload = SaleRecordCodec.decode(record.notes) ?: return false
+        val target = CommercialTargets.fromRecord(record) ?: return false
         val client = clients.value.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = DcUiState(
-            target = if (record.module == OperationModule.DEVIS.name) OperationModule.DEVIS else OperationModule.COMMANDE,
+            target = target,
             client = client,
             lines = payload.lines,
             discountInput = payload.discount.toInputAmount(),
@@ -316,7 +336,7 @@ class DevisCommandeViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(note = value.take(500))
     }
 
-    /** Enregistre le devis ou la commande (pièce commerciale — aucun effet stock/caisse). */
+    /** Enregistre la pièce commerciale (aucun effet stock/caisse). */
     fun save() {
         if (_busy.value) return
         val state = _uiState.value
@@ -352,7 +372,7 @@ class DevisCommandeViewModel @Inject constructor(
                 )
                 when (val r = saveDevisCommande(state.target, state.editingRecordId, payload)) {
                     is SaveDevisCommandeUseCase.Result.Succes -> {
-                        _result.value = Result.Saved(r.reference, state.target == OperationModule.DEVIS)
+                        _result.value = Result.Saved(r.reference, state.target.isDevis)
                         _uiState.value = DcUiState(target = state.target)
                     }
                     SaveDevisCommandeUseCase.Result.LectureSeule -> _result.value = Result.ReadOnly
@@ -372,10 +392,14 @@ class DevisCommandeViewModel @Inject constructor(
 
     fun convertToOrder(record: OperationRecordEntity) {
         if (_busy.value) return
+        val targetDevis = CommercialTargets.fromRecord(record) ?: run {
+            _result.value = Result.PiecIntrouvable
+            return
+        }
         viewModelScope.launch {
             _busy.value = true
             try {
-                when (val r = convertDevis(record.id)) {
+                when (val r = convertDevis(record.id, targetDevis)) {
                     is ConvertDevisToOrderUseCase.Result.Succes -> _result.value = Result.OrderCreated(r.reference)
                     ConvertDevisToOrderUseCase.Result.LectureSeule -> _result.value = Result.ReadOnly
                     ConvertDevisToOrderUseCase.Result.Introuvable -> _result.value = Result.PiecIntrouvable
@@ -460,10 +484,14 @@ private fun Double.saleRateText(): String =
 @Composable
 fun DevisCommandeScreen(
     onBack: () -> Unit,
+    family: DcFamily = DcFamily.VENTE,
+    openCreate: Boolean = false,
     viewModel: DevisCommandeViewModel = hiltViewModel(),
 ) {
     val devis by viewModel.devis.collectAsState(initial = emptyList())
     val commandes by viewModel.commandes.collectAsState(initial = emptyList())
+    val prestationsDevis by viewModel.prestationsDevis.collectAsState(initial = emptyList())
+    val prestationsCommandes by viewModel.prestationsCommandes.collectAsState(initial = emptyList())
     val facturees by viewModel.facturees.collectAsState(initial = emptySet())
     val clients by viewModel.clients.collectAsState()
     val products by viewModel.products.collectAsState(initial = emptyList())
@@ -472,12 +500,12 @@ fun DevisCommandeScreen(
     val devise by viewModel.devise.collectAsState()
     val ui by viewModel.uiState.collectAsState()
     val busy by viewModel.busy.collectAsState()
-    val result by viewModel.result.collectAsState()
+
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
 
     var tab by rememberSaveable { mutableStateOf("DEVIS") }
-    var formVisible by rememberSaveable { mutableStateOf(false) }
+    var formVisible by rememberSaveable(openCreate) { mutableStateOf(openCreate) }
     var clientSheetVisible by remember { mutableStateOf(false) }
     var clientSearch by remember { mutableStateOf("") }
     var productSearch by rememberSaveable { mutableStateOf("") }
@@ -490,16 +518,38 @@ fun DevisCommandeScreen(
     var invoicePayment by rememberSaveable { mutableStateOf("") }
     var invoicePaid by rememberSaveable { mutableStateOf("") }
 
+    // --- Cibles selon la famille ---
+    val targetDevis: CommercialTarget =
+        if (family == DcFamily.VENTE) CommercialTarget.Devis else CommercialTarget.DevisPrestation
+    val targetCommande: CommercialTarget =
+        if (family == DcFamily.VENTE) CommercialTarget.Commande else CommercialTarget.CommandePrestation
+    val targetParTab: (String) -> CommercialTarget = { if (it == "DEVIS") targetDevis else targetCommande }
+    val liste = when (family) {
+        DcFamily.VENTE -> if (tab == "DEVIS") devis else commandes
+        DcFamily.PRESTATIONS -> if (tab == "DEVIS") prestationsDevis else prestationsCommandes
+    }
+
     val fallbackPayment = stringResource(R.string.sales_cash)
     LaunchedEffect(paymentMethods) {
         if (invoicePayment.isBlank() && paymentMethods.isNotEmpty()) invoicePayment = paymentMethods.first()
     }
-    LaunchedEffect(result) {
-        when (val r = result) {
+    LaunchedEffect(openCreate) {
+        if (openCreate) {
+            viewModel.startNew(targetParTab(tab))
+            formVisible = true
+        }
+    }
+    LaunchedEffect(viewModel.result) {
+        when (val r = viewModel.result.value) {
             is DevisCommandeViewModel.Result.Saved -> {
                 snackbar.showSnackbar(
                     context.getString(
-                        if (r.isDevis) R.string.dc_devis_saved else R.string.dc_commande_saved,
+                        when {
+                            r.isDevis && family == DcFamily.PRESTATIONS -> R.string.prest_devis_saved
+                            r.isDevis -> R.string.dc_devis_saved
+                            family == DcFamily.PRESTATIONS -> R.string.prest_commande_saved
+                            else -> R.string.dc_commande_saved
+                        },
                         r.reference,
                     ),
                 )
@@ -569,11 +619,16 @@ fun DevisCommandeScreen(
             // --- LISTE (onglets Devis / Commandes) ---
             Scaffold(
                 containerColor = MissaCanvas,
-                topBar = { MissaTopAppBar(title = stringResource(R.string.dc_title), onBack = onBack) },
+                topBar = {
+                    MissaTopAppBar(
+                        title = stringResource(if (family == DcFamily.VENTE) R.string.dc_title else R.string.prest_title),
+                        onBack = onBack,
+                    )
+                },
                 floatingActionButton = {
                     FloatingActionButton(
                         onClick = {
-                            viewModel.startNew(if (tab == "DEVIS") OperationModule.DEVIS else OperationModule.COMMANDE)
+                            viewModel.startNew(targetParTab(tab))
                             formVisible = true
                         },
                         containerColor = BrandBlue,
@@ -592,34 +647,50 @@ fun DevisCommandeScreen(
                             FilterChip(
                                 selected = tab == "DEVIS",
                                 onClick = { tab = "DEVIS" },
-                                label = { Text(stringResource(R.string.dc_tab_devis)) },
+                                label = {
+                                    Text(
+                                        stringResource(
+                                            if (family == DcFamily.VENTE) R.string.dc_tab_devis else R.string.prest_tab_devis,
+                                        ),
+                                    )
+                                },
                                 modifier = Modifier.weight(1f),
                             )
                             FilterChip(
                                 selected = tab == "COMMANDE",
                                 onClick = { tab = "COMMANDE" },
-                                label = { Text(stringResource(R.string.dc_tab_commandes)) },
+                                label = {
+                                    Text(
+                                        stringResource(
+                                            if (family == DcFamily.VENTE) R.string.dc_tab_commandes else R.string.prest_tab_commandes,
+                                        ),
+                                    )
+                                },
                                 modifier = Modifier.weight(1f),
                             )
                         }
                     }
-                    val records = if (tab == "DEVIS") devis else commandes
-                    if (records.isEmpty()) {
+                    if (liste.isEmpty()) {
                         item {
                             MissaEmptyState(
                                 icon = Icons.Outlined.Description,
                                 title = stringResource(
-                                    if (tab == "DEVIS") R.string.dc_devis_empty else R.string.dc_commande_empty,
+                                    when {
+                                        tab == "DEVIS" && family == DcFamily.PRESTATIONS -> R.string.prest_devis_empty
+                                        tab == "DEVIS" -> R.string.dc_devis_empty
+                                        family == DcFamily.PRESTATIONS -> R.string.prest_commande_empty
+                                        else -> R.string.dc_commande_empty
+                                    },
                                 ),
                             )
                         }
                     } else {
-                        items(records, key = { it.id }) { record ->
+                        items(liste, key = { it.id }) { record ->
                             DcRecordRow(
                                 record = record,
                                 devise = devise,
-                                isCommande = tab == "COMMANDE",
-                                estFacturee = isCommande && record.id in facturees,
+                                estCommande = tab == "COMMANDE",
+                                estFacturee = tab == "COMMANDE" && record.id in facturees,
                                 onOpen = { detailRecord = record },
                             )
                         }
@@ -642,9 +713,13 @@ fun DevisCommandeScreen(
                     MissaTopAppBar(
                         title = stringResource(
                             when {
-                                ui.editingRecordId != null && ui.target == OperationModule.DEVIS -> R.string.dc_edit_devis
+                                ui.editingRecordId != null && ui.target.isDevis && family == DcFamily.PRESTATIONS -> R.string.prest_edit_devis
+                                ui.editingRecordId != null && ui.target.isDevis -> R.string.dc_edit_devis
+                                ui.editingRecordId != null && family == DcFamily.PRESTATIONS -> R.string.prest_edit_commande
                                 ui.editingRecordId != null -> R.string.dc_edit_commande
-                                ui.target == OperationModule.DEVIS -> R.string.dc_new_devis
+                                ui.target.isDevis && family == DcFamily.PRESTATIONS -> R.string.prest_new_devis
+                                ui.target.isDevis -> R.string.dc_new_devis
+                                family == DcFamily.PRESTATIONS -> R.string.prest_new_commande
                                 else -> R.string.dc_new_commande
                             },
                         ),
@@ -715,7 +790,7 @@ fun DevisCommandeScreen(
                         }
                     }
 
-                    // --- PRODUITS ---
+                    // --- PRODUITS / PRESTATIONS ---
                     DcCard(stringResource(R.string.dc_products)) {
                         OutlinedTextField(
                             value = productSearch,
@@ -769,7 +844,7 @@ fun DevisCommandeScreen(
                             }
                         }
 
-                        // --- LIGNE LIBRE ---
+                        // --- LIGNE LIBRE (ou prestation libre) ---
                         Row(modifier = Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             OutlinedTextField(
                                 value = freeName,
@@ -900,7 +975,8 @@ fun DevisCommandeScreen(
         // --- DÉTAIL D'UNE PIÈCE (conversions) ---
         detailRecord?.let { record ->
             val payload = SaleRecordCodec.decode(record.notes)
-            val estCommande = record.module == OperationModule.COMMANDE.name
+            val target = CommercialTargets.fromRecord(record)
+            val estCommande = target?.isDevis == false
             val isCancelled = record.status == OperationStatus.CANCELLED.name
             val estFacturee = estCommande && record.id in facturees
             ModalBottomSheet(onDismissRequest = { detailRecord = null }, containerColor = Color.White) {
@@ -917,9 +993,7 @@ fun DevisCommandeScreen(
                         payload?.let { Text(saleMoney(it.total, devise), color = BrandBlue, fontWeight = FontWeight.Bold) }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        if (isCancelled) {
-                            DcBadge(stringResource(R.string.ops_status_cancelled), Red40)
-                        }
+                        if (isCancelled) DcBadge(stringResource(R.string.ops_status_cancelled), Red40)
                         if (estFacturee) DcBadge(stringResource(R.string.dc_invoiced), Green60)
                         if (estCommande && !estFacturee && !isCancelled) DcBadge(stringResource(R.string.dc_to_invoice), BrandBlue)
                     }
@@ -1061,7 +1135,7 @@ private fun DcBadge(text: String, color: Color) {
 private fun DcRecordRow(
     record: OperationRecordEntity,
     devise: String,
-    isCommande: Boolean,
+    estCommande: Boolean,
     estFacturee: Boolean,
     onOpen: () -> Unit,
 ) {
@@ -1089,8 +1163,8 @@ private fun DcRecordRow(
             }
             Row(modifier = Modifier.padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (isCancelled) DcBadge(stringResource(R.string.ops_status_cancelled), Red40)
-                if (isCommande && estFacturee) DcBadge(stringResource(R.string.dc_invoiced), Green60)
-                if (isCommande && !estFacturee && !isCancelled) DcBadge(stringResource(R.string.dc_to_invoice), BrandBlue)
+                if (estCommande && estFacturee) DcBadge(stringResource(R.string.dc_invoiced), Green60)
+                if (estCommande && !estFacturee && !isCancelled) DcBadge(stringResource(R.string.dc_to_invoice), BrandBlue)
             }
         }
     }

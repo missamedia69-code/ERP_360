@@ -4,8 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
@@ -16,18 +18,21 @@ import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.StockMovementDao
+import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
+import com.missa.b360.core.data.entity.AbsenceEntity
 import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.EmployeeEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
@@ -45,6 +50,7 @@ import com.missa.b360.core.data.entity.RolePermissionEntity
 import com.missa.b360.core.data.entity.SequenceEntity
 import com.missa.b360.core.data.entity.SettingEntity
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.data.entity.UserEntity
 
@@ -79,8 +85,11 @@ import com.missa.b360.core.data.entity.UserEntity
         ProductEntity::class,
         ProductStockEntity::class,
         StockMovementEntity::class,
+        EmployeeEntity::class,
+        AbsenceEntity::class,
+        TaskEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -102,6 +111,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun productStockDao(): ProductStockDao
     abstract fun stockMovementDao(): StockMovementDao
+    abstract fun employeeDao(): EmployeeDao
+    abstract fun absenceDao(): AbsenceDao
+    abstract fun taskDao(): TaskDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -243,6 +255,36 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL(
                     "CREATE INDEX IF NOT EXISTS `index_stock_movements_horodatage` " +
                         "ON `stock_movements` (`horodatage`)",
+                )
+            }
+        }
+
+        /** v6 → v7 : RH (employés, absences) + tâches de suivi. */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `employees` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, " +
+                        "`nom` TEXT NOT NULL, `telephone` TEXT NOT NULL, `poste` TEXT, " +
+                        "`salaireBase` REAL NOT NULL, `joursMensuels` REAL NOT NULL, " +
+                        "`statut` TEXT NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_employees_code` ON `employees` (`code`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `absences` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `employeeId` INTEGER NOT NULL, " +
+                        "`type` TEXT NOT NULL, `dateDebut` INTEGER NOT NULL, `dureeJours` REAL NOT NULL, " +
+                        "`motif` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_absences_employeeId` ON `absences` (`employeeId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tasks` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `titre` TEXT NOT NULL, " +
+                        "`notes` TEXT, `statut` TEXT NOT NULL, `echeance` INTEGER, `createdAt` INTEGER NOT NULL)",
                 )
             }
         }

@@ -234,7 +234,7 @@ fun SalesScreen(
                 viewModel.clearSaveResult()
             }
             SalesViewModel.SaveResult.Cancelled -> {
-                snackbar.showSnackbar(context.getString(R.string.sales_cancelled))
+                snackbar.showSnackbar(context.getString(R.string.sales_annulee_snackbar))
                 activeReceipt = null
                 stepName = SalesStep.LIST.name
                 viewModel.clearSaveResult()

@@ -21,6 +21,7 @@ import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveAllClientsUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
+import com.missa.b360.core.domain.usecase.RappelPaiementUseCase
 import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UpdateClientUseCase
 import com.missa.b360.core.util.Iso4217
@@ -29,6 +30,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +49,7 @@ class ClientsViewModel @Inject constructor(
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
     private val siteUseCases: SiteUseCases,
+    private val rappelPaiement: RappelPaiementUseCase,
 ) : ViewModel() {
 
     /** Le module Client montre aussi les comptes désactivés, contrairement au sélecteur Vente. */
@@ -90,6 +93,47 @@ class ClientsViewModel @Inject constructor(
 
     private val _erreurCategorie = MutableStateFlow<String?>(null)
     val erreurCategorie: StateFlow<String?> = _erreurCategorie
+
+    /** Solde dû par client (factures − payé − avoirs) pour la cloche de rappel. */
+    private val _soldes = MutableStateFlow<Map<Long, Double>>(emptyMap())
+    val soldes: StateFlow<Map<Long, Double>> = _soldes
+
+    /** Référence du dernier rappel enregistré (affichée en snackbar). */
+    private val _rappelMessage = MutableStateFlow<String?>(null)
+    val rappelMessage: StateFlow<String?> = _rappelMessage
+    fun acquitterRappel() {
+        _rappelMessage.value = null
+    }
+
+    fun rafraichirSoldes() {
+        viewModelScope.launch {
+            val liste = clients.first()
+            _soldes.value = liste.associate { c ->
+                val s = try {
+                    rappelPaiement.soldeClient(c.id)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: Exception) {
+                    0.0
+                }
+                c.id to s
+            }
+        }
+    }
+
+    fun rappelPaiement(clientId: Long) {
+        viewModelScope.launch {
+            when (val r = rappelPaiement(clientId)) {
+                is RappelPaiementUseCase.Result.Succes -> {
+                    _rappelMessage.value = r.reference
+                    rafraichirSoldes()
+                }
+                RappelPaiementUseCase.Result.LectureSeule -> Unit
+                RappelPaiementUseCase.Result.ClientIntrouvable -> Unit
+                RappelPaiementUseCase.Result.AucunSolde -> Unit
+            }
+        }
+    }
 
     private var demandeDoublon: DemandeCreation? = null
     private var creationEnCours = false

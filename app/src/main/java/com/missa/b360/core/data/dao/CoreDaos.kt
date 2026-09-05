@@ -140,6 +140,16 @@ interface TaxDao {
     suspend fun count(): Int
 
     @Insert
+    suspend fun insert(tax: TaxEntity): Long
+
+    @Update
+    suspend fun update(tax: TaxEntity)
+
+    /** Une seule taxe par défaut à la fois (référentiel, spec §30). */
+    @Query("UPDATE taxes SET parDefaut = 0")
+    suspend fun resetParDefaut()
+
+    @Insert
     suspend fun insertAll(taxes: List<TaxEntity>)
 }
 
@@ -150,6 +160,12 @@ interface PaymentMethodDao {
 
     @Query("SELECT COUNT(*) FROM payment_methods")
     suspend fun count(): Int
+
+    @Insert
+    suspend fun insert(method: PaymentMethodEntity): Long
+
+    @Update
+    suspend fun update(method: PaymentMethodEntity)
 
     @Insert
     suspend fun insertAll(methods: List<PaymentMethodEntity>)

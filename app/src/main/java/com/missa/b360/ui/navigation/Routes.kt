@@ -26,4 +26,10 @@ object Routes {
     const val ADMIN_UTILISATEURS = "admin_utilisateurs"
     const val ADMIN_MULTISITE = "admin_multisite"
     const val ADMIN_A_PROPOS = "admin_a_propos"
+
+    // Référentiels (spec §30) — moyens de paiement, taxes, unités.
+    const val ADMIN_REFERENTIELS = "admin_referentiels"
+
+    // Tâches de suivi (spec §Tâches).
+    const val TASKS = "tasks"
 }

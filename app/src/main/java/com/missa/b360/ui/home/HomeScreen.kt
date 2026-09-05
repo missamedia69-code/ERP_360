@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
@@ -1265,6 +1266,9 @@ private fun MissaBusinessDrawer(
             DrawerMenuItem(Icons.Outlined.Store, stringResource(R.string.home_sites_sales), currentRoute == Routes.ADMIN_MULTISITE) {
                 onNavigate(Routes.ADMIN_MULTISITE)
             }
+            DrawerMenuItem(Icons.Outlined.Payments, stringResource(R.string.refer_title), currentRoute == Routes.ADMIN_REFERENTIELS) {
+                onNavigate(Routes.ADMIN_REFERENTIELS)
+            }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_tools))
             DrawerMenuItem(Icons.Outlined.Backup, stringResource(R.string.admin_sauvegarde), currentRoute == Routes.ADMIN_SAUVEGARDE) {
@@ -1275,6 +1279,9 @@ private fun MissaBusinessDrawer(
             }
             DrawerMenuItem(Icons.Outlined.Notifications, stringResource(R.string.notifications), currentRoute == Routes.NOTIFICATIONS) {
                 onNavigate(Routes.NOTIFICATIONS)
+            }
+            DrawerMenuItem(Icons.Outlined.Checklist, stringResource(R.string.tasks_title), currentRoute == Routes.TASKS) {
+                onNavigate(Routes.TASKS)
             }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_support))
