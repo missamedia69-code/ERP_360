@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -178,6 +179,7 @@ fun ClientsScreen(
     val defaultCountry by viewModel.codePaysParDefaut.collectAsState()
     val result by viewModel.resultat.collectAsState()
     val categoryError by viewModel.erreurCategorie.collectAsState()
+    val rappelMessage by viewModel.rappelMessage.collectAsState()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
 
@@ -329,6 +331,11 @@ fun ClientsScreen(
             currentViewName = ClientView.LIST.name
         }
     }
+    LaunchedEffect(rappelMessage) {
+        val ref = rappelMessage ?: return@LaunchedEffect
+        snackbar.showSnackbar(context.getString(R.string.rappel_envoye, ref))
+        viewModel.acquitterRappel()
+    }
 
     Box(Modifier.fillMaxSize()) {
         when (currentView) {
@@ -349,6 +356,7 @@ fun ClientsScreen(
                     detailTabName = ClientDetailTab.INFO.name
                     currentViewName = ClientView.DETAIL.name
                 },
+                onRappel = { viewModel.rappelPaiement(it.id) },
             )
             ClientView.DETAIL -> selectedClient?.let { client ->
                 ClientDetailScreen(
@@ -434,6 +442,7 @@ fun ClientsScreen(
                     selectedClientId = it.id
                     currentViewName = ClientView.DETAIL.name
                 },
+                onRappel = { viewModel.rappelPaiement(it.id) },
             )
             ClientView.DEACTIVATE -> selectedClient?.let { client ->
                 ClientDeactivateScreen(
@@ -491,6 +500,7 @@ private fun ClientListScreen(
     onSearch: () -> Unit,
     onNavigate: (String) -> Unit,
     onOpen: (ClientEntity) -> Unit,
+    onRappel: (ClientEntity) -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val visible = clients.filter { client ->
@@ -558,6 +568,7 @@ private fun ClientListScreen(
                         outstanding = metrics[client.id]?.outstanding ?: 0.0,
                         devise = devise,
                         onOpen = { onOpen(client) },
+                        onRappel = { onRappel(client) },
                     )
                 }
             }
@@ -597,7 +608,7 @@ private fun ClientEmptyList(onNew: () -> Unit) {
 }
 
 @Composable
-private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?, outstanding: Double, devise: String, onOpen: () -> Unit) {
+private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?, outstanding: Double, devise: String, onOpen: () -> Unit, onRappel: () -> Unit) {
     Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen), shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
         Row(Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
             ClientAvatar(client.nom, Modifier.size(34.dp))
@@ -607,8 +618,13 @@ private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?,
                 Text("${client.code} · ${client.telephone}", color = ClientMuted, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 category?.let { Text(it.nom, color = ClientBlue, fontSize = 9.sp) }
             }
+            if (outstanding > 0) {
+                IconButton(onClick = onRappel, modifier = Modifier.size(30.dp)) {
+                    Icon(Icons.Outlined.Notifications, contentDescription = stringResource(R.string.rappel_bell_cd), tint = ClientBlue, modifier = Modifier.size(18.dp))
+                }
+            }
             Column(horizontalAlignment = Alignment.End) {
-                Text(if (outstanding > 0) clientMoney(outstanding, devise) else "—", color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                Text(if (outstanding > 0) clientMoney(outstanding, devise) else "—", color = if (outstanding > 0) ClientRed else ClientInk, fontWeight = FontWeight.Bold, fontSize = 10.sp)
                 ClientStatusChip(client)
             }
         }
@@ -1221,7 +1237,7 @@ private fun ClientAccountRow(entry: AccountEntry, devise: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<CategoryClientEntity>, metrics: Map<Long, ClientSalesMetrics>, devise: String, onBack: () -> Unit, onOpen: (ClientEntity) -> Unit) {
+private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<CategoryClientEntity>, metrics: Map<Long, ClientSalesMetrics>, devise: String, onBack: () -> Unit, onOpen: (ClientEntity) -> Unit, onRappel: (ClientEntity) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
     var status by rememberSaveable { mutableStateOf("ALL") }
     var categoryId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -1249,7 +1265,16 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
             item { OutlinedTextField(value = city, onValueChange = { city = it }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_city)) }, singleLine = true) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { OutlinedTextField(value = since, onValueChange = { since = it.take(10) }, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_flow_from)) }, placeholder = { Text("JJ/MM/AAAA", fontSize = 9.sp) }, singleLine = true); OutlinedTextField(value = until, onValueChange = { until = it.take(10) }, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_flow_to)) }, placeholder = { Text("JJ/MM/AAAA", fontSize = 9.sp) }, singleLine = true) } }
             item { Text(stringResource(R.string.clients_flow_results, results.size), color = ClientMuted, fontSize = 11.sp) }
-            items(results, key = { it.id }) { client -> ClientListRow(client, categories.firstOrNull { it.id == client.categorieId }, metrics[client.id]?.outstanding ?: 0.0, devise) { onOpen(client) } }
+            items(results, key = { it.id }) { client ->
+                ClientListRow(
+                    client = client,
+                    category = categories.firstOrNull { it.id == client.categorieId },
+                    outstanding = metrics[client.id]?.outstanding ?: 0.0,
+                    devise = devise,
+                    onOpen = { onOpen(client) },
+                    onRappel = { onRappel(client) },
+                )
+            }
         }
     }
 }
