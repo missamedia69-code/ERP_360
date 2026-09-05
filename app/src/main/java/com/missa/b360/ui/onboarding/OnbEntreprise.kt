@@ -44,7 +44,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -544,12 +543,12 @@ private fun Modifier.dashedBorder(width: androidx.compose.ui.unit.Dp, color: and
         val path = Path().apply {
             addRoundRect(
                 androidx.compose.ui.geometry.RoundRect(
-                    Offset.Zero,
-                    Offset(size.width, size.height),
-                    r,
-                    r,
+                    0f,
+                    0f,
+                    size.width,
+                    size.height,
+                    androidx.compose.ui.geometry.CornerRadius(r),
                 ),
-                Path.Direction.CW,
             )
         }
         drawPath(
