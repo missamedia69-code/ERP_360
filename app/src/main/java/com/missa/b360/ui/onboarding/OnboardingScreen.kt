@@ -1,6 +1,6 @@
 package com.missa.b360.ui.onboarding
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,10 +38,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -273,8 +271,9 @@ internal fun OnbDots(total: Int, active: Int) {
 }
 
 /**
- * Écran 1 — Bienvenue : fond bleu roi, monogramme de la marque, accroche et
- * bouton « Commencer » vert signature (maquette).
+ * Écran 1 — Bienvenue : fond bleu roi, logo officiel de la marque (fond bleu
+ * assorti, la tuile se fond dans l'écran), accroche et bouton « Commencer »
+ * vert signature (maquette).
  */
 @Composable
 private fun WelcomeStep(onCommencer: () -> Unit) {
@@ -292,37 +291,16 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            OnbLogoMark(modifier = Modifier.size(112.dp))
-            Spacer(Modifier.height(18.dp))
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "MISSA\nBUSINESS",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 33.sp,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = "360",
-                    color = MissaLime,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 34.sp,
-                )
-            }
-            Spacer(Modifier.height(44.dp))
+            Image(
+                painter = painterResource(R.drawable.logo_missa360),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.size(280.dp),
+            )
+            Spacer(Modifier.height(30.dp))
             Text(
                 text = stringResource(R.string.obn_bienvenue_titre),
                 color = Color.White.copy(alpha = 0.78f),
                 fontSize = 15.sp,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "Missa Business 360",
-                color = MissaLime,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold,
             )
             Spacer(Modifier.height(12.dp))
             Text(
@@ -377,23 +355,3 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
     }
 }
 
-/** Monogramme vectoriel de la marque sur fond bleu : anneau blanc, repère vert signature. */
-@Composable
-private fun OnbLogoMark(modifier: Modifier = Modifier) {
-    Canvas(modifier = modifier) {
-        val stroke = size.width.coerceAtMost(size.height) * 0.11f
-        drawArc(
-            color = Color.White,
-            startAngle = 40f,
-            sweepAngle = 300f,
-            useCenter = false,
-            style = Stroke(width = stroke, cap = StrokeCap.Round),
-        )
-        val start = Offset(size.width * 0.36f, size.height * 0.63f)
-        val middle = Offset(size.width * 0.59f, size.height * 0.40f)
-        val end = Offset(size.width * 0.79f, size.height * 0.19f)
-        drawLine(Color.White, start, middle, strokeWidth = stroke, cap = StrokeCap.Round)
-        drawLine(MissaLime, middle, end, strokeWidth = stroke, cap = StrokeCap.Round)
-        drawCircle(MissaLime, radius = stroke * 0.8f, center = end)
-    }
-}

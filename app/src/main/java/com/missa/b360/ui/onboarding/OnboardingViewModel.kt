@@ -283,9 +283,46 @@ class OnboardingViewModel @Inject constructor(
 
     // --- Configuration initiale ---
 
+    /** La langue est appliquée immédiatement (l'interface se recompose) et conservée. */
+    fun appliquerLangue(code: String) {
+        langue = code
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.LANGUE, code)
+            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != code) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(code))
+            }
+        }
+    }
+
+    /** Le fuseau pilote immédiatement l'affichage des dates dans toute l'application. */
+    fun appliquerFuseau(id: String) {
+        fuseau = id
+        FormatPrefs.appliquer(fuseau, formatJours, formatNombres)
+    }
+
+    /** Le motif de date pilote immédiatement DateUtils (journal, licences, clients…). */
+    fun appliquerFormatDate(motif: String) {
+        formatJours = motif
+        FormatPrefs.appliquer(fuseau, formatJours, formatNombres)
+    }
+
+    /** Le style des nombres pilote immédiatement MoneyUtils (montants partout). */
+    fun appliquerFormatNombres(style: String) {
+        formatNombres = style
+        FormatPrefs.appliquer(fuseau, formatJours, formatNombres)
+    }
+
+    /** Les sauvegardes automatiques (démarrage) sont conservées immédiatement. */
+    fun appliquerSauvegardes(actives: Boolean) {
+        sauvegardesActives = actives
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.FREQUENCE_SAUVGARDE, if (actives) "auto" else "off")
+        }
+    }
+
     /**
-     * Enregistre la configuration (langue appliquée immédiatement, fuseau, formats et
-     * sauvegardes conservés dans les réglages) avant l'étape de sécurité.
+     * Enregistre la configuration (déjà appliquée en direct à chaque choix) avant
+     * l'étape de sécurité : passage au prochain écran.
      */
     private fun appliquerConfiguration() {
         val langueCible = langue

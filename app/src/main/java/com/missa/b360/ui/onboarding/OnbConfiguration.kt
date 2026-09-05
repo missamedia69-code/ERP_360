@@ -2,7 +2,7 @@ package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -42,10 +41,10 @@ import com.missa.b360.ui.theme.MissaSurface
 import java.util.TimeZone
 
 /**
- * Écran 5 — Configuration initiale : langue (appliquée immédiatement), fuseau
- * horaire, formats et sauvegardes automatiques, conservés dans les réglages.
+ * Écran — Configuration initiale : langue, fuseau horaire, format de date,
+ * style des nombres et sauvegardes automatiques. Chaque choix est appliqué
+ * immédiatement à toute l'application (FormatPrefs / locale) puis conservé.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
     OnbScaffold(
@@ -74,7 +73,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     options = langues,
                     selectedKey = viewModel.langue,
                     optionKey = { it.first },
-                    onPick = { viewModel.langue = it.first },
+                    onPick = { viewModel.appliquerLangue(it.first) },
                     enabled = !viewModel.enregistrementEnCours,
                 )
                 HorizontalDivider(color = MissaBorder)
@@ -85,7 +84,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     selectedKey = viewModel.fuseau,
                     optionKey = { it },
                     optionLabel = { OnbZoneLibelle(it) },
-                    onPick = { viewModel.fuseau = it },
+                    onPick = { viewModel.appliquerFuseau(it) },
                     enabled = !viewModel.enregistrementEnCours,
                 )
                 HorizontalDivider(color = MissaBorder)
@@ -101,7 +100,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     selectedKey = viewModel.formatJours,
                     optionKey = { it.first },
                     optionLabel = { it.second },
-                    onPick = { viewModel.formatJours = it.first },
+                    onPick = { viewModel.appliquerFormatDate(it.first) },
                     enabled = !viewModel.enregistrementEnCours,
                 )
                 HorizontalDivider(color = MissaBorder)
@@ -115,7 +114,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     selectedKey = viewModel.formatNombres,
                     optionKey = { it.first },
                     optionLabel = { it.second },
-                    onPick = { viewModel.formatNombres = it.first },
+                    onPick = { viewModel.appliquerFormatNombres(it.first) },
                     enabled = !viewModel.enregistrementEnCours,
                 )
                 HorizontalDivider(color = MissaBorder)
@@ -141,7 +140,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     }
                     Switch(
                         checked = viewModel.sauvegardesActives,
-                        onCheckedChange = { viewModel.sauvegardesActives = it },
+                        onCheckedChange = { viewModel.appliquerSauvegardes(it) },
                         enabled = !viewModel.enregistrementEnCours,
                         colors = androidx.compose.material3.SwitchDefaults.colors(
                             checkedTrackColor = BrandBlue,
@@ -185,9 +184,9 @@ private fun OnbZoneLibelle(id: String): String {
 
 /**
  * Ligne de réglage de la maquette : libellé au-dessus de la valeur courante,
- * chevron de droite et menu déroulant ancré sur la ligne.
+ * chevron de droite et menu déroulant ancré sur la ligne (DropdownMenu
+ * standard, ancré sur le conteneur de la ligne).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun <T> OnbConfigLigne(
     labelRes: Int,
@@ -201,16 +200,12 @@ private fun <T> OnbConfigLigne(
     var ouvert by remember { mutableStateOf(false) }
     val choisie = options.firstOrNull { optionKey(it) == selectedKey }
     val libelle = if (choisie != null) (optionLabel?.invoke(choisie) ?: optionKey(choisie)) else selectedKey
-    ExposedDropdownMenuBox(
-        expanded = ouvert,
-        onExpandedChange = { ouvert = it },
-    ) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
-                .menuAnchor()
                 .fillMaxWidth()
-                .clickable(enabled = enabled) { ouvert = !ouvert }
-                .padding(vertical = 13.dp),
+                .padding(vertical = 13.dp)
+                .then(if (enabled) Modifier.clickable { ouvert = !ouvert } else Modifier),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -234,7 +229,7 @@ private fun <T> OnbConfigLigne(
                 modifier = Modifier.size(18.dp),
             )
         }
-        ExposedDropdownMenu(
+        DropdownMenu(
             expanded = ouvert,
             onDismissRequest = { ouvert = false },
         ) {
