@@ -69,39 +69,46 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             OnbProfilCarte(
-                titreRes = R.string.obn_profil_commerce,
-                sousTitreRes = R.string.obn_profil_commerce_sous,
+                titreRes = R.string.obn_profil_av,
+                sousTitreRes = R.string.obn_profil_av_sous,
                 icone = Icons.Outlined.ShoppingCart,
-                selected = viewModel.profil == ProfilActivite.B,
-                onClick = { viewModel.choisirProfil(ProfilActivite.B) },
+                selected = viewModel.profil == ProfilActivite.AV,
+                onClick = { viewModel.choisirProfil(ProfilActivite.AV) },
             )
             OnbProfilCarte(
-                titreRes = R.string.obn_profil_comstock,
-                sousTitreRes = R.string.obn_profil_comstock_sous,
+                titreRes = R.string.obn_profil_asv,
+                sousTitreRes = R.string.obn_profil_asv_sous,
                 icone = Icons.Outlined.Inventory2,
-                selected = viewModel.profil == ProfilActivite.D,
-                onClick = { viewModel.choisirProfil(ProfilActivite.D) },
+                selected = viewModel.profil == ProfilActivite.ASV,
+                onClick = { viewModel.choisirProfil(ProfilActivite.ASV) },
             )
             OnbProfilCarte(
-                titreRes = R.string.obn_profil_production,
-                sousTitreRes = R.string.obn_profil_production_sous,
+                titreRes = R.string.obn_profil_apsv,
+                sousTitreRes = R.string.obn_profil_apsv_sous,
                 icone = Icons.Outlined.Construction,
-                selected = viewModel.profil == ProfilActivite.E,
-                onClick = { viewModel.choisirProfil(ProfilActivite.E) },
+                selected = viewModel.profil == ProfilActivite.APSV,
+                onClick = { viewModel.choisirProfil(ProfilActivite.APSV) },
             )
             OnbProfilCarte(
-                titreRes = R.string.obn_profil_services,
-                sousTitreRes = R.string.obn_profil_services_sous,
+                titreRes = R.string.obn_profil_ser,
+                sousTitreRes = R.string.obn_profil_ser_sous,
                 icone = Icons.Outlined.Handshake,
-                selected = viewModel.profil == ProfilActivite.F,
-                onClick = { viewModel.choisirProfil(ProfilActivite.F) },
+                selected = viewModel.profil == ProfilActivite.SER,
+                onClick = { viewModel.choisirProfil(ProfilActivite.SER) },
             )
             OnbProfilCarte(
-                titreRes = R.string.obn_profil_autre,
-                sousTitreRes = R.string.obn_profil_autre_sous,
+                titreRes = R.string.obn_profil_prj,
+                sousTitreRes = R.string.obn_profil_prj_sous,
                 icone = Icons.Outlined.Workspaces,
-                selected = viewModel.profil == ProfilActivite.H,
-                onClick = { viewModel.choisirProfil(ProfilActivite.H) },
+                selected = viewModel.profil == ProfilActivite.PRJ,
+                onClick = { viewModel.choisirProfil(ProfilActivite.PRJ) },
+            )
+            OnbProfilCarte(
+                titreRes = R.string.obn_profil_full,
+                sousTitreRes = R.string.obn_profil_full_sous,
+                icone = Icons.Outlined.Business,
+                selected = viewModel.profil == ProfilActivite.FULL,
+                onClick = { viewModel.choisirProfil(ProfilActivite.FULL) },
             )
             TextButton(
                 onClick = { detailsVisibles = !detailsVisibles },
@@ -133,12 +140,18 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Text(
-                                    text = stringResource(profile.labelRes),
-                                    fontSize = 13.5.sp,
-                                    color = MissaInk,
-                                    modifier = Modifier.weight(1f),
-                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(profile.labelRes),
+                                        fontSize = 13.5.sp,
+                                        color = MissaInk,
+                                    )
+                                    Text(
+                                        text = profile.description,
+                                        fontSize = 11.sp,
+                                        color = MissaMuted,
+                                    )
+                                }
                                 if (profile == viewModel.profil) {
                                     Icon(
                                         imageVector = Icons.Outlined.ChevronRight,

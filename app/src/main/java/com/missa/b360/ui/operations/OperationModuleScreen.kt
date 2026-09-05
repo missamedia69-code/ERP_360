@@ -257,7 +257,7 @@ fun OperationFormScreen(
         }
     }
 
-    val onConfirm: () -> Unit = {
+    val onConfirm: () -> Unit = onConfirm@{
         // Validation UI avant la validation métier — les saisies sont conservées (spec §3).
         val errors = mutableMapOf<String, String>()
         if (!titleValid) errors["title"] = context.getString(R.string.product_name_required)

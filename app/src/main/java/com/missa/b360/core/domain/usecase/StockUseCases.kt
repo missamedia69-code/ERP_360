@@ -31,7 +31,7 @@ object StockValidation {
 
     /** AJUSTEMENT : écart signé, non nul, fini. */
     fun ecartAjustementEstValide(ecart: Double): Boolean =
-        ecart.isFinite() && ecart.abs() >= QUANTITE_EPSILON
+        ecart.isFinite() && abs(ecart) >= QUANTITE_EPSILON
 
     /** Transfert (spec §13) : source ≠ destination, quantité positive. */
     fun transfertEstValide(sourceId: Long?, destId: Long?, quantite: Double): Boolean =

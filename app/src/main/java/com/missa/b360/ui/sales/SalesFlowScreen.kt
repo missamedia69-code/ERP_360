@@ -98,6 +98,7 @@ import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleLine
+import com.missa.b360.core.util.toInputAmount
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.util.DateUtils

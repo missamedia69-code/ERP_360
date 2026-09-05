@@ -1403,14 +1403,13 @@ private fun DrawerMenuItem(
 
 @StringRes
 private fun String?.profileLabel(): Int? = when (this) {
-    "A" -> R.string.profil_a
-    "B" -> R.string.profil_b
-    "C" -> R.string.profil_c
-    "D" -> R.string.profil_d
-    "E" -> R.string.profil_e
-    "F" -> R.string.profil_f
-    "G" -> R.string.profil_g
-    "H" -> R.string.profil_h
+    "AV" -> R.string.profil_av
+    "ASV" -> R.string.profil_asv
+    "APSV" -> R.string.profil_apsv
+    "SER" -> R.string.profil_ser
+    "PRJ" -> R.string.profil_prj
+    "FULL" -> R.string.profil_full
+    "CUSTOM" -> R.string.profil_custom
     else -> null
 }
 

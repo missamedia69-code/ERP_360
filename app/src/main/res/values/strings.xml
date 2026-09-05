@@ -37,6 +37,12 @@
     <string name="module_rh">RH &amp; Paie</string>
     <string name="module_projets">Projets</string>
     <string name="module_reporting">Reporting</string>
+    <string name="module_comptabilite">Comptabilité</string>
+    <string name="module_tresorerie">Trésorerie</string>
+    <string name="module_crm">CRM</string>
+    <string name="module_qualite">Qualité</string>
+    <string name="module_maintenance">Maintenance</string>
+    <string name="module_logistique">Logistique</string>
 
     <!-- Onboarding (Phase B) -->
     <string name="ob_langue_title">Choisissez votre langue</string>
@@ -49,14 +55,32 @@
     <string name="ob_retour">Retour</string>
 
     <string name="ob_profil_title">Votre profil d\'activité</string>
-    <string name="profil_a">Micro-commerce / indépendant</string>
-    <string name="profil_b">Commerce de détail / boutique</string>
-    <string name="profil_c">Commerce multi-points (succursales)</string>
-    <string name="profil_d">Distribution / grossiste</string>
-    <string name="profil_e">Production / industrie légère</string>
-    <string name="profil_f">Services &amp; prestations</string>
-    <string name="profil_g">BTP / projets</string>
-    <string name="profil_h">Groupe multi-activités</string>
+    <string name="profil_av">Achat - Vente</string>
+    <string name="profil_av_sous">Négoce simple sans gestion de stock</string>
+    <string name="profil_asv">Achat - Stock - Vente</string>
+    <string name="profil_asv_sous">Négoce classique avec stock et livraisons</string>
+    <string name="profil_apsv">Achat - Production - Stock - Vente</string>
+    <string name="profil_apsv_sous">Fabrication / industrie</string>
+    <string name="profil_ser">Service</string>
+    <string name="profil_ser_sous">Prestations de service</string>
+    <string name="profil_prj">Projet</string>
+    <string name="profil_prj_sous">Société de projets / ingénierie</string>
+    <string name="profil_full">Complet</string>
+    <string name="profil_full_sous">Tous les modules activés</string>
+    <string name="profil_custom">Personnalisé</string>
+    <string name="profil_custom_sous">Activation manuelle des modules</string>
+    <string name="obn_profil_av">Achat - Vente</string>
+    <string name="obn_profil_av_sous">Négoce simple</string>
+    <string name="obn_profil_asv">Achat - Stock - Vente</string>
+    <string name="obn_profil_asv_sous">Négoce avec stock</string>
+    <string name="obn_profil_apsv">Achat - Production - Stock - Vente</string>
+    <string name="obn_profil_apsv_sous">Fabrication / industrie</string>
+    <string name="obn_profil_ser">Service</string>
+    <string name="obn_profil_ser_sous">Prestations de service</string>
+    <string name="obn_profil_prj">Projet</string>
+    <string name="obn_profil_prj_sous">Gestion de projets</string>
+    <string name="obn_profil_full">Complet</string>
+    <string name="obn_profil_full_sous">Tous les modules</string>
 
     <string name="ob_palier_title">Effectif de l\'entreprise</string>
     <string name="palier_p1">Solo / Nano (1)</string>

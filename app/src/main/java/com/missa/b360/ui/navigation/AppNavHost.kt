@@ -25,9 +25,14 @@ import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
 import com.missa.b360.ui.admin.ReferentielsScreen
 import com.missa.b360.ui.clients.ClientsScreen
+import com.missa.b360.ui.comptabilite.ComptabiliteScreen
+import com.missa.b360.ui.crm.CrmScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.logistique.LogistiqueScreen
+import com.missa.b360.ui.maintenance.MaintenanceScreen
 import com.missa.b360.ui.production.ProductionScreen
 import com.missa.b360.ui.purchases.PurchasesScreen
+import com.missa.b360.ui.qualite.QualiteScreen
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.rh.RhScreen
 import com.missa.b360.ui.tasks.TasksScreen
@@ -43,6 +48,7 @@ import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
+import com.missa.b360.ui.tresorerie.TresorerieScreen
 import com.missa.b360.ui.onboarding.OnboardingScreen
 import com.missa.b360.ui.onboarding.PinLockScreen
 
@@ -288,6 +294,25 @@ private fun MainNavHost() {
         operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
         operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
         operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
+        // Nouveaux modules (structure ERP 360 complète)
+        composable(AppModule.COMPTABILITE.route) {
+            ComptabiliteScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppModule.TRESORERIE.route) {
+            TresorerieScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppModule.CRM.route) {
+            CrmScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppModule.QUALITE.route) {
+            QualiteScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppModule.MAINTENANCE.route) {
+            MaintenanceScreen(onBack = { navController.popBackStack() })
+        }
+        composable(AppModule.LOGISTIQUE.route) {
+            LogistiqueScreen(onBack = { navController.popBackStack() })
+        }
         // Référentiels (spec §30) — moyens de paiement, taxes, unités.
         composable(Routes.ADMIN_REFERENTIELS) {
             ReferentielsScreen(onBack = { navController.popBackStack() })

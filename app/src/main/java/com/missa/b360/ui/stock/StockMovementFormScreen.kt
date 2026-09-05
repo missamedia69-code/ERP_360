@@ -164,7 +164,7 @@ fun StockMovementFormScreen(
         }
     }
 
-    val onConfirm: () -> Unit = {
+    val onConfirm: () -> Unit = onConfirm@{
         val pid = produitId
         if (!canConfirm || pid == null) return@onConfirm
         val motifFinal = if (motif == "AUTRE") motifAutre.trim() else motif
@@ -531,7 +531,7 @@ fun StockTransferFormScreen(
         }
     }
 
-    val onConfirm: () -> Unit = {
+    val onConfirm: () -> Unit = onConfirm@{
         val pid = produitId
         val srcId = siteSourceId
         val dstId = siteDestId

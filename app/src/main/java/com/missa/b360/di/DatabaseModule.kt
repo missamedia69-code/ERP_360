@@ -2,8 +2,10 @@ package com.missa.b360.di
 
 import android.content.Context
 import androidx.room.Room
+import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
@@ -18,6 +20,7 @@ import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.db.AppDatabase
@@ -60,4 +63,7 @@ object DatabaseModule {
     @Provides fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
     @Provides fun provideProductStockDao(db: AppDatabase): ProductStockDao = db.productStockDao()
     @Provides fun provideStockMovementDao(db: AppDatabase): StockMovementDao = db.stockMovementDao()
+    @Provides fun provideEmployeeDao(db: AppDatabase): EmployeeDao = db.employeeDao()
+    @Provides fun provideAbsenceDao(db: AppDatabase): AbsenceDao = db.absenceDao()
+    @Provides fun provideTaskDao(db: AppDatabase): TaskDao = db.taskDao()
 }

@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -44,6 +45,7 @@ private fun LegacyClientsScreen(
     val soldes by viewModel.soldes.collectAsState()
     val rappelMessage by viewModel.rappelMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     var recherche by remember { mutableStateOf("") }
     var formVisible by remember { mutableStateOf(false) }
@@ -64,7 +66,7 @@ private fun LegacyClientsScreen(
 
     LaunchedEffect(rappelMessage) {
         val ref = rappelMessage ?: return@LaunchedEffect
-        snackbarHostState.showSnackbar(stringResource(R.string.rappel_envoye, ref))
+        snackbarHostState.showSnackbar(context.getString(R.string.rappel_envoye, ref))
         viewModel.acquitterRappel()
     }
 

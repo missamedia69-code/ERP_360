@@ -17,6 +17,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -171,8 +174,9 @@ private fun OnbZones(): List<String> {
 
 private fun OnbZoneLibelle(id: String): String {
     val ville = id.substringAfter('/', missingDelimiterValue = "UTC")
-    val heures = TimeZone.getTimeZone(id).rawOffset / 3_600_000
-    val minutes = Math.abs(TimeZone.getTimeZone(id).rawOffset % 3_600_000) / 60_000
+    val rawOffset = TimeZone.getTimeZone(id).rawOffset
+    val heures = rawOffset / 3_600_000
+    val minutes = Math.abs(rawOffset % 3_600_000) / 60_000
     val decalage = if (minutes == 0) {
         if (heures >= 0) "+$heures" else "$heures"
     } else {

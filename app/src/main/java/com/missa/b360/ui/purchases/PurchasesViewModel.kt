@@ -18,6 +18,9 @@ import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.SavePurchaseUseCase
 import com.missa.b360.ui.stock.ProductStocks
 import com.missa.b360.ui.stock.ProductWithStock
+import com.missa.b360.core.util.filterMoneyInput
+import com.missa.b360.core.util.toInputAmount
+import com.missa.b360.core.util.toMoneyOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -262,14 +265,3 @@ class PurchasesViewModel @Inject constructor(
         _saveResult.value = null
     }
 }
-
-private fun String.toMoneyOrNull(): Double? = trim()
-    .takeIf { it.isNotEmpty() }
-    ?.replace(',', '.')
-    ?.toDoubleOrNull()
-    ?.takeIf { it.isFinite() }
-
-private fun String.filterMoneyInput(): String = filter { it.isDigit() || it == ',' || it == '.' }
-
-private fun Double.toInputAmount(): String =
-    if (this % 1.0 == 0.0) toInt().toString() else toString()

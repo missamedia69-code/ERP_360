@@ -93,6 +93,9 @@ import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.SaveDevisCommandeUseCase
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.core.util.filterMoneyInput
+import com.missa.b360.core.util.toInputAmount
+import com.missa.b360.core.util.toMoneyOrNull
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.stock.ProductStocks
@@ -461,17 +464,6 @@ class DevisCommandeViewModel @Inject constructor(
         _result.value = null
     }
 }
-
-private fun String.toMoneyOrNull(): Double? = trim()
-    .takeIf { it.isNotEmpty() }
-    ?.replace(',', '.')
-    ?.toDoubleOrNull()
-    ?.takeIf { it.isFinite() }
-
-private fun String.filterMoneyInput(): String = filter { it.isDigit() || it == ',' || it == '.' }
-
-private fun Double.toInputAmount(): String =
-    if (this % 1.0 == 0.0) toInt().toString() else toString()
 
 private fun Double.saleQtyText(): String =
     if (this % 1.0 == 0.0) toInt().toString() else DecimalFormat("0.##").format(this)

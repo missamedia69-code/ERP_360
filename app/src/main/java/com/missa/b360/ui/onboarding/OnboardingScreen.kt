@@ -292,7 +292,7 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                painter = painterResource(R.drawable.logo_missa360),
+                painter = painterResource(R.drawable.logo_missa),
                 contentDescription = stringResource(R.string.app_name),
                 modifier = Modifier.size(280.dp),
             )

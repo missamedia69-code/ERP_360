@@ -23,6 +23,9 @@ import com.missa.b360.core.domain.usecase.ReverseSaleStockUseCase
 import com.missa.b360.core.domain.usecase.SaveSaleUseCase
 import com.missa.b360.ui.stock.ProductStocks
 import com.missa.b360.ui.stock.ProductWithStock
+import com.missa.b360.core.util.filterMoneyInput
+import com.missa.b360.core.util.toInputAmount
+import com.missa.b360.core.util.toMoneyOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -407,15 +410,4 @@ fun outstandingBalance(records: List<OperationRecordEntity>, clientId: Long?): D
         }
 }
 
-internal fun String.toMoneyOrNull(): Double? = trim()
-    .takeIf { it.isNotEmpty() }
-    ?.replace(',', '.')
-    ?.toDoubleOrNull()
-    ?.takeIf { it.isFinite() }
-
 private fun String.toMoneyOrZero(): Double = toMoneyOrNull()?.coerceAtLeast(0.0) ?: 0.0
-
-internal fun String.filterMoneyInput(): String = filter { it.isDigit() || it == ',' || it == '.' }
-
-internal fun Double.toInputAmount(): String =
-    if (this % 1.0 == 0.0) toInt().toString() else toString()

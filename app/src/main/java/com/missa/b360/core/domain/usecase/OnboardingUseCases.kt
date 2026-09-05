@@ -260,7 +260,7 @@ class CompleteOnboardingUseCase @Inject constructor(
         val entreprise = enterpriseDao.get() ?: return false
         if (settingsStore.get(SettingsStore.Keys.ONBOARDING_TERMINE) == "true") return true
         settingsStore.set(SettingsStore.Keys.ONBOARDING_TERMINE, "true")
-        settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE) ?: "B")
+        settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE) ?: "AV")
         enterpriseDao.upsert(entreprise.copy(onboardingTermine = true))
         journalManager.log("ADMIN", "ONBOARDING_TERMINE", "Configuration initiale terminée")
         return true

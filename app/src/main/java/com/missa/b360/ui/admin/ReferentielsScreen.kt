@@ -79,10 +79,10 @@ class ReferentielsViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed interface Result {
-        data object Saved : Result()
-        data object ReadOnly : Result()
-        data object Invalid : Result()
-        data object Exists : Result()
+        object Saved : Result
+        object ReadOnly : Result
+        object Invalid : Result
+        object Exists : Result
     }
 
     val methods: StateFlow<List<PaymentMethodEntity>> = paymentMethodDao.observeAll()

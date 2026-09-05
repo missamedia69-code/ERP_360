@@ -1,6 +1,9 @@
 package com.missa.b360.ui.navigation
 
-/** Routes hors modules métier (socle + administration). */
+/**
+ * Routes de l'application — socle + administration + formulaires dédiés.
+ * Les modules métier utilisent leur route définie dans [AppModule].
+ */
 object Routes {
     const val HOME = "home"
     const val NOTIFICATIONS = "notifications"
@@ -32,4 +35,7 @@ object Routes {
 
     // Tâches de suivi (spec §Tâches).
     const val TASKS = "tasks"
+
+    // Module Administration — sélection de modules pour profil CUSTOM
+    const val ADMIN_MODULES = "admin_modules"
 }

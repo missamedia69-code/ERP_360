@@ -246,7 +246,7 @@ fun ProductFormScreen(
         }
     }
 
-    val onSave: () -> Unit = {
+    val onSave: () -> Unit = onSave@{
         val errors = mutableMapOf<String, String>()
         val invalid = context.getString(R.string.product_amount_invalid)
         if (nom.trim().length < 2) errors["nom"] = context.getString(R.string.product_name_required)
