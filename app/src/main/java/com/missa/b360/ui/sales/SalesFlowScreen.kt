@@ -510,7 +510,7 @@ fun SalesScreen(
     }
     SnackbarHost(
         hostState = snackbar,
-        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 120.dp),
+        modifier = Modifier.eralign(Alignment.BottomCenter).padding(bottom = 120.dp),
     )
 }
 

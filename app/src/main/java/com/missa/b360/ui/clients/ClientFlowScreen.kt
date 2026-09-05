@@ -1326,7 +1326,10 @@ private fun List<ClientAddressEntity>.withOnePrimaryAddress(): List<ClientAddres
 }
 
 private fun saleMetricsByClient(records: List<OperationRecordEntity>): Map<Long, ClientSalesMetrics> =
-    records.filter { it.status == OperationStatus.VALIDATED.name }.mapNotNull { record -> SaleRecordCodec.decode(record.notes)?.let { it.clientId to it } }.groupBy({ it.first }, { it.second }).mapValues { (_, values) -> ClientSalesMetrics(values.sumOf { it.total }, values.sumOf { (it.total - it.paidAmount).coerceAtLeast(0.0) }, values.size) }
+    records.filter { it.status == OperationStatus.VALIDATED.name }
+        .mapNotNull { record -> SaleRecordCodec.decode(record.notes)?.let { sale -> sale.clientId?.let { it to sale } } }
+        .groupBy({ it.first }, { it.second })
+        .mapValues { (_, values) -> ClientSalesMetrics(values.sumOf { it.total }, values.sumOf { (it.total - it.paidAmount).coerceAtLeast(0.0) }, values.size) }
 
 private fun List<OperationRecordEntity>.salesFor(clientId: Long): List<OperationRecordEntity> = filter { SaleRecordCodec.decode(it.notes)?.clientId == clientId }
 private fun payloadOutstanding(record: OperationRecordEntity): Double =

@@ -63,7 +63,7 @@ data class SaleRecordPayload(
     val schemaVersion: Int = 2,
     val saleId: Long? = null,
     val reference: String? = null,
-    val clientId: Long,
+    val clientId: Long?,
     val clientName: String,
     val lines: List<SaleLine>,
     val subtotal: Double,

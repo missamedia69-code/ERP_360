@@ -56,6 +56,13 @@ android {
     }
 }
 
+// Résolution du conflit androidx.annotation.experimental défini plusieurs fois
+configurations.all {
+    resolutionStrategy {
+        force("androidx.annotation:annotation:1.9.1")
+    }
+}
+
 ksp {
     // Export du schéma Room pour les migrations (livrable §12 : migrations)
     arg("room.schemaLocation", "$projectDir/schemas")
@@ -104,6 +111,9 @@ dependencies {
 
     // Export JSON (kotlinx-serialization)
     implementation(libs.kotlinx.serialization.json)
+
+    // Annotation explicite pour éviter les conflits
+    implementation("androidx.annotation:annotation:1.9.1")
 
     // Tests unitaires des règles métier (UseCases)
     testImplementation(libs.junit)

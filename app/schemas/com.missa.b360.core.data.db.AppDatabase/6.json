@@ -1,0 +1,1727 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "2198d1a060d97cdc195f815ddd1b864c",
+    "entities": [
+      {
+        "tableName": "enterprise",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `nom` TEXT NOT NULL, `secteur` TEXT, `adresse` TEXT, `telephone` TEXT, `email` TEXT, `devise` TEXT NOT NULL, `langue` TEXT NOT NULL, `pays` TEXT, `logoUri` TEXT, `profilActivite` TEXT, `palierTaille` TEXT, `onboardingTermine` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "secteur",
+            "columnName": "secteur",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "devise",
+            "columnName": "devise",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "langue",
+            "columnName": "langue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pays",
+            "columnName": "pays",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "logoUri",
+            "columnName": "logoUri",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "profilActivite",
+            "columnName": "profilActivite",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "palierTaille",
+            "columnName": "palierTaille",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "onboardingTermine",
+            "columnName": "onboardingTermine",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "sites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `type` TEXT NOT NULL, `adresse` TEXT, `principal` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "principal",
+            "columnName": "principal",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `emailSecours` TEXT NOT NULL, `pinHash` TEXT, `roleId` INTEGER, `actif` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "emailSecours",
+            "columnName": "emailSecours",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinHash",
+            "columnName": "pinHash",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "roleId",
+            "columnName": "roleId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_users_emailSecours",
+            "unique": true,
+            "columnNames": [
+              "emailSecours"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_users_emailSecours` ON `${TABLE_NAME}` (`emailSecours`)"
+          }
+        ]
+      },
+      {
+        "tableName": "roles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `type` TEXT NOT NULL, `modele` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modele",
+            "columnName": "modele",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "role_permissions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`roleId` INTEGER NOT NULL, `module` TEXT NOT NULL, `action` TEXT NOT NULL, `granted` INTEGER NOT NULL, PRIMARY KEY(`roleId`, `module`, `action`))",
+        "fields": [
+          {
+            "fieldPath": "roleId",
+            "columnName": "roleId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "module",
+            "columnName": "module",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "granted",
+            "columnName": "granted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "roleId",
+            "module",
+            "action"
+          ]
+        }
+      },
+      {
+        "tableName": "licence",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `statut` TEXT NOT NULL, `dateDebutEssai` INTEGER NOT NULL, `dateActivation` INTEGER, `dateExpiration` INTEGER, `code` TEXT, `appareilId` TEXT, `desassociationsUtilisees` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateDebutEssai",
+            "columnName": "dateDebutEssai",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateActivation",
+            "columnName": "dateActivation",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "dateExpiration",
+            "columnName": "dateExpiration",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "appareilId",
+            "columnName": "appareilId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "desassociationsUtilisees",
+            "columnName": "desassociationsUtilisees",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "sequences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`docType` TEXT NOT NULL, `annee` INTEGER NOT NULL, `compteur` INTEGER NOT NULL, PRIMARY KEY(`docType`, `annee`))",
+        "fields": [
+          {
+            "fieldPath": "docType",
+            "columnName": "docType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "annee",
+            "columnName": "annee",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "compteur",
+            "columnName": "compteur",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "docType",
+            "annee"
+          ]
+        }
+      },
+      {
+        "tableName": "taxes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `taux` REAL NOT NULL, `parDefaut` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taux",
+            "columnName": "taux",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parDefaut",
+            "columnName": "parDefaut",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "payment_methods",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `actif` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cle` TEXT NOT NULL, `valeur` TEXT NOT NULL, `locked` INTEGER NOT NULL, PRIMARY KEY(`cle`))",
+        "fields": [
+          {
+            "fieldPath": "cle",
+            "columnName": "cle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valeur",
+            "columnName": "valeur",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locked",
+            "columnName": "locked",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "cle"
+          ]
+        }
+      },
+      {
+        "tableName": "backups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `date` INTEGER NOT NULL, `type` TEXT NOT NULL, `chemin` TEXT NOT NULL, `plateforme` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chemin",
+            "columnName": "chemin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plateforme",
+            "columnName": "plateforme",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "journal",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `horodatage` INTEGER NOT NULL, `userId` INTEGER, `module` TEXT NOT NULL, `action` TEXT NOT NULL, `details` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "horodatage",
+            "columnName": "horodatage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "userId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "module",
+            "columnName": "module",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "action",
+            "columnName": "action",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "details",
+            "columnName": "details",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_journal_horodatage",
+            "unique": false,
+            "columnNames": [
+              "horodatage"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_journal_horodatage` ON `${TABLE_NAME}` (`horodatage`)"
+          }
+        ]
+      },
+      {
+        "tableName": "notifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `titre` TEXT NOT NULL, `message` TEXT NOT NULL, `date` INTEGER NOT NULL, `lue` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titre",
+            "columnName": "titre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lue",
+            "columnName": "lue",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "clients",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `nom` TEXT NOT NULL, `type` TEXT NOT NULL, `telephone` TEXT NOT NULL, `telephone2` TEXT, `email` TEXT, `adresse` TEXT, `nif` TEXT, `commercial` TEXT, `conditionPaiementJours` INTEGER NOT NULL, `categorieId` INTEGER, `remiseDefautPct` REAL NOT NULL, `limiteCredit` REAL, `statut` TEXT NOT NULL, `badgeId` INTEGER, `prospect` INTEGER NOT NULL, `photoPath` TEXT, `notes` TEXT, `siteId` INTEGER, `codeFournisseur` TEXT, `createdAt` INTEGER NOT NULL, `active` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telephone2",
+            "columnName": "telephone2",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nif",
+            "columnName": "nif",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "commercial",
+            "columnName": "commercial",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "conditionPaiementJours",
+            "columnName": "conditionPaiementJours",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "remiseDefautPct",
+            "columnName": "remiseDefautPct",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "limiteCredit",
+            "columnName": "limiteCredit",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "badgeId",
+            "columnName": "badgeId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "prospect",
+            "columnName": "prospect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "siteId",
+            "columnName": "siteId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "codeFournisseur",
+            "columnName": "codeFournisseur",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_clients_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_clients_code` ON `${TABLE_NAME}` (`code`)"
+          },
+          {
+            "name": "index_clients_telephone",
+            "unique": false,
+            "columnNames": [
+              "telephone"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clients_telephone` ON `${TABLE_NAME}` (`telephone`)"
+          },
+          {
+            "name": "index_clients_nom",
+            "unique": false,
+            "columnNames": [
+              "nom"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_clients_nom` ON `${TABLE_NAME}` (`nom`)"
+          }
+        ]
+      },
+      {
+        "tableName": "client_contacts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clientId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `fonction` TEXT, `telephone` TEXT, `email` TEXT, `principal` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fonction",
+            "columnName": "fonction",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "principal",
+            "columnName": "principal",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_client_contacts_clientId",
+            "unique": false,
+            "columnNames": [
+              "clientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_client_contacts_clientId` ON `${TABLE_NAME}` (`clientId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "client_addresses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clientId` INTEGER NOT NULL, `libelle` TEXT NOT NULL, `adresse` TEXT NOT NULL, `ville` TEXT, `principale` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "libelle",
+            "columnName": "libelle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ville",
+            "columnName": "ville",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "principale",
+            "columnName": "principale",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_client_addresses_clientId",
+            "unique": false,
+            "columnNames": [
+              "clientId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_client_addresses_clientId` ON `${TABLE_NAME}` (`clientId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "client_categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "client_prices",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `clientId` INTEGER NOT NULL, `produitId` INTEGER NOT NULL, `prix` REAL NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "clientId",
+            "columnName": "clientId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "produitId",
+            "columnName": "produitId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prix",
+            "columnName": "prix",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_client_prices_clientId_produitId",
+            "unique": true,
+            "columnNames": [
+              "clientId",
+              "produitId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_client_prices_clientId_produitId` ON `${TABLE_NAME}` (`clientId`, `produitId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "loyalty_badges",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `remisePct` REAL NOT NULL, `actif` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remisePct",
+            "columnName": "remisePct",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "fournisseurs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `nom` TEXT NOT NULL, `telephone` TEXT NOT NULL, `telephone2` TEXT, `email` TEXT, `adresse` TEXT, `siteId` INTEGER, `notes` TEXT, `statut` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telephone",
+            "columnName": "telephone",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "telephone2",
+            "columnName": "telephone2",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "siteId",
+            "columnName": "siteId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_fournisseurs_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_fournisseurs_code` ON `${TABLE_NAME}` (`code`)"
+          },
+          {
+            "name": "index_fournisseurs_telephone",
+            "unique": false,
+            "columnNames": [
+              "telephone"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_fournisseurs_telephone` ON `${TABLE_NAME}` (`telephone`)"
+          },
+          {
+            "name": "index_fournisseurs_nom",
+            "unique": false,
+            "columnNames": [
+              "nom"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_fournisseurs_nom` ON `${TABLE_NAME}` (`nom`)"
+          }
+        ]
+      },
+      {
+        "tableName": "operation_records",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `module` TEXT NOT NULL, `reference` TEXT NOT NULL, `title` TEXT NOT NULL, `counterpart` TEXT, `amount` REAL, `quantity` REAL, `direction` TEXT NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "module",
+            "columnName": "module",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "counterpart",
+            "columnName": "counterpart",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "direction",
+            "columnName": "direction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_records_module",
+            "unique": false,
+            "columnNames": [
+              "module"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_records_module` ON `${TABLE_NAME}` (`module`)"
+          },
+          {
+            "name": "index_operation_records_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_records_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          },
+          {
+            "name": "index_operation_records_reference",
+            "unique": true,
+            "columnNames": [
+              "reference"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_operation_records_reference` ON `${TABLE_NAME}` (`reference`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `couleur` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "couleur",
+            "columnName": "couleur",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_categories_nom",
+            "unique": true,
+            "columnNames": [
+              "nom"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_categories_nom` ON `${TABLE_NAME}` (`nom`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_warehouses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `nom` TEXT NOT NULL, `adresse` TEXT, `principal` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adresse",
+            "columnName": "adresse",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "principal",
+            "columnName": "principal",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_warehouses_nom",
+            "unique": true,
+            "columnNames": [
+              "nom"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_warehouses_nom` ON `${TABLE_NAME}` (`nom`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_products",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `nom` TEXT NOT NULL, `categorieId` INTEGER, `warehouseId` INTEGER, `unite` TEXT NOT NULL, `prixAchat` REAL NOT NULL, `prixVente` REAL NOT NULL, `seuilMin` REAL NOT NULL, `seuilMax` REAL NOT NULL, `quantiteInitiale` REAL NOT NULL, `quantite` REAL NOT NULL, `actif` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nom",
+            "columnName": "nom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorieId",
+            "columnName": "categorieId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "warehouseId",
+            "columnName": "warehouseId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "unite",
+            "columnName": "unite",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prixAchat",
+            "columnName": "prixAchat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prixVente",
+            "columnName": "prixVente",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seuilMin",
+            "columnName": "seuilMin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seuilMax",
+            "columnName": "seuilMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantiteInitiale",
+            "columnName": "quantiteInitiale",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantite",
+            "columnName": "quantite",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actif",
+            "columnName": "actif",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_products_code",
+            "unique": true,
+            "columnNames": [
+              "code"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_products_code` ON `${TABLE_NAME}` (`code`)"
+          },
+          {
+            "name": "index_stock_products_categorieId",
+            "unique": false,
+            "columnNames": [
+              "categorieId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_products_categorieId` ON `${TABLE_NAME}` (`categorieId`)"
+          },
+          {
+            "name": "index_stock_products_warehouseId",
+            "unique": false,
+            "columnNames": [
+              "warehouseId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_products_warehouseId` ON `${TABLE_NAME}` (`warehouseId`)"
+          },
+          {
+            "name": "index_stock_products_nom",
+            "unique": false,
+            "columnNames": [
+              "nom"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_products_nom` ON `${TABLE_NAME}` (`nom`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_movements",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, `type` TEXT NOT NULL, `productId` INTEGER NOT NULL, `sourceWarehouseId` INTEGER, `targetWarehouseId` INTEGER, `quantity` REAL NOT NULL, `delta` REAL NOT NULL, `price` REAL, `counterpart` TEXT, `status` TEXT NOT NULL, `date` INTEGER NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "productId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceWarehouseId",
+            "columnName": "sourceWarehouseId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "targetWarehouseId",
+            "columnName": "targetWarehouseId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "delta",
+            "columnName": "delta",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "counterpart",
+            "columnName": "counterpart",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_movements_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_movements_productId` ON `${TABLE_NAME}` (`productId`)"
+          },
+          {
+            "name": "index_stock_movements_reference",
+            "unique": true,
+            "columnNames": [
+              "reference"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_movements_reference` ON `${TABLE_NAME}` (`reference`)"
+          },
+          {
+            "name": "index_stock_movements_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_movements_type` ON `${TABLE_NAME}` (`type`)"
+          },
+          {
+            "name": "index_stock_movements_date",
+            "unique": false,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_movements_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_inventories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, `warehouseId` INTEGER, `status` TEXT NOT NULL, `date` INTEGER NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL, `validatedAt` INTEGER, `completedAt` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reference",
+            "columnName": "reference",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warehouseId",
+            "columnName": "warehouseId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "validatedAt",
+            "columnName": "validatedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_inventories_reference",
+            "unique": true,
+            "columnNames": [
+              "reference"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stock_inventories_reference` ON `${TABLE_NAME}` (`reference`)"
+          },
+          {
+            "name": "index_stock_inventories_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_inventories_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_stock_inventories_date",
+            "unique": false,
+            "columnNames": [
+              "date"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_inventories_date` ON `${TABLE_NAME}` (`date`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stock_inventory_lines",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `inventoryId` INTEGER NOT NULL, `productId` INTEGER NOT NULL, `expectedQuantity` REAL NOT NULL, `countedQuantity` REAL NOT NULL, `ecart` REAL NOT NULL, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inventoryId",
+            "columnName": "inventoryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "productId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expectedQuantity",
+            "columnName": "expectedQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "countedQuantity",
+            "columnName": "countedQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ecart",
+            "columnName": "ecart",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_inventory_lines_inventoryId",
+            "unique": false,
+            "columnNames": [
+              "inventoryId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_inventory_lines_inventoryId` ON `${TABLE_NAME}` (`inventoryId`)"
+          },
+          {
+            "name": "index_stock_inventory_lines_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_inventory_lines_productId` ON `${TABLE_NAME}` (`productId`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2198d1a060d97cdc195f815ddd1b864c')"
+    ]
+  }
+}
