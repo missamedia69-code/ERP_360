@@ -118,6 +118,11 @@ class SalesViewModel @Inject constructor(
 
     private val _saveResult = MutableStateFlow<SaveResult?>(null)
     val saveResult: StateFlow<SaveResult?> = _saveResult
+    /** Anti double-soumission : sauvegarde et annulation en cours (spec §3 SAUVEGARDE). */
+    private val _saving = MutableStateFlow(false)
+    val saving: StateFlow<Boolean> = _saving
+    private val _cancelling = MutableStateFlow(false)
+    val cancelling: StateFlow<Boolean> = _cancelling
     private var nextLineId = 1L
 
     fun selectClient(client: ClientEntity) {
@@ -266,6 +271,7 @@ class SalesViewModel @Inject constructor(
      * Un brouillon n'a aucun effet sur le stock ni sur la finance (spec §3).
      */
     fun save(paymentMethod: String, draft: Boolean) {
+        if (_saving.value) return
         val sale = _uiState.value
         val client = sale.selectedClient ?: run {
             _saveResult.value = SaveResult.MissingClient
@@ -283,6 +289,7 @@ class SalesViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            _saving.value = true
             try {
                 val payload = SaleRecordPayload(
                     clientId = client.id,
@@ -334,6 +341,8 @@ class SalesViewModel @Inject constructor(
                 throw exception
             } catch (_: Exception) {
                 _saveResult.value = SaveResult.Error
+            } finally {
+                _saving.value = false
             }
         }
     }
@@ -358,7 +367,9 @@ class SalesViewModel @Inject constructor(
      * recomposition du stock par des mouvements d'entrée.
      */
     fun cancelSale(id: Long) {
+        if (_cancelling.value) return
         viewModelScope.launch {
+            _cancelling.value = true
             try {
                 when (reverseSaleStock(id)) {
                     is ReverseSaleStockUseCase.Result.Succes -> _saveResult.value = SaveResult.Cancelled
@@ -368,6 +379,8 @@ class SalesViewModel @Inject constructor(
                 throw exception
             } catch (_: Exception) {
                 _saveResult.value = SaveResult.Error
+            } finally {
+                _cancelling.value = false
             }
         }
     }

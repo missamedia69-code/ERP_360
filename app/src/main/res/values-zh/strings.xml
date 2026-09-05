@@ -335,6 +335,8 @@
     <string name="ops_quantity">数量</string>
     <string name="ops_income">收入</string>
     <string name="ops_expense">支出</string>
+    <string name="ops_summary">摘要</string>
+    <string name="ops_direction">资金方向</string>
     <string name="ops_notes">备注</string>
     <string name="ops_save">保存</string>
     <string name="ops_hint_stock">记录商品、盘点和库存调整。</string>

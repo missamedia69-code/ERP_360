@@ -34,6 +34,10 @@ class OperationsViewModel @Inject constructor(
     private val _result = MutableStateFlow<Result?>(null)
     val result: StateFlow<Result?> = _result
 
+    /** Anti double-soumission : création en cours (spec §3 SAUVEGARDE). */
+    private val _enCours = MutableStateFlow(false)
+    val enCours: StateFlow<Boolean> = _enCours
+
     val devise: StateFlow<String> = getEnterprise.observer()
         .map { it?.devise ?: "XAF" }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
@@ -50,6 +54,7 @@ class OperationsViewModel @Inject constructor(
         direction: OperationDirection,
         notes: String,
     ) {
+        if (_enCours.value) return
         val amount = amountText.toAmountOrNull()
         val quantity = quantityText.toAmountOrNull()
         // Une saisie non vide non numérique doit être refusée plutôt que convertie silencieusement.
@@ -58,6 +63,7 @@ class OperationsViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
+            _enCours.value = true
             try {
                 _result.value = when (
                     val result = operations.create(
@@ -80,6 +86,8 @@ class OperationsViewModel @Inject constructor(
                 throw exception
             } catch (_: Exception) {
                 _result.value = Result.Error
+            } finally {
+                _enCours.value = false
             }
         }
     }

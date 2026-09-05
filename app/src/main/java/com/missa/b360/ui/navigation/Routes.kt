@@ -9,6 +9,7 @@ object Routes {
     const val STOCK_PRODUCT_FORM = "stock_product_form"
     const val STOCK_MOVEMENT_FORM = "stock_movement_form"
     const val STOCK_TRANSFER_FORM = "stock_transfer_form"
+    const val OPERATION_FORM = "operation_form"
 
     // ☰ Administration & Paramétrage (module 9.1, Phase C)
     const val ADMIN_REGLAGES = "admin_reglages"

@@ -441,6 +441,8 @@
     <string name="ops_quantity">Quantité</string>
     <string name="ops_income">Entrée</string>
     <string name="ops_expense">Sortie</string>
+    <string name="ops_summary">Résumé</string>
+    <string name="ops_direction">Sens de la trésorerie</string>
     <string name="ops_notes">Notes</string>
     <string name="ops_save">Enregistrer</string>
     <string name="ops_hint_stock">Enregistrez vos articles, inventaires et ajustements de stock.</string>

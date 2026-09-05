@@ -1,6 +1,8 @@
 package com.missa.b360.ui.operations
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,13 +14,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -29,6 +40,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,7 +56,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,7 +72,11 @@ import com.missa.b360.ui.components.MissaPanel
 import com.missa.b360.ui.components.MissaSectionTitle
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaCanvas
+import com.missa.b360.ui.theme.MissaInk
+import com.missa.b360.ui.theme.MissaMuted
 
 /**
  * Ecran commun aux modules opérationnels livrés progressivement. Chaque module possède sa
@@ -72,6 +87,7 @@ import com.missa.b360.ui.theme.MissaCanvas
 fun OperationModuleScreen(
     module: OperationModule,
     onBack: () -> Unit,
+    onNavigate: (String) -> Unit,
     openCreate: Boolean = false,
     initialDirection: OperationDirection = OperationDirection.NONE,
     viewModel: OperationsViewModel = hiltViewModel(),
@@ -81,15 +97,15 @@ fun OperationModuleScreen(
     val result by viewModel.result.collectAsState()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
-    var formVisible by remember { mutableStateOf(false) }
+
+    val openForm = { onNavigate(operationFormRoute(module, initialDirection)) }
 
     LaunchedEffect(openCreate) {
-        if (openCreate) formVisible = true
+        if (openCreate) openForm()
     }
     LaunchedEffect(result) {
         when (val current = result) {
             is OperationsViewModel.Result.Created -> {
-                formVisible = false
                 snackbar.showSnackbar(context.getString(R.string.ops_created, current.reference))
                 viewModel.clearResult()
             }
@@ -120,7 +136,7 @@ fun OperationModuleScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { formVisible = true },
+                onClick = openForm,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
@@ -150,7 +166,7 @@ fun OperationModuleScreen(
             }
             if (records.isEmpty()) {
                 item {
-                    EmptyOperationState(module = module, onCreate = { formVisible = true })
+                    EmptyOperationState(module = module, onCreate = openForm)
                 }
             } else {
                 items(records, key = { it.id }) { record ->
@@ -165,18 +181,310 @@ fun OperationModuleScreen(
             item { Spacer(Modifier.height(72.dp)) }
         }
     }
+}
 
-    if (formVisible) {
-        OperationFormDialog(
-            module = module,
-            initialDirection = initialDirection,
-            onDismiss = { formVisible = false },
-            onConfirm = { title, counterpart, amount, quantity, direction, notes ->
-                viewModel.create(module, title, counterpart, amount, quantity, direction, notes)
+/** Route du formulaire d'une opération (page dédiée, spec §3.2). */
+fun operationFormRoute(module: OperationModule, direction: OperationDirection = OperationDirection.NONE): String =
+    "operation_form?module=${module.name}" + direction.takeUnless { it == OperationDirection.NONE }?.let { "&direction=${it.name}" }.orEmpty()
+
+/**
+ * Formulaire d'opération — UNE PAGE (spec §3.2) : identité, montants, sens, notes,
+ * résumé, barre d'actions [Annuler][Enregistrer]. Les saisies sont conservées en cas
+ * d'erreur et le bouton est désactivé pendant l'enregistrement.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OperationFormScreen(
+    module: OperationModule,
+    initialDirection: OperationDirection,
+    onBack: () -> Unit,
+    viewModel: OperationsViewModel = hiltViewModel(),
+) {
+    val devise by viewModel.devise.collectAsState()
+    val enCours by viewModel.enCours.collectAsState()
+    val result by viewModel.result.collectAsState()
+    val context = LocalContext.current
+    val snackbar = remember { SnackbarHostState() }
+
+    var title by remember { mutableStateOf("") }
+    var counterpart by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var direction by remember(initialDirection) {
+        mutableStateOf(initialDirection.takeUnless { it == OperationDirection.NONE } ?: OperationDirection.IN)
+    }
+    var titleError by remember { mutableStateOf<String?>(null) }
+    var amountError by remember { mutableStateOf<String?>(null) }
+    var quantityError by remember { mutableStateOf<String?>(null) }
+
+    val showAmount = module != OperationModule.STOCK
+    val showQuantity = module in setOf(
+        OperationModule.STOCK,
+        OperationModule.LIVRAISON,
+        OperationModule.PRODUCTION,
+        OperationModule.SERVICES,
+    )
+    val invalid = stringResource(R.string.product_amount_invalid)
+    val titleValid = title.trim().length >= 2
+    val amountValue = amount.toNumberOrNull()
+    val quantityValue = quantity.toNumberOrNull()
+    val canConfirm = titleValid &&
+        (amount.isBlank() || amountValue != null) &&
+        (quantity.isBlank() || quantityValue != null) &&
+        !enCours
+
+    LaunchedEffect(result) {
+        when (val current = result) {
+            is OperationsViewModel.Result.Created -> {
+                snackbar.showSnackbar(context.getString(R.string.ops_created, current.reference))
+                viewModel.clearResult()
+                onBack()
+            }
+            OperationsViewModel.Result.Invalid -> {
+                snackbar.showSnackbar(context.getString(R.string.ops_invalid))
+                viewModel.clearResult()
+            }
+            OperationsViewModel.Result.ReadOnly -> {
+                snackbar.showSnackbar(context.getString(R.string.ops_read_only))
+                viewModel.clearResult()
+            }
+            OperationsViewModel.Result.Error -> {
+                snackbar.showSnackbar(context.getString(R.string.ops_error))
+                viewModel.clearResult()
+            }
+            null -> Unit
+        }
+    }
+
+    fun onConfirm() {
+        // Validation UI avant la validation métier — les saisies sont conservées (spec §3).
+        val errors = mutableMapOf<String, String>()
+        if (!titleValid) errors["title"] = context.getString(R.string.product_name_required)
+        if (amount.isNotBlank() && amountValue == null) errors["amount"] = invalid
+        if (quantity.isNotBlank() && quantityValue == null) errors["quantity"] = invalid
+        if (errors.isNotEmpty()) {
+            titleError = errors["title"]
+            amountError = errors["amount"]
+            quantityError = errors["quantity"]
+            return
+        }
+        titleError = null
+        amountError = null
+        quantityError = null
+        viewModel.create(module, title, counterpart, amount, quantity, direction, notes)
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MissaCanvas,
+            topBar = {
+                MissaTopAppBar(
+                    title = stringResource(R.string.ops_new, stringResource(module.appModule().titleRes)),
+                    onBack = onBack,
+                )
             },
+            bottomBar = {
+                Surface(color = Color.White, shadowElevation = 6.dp) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        OutlinedButton(
+                            onClick = onBack,
+                            enabled = !enCours,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                        ) {
+                            Text(stringResource(R.string.ops_cancel))
+                        }
+                        Button(
+                            onClick = onConfirm,
+                            enabled = canConfirm,
+                            modifier = Modifier
+                                .weight(2f)
+                                .height(48.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                        ) {
+                            if (enCours) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = Color.White,
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            } else {
+                                Icon(Icons.Outlined.Save, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                            }
+                            Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                // --- IDENTITÉ ---
+                FormCard(stringResource(R.string.ops_title)) {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it; titleError = null },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.ops_title)) },
+                        isError = titleError != null,
+                        supportingText = { titleError?.let { Text(it) } ?: Text(" ") },
+                        singleLine = true,
+                    )
+                    OutlinedTextField(
+                        value = counterpart,
+                        onValueChange = { counterpart = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.ops_counterpart)) },
+                        singleLine = true,
+                    )
+                }
+
+                // --- MONTANTS ---
+                if (showAmount || showQuantity) {
+                    FormCard(stringResource(R.string.ops_amount)) {
+                        if (showAmount) {
+                            OutlinedTextField(
+                                value = amount,
+                                onValueChange = { amount = it.numberChars(); amountError = null },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text(stringResource(R.string.ops_amount)) },
+                                isError = amountError != null,
+                                supportingText = { amountError?.let { Text(it) } ?: Text(" ") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            )
+                        }
+                        if (showQuantity) {
+                            OutlinedTextField(
+                                value = quantity,
+                                onValueChange = { quantity = it.numberChars(); quantityError = null },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text(stringResource(R.string.ops_quantity)) },
+                                isError = quantityError != null,
+                                supportingText = { quantityError?.let { Text(it) } ?: Text(" ") },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            )
+                        }
+                    }
+                }
+
+                // --- SENS (caisse) ---
+                if (module == OperationModule.FINANCES) {
+                    FormCard(stringResource(R.string.ops_direction)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = direction == OperationDirection.IN,
+                                onClick = { direction = OperationDirection.IN },
+                                label = { Text(stringResource(R.string.ops_income)) },
+                            )
+                            FilterChip(
+                                selected = direction == OperationDirection.OUT,
+                                onClick = { direction = OperationDirection.OUT },
+                                label = { Text(stringResource(R.string.ops_expense)) },
+                            )
+                        }
+                    }
+                }
+
+                // --- NOTES ---
+                FormCard(stringResource(R.string.ops_notes)) {
+                    OutlinedTextField(
+                        value = notes,
+                        onValueChange = { notes = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.ops_notes)) },
+                        minLines = 2,
+                        maxLines = 4,
+                    )
+                }
+
+                // --- RÉSUMÉ ---
+                FormCard(stringResource(R.string.ops_summary)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            if (showAmount && amount.isNotBlank()) {
+                                SummaryLine(
+                                    stringResource(R.string.ops_amount),
+                                    if (amountValue != null) MoneyUtils.format(amountValue, devise) else amount,
+                                )
+                            }
+                            if (showQuantity && quantity.isNotBlank()) {
+                                SummaryLine(
+                                    stringResource(R.string.ops_quantity),
+                                    quantity,
+                                )
+                            }
+                            SummaryLine(
+                                stringResource(R.string.ops_direction),
+                                stringResource(
+                                    if (direction == OperationDirection.OUT) R.string.ops_expense else R.string.ops_income,
+                                ),
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+        SnackbarHost(
+            hostState = snackbar,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 84.dp),
         )
     }
 }
+
+@Composable
+private fun FormCard(title: String, content: @Composable () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, MissaBorder),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                text = title,
+                color = BrandBlue,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleSmall,
+            )
+            content()
+        }
+    }
+}
+
+@Composable
+private fun SummaryLine(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = MissaMuted, style = MaterialTheme.typography.bodyMedium)
+        Text(value, color = MissaInk, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+private fun String.numberChars(): String = filter { it.isDigit() || it == ',' || it == '.' }
+
+private fun String.toNumberOrNull(): Double? = trim()
+    .takeIf { it.isNotEmpty() }
+    ?.replace(',', '.')
+    ?.toDoubleOrNull()
+    ?.takeIf { it.isFinite() }
 
 @Composable
 private fun EmptyOperationState(module: OperationModule, onCreate: () -> Unit) {
@@ -260,7 +568,7 @@ private fun OperationRecordCard(
 private fun StatusChip(status: OperationStatus) {
     val (label, color) = when (status) {
         OperationStatus.DRAFT -> R.string.ops_status_draft to MaterialTheme.colorScheme.secondary
-        OperationStatus.VALIDATED -> R.string.ops_status_validated to Color(0xFF16803C)
+        OperationStatus.VALIDATED -> R.string.ops_status_validated to Color(0xFF16883C)
         OperationStatus.CANCELLED -> R.string.ops_status_cancelled to MaterialTheme.colorScheme.error
     }
     AssistChip(
@@ -272,104 +580,6 @@ private fun StatusChip(status: OperationStatus) {
             disabledContainerColor = color.copy(alpha = 0.10f),
         ),
         border = null,
-    )
-}
-
-@Composable
-private fun OperationFormDialog(
-    module: OperationModule,
-    initialDirection: OperationDirection,
-    onDismiss: () -> Unit,
-    onConfirm: (String, String, String, String, OperationDirection, String) -> Unit,
-) {
-    var title by remember { mutableStateOf("") }
-    var counterpart by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
-    var direction by remember(initialDirection) {
-        mutableStateOf(initialDirection.takeUnless { it == OperationDirection.NONE } ?: OperationDirection.IN)
-    }
-    val showAmount = module != OperationModule.STOCK
-    val showQuantity = module in setOf(
-        OperationModule.STOCK,
-        OperationModule.LIVRAISON,
-        OperationModule.PRODUCTION,
-        OperationModule.SERVICES,
-    )
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.ops_new, stringResource(module.appModule().titleRes))) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(stringResource(R.string.ops_title)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = counterpart,
-                    onValueChange = { counterpart = it },
-                    label = { Text(stringResource(R.string.ops_counterpart)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                if (showAmount) {
-                    OutlinedTextField(
-                        value = amount,
-                        onValueChange = { amount = it },
-                        label = { Text(stringResource(R.string.ops_amount)) },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                if (showQuantity) {
-                    OutlinedTextField(
-                        value = quantity,
-                        onValueChange = { quantity = it },
-                        label = { Text(stringResource(R.string.ops_quantity)) },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                if (module == OperationModule.FINANCES) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(
-                            selected = direction == OperationDirection.IN,
-                            onClick = { direction = OperationDirection.IN },
-                            label = { Text(stringResource(R.string.ops_income)) },
-                        )
-                        FilterChip(
-                            selected = direction == OperationDirection.OUT,
-                            onClick = { direction = OperationDirection.OUT },
-                            label = { Text(stringResource(R.string.ops_expense)) },
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text(stringResource(R.string.ops_notes)) },
-                    minLines = 2,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(title, counterpart, amount, quantity, direction, notes) }) {
-                Text(stringResource(R.string.ops_save))
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text(stringResource(R.string.ops_cancel))
-            }
-        },
     )
 }
 

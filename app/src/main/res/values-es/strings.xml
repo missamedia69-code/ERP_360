@@ -335,6 +335,8 @@
     <string name="ops_quantity">Cantidad</string>
     <string name="ops_income">Ingreso</string>
     <string name="ops_expense">Gasto</string>
+    <string name="ops_summary">Resumen</string>
+    <string name="ops_direction">Sentido de la tesorería</string>
     <string name="ops_notes">Notas</string>
     <string name="ops_save">Guardar</string>
     <string name="ops_hint_stock">Registre sus artículos, inventarios y ajustes de existencias.</string>

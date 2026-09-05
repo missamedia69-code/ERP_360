@@ -335,6 +335,8 @@
     <string name="ops_quantity">الكمية</string>
     <string name="ops_income">إيراد</string>
     <string name="ops_expense">مصروف</string>
+    <string name="ops_summary">الملخص</string>
+    <string name="ops_direction">اتجاه النقدية</string>
     <string name="ops_notes">ملاحظات</string>
     <string name="ops_save">حفظ</string>
     <string name="ops_hint_stock">سجل أصنافك وجردك وتسويات المخزون.</string>

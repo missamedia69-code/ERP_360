@@ -53,6 +53,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -145,6 +146,8 @@ fun SalesScreen(
     val paymentMethods by viewModel.paymentMethods.collectAsState()
     val devise by viewModel.devise.collectAsState()
     val history by viewModel.history.collectAsState(initial = emptyList())
+    val saving by viewModel.saving.collectAsState()
+    val cancelling by viewModel.cancelling.collectAsState()
     val saveResult by viewModel.saveResult.collectAsState()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -363,7 +366,10 @@ fun SalesScreen(
             title = stringResource(R.string.sales_summary),
             step = 3,
             onBack = { stepName = SalesStep.PAYMENT.name },
-            bottomAction = FlowAction(stringResource(R.string.sales_save_sale), sale.selectedClient != null && sale.lines.isNotEmpty()) {
+            bottomAction = FlowAction(
+                stringResource(R.string.sales_save_sale),
+                sale.selectedClient != null && sale.lines.isNotEmpty() && !saving,
+            ) {
                 viewModel.save(selectedPayment, draft = false)
             },
         ) { padding ->
@@ -374,6 +380,7 @@ fun SalesScreen(
                 paymentMethod = selectedPayment,
                 paidInput = sale.paidInput,
                 devise = devise,
+                busy = saving,
                 onSaveDraft = { viewModel.save(selectedPayment, draft = true) },
                 modifier = Modifier.padding(padding),
             )
@@ -474,8 +481,12 @@ fun SalesScreen(
                         viewModel.cancelSale(activeReceipt!!.recordId)
                         cancelVisible = false
                     },
+                    enabled = !cancelling,
                     colors = ButtonDefaults.buttonColors(containerColor = FlowRed),
-                ) { Text(stringResource(R.string.sales_cancel_sale)) }
+                ) {
+                    if (cancelling) CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = Color.White)
+                    Text(stringResource(R.string.sales_cancel_sale))
+                }
             },
             dismissButton = { TextButton(onClick = { cancelVisible = false }) { Text(stringResource(R.string.ops_cancel)) } },
         )
@@ -508,6 +519,13 @@ private fun SalesPageTitle(title: String) {
 }
 
 private data class FlowAction(val label: String, val enabled: Boolean, val onClick: () -> Unit)
+
+/** Action de bas de parcours : libellé, disponibilité et action (spec §3.2). */
+data class FlowAction(
+    val label: String,
+    val enabled: Boolean,
+    val onClick: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -1135,7 +1153,7 @@ private fun PaymentStepContent(client: ClientEntity?, totals: SaleTotals, paymen
 }
 
 @Composable
-private fun SummaryStepContent(client: ClientEntity?, lines: List<SaleLine>, totals: SaleTotals, paymentMethod: String, paidInput: String, devise: String, onSaveDraft: () -> Unit, modifier: Modifier = Modifier) {
+private fun SummaryStepContent(client: ClientEntity?, lines: List<SaleLine>, totals: SaleTotals, paymentMethod: String, paidInput: String, devise: String, busy: Boolean, onSaveDraft: () -> Unit, modifier: Modifier = Modifier) {
     val paid = paidInput.toSaleValue() ?: totals.total
     Column(modifier = modifier.padding(15.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
         client?.let { SelectedCustomerCard(it, onClick = {}) }
@@ -1156,7 +1174,7 @@ private fun SummaryStepContent(client: ClientEntity?, lines: List<SaleLine>, tot
                 FlowAmountLine(stringResource(R.string.sales_remaining), saleMoney((totals.total - paid).coerceAtLeast(0.0), devise))
             }
         }
-        TextButton(onClick = onSaveDraft, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        TextButton(onClick = onSaveDraft, enabled = !busy, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(stringResource(R.string.sales_save_draft))
         }
     }

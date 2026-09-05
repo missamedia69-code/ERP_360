@@ -27,6 +27,7 @@ import com.missa.b360.ui.clients.ClientsScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
+import com.missa.b360.ui.operations.OperationFormScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
 import com.missa.b360.ui.sales.SalesScreen
@@ -207,6 +208,32 @@ private fun MainNavHost() {
         operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
         operationDestination(AppModule.RH, OperationModule.RH, navController)
         operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
+        // Formulaire d'opération — page dédiée unique (spec §3.2) : [Retour | Titre] ... [Annuler][Enregistrer].
+        composable(
+            route = "${Routes.OPERATION_FORM}?module={module}&direction={direction}",
+            arguments = listOf(
+                navArgument("module") {
+                    type = NavType.StringType
+                },
+                navArgument("direction") {
+                    type = NavType.StringType
+                    defaultValue = "NONE"
+                },
+            ),
+        ) { entry ->
+            val module = runCatching {
+                OperationModule.valueOf(entry.arguments?.getString("module").orEmpty())
+            }.getOrNull()
+            if (module != null) {
+                OperationFormScreen(
+                    module = module,
+                    initialDirection = OperationDirection.entries.firstOrNull {
+                        it.name == entry.arguments?.getString("direction")
+                    } ?: OperationDirection.NONE,
+                    onBack = { navController.popBackStack() },
+                )
+            }
+        }
         composable(AppModule.REPORTING.route) {
             ReportingScreen(onBack = { navController.popBackStack() })
         }
@@ -235,6 +262,7 @@ private fun NavGraphBuilder.operationDestination(
         OperationModuleScreen(
             module = operationModule,
             onBack = { navController.popBackStack() },
+            onNavigate = { route -> navController.navigate(route) },
             openCreate = entry.arguments?.getBoolean("create") == true,
             initialDirection = OperationDirection.entries.firstOrNull {
                 it.name == entry.arguments?.getString("direction")
