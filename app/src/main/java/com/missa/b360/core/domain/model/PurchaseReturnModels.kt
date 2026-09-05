@@ -86,7 +86,7 @@ object ReturnRules {
     ): Map<String, Double> =
         original.lines
             .groupBy { lineKey(it) }
-            .mapValues { key, group ->
+            .mapValues { (key, group) ->
                 val vendu = group.sumOf { it.quantity }
                 val deja = returns
                     .flatMap { it.lines }
