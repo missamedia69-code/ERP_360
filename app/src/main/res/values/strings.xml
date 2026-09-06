@@ -1193,9 +1193,6 @@
     <string name="obn_retention_365_sous">Recommandé : audit complet sur un exercice</string>
 
     <string name="obn_profil_perso_sous">Choisissez vous-même les modules à activer</string>
-    <string name="obn_profil_perso_compteur">%1$d module(s) sélectionné(s)</string>
-    <string name="obn_profil_perso_tout">Tout cocher</string>
-    <string name="obn_profil_perso_rien">Tout décocher</string>
     <string name="obn_profil_perso_vide">Sélectionnez au moins un module pour continuer.</string>
     <string name="obn_profil_perso_fonctions">%1$d fonctionnalités</string>
 
@@ -1357,9 +1354,6 @@
     <string name="module_desc_log">Expéditions, transporteurs, tournées et preuves de livraison.</string>
     <string name="module_desc_rep">Tableaux de bord, indicateurs, rapports et exports.</string>
     <string name="obn_socle_titre">Modules support</string>
-    <string name="obn_socle_sous">Briques transverses qui s\'ajoutent à votre profil métier.</string>
-    <string name="obn_socle_recommande">Recommandé</string>
-    <string name="obn_socle_compteur">%1$d option(s) activée(s)</string>
     <string name="obn_socle_defaut">Rétablir la sélection conseillée</string>
     <string name="obn_profil_perso_metier">Modules métier</string>
     <string name="obn_profil_detail_metier">Modules métier</string>
@@ -1432,7 +1426,6 @@
     <string name="kpi_aucun_module">Aucun module actif : activez-en depuis les réglages.</string>
     <string name="kpi_variation_hausse">+%1$s vs période précédente</string>
     <string name="kpi_variation_baisse">%1$s vs période précédente</string>
-    <string name="obn_socle_pour">S\'ajoutent à %1$s</string>
     <string name="obn_socle_deplier">Afficher les modules support</string>
     <string name="obn_socle_replier">Masquer les modules support</string>
     <string name="obn_entreprise_localisation">Localisation et devise</string>
@@ -1508,4 +1501,10 @@
     <string name="obn_section_format">Format</string>
     <string name="obn_logo_present">Logo ajouté</string>
     <string name="fisc_pack_detail">Détail fiscal</string>
+    <string name="obn_pack_inclus">Inclus dans ce pack</string>
+    <string name="obn_pack_inclus_note">Ces modules forment un ensemble cohérent et restent actifs.</string>
+    <string name="obn_pack_ajouter">Ajouter d\'autres modules</string>
+    <string name="obn_pack_ajouter_note">Facultatif : activable ou désactivable plus tard dans les réglages.</string>
+    <string name="obn_pack_complet">Ce pack active déjà les 14 modules.</string>
+    <string name="obn_pack_compteur">%1$d modules actifs</string>
 </resources>

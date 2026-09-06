@@ -63,17 +63,29 @@ class OnboardingViewModel @Inject constructor(
     var profil by mutableStateOf<ProfilActivite?>(null)
         private set
 
-    /** Modules métier cochés quand le profil « Personnalisé » est retenu. */
+    /**
+     * Modules métier actifs : le pack du profil, plus ceux que l'utilisateur a
+     * ajoutés. En profil « Personnalisé », uniquement sa sélection.
+     */
     var modulesPersonnalises by mutableStateOf<Set<ModuleCode>>(emptySet())
         private set
 
-    /** Options socle retenues (Comptabilité, Trésorerie, Logistique, Reporting…). */
+    /** Options socle actives = recommandations verrouillées + [extrasSupport]. */
     var modulesSupport by mutableStateOf<Set<ModuleCode>>(emptySet())
         private set
 
-    /** Vrai dès que l'utilisateur touche une option socle : on cesse de la recalculer. */
-    var socleAjuste by mutableStateOf(false)
+    /**
+     * Briques transverses ajoutées à la main, en plus des recommandations.
+     *
+     * Elles sont conservées à part pour survivre à tout recalcul : changer
+     * d'effectif ou de profil met à jour le socle recommandé sans effacer ce
+     * que l'utilisateur a explicitement demandé.
+     */
+    var extrasSupport by mutableStateOf<Set<ModuleCode>>(emptySet())
         private set
+
+    /** Vrai dès que l'utilisateur a ajouté une brique hors recommandations. */
+    val socleAjuste: Boolean get() = extrasSupport.isNotEmpty()
 
     /** Effectif déclaré (P1–P6) — champ compact de l'écran « type d'activité ». */
     var palier by mutableStateOf<PalierTaille?>(null)
@@ -166,12 +178,14 @@ class OnboardingViewModel @Inject constructor(
                     .deserialiser(settingsStore.get(SettingsStore.Keys.MODULES_ACTIFS))
                 modulesPersonnalises = ModulesSocle.filtrerMetier(actifsEnregistres).toSet()
                 val socleEnregistre = settingsStore.get(SettingsStore.Keys.MODULES_SUPPORT)
-                socleAjuste = socleEnregistre != null
-                modulesSupport = if (socleEnregistre != null) {
-                    ModulesPersonnalises.deserialiser(socleEnregistre).toSet()
-                } else {
-                    ModulesSocle.filtrerSupport(actifsEnregistres).toSet()
-                }
+                // Les recommandations sont recalculées ; on ne retient de la
+                // sauvegarde que les ajouts volontaires (normalisés plus bas,
+                // une fois l'effectif restauré).
+                extrasSupport = ModulesPersonnalises
+                    .deserialiser(socleEnregistre ?: "")
+                    .let(ModulesSocle::filtrerSupport)
+                    .toSet()
+                modulesSupport = ModulesSocle.filtrerSupport(actifsEnregistres).toSet()
                 palier = progression.palier?.let {
                     runCatching { PalierTaille.valueOf(it) }.getOrNull()
                 }
@@ -198,6 +212,10 @@ class OnboardingViewModel @Inject constructor(
                     settingsStore.get(SettingsStore.Keys.RETENTION_JOURNAL),
                 )
                 pinDejaConfigure = progression.pinConfigure
+                // Profil, effectif et modules métier sont maintenant connus :
+                // le socle recommandé peut être recalculé, et les ajouts
+                // volontaires débarrassés de ce qui est devenu recommandé.
+                rafraichirSocle()
                 val configurationTerminee =
                     settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE) != null
                 step = when {
@@ -253,12 +271,14 @@ class OnboardingViewModel @Inject constructor(
      * recalculées comme simple proposition tant que l'utilisateur n'y a pas touché.
      */
     fun choisirProfil(p: ProfilActivite) {
+        // Re-cliquer sur la carte déjà choisie ne fait que replier le panneau :
+        // les modules ajoutés à la main ne doivent pas disparaître au passage.
+        val changementDeProfil = profil != p
         profil = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name) }
         if (p != ProfilActivite.CUSTOM) {
-            modulesPersonnalises = ModulesSocle
-                .filtrerMetier(ProfilConfiguration.modulesPourProfil(p))
-                .toSet()
+            val pack = ModulesSocle.metierDuPack(p)
+            modulesPersonnalises = if (changementDeProfil) pack else modulesPersonnalises + pack
         }
         rafraichirSocle()
         enregistrerModules()
@@ -284,8 +304,13 @@ class OnboardingViewModel @Inject constructor(
         enregistrerModules()
     }
 
-    /** Coche / décoche un module métier dans la sélection personnalisée. */
+    /**
+     * Ajoute ou retire un module métier **hors pack**. Un module inclus dans le
+     * profil est verrouillé : l'appel est sans effet, la cohérence du pack
+     * prime sur le clic.
+     */
     fun basculerModule(module: ModuleCode) {
+        if (module in ModulesSocle.metierDuPack(profil)) return
         val nouvelle = modulesPersonnalises.toMutableSet()
         if (!nouvelle.add(module)) nouvelle.remove(module)
         modulesPersonnalises = nouvelle
@@ -293,26 +318,23 @@ class OnboardingViewModel @Inject constructor(
         enregistrerModules()
     }
 
-    /** Tout cocher / tout décocher depuis l'en-tête de la liste des modules métier. */
-    fun basculerTousLesModules() {
-        val tout = ModulesSocle.metier.toSet()
-        modulesPersonnalises = if (modulesPersonnalises.size == tout.size) emptySet() else tout
+    /**
+     * Ajoute ou retire une brique transverse **hors recommandations**. Les
+     * modules recommandés pour le profil sont verrouillés.
+     */
+    fun basculerSupport(module: ModuleCode) {
+        if (module in socleRecommande()) return
+        val nouvelle = extrasSupport.toMutableSet()
+        if (!nouvelle.add(module)) nouvelle.remove(module)
+        extrasSupport = nouvelle
         rafraichirSocle()
         enregistrerModules()
     }
 
-    /** Active / désactive une option socle — le choix de l'utilisateur devient prioritaire. */
-    fun basculerSupport(module: ModuleCode) {
-        val nouvelle = modulesSupport.toMutableSet()
-        if (!nouvelle.add(module)) nouvelle.remove(module)
-        modulesSupport = nouvelle
-        socleAjuste = true
-        enregistrerModules()
-    }
-
-    /** Revient aux options socle conseillées pour le profil et l'effectif déclarés. */
+    /** Retire tous les ajouts manuels : on revient au pack seul. */
     fun reinitialiserSocle() {
-        socleAjuste = false
+        extrasSupport = emptySet()
+        modulesPersonnalises = ModulesSocle.metierDuPack(profil)
         rafraichirSocle()
         enregistrerModules()
     }
@@ -325,19 +347,26 @@ class OnboardingViewModel @Inject constructor(
     fun modulesMetier(): List<ModuleCode> =
         ModulesSocle.metierActifs(profil, modulesPersonnalises)
 
-    /** Recalcule la proposition socle tant que l'utilisateur ne l'a pas ajustée. */
+    /**
+     * Recalcule le socle : recommandations du moment — elles suivent le profil,
+     * l'effectif et les modules métier — augmentées des ajouts volontaires.
+     */
     private fun rafraichirSocle() {
-        if (!socleAjuste) modulesSupport = socleRecommande()
+        val recommandes = socleRecommande()
+        extrasSupport = extrasSupport - recommandes
+        modulesSupport = ModulesSocle.support
+            .filter { it in recommandes || it in extrasSupport }
+            .toSet()
     }
 
     /** La sélection est conservée immédiatement (reprise d'onboarding). */
     private fun enregistrerModules() {
         val actifs = ModulesPersonnalises.modulesActifs(profil, modulesPersonnalises, modulesSupport)
         val valeurActifs = ModulesPersonnalises.serialiser(actifs)
-        val valeurSocle = ModulesPersonnalises.serialiser(ModulesSocle.filtrerSupport(modulesSupport))
+        val valeurExtras = ModulesPersonnalises.serialiser(ModulesSocle.filtrerSupport(extrasSupport))
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeurActifs)
-            if (socleAjuste) settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurSocle)
+            settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurExtras)
         }
     }
 

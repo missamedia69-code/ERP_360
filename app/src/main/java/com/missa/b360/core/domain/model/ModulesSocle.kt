@@ -15,8 +15,9 @@ enum class TypeModule { METIER, SUPPORT }
  *    Reporting, CRM, RH, Qualité, Maintenance) : transverses, ils s'ajoutent
  *    au profil et se cochent indépendamment.
  *
- * Les recommandations ci-dessous ne sont que des valeurs de départ : l'utilisateur
- * garde la main sur chaque option socle.
+ * Les modules recommandés pour un profil donné forment un ensemble cohérent :
+ * ils sont verrouillés (voir [metierDuPack] et [recommandes]). L'utilisateur
+ * n'ajoute que ce dont il a besoin en plus.
  */
 object ModulesSocle {
 
@@ -54,14 +55,30 @@ object ModulesSocle {
         support.filter { it in modules }
 
     /**
-     * Modules métier réellement retenus : sélection manuelle en profil
-     * « Personnalisé », configuration du profil sinon.
+     * Modules métier inclus d'office par le profil : le cœur du pack, que
+     * l'utilisateur ne peut pas décocher — un profil « Achat-Vente » sans
+     * module Vente ne veut rien dire.
+     *
+     * Le profil « Personnalisé » n'a par définition aucun module imposé.
+     */
+    fun metierDuPack(profil: ProfilActivite?): Set<ModuleCode> = when (profil) {
+        null, ProfilActivite.CUSTOM -> emptySet()
+        else -> filtrerMetier(ProfilConfiguration.modulesPourProfil(profil)).toSet()
+    }
+
+    /**
+     * Modules métier réellement retenus : le pack du profil, plus les modules
+     * que l'utilisateur a ajoutés de lui-même. En profil « Personnalisé », il
+     * n'y a que des ajouts.
      */
     fun metierActifs(profil: ProfilActivite?, personnalises: Collection<ModuleCode>): List<ModuleCode> =
-        when {
-            profil == null -> emptyList()
-            profil == ProfilActivite.CUSTOM -> filtrerMetier(personnalises)
-            else -> filtrerMetier(ProfilConfiguration.modulesPourProfil(profil))
+        when (profil) {
+            null -> emptyList()
+            ProfilActivite.CUSTOM -> filtrerMetier(personnalises)
+            else -> {
+                val pack = metierDuPack(profil)
+                metier.filter { it in pack || it in personnalises }
+            }
         }
 
     /**
@@ -76,6 +93,9 @@ object ModulesSocle {
      * - **Qualité** et **Maintenance** : dès qu'il y a de la production.
      *
      * Les modules support déjà prévus par le profil restent recommandés.
+     *
+     * Ce résultat est verrouillé dans l'interface : il constitue le socle du
+     * pack, auquel l'utilisateur ajoute librement les autres briques.
      */
     fun recommandes(
         profil: ProfilActivite?,

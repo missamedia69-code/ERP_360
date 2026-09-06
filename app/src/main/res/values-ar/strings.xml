@@ -1165,9 +1165,6 @@
     <string name="obn_retention_365_sous">موصى به: تدقيق كامل على مدى سنة مالية</string>
 
     <string name="obn_profil_perso_sous">اختر بنفسك الوحدات التي تريد تفعيلها</string>
-    <string name="obn_profil_perso_compteur">تم اختيار %1$d وحدة</string>
-    <string name="obn_profil_perso_tout">تحديد الكل</string>
-    <string name="obn_profil_perso_rien">إلغاء تحديد الكل</string>
     <string name="obn_profil_perso_vide">اختر وحدة واحدة على الأقل للمتابعة.</string>
     <string name="obn_profil_perso_fonctions">%1$d ميزة</string>
 
@@ -1329,9 +1326,6 @@
     <string name="module_desc_log">الشحنات وشركات النقل والجولات وإثبات التسليم.</string>
     <string name="module_desc_rep">لوحات المعلومات والمؤشرات والتقارير والتصدير.</string>
     <string name="obn_socle_titre">الوحدات المساندة</string>
-    <string name="obn_socle_sous">لبنات عامة تُضاف إلى ملف نشاطك.</string>
-    <string name="obn_socle_recommande">موصى به</string>
-    <string name="obn_socle_compteur">%1$d خيار مفعّل</string>
     <string name="obn_socle_defaut">استعادة الاختيار المقترح</string>
     <string name="obn_profil_perso_metier">وحدات النشاط</string>
     <string name="obn_profil_detail_metier">وحدات النشاط</string>
@@ -1404,7 +1398,6 @@
     <string name="kpi_aucun_module">لا توجد وحدة مفعّلة: فعّلها من الإعدادات.</string>
     <string name="kpi_variation_hausse">+%1$s مقارنة بالفترة السابقة</string>
     <string name="kpi_variation_baisse">%1$s مقارنة بالفترة السابقة</string>
-    <string name="obn_socle_pour">تُضاف إلى %1$s</string>
     <string name="obn_socle_deplier">إظهار الوحدات المساندة</string>
     <string name="obn_socle_replier">إخفاء الوحدات المساندة</string>
     <string name="obn_entreprise_localisation">الموقع والعملة</string>
@@ -1480,4 +1473,10 @@
     <string name="obn_section_format">الصيغة</string>
     <string name="obn_logo_present">تمت إضافة الشعار</string>
     <string name="fisc_pack_detail">التفاصيل الضريبية</string>
+    <string name="obn_pack_inclus">مضمَّن في هذه الحزمة</string>
+    <string name="obn_pack_inclus_note">تعمل هذه الوحدات معًا وتبقى مفعَّلة.</string>
+    <string name="obn_pack_ajouter">إضافة وحدات أخرى</string>
+    <string name="obn_pack_ajouter_note">اختياري: يمكن تفعيلها أو إيقافها لاحقًا من الإعدادات.</string>
+    <string name="obn_pack_complet">تفعّل هذه الحزمة جميع الوحدات الأربع عشرة.</string>
+    <string name="obn_pack_compteur">%1$d وحدة مفعَّلة</string>
 </resources>

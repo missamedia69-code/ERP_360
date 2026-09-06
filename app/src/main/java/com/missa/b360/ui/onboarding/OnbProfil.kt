@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.Workspaces
@@ -31,10 +33,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,10 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.core.domain.model.ModuleSousElements
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
@@ -169,10 +171,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                     onInfo = { detailProfil = carte.profil.name },
                 )
                 if (ouvert) {
-                    if (carte.profil == ProfilActivite.CUSTOM) {
-                        OnbModulesPersonnalises(viewModel = viewModel)
-                    }
-                    OnbModulesSocle(viewModel = viewModel, profilTitreRes = carte.titreRes)
+                    OnbModulesDuPack(viewModel = viewModel)
                 }
             }
             MissaSelecteurBleu(
@@ -210,180 +209,125 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
 }
 
 /**
- * Personnalisation du niveau 1 (profil « Personnalisé ») : les six modules
- * **métier** cochables un à un, avec le nombre de fonctionnalités que chacun
- * apporte. Les briques transverses restent gérées par la carte « Modules support ».
+ * Composition du pack, dépliée sous la tranche choisie.
+ *
+ * Deux temps, et une règle : **ce que le pack apporte est verrouillé**. Les
+ * modules métier du profil et les briques transverses recommandées forment un
+ * ensemble cohérent — un « Achat-Vente » sans Vente, ou des ventes sans
+ * Comptabilité, ne produiraient qu'une installation bancale. Ils sont donc
+ * montrés en pastilles cadenassées, pour information.
+ *
+ * En dessous, tout le reste du catalogue est librement cochable, modules métier
+ * compris : un prestataire de services qui tient malgré tout un petit stock
+ * ajoute Stock sans quitter son profil.
  */
 @Composable
-private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
-    val selection = viewModel.modulesPersonnalises
-    val tousCoches = selection.size == ModulesSocle.metier.size
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, if (selection.isEmpty()) Red40 else BrandBlue),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
-            Text(
-                text = stringResource(R.string.obn_profil_perso_metier),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = MissaInk,
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.obn_profil_perso_compteur, selection.size),
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (selection.isEmpty()) Red40 else MissaInk,
-                    modifier = Modifier.weight(1f),
-                )
-                TextButton(onClick = viewModel::basculerTousLesModules) {
-                    Text(
-                        text = stringResource(
-                            if (tousCoches) R.string.obn_profil_perso_rien
-                            else R.string.obn_profil_perso_tout,
-                        ),
-                        fontSize = 12.sp,
-                    )
-                }
-            }
-            if (selection.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.obn_profil_perso_vide),
-                    fontSize = 11.5.sp,
-                    color = Red40,
-                )
-            }
-            Spacer(Modifier.height(4.dp))
-            for (module in ModulesSocle.metier) {
-                val actif = module in selection
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { viewModel.basculerModule(module) }
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(
-                        checked = actif,
-                        onCheckedChange = { viewModel.basculerModule(module) },
-                        colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(ModulesPersonnalises.libelleRes(module)),
-                            fontSize = 13.sp,
-                            fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
-                            color = MissaInk,
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.obn_profil_perso_fonctions,
-                                ModuleSousElements.pourModule(module).size,
-                            ),
-                            fontSize = 11.sp,
-                            color = MissaMuted,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
+private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
+    val profil = viewModel.profil
+    val metierDuPack = ModulesSocle.metierDuPack(profil)
+    val supportRecommande = viewModel.socleRecommande()
+    val verrouilles = ModuleCode.entries.filter { it in metierDuPack || it in supportRecommande }
+    val metierAjoutable = ModulesSocle.metier.filterNot { it in metierDuPack }
+    val supportAjoutable = ModulesSocle.support.filterNot { it in supportRecommande }
+    val metierChoisi = viewModel.modulesPersonnalises
+    val actifs = verrouilles.size +
+        metierAjoutable.count { it in metierChoisi } +
+        supportAjoutable.count { it in viewModel.modulesSupport }
+    val selectionVide = profil == ProfilActivite.CUSTOM && metierChoisi.isEmpty()
 
-/**
- * Niveau 2 — options socle, dépliées **sous la tranche métier choisie** : les
- * briques transverses (Comptabilité, Trésorerie, Logistique, Reporting, CRM, RH,
- * Qualité, Maintenance) s'ajoutent au profil sélectionné juste au-dessus. Elles sont pré-cochées selon des règles simples (comptabilité et
- * reporting systématiques, trésorerie dès qu'il y a achat ou vente, logistique
- * avec le stock, qualité et maintenance avec la production, RH selon
- * l'effectif) ; l'utilisateur reste libre de les activer ou non.
- */
-@Composable
-private fun OnbModulesSocle(viewModel: OnboardingViewModel, profilTitreRes: Int) {
-    val selection = viewModel.modulesSupport
-    val recommandes = viewModel.socleRecommande()
     Card(
         shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.45f)),
+        border = BorderStroke(1.dp, if (selectionVide) Red40 else BrandBlue.copy(alpha = 0.45f)),
         colors = CardDefaults.cardColors(containerColor = MissaSoftBlue),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.obn_socle_titre),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MissaInk,
-                    )
-                    Text(
-                        text = stringResource(
-                            R.string.obn_socle_pour,
-                            stringResource(profilTitreRes),
-                        ),
-                        fontSize = 11.5.sp,
-                        color = MissaMuted,
-                    )
-                }
                 Text(
-                    text = stringResource(R.string.obn_socle_compteur, selection.size),
+                    text = stringResource(R.string.obn_pack_inclus),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MissaInk,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = stringResource(R.string.obn_pack_compteur, actifs),
                     fontSize = 11.5.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = BrandBlue,
                 )
             }
-            Spacer(Modifier.height(6.dp))
-            for (module in ModulesSocle.support) {
-                val actif = module in selection
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { viewModel.basculerSupport(module) }
-                        .padding(vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = stringResource(ModulesPersonnalises.libelleRes(module)),
-                                fontSize = 13.sp,
-                                fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
-                                color = MissaInk,
-                            )
-                            if (module in recommandes) {
-                                Spacer(Modifier.width(6.dp))
-                                Surface(shape = RoundedCornerShape(6.dp), color = MissaSurface) {
-                                    Text(
-                                        text = stringResource(R.string.obn_socle_recommande),
-                                        fontSize = 10.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = BrandBlue,
-                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
-                                    )
-                                }
-                            }
-                        }
-                        Text(
-                            text = stringResource(ModulesSocle.descriptionRes(module)),
-                            fontSize = 11.sp,
-                            color = MissaMuted,
-                        )
-                    }
-                    Spacer(Modifier.width(10.dp))
-                    Switch(
-                        checked = actif,
-                        onCheckedChange = { viewModel.basculerSupport(module) },
-                        colors = SwitchDefaults.colors(checkedTrackColor = BrandBlue),
+            Text(
+                text = stringResource(R.string.obn_pack_inclus_note),
+                fontSize = 11.sp,
+                color = MissaMuted,
+            )
+            Spacer(Modifier.height(7.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                for (module in verrouilles) {
+                    OnbModulePastille(module)
+                }
+            }
+            if (selectionVide) {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.obn_profil_perso_vide),
+                    fontSize = 11.5.sp,
+                    color = Red40,
+                )
+            }
+
+            if (metierAjoutable.isEmpty() && supportAjoutable.isEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.obn_pack_complet),
+                    fontSize = 11.5.sp,
+                    color = MissaMuted,
+                )
+                return@Column
+            }
+
+            Spacer(Modifier.height(11.dp))
+            HorizontalDivider(color = BrandBlue.copy(alpha = 0.18f))
+            Spacer(Modifier.height(9.dp))
+            Text(
+                text = stringResource(R.string.obn_pack_ajouter),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(R.string.obn_pack_ajouter_note),
+                fontSize = 11.sp,
+                color = MissaMuted,
+            )
+            Spacer(Modifier.height(4.dp))
+            if (metierAjoutable.isNotEmpty()) {
+                OnbModulesGroupe(titreRes = R.string.obn_profil_perso_metier)
+                for (module in metierAjoutable) {
+                    OnbModuleAjoutable(
+                        module = module,
+                        coche = module in metierChoisi,
+                        onBascule = { viewModel.basculerModule(module) },
                     )
                 }
             }
-            if (viewModel.socleAjuste) {
+            if (supportAjoutable.isNotEmpty()) {
+                OnbModulesGroupe(titreRes = R.string.obn_socle_titre)
+                for (module in supportAjoutable) {
+                    OnbModuleAjoutable(
+                        module = module,
+                        coche = module in viewModel.modulesSupport,
+                        onBascule = { viewModel.basculerSupport(module) },
+                    )
+                }
+            }
+            if (viewModel.socleAjuste || metierChoisi.any { it !in metierDuPack }) {
                 TextButton(
                     onClick = viewModel::reinitialiserSocle,
                     modifier = Modifier.align(Alignment.End),
@@ -391,6 +335,82 @@ private fun OnbModulesSocle(viewModel: OnboardingViewModel, profilTitreRes: Int)
                     Text(text = stringResource(R.string.obn_socle_defaut), fontSize = 12.sp)
                 }
             }
+        }
+    }
+}
+
+/** Intertitre « Modules métier » / « Modules support » de la liste des ajouts. */
+@Composable
+private fun OnbModulesGroupe(titreRes: Int) {
+    Text(
+        text = stringResource(titreRes),
+        fontSize = 10.5.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = MissaMuted,
+        modifier = Modifier.padding(top = 6.dp, bottom = 2.dp),
+    )
+}
+
+/** Module fourni par le pack : pastille cadenassée, sans interrupteur. */
+@Composable
+private fun OnbModulePastille(module: ModuleCode) {
+    Surface(
+        shape = RoundedCornerShape(7.dp),
+        color = MissaSurface,
+        border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.35f)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Lock,
+                contentDescription = null,
+                tint = BrandBlue,
+                modifier = Modifier.size(11.dp),
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = stringResource(ModulesPersonnalises.libelleRes(module)),
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+            )
+        }
+    }
+}
+
+/** Module hors pack : case à cocher, libellé et rôle en une ligne. */
+@Composable
+private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onBascule)
+            .padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = coche,
+            onCheckedChange = { onBascule() },
+            colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
+            modifier = Modifier.size(34.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(ModulesPersonnalises.libelleRes(module)),
+                fontSize = 12.5.sp,
+                fontWeight = if (coche) FontWeight.SemiBold else FontWeight.Normal,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(ModulesSocle.descriptionRes(module)),
+                fontSize = 10.5.sp,
+                color = MissaMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

@@ -1165,9 +1165,6 @@
     <string name="obn_retention_365_sous">推荐：覆盖一个会计年度的完整审计</string>
 
     <string name="obn_profil_perso_sous">自行选择要启用的模块</string>
-    <string name="obn_profil_perso_compteur">已选择 %1$d 个模块</string>
-    <string name="obn_profil_perso_tout">全选</string>
-    <string name="obn_profil_perso_rien">全部取消</string>
     <string name="obn_profil_perso_vide">请至少选择一个模块以继续。</string>
     <string name="obn_profil_perso_fonctions">%1$d 项功能</string>
 
@@ -1329,9 +1326,6 @@
     <string name="module_desc_log">发运、承运商、配送路线与签收。</string>
     <string name="module_desc_rep">仪表板、指标、报表与导出。</string>
     <string name="obn_socle_titre">支撑模块</string>
-    <string name="obn_socle_sous">在业务方案之上叠加的通用模块。</string>
-    <string name="obn_socle_recommande">推荐</string>
-    <string name="obn_socle_compteur">已启用 %1$d 项</string>
     <string name="obn_socle_defaut">恢复建议选择</string>
     <string name="obn_profil_perso_metier">业务模块</string>
     <string name="obn_profil_detail_metier">业务模块</string>
@@ -1404,7 +1398,6 @@
     <string name="kpi_aucun_module">没有启用的模块：请在设置中启用。</string>
     <string name="kpi_variation_hausse">环比 +%1$s</string>
     <string name="kpi_variation_baisse">环比 %1$s</string>
-    <string name="obn_socle_pour">叠加于 %1$s</string>
     <string name="obn_socle_deplier">显示支撑模块</string>
     <string name="obn_socle_replier">隐藏支撑模块</string>
     <string name="obn_entreprise_localisation">地区与货币</string>
@@ -1480,4 +1473,10 @@
     <string name="obn_section_format">格式</string>
     <string name="obn_logo_present">已添加标志</string>
     <string name="fisc_pack_detail">税务明细</string>
+    <string name="obn_pack_inclus">该方案包含</string>
+    <string name="obn_pack_inclus_note">这些模块相互配合，始终保持启用。</string>
+    <string name="obn_pack_ajouter">添加其他模块</string>
+    <string name="obn_pack_ajouter_note">可选：稍后可在设置中开启或关闭。</string>
+    <string name="obn_pack_complet">该方案已启用全部 14 个模块。</string>
+    <string name="obn_pack_compteur">已启用 %1$d 个模块</string>
 </resources>
