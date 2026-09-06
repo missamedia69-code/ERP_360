@@ -440,6 +440,7 @@ fun SalesScreen(
             PrintScreen(
                 receipt = receipt,
                 devise = devise,
+                mentions = mentions,
                 onBack = { stepName = SalesStep.OPTIONS.name },
                 onPrint = { context.printSaleReceipt(receipt, devise, mentions) },
             )
@@ -1346,10 +1347,16 @@ private fun InvoiceOption(icon: androidx.compose.ui.graphics.vector.ImageVector,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PrintScreen(receipt: SaleReceipt, devise: String, onBack: () -> Unit, onPrint: () -> Unit) {
+private fun PrintScreen(
+    receipt: SaleReceipt,
+    devise: String,
+    mentions: MentionsLegales,
+    onBack: () -> Unit,
+    onPrint: () -> Unit,
+) {
     Scaffold(containerColor = Color(0xFF1B1C20), topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_print_title), color = Color.White, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back), tint = Color.White) } }, colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFF1B1C20))) }, bottomBar = { Button(onClick = onPrint, modifier = Modifier.fillMaxWidth().padding(16.dp).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = FlowBlue)) { Icon(Icons.Outlined.Print, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.sales_print)) } }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Surface(modifier = Modifier.fillMaxWidth().height(480.dp), shape = RoundedCornerShape(5.dp), color = Color.White) { Box(modifier = Modifier.padding(14.dp)) { InvoicePaper(receipt, devise) } }
+            Surface(modifier = Modifier.fillMaxWidth().height(480.dp), shape = RoundedCornerShape(5.dp), color = Color.White) { Box(modifier = Modifier.padding(14.dp)) { InvoicePaper(receipt, devise, mentions) } }
             Spacer(Modifier.height(14.dp))
             Text(stringResource(R.string.sales_print_ready), color = Color.White.copy(alpha = .82f), fontSize = 12.sp)
         }

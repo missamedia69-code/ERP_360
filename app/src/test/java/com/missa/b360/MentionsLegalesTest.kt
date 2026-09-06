@@ -20,6 +20,7 @@ class MentionsLegalesTest {
     ) = EnterpriseEntity(
         nom = "Boutique Akwa",
         devise = "XAF",
+        langue = "fr",
         pays = pays,
         adresse = adresse,
         telephone = telephone,
