@@ -1158,4 +1158,12 @@
 
     <string name="obn_effectif_label">员工人数</string>
     <string name="obn_effectif_placeholder">选择员工规模</string>
+
+    <string name="selecteur_recherche">搜索…</string>
+    <string name="selecteur_aucun">未找到匹配结果。</string>
+    <string name="obn_format_nombres_fr">千位用空格，小数用逗号</string>
+    <string name="obn_format_nombres_en">千位用逗号，小数用句点</string>
+    <string name="obn_retention_30_sous">轻量日志，适合存储空间有限的设备</string>
+    <string name="obn_retention_90_sous">季度跟踪的良好折中</string>
+    <string name="obn_retention_365_sous">推荐：覆盖一个会计年度的完整审计</string>
 </resources>

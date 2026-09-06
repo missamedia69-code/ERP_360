@@ -2,6 +2,8 @@ package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,9 +40,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -89,7 +96,7 @@ fun OnboardingScreen(
             }
         } else {
             when (viewModel.step) {
-                OnboardingStep.BIENVENUE -> WelcomeStep(onCommencer = viewModel::suivant)
+                OnboardingStep.BIENVENUE -> WelcomeStep(viewModel = viewModel)
                 OnboardingStep.CONFIGURATION -> OnbConfigurationStep(viewModel)
                 OnboardingStep.PROFIL -> OnbProfilStep(viewModel)
                 OnboardingStep.ENTREPRISE -> OnbEntrepriseStep(viewModel)
@@ -275,7 +282,7 @@ internal fun OnbDots(total: Int, active: Int) {
  * vert signature (maquette).
  */
 @Composable
-private fun WelcomeStep(onCommencer: () -> Unit) {
+private fun WelcomeStep(viewModel: OnboardingViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -314,8 +321,13 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(vertical = 18.dp),
         ) {
+            OnbLanguesDrapeaux(
+                selection = viewModel.langue,
+                onSelect = viewModel::appliquerLangue,
+            )
+            Spacer(Modifier.height(20.dp))
             Button(
-                onClick = onCommencer,
+                onClick = viewModel::suivant,
                 modifier = Modifier
                     .width(250.dp)
                     .height(52.dp),
@@ -339,7 +351,7 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
             }
             Spacer(Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                for (index in 0 until 7) {
+                for (index in 0 until OnboardingStep.TERMINE.ordinal) {
                     Box(
                         modifier = Modifier
                             .size(if (index == 0) 9.dp else 7.dp)
@@ -354,3 +366,58 @@ private fun WelcomeStep(onCommencer: () -> Unit) {
     }
 }
 
+/** Langues proposées : code de locale + drapeau + libellé (accessibilité). */
+private val OnbLangues = listOf(
+    Triple("fr", "\uD83C\uDDEB\uD83C\uDDF7", R.string.langue_fr),
+    Triple("en", "\uD83C\uDDEC\uD83C\uDDE7", R.string.langue_en),
+    Triple("es", "\uD83C\uDDEA\uD83C\uDDF8", R.string.langue_es),
+    Triple("ar", "\uD83C\uDDF8\uD83C\uDDE6", R.string.langue_ar),
+    Triple("zh", "\uD83C\uDDE8\uD83C\uDDF3", R.string.langue_zh),
+)
+
+/**
+ * Sélection de la langue sur l'écran de bienvenue : rangée de drapeaux
+ * cliquables sur le fond bleu de marque — c'est le tout premier choix de
+ * l'utilisateur, appliqué immédiatement à l'interface.
+ */
+@Composable
+private fun OnbLanguesDrapeaux(
+    selection: String,
+    onSelect: (String) -> Unit,
+) {
+    val courant = selection.substringBefore('-').lowercase()
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OnbLangues.forEach { (code, drapeau, labelRes) ->
+            val actif = courant == code
+            val libelle = stringResource(labelRes)
+            Box(
+                modifier = Modifier
+                    .size(width = 52.dp, height = 42.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        if (actif) Color.White.copy(alpha = 0.95f)
+                        else Color.White.copy(alpha = 0.12f),
+                    )
+                    .border(
+                        width = if (actif) 2.dp else 1.dp,
+                        color = if (actif) MissaLime else Color.White.copy(alpha = 0.35f),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .clickable(
+                        onClickLabel = libelle,
+                        role = Role.RadioButton,
+                    ) { onSelect(code) }
+                    .semantics {
+                        contentDescription = libelle
+                        selected = actif
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = drapeau, fontSize = 21.sp)
+            }
+        }
+    }
+}

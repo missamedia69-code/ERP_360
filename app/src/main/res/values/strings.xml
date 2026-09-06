@@ -1186,4 +1186,12 @@
 
     <string name="obn_effectif_label">Nombre d\'employés</string>
     <string name="obn_effectif_placeholder">Sélectionner un effectif</string>
+
+    <string name="selecteur_recherche">Rechercher…</string>
+    <string name="selecteur_aucun">Aucun résultat pour cette recherche.</string>
+    <string name="obn_format_nombres_fr">Espace pour les milliers, virgule décimale</string>
+    <string name="obn_format_nombres_en">Virgule pour les milliers, point décimal</string>
+    <string name="obn_retention_30_sous">Journal léger, appareils à faible stockage</string>
+    <string name="obn_retention_90_sous">Bon compromis pour un suivi trimestriel</string>
+    <string name="obn_retention_365_sous">Recommandé : audit complet sur un exercice</string>
 </resources>

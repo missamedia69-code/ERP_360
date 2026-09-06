@@ -1179,4 +1179,12 @@
 
     <string name="obn_effectif_label">Number of employees</string>
     <string name="obn_effectif_placeholder">Select a headcount</string>
+
+    <string name="selecteur_recherche">Search…</string>
+    <string name="selecteur_aucun">No result for this search.</string>
+    <string name="obn_format_nombres_fr">Space for thousands, decimal comma</string>
+    <string name="obn_format_nombres_en">Comma for thousands, decimal point</string>
+    <string name="obn_retention_30_sous">Light log, devices with low storage</string>
+    <string name="obn_retention_90_sous">Good trade-off for quarterly tracking</string>
+    <string name="obn_retention_365_sous">Recommended: full audit over a fiscal year</string>
 </resources>

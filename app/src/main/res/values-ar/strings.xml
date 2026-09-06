@@ -1158,4 +1158,12 @@
 
     <string name="obn_effectif_label">عدد الموظفين</string>
     <string name="obn_effectif_placeholder">اختر عدد الموظفين</string>
+
+    <string name="selecteur_recherche">بحث…</string>
+    <string name="selecteur_aucun">لا توجد نتائج لهذا البحث.</string>
+    <string name="obn_format_nombres_fr">مسافة للآلاف وفاصلة عشرية</string>
+    <string name="obn_format_nombres_en">فاصلة للآلاف ونقطة عشرية</string>
+    <string name="obn_retention_30_sous">سجل خفيف، للأجهزة ذات التخزين المحدود</string>
+    <string name="obn_retention_90_sous">توازن جيد للمتابعة الفصلية</string>
+    <string name="obn_retention_365_sous">موصى به: تدقيق كامل على مدى سنة مالية</string>
 </resources>

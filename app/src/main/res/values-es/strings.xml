@@ -1158,4 +1158,12 @@
 
     <string name="obn_effectif_label">Número de empleados</string>
     <string name="obn_effectif_placeholder">Seleccione una plantilla</string>
+
+    <string name="selecteur_recherche">Buscar…</string>
+    <string name="selecteur_aucun">Sin resultados para esta búsqueda.</string>
+    <string name="obn_format_nombres_fr">Espacio para los miles, coma decimal</string>
+    <string name="obn_format_nombres_en">Coma para los miles, punto decimal</string>
+    <string name="obn_retention_30_sous">Registro ligero, dispositivos con poco espacio</string>
+    <string name="obn_retention_90_sous">Buen equilibrio para un seguimiento trimestral</string>
+    <string name="obn_retention_365_sous">Recomendado: auditoría completa de un ejercicio</string>
 </resources>
