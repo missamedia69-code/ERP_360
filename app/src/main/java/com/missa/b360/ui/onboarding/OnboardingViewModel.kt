@@ -18,10 +18,10 @@ import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
 import com.missa.b360.core.security.PinHasher
 import com.missa.b360.core.util.FormatPrefs
+import com.missa.b360.core.util.Fuseaux
 import com.missa.b360.core.util.Iso4217
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.TimeZone
 import javax.inject.Inject
 
 /**
@@ -77,7 +77,7 @@ class OnboardingViewModel @Inject constructor(
     var langue by mutableStateOf(
         AppCompatDelegate.getApplicationLocales().toLanguageTags().ifBlank { "fr" },
     )
-    var fuseau by mutableStateOf(TimeZone.getDefault().id)
+    var fuseau by mutableStateOf(Fuseaux.idParDefaut())
     var formatJours by mutableStateOf("dd/MM/yyyy")
     var formatNombres by mutableStateOf("fr")
     var sauvegardesActives by mutableStateOf(true)
@@ -126,7 +126,7 @@ class OnboardingViewModel @Inject constructor(
                     if (nomSitePrincipal.isBlank()) nomSitePrincipal = entreprise.nom
                 }
                 progression.tauxTaxe?.let { definirTauxTaxe(it) }
-                fuseau = settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE) ?: TimeZone.getDefault().id
+                fuseau = Fuseaux.resoudre(settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE)).id
                 formatJours = settingsStore.get(SettingsStore.Keys.FORMAT_DATE) ?: "dd/MM/yyyy"
                 formatNombres = settingsStore.get(SettingsStore.Keys.FORMAT_NOMBRES) ?: "fr"
                 sauvegardesActives = settingsStore.get(SettingsStore.Keys.FREQUENCE_SAUVGARDE) != "off"
