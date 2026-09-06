@@ -102,17 +102,19 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     val locale = LocalConfiguration.current.locales[0]
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     // Devise officielle de chaque pays : calculée une fois, réutilisée par la liste
-    // des pays (pastille de droite) et par le pack appliqué à la sélection.
+    // des pays et par le pack appliqué à la sélection.
     val devisesParPays = remember(locale) {
         paysListe.associate { pays -> pays.code to Iso4217.deviseDuPays(pays.code) }
     }
     val optionsPays = paysListe.map { pays ->
+        val taxe = libelleTaxePays(pays.typeTaxe, pays.tauxTaxeSuggere)
         MissaOption(
             cle = pays.code,
             titre = pays.nom,
-            sousTitre = libelleTaxePays(pays.typeTaxe, pays.tauxTaxeSuggere),
+            // La monnaie ouvre la ligne, la taxe suit : « XAF · 19,25 % · TVA ».
+            // Elle n'est donc plus répétée en pastille sous le code du pays.
+            sousTitre = devisesParPays[pays.code]?.let { devise -> "$devise · $taxe" } ?: taxe,
             badge = pays.code,
-            badgeSecondaire = devisesParPays[pays.code],
         )
     }
     val deviseSuggeree = devisesParPays[viewModel.codePays]
