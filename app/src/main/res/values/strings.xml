@@ -1432,7 +1432,6 @@
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">Téléphone</string>
-    <string name="obn_telephone_ex">+237 6 XX XX XX XX</string>
     <string name="obn_email">E-mail</string>
     <string name="obn_email_ex">contact@entreprise.com</string>
     <string name="obn_adresse">Adresse</string>

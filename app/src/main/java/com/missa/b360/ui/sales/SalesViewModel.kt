@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
+import com.missa.b360.core.util.Iso4217
 
 /** État d'un panier de vente en cours, jamais prérempli avec des articles fictifs. */
 data class SalesUiState(
@@ -110,8 +111,8 @@ class SalesViewModel @Inject constructor(
         .map { methods -> methods.filter { it.actif }.map { it.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { enterprise -> enterprise?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { enterprise -> enterprise?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
     /** Fiche entreprise : alimente les mentions légales imprimées sur les pièces. */
     val entreprise: StateFlow<EnterpriseEntity?> = getEnterprise.observer()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)

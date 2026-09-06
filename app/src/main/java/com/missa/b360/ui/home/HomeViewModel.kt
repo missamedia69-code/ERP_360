@@ -21,11 +21,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 import javax.inject.Inject
+import com.missa.b360.core.util.Iso4217
 
 /** Données de synthèse disponibles dès les modules actuellement implémentés. */
 data class HomeUiState(
     val entrepriseNom: String = "",
-    val devise: String = "XAF",
+    val devise: String = Iso4217.DEVISE_REPLI,
     val entrepriseLogoUri: String? = null,
     val profilActivite: String? = null,
     val palierTaille: String? = null,
@@ -66,7 +67,7 @@ class HomeViewModel @Inject constructor(
     ) { entreprise, utilisateurs, clients, fournisseurs, historiqueSauvegardes ->
         HomeUiState(
             entrepriseNom = entreprise?.nom.orEmpty(),
-            devise = entreprise?.devise ?: "XAF",
+            devise = entreprise?.devise ?: Iso4217.DEVISE_REPLI,
             entrepriseLogoUri = entreprise?.logoUri,
             profilActivite = entreprise?.profilActivite,
             palierTaille = entreprise?.palierTaille,

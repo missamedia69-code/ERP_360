@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.missa.b360.core.util.Iso4217
 
 /**
  * Produit joint à son stock courant — vue unique partagée par le module Stock
@@ -102,8 +103,8 @@ class StockViewModel @Inject constructor(
     val movements: Flow<List<StockMovementView>> = observeMovements()
 
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { enterprise -> enterprise?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { enterprise -> enterprise?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 }
 
 /**

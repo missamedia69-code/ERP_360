@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
+import com.missa.b360.core.util.Iso4217
 
 /**
  * Tableau de bord : croise les données de tous les modules et ne présente que
@@ -27,8 +28,8 @@ class ReportingViewModel @Inject constructor(
 ) : ViewModel() {
 
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { it?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     /**
      * Modules actifs de l'installation. Une installation antérieure à la

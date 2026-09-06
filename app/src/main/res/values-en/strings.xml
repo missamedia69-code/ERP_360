@@ -1425,7 +1425,6 @@
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">Phone</string>
-    <string name="obn_telephone_ex">+1 555 000 0000</string>
     <string name="obn_email">Email</string>
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">Address</string>

@@ -1404,7 +1404,6 @@
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">الهاتف</string>
-    <string name="obn_telephone_ex">+966 5X XXX XXXX</string>
     <string name="obn_email">البريد الإلكتروني</string>
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">العنوان</string>

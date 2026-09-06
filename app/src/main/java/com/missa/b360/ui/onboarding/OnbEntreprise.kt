@@ -118,9 +118,11 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             cle = pays.code,
             titre = pays.nom,
             // La monnaie ouvre la ligne, la taxe suit : « XAF · 19,25 % · TVA ».
-            // Elle n'est donc plus répétée en pastille sous le code du pays.
             sousTitre = devisesParPays[pays.code]?.let { devise -> "$devise · $taxe" } ?: taxe,
             badge = pays.code,
+            // L'indicatif complète la pastille : il pilote le champ téléphone
+            // et sert aussi de repère pour reconnaître le bon territoire.
+            badgeSecondaire = Iso4217.indicatifTelephone(pays.code),
         )
     }
     val deviseSuggeree = devisesParPays[viewModel.codePays]
@@ -312,8 +314,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         onValeur = { viewModel.telephone = it },
                         label = stringResource(R.string.obn_telephone),
                         icone = Icons.Outlined.Call,
-                        placeholder = indicatif?.let { "$it " }
-                            ?: stringResource(R.string.obn_telephone_ex),
+                        placeholder = indicatif,
                         clavier = KeyboardType.Phone,
                         active = !viewModel.enregistrementEnCours,
                     )

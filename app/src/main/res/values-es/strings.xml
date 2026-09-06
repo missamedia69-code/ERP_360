@@ -1404,7 +1404,6 @@
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">Teléfono</string>
-    <string name="obn_telephone_ex">+34 600 000 000</string>
     <string name="obn_email">Correo electrónico</string>
     <string name="obn_email_ex">contacto@empresa.com</string>
     <string name="obn_adresse">Dirección</string>

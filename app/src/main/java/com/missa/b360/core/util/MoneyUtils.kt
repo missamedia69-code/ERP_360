@@ -307,8 +307,47 @@ object Iso4217 {
             .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, Devise::nom))
             .toList()
 
+    /**
+     * Devise affichée tant que l'entreprise n'est pas chargée.
+     *
+     * Ce n'est pas un choix éditorial mais un repli technique : les écrans se
+     * composent avant que la base ait répondu. La valeur réelle vient toujours
+     * de `entreprise.devise`, renseignée par le pack pays à l'installation.
+     */
+    const val DEVISE_REPLI: String = "XAF"
+
     fun indicatifTelephone(codePays: String?): String? =
         codePays?.trim()?.uppercase()?.let(INDICATIFS_TELEPHONIQUES::get)
+
+    /**
+     * Remplace l'indicatif d'un numéro lors d'un changement de pays.
+     *
+     * Trois cas seulement : le champ est vide et reçoit le nouvel indicatif ;
+     * il commence par l'ancien, qui est échangé en gardant le numéro national ;
+     * il porte autre chose — un numéro saisi avec un indicatif étranger — et
+     * l'on n'y touche pas, la saisie de l'utilisateur prime.
+     */
+    fun remplacerIndicatif(numero: String, ancien: String?, nouveau: String?): String {
+        if (nouveau == null) return numero
+        val net = numero.trim()
+        return when {
+            net.isEmpty() -> "$nouveau "
+            ancien != null && ancien != nouveau && net.startsWith(ancien) ->
+                nouveau + net.removePrefix(ancien)
+            else -> net
+        }
+    }
+
+    /**
+     * Vrai quand le champ ne contient qu'un indicatif, éventuellement suivi de
+     * séparateurs : c'est un champ resté vide, pas un numéro de téléphone.
+     */
+    fun estIndicatifSeul(numero: String): Boolean {
+        val net = numero.trim()
+        if (!net.startsWith("+")) return false
+        val chiffres = net.drop(1).filter { !it.isWhitespace() && it != '-' && it != '(' && it != ')' }
+        return chiffres.isNotEmpty() && INDICATIFS_TELEPHONIQUES.containsValue("+$chiffres")
+    }
 
     fun paysAvecIndicatif(locale: Locale): List<PaysAvecIndicatif> =
         paysDisponibles(locale).mapNotNull { pays ->

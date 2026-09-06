@@ -11,11 +11,13 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.domain.model.CleIdentifiant
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.core.domain.model.ReferentielFiscal
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
@@ -93,7 +95,7 @@ class OnboardingViewModel @Inject constructor(
     // --- Étape entreprise (informations + logo) ---
     var nomEntreprise by mutableStateOf("")
     var secteur by mutableStateOf("")
-    var devise by mutableStateOf("XAF")
+    var devise by mutableStateOf(Iso4217.DEVISE_REPLI)
     var pays by mutableStateOf("")
     /** Code ISO conservé avec le libellé localisé du pays, notamment pour l'indicatif téléphone. */
     var codePays by mutableStateOf<String?>(null)
@@ -386,9 +388,28 @@ class OnboardingViewModel @Inject constructor(
         codePays = code
         definirTauxTaxe(tauxSuggere)
         Iso4217.deviseDuPays(code)?.let { devise = it }
-        val indicatif = Iso4217.indicatifTelephone(code)
-        if (indicatif != null && (telephone.isBlank() || telephone.trim() == ancienIndicatif)) {
-            telephone = indicatif
+        // L'indicatif suit le pays, y compris dans un numéro déjà saisi.
+        telephone = Iso4217.remplacerIndicatif(
+            numero = telephone,
+            ancien = ancienIndicatif,
+            nouveau = Iso4217.indicatifTelephone(code),
+        )
+        oublierIdentifiantsHorsPays()
+    }
+
+    /**
+     * Un NIU camerounais n'est pas un numéro de TVA français : quand le pays
+     * change, une valeur qui ne respecte plus le format attendu est effacée
+     * plutôt que laissée en erreur. Ce qui reste valide est conservé.
+     */
+    private fun oublierIdentifiantsHorsPays() {
+        ReferentielFiscal.regles(codePays, "", "").forEach { regle ->
+            when (regle.cle) {
+                CleIdentifiant.FISCAL ->
+                    if (!regle.estValide(numeroFiscal)) numeroFiscal = ""
+                CleIdentifiant.REGISTRE ->
+                    if (!regle.estValide(registreCommerce)) registreCommerce = ""
+            }
         }
     }
 
@@ -469,7 +490,8 @@ class OnboardingViewModel @Inject constructor(
                         profilActivite = profil?.name,
                         palierTaille = palier?.name,
                         secteur = secteurValide,
-                        telephone = telephone.trim().ifEmpty { null },
+                        telephone = telephone.trim()
+                            .takeUnless { it.isEmpty() || Iso4217.estIndicatifSeul(it) },
                         email = email.trim().ifEmpty { null },
                         adresse = adresse.trim().ifEmpty { null },
                         numeroFiscal = numeroFiscal.trim().ifEmpty { null },

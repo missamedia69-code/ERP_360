@@ -1404,7 +1404,6 @@
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">电话</string>
-    <string name="obn_telephone_ex">+86 138 0000 0000</string>
     <string name="obn_email">电子邮箱</string>
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">地址</string>

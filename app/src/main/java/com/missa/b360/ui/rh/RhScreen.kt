@@ -88,6 +88,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.missa.b360.core.util.Iso4217
 
 /**
  * RH (spec §RH / §Paie) — employés, absences, paie (P), avances (AV).
@@ -114,8 +115,8 @@ class RhViewModel @Inject constructor(
     val absences: StateFlow<List<AbsenceEntity>> = absenceDao.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { it?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     /** Pièces RH (bulletins P + avances AV) — rechargé après chaque action. */
     private val _rhRecords = MutableStateFlow(emptyList<OperationRecordEntity>())
@@ -269,7 +270,7 @@ fun RhScreen(
     val context = LocalContext.current
     val employees by viewModel.employees.collectAsState(initial = emptyList())
     val absences by viewModel.absences.collectAsState(initial = emptyList())
-    val devise by viewModel.devise.collectAsState(initial = "XAF")
+    val devise by viewModel.devise.collectAsState(initial = Iso4217.DEVISE_REPLI)
     val payslips by viewModel.payslips.collectAsState(initial = emptyList())
     val avances by viewModel.avances.collectAsState(initial = emptyList())
     val busy by viewModel.busy.collectAsState()

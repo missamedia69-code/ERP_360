@@ -92,6 +92,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.missa.b360.core.util.Iso4217
 
 /** Ligne retournable : agrégation par clé (produit ou libellé) de la facture d'origine. */
 data class ReturnLineItem(
@@ -132,8 +133,8 @@ class ReturnSaleViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { it?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     private val _vente = MutableStateFlow<OperationRecordEntity?>(null)
     val vente: StateFlow<OperationRecordEntity?> = _vente

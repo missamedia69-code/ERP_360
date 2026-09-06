@@ -24,6 +24,7 @@ import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.core.util.Iso4217
 
 /** Écran Clients (9.2) : liste + recherche + catégories + badges + désactivation. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,7 +165,7 @@ private fun LegacyClientsScreen(
                             nomCategorie = categories.firstOrNull { it.id == client.categorieId }?.nom,
                             badge = badges.firstOrNull { it.id == client.badgeId },
                             solde = soldes[client.id] ?: 0.0,
-                            devise = deviseEntreprise ?: "XAF",
+                            devise = deviseEntreprise ?: Iso4217.DEVISE_REPLI,
                             onClick = {
                                 clientEdite = client
                                 formVisible = true
