@@ -1480,4 +1480,20 @@
     <string name="obn_pin_premier_ok">已记录第一次输入，请再输入一次。</string>
     <string name="obn_pin_recommencer">重新开始</string>
     <string name="obn_pin_effacer">删除最后一位</string>
+    <string name="obn_recap_pays">国家</string>
+    <string name="obn_recap_fiscalite">税制</string>
+    <string name="obn_recap_identifiants">登记编号</string>
+    <string name="obn_recap_modules">已启用模块</string>
+    <string name="obn_recap_proprietaire">所有者</string>
+    <string name="obn_essai_titre">7 天免费试用</string>
+    <string name="obn_essai_jusqu_au">所有功能可使用至 %1$s。</string>
+    <string name="obn_licence_jusqu_au">许可证有效期至 %1$s。</string>
+    <string name="obn_essai_apres">期满后若未激活，应用将转为只读：您的数据仍可查阅和导出。</string>
+    <string name="obn_code_titre">获取您的激活码</string>
+    <string name="obn_code_whatsapp">WhatsApp</string>
+    <string name="obn_code_email">电子邮件</string>
+    <string name="obn_code_objet">购买 Missa Business 360 激活码</string>
+    <string name="obn_code_message">您好，我想为以下企业购买 Missa Business 360 激活码：%1$s。</string>
+    <string name="obn_code_indispo">此设备上没有可以打开该联系方式的应用。</string>
+    <string name="obn_code_a_configurer">商务联系方式尚未在 res/values/contact.xml 中设置。</string>
 </resources>

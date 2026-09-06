@@ -1480,4 +1480,20 @@
     <string name="obn_pin_premier_ok">تم حفظ الرمز الأول، أدخله مرة أخرى.</string>
     <string name="obn_pin_recommencer">البدء من جديد</string>
     <string name="obn_pin_effacer">حذف آخر رقم</string>
+    <string name="obn_recap_pays">البلد</string>
+    <string name="obn_recap_fiscalite">النظام الضريبي</string>
+    <string name="obn_recap_identifiants">المعرّفات</string>
+    <string name="obn_recap_modules">الوحدات المفعّلة</string>
+    <string name="obn_recap_proprietaire">المالك</string>
+    <string name="obn_essai_titre">تجربة مجانية لمدة 7 أيام</string>
+    <string name="obn_essai_jusqu_au">جميع الميزات متاحة حتى %1$s.</string>
+    <string name="obn_licence_jusqu_au">الترخيص صالح حتى %1$s.</string>
+    <string name="obn_essai_apres">بعد هذا التاريخ، ومن دون رمز تفعيل، ينتقل التطبيق إلى وضع القراءة فقط: تبقى بياناتك قابلة للاطلاع والتصدير.</string>
+    <string name="obn_code_titre">احصل على رمز التفعيل</string>
+    <string name="obn_code_whatsapp">واتساب</string>
+    <string name="obn_code_email">البريد الإلكتروني</string>
+    <string name="obn_code_objet">شراء رمز تفعيل Missa Business 360</string>
+    <string name="obn_code_message">مرحبًا، أرغب في شراء رمز تفعيل Missa Business 360 لـ: %1$s.</string>
+    <string name="obn_code_indispo">لا يوجد تطبيق على هذا الجهاز يمكنه فتح جهة الاتصال هذه.</string>
+    <string name="obn_code_a_configurer">بيانات الاتصال التجارية لم تُضبط بعد في res/values/contact.xml.</string>
 </resources>

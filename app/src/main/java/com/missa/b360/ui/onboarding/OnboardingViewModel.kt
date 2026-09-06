@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.entity.LicenceStatus
 import com.missa.b360.core.domain.model.CleIdentifiant
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
@@ -21,10 +22,12 @@ import com.missa.b360.core.domain.model.ReferentielFiscal
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
+import com.missa.b360.core.domain.usecase.GetLicenceInfoUseCase
 import com.missa.b360.core.domain.usecase.GetOnboardingProgressUseCase
 import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
 import com.missa.b360.core.journal.JournalManager
+import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.security.PinHasher
 import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.core.util.Fuseaux
@@ -54,6 +57,7 @@ class OnboardingViewModel @Inject constructor(
     private val createOwner: CreateOwnerUserUseCase,
     private val completeOnboarding: CompleteOnboardingUseCase,
     private val validatePin: ValidatePinUseCase,
+    private val getLicenceInfo: GetLicenceInfoUseCase,
     private val backupUseCases: BackupUseCases,
 ) : ViewModel() {
 
@@ -155,6 +159,20 @@ class OnboardingViewModel @Inject constructor(
     var votreNom by mutableStateOf("")
     var emailSecours by mutableStateOf("")
     var pinDejaConfigure by mutableStateOf(false)
+        private set
+
+    // --- Licence (écran final) ---
+
+    /**
+     * Fin de l'essai gratuit, lue en base : l'essai a démarré à la création de
+     * l'entreprise (RA-04), pas à l'affichage de cet écran. Nulle tant que la
+     * licence n'a pas été chargée.
+     */
+    var essaiExpireLe by mutableStateOf<Long?>(null)
+        private set
+
+    /** Vrai lorsqu'un code a déjà été activé : inutile alors de vendre l'essai. */
+    var licenceDejaActive by mutableStateOf(false)
         private set
 
     var erreurRes by mutableStateOf<Int?>(null)
@@ -344,6 +362,26 @@ class OnboardingViewModel @Inject constructor(
         modulesSupport = ModulesSocle.support
             .filter { it in recommandes || it in extrasSupport }
             .toSet()
+    }
+
+    /** Modules qui seront réellement ouverts : métier du pack + socle support. */
+    val modulesActifs: List<ModuleCode>
+        get() = ModulesPersonnalises.modulesActifs(profil, modulesPersonnalises, modulesSupport)
+
+    /**
+     * Lit l'état de la licence pour l'écran final. L'échéance affichée est celle
+     * enregistrée en base : afficher « aujourd'hui + 7 jours » mentirait après une
+     * reprise d'onboarding entamé la veille.
+     */
+    fun chargerEtatLicence() {
+        viewModelScope.launch {
+            val info = runCatching { getLicenceInfo() }.getOrNull() ?: return@launch
+            licenceDejaActive = info.statut == LicenceStatus.ACTIVE
+            essaiExpireLe = when (info.statut) {
+                LicenceStatus.ACTIVE -> info.dateExpiration
+                else -> info.dateDebutEssai?.plus(LicenceManager.DUREE_ESSAI_MS)
+            }
+        }
     }
 
     /** La sélection est conservée immédiatement (reprise d'onboarding). */

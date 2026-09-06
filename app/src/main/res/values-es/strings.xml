@@ -1480,4 +1480,20 @@
     <string name="obn_pin_premier_ok">Primer código guardado, introdúzcalo de nuevo.</string>
     <string name="obn_pin_recommencer">Empezar de nuevo</string>
     <string name="obn_pin_effacer">Borrar el último dígito</string>
+    <string name="obn_recap_pays">País</string>
+    <string name="obn_recap_fiscalite">Fiscalidad</string>
+    <string name="obn_recap_identifiants">Identificadores</string>
+    <string name="obn_recap_modules">Módulos activados</string>
+    <string name="obn_recap_proprietaire">Propietario</string>
+    <string name="obn_essai_titre">Prueba gratuita de 7 días</string>
+    <string name="obn_essai_jusqu_au">Todas las funciones hasta el %1$s.</string>
+    <string name="obn_licence_jusqu_au">Licencia válida hasta el %1$s.</string>
+    <string name="obn_essai_apres">Pasado ese plazo, sin código de activación la aplicación pasa a solo lectura: sus datos siguen consultables y exportables.</string>
+    <string name="obn_code_titre">Obtenga su código de activación</string>
+    <string name="obn_code_whatsapp">WhatsApp</string>
+    <string name="obn_code_email">Correo</string>
+    <string name="obn_code_objet">Compra de un código de activación Missa Business 360</string>
+    <string name="obn_code_message">Hola, deseo comprar un código de activación Missa Business 360 para: %1$s.</string>
+    <string name="obn_code_indispo">Ninguna aplicación de este dispositivo puede abrir ese contacto.</string>
+    <string name="obn_code_a_configurer">Datos comerciales pendientes de configurar en res/values/contact.xml.</string>
 </resources>

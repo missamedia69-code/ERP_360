@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Coordonnées commerciales de l'éditeur — À REMPLACER AVANT DIFFUSION.
+
+    Ce sont les seules valeurs à modifier pour que le bouton « Obtenir votre
+    code » de l'écran final joigne réellement le service commercial. Les valeurs
+    ci-dessous sont des témoins injoignables :
+      · example.com est un domaine réservé par l'IANA ;
+      · +237 6 00 00 00 00 n'est attribué à aucun abonné.
+    Tant qu'elles sont en place, l'écran affiche un avertissement en clair.
+
+    Ces chaînes ne sont pas traduites : un numéro et une adresse ne changent
+    pas avec la langue.
+-->
+<resources>
+    <string name="contact_commercial_whatsapp" translatable="false">+237600000000</string>
+    <string name="contact_commercial_email" translatable="false">contact@example.com</string>
+</resources>

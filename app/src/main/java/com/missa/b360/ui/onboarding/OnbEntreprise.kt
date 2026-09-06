@@ -746,7 +746,7 @@ private fun OnbPackCellule(contenu: Pair<Int, String>?, modifier: Modifier = Mod
  * un « 0 % » qui laisserait croire à une exonération.
  */
 @Composable
-private fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
+internal fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
     typeTaxe == null -> stringResource(R.string.fisc_taux_a_renseigner)
     typeTaxe == TypeTaxe.AUCUNE || taux <= 0.0 -> stringResource(typeTaxe.libelleRes)
     else -> Iso4217.formatPourcentage(taux) + " · " + stringResource(typeTaxe.libelleRes)

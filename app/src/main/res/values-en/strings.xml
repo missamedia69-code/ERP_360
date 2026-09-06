@@ -1501,4 +1501,20 @@
     <string name="obn_pin_premier_ok">First code saved, enter it once more.</string>
     <string name="obn_pin_recommencer">Start over</string>
     <string name="obn_pin_effacer">Delete last digit</string>
+    <string name="obn_recap_pays">Country</string>
+    <string name="obn_recap_fiscalite">Taxation</string>
+    <string name="obn_recap_identifiants">Registration numbers</string>
+    <string name="obn_recap_modules">Modules enabled</string>
+    <string name="obn_recap_proprietaire">Owner</string>
+    <string name="obn_essai_titre">7-day free trial</string>
+    <string name="obn_essai_jusqu_au">All features available until %1$s.</string>
+    <string name="obn_licence_jusqu_au">Licence valid until %1$s.</string>
+    <string name="obn_essai_apres">After that date, without an activation code the app switches to read-only: your data stays readable and exportable.</string>
+    <string name="obn_code_titre">Get your activation code</string>
+    <string name="obn_code_whatsapp">WhatsApp</string>
+    <string name="obn_code_email">Email</string>
+    <string name="obn_code_objet">Missa Business 360 activation code purchase</string>
+    <string name="obn_code_message">Hello, I would like to buy a Missa Business 360 activation code for: %1$s.</string>
+    <string name="obn_code_indispo">No app on this device can open that contact.</string>
+    <string name="obn_code_a_configurer">Sales contact details still to be set in res/values/contact.xml.</string>
 </resources>

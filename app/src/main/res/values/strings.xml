@@ -1508,4 +1508,20 @@
     <string name="obn_pin_premier_ok">Premier code enregistré, saisissez-le à nouveau.</string>
     <string name="obn_pin_recommencer">Recommencer</string>
     <string name="obn_pin_effacer">Effacer le dernier chiffre</string>
+    <string name="obn_recap_pays">Pays</string>
+    <string name="obn_recap_fiscalite">Fiscalité</string>
+    <string name="obn_recap_identifiants">Identifiants</string>
+    <string name="obn_recap_modules">Modules activés</string>
+    <string name="obn_recap_proprietaire">Propriétaire</string>
+    <string name="obn_essai_titre">Essai gratuit de 7 jours</string>
+    <string name="obn_essai_jusqu_au">Toutes les fonctionnalités jusqu\'au %1$s.</string>
+    <string name="obn_licence_jusqu_au">Licence valable jusqu\'au %1$s.</string>
+    <string name="obn_essai_apres">Passé ce délai, sans code d\'activation, l\'application passe en lecture seule : vos données restent consultables et exportables.</string>
+    <string name="obn_code_titre">Obtenir votre code d\'activation</string>
+    <string name="obn_code_whatsapp">WhatsApp</string>
+    <string name="obn_code_email">E-mail</string>
+    <string name="obn_code_objet">Achat d\'un code d\'activation Missa Business 360</string>
+    <string name="obn_code_message">Bonjour, je souhaite acheter un code d\'activation Missa Business 360 pour : %1$s.</string>
+    <string name="obn_code_indispo">Aucune application ne peut ouvrir ce contact sur cet appareil.</string>
+    <string name="obn_code_a_configurer">Coordonnées commerciales à renseigner dans res/values/contact.xml.</string>
 </resources>
