@@ -1442,4 +1442,19 @@
     <string name="obn_entreprise_exploitation">Site et fiscalité</string>
     <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">Taux suggéré pour %1$s</string>
+
+    <!-- Entreprise : coordonnees et identifiants legaux -->
+    <string name="obn_telephone">Téléphone</string>
+    <string name="obn_telephone_ex">+237 6 XX XX XX XX</string>
+    <string name="obn_email">E-mail</string>
+    <string name="obn_email_ex">contact@entreprise.com</string>
+    <string name="obn_adresse">Adresse</string>
+    <string name="obn_adresse_ex">Rue, quartier, ville</string>
+    <string name="obn_numero_fiscal">Numéro fiscal (NIU / NIF)</string>
+    <string name="obn_numero_fiscal_ex">P0123456789X</string>
+    <string name="obn_registre">Registre du commerce (RCCM)</string>
+    <string name="obn_registre_ex">RC/DLA/2024/B/1234</string>
+    <string name="obn_entreprise_contact">Coordonnées et identifiants légaux</string>
+    <string name="obn_entreprise_contact_sous">Reprises automatiquement sur vos devis, factures et bons de livraison.</string>
+    <string name="obn_erreur_email_entreprise">Adresse e-mail invalide.</string>
 </resources>

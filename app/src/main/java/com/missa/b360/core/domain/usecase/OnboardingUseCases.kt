@@ -73,6 +73,13 @@ class SetupEnterpriseUseCase @Inject constructor(
         val palierTaille: String? = null,
         /** Secteur d'activité libre (champ existant de l'entreprise, optionnel). */
         val secteur: String? = null,
+        /** Coordonnées imprimées sur les devis, factures et bons de livraison. */
+        val telephone: String? = null,
+        val email: String? = null,
+        val adresse: String? = null,
+        /** Identifiants légaux (NIU / NIF, RCCM) exigés sur les pièces de vente. */
+        val numeroFiscal: String? = null,
+        val registreCommerce: String? = null,
         /** URI du logo image sélectionné pendant l'onboarding. */
         val logoUri: String? = null,
     )
@@ -96,6 +103,11 @@ class SetupEnterpriseUseCase @Inject constructor(
                     secteur = params.secteur?.trim()?.ifEmpty { null },
                     langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
                     pays = params.pays,
+                    telephone = params.telephone?.trim()?.ifEmpty { null },
+                    email = params.email?.trim()?.ifEmpty { null },
+                    adresse = params.adresse?.trim()?.ifEmpty { null },
+                    numeroFiscal = params.numeroFiscal?.trim()?.ifEmpty { null },
+                    registreCommerce = params.registreCommerce?.trim()?.ifEmpty { null },
                     logoUri = params.logoUri,
                     profilActivite = params.profilActivite
                         ?: settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),

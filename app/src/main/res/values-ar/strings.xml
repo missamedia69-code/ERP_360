@@ -1414,4 +1414,19 @@
     <string name="obn_entreprise_exploitation">الموقع والضرائب</string>
     <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">النسبة المقترحة لـ %1$s</string>
+
+    <!-- Entreprise : coordonnees et identifiants legaux -->
+    <string name="obn_telephone">الهاتف</string>
+    <string name="obn_telephone_ex">+966 5X XXX XXXX</string>
+    <string name="obn_email">البريد الإلكتروني</string>
+    <string name="obn_email_ex">contact@company.com</string>
+    <string name="obn_adresse">العنوان</string>
+    <string name="obn_adresse_ex">الشارع، الحي، المدينة</string>
+    <string name="obn_numero_fiscal">الرقم الضريبي</string>
+    <string name="obn_numero_fiscal_ex">300012345600003</string>
+    <string name="obn_registre">السجل التجاري</string>
+    <string name="obn_registre_ex">CR-1010123456</string>
+    <string name="obn_entreprise_contact">بيانات الاتصال والمعرفات القانونية</string>
+    <string name="obn_entreprise_contact_sous">تُستخدم تلقائيًا في عروض الأسعار والفواتير وسندات التسليم.</string>
+    <string name="obn_erreur_email_entreprise">عنوان بريد إلكتروني غير صالح.</string>
 </resources>

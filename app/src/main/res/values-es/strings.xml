@@ -1414,4 +1414,19 @@
     <string name="obn_entreprise_exploitation">Sede e impuestos</string>
     <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">Tasa sugerida para %1$s</string>
+
+    <!-- Entreprise : coordonnees et identifiants legaux -->
+    <string name="obn_telephone">Teléfono</string>
+    <string name="obn_telephone_ex">+34 600 000 000</string>
+    <string name="obn_email">Correo electrónico</string>
+    <string name="obn_email_ex">contacto@empresa.com</string>
+    <string name="obn_adresse">Dirección</string>
+    <string name="obn_adresse_ex">Calle, barrio, ciudad</string>
+    <string name="obn_numero_fiscal">Número fiscal (NIF)</string>
+    <string name="obn_numero_fiscal_ex">B12345678</string>
+    <string name="obn_registre">Registro mercantil</string>
+    <string name="obn_registre_ex">M-12345 F-67</string>
+    <string name="obn_entreprise_contact">Datos de contacto e identificadores legales</string>
+    <string name="obn_entreprise_contact_sous">Se reutilizan en presupuestos, facturas y albaranes.</string>
+    <string name="obn_erreur_email_entreprise">Dirección de correo no válida.</string>
 </resources>

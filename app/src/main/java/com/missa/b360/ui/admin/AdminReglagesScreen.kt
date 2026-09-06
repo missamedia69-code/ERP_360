@@ -101,6 +101,12 @@ fun AdminReglagesScreen(
             SettingField(state.adresse, viewModel::changerAdresse, R.string.adm_adresse)
             SettingField(state.telephone, viewModel::changerTelephone, R.string.adm_telephone)
             SettingField(state.email, viewModel::changerEmail, R.string.adm_email)
+            SettingField(state.numeroFiscal, viewModel::changerNumeroFiscal, R.string.obn_numero_fiscal)
+            SettingField(
+                value = state.registreCommerce,
+                onValueChange = viewModel::changerRegistreCommerce,
+                labelRes = R.string.obn_registre,
+            )
             Button(onClick = viewModel::sauvegarderInfos, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.adm_sauvegarder), fontWeight = FontWeight.Bold)
             }

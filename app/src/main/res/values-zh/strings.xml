@@ -1414,4 +1414,19 @@
     <string name="obn_entreprise_exploitation">场所与税务</string>
     <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">%1$s 的建议税率</string>
+
+    <!-- Entreprise : coordonnees et identifiants legaux -->
+    <string name="obn_telephone">电话</string>
+    <string name="obn_telephone_ex">+86 138 0000 0000</string>
+    <string name="obn_email">电子邮箱</string>
+    <string name="obn_email_ex">contact@company.com</string>
+    <string name="obn_adresse">地址</string>
+    <string name="obn_adresse_ex">街道、区、城市</string>
+    <string name="obn_numero_fiscal">税号</string>
+    <string name="obn_numero_fiscal_ex">91310000MA1K35Q12X</string>
+    <string name="obn_registre">工商注册号</string>
+    <string name="obn_registre_ex">91310000MA1K35Q12X</string>
+    <string name="obn_entreprise_contact">联系方式与法定证照</string>
+    <string name="obn_entreprise_contact_sous">将自动出现在报价单、发票和送货单上。</string>
+    <string name="obn_erreur_email_entreprise">电子邮箱地址无效。</string>
 </resources>

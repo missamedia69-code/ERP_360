@@ -93,6 +93,16 @@ class OnboardingViewModel @Inject constructor(
     var tauxTaxe by mutableStateOf(0.0)
         private set
     var nomSitePrincipal by mutableStateOf("")
+
+    /** Coordonnées reprises sur les devis, factures et bons de livraison. */
+    var telephone by mutableStateOf("")
+    var email by mutableStateOf("")
+    var adresse by mutableStateOf("")
+
+    /** Identifiants légaux exigés sur les pièces de vente (NIU / NIF, RCCM). */
+    var numeroFiscal by mutableStateOf("")
+    var registreCommerce by mutableStateOf("")
+
     var logoUri by mutableStateOf<String?>(null)
         private set
 
@@ -171,6 +181,11 @@ class OnboardingViewModel @Inject constructor(
                     devise = entreprise.devise
                     pays = entreprise.pays.orEmpty()
                     logoUri = entreprise.logoUri
+                    telephone = entreprise.telephone.orEmpty()
+                    email = entreprise.email.orEmpty()
+                    adresse = entreprise.adresse.orEmpty()
+                    numeroFiscal = entreprise.numeroFiscal.orEmpty()
+                    registreCommerce = entreprise.registreCommerce.orEmpty()
                     codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
                     if (nomSitePrincipal.isBlank()) nomSitePrincipal = entreprise.nom
                 }
@@ -343,12 +358,24 @@ class OnboardingViewModel @Inject constructor(
 
     // --- Entreprise ---
 
-    /** Applique un pays du catalogue et rend son taux immédiatement modifiable. */
+    /**
+     * Applique un pays du catalogue : taux de taxe suggéré et, si le téléphone
+     * est encore vide ou ne porte qu'un ancien indicatif, indicatif pré-rempli.
+     */
     fun choisirPays(nom: String, code: String, tauxSuggere: Double) {
+        val ancienIndicatif = Iso4217.indicatifTelephone(codePays)
         pays = nom
         codePays = code
         definirTauxTaxe(tauxSuggere)
+        val indicatif = Iso4217.indicatifTelephone(code)
+        if (indicatif != null && (telephone.isBlank() || telephone.trim() == ancienIndicatif)) {
+            telephone = indicatif
+        }
     }
+
+    /** L'e-mail est facultatif, mais s'il est saisi il doit rester exploitable. */
+    fun emailEntrepriseEstValide(): Boolean =
+        email.isBlank() || android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
 
     /** Une saisie libre n'a pas de code ISO ni d'indicatif téléphonique supposé. */
     fun modifierPaysManuel(nom: String) {
@@ -403,6 +430,10 @@ class OnboardingViewModel @Inject constructor(
         val deviseSelectionnee = devise
         val paysSelectionne = pays.trim().ifEmpty { null }
         val secteurValide = secteur.trim().ifEmpty { null }
+        if (!emailEntrepriseEstValide()) {
+            erreurRes = R.string.obn_erreur_email_entreprise
+            return
+        }
         val logoUriSelectionnee = logoUri
 
         enregistrementEnCours = true
@@ -419,6 +450,11 @@ class OnboardingViewModel @Inject constructor(
                         profilActivite = profil?.name,
                         palierTaille = palier?.name,
                         secteur = secteurValide,
+                        telephone = telephone.trim().ifEmpty { null },
+                        email = email.trim().ifEmpty { null },
+                        adresse = adresse.trim().ifEmpty { null },
+                        numeroFiscal = numeroFiscal.trim().ifEmpty { null },
+                        registreCommerce = registreCommerce.trim().ifEmpty { null },
                         logoUri = logoUriSelectionnee,
                     ),
                 )

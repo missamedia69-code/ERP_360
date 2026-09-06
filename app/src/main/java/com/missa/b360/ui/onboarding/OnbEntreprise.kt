@@ -19,9 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Percent
+import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -72,7 +77,8 @@ private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 
 /**
  * Écran 4 — Informations sur votre entreprise : identité, localisation, devise,
- * logo, site principal et taux de taxe.
+ * coordonnées et identifiants légaux (NIU / RCCM), logo, site principal et taux
+ * de taxe.
  *
  * Pays et devise passent par le sélecteur standard [MissaSelecteurLigne]
  * (recherche insensible aux accents, catalogue détaillé) ; site principal et
@@ -100,13 +106,14 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
         MissaOption(cle = devise.code, titre = devise.nom, badge = devise.code)
     }
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
+    val emailValide = viewModel.emailEntrepriseEstValide()
 
     OnbScaffold(
         titreRes = R.string.obn_entreprise_titre,
         sousTitreRes = R.string.obn_entreprise_sous,
         viewModel = viewModel,
         boutonPleineLargeur = true,
-        boutonActive = !viewModel.enregistrementEnCours,
+        boutonActive = !viewModel.enregistrementEnCours && emailValide,
         onRetour = viewModel::precedent,
     ) {
         Column(
@@ -211,6 +218,83 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 }
             }
 
+            // --- Coordonnées et identifiants légaux ---
+            OnbEntrepriseSection(
+                titreRes = R.string.obn_entreprise_contact,
+                sousTitreRes = R.string.obn_entreprise_contact_sous,
+            )
+            OnbEntrepriseCarte {
+                OnbChamp(icone = Icons.Outlined.Call, labelRes = R.string.obn_telephone) {
+                    OutlinedTextField(
+                        value = viewModel.telephone,
+                        onValueChange = { viewModel.telephone = it },
+                        placeholder = { Text(stringResource(R.string.obn_telephone_ex)) },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(icone = Icons.Outlined.MailOutline, labelRes = R.string.obn_email) {
+                    OutlinedTextField(
+                        value = viewModel.email,
+                        onValueChange = { viewModel.email = it },
+                        placeholder = { Text(stringResource(R.string.obn_email_ex)) },
+                        singleLine = true,
+                        isError = !emailValide,
+                        enabled = !viewModel.enregistrementEnCours,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        supportingText = if (emailValide) {
+                            null
+                        } else {
+                            {
+                                Text(
+                                    text = stringResource(R.string.obn_erreur_email_entreprise),
+                                    color = Red40,
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(icone = Icons.Outlined.Place, labelRes = R.string.obn_adresse) {
+                    OutlinedTextField(
+                        value = viewModel.adresse,
+                        onValueChange = { viewModel.adresse = it },
+                        placeholder = { Text(stringResource(R.string.obn_adresse_ex)) },
+                        singleLine = false,
+                        minLines = 2,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(icone = Icons.Outlined.Badge, labelRes = R.string.obn_numero_fiscal) {
+                    OutlinedTextField(
+                        value = viewModel.numeroFiscal,
+                        onValueChange = { viewModel.numeroFiscal = it },
+                        placeholder = { Text(stringResource(R.string.obn_numero_fiscal_ex)) },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(icone = Icons.Outlined.Gavel, labelRes = R.string.obn_registre) {
+                    OutlinedTextField(
+                        value = viewModel.registreCommerce,
+                        onValueChange = { viewModel.registreCommerce = it },
+                        placeholder = { Text(stringResource(R.string.obn_registre_ex)) },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
             // --- Logo de l'entreprise ---
             OnbLogoCard(
                 logoUri = viewModel.logoUri,
@@ -265,15 +349,24 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     }
 }
 
-/** Intertitre de section de l'écran entreprise. */
+/** Intertitre de section de l'écran entreprise, avec explication facultative. */
 @Composable
-private fun OnbEntrepriseSection(titreRes: Int) {
-    Text(
-        text = stringResource(titreRes),
-        fontSize = 12.5.sp,
-        fontWeight = FontWeight.Bold,
-        color = MissaInk,
-    )
+private fun OnbEntrepriseSection(titreRes: Int, sousTitreRes: Int? = null) {
+    Column {
+        Text(
+            text = stringResource(titreRes),
+            fontSize = 12.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = MissaInk,
+        )
+        if (sousTitreRes != null) {
+            Text(
+                text = stringResource(sousTitreRes),
+                fontSize = 11.5.sp,
+                color = MissaMuted,
+            )
+        }
+    }
 }
 
 /** Carte blanche standard regroupant des champs de l'écran entreprise. */

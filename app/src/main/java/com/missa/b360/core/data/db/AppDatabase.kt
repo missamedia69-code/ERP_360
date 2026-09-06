@@ -89,7 +89,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -289,6 +289,18 @@ abstract class AppDatabase : RoomDatabase() {
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `titre` TEXT NOT NULL, " +
                         "`notes` TEXT, `statut` TEXT NOT NULL, `echeance` INTEGER, `createdAt` INTEGER NOT NULL)",
                 )
+            }
+        }
+
+        /**
+         * v7 → v8 : identifiants légaux de l'entreprise (numéro fiscal NIU/NIF et
+         * registre du commerce RCCM), obligatoires sur les pièces de vente.
+         * Colonnes nullables : aucune donnée existante n'est perdue.
+         */
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `numeroFiscal` TEXT")
+                db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `registreCommerce` TEXT")
             }
         }
     }
