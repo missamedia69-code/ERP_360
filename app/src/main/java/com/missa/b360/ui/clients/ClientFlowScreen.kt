@@ -50,9 +50,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -98,11 +98,15 @@ import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.domain.model.MentionsLegales
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.usecase.ClientProfileInput
 import com.missa.b360.core.domain.usecase.ClientValidation
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
+import com.missa.b360.ui.components.MissaBrandMark
+import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.Green90
@@ -112,9 +116,6 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.Red40
-import com.missa.b360.ui.components.MissaBrandMark
-import com.missa.b360.ui.navigation.AppModule
-import com.missa.b360.ui.navigation.Routes
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
@@ -176,6 +177,13 @@ fun ClientsScreen(
     val sites by viewModel.sitesFlow.collectAsState(initial = emptyList())
     val sales by viewModel.salesHistory.collectAsState(initial = emptyList())
     val devise by viewModel.deviseEntreprise.collectAsState()
+    val entreprise by viewModel.entreprise.collectAsState()
+    val mentions = MentionsLegales.depuis(
+        entreprise = entreprise,
+        libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
+        libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
+        nomParDefaut = stringResource(R.string.app_name),
+    )
     val defaultCountry by viewModel.codePaysParDefaut.collectAsState()
     val result by viewModel.resultat.collectAsState()
     val categoryError by viewModel.erreurCategorie.collectAsState()
@@ -279,7 +287,7 @@ fun ClientsScreen(
     }
     val accountPdfLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         val client = selectedClient
-        if (uri != null && client != null) context.writeClientAccountPdf(uri, client, sales, devise.orEmpty())
+        if (uri != null && client != null) context.writeClientAccountPdf(uri, client, sales, devise.orEmpty(), mentions)
     }
 
     LaunchedEffect(defaultCountry) {
@@ -1387,7 +1395,13 @@ private fun Context.readClientCsv(uri: Uri): List<ImportedClientRow> = runCatchi
     } ?: emptyList()
 }.getOrDefault(emptyList())
 
-private fun Context.writeClientAccountPdf(uri: Uri, client: ClientEntity, records: List<OperationRecordEntity>, devise: String): Boolean = runCatching {
+private fun Context.writeClientAccountPdf(
+    uri: Uri,
+    client: ClientEntity,
+    records: List<OperationRecordEntity>,
+    devise: String,
+    mentions: MentionsLegales,
+): Boolean = runCatching {
     val entries = records.salesFor(client.id).filter { it.status == OperationStatus.VALIDATED.name }.sortedBy { it.createdAt }.toAccountEntries()
     val document = PdfDocument()
     try {
@@ -1395,10 +1409,16 @@ private fun Context.writeClientAccountPdf(uri: Uri, client: ClientEntity, record
         val canvas = page.canvas
         val title = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(21, 84, 232); textSize = 21f; typeface = android.graphics.Typeface.DEFAULT_BOLD }
         val body = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(16, 28, 67); textSize = 11f }
-        canvas.drawText("MISSA BUSINESS 360", 45f, 60f, title)
-        canvas.drawText(client.nom, 45f, 95f, body)
-        canvas.drawText("${client.code} · ${client.telephone}", 45f, 116f, body)
-        var y = 158f
+        val petit = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(108, 122, 155); textSize = 10f }
+        canvas.drawText(mentions.nom, 45f, 60f, title)
+        var enteteY = 78f
+        mentions.lignes.forEach { ligne ->
+            canvas.drawText(ligne, 45f, enteteY, petit)
+            enteteY += 14f
+        }
+        canvas.drawText(client.nom, 45f, enteteY + 17f, body)
+        canvas.drawText("${client.code} · ${client.telephone}", 45f, enteteY + 38f, body)
+        var y = enteteY + 80f
         entries.take(27).forEach { entry ->
             canvas.drawText("${DateUtils.formatDate(entry.record.createdAt)}  ${entry.record.reference.take(22)}", 45f, y, body)
             canvas.drawText(clientMoney(entry.balance, devise), 430f, y, body)

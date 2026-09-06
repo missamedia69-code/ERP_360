@@ -34,17 +34,17 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.Print
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
@@ -55,8 +55,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -97,11 +97,15 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.domain.model.MentionsLegales
 import com.missa.b360.core.domain.model.SaleLine
-import com.missa.b360.core.util.toInputAmount
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.core.util.toInputAmount
+import com.missa.b360.ui.components.MissaBrandMark
+import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.Blue40
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
@@ -112,9 +116,6 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.Red40
-import com.missa.b360.ui.components.MissaBrandMark
-import com.missa.b360.ui.navigation.AppModule
-import com.missa.b360.ui.navigation.Routes
 
 private enum class SalesStep { LIST, CLIENT, PRODUCTS, CART, PAYMENT, SUMMARY, SUCCESS, INVOICE, OPTIONS, PRINT }
 
@@ -148,6 +149,13 @@ fun SalesScreen(
     val taxRate by viewModel.taxRate.collectAsState()
     val paymentMethods by viewModel.paymentMethods.collectAsState()
     val devise by viewModel.devise.collectAsState()
+    val entreprise by viewModel.entreprise.collectAsState()
+    val mentions = MentionsLegales.depuis(
+        entreprise = entreprise,
+        libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
+        libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
+        nomParDefaut = stringResource(R.string.app_name),
+    )
     val history by viewModel.history.collectAsState(initial = emptyList())
     val saving by viewModel.saving.collectAsState()
     val cancelling by viewModel.cancelling.collectAsState()
@@ -179,7 +187,7 @@ fun SalesScreen(
     val createPdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
         val receipt = activeReceipt
         if (uri != null && receipt != null) {
-            context.writeInvoicePdf(uri, receipt, devise)
+            context.writeInvoicePdf(uri, receipt, devise, mentions)
         }
     }
 
@@ -405,8 +413,9 @@ fun SalesScreen(
             InvoicePreviewScreen(
                 receipt = receipt,
                 devise = devise,
+                mentions = mentions,
                 onBack = { stepName = SalesStep.LIST.name },
-                onShare = { context.shareInvoice(receipt, devise) },
+                onShare = { context.shareInvoice(receipt, devise, mentions) },
                 onOptions = { stepName = SalesStep.OPTIONS.name },
             )
         } ?: Unit
@@ -416,9 +425,9 @@ fun SalesScreen(
                 devise = devise,
                 onBack = { stepName = SalesStep.INVOICE.name },
                 onPrint = { stepName = SalesStep.PRINT.name },
-                onShare = { context.shareInvoice(receipt, devise) },
+                onShare = { context.shareInvoice(receipt, devise, mentions) },
                 onDownload = { createPdf.launch("${receipt.reference}.pdf") },
-                onEmail = { context.emailInvoice(receipt, devise) },
+                onEmail = { context.emailInvoice(receipt, devise, mentions) },
                 onView = { stepName = SalesStep.INVOICE.name },
                 onDuplicate = {
                     if (viewModel.duplicate(receipt.payload, clients)) stepName = SalesStep.CLIENT.name
@@ -432,7 +441,7 @@ fun SalesScreen(
                 receipt = receipt,
                 devise = devise,
                 onBack = { stepName = SalesStep.OPTIONS.name },
-                onPrint = { context.printSaleReceipt(receipt, devise) },
+                onPrint = { context.printSaleReceipt(receipt, devise, mentions) },
             )
         } ?: Unit
     }
@@ -1237,24 +1246,36 @@ private fun InvoiceInfoCard(receipt: SaleReceipt, devise: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InvoicePreviewScreen(receipt: SaleReceipt, devise: String, onBack: () -> Unit, onShare: () -> Unit, onOptions: () -> Unit) {
+private fun InvoicePreviewScreen(
+    receipt: SaleReceipt,
+    devise: String,
+    mentions: MentionsLegales,
+    onBack: () -> Unit,
+    onShare: () -> Unit,
+    onOptions: () -> Unit,
+) {
     Scaffold(containerColor = FlowBackground, topBar = { CenterAlignedTopAppBar(title = { SalesPageTitle(stringResource(R.string.sales_invoice_preview)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back)) } }, actions = { IconButton(onClick = onShare) { Icon(Icons.Outlined.Share, stringResource(R.string.sales_share_invoice)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { InvoicePaper(receipt, devise) }
+            item { InvoicePaper(receipt, devise, mentions) }
             item { Button(onClick = onOptions, modifier = Modifier.fillMaxWidth().height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = FlowBlue)) { Text(stringResource(R.string.sales_invoice_options)) } }
         }
     }
 }
 
 @Composable
-private fun InvoicePaper(receipt: SaleReceipt, devise: String) {
+private fun InvoicePaper(receipt: SaleReceipt, devise: String, mentions: MentionsLegales) {
     val payload = receipt.payload
     Card(shape = RoundedCornerShape(4.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, FlowBorder), modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.Top) {
                 androidx.compose.foundation.Image(painter = painterResource(R.drawable.logo_missa), contentDescription = stringResource(R.string.app_name), modifier = Modifier.size(56.dp), contentScale = ContentScale.Fit)
                 Spacer(Modifier.width(9.dp))
-                Column(modifier = Modifier.weight(1f)) { Text("MISSA BUSINESS", color = FlowInk, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp); Text("360", color = FlowGreen, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp) }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(mentions.nom, color = FlowInk, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                    mentions.lignes.forEach { ligne ->
+                        Text(ligne, color = FlowMuted, fontSize = 9.sp)
+                    }
+                }
                 Column(horizontalAlignment = Alignment.End) { Text(stringResource(R.string.sales_invoice_customer).uppercase(), color = FlowInk, fontSize = 12.sp, fontWeight = FontWeight.Bold); Text(if (payload.total <= payload.paidAmount) stringResource(R.string.sales_status_paid) else stringResource(R.string.sales_status_pending), color = FlowGreen, fontSize = 9.sp, fontWeight = FontWeight.Bold) }
             }
             HorizontalDivider(color = FlowBorder)
@@ -1394,28 +1415,41 @@ private fun FlowPaymentPicker(selected: String, methods: List<String>, onSelect:
     }
 }
 
-private fun Context.shareInvoice(receipt: SaleReceipt, devise: String) {
-    val text = "${getString(R.string.sales_invoice_customer)} ${receipt.reference}\n${receipt.clientName}\n${getString(R.string.sales_total)}: ${saleMoney(receipt.total, devise)}"
+private fun Context.shareInvoice(receipt: SaleReceipt, devise: String, mentions: MentionsLegales) {
+    val entete = mentions.texte() + "\n\n"
+    val text = entete + "${getString(R.string.sales_invoice_customer)} ${receipt.reference}\n${receipt.clientName}\n${getString(R.string.sales_total)}: ${saleMoney(receipt.total, devise)}"
     startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, "${getString(R.string.sales_share_subject)} ${receipt.reference}").putExtra(Intent.EXTRA_TEXT, text), getString(R.string.sales_share_invoice)))
 }
 
-private fun Context.emailInvoice(receipt: SaleReceipt, devise: String) {
-    val body = "${getString(R.string.sales_invoice_customer)} ${receipt.reference}\n${getString(R.string.sales_total)}: ${saleMoney(receipt.total, devise)}"
+private fun Context.emailInvoice(receipt: SaleReceipt, devise: String, mentions: MentionsLegales) {
+    val entete = mentions.texte() + "\n\n"
+    val body = entete + "${getString(R.string.sales_invoice_customer)} ${receipt.reference}\n${getString(R.string.sales_total)}: ${saleMoney(receipt.total, devise)}"
     startActivity(Intent.createChooser(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).putExtra(Intent.EXTRA_SUBJECT, "${getString(R.string.sales_email_subject)} ${receipt.reference}").putExtra(Intent.EXTRA_TEXT, body), getString(R.string.sales_email_invoice)))
 }
 
-private fun Context.writeInvoicePdf(uri: Uri, receipt: SaleReceipt, devise: String): Boolean = runCatching {
+private fun Context.writeInvoicePdf(
+    uri: Uri,
+    receipt: SaleReceipt,
+    devise: String,
+    mentions: MentionsLegales,
+): Boolean = runCatching {
     val document = PdfDocument()
     try {
         val page = document.startPage(PdfDocument.PageInfo.Builder(595, 842, 1).create())
         val canvas = page.canvas
         val title = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(21, 84, 232); textSize = 22f; typeface = android.graphics.Typeface.DEFAULT_BOLD }
         val body = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(16, 28, 67); textSize = 12f }
-        canvas.drawText("MISSA BUSINESS 360", 45f, 64f, title)
-        canvas.drawText(receipt.reference, 45f, 105f, body)
-        canvas.drawText(DateUtils.formatDateHeure(receipt.createdAt), 45f, 128f, body)
-        canvas.drawText(receipt.clientName, 45f, 151f, body)
-        var y = 190f
+        val petit = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = android.graphics.Color.rgb(108, 122, 155); textSize = 10f }
+        canvas.drawText(mentions.nom, 45f, 64f, title)
+        var enteteY = 82f
+        mentions.lignes.forEach { ligne ->
+            canvas.drawText(ligne, 45f, enteteY, petit)
+            enteteY += 14f
+        }
+        canvas.drawText(receipt.reference, 45f, enteteY + 16f, body)
+        canvas.drawText(DateUtils.formatDateHeure(receipt.createdAt), 45f, enteteY + 39f, body)
+        canvas.drawText(receipt.clientName, 45f, enteteY + 62f, body)
+        var y = enteteY + 101f
         receipt.payload.lines.take(23).forEach { line ->
             canvas.drawText("${line.name.take(32)} × ${line.quantity.saleQty()}  ${saleMoney(line.total, devise)}", 45f, y, body)
             y += 23f

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
+import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
@@ -61,6 +62,10 @@ class ClientsViewModel @Inject constructor(
 
     private val _deviseEntreprise = MutableStateFlow<String?>(null)
     val deviseEntreprise: StateFlow<String?> = _deviseEntreprise
+
+    /** Fiche entreprise : mentions légales du relevé de compte client. */
+    private val _entreprise = MutableStateFlow<EnterpriseEntity?>(null)
+    val entreprise: StateFlow<EnterpriseEntity?> = _entreprise
 
     private val _codePaysParDefaut = MutableStateFlow<String?>(null)
     val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
@@ -141,6 +146,7 @@ class ClientsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val entreprise = getEnterprise()
+            _entreprise.value = entreprise
             _deviseEntreprise.value = entreprise?.devise
             val codeEnregistre = settingsStore.get(SettingsStore.Keys.PAYS)
                 ?.takeIf { Iso4217.indicatifTelephone(it) != null }

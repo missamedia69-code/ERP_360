@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleLine
@@ -111,6 +112,9 @@ class SalesViewModel @Inject constructor(
     val devise: StateFlow<String> = getEnterprise.observer()
         .map { enterprise -> enterprise?.devise ?: "XAF" }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+    /** Fiche entreprise : alimente les mentions légales imprimées sur les pièces. */
+    val entreprise: StateFlow<EnterpriseEntity?> = getEnterprise.observer()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val history: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.VENTE)
     /** Catalogue produits avec stock courant (spec §9 : ajout par recherche). */
     val products: StateFlow<List<ProductWithStock>> = combine(

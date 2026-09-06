@@ -16,6 +16,7 @@ ce qui est reporté et ce qui restera hors périmètre.
 | Taxe unique par défaut sur les pièces | ✅ | `TaxEntity(nom, taux, parDefaut)` |
 | Coordonnées + identifiants légaux de l'entreprise | ✅ | `EnterpriseEntity` (Room v8) |
 | **Zone fiscale et identifiants légaux par pays** | ✅ | `core/domain/model/ReferentielFiscal.kt` |
+| **Bloc émetteur sur les pièces** | ✅ | `core/domain/model/MentionsLegales.kt` |
 | Journal d'audit horodaté | ✅ | `JournalManager` (rétention paramétrable) |
 
 ## 2. Lot livré — Phase 1 : identifiants uniques pilotés par le pays
@@ -50,10 +51,19 @@ Correspondance avec le modèle de la spécification :
 
 ## 3. Trajectoire proposée
 
-### Phase 2 — Mentions légales sur les pièces
-Reprendre le bloc « émetteur » (nom, adresse, téléphone, e‑mail, identifiants légaux, taux et
-libellé de taxe) sur les devis, factures, bons de livraison et reçus, avec le vocabulaire de la
-zone. Aucune migration nécessaire : les données existent déjà.
+### Phase 2 — Mentions légales sur les pièces — **livrée**
+`MentionsLegales.depuis(entreprise, …)` assemble le bloc émetteur (raison sociale, adresse,
+téléphone, e‑mail puis identifiants légaux préfixés de leur libellé local) une seule fois, pour :
+
+* la facture affichée à l'écran (`InvoicePaper`), dont l'en‑tête portait jusqu'ici la marque de
+  l'éditeur au lieu de celle du commerçant ;
+* le PDF téléchargé et le PDF d'impression (`SalePrintAdapter`) ;
+* le partage et l'e‑mail, qui n'envoyaient qu'une référence et un total ;
+* le relevé de compte client en PDF.
+
+Reste à faire dans cette phase : les devis et commandes, les bons de livraison et les pièces
+d'achat, ainsi que le rappel du libellé de taxe local (« TVA », « VAT », « GST ») à la place du
+libellé figé.
 
 ### Phase 3 — Identifiants des tiers
 Ajouter les identifiants fiscaux aux clients et fournisseurs (statut B2B/B2C, numéro de TVA),
