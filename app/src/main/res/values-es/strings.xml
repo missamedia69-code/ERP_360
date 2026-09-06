@@ -1315,4 +1315,28 @@
     <string name="obn_profil_detail_custom">Catálogo completo: marque después los módulos que necesite.</string>
     <string name="obn_profil_detail_modifiable">Podrá activar más módulos más adelante en los ajustes.</string>
     <string name="obn_profil_detail_complet">Completo</string>
+
+    <!-- Modules metier / modules support (socle) -->
+    <string name="module_desc_ach">Proveedores, pedidos, recepciones y facturas de compra.</string>
+    <string name="module_desc_ven">Clientes, presupuestos, pedidos, entregas y facturación.</string>
+    <string name="module_desc_stk">Artículos, almacenes, movimientos, inventarios y valoración.</string>
+    <string name="module_desc_pro">Listas de materiales, órdenes de fabricación y taller.</string>
+    <string name="module_desc_ser">Servicios, contratos, intervenciones y posventa.</string>
+    <string name="module_desc_prj">Proyectos, fases, tareas, presupuestos y avance.</string>
+    <string name="module_desc_rh">Empleados, contratos, vacaciones, nómina y competencias.</string>
+    <string name="module_desc_cpt">Diarios, libro mayor, balance, IVA y cierres.</string>
+    <string name="module_desc_tre">Bancos, pagos, vencimientos y previsiones.</string>
+    <string name="module_desc_crm">Clientes potenciales, oportunidades, embudo y campañas.</string>
+    <string name="module_desc_qua">Controles, no conformidades, auditorías y certificaciones.</string>
+    <string name="module_desc_mai">Equipos, mantenimiento preventivo y correctivo.</string>
+    <string name="module_desc_log">Expediciones, transportistas, rutas y pruebas de entrega.</string>
+    <string name="module_desc_rep">Cuadros de mando, indicadores, informes y exportaciones.</string>
+    <string name="obn_socle_titre">Módulos de soporte</string>
+    <string name="obn_socle_sous">Bloques transversales que se añaden a su perfil de negocio.</string>
+    <string name="obn_socle_recommande">Recomendado</string>
+    <string name="obn_socle_compteur">%1$d opción(es) activada(s)</string>
+    <string name="obn_socle_defaut">Restaurar la selección sugerida</string>
+    <string name="obn_profil_perso_metier">Módulos de negocio</string>
+    <string name="obn_profil_detail_metier">Módulos de negocio</string>
+    <string name="obn_profil_detail_support">Módulos de soporte sugeridos</string>
 </resources>

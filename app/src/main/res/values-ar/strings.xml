@@ -1315,4 +1315,28 @@
     <string name="obn_profil_detail_custom">الكتالوج الكامل: اختر بعد ذلك الوحدات التي تحتاجها.</string>
     <string name="obn_profil_detail_modifiable">يمكنك تفعيل وحدات أخرى لاحقًا من الإعدادات.</string>
     <string name="obn_profil_detail_complet">كامل</string>
+
+    <!-- Modules metier / modules support (socle) -->
+    <string name="module_desc_ach">الموردون وأوامر الشراء والاستلامات والفواتير.</string>
+    <string name="module_desc_ven">العملاء وعروض الأسعار والطلبات والتسليم والفوترة.</string>
+    <string name="module_desc_stk">الأصناف والمستودعات والحركات والجرد والتقييم.</string>
+    <string name="module_desc_pro">قوائم المواد وأوامر التصنيع ومتابعة الورشة.</string>
+    <string name="module_desc_ser">الخدمات والعقود والتدخلات وما بعد البيع.</string>
+    <string name="module_desc_prj">المشاريع والمراحل والمهام والميزانيات والتقدم.</string>
+    <string name="module_desc_rh">الموظفون والعقود والإجازات والرواتب والمهارات.</string>
+    <string name="module_desc_cpt">اليوميات ودفتر الأستاذ والميزانية والضريبة والإقفال.</string>
+    <string name="module_desc_tre">البنوك والمدفوعات والاستحقاقات والتنبؤات.</string>
+    <string name="module_desc_crm">العملاء المحتملون والفرص ومسار المبيعات والحملات.</string>
+    <string name="module_desc_qua">الفحوصات وعدم المطابقة والتدقيق والشهادات.</string>
+    <string name="module_desc_mai">المعدات والصيانة الوقائية والتصحيحية.</string>
+    <string name="module_desc_log">الشحنات وشركات النقل والجولات وإثبات التسليم.</string>
+    <string name="module_desc_rep">لوحات المعلومات والمؤشرات والتقارير والتصدير.</string>
+    <string name="obn_socle_titre">الوحدات المساندة</string>
+    <string name="obn_socle_sous">لبنات عامة تُضاف إلى ملف نشاطك.</string>
+    <string name="obn_socle_recommande">موصى به</string>
+    <string name="obn_socle_compteur">%1$d خيار مفعّل</string>
+    <string name="obn_socle_defaut">استعادة الاختيار المقترح</string>
+    <string name="obn_profil_perso_metier">وحدات النشاط</string>
+    <string name="obn_profil_detail_metier">وحدات النشاط</string>
+    <string name="obn_profil_detail_support">الوحدات المساندة المقترحة</string>
 </resources>

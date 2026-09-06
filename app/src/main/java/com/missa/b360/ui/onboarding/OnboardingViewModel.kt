@@ -13,6 +13,7 @@ import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ProfilConfiguration
@@ -62,8 +63,16 @@ class OnboardingViewModel @Inject constructor(
     var profil by mutableStateOf<ProfilActivite?>(null)
         private set
 
-    /** Modules cochés quand le profil « Personnalisé » est retenu. */
+    /** Modules métier cochés quand le profil « Personnalisé » est retenu. */
     var modulesPersonnalises by mutableStateOf<Set<ModuleCode>>(emptySet())
+        private set
+
+    /** Options socle retenues (Comptabilité, Trésorerie, Logistique, Reporting…). */
+    var modulesSupport by mutableStateOf<Set<ModuleCode>>(emptySet())
+        private set
+
+    /** Vrai dès que l'utilisateur touche une option socle : on cesse de la recalculer. */
+    var socleAjuste by mutableStateOf(false)
         private set
 
     /** Effectif déclaré (P1–P6) — champ compact de l'écran « type d'activité ». */
@@ -143,9 +152,16 @@ class OnboardingViewModel @Inject constructor(
                 profil = progression.profil?.let {
                     runCatching { ProfilActivite.valueOf(it) }.getOrNull()
                 }
-                modulesPersonnalises = ModulesPersonnalises
+                val actifsEnregistres = ModulesPersonnalises
                     .deserialiser(settingsStore.get(SettingsStore.Keys.MODULES_ACTIFS))
-                    .toSet()
+                modulesPersonnalises = ModulesSocle.filtrerMetier(actifsEnregistres).toSet()
+                val socleEnregistre = settingsStore.get(SettingsStore.Keys.MODULES_SUPPORT)
+                socleAjuste = socleEnregistre != null
+                modulesSupport = if (socleEnregistre != null) {
+                    ModulesPersonnalises.deserialiser(socleEnregistre).toSet()
+                } else {
+                    ModulesSocle.filtrerSupport(actifsEnregistres).toSet()
+                }
                 palier = progression.palier?.let {
                     runCatching { PalierTaille.valueOf(it) }.getOrNull()
                 }
@@ -214,56 +230,103 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    // --- Profil d'activité ---
+    // --- Profil d'activité (niveau 1 : métier / niveau 2 : socle) ---
 
-    /** Le profil pilote les modules activés (ProfilConfiguration.modulesPourProfil). */
+    /**
+     * Le profil ne pilote plus que les modules **métier** : les briques
+     * transverses (Comptabilité, Trésorerie, Logistique, Reporting…) sont
+     * recalculées comme simple proposition tant que l'utilisateur n'y a pas touché.
+     */
     fun choisirProfil(p: ProfilActivite) {
         profil = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name) }
         if (p != ProfilActivite.CUSTOM) {
-            enregistrerModules(ProfilConfiguration.modulesPourProfil(p).toSet())
+            modulesPersonnalises = ModulesSocle
+                .filtrerMetier(ProfilConfiguration.modulesPourProfil(p))
+                .toSet()
         }
+        rafraichirSocle()
+        enregistrerModules()
     }
 
     /**
-     * Bascule sur le profil « Personnalisé » : la sélection démarre des modules
-     * du profil déjà choisi, pour n'avoir qu'à ajuster au lieu de tout cocher.
+     * Bascule sur le profil « Personnalisé » : la sélection métier démarre de
+     * celle du profil déjà choisi, pour n'avoir qu'à ajuster au lieu de tout cocher.
      */
     fun choisirPersonnalisation() {
         val depart = when {
             modulesPersonnalises.isNotEmpty() -> modulesPersonnalises
             profil != null && profil != ProfilActivite.CUSTOM ->
-                ProfilConfiguration.modulesPourProfil(profil!!).toSet()
+                ModulesSocle.filtrerMetier(ProfilConfiguration.modulesPourProfil(profil!!)).toSet()
             else -> emptySet()
         }
         profil = ProfilActivite.CUSTOM
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, ProfilActivite.CUSTOM.name)
         }
-        enregistrerModules(depart)
+        modulesPersonnalises = depart
+        rafraichirSocle()
+        enregistrerModules()
     }
 
-    /** Coche / décoche un module dans la sélection personnalisée. */
+    /** Coche / décoche un module métier dans la sélection personnalisée. */
     fun basculerModule(module: ModuleCode) {
         val nouvelle = modulesPersonnalises.toMutableSet()
         if (!nouvelle.add(module)) nouvelle.remove(module)
-        enregistrerModules(nouvelle)
+        modulesPersonnalises = nouvelle
+        rafraichirSocle()
+        enregistrerModules()
     }
 
-    /** Tout cocher / tout décocher depuis l'en-tête de la liste des modules. */
+    /** Tout cocher / tout décocher depuis l'en-tête de la liste des modules métier. */
     fun basculerTousLesModules() {
-        val tout = ModuleCode.entries.toSet()
-        enregistrerModules(if (modulesPersonnalises.size == tout.size) emptySet() else tout)
+        val tout = ModulesSocle.metier.toSet()
+        modulesPersonnalises = if (modulesPersonnalises.size == tout.size) emptySet() else tout
+        rafraichirSocle()
+        enregistrerModules()
     }
 
-    /** La sélection de modules est conservée immédiatement (reprise d'onboarding). */
-    private fun enregistrerModules(modules: Set<ModuleCode>) {
-        modulesPersonnalises = modules
-        val valeur = ModulesPersonnalises.serialiser(modules)
-        viewModelScope.launch { settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeur) }
+    /** Active / désactive une option socle — le choix de l'utilisateur devient prioritaire. */
+    fun basculerSupport(module: ModuleCode) {
+        val nouvelle = modulesSupport.toMutableSet()
+        if (!nouvelle.add(module)) nouvelle.remove(module)
+        modulesSupport = nouvelle
+        socleAjuste = true
+        enregistrerModules()
     }
 
-    /** L'écran « type d'activité » n'est valide qu'avec au moins un module actif. */
+    /** Revient aux options socle conseillées pour le profil et l'effectif déclarés. */
+    fun reinitialiserSocle() {
+        socleAjuste = false
+        rafraichirSocle()
+        enregistrerModules()
+    }
+
+    /** Options socle conseillées pour la configuration courante (badges « Recommandé »). */
+    fun socleRecommande(): Set<ModuleCode> =
+        ModulesSocle.recommandes(profil, palier, modulesMetier())
+
+    /** Modules métier retenus (profil ou sélection personnalisée). */
+    fun modulesMetier(): List<ModuleCode> =
+        ModulesSocle.metierActifs(profil, modulesPersonnalises)
+
+    /** Recalcule la proposition socle tant que l'utilisateur ne l'a pas ajustée. */
+    private fun rafraichirSocle() {
+        if (!socleAjuste) modulesSupport = socleRecommande()
+    }
+
+    /** La sélection est conservée immédiatement (reprise d'onboarding). */
+    private fun enregistrerModules() {
+        val actifs = ModulesPersonnalises.modulesActifs(profil, modulesPersonnalises, modulesSupport)
+        val valeurActifs = ModulesPersonnalises.serialiser(actifs)
+        val valeurSocle = ModulesPersonnalises.serialiser(ModulesSocle.filtrerSupport(modulesSupport))
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeurActifs)
+            if (socleAjuste) settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurSocle)
+        }
+    }
+
+    /** L'écran « type d'activité » n'est valide qu'avec au moins un module métier. */
     fun profilEcranValide(): Boolean = when (profil) {
         null -> false
         ProfilActivite.CUSTOM -> modulesPersonnalises.isNotEmpty()
@@ -274,6 +337,8 @@ class OnboardingViewModel @Inject constructor(
     fun choisirPalier(p: PalierTaille) {
         palier = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, p.name) }
+        rafraichirSocle()
+        enregistrerModules()
     }
 
     // --- Entreprise ---

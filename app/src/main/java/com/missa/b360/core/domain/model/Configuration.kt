@@ -239,13 +239,17 @@ object ModulesPersonnalises {
             .distinct()
 
     /**
-     * Modules réellement actifs : la sélection manuelle prime pour le profil
-     * « Personnalisé », sinon la configuration du profil s'applique.
+     * Modules réellement actifs : les modules métier (sélection manuelle en
+     * profil « Personnalisé », configuration du profil sinon) auxquels
+     * s'ajoutent les options socle retenues par l'utilisateur.
      */
-    fun modulesActifs(profil: ProfilActivite?, personnalises: Collection<ModuleCode>): List<ModuleCode> =
-        when {
-            profil == ProfilActivite.CUSTOM -> ModuleCode.entries.filter { it in personnalises }
-            profil != null -> ProfilConfiguration.modulesPourProfil(profil)
-            else -> emptyList()
-        }
+    fun modulesActifs(
+        profil: ProfilActivite?,
+        personnalises: Collection<ModuleCode>,
+        support: Collection<ModuleCode> = emptyList(),
+    ): List<ModuleCode> {
+        val metier = ModulesSocle.metierActifs(profil, personnalises)
+        val socle = ModulesSocle.filtrerSupport(support)
+        return ModuleCode.entries.filter { it in metier || it in socle }
+    }
 }

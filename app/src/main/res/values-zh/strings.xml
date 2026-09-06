@@ -1315,4 +1315,28 @@
     <string name="obn_profil_detail_custom">完整目录：随后勾选您需要的模块。</string>
     <string name="obn_profil_detail_modifiable">您之后可在设置中启用更多模块。</string>
     <string name="obn_profil_detail_complet">完整</string>
+
+    <!-- Modules metier / modules support (socle) -->
+    <string name="module_desc_ach">供应商、采购订单、收货与发票。</string>
+    <string name="module_desc_ven">客户、报价、订单、交付与开票。</string>
+    <string name="module_desc_stk">物料、仓库、库存移动、盘点与估值。</string>
+    <string name="module_desc_pro">物料清单、生产工单与车间跟踪。</string>
+    <string name="module_desc_ser">服务、合同、现场作业与售后。</string>
+    <string name="module_desc_prj">项目、阶段、任务、预算与进度。</string>
+    <string name="module_desc_rh">员工、合同、休假、薪资与技能。</string>
+    <string name="module_desc_cpt">账簿、总账、报表、增值税与结账。</string>
+    <string name="module_desc_tre">银行、收付款、到期与现金预测。</string>
+    <string name="module_desc_crm">线索、商机、销售漏斗与营销活动。</string>
+    <string name="module_desc_qua">检验、不合格项、审核与认证。</string>
+    <string name="module_desc_mai">设备、预防性与故障维护。</string>
+    <string name="module_desc_log">发运、承运商、配送路线与签收。</string>
+    <string name="module_desc_rep">仪表板、指标、报表与导出。</string>
+    <string name="obn_socle_titre">支撑模块</string>
+    <string name="obn_socle_sous">在业务方案之上叠加的通用模块。</string>
+    <string name="obn_socle_recommande">推荐</string>
+    <string name="obn_socle_compteur">已启用 %1$d 项</string>
+    <string name="obn_socle_defaut">恢复建议选择</string>
+    <string name="obn_profil_perso_metier">业务模块</string>
+    <string name="obn_profil_detail_metier">业务模块</string>
+    <string name="obn_profil_detail_support">建议的支撑模块</string>
 </resources>

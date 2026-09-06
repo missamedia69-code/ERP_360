@@ -31,6 +31,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -48,9 +50,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModuleSousElements
 import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.ui.components.MissaOption
@@ -167,6 +169,9 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 enabled = !viewModel.enregistrementEnCours,
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
             )
+            if (viewModel.profil != null) {
+                OnbModulesSocle(viewModel = viewModel)
+            }
         }
     }
     val carteDetaillee = cartes.firstOrNull { it.profil.name == detailProfil }
@@ -176,6 +181,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             titreRes = carteDetaillee.titreRes,
             sousTitreRes = carteDetaillee.sousTitreRes,
             icone = carteDetaillee.icone,
+            palier = viewModel.palier,
             dejaChoisi = viewModel.profil == carteDetaillee.profil,
             onChoisir = {
                 choisir(carteDetaillee.profil)
@@ -187,14 +193,14 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
 }
 
 /**
- * Personnalisation des modules (profil « Personnalisé ») : les 14 modules métier
- * cochables un à un, avec le nombre de fonctionnalités que chacun apporte. La
- * sélection est conservée immédiatement et pilote les modules actifs de l'app.
+ * Personnalisation du niveau 1 (profil « Personnalisé ») : les six modules
+ * **métier** cochables un à un, avec le nombre de fonctionnalités que chacun
+ * apporte. Les briques transverses restent gérées par la carte « Modules support ».
  */
 @Composable
 private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
     val selection = viewModel.modulesPersonnalises
-    val tousCoches = selection.size == ModuleCode.entries.size
+    val tousCoches = selection.size == ModulesSocle.metier.size
     Card(
         shape = RoundedCornerShape(14.dp),
         border = BorderStroke(1.dp, if (selection.isEmpty()) Red40 else BrandBlue),
@@ -203,6 +209,12 @@ private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Text(
+                text = stringResource(R.string.obn_profil_perso_metier),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.obn_profil_perso_compteur, selection.size),
@@ -229,7 +241,7 @@ private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
                 )
             }
             Spacer(Modifier.height(4.dp))
-            for (module in ModuleCode.entries) {
+            for (module in ModulesSocle.metier) {
                 val actif = module in selection
                 Row(
                     modifier = Modifier
@@ -259,6 +271,104 @@ private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
                             color = MissaMuted,
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Niveau 2 — options socle : les briques transverses (Comptabilité, Trésorerie,
+ * Logistique, Reporting, CRM, RH, Qualité, Maintenance) s'ajoutent au profil
+ * métier. Elles sont pré-cochées selon des règles simples (comptabilité et
+ * reporting systématiques, trésorerie dès qu'il y a achat ou vente, logistique
+ * avec le stock, qualité et maintenance avec la production, RH selon
+ * l'effectif) ; l'utilisateur reste libre de les activer ou non.
+ */
+@Composable
+private fun OnbModulesSocle(viewModel: OnboardingViewModel) {
+    val selection = viewModel.modulesSupport
+    val recommandes = viewModel.socleRecommande()
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.obn_socle_titre),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MissaInk,
+                    )
+                    Text(
+                        text = stringResource(R.string.obn_socle_sous),
+                        fontSize = 11.5.sp,
+                        color = MissaMuted,
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.obn_socle_compteur, selection.size),
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = BrandBlue,
+                )
+            }
+            Spacer(Modifier.height(6.dp))
+            for (module in ModulesSocle.support) {
+                val actif = module in selection
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.basculerSupport(module) }
+                        .padding(vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = stringResource(ModulesPersonnalises.libelleRes(module)),
+                                fontSize = 13.sp,
+                                fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
+                                color = MissaInk,
+                            )
+                            if (module in recommandes) {
+                                Spacer(Modifier.width(6.dp))
+                                Surface(shape = RoundedCornerShape(6.dp), color = MissaSoftBlue) {
+                                    Text(
+                                        text = stringResource(R.string.obn_socle_recommande),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = BrandBlue,
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            text = stringResource(ModulesSocle.descriptionRes(module)),
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Switch(
+                        checked = actif,
+                        onCheckedChange = { viewModel.basculerSupport(module) },
+                        colors = SwitchDefaults.colors(checkedTrackColor = BrandBlue),
+                    )
+                }
+            }
+            if (viewModel.socleAjuste) {
+                TextButton(
+                    onClick = viewModel::reinitialiserSocle,
+                    modifier = Modifier.align(Alignment.End),
+                ) {
+                    Text(text = stringResource(R.string.obn_socle_defaut), fontSize = 12.sp)
                 }
             }
         }

@@ -1336,4 +1336,28 @@
     <string name="obn_profil_detail_custom">Full catalogue: then tick the modules you need.</string>
     <string name="obn_profil_detail_modifiable">You can activate more modules later in the settings.</string>
     <string name="obn_profil_detail_complet">Full</string>
+
+    <!-- Modules metier / modules support (socle) -->
+    <string name="module_desc_ach">Suppliers, purchase orders, receipts and invoices.</string>
+    <string name="module_desc_ven">Customers, quotes, orders, deliveries and invoicing.</string>
+    <string name="module_desc_stk">Items, warehouses, movements, counts and valuation.</string>
+    <string name="module_desc_pro">Bills of materials, work orders and shop-floor tracking.</string>
+    <string name="module_desc_ser">Services, contracts, field jobs and after-sales.</string>
+    <string name="module_desc_prj">Projects, phases, tasks, budgets and progress.</string>
+    <string name="module_desc_rh">Employees, contracts, leave, payroll and skills.</string>
+    <string name="module_desc_cpt">Journals, ledger, balance sheet, VAT and closings.</string>
+    <string name="module_desc_tre">Banks, payments, due dates and cash forecasts.</string>
+    <string name="module_desc_crm">Leads, opportunities, pipeline and campaigns.</string>
+    <string name="module_desc_qua">Checks, non-conformities, audits and certifications.</string>
+    <string name="module_desc_mai">Equipment, preventive and corrective maintenance.</string>
+    <string name="module_desc_log">Shipments, carriers, rounds and proof of delivery.</string>
+    <string name="module_desc_rep">Dashboards, KPIs, reports and exports.</string>
+    <string name="obn_socle_titre">Support modules</string>
+    <string name="obn_socle_sous">Cross-functional building blocks added on top of your business profile.</string>
+    <string name="obn_socle_recommande">Recommended</string>
+    <string name="obn_socle_compteur">%1$d option(s) enabled</string>
+    <string name="obn_socle_defaut">Restore the suggested selection</string>
+    <string name="obn_profil_perso_metier">Business modules</string>
+    <string name="obn_profil_detail_metier">Business modules</string>
+    <string name="obn_profil_detail_support">Suggested support modules</string>
 </resources>

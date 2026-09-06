@@ -1343,4 +1343,28 @@
     <string name="obn_profil_detail_custom">Catalogue complet : cochez ensuite les modules dont vous avez besoin.</string>
     <string name="obn_profil_detail_modifiable">Vous pourrez activer d\'autres modules plus tard dans les réglages.</string>
     <string name="obn_profil_detail_complet">Complet</string>
+
+    <!-- Modules metier / modules support (socle) -->
+    <string name="module_desc_ach">Fournisseurs, commandes, réceptions et factures d\'achat.</string>
+    <string name="module_desc_ven">Clients, devis, commandes, livraisons et facturation.</string>
+    <string name="module_desc_stk">Articles, entrepôts, mouvements, inventaires et valorisation.</string>
+    <string name="module_desc_pro">Nomenclatures, ordres de fabrication et suivi d\'atelier.</string>
+    <string name="module_desc_ser">Prestations, contrats, interventions et service après-vente.</string>
+    <string name="module_desc_prj">Projets, phases, tâches, budgets et avancement.</string>
+    <string name="module_desc_rh">Employés, contrats, congés, paie et compétences.</string>
+    <string name="module_desc_cpt">Journaux, grand livre, bilan, TVA et clôtures.</string>
+    <string name="module_desc_tre">Banques, règlements, échéances et prévisions.</string>
+    <string name="module_desc_crm">Prospects, opportunités, pipeline et campagnes.</string>
+    <string name="module_desc_qua">Contrôles, non-conformités, audits et certifications.</string>
+    <string name="module_desc_mai">Équipements, maintenance préventive et corrective.</string>
+    <string name="module_desc_log">Expéditions, transporteurs, tournées et preuves de livraison.</string>
+    <string name="module_desc_rep">Tableaux de bord, indicateurs, rapports et exports.</string>
+    <string name="obn_socle_titre">Modules support</string>
+    <string name="obn_socle_sous">Briques transverses qui s\'ajoutent à votre profil métier.</string>
+    <string name="obn_socle_recommande">Recommandé</string>
+    <string name="obn_socle_compteur">%1$d option(s) activée(s)</string>
+    <string name="obn_socle_defaut">Rétablir la sélection conseillée</string>
+    <string name="obn_profil_perso_metier">Modules métier</string>
+    <string name="obn_profil_detail_metier">Modules métier</string>
+    <string name="obn_profil_detail_support">Modules support conseillés</string>
 </resources>

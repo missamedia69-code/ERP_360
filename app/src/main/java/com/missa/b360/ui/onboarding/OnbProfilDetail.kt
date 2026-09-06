@@ -34,6 +34,8 @@ import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModuleFonctions
 import com.missa.b360.core.domain.model.ModuleSousElements
 import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.ModulesSocle
+import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ProfilConfiguration
 import com.missa.b360.ui.theme.BrandBlue
@@ -55,28 +57,31 @@ internal fun OnbProfilDetailDialogue(
     titreRes: Int,
     sousTitreRes: Int,
     icone: ImageVector,
+    palier: PalierTaille?,
     dejaChoisi: Boolean,
     onChoisir: () -> Unit,
     onFermer: () -> Unit,
 ) {
     val catalogueComplet = profil == ProfilActivite.CUSTOM
-    val modules: List<ModuleCode> = if (catalogueComplet) {
-        ModuleCode.entries.toList()
+    val metier: List<ModuleCode> = if (catalogueComplet) {
+        ModulesSocle.metier
     } else {
-        ProfilConfiguration.modulesPourProfil(profil)
+        ModulesSocle.metierActifs(profil, emptyList())
     }
-    val blocs: List<Pair<ModuleCode, List<String>>> = modules.map { module ->
-        // Un module activé « en entier » par le profil (valeur null dans la
-        // configuration) doit lister tout son catalogue ; le repli protège
-        // aussi d'une configuration incomplète — jamais de module vide.
-        module to if (catalogueComplet) {
-            ModuleSousElements.pourModule(module)
-        } else {
-            ProfilConfiguration.sousElementsPourModule(profil, module)
-                .ifEmpty { ModuleSousElements.pourModule(module) }
-        }
+    val socle: List<ModuleCode> = if (catalogueComplet) {
+        ModulesSocle.support
+    } else {
+        ModulesSocle.support.filter { it in ModulesSocle.recommandes(profil, palier, metier) }
     }
-    val totalFonctions = blocs.sumOf { it.second.size }
+    // Un module métier peut n'être activé qu'en partie par le profil ; une brique
+    // socle est toujours proposée entière.
+    val blocsMetier = metier.map { module ->
+        module to ProfilConfiguration.sousElementsPourModule(profil, module)
+            .ifEmpty { ModuleSousElements.pourModule(module) }
+    }
+    val blocsSocle = socle.map { module -> module to ModuleSousElements.pourModule(module) }
+    val totalModules = blocsMetier.size + blocsSocle.size
+    val totalFonctions = blocsMetier.sumOf { it.second.size } + blocsSocle.sumOf { it.second.size }
     AlertDialog(
         onDismissRequest = onFermer,
         icon = {
@@ -120,7 +125,7 @@ internal fun OnbProfilDetailDialogue(
                     Text(
                         text = stringResource(
                             R.string.obn_profil_detail_resume,
-                            modules.size,
+                            totalModules,
                             totalFonctions,
                         ),
                         fontSize = 12.5.sp,
@@ -144,8 +149,25 @@ internal fun OnbProfilDetailDialogue(
                         .fillMaxWidth()
                         .heightIn(max = 340.dp),
                 ) {
-                    items(blocs, key = { it.first.name }) { (module, fonctions) ->
+                    item {
+                        OnbProfilDetailSection(
+                            titreRes = R.string.obn_profil_detail_metier,
+                            nombre = blocsMetier.size,
+                        )
+                    }
+                    items(blocsMetier, key = { "metier_" + it.first.name }) { (module, fonctions) ->
                         OnbProfilDetailModule(module = module, fonctions = fonctions)
+                    }
+                    if (blocsSocle.isNotEmpty()) {
+                        item {
+                            OnbProfilDetailSection(
+                                titreRes = R.string.obn_profil_detail_support,
+                                nombre = blocsSocle.size,
+                            )
+                        }
+                        items(blocsSocle, key = { "socle_" + it.first.name }) { (module, fonctions) ->
+                            OnbProfilDetailModule(module = module, fonctions = fonctions)
+                        }
                     }
                 }
             }
@@ -168,6 +190,24 @@ internal fun OnbProfilDetailDialogue(
             }
         },
     )
+}
+
+/** Intertitre d'une section de la boîte (« Modules métier », « Modules support »). */
+@Composable
+private fun OnbProfilDetailSection(titreRes: Int, nombre: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(titreRes),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = BrandBlue,
+            modifier = Modifier.weight(1f),
+        )
+        Text(text = nombre.toString(), fontSize = 11.sp, color = MissaMuted)
+    }
 }
 
 /** Un module de la boîte : puce, nom traduit, compteur et fonctionnalités listées. */
