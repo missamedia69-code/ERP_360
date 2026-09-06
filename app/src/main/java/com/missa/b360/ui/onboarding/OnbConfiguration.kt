@@ -1,7 +1,10 @@
 package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +45,7 @@ import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
 import java.util.TimeZone
 
@@ -53,6 +62,11 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
         viewModel = viewModel,
         onRetour = viewModel::precedent,
     ) {
+        OnbLanguesDrapeaux(
+            selection = viewModel.langue,
+            onSelect = viewModel::appliquerLangue,
+            enabled = !viewModel.enregistrementEnCours,
+        )
         Card(
             shape = RoundedCornerShape(16.dp),
             border = BorderStroke(1.dp, MissaBorder),
@@ -61,22 +75,6 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                val langues = listOf(
-                    "fr" to stringResource(R.string.langue_fr),
-                    "en" to stringResource(R.string.langue_en),
-                    "es" to stringResource(R.string.langue_es),
-                    "ar" to stringResource(R.string.langue_ar),
-                    "zh" to stringResource(R.string.langue_zh),
-                )
-                OnbConfigLigne(
-                    labelRes = R.string.obn_langue,
-                    options = langues,
-                    selectedKey = viewModel.langue,
-                    optionKey = { it.first },
-                    onPick = { viewModel.appliquerLangue(it.first) },
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
                 val fuseaux = OnbZones()
                 OnbConfigLigne(
                     labelRes = R.string.obn_fuseau,
@@ -147,6 +145,68 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                         ),
                     )
                 }
+            }
+        }
+    }
+}
+
+/** Langues proposées : code de locale + drapeau + libellé (accessibilité). */
+private val OnbLangues = listOf(
+    Triple("fr", "🇫🇷", R.string.langue_fr),
+    Triple("en", "🇬🇧", R.string.langue_en),
+    Triple("es", "🇪🇸", R.string.langue_es),
+    Triple("ar", "🇸🇦", R.string.langue_ar),
+    Triple("zh", "🇨🇳", R.string.langue_zh),
+)
+
+/**
+ * Sélecteur de langue horizontal : une rangée de drapeaux cliquables placée
+ * au-dessus de la carte de configuration. Le drapeau actif est mis en avant
+ * (fond bleu clair + bordure de marque) et la langue s'applique immédiatement.
+ */
+@Composable
+private fun OnbLanguesDrapeaux(
+    selection: String,
+    onSelect: (String) -> Unit,
+    enabled: Boolean,
+) {
+    val courant = selection.substringBefore('-').lowercase()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        OnbLangues.forEach { (code, drapeau, labelRes) ->
+            val actif = courant == code
+            val libelle = stringResource(labelRes)
+            Box(
+                modifier = Modifier
+                    .size(width = 54.dp, height = 44.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(if (actif) MissaSoftBlue else MissaSurface)
+                    .border(
+                        width = if (actif) 2.dp else 1.dp,
+                        color = if (actif) BrandBlue else MissaBorder,
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .then(
+                        if (enabled) {
+                            Modifier.clickable(
+                                enabled = true,
+                                onClickLabel = libelle,
+                                role = Role.RadioButton,
+                            ) { onSelect(code) }
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .semantics {
+                        contentDescription = libelle
+                        selected = actif
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(text = drapeau, fontSize = 22.sp)
             }
         }
     }
