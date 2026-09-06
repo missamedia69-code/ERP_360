@@ -93,7 +93,6 @@
     <string name="ob_pays">Country</string>
     <string name="ob_pays_recherche">Search for a country</string>
     <string name="ob_pays_aucun_resultat">No country found</string>
-    <string name="ob_pays_saisie_manuelle">Enter a country and its rate manually</string>
     <string name="ob_pays_personnalise">Custom country</string>
     <string name="ob_pays_saisie_manuelle_note">Enter a country that is not listed, then adjust the VAT/GST rate below.</string>
     <string name="ob_tva_gst">VAT / GST</string>
@@ -1470,5 +1469,7 @@
     <string name="fisc_pack_identifiants">Legal identifiers</string>
     <string name="fisc_pack_indicatif">Dialling code</string>
     <string name="fisc_devise_suggeree">Official currency of %1$s</string>
+    <string name="fisc_pack_personnaliser">Change these values manually</string>
+    <string name="fisc_pack_personnaliser_note">Only needed if the pack does not match your situation.</string>
     <string name="fisc_pack_aucun_pays">Choose a country to apply currency, tax and legal identifiers automatically.</string>
 </resources>

@@ -93,7 +93,6 @@
     <string name="ob_pays">国家/地区</string>
     <string name="ob_pays_recherche">搜索国家或地区</string>
     <string name="ob_pays_aucun_resultat">未找到国家或地区</string>
-    <string name="ob_pays_saisie_manuelle">手动输入国家或地区及其税率</string>
     <string name="ob_pays_personnalise">自定义国家或地区</string>
     <string name="ob_pays_saisie_manuelle_note">输入列表中没有的国家或地区，然后在下方调整增值税或 GST 税率。</string>
     <string name="ob_tva_gst">增值税 / GST</string>
@@ -1449,5 +1448,7 @@
     <string name="fisc_pack_identifiants">法定证照</string>
     <string name="fisc_pack_indicatif">国际区号</string>
     <string name="fisc_devise_suggeree">%1$s的法定货币</string>
+    <string name="fisc_pack_personnaliser">手动修改这些项目</string>
+    <string name="fisc_pack_personnaliser_note">仅当配置与您的实际情况不符时使用。</string>
     <string name="fisc_pack_aucun_pays">选择国家后将自动套用货币、税率和法定证照。</string>
 </resources>

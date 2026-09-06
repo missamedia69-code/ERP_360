@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,8 @@ import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Percent
@@ -91,7 +94,6 @@ private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
-    var saisiePaysManuelle by rememberSaveable { mutableStateOf(false) }
     val locale = LocalConfiguration.current.locales[0]
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     // Devise officielle de chaque pays : calculée une fois, réutilisée par la liste
@@ -186,7 +188,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 }
             }
 
-            // --- Localisation et devise (sélecteur standard) ---
+            // --- Localisation : le pays pilote tout le pack ---
             OnbEntrepriseSection(titreRes = R.string.obn_entreprise_localisation)
             Card(
                 shape = RoundedCornerShape(16.dp),
@@ -202,7 +204,6 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         selectionCle = viewModel.codePays,
                         onSelection = { code ->
                             paysListe.firstOrNull { it.code == code }?.let { pays ->
-                                saisiePaysManuelle = false
                                 viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
                             }
                         },
@@ -211,42 +212,12 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                             stringResource(R.string.ob_selectionne)
                         },
                     )
-                    HorizontalDivider(color = MissaBorder)
-                    MissaSelecteurLigne(
-                        label = stringResource(R.string.obn_devise_principale),
-                        options = optionsDevise,
-                        selectionCle = viewModel.devise,
-                        onSelection = { code -> viewModel.devise = code },
-                        enabled = !viewModel.enregistrementEnCours,
-                    )
-                    TextButton(
-                        onClick = { saisiePaysManuelle = !saisiePaysManuelle },
-                        modifier = Modifier.align(Alignment.Start),
-                    ) {
-                        Text(stringResource(R.string.ob_pays_saisie_manuelle), fontSize = 12.5.sp)
-                    }
-                    if (saisiePaysManuelle) {
-                        Text(
-                            text = stringResource(R.string.ob_pays_saisie_manuelle_note),
-                            fontSize = 11.5.sp,
-                            color = MissaMuted,
-                        )
-                        Spacer(Modifier.height(6.dp))
-                        OutlinedTextField(
-                            value = viewModel.pays,
-                            onValueChange = viewModel::modifierPaysManuel,
-                            label = { Text(stringResource(R.string.ob_pays_personnalise)) },
-                            singleLine = true,
-                            enabled = !viewModel.enregistrementEnCours,
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(Modifier.height(12.dp))
-                    }
                 }
             }
 
-            // --- Pack appliqué par le pays ---
+            // --- Pack appliqué par le pays : valeurs remplies d'office ---
+            // Devise, taux et pays libre ne sont plus des champs permanents : ils
+            // n'apparaissent que derrière l'option « modifier manuellement ».
             OnbPackPays(
                 pays = viewModel.pays,
                 devise = viewModel.devise,
@@ -254,10 +225,57 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                     Iso4217.nomDevise(viewModel.devise, locale)
                 },
                 libelleTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.libelleTaxe,
+                tauxTaxe = viewModel.tauxTaxeTexte,
                 indicatif = Iso4217.indicatifTelephone(viewModel.codePays),
                 zone = zoneFiscale,
                 identifiants = reglesIdentifiants.map { it.libelle },
-            )
+            ) {
+                MissaSelecteurLigne(
+                    label = stringResource(R.string.obn_devise_principale),
+                    options = optionsDevise,
+                    selectionCle = viewModel.devise,
+                    onSelection = { code -> viewModel.devise = code },
+                    enabled = !viewModel.enregistrementEnCours,
+                )
+                HorizontalDivider(color = MissaBorder)
+                OnbChamp(icone = Icons.Outlined.Percent, labelRes = R.string.ob_taux_taxe) {
+                    OutlinedTextField(
+                        value = viewModel.tauxTaxeTexte,
+                        onValueChange = viewModel::modifierTauxTaxe,
+                        singleLine = true,
+                        isError = tauxTaxeInvalide,
+                        enabled = !viewModel.enregistrementEnCours,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        supportingText = {
+                            if (tauxTaxeInvalide) {
+                                Text(stringResource(R.string.ob_erreur_taux_taxe), color = Red40)
+                            } else if (viewModel.pays.isNotBlank()) {
+                                Text(stringResource(R.string.obn_taux_suggere, viewModel.pays))
+                            }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(icone = Icons.Outlined.Public, labelRes = R.string.ob_pays_personnalise) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = viewModel.pays,
+                            onValueChange = viewModel::modifierPaysManuel,
+                            singleLine = true,
+                            enabled = !viewModel.enregistrementEnCours,
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.ob_pays_saisie_manuelle_note),
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                    }
+                }
+            }
 
             // --- Coordonnées et identifiants légaux ---
             OnbEntrepriseSection(
@@ -386,37 +404,18 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                OnbChamp(
-                    icone = Icons.Outlined.Percent,
-                    labelRes = R.string.ob_taux_taxe,
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.tauxTaxeTexte,
-                        onValueChange = viewModel::modifierTauxTaxe,
-                        singleLine = true,
-                        isError = tauxTaxeInvalide,
-                        enabled = !viewModel.enregistrementEnCours,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        supportingText = {
-                            if (tauxTaxeInvalide) {
-                                Text(stringResource(R.string.ob_erreur_taux_taxe), color = Red40)
-                            } else if (viewModel.pays.isNotBlank()) {
-                                Text(stringResource(R.string.obn_taux_suggere, viewModel.pays))
-                            }
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
             }
         }
     }
 }
 
 /**
- * Récapitulatif de ce que le choix du pays a rempli : devise officielle, taxe,
- * indicatif téléphonique, zone fiscale et identifiants légaux attendus.
- * Purement informatif — chaque valeur reste modifiable dans les champs concernés.
+ * Le « pack pays » : tout ce que le choix du pays a rempli d'office — devise,
+ * taxe, indicatif téléphonique, zone fiscale et identifiants légaux attendus.
+ *
+ * Ces éléments n'ont plus de champ permanent ailleurs dans l'écran : ils sont
+ * affichés en lecture et ne redeviennent modifiables que par l'unique option
+ * « modifier manuellement », qui déplie [personnalisation].
  */
 @Composable
 private fun OnbPackPays(
@@ -424,11 +423,24 @@ private fun OnbPackPays(
     devise: String,
     nomDevise: String,
     libelleTaxe: String?,
+    tauxTaxe: String,
     indicatif: String?,
     zone: ZoneFiscale,
     identifiants: List<String>,
+    personnalisation: @Composable ColumnScope.() -> Unit,
 ) {
+    var personnaliser by rememberSaveable { mutableStateOf(false) }
     val libelleZone = stringResource(zone.libelleRes)
+    // Le taux effectif prime ; le nom local de la taxe (entre parenthèses dans le
+    // référentiel : « 19,25 % (TVA) ») le complète sans répéter la valeur.
+    val nomTaxe = libelleTaxe?.substringAfter('(', "")?.substringBefore(')')?.takeIf {
+        it.isNotBlank()
+    }
+    val valeurTaxe = when {
+        tauxTaxe.isBlank() -> libelleTaxe
+        nomTaxe != null -> "$tauxTaxe % ($nomTaxe)"
+        else -> "$tauxTaxe %"
+    }
     Surface(
         color = MissaSoftBlue,
         shape = RoundedCornerShape(14.dp),
@@ -467,7 +479,7 @@ private fun OnbPackPays(
                     labelRes = R.string.obn_devise_principale,
                     valeur = "$devise · $nomDevise",
                 )
-                libelleTaxe?.let { taxe ->
+                valeurTaxe?.let { taxe ->
                     OnbPackLigne(labelRes = R.string.ob_taux_taxe, valeur = taxe)
                 }
                 indicatif?.let { code ->
@@ -484,6 +496,44 @@ private fun OnbPackPays(
                         labelRes = R.string.fisc_pack_identifiants,
                         valeur = identifiants.joinToString(" · "),
                     )
+                }
+            }
+            TextButton(
+                onClick = { personnaliser = !personnaliser },
+                modifier = Modifier.align(Alignment.Start),
+            ) {
+                Icon(
+                    imageVector = if (personnaliser) {
+                        Icons.Outlined.ExpandLess
+                    } else {
+                        Icons.Outlined.ExpandMore
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(17.dp),
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = stringResource(R.string.fisc_pack_personnaliser),
+                    fontSize = 12.5.sp,
+                )
+            }
+            if (personnaliser) {
+                Surface(
+                    color = MissaSurface,
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MissaBorder),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = stringResource(R.string.fisc_pack_personnaliser_note),
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                        personnalisation()
+                        Spacer(Modifier.height(6.dp))
+                    }
                 }
             }
         }

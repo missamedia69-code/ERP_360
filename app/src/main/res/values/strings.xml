@@ -97,7 +97,6 @@
     <string name="ob_pays">Pays</string>
     <string name="ob_pays_recherche">Rechercher un pays</string>
     <string name="ob_pays_aucun_resultat">Aucun pays trouvé</string>
-    <string name="ob_pays_saisie_manuelle">Saisir un pays et son taux manuellement</string>
     <string name="ob_pays_personnalise">Pays personnalisé</string>
     <string name="ob_pays_saisie_manuelle_note">Saisissez un pays absent de la liste, puis ajustez le taux de TVA/GST ci-dessous.</string>
     <string name="ob_tva_gst">TVA / GST</string>
@@ -1477,5 +1476,7 @@
     <string name="fisc_pack_identifiants">Identifiants légaux</string>
     <string name="fisc_pack_indicatif">Indicatif téléphonique</string>
     <string name="fisc_devise_suggeree">Devise officielle de %1$s</string>
+    <string name="fisc_pack_personnaliser">Modifier manuellement ces éléments</string>
+    <string name="fisc_pack_personnaliser_note">À n\'utiliser que si le pack ne correspond pas à votre situation.</string>
     <string name="fisc_pack_aucun_pays">Choisissez un pays pour appliquer automatiquement devise, taxe et identifiants légaux.</string>
 </resources>

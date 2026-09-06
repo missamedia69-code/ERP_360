@@ -93,7 +93,6 @@
     <string name="ob_pays">البلد</string>
     <string name="ob_pays_recherche">ابحث عن بلد</string>
     <string name="ob_pays_aucun_resultat">لم يتم العثور على بلد</string>
-    <string name="ob_pays_saisie_manuelle">إدخال بلد ونسبته يدويًا</string>
     <string name="ob_pays_personnalise">بلد مخصص</string>
     <string name="ob_pays_saisie_manuelle_note">أدخل بلدًا غير موجود في القائمة، ثم عدّل نسبة ضريبة القيمة المضافة أو GST أدناه.</string>
     <string name="ob_tva_gst">ضريبة القيمة المضافة / GST</string>
@@ -1449,5 +1448,7 @@
     <string name="fisc_pack_identifiants">المعرفات القانونية</string>
     <string name="fisc_pack_indicatif">رمز الاتصال</string>
     <string name="fisc_devise_suggeree">العملة الرسمية لـ %1$s</string>
+    <string name="fisc_pack_personnaliser">تعديل هذه العناصر يدويًا</string>
+    <string name="fisc_pack_personnaliser_note">استخدمه فقط إذا كانت الحزمة لا تطابق وضعك.</string>
     <string name="fisc_pack_aucun_pays">اختر دولة لتطبيق العملة والضريبة والمعرفات القانونية تلقائيًا.</string>
 </resources>

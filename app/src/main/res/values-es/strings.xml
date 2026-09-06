@@ -93,7 +93,6 @@
     <string name="ob_pays">País</string>
     <string name="ob_pays_recherche">Buscar un país</string>
     <string name="ob_pays_aucun_resultat">No se encontró ningún país</string>
-    <string name="ob_pays_saisie_manuelle">Introducir manualmente un país y su tasa</string>
     <string name="ob_pays_personnalise">País personalizado</string>
     <string name="ob_pays_saisie_manuelle_note">Introduzca un país que no esté en la lista y ajuste abajo la tasa de IVA/GST.</string>
     <string name="ob_tva_gst">IVA / GST</string>
@@ -1449,5 +1448,7 @@
     <string name="fisc_pack_identifiants">Identificadores legales</string>
     <string name="fisc_pack_indicatif">Prefijo telefónico</string>
     <string name="fisc_devise_suggeree">Moneda oficial de %1$s</string>
+    <string name="fisc_pack_personnaliser">Modificar manualmente estos elementos</string>
+    <string name="fisc_pack_personnaliser_note">Úselo solo si el paquete no corresponde a su situación.</string>
     <string name="fisc_pack_aucun_pays">Elija un país para aplicar automáticamente moneda, impuesto e identificadores legales.</string>
 </resources>
