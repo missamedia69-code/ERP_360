@@ -4,8 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
@@ -32,23 +32,23 @@ import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
-import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Security
@@ -83,6 +83,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -102,6 +103,10 @@ import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaBrandMark
+import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.ui.operations.ReportingViewModel
+import com.missa.b360.ui.operations.detailAlerte
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.MissaBorder
@@ -109,8 +114,8 @@ import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
-import com.missa.b360.ui.navigation.AppModule
-import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.Red40
 import kotlinx.coroutines.launch
 
 /* Palette du tableau de bord mobile. */
@@ -578,6 +583,9 @@ private fun HomeDashboard(
                 purchases = state.achats,
                 stockQuantity = state.quantiteStock,
             )
+        }
+        item {
+            HomeAlertesCard(onVoirTout = { onNavigate(AppModule.REPORTING.route) })
         }
         item {
             ReminderCard(onClick = { onNavigate(Routes.NOTIFICATIONS) })
@@ -1422,4 +1430,77 @@ private fun String?.sizeLabel(): Int? = when (this) {
     "P5" -> R.string.palier_p5
     "P6" -> R.string.palier_p6
     else -> null
+}
+
+/**
+ * Alertes du tableau de bord ramenées sur l'accueil : le reporting vient à
+ * l'utilisateur au lieu d'attendre qu'il ouvre un écran. Seules les alertes des
+ * modules actifs sont retenues ; la carte disparaît quand tout est à jour.
+ */
+@Composable
+private fun HomeAlertesCard(
+    onVoirTout: () -> Unit,
+    viewModel: ReportingViewModel = hiltViewModel(),
+) {
+    val tableau by viewModel.tableau.collectAsState()
+    val devise by viewModel.devise.collectAsState()
+    val modules by viewModel.modulesActifs.collectAsState()
+    val alertes = tableau.alertes.filter { it.code.module in modules }.take(3)
+    if (alertes.isEmpty()) return
+    Surface(
+        shape = RoundedCornerShape(14.dp),
+        color = MissaSurface,
+        border = BorderStroke(1.dp, Red40.copy(alpha = 0.35f)),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onVoirTout),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.WarningAmber,
+                    contentDescription = null,
+                    tint = Red40,
+                    modifier = Modifier.size(17.dp),
+                )
+                Spacer(Modifier.width(7.dp))
+                Text(
+                    text = stringResource(R.string.kpi_titre_alertes),
+                    color = MissaInk,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.5.sp,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = stringResource(R.string.home_see_all),
+                    color = BrandBlue,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 11.sp,
+                )
+            }
+            for (alerte in alertes) {
+                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Red40),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(alerte.code.libelleRes),
+                            color = MissaInk,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 11.5.sp,
+                        )
+                        Text(
+                            text = detailAlerte(alerte, devise),
+                            color = MissaMuted,
+                            fontSize = 10.5.sp,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
