@@ -20,7 +20,7 @@ class ReferentielFiscalTest {
         assertEquals(ZoneFiscale.UEMOA, ReferentielFiscal.zone("ci"))
         assertEquals(ZoneFiscale.UE, ReferentielFiscal.zone("FR"))
         // Pays de l'UE absent de la table détaillée : repli par appartenance.
-        assertEquals(ZoneFiscale.UE, ReferentielFiscal.zone("SE"))
+        assertEquals(ZoneFiscale.UE, ReferentielFiscal.zone("SK"))
         assertEquals(ZoneFiscale.GCC, ReferentielFiscal.zone("QA"))
         assertEquals(ZoneFiscale.AUTRE, ReferentielFiscal.zone(null))
     }
@@ -40,13 +40,27 @@ class ReferentielFiscalTest {
 
     @Test
     fun `pays sans fiche detaillee recoit les libelles de sa zone`() {
-        val suede = regles("SE")
+        // La Slovaquie n'a pas de fiche : elle hérite du vocabulaire de l'Union.
+        val slovaquie = regles("SK")
         assertEquals(
             "N° TVA intracommunautaire",
-            suede.first { it.cle == CleIdentifiant.FISCAL }.libelle,
+            slovaquie.first { it.cle == CleIdentifiant.FISCAL }.libelle,
         )
         val benin = regles("BJ")
         assertEquals("RCCM", benin.first { it.cle == CleIdentifiant.REGISTRE }.libelle)
+    }
+
+    @Test
+    fun `la suede a desormais sa propre fiche`() {
+        val suede = regles("SE")
+        assertEquals(
+            "Momsregistreringsnummer",
+            suede.first { it.cle == CleIdentifiant.FISCAL }.libelle,
+        )
+        assertEquals(
+            "Organisationsnummer",
+            suede.first { it.cle == CleIdentifiant.REGISTRE }.libelle,
+        )
     }
 
     @Test
@@ -60,7 +74,9 @@ class ReferentielFiscalTest {
 
     @Test
     fun `exemples fournis conformes a leur propre motif`() {
-        listOf("CM", "CI", "SN", "MA", "FR", "AE", "SA", "US", "IN", "BR").forEach { code ->
+        // Toutes les fiches, pas un échantillon : une ligne ajoutée à la table
+        // est ainsi contrôlée d'office.
+        ReferentielFiscal.codesDetailles.forEach { code ->
             regles(code).forEach { regle ->
                 assertTrue(
                     "Exemple non conforme pour $code / ${regle.libelle}",

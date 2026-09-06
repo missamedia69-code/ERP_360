@@ -328,4 +328,7 @@ object ReferentielFiscal {
 
     /** Nombre de pays disposant d'une fiche détaillée (diagnostic / tests). */
     val paysDetailles: Int get() = FICHES.size
+
+    /** Codes des pays disposant d'une fiche détaillée (diagnostic / tests). */
+    val codesDetailles: Set<String> get() = FICHES.keys
 }

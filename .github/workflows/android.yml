@@ -56,11 +56,21 @@ jobs:
       - name: Rendre le wrapper exécutable
         run: chmod +x ./gradlew
 
+      # La sortie est conservée : en cas d'échec elle est retraduite en
+      # annotations, seules lisibles quand le journal brut est inaccessible.
       - name: assembleDebug
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace assembleDebug 2>&1 | tee build.log
 
       - name: Tests unitaires
-        run: ./gradlew --no-daemon --stacktrace testDebugUnitTest
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon --stacktrace testDebugUnitTest 2>&1 | tee tests.log
+
+      - name: Récapituler les échecs
+        if: failure()
+        run: python3 .github/scripts/annoter_echecs.py build.log tests.log
 
       - name: APK de débogage
         if: success()
@@ -78,5 +88,8 @@ jobs:
           name: rapports-tests
           path: |
             app/build/reports/tests/
-            app/build/reports/problems/
+            app/build/test-results/
+            build.log
+            tests.log
+          if-no-files-found: ignore
           retention-days: 7
