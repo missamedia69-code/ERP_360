@@ -1,0 +1,82 @@
+name: Build Android
+
+# Vérifie chaque poussée : les traductions d'abord (quelques secondes), puis la
+# compilation et les tests unitaires. L'APK de débogage est publié en artefact.
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+  pull_request:
+  workflow_dispatch:
+
+# Une seule exécution par branche : les poussées successives annulent la précédente.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  traductions:
+    name: Traductions (5 langues)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Parité des fichiers strings.xml
+        run: python3 .github/scripts/verifier_traductions.py
+
+  build:
+    name: Compilation et tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2g
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: SDK Android
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0'
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Rendre le wrapper exécutable
+        run: chmod +x ./gradlew
+
+      - name: assembleDebug
+        run: ./gradlew --no-daemon --stacktrace assembleDebug
+
+      - name: Tests unitaires
+        run: ./gradlew --no-daemon --stacktrace testDebugUnitTest
+
+      - name: APK de débogage
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp360-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Rapports de test (en cas d'échec)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-tests
+          path: |
+            app/build/reports/tests/
+            app/build/reports/problems/
+          retention-days: 7

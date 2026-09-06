@@ -5,6 +5,7 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
@@ -129,3 +130,28 @@ et use cases du socle (`SocleUseCasesTest`).
 - `branding/` — logo officiel `logo_missa.png` + script `gen_icons.ps1` de génération des icônes
 - `app/schemas/` — schémas Room exportés (traçabilité des migrations)
 - `LICENSE` — Apache License 2.0
+
+---
+
+## 🔁 Intégration continue
+
+Chaque poussée sur `main` ou sur une branche `arena/**` déclenche
+[`.github/workflows/android.yml`](.github/workflows/android.yml), en deux temps :
+
+| Étape | Durée | Ce qu'elle garantit |
+|---|---|---|
+| **Traductions** | ~10 s | Les cinq `strings.xml` portent exactement les mêmes clés, avec les mêmes paramètres `%1$s`, et aucune apostrophe non échappée |
+| **Compilation et tests** | ~10 min | `assembleDebug` puis `testDebugUnitTest` sur JDK 21 et SDK 36 |
+
+L'**APK de débogage** est publié en artefact de chaque exécution réussie (14 jours) :
+onglet *Actions* → exécution → *erp360-debug-apk*. En cas d'échec des tests, les rapports
+HTML sont joints à la place.
+
+Le contrôle des traductions s'exécute aussi à la main, sans rien installer :
+
+```bash
+python3 .github/scripts/verifier_traductions.py
+```
+
+Il liste en outre les clés jamais référencées dans le code — simple avertissement,
+une chaîne pouvant être prévue pour un écran à venir.
