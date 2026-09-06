@@ -1453,6 +1453,7 @@
     <string name="fisc_pack_aucun_pays">اختر دولة لتطبيق العملة والضريبة والمعرفات القانونية تلقائيًا.</string>
 
     <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taux_a_renseigner">المعدل بحاجة إلى إدخال</string>
     <string name="fisc_taxe_tva">ضريبة القيمة المضافة</string>
     <string name="fisc_taxe_gst">GST</string>
     <string name="fisc_taxe_gst_hst">GST/HST</string>

@@ -1474,6 +1474,7 @@
     <string name="fisc_pack_aucun_pays">Choose a country to apply currency, tax and legal identifiers automatically.</string>
 
     <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taux_a_renseigner">Rate to be entered</string>
     <string name="fisc_taxe_tva">VAT</string>
     <string name="fisc_taxe_gst">GST</string>
     <string name="fisc_taxe_gst_hst">GST/HST</string>

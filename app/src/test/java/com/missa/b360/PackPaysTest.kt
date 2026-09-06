@@ -17,8 +17,8 @@ class PackPaysTest {
 
     @Test
     fun `chaque pack a un taux de taxe dans le catalogue`() {
-        // Le taux standard n'est pas dupliqué dans le pack : il doit donc exister
-        // dans le catalogue, seule source de vérité.
+        // Ni le taux ni la nature de la taxe ne sont dupliqués dans le pack :
+        // ils doivent donc exister au catalogue, seule source de vérité.
         val sansTaux = ReferentielPackPays.paysCouverts.filterNot { code ->
             Iso4217.TAXES_SUGGEREES.containsKey(code)
         }
@@ -26,12 +26,12 @@ class PackPaysTest {
     }
 
     @Test
-    fun `un pays sans taxe a un taux nul et inversement`() {
+    fun `un pays sans taxe n a ni taux ni taux reduits`() {
         ReferentielPackPays.TABLE.values.forEach { pack ->
-            val taux = Iso4217.TAXES_SUGGEREES.getValue(pack.code).tauxParDefaut
-            if (pack.typeTaxe == TypeTaxe.AUCUNE) {
-                assertEquals("Taxe inattendue pour ${pack.code}", 0.0, taux, 0.0)
-                assertTrue(pack.tauxReduits.isEmpty())
+            val taxe = Iso4217.TAXES_SUGGEREES.getValue(pack.code)
+            if (taxe.type == TypeTaxe.AUCUNE) {
+                assertEquals("Taxe inattendue pour ${pack.code}", 0.0, taxe.tauxParDefaut, 0.0)
+                assertTrue("Taux réduits incohérents pour ${pack.code}", pack.tauxReduits.isEmpty())
             }
         }
     }
@@ -64,7 +64,7 @@ class PackPaysTest {
         val cm = ReferentielPackPays.pack("cm")
         assertNotNull(cm)
         requireNotNull(cm)
-        assertEquals(TypeTaxe.TVA, cm.typeTaxe)
+        assertEquals(TypeTaxe.TVA, Iso4217.TAXES_SUGGEREES.getValue("CM").type)
         assertEquals(19.25, Iso4217.TAXES_SUGGEREES.getValue("CM").tauxParDefaut, 0.0)
         assertEquals(33.0, cm.impotSocietes, 0.0)
         assertEquals("XAF", Iso4217.deviseDuPays("CM"))

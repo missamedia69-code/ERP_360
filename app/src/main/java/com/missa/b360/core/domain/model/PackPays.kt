@@ -37,7 +37,7 @@ data class EFacturation(
 /**
  * Le « pack pays » : ce que la seule sélection du pays permet de pré-remplir.
  *
- * Le taux de taxe standard n'est volontairement pas répété ici — il vit dans
+ * Ni le taux de taxe standard ni sa nature ne sont répétés ici : ils vivent dans
  * [com.missa.b360.core.util.Iso4217.TAXES_SUGGEREES], seule source de vérité —
  * pas plus que la devise, déduite du référentiel ISO du système, ni la zone
  * fiscale et les identifiants légaux, portés par [ReferentielFiscal].
@@ -50,7 +50,6 @@ data class EFacturation(
  */
 data class PackPays(
     val code: String,
-    val typeTaxe: TypeTaxe,
     val tauxReduits: List<Double> = emptyList(),
     val seuilAssujettissement: Long? = null,
     val impotSocietes: Double,
@@ -72,7 +71,6 @@ object ReferentielPackPays {
         mapOf(
             "BJ" to PackPays(
                 code = "BJ",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -81,7 +79,6 @@ object ReferentielPackPays {
             ),
             "BF" to PackPays(
                 code = "BF",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 27.5,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -89,7 +86,6 @@ object ReferentielPackPays {
             ),
             "CI" to PackPays(
                 code = "CI",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 9.0),
                 seuilAssujettissement = 50_000_000,
                 impotSocietes = 25.0,
@@ -99,7 +95,6 @@ object ReferentielPackPays {
             ),
             "ML" to PackPays(
                 code = "ML",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -107,7 +102,6 @@ object ReferentielPackPays {
             ),
             "NE" to PackPays(
                 code = "NE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -115,7 +109,6 @@ object ReferentielPackPays {
             ),
             "SN" to PackPays(
                 code = "SN",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -123,7 +116,6 @@ object ReferentielPackPays {
             ),
             "TG" to PackPays(
                 code = "TG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 27.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -131,7 +123,6 @@ object ReferentielPackPays {
             ),
             "CM" to PackPays(
                 code = "CM",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0),
                 impotSocietes = 33.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -139,7 +130,6 @@ object ReferentielPackPays {
             ),
             "GA" to PackPays(
                 code = "GA",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -147,7 +137,6 @@ object ReferentielPackPays {
             ),
             "CG" to PackPays(
                 code = "CG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 impotSocietes = 28.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -155,7 +144,6 @@ object ReferentielPackPays {
             ),
             "CF" to PackPays(
                 code = "CF",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0),
                 seuilAssujettissement = 30_000_000,
                 impotSocietes = 30.0,
@@ -164,7 +152,6 @@ object ReferentielPackPays {
             ),
             "TD" to PackPays(
                 code = "TD",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(9.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -173,7 +160,6 @@ object ReferentielPackPays {
             ),
             "GQ" to PackPays(
                 code = "GQ",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0),
                 impotSocietes = 25.0,
                 impotSocietesMinimum = 1.5,
@@ -182,7 +168,6 @@ object ReferentielPackPays {
             ),
             "KM" to PackPays(
                 code = "KM",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(3.0, 5.0, 7.5),
                 impotSocietes = 35.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -190,7 +175,6 @@ object ReferentielPackPays {
             ),
             "GN" to PackPays(
                 code = "GN",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0),
                 seuilAssujettissement = 50_000_000,
                 impotSocietes = 25.0,
@@ -201,7 +185,6 @@ object ReferentielPackPays {
             ),
             "CD" to PackPays(
                 code = "CD",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -210,7 +193,6 @@ object ReferentielPackPays {
             ),
             "MA" to PackPays(
                 code = "MA",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(7.0, 10.0, 14.0),
                 seuilAssujettissement = 500_000,
                 impotSocietes = 20.0,
@@ -220,7 +202,6 @@ object ReferentielPackPays {
             ),
             "TN" to PackPays(
                 code = "TN",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(7.0, 13.0),
                 impotSocietes = 20.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -228,7 +209,6 @@ object ReferentielPackPays {
             ),
             "DZ" to PackPays(
                 code = "DZ",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(9.0),
                 impotSocietes = 26.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -236,7 +216,6 @@ object ReferentielPackPays {
             ),
             "EG" to PackPays(
                 code = "EG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 seuilAssujettissement = 500_000,
                 impotSocietes = 22.5,
@@ -246,7 +225,6 @@ object ReferentielPackPays {
             ),
             "KE" to PackPays(
                 code = "KE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(8.0),
                 seuilAssujettissement = 5_000_000,
                 impotSocietes = 30.0,
@@ -256,7 +234,6 @@ object ReferentielPackPays {
             ),
             "TZ" to PackPays(
                 code = "TZ",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -264,7 +241,6 @@ object ReferentielPackPays {
             ),
             "UG" to PackPays(
                 code = "UG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -273,7 +249,6 @@ object ReferentielPackPays {
             ),
             "NG" to PackPays(
                 code = "NG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 seuilAssujettissement = 25_000_000,
                 impotSocietes = 30.0,
@@ -282,7 +257,6 @@ object ReferentielPackPays {
             ),
             "GH" to PackPays(
                 code = "GH",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(3.0, 5.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -290,7 +264,6 @@ object ReferentielPackPays {
             ),
             "ZA" to PackPays(
                 code = "ZA",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 seuilAssujettissement = 1_000_000,
                 impotSocietes = 27.0,
@@ -300,7 +273,6 @@ object ReferentielPackPays {
             ),
             "FR" to PackPays(
                 code = "FR",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(2.1, 5.5, 10.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -309,7 +281,6 @@ object ReferentielPackPays {
             ),
             "DE" to PackPays(
                 code = "DE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(7.0),
                 impotSocietes = 15.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -318,7 +289,6 @@ object ReferentielPackPays {
             ),
             "IT" to PackPays(
                 code = "IT",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 10.0),
                 impotSocietes = 24.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -327,7 +297,6 @@ object ReferentielPackPays {
             ),
             "ES" to PackPays(
                 code = "ES",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(4.0, 10.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -336,7 +305,6 @@ object ReferentielPackPays {
             ),
             "NL" to PackPays(
                 code = "NL",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(9.0),
                 impotSocietes = 19.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -345,7 +313,6 @@ object ReferentielPackPays {
             ),
             "BE" to PackPays(
                 code = "BE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0, 12.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -354,7 +321,6 @@ object ReferentielPackPays {
             ),
             "PT" to PackPays(
                 code = "PT",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0, 13.0),
                 impotSocietes = 21.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -363,7 +329,6 @@ object ReferentielPackPays {
             ),
             "IE" to PackPays(
                 code = "IE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(4.8, 9.0, 13.5),
                 impotSocietes = 12.5,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -372,7 +337,6 @@ object ReferentielPackPays {
             ),
             "FI" to PackPays(
                 code = "FI",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0, 14.0),
                 impotSocietes = 20.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -381,7 +345,6 @@ object ReferentielPackPays {
             ),
             "GR" to PackPays(
                 code = "GR",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0, 13.0),
                 impotSocietes = 22.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -390,7 +353,6 @@ object ReferentielPackPays {
             ),
             "PL" to PackPays(
                 code = "PL",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 8.0),
                 impotSocietes = 19.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -399,7 +361,6 @@ object ReferentielPackPays {
             ),
             "CZ" to PackPays(
                 code = "CZ",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(12.0),
                 impotSocietes = 21.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -408,7 +369,6 @@ object ReferentielPackPays {
             ),
             "SE" to PackPays(
                 code = "SE",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0, 12.0),
                 impotSocietes = 20.6,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -417,7 +377,6 @@ object ReferentielPackPays {
             ),
             "DK" to PackPays(
                 code = "DK",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 22.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
                 impotRevenuMax = 56.0,
@@ -425,7 +384,6 @@ object ReferentielPackPays {
             ),
             "HU" to PackPays(
                 code = "HU",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 18.0),
                 impotSocietes = 9.0,
                 impotRevenu = TypeImpotRevenu.FORFAITAIRE,
@@ -434,7 +392,6 @@ object ReferentielPackPays {
             ),
             "RO" to PackPays(
                 code = "RO",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 9.0),
                 impotSocietes = 16.0,
                 impotRevenu = TypeImpotRevenu.FORFAITAIRE,
@@ -443,7 +400,6 @@ object ReferentielPackPays {
             ),
             "BG" to PackPays(
                 code = "BG",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(9.0),
                 impotSocietes = 10.0,
                 impotRevenu = TypeImpotRevenu.FORFAITAIRE,
@@ -452,7 +408,6 @@ object ReferentielPackPays {
             ),
             "GB" to PackPays(
                 code = "GB",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 seuilAssujettissement = 90_000,
                 impotSocietes = 25.0,
@@ -462,7 +417,6 @@ object ReferentielPackPays {
             ),
             "CH" to PackPays(
                 code = "CH",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(2.5, 3.8),
                 seuilAssujettissement = 100_000,
                 impotSocietes = 11.9,
@@ -472,14 +426,12 @@ object ReferentielPackPays {
             ),
             "MC" to PackPays(
                 code = "MC",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(2.1, 5.5, 10.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "AD" to PackPays(
                 code = "AD",
-                typeTaxe = TypeTaxe.IGI,
                 tauxReduits = listOf(1.0, 2.5),
                 impotSocietes = 10.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -487,7 +439,6 @@ object ReferentielPackPays {
             ),
             "AE" to PackPays(
                 code = "AE",
-                typeTaxe = TypeTaxe.TVA,
                 seuilAssujettissement = 375_000,
                 impotSocietes = 9.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
@@ -495,7 +446,6 @@ object ReferentielPackPays {
             ),
             "SA" to PackPays(
                 code = "SA",
-                typeTaxe = TypeTaxe.TVA,
                 seuilAssujettissement = 375_000,
                 impotSocietes = 20.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
@@ -503,32 +453,27 @@ object ReferentielPackPays {
             ),
             "OM" to PackPays(
                 code = "OM",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 15.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
                 eFacturation = EFacturation(obligatoire = true, systeme = "Fawtara", format = "Peppol PINT-OM"),
             ),
             "QA" to PackPays(
                 code = "QA",
-                typeTaxe = TypeTaxe.AUCUNE,
                 impotSocietes = 10.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "KW" to PackPays(
                 code = "KW",
-                typeTaxe = TypeTaxe.AUCUNE,
                 impotSocietes = 15.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "BH" to PackPays(
                 code = "BH",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 10.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "CO" to PackPays(
                 code = "CO",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0),
                 impotSocietes = 35.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -537,7 +482,6 @@ object ReferentielPackPays {
             ),
             "BR" to PackPays(
                 code = "BR",
-                typeTaxe = TypeTaxe.ICMS,
                 tauxReduits = listOf(7.0, 12.0),
                 impotSocietes = 34.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -546,7 +490,6 @@ object ReferentielPackPays {
             ),
             "MX" to PackPays(
                 code = "MX",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(8.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -555,7 +498,6 @@ object ReferentielPackPays {
             ),
             "AR" to PackPays(
                 code = "AR",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.5),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -564,7 +506,6 @@ object ReferentielPackPays {
             ),
             "CL" to PackPays(
                 code = "CL",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 27.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
                 impotRevenuMax = 40.0,
@@ -572,7 +513,6 @@ object ReferentielPackPays {
             ),
             "PE" to PackPays(
                 code = "PE",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 29.5,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
                 impotRevenuMax = 30.0,
@@ -580,7 +520,6 @@ object ReferentielPackPays {
             ),
             "UY" to PackPays(
                 code = "UY",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(10.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -589,7 +528,6 @@ object ReferentielPackPays {
             ),
             "PA" to PackPays(
                 code = "PA",
-                typeTaxe = TypeTaxe.ITBMS,
                 tauxReduits = listOf(5.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -597,7 +535,6 @@ object ReferentielPackPays {
             ),
             "CR" to PackPays(
                 code = "CR",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(1.0, 2.0, 4.0),
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -606,7 +543,6 @@ object ReferentielPackPays {
             ),
             "IN" to PackPays(
                 code = "IN",
-                typeTaxe = TypeTaxe.GST,
                 tauxReduits = listOf(5.0, 12.0, 28.0),
                 seuilAssujettissement = 4_000_000,
                 impotSocietes = 25.0,
@@ -616,7 +552,6 @@ object ReferentielPackPays {
             ),
             "SG" to PackPays(
                 code = "SG",
-                typeTaxe = TypeTaxe.GST,
                 seuilAssujettissement = 1_000_000,
                 impotSocietes = 17.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -625,7 +560,6 @@ object ReferentielPackPays {
             ),
             "MY" to PackPays(
                 code = "MY",
-                typeTaxe = TypeTaxe.SST,
                 seuilAssujettissement = 500_000,
                 impotSocietes = 24.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -634,7 +568,6 @@ object ReferentielPackPays {
             ),
             "TH" to PackPays(
                 code = "TH",
-                typeTaxe = TypeTaxe.TVA,
                 seuilAssujettissement = 1_800_000,
                 impotSocietes = 20.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -643,7 +576,6 @@ object ReferentielPackPays {
             ),
             "VN" to PackPays(
                 code = "VN",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(5.0, 8.0),
                 impotSocietes = 20.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -652,7 +584,6 @@ object ReferentielPackPays {
             ),
             "ID" to PackPays(
                 code = "ID",
-                typeTaxe = TypeTaxe.TVA,
                 seuilAssujettissement = 4_800_000_000,
                 impotSocietes = 22.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -661,7 +592,6 @@ object ReferentielPackPays {
             ),
             "CN" to PackPays(
                 code = "CN",
-                typeTaxe = TypeTaxe.TVA,
                 tauxReduits = listOf(6.0, 9.0),
                 impotSocietes = 25.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -670,7 +600,6 @@ object ReferentielPackPays {
             ),
             "JP" to PackPays(
                 code = "JP",
-                typeTaxe = TypeTaxe.CONSOMMATION,
                 tauxReduits = listOf(8.0),
                 impotSocietes = 23.2,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -678,7 +607,6 @@ object ReferentielPackPays {
             ),
             "KR" to PackPays(
                 code = "KR",
-                typeTaxe = TypeTaxe.TVA,
                 impotSocietes = 24.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
                 impotRevenuMax = 49.5,
@@ -686,7 +614,6 @@ object ReferentielPackPays {
             ),
             "AU" to PackPays(
                 code = "AU",
-                typeTaxe = TypeTaxe.GST,
                 seuilAssujettissement = 75_000,
                 impotSocietes = 30.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -695,7 +622,6 @@ object ReferentielPackPays {
             ),
             "NZ" to PackPays(
                 code = "NZ",
-                typeTaxe = TypeTaxe.GST,
                 seuilAssujettissement = 60_000,
                 impotSocietes = 28.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -704,14 +630,12 @@ object ReferentielPackPays {
             ),
             "US" to PackPays(
                 code = "US",
-                typeTaxe = TypeTaxe.VENTES,
                 impotSocietes = 21.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
                 impotRevenuMax = 37.0,
             ),
             "CA" to PackPays(
                 code = "CA",
-                typeTaxe = TypeTaxe.GST_HST,
                 seuilAssujettissement = 30_000,
                 impotSocietes = 15.0,
                 impotRevenu = TypeImpotRevenu.PROGRESSIF,
@@ -719,19 +643,16 @@ object ReferentielPackPays {
             ),
             "BS" to PackPays(
                 code = "BS",
-                typeTaxe = TypeTaxe.AUCUNE,
                 impotSocietes = 0.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "BM" to PackPays(
                 code = "BM",
-                typeTaxe = TypeTaxe.AUCUNE,
                 impotSocietes = 0.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),
             "KY" to PackPays(
                 code = "KY",
-                typeTaxe = TypeTaxe.AUCUNE,
                 impotSocietes = 0.0,
                 impotRevenu = TypeImpotRevenu.AUCUN,
             ),

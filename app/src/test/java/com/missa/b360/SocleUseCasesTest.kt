@@ -4,11 +4,13 @@ import com.missa.b360.core.domain.usecase.CheckCreditLimitUseCase
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.security.PinHasher
+import com.missa.b360.core.domain.model.TypeTaxe
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
 import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -106,8 +108,11 @@ class SocleUseCasesTest {
         val cameroun = pays.firstOrNull { it.code == "CM" }
         assertEquals(19.25, cameroun?.tauxTaxeSuggere ?: -1.0, 0.0)
         assertEquals(25.5, Iso4217.TAXES_SUGGEREES.getValue("FI").tauxParDefaut, 0.0)
-        assertEquals("5 % (GST) + HST 13–15 %", Iso4217.TAXES_SUGGEREES.getValue("CA").libelle)
-        assertEquals("Aucune (Sales Tax par État)", Iso4217.TAXES_SUGGEREES.getValue("US").libelle)
+        assertEquals(TypeTaxe.TVA, cameroun?.typeTaxe)
+        assertEquals(TypeTaxe.GST_HST, Iso4217.TAXES_SUGGEREES.getValue("CA").type)
+        assertEquals(TypeTaxe.VENTES, Iso4217.TAXES_SUGGEREES.getValue("US").type)
+        // Un territoire inconnu du référentiel n'invente pas un taux nul crédible.
+        assertNull(pays.firstOrNull { it.code == "AQ" }?.typeTaxe)
         assertTrue(pays.all { it.tauxTaxeSuggere >= 0.0 })
     }
 }

@@ -1453,6 +1453,7 @@
     <string name="fisc_pack_aucun_pays">选择国家后将自动套用货币、税率和法定证照。</string>
 
     <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taux_a_renseigner">税率待填写</string>
     <string name="fisc_taxe_tva">增值税</string>
     <string name="fisc_taxe_gst">商品服务税</string>
     <string name="fisc_taxe_gst_hst">GST/HST</string>

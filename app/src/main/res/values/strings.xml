@@ -1481,6 +1481,7 @@
     <string name="fisc_pack_aucun_pays">Choisissez un pays pour appliquer automatiquement devise, taxe et identifiants légaux.</string>
 
     <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taux_a_renseigner">Taux à renseigner</string>
     <string name="fisc_taxe_tva">TVA</string>
     <string name="fisc_taxe_gst">GST</string>
     <string name="fisc_taxe_gst_hst">GST/HST</string>

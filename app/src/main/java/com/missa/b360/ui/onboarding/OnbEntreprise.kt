@@ -107,18 +107,10 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
         paysListe.associate { pays -> pays.code to Iso4217.deviseDuPays(pays.code) }
     }
     val optionsPays = paysListe.map { pays ->
-        val typeTaxe = ReferentielPackPays.pack(pays.code)?.typeTaxe
         MissaOption(
             cle = pays.code,
             titre = pays.nom,
-            // Le taux n'est affiché qu'une fois, suivi de la nature locale de la
-            // taxe (TVA, VAT, GST…) ; repli sur le libellé du catalogue.
-            sousTitre = when (typeTaxe) {
-                null -> pays.libelleTaxe
-                TypeTaxe.AUCUNE -> stringResource(TypeTaxe.AUCUNE.libelleRes)
-                else -> Iso4217.formatPourcentage(pays.tauxTaxeSuggere) +
-                    " · " + stringResource(typeTaxe.libelleRes)
-            },
+            sousTitre = libelleTaxePays(pays.typeTaxe, pays.tauxTaxeSuggere),
             badge = pays.code,
             badgeSecondaire = devisesParPays[pays.code],
         )
@@ -236,7 +228,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 nomDevise = remember(viewModel.devise, locale) {
                     Iso4217.nomDevise(viewModel.devise, locale)
                 },
-                libelleTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.libelleTaxe,
+                typeTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe,
                 tauxTaxe = viewModel.tauxTaxeTexte,
                 pack = ReferentielPackPays.pack(viewModel.codePays),
                 indicatif = Iso4217.indicatifTelephone(viewModel.codePays),
@@ -435,7 +427,7 @@ private fun OnbPackPays(
     pays: String,
     devise: String,
     nomDevise: String,
-    libelleTaxe: String?,
+    typeTaxe: TypeTaxe?,
     tauxTaxe: String,
     pack: PackPays?,
     indicatif: String?,
@@ -445,14 +437,12 @@ private fun OnbPackPays(
 ) {
     var personnaliser by rememberSaveable { mutableStateOf(false) }
     val libelleZone = stringResource(zone.libelleRes)
-    // Le taux effectif prime, suivi de la nature locale de la taxe issue du
-    // référentiel détaillé ; à défaut, le libellé du catalogue fait foi.
-    val nomTaxe = pack?.typeTaxe?.let { stringResource(it.libelleRes) }
+    // Le taux saisi prime sur le taux catalogue : c'est lui qui sera enregistré.
     val valeurTaxe = when {
-        pack?.typeTaxe == TypeTaxe.AUCUNE -> nomTaxe
-        tauxTaxe.isBlank() -> libelleTaxe
-        nomTaxe != null -> "$tauxTaxe % · $nomTaxe"
-        else -> libelleTaxe ?: "$tauxTaxe %"
+        typeTaxe == null -> stringResource(R.string.fisc_taux_a_renseigner)
+        typeTaxe == TypeTaxe.AUCUNE -> stringResource(typeTaxe.libelleRes)
+        tauxTaxe.isBlank() -> stringResource(typeTaxe.libelleRes)
+        else -> "$tauxTaxe % · " + stringResource(typeTaxe.libelleRes)
     }
     Surface(
         color = MissaSoftBlue,
@@ -492,9 +482,7 @@ private fun OnbPackPays(
                     labelRes = R.string.obn_devise_principale,
                     valeur = "$devise · $nomDevise",
                 )
-                valeurTaxe?.let { taxe ->
-                    OnbPackLigne(labelRes = R.string.fisc_pack_taxe, valeur = taxe)
-                }
+                OnbPackLigne(labelRes = R.string.fisc_pack_taxe, valeur = valeurTaxe)
                 pack?.tauxReduits?.takeIf { it.isNotEmpty() }?.let { reduits ->
                     OnbPackLigne(
                         labelRes = R.string.fisc_pack_taux_reduits,
@@ -609,6 +597,19 @@ private fun OnbPackPays(
             }
         }
     }
+}
+
+/**
+ * Libellé unique de la taxe d'un pays, pour la liste comme pour le pack :
+ * « 19,25 % · TVA », « Aucune taxe à la consommation » quand le pays n'en lève
+ * pas, « Taux à renseigner » quand le référentiel ignore le territoire — jamais
+ * un « 0 % » qui laisserait croire à une exonération.
+ */
+@Composable
+private fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
+    typeTaxe == null -> stringResource(R.string.fisc_taux_a_renseigner)
+    typeTaxe == TypeTaxe.AUCUNE || taux <= 0.0 -> stringResource(typeTaxe.libelleRes)
+    else -> Iso4217.formatPourcentage(taux) + " · " + stringResource(typeTaxe.libelleRes)
 }
 
 /** Ligne « libellé — valeur » du pack pays. */
