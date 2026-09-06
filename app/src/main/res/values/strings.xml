@@ -1086,13 +1086,11 @@
     <string name="obn_entreprise_sous">Ces informations seront utilisées pour personnaliser votre environnement.</string>
     <string name="obn_nom_ex">ex: Missa SARL</string>
     <string name="obn_secteur">Secteur d\'activité</string>
-    <string name="obn_secteur_ex">Sélectionnez</string>
+    <string name="obn_secteur_ex">ex : Commerce de détail</string>
     <string name="obn_devise_principale">Devise principale</string>
     <string name="obn_logo_titre">Ajoutez votre logo</string>
     <string name="obn_logo_optionnel">Optionnel</string>
     <string name="obn_logo_description">Personnalisez votre application avec le logo de votre entreprise.</string>
-    <string name="obn_logo_deposer">Déposer votre logo ici</string>
-    <string name="obn_logo_ou">ou</string>
     <string name="obn_logo_parcourir">Parcourir</string>
     <string name="obn_logo_formats">Formats acceptés : PNG, JPG — Taille max : 2MB</string>
     <string name="obn_logo_trop_grand">Image trop lourde (taille max : 2MB)</string>
@@ -1438,7 +1436,6 @@
     <string name="obn_socle_deplier">Afficher les modules support</string>
     <string name="obn_socle_replier">Masquer les modules support</string>
     <string name="obn_entreprise_localisation">Localisation et devise</string>
-    <string name="obn_entreprise_exploitation">Site et fiscalité</string>
     <string name="obn_taux_suggere">Taux suggéré pour %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1448,7 +1445,6 @@
     <string name="obn_email_ex">contact@entreprise.com</string>
     <string name="obn_adresse">Adresse</string>
     <string name="obn_adresse_ex">Rue, quartier, ville</string>
-    <string name="obn_entreprise_contact">Coordonnées et identifiants légaux</string>
     <string name="obn_entreprise_contact_sous">Reprises automatiquement sur vos devis, factures et bons de livraison.</string>
     <string name="obn_erreur_email_entreprise">Adresse e-mail invalide.</string>
 
@@ -1472,7 +1468,6 @@
 
     <!-- Pack pays : devise, taxe, indicatif, identifiants -->
     <string name="fisc_pack_titre">Pack pays appliqué</string>
-    <string name="fisc_pack_note">Renseigné d\'après %1$s. Tout reste modifiable ci-dessous.</string>
     <string name="fisc_pack_identifiants">Identifiants légaux</string>
     <string name="fisc_pack_indicatif">Indicatif téléphonique</string>
     <string name="fisc_devise_suggeree">Devise officielle de %1$s</string>
@@ -1507,4 +1502,10 @@
     <string name="fisc_pack_efacture_facultative">Facultative · %1$s</string>
     <string name="fisc_pack_efacture_aucune">Aucun dispositif national</string>
     <string name="fisc_pack_seuil_aucun">Aucun seuil : taxe due dès le premier franc</string>
+    <string name="obn_section_identite">Identité de l\'entreprise</string>
+    <string name="obn_section_coordonnees">Coordonnées</string>
+    <string name="obn_section_a_completer">À compléter</string>
+    <string name="obn_section_format">Format</string>
+    <string name="obn_logo_present">Logo ajouté</string>
+    <string name="fisc_pack_detail">Détail fiscal</string>
 </resources>

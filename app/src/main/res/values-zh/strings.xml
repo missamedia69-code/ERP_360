@@ -1058,13 +1058,11 @@
     <string name="obn_entreprise_sous">这些信息将用于个性化您的环境。</string>
     <string name="obn_nom_ex">例：Missa SARL</string>
     <string name="obn_secteur">业务领域</string>
-    <string name="obn_secteur_ex">请选择</string>
+    <string name="obn_secteur_ex">例：零售业</string>
     <string name="obn_devise_principale">主要货币</string>
     <string name="obn_logo_titre">添加您的标志</string>
     <string name="obn_logo_optionnel">可选</string>
     <string name="obn_logo_description">使用您的企业标志个性化您的应用。</string>
-    <string name="obn_logo_deposer">在此放置您的标志</string>
-    <string name="obn_logo_ou">或</string>
     <string name="obn_logo_parcourir">浏览</string>
     <string name="obn_logo_formats">接受的格式：PNG、JPG — 最大 2MB</string>
     <string name="obn_logo_trop_grand">图片过大（最大 2MB）</string>
@@ -1410,7 +1408,6 @@
     <string name="obn_socle_deplier">显示支撑模块</string>
     <string name="obn_socle_replier">隐藏支撑模块</string>
     <string name="obn_entreprise_localisation">地区与货币</string>
-    <string name="obn_entreprise_exploitation">场所与税务</string>
     <string name="obn_taux_suggere">%1$s 的建议税率</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1420,7 +1417,6 @@
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">地址</string>
     <string name="obn_adresse_ex">街道、区、城市</string>
-    <string name="obn_entreprise_contact">联系方式与法定证照</string>
     <string name="obn_entreprise_contact_sous">将自动出现在报价单、发票和送货单上。</string>
     <string name="obn_erreur_email_entreprise">电子邮箱地址无效。</string>
 
@@ -1444,7 +1440,6 @@
 
     <!-- Pack pays : devise, taxe, indicatif, identifiants -->
     <string name="fisc_pack_titre">已套用国家配置</string>
-    <string name="fisc_pack_note">根据%1$s自动填写，以下内容均可修改。</string>
     <string name="fisc_pack_identifiants">法定证照</string>
     <string name="fisc_pack_indicatif">国际区号</string>
     <string name="fisc_devise_suggeree">%1$s的法定货币</string>
@@ -1479,4 +1474,10 @@
     <string name="fisc_pack_efacture_facultative">可选 · %1$s</string>
     <string name="fisc_pack_efacture_aucune">暂无国家系统</string>
     <string name="fisc_pack_seuil_aucun">无起征点：首笔交易即计税</string>
+    <string name="obn_section_identite">企业身份</string>
+    <string name="obn_section_coordonnees">联系方式</string>
+    <string name="obn_section_a_completer">待填写</string>
+    <string name="obn_section_format">格式</string>
+    <string name="obn_logo_present">已添加标志</string>
+    <string name="fisc_pack_detail">税务明细</string>
 </resources>

@@ -4,13 +4,13 @@ import android.content.Intent
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,18 +24,20 @@ import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Percent
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Storefront
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -59,7 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
@@ -74,6 +76,7 @@ import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaOption
+import com.missa.b360.ui.components.MissaSectionPliable
 import com.missa.b360.ui.components.MissaSelecteurLigne
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
@@ -88,13 +91,16 @@ private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
 private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 
 /**
- * Écran 4 — Informations sur votre entreprise : identité, localisation, devise,
- * coordonnées et identifiants légaux (NIU / RCCM), logo, site principal et taux
- * de taxe.
+ * Écran 4 — Informations sur votre entreprise.
  *
- * Pays et devise passent par le sélecteur standard [MissaSelecteurLigne]
- * (recherche insensible aux accents, catalogue détaillé) ; site principal et
- * taux de taxe sont visibles directement, sans « Plus de détails » à déplier.
+ * L'écran est découpé en cinq sections repliables de même facture
+ * ([MissaSectionPliable]) : identité, localisation et fiscalité, coordonnées,
+ * identifiants légaux, logo. Replié, chaque bloc résume en une ligne ce qu'il
+ * contient ; les deux premiers — les seuls indispensables — sont ouverts
+ * d'emblée. L'ensemble tient ainsi dans un écran et demi au lieu de trois.
+ *
+ * Les champs utilisent le libellé flottant de Material 3 plutôt qu'un titre
+ * posé au-dessus : même information, une trentaine de points gagnés par champ.
  */
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
@@ -135,14 +141,18 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 badge = devise.code,
             )
         }
+    val typeTaxePays = paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
     val emailValide = viewModel.emailEntrepriseEstValide()
     val zoneFiscale = ReferentielFiscal.zone(viewModel.codePays)
+    val indicatif = Iso4217.indicatifTelephone(viewModel.codePays)
     val reglesIdentifiants = ReferentielFiscal.regles(
         codePays = viewModel.codePays,
         libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
         libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
     )
+    val aCompleter = stringResource(R.string.obn_section_a_completer)
+    val facultatif = stringResource(R.string.obn_logo_optionnel)
 
     OnbScaffold(
         titreRes = R.string.obn_entreprise_titre,
@@ -154,275 +164,337 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // --- Identité de l'entreprise ---
-            OnbEntrepriseCarte {
-                OnbChamp(
-                    icone = Icons.Outlined.Business,
-                    labelRes = R.string.ob_nom_entreprise,
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.nomEntreprise,
-                        onValueChange = { nom ->
+            // --- 1. Identité : ce qui nomme l'entreprise et son site ---
+            MissaSectionPliable(
+                titre = stringResource(R.string.obn_section_identite),
+                icone = Icons.Outlined.Business,
+                resume = resume(
+                    viewModel.nomEntreprise,
+                    viewModel.secteur,
+                    viewModel.nomSitePrincipal.takeIf { it != viewModel.nomEntreprise },
+                ),
+                etiquette = aCompleter.takeIf { viewModel.nomEntreprise.isBlank() },
+                ouvertParDefaut = true,
+            ) {
+                OnbChampsEmpiles {
+                    OnbChampTexte(
+                        valeur = viewModel.nomEntreprise,
+                        onValeur = { nom ->
                             val ancienNom = viewModel.nomEntreprise
                             viewModel.nomEntreprise = nom
                             if (!siteModifieManuellement || viewModel.nomSitePrincipal == ancienNom) {
                                 viewModel.nomSitePrincipal = nom
                             }
                         },
-                        placeholder = { Text(stringResource(R.string.obn_nom_ex)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.ob_nom_entreprise),
+                        icone = Icons.Outlined.Business,
+                        placeholder = stringResource(R.string.obn_nom_ex),
+                        active = !viewModel.enregistrementEnCours,
                     )
-                }
-                OnbChamp(
-                    icone = Icons.Outlined.Category,
-                    labelRes = R.string.obn_secteur,
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.secteur,
-                        onValueChange = { viewModel.secteur = it },
-                        placeholder = { Text(stringResource(R.string.obn_secteur_ex)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
+                    OnbChampTexte(
+                        valeur = viewModel.secteur,
+                        onValeur = { viewModel.secteur = it },
+                        label = stringResource(R.string.obn_secteur),
+                        icone = Icons.Outlined.Category,
+                        placeholder = stringResource(R.string.obn_secteur_ex),
+                        active = !viewModel.enregistrementEnCours,
                     )
-                }
-            }
-
-            // --- Localisation : le pays pilote tout le pack ---
-            OnbEntrepriseSection(titreRes = R.string.obn_entreprise_localisation)
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MissaBorder),
-                colors = CardDefaults.cardColors(containerColor = MissaSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    MissaSelecteurLigne(
-                        label = stringResource(R.string.ob_pays),
-                        options = optionsPays,
-                        selectionCle = viewModel.codePays,
-                        onSelection = { code ->
-                            paysListe.firstOrNull { it.code == code }?.let { pays ->
-                                viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
-                            }
-                        },
-                        enabled = !viewModel.enregistrementEnCours,
-                        placeholder = viewModel.pays.ifBlank {
-                            stringResource(R.string.ob_selectionne)
-                        },
-                    )
-                }
-            }
-
-            // --- Pack appliqué par le pays : valeurs remplies d'office ---
-            // Devise, taux et pays libre ne sont plus des champs permanents : ils
-            // n'apparaissent que derrière l'option « modifier manuellement ».
-            OnbPackPays(
-                pays = viewModel.pays,
-                devise = viewModel.devise,
-                nomDevise = remember(viewModel.devise, locale) {
-                    Iso4217.nomDevise(viewModel.devise, locale)
-                },
-                typeTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe,
-                tauxTaxe = viewModel.tauxTaxeTexte,
-                pack = ReferentielPackPays.pack(viewModel.codePays),
-                indicatif = Iso4217.indicatifTelephone(viewModel.codePays),
-                zone = zoneFiscale,
-                identifiants = reglesIdentifiants.map { it.libelle },
-            ) {
-                MissaSelecteurLigne(
-                    label = stringResource(R.string.obn_devise_principale),
-                    options = optionsDevise,
-                    selectionCle = viewModel.devise,
-                    onSelection = { code -> viewModel.devise = code },
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
-                OnbChamp(icone = Icons.Outlined.Percent, labelRes = R.string.ob_taux_taxe) {
-                    OutlinedTextField(
-                        value = viewModel.tauxTaxeTexte,
-                        onValueChange = viewModel::modifierTauxTaxe,
-                        singleLine = true,
-                        isError = tauxTaxeInvalide,
-                        enabled = !viewModel.enregistrementEnCours,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        supportingText = {
-                            if (tauxTaxeInvalide) {
-                                Text(stringResource(R.string.ob_erreur_taux_taxe), color = Red40)
-                            } else if (viewModel.pays.isNotBlank()) {
-                                Text(stringResource(R.string.obn_taux_suggere, viewModel.pays))
-                            }
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OnbChamp(icone = Icons.Outlined.Public, labelRes = R.string.ob_pays_personnalise) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
-                            value = viewModel.pays,
-                            onValueChange = viewModel::modifierPaysManuel,
-                            singleLine = true,
-                            enabled = !viewModel.enregistrementEnCours,
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.ob_pays_saisie_manuelle_note),
-                            fontSize = 11.sp,
-                            color = MissaMuted,
-                        )
-                    }
-                }
-            }
-
-            // --- Coordonnées et identifiants légaux ---
-            OnbEntrepriseSection(
-                titreRes = R.string.obn_entreprise_contact,
-                sousTitreRes = R.string.obn_entreprise_contact_sous,
-            )
-            OnbEntrepriseCarte {
-                OnbChamp(icone = Icons.Outlined.Call, labelRes = R.string.obn_telephone) {
-                    OutlinedTextField(
-                        value = viewModel.telephone,
-                        onValueChange = { viewModel.telephone = it },
-                        placeholder = { Text(stringResource(R.string.obn_telephone_ex)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OnbChamp(icone = Icons.Outlined.MailOutline, labelRes = R.string.obn_email) {
-                    OutlinedTextField(
-                        value = viewModel.email,
-                        onValueChange = { viewModel.email = it },
-                        placeholder = { Text(stringResource(R.string.obn_email_ex)) },
-                        singleLine = true,
-                        isError = !emailValide,
-                        enabled = !viewModel.enregistrementEnCours,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        supportingText = if (emailValide) {
-                            null
-                        } else {
-                            {
-                                Text(
-                                    text = stringResource(R.string.obn_erreur_email_entreprise),
-                                    color = Red40,
-                                )
-                            }
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OnbChamp(icone = Icons.Outlined.Place, labelRes = R.string.obn_adresse) {
-                    OutlinedTextField(
-                        value = viewModel.adresse,
-                        onValueChange = { viewModel.adresse = it },
-                        placeholder = { Text(stringResource(R.string.obn_adresse_ex)) },
-                        singleLine = false,
-                        minLines = 2,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                reglesIdentifiants.forEach { regle ->
-                    val valeur = when (regle.cle) {
-                        CleIdentifiant.FISCAL -> viewModel.numeroFiscal
-                        CleIdentifiant.REGISTRE -> viewModel.registreCommerce
-                    }
-                    val formatIncorrect = !regle.estValide(valeur)
-                    OnbChamp(
-                        icone = when (regle.cle) {
-                            CleIdentifiant.FISCAL -> Icons.Outlined.Badge
-                            CleIdentifiant.REGISTRE -> Icons.Outlined.Gavel
-                        },
-                        label = regle.libelle,
-                    ) {
-                        OutlinedTextField(
-                            value = valeur,
-                            onValueChange = { saisie ->
-                                when (regle.cle) {
-                                    CleIdentifiant.FISCAL -> viewModel.numeroFiscal = saisie
-                                    CleIdentifiant.REGISTRE -> viewModel.registreCommerce = saisie
-                                }
-                            },
-                            placeholder = {
-                                if (regle.exemple.isNotEmpty()) Text(regle.exemple)
-                            },
-                            singleLine = true,
-                            isError = formatIncorrect,
-                            enabled = !viewModel.enregistrementEnCours,
-                            supportingText = if (formatIncorrect && regle.exemple.isNotEmpty()) {
-                                {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.fisc_format_attendu,
-                                            regle.exemple,
-                                        ),
-                                        color = MissaMuted,
-                                    )
-                                }
-                            } else {
-                                null
-                            },
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-            }
-
-            // --- Logo de l'entreprise ---
-            OnbLogoCard(
-                logoUri = viewModel.logoUri,
-                enabled = !viewModel.enregistrementEnCours,
-                onLogoSelected = viewModel::definirLogoUri,
-                onLogoCleared = { viewModel.definirLogoUri(null) },
-            )
-
-            // --- Site principal et taxe : visibles d'emblée ---
-            OnbEntrepriseSection(titreRes = R.string.obn_entreprise_exploitation)
-            OnbEntrepriseCarte {
-                OnbChamp(
-                    icone = Icons.Outlined.Storefront,
-                    labelRes = R.string.ob_site_principal,
-                ) {
-                    OutlinedTextField(
-                        value = viewModel.nomSitePrincipal,
-                        onValueChange = {
+                    OnbChampTexte(
+                        valeur = viewModel.nomSitePrincipal,
+                        onValeur = {
                             siteModifieManuellement = true
                             viewModel.nomSitePrincipal = it
                         },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.ob_site_principal),
+                        icone = Icons.Outlined.Storefront,
+                        active = !viewModel.enregistrementEnCours,
                     )
                 }
             }
+
+            // --- 2. Localisation : le pays pilote tout le pack fiscal ---
+            MissaSectionPliable(
+                titre = stringResource(R.string.obn_entreprise_localisation),
+                icone = Icons.Outlined.Public,
+                resume = if (viewModel.pays.isBlank()) {
+                    stringResource(R.string.ob_selectionne)
+                } else {
+                    resume(
+                        viewModel.pays,
+                        viewModel.devise,
+                        libelleTaxePays(typeTaxePays, viewModel.tauxTaxe),
+                    )
+                },
+                etiquette = aCompleter.takeIf { viewModel.pays.isBlank() },
+                ouvertParDefaut = true,
+            ) {
+                MissaSelecteurLigne(
+                    label = stringResource(R.string.ob_pays),
+                    options = optionsPays,
+                    selectionCle = viewModel.codePays,
+                    onSelection = { code ->
+                        paysListe.firstOrNull { it.code == code }?.let { pays ->
+                            viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
+                        }
+                    },
+                    enabled = !viewModel.enregistrementEnCours,
+                    placeholder = viewModel.pays.ifBlank {
+                        stringResource(R.string.ob_selectionne)
+                    },
+                )
+                Spacer(Modifier.height(4.dp))
+                // Le pack : valeurs remplies d'office par le pays. Devise, taux et
+                // pays libre n'ont pas de champ permanent ailleurs — ils ne
+                // redeviennent modifiables que par « modifier manuellement ».
+                OnbPackPays(
+                    pays = viewModel.pays,
+                    devise = viewModel.devise,
+                    nomDevise = remember(viewModel.devise, locale) {
+                        Iso4217.nomDevise(viewModel.devise, locale)
+                    },
+                    typeTaxe = typeTaxePays,
+                    tauxTaxe = viewModel.tauxTaxeTexte,
+                    pack = ReferentielPackPays.pack(viewModel.codePays),
+                    indicatif = indicatif,
+                    zone = zoneFiscale,
+                    identifiants = reglesIdentifiants.map { it.libelle },
+                ) {
+                    MissaSelecteurLigne(
+                        label = stringResource(R.string.obn_devise_principale),
+                        options = optionsDevise,
+                        selectionCle = viewModel.devise,
+                        onSelection = { code -> viewModel.devise = code },
+                        enabled = !viewModel.enregistrementEnCours,
+                    )
+                    HorizontalDivider(color = MissaBorder)
+                    Spacer(Modifier.height(12.dp))
+                    OnbChampsEmpiles {
+                        OnbChampTexte(
+                            valeur = viewModel.tauxTaxeTexte,
+                            onValeur = viewModel::modifierTauxTaxe,
+                            label = stringResource(R.string.ob_taux_taxe),
+                            icone = Icons.Outlined.Percent,
+                            clavier = KeyboardType.Decimal,
+                            erreur = tauxTaxeInvalide,
+                            aide = stringResource(R.string.ob_erreur_taux_taxe)
+                                .takeIf { tauxTaxeInvalide },
+                            active = !viewModel.enregistrementEnCours,
+                        )
+                        OnbChampTexte(
+                            valeur = viewModel.pays,
+                            onValeur = viewModel::modifierPaysManuel,
+                            label = stringResource(R.string.ob_pays_personnalise),
+                            icone = Icons.Outlined.Public,
+                            aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
+                            active = !viewModel.enregistrementEnCours,
+                        )
+                    }
+                }
+            }
+
+            // --- 3. Coordonnées : reprises sur les documents commerciaux ---
+            MissaSectionPliable(
+                titre = stringResource(R.string.obn_section_coordonnees),
+                icone = Icons.Outlined.Call,
+                resume = resume(viewModel.telephone, viewModel.email, viewModel.adresse)
+                    ?: stringResource(R.string.obn_entreprise_contact_sous),
+                etiquette = if (emailValide) facultatif else aCompleter,
+                etiquetteEnErreur = !emailValide,
+                // Le bouton « Suivant » est bloqué par un e-mail mal formé :
+                // la section s'ouvre d'elle-même pour que la cause soit visible.
+                ouvrirDOffice = !emailValide,
+            ) {
+                OnbChampsEmpiles {
+                    OnbChampTexte(
+                        valeur = viewModel.telephone,
+                        onValeur = { viewModel.telephone = it },
+                        label = stringResource(R.string.obn_telephone),
+                        icone = Icons.Outlined.Call,
+                        placeholder = indicatif?.let { "$it " }
+                            ?: stringResource(R.string.obn_telephone_ex),
+                        clavier = KeyboardType.Phone,
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                    OnbChampTexte(
+                        valeur = viewModel.email,
+                        onValeur = { viewModel.email = it },
+                        label = stringResource(R.string.obn_email),
+                        icone = Icons.Outlined.MailOutline,
+                        placeholder = stringResource(R.string.obn_email_ex),
+                        clavier = KeyboardType.Email,
+                        erreur = !emailValide,
+                        aide = stringResource(R.string.obn_erreur_email_entreprise)
+                            .takeIf { !emailValide },
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                    OnbChampTexte(
+                        valeur = viewModel.adresse,
+                        onValeur = { viewModel.adresse = it },
+                        label = stringResource(R.string.obn_adresse),
+                        icone = Icons.Outlined.Place,
+                        placeholder = stringResource(R.string.obn_adresse_ex),
+                        lignesMin = 2,
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                }
+            }
+
+            // --- 4. Identifiants légaux : ceux qu'attend le pays choisi ---
+            if (reglesIdentifiants.isNotEmpty()) {
+                val saisis = reglesIdentifiants.mapNotNull { regle ->
+                    when (regle.cle) {
+                        CleIdentifiant.FISCAL -> viewModel.numeroFiscal
+                        CleIdentifiant.REGISTRE -> viewModel.registreCommerce
+                    }.takeIf { it.isNotBlank() }
+                }
+                val formatsIncorrects = reglesIdentifiants.any { regle ->
+                    !regle.estValide(
+                        when (regle.cle) {
+                            CleIdentifiant.FISCAL -> viewModel.numeroFiscal
+                            CleIdentifiant.REGISTRE -> viewModel.registreCommerce
+                        },
+                    )
+                }
+                MissaSectionPliable(
+                    titre = stringResource(R.string.fisc_pack_identifiants),
+                    icone = Icons.Outlined.Badge,
+                    resume = saisis.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+                        ?: reglesIdentifiants.joinToString(" · ") { it.libelle },
+                    etiquette = if (formatsIncorrects) {
+                        stringResource(R.string.obn_section_format)
+                    } else {
+                        facultatif
+                    },
+                    etiquetteEnErreur = formatsIncorrects,
+                ) {
+                    OnbChampsEmpiles {
+                        reglesIdentifiants.forEach { regle ->
+                            val valeur = when (regle.cle) {
+                                CleIdentifiant.FISCAL -> viewModel.numeroFiscal
+                                CleIdentifiant.REGISTRE -> viewModel.registreCommerce
+                            }
+                            val formatIncorrect = !regle.estValide(valeur)
+                            OnbChampTexte(
+                                valeur = valeur,
+                                onValeur = { saisie ->
+                                    when (regle.cle) {
+                                        CleIdentifiant.FISCAL -> viewModel.numeroFiscal = saisie
+                                        CleIdentifiant.REGISTRE ->
+                                            viewModel.registreCommerce = saisie
+                                    }
+                                },
+                                label = regle.libelle,
+                                icone = when (regle.cle) {
+                                    CleIdentifiant.FISCAL -> Icons.Outlined.Badge
+                                    CleIdentifiant.REGISTRE -> Icons.Outlined.Gavel
+                                },
+                                placeholder = regle.exemple.takeIf { it.isNotEmpty() },
+                                erreur = formatIncorrect,
+                                aide = if (formatIncorrect && regle.exemple.isNotEmpty()) {
+                                    stringResource(R.string.fisc_format_attendu, regle.exemple)
+                                } else {
+                                    null
+                                },
+                                aideNeutre = true,
+                                active = !viewModel.enregistrementEnCours,
+                            )
+                        }
+                    }
+                }
+            }
+
+            // --- 5. Logo : une ligne, pas une zone de dépôt de 150 points ---
+            OnbLogoSection(
+                logoUri = viewModel.logoUri,
+                enabled = !viewModel.enregistrementEnCours,
+                etiquette = facultatif,
+                onLogoSelected = viewModel::definirLogoUri,
+                onLogoCleared = { viewModel.definirLogoUri(null) },
+            )
         }
     }
 }
 
+/** Résumé d'en-tête : les valeurs renseignées, séparées par des points médians. */
+private fun resume(vararg valeurs: String?): String? =
+    valeurs.filter { !it.isNullOrBlank() }.joinToString(" · ").ifBlank { null }
+
+/** Espacement commun à toutes les piles de champs de l'écran. */
+@Composable
+private fun OnbChampsEmpiles(contenu: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(9.dp),
+        content = contenu,
+    )
+}
+
 /**
- * Le « pack pays » : tout ce que le choix du pays a rempli d'office — devise,
- * taxe, indicatif téléphonique, zone fiscale et identifiants légaux attendus.
+ * Champ de saisie standard de l'écran : libellé flottant Material 3 et icône de
+ * marque à l'intérieur du contour. Le texte d'aide n'occupe de la place que
+ * lorsqu'il a quelque chose à dire.
  *
- * Ces éléments n'ont plus de champ permanent ailleurs dans l'écran : ils sont
- * affichés en lecture et ne redeviennent modifiables que par l'unique option
- * « modifier manuellement », qui déplie [personnalisation].
+ * @param aideNeutre affiche l'aide en gris même en erreur (format attendu)
+ */
+@Composable
+private fun OnbChampTexte(
+    valeur: String,
+    onValeur: (String) -> Unit,
+    label: String,
+    icone: ImageVector,
+    modifier: Modifier = Modifier,
+    placeholder: String? = null,
+    clavier: KeyboardType = KeyboardType.Text,
+    erreur: Boolean = false,
+    aide: String? = null,
+    aideNeutre: Boolean = false,
+    lignesMin: Int = 1,
+    active: Boolean = true,
+) {
+    OutlinedTextField(
+        value = valeur,
+        onValueChange = onValeur,
+        label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        leadingIcon = {
+            Icon(
+                imageVector = icone,
+                contentDescription = null,
+                tint = if (erreur) Red40 else BrandBlue,
+                modifier = Modifier.size(18.dp),
+            )
+        },
+        placeholder = placeholder?.let { { Text(it, fontSize = 13.sp, color = MissaMuted) } },
+        singleLine = lignesMin == 1,
+        minLines = lignesMin,
+        isError = erreur,
+        enabled = active,
+        keyboardOptions = KeyboardOptions(keyboardType = clavier),
+        supportingText = aide?.let {
+            {
+                Text(
+                    text = it,
+                    fontSize = 11.sp,
+                    color = if (erreur && !aideNeutre) Red40 else MissaMuted,
+                )
+            }
+        },
+        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+
+/**
+ * Le « pack pays » : tout ce que le choix du pays a rempli d'office.
+ *
+ * Les quatre valeurs qui gouvernent la facturation — devise, taxe, zone
+ * comptable, identifiants attendus — sont présentées en grille de deux
+ * colonnes, immédiatement lisibles. Le reste (taux réduits, seuil, impôts,
+ * facturation électronique) est de la documentation : il attend derrière
+ * « Détail fiscal ». Un second lien, « modifier manuellement », déplie
+ * [personnalisation].
  */
 @Composable
 private fun OnbPackPays(
@@ -437,6 +509,7 @@ private fun OnbPackPays(
     identifiants: List<String>,
     personnalisation: @Composable ColumnScope.() -> Unit,
 ) {
+    var detailOuvert by rememberSaveable { mutableStateOf(false) }
     var personnaliser by rememberSaveable { mutableStateOf(false) }
     val libelleZone = stringResource(zone.libelleRes)
     // Le taux saisi prime sur le taux catalogue : c'est lui qui sera enregistré.
@@ -452,151 +525,215 @@ private fun OnbPackPays(
         border = BorderStroke(1.dp, BrandBlue),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Outlined.Public,
                     contentDescription = null,
                     tint = BrandBlue,
-                    modifier = Modifier.size(17.dp),
+                    modifier = Modifier.size(16.dp),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(7.dp))
                 Text(
                     text = stringResource(R.string.fisc_pack_titre),
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = MissaInk,
+                    modifier = Modifier.weight(1f),
                 )
-            }
-            Spacer(Modifier.height(3.dp))
-            Text(
-                text = if (pays.isBlank()) {
-                    stringResource(R.string.fisc_pack_aucun_pays)
-                } else {
-                    stringResource(R.string.fisc_pack_note, pays)
-                },
-                fontSize = 11.sp,
-                color = MissaMuted,
-            )
-            if (pays.isNotBlank()) {
-                Spacer(Modifier.height(9.dp))
-                OnbPackLigne(
-                    labelRes = R.string.obn_devise_principale,
-                    valeur = "$devise · $nomDevise",
-                )
-                OnbPackLigne(labelRes = R.string.fisc_pack_taxe, valeur = valeurTaxe)
-                pack?.tauxReduits?.takeIf { it.isNotEmpty() }?.let { reduits ->
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_taux_reduits,
-                        valeur = reduits.joinToString(" · ", transform = Iso4217::formatPourcentage),
-                    )
-                }
-                pack?.seuilAssujettissement?.let { seuil ->
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_seuil,
-                        valeur = MoneyUtils.format(seuil.toDouble(), devise),
-                    )
-                }
-                pack?.let { detail ->
-                    val tauxIs = Iso4217.formatPourcentage(detail.impotSocietes)
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_impot_societes,
-                        valeur = detail.impotSocietesMinimum?.let { minimum ->
-                            stringResource(
-                                R.string.fisc_pack_is_minimum,
-                                tauxIs,
-                                Iso4217.formatPourcentage(minimum),
-                            )
-                        } ?: tauxIs,
-                    )
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_impot_revenu,
-                        valeur = if (detail.impotRevenu == TypeImpotRevenu.AUCUN) {
-                            stringResource(TypeImpotRevenu.AUCUN.libelleRes)
-                        } else {
-                            stringResource(
-                                R.string.fisc_pack_ir_valeur,
-                                stringResource(detail.impotRevenu.libelleRes),
-                                Iso4217.formatPourcentage(detail.impotRevenuMax),
-                            )
-                        },
-                    )
-                }
-                indicatif?.let { code ->
-                    OnbPackLigne(labelRes = R.string.fisc_pack_indicatif, valeur = code)
-                }
-                OnbPackLigne(
-                    labelRes = R.string.fisc_zone_label,
-                    valeur = zone.referentielComptable
-                        ?.let { "$libelleZone · $it" }
-                        ?: libelleZone,
-                )
-                if (identifiants.isNotEmpty()) {
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_identifiants,
-                        valeur = identifiants.joinToString(" · "),
-                    )
-                }
-                if (pack != null) {
-                    val eFacture = pack.eFacturation
-                    OnbPackLigne(
-                        labelRes = R.string.fisc_pack_efacture,
-                        valeur = if (eFacture == null) {
-                            stringResource(R.string.fisc_pack_efacture_aucune)
-                        } else {
-                            val dispositif = eFacture.format
-                                ?.let { "${eFacture.systeme} ($it)" }
-                                ?: eFacture.systeme
-                            stringResource(
-                                if (eFacture.obligatoire) {
-                                    R.string.fisc_pack_efacture_obligatoire
-                                } else {
-                                    R.string.fisc_pack_efacture_facultative
-                                },
-                                dispositif,
-                            )
-                        },
-                    )
+                if (pays.isNotBlank()) {
+                    Surface(color = MissaSurface, shape = RoundedCornerShape(6.dp)) {
+                        Text(
+                            text = pays,
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = BrandBlue,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+                        )
+                    }
                 }
             }
-            TextButton(
-                onClick = { personnaliser = !personnaliser },
-                modifier = Modifier.align(Alignment.Start),
-            ) {
-                Icon(
-                    imageVector = if (personnaliser) {
-                        Icons.Outlined.ExpandLess
-                    } else {
-                        Icons.Outlined.ExpandMore
-                    },
-                    contentDescription = null,
-                    modifier = Modifier.size(17.dp),
-                )
-                Spacer(Modifier.width(6.dp))
+            if (pays.isBlank()) {
+                Spacer(Modifier.height(3.dp))
                 Text(
-                    text = stringResource(R.string.fisc_pack_personnaliser),
-                    fontSize = 12.5.sp,
+                    text = stringResource(R.string.fisc_pack_aucun_pays),
+                    fontSize = 11.sp,
+                    color = MissaMuted,
+                )
+            } else {
+                Spacer(Modifier.height(8.dp))
+                // Grille 2 × 2 : l'essentiel du pack en quatre cellules.
+                OnbPackRangee(
+                    gauche = R.string.obn_devise_principale to "$devise · $nomDevise",
+                    droite = R.string.fisc_pack_taxe to valeurTaxe,
+                )
+                OnbPackRangee(
+                    gauche = R.string.fisc_zone_label to (
+                        zone.referentielComptable?.let { "$libelleZone · $it" } ?: libelleZone
+                        ),
+                    droite = identifiants.takeIf { it.isNotEmpty() }?.let {
+                        R.string.fisc_pack_identifiants to it.joinToString(" · ")
+                    },
+                )
+                AnimatedVisibility(visible = detailOuvert) {
+                    Column {
+                        pack?.let { detail ->
+                            OnbPackRangee(
+                                gauche = detail.tauxReduits.takeIf { it.isNotEmpty() }?.let {
+                                    R.string.fisc_pack_taux_reduits to
+                                        it.joinToString(" · ", transform = Iso4217::formatPourcentage)
+                                },
+                                droite = R.string.fisc_pack_seuil to (
+                                    detail.seuilAssujettissement
+                                        ?.let { MoneyUtils.format(it.toDouble(), devise) }
+                                        ?: stringResource(R.string.fisc_pack_seuil_aucun)
+                                    ),
+                            )
+                            val tauxIs = Iso4217.formatPourcentage(detail.impotSocietes)
+                            OnbPackRangee(
+                                gauche = R.string.fisc_pack_impot_societes to (
+                                    detail.impotSocietesMinimum?.let { minimum ->
+                                        stringResource(
+                                            R.string.fisc_pack_is_minimum,
+                                            tauxIs,
+                                            Iso4217.formatPourcentage(minimum),
+                                        )
+                                    } ?: tauxIs
+                                    ),
+                                droite = R.string.fisc_pack_impot_revenu to
+                                    if (detail.impotRevenu == TypeImpotRevenu.AUCUN) {
+                                        stringResource(TypeImpotRevenu.AUCUN.libelleRes)
+                                    } else {
+                                        stringResource(
+                                            R.string.fisc_pack_ir_valeur,
+                                            stringResource(detail.impotRevenu.libelleRes),
+                                            Iso4217.formatPourcentage(detail.impotRevenuMax),
+                                        )
+                                    },
+                            )
+                            val eFacture = detail.eFacturation
+                            OnbPackRangee(
+                                gauche = R.string.fisc_pack_efacture to if (eFacture == null) {
+                                    stringResource(R.string.fisc_pack_efacture_aucune)
+                                } else {
+                                    val dispositif = eFacture.format
+                                        ?.let { "${eFacture.systeme} ($it)" }
+                                        ?: eFacture.systeme
+                                    stringResource(
+                                        if (eFacture.obligatoire) {
+                                            R.string.fisc_pack_efacture_obligatoire
+                                        } else {
+                                            R.string.fisc_pack_efacture_facultative
+                                        },
+                                        dispositif,
+                                    )
+                                },
+                                droite = indicatif?.let { R.string.fisc_pack_indicatif to it },
+                            )
+                        }
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (pays.isNotBlank() && pack != null) {
+                    OnbPackLien(
+                        texteRes = R.string.fisc_pack_detail,
+                        ouvert = detailOuvert,
+                        onClic = { detailOuvert = !detailOuvert },
+                    )
+                    Spacer(Modifier.width(4.dp))
+                }
+                OnbPackLien(
+                    texteRes = R.string.fisc_pack_personnaliser,
+                    ouvert = personnaliser,
+                    onClic = { personnaliser = !personnaliser },
                 )
             }
-            if (personnaliser) {
+            AnimatedVisibility(visible = personnaliser) {
                 Surface(
                     color = MissaSurface,
                     shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.dp, MissaBorder),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) {
-                        Spacer(Modifier.height(6.dp))
+                    Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
                         Text(
                             text = stringResource(R.string.fisc_pack_personnaliser_note),
                             fontSize = 11.sp,
                             color = MissaMuted,
                         )
                         personnalisation()
-                        Spacer(Modifier.height(6.dp))
                     }
                 }
             }
+        }
+    }
+}
+
+/** Lien du pack : chevron + libellé, compact, deux par rangée. */
+@Composable
+private fun OnbPackLien(texteRes: Int, ouvert: Boolean, onClic: () -> Unit) {
+    TextButton(
+        onClick = onClic,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = 6.dp,
+            vertical = 2.dp,
+        ),
+    ) {
+        Icon(
+            imageVector = if (ouvert) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+            contentDescription = null,
+            modifier = Modifier.size(15.dp),
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(text = stringResource(texteRes), fontSize = 11.5.sp)
+    }
+}
+
+/**
+ * Rangée de deux cellules du pack. La cellule de droite peut manquer : la
+ * gauche garde alors sa demi-largeur, pour que les colonnes restent alignées
+ * d'une rangée à l'autre.
+ */
+@Composable
+private fun OnbPackRangee(
+    gauche: Pair<Int, String>?,
+    droite: Pair<Int, String>? = null,
+) {
+    if (gauche == null && droite == null) return
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        OnbPackCellule(gauche, Modifier.weight(1f))
+        OnbPackCellule(droite, Modifier.weight(1f))
+    }
+}
+
+/** Cellule « libellé au-dessus, valeur en dessous » du pack pays. */
+@Composable
+private fun OnbPackCellule(contenu: Pair<Int, String>?, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        if (contenu != null) {
+            Text(
+                text = stringResource(contenu.first),
+                fontSize = 10.sp,
+                color = MissaMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = contenu.second,
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+                lineHeight = 14.sp,
+            )
         }
     }
 }
@@ -614,121 +751,18 @@ private fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
     else -> Iso4217.formatPourcentage(taux) + " · " + stringResource(typeTaxe.libelleRes)
 }
 
-/** Ligne « libellé — valeur » du pack pays. */
-@Composable
-private fun OnbPackLigne(labelRes: Int, valeur: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(top = 3.dp), verticalAlignment = Alignment.Top) {
-        Text(
-            text = stringResource(labelRes),
-            fontSize = 11.5.sp,
-            color = MissaMuted,
-            modifier = Modifier.width(112.dp),
-        )
-        Text(
-            text = valeur,
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MissaInk,
-            modifier = Modifier.weight(1f),
-        )
-    }
-}
-
-/** Intertitre de section de l'écran entreprise, avec explication facultative. */
-@Composable
-private fun OnbEntrepriseSection(titreRes: Int, sousTitreRes: Int? = null) {
-    Column {
-        Text(
-            text = stringResource(titreRes),
-            fontSize = 12.5.sp,
-            fontWeight = FontWeight.Bold,
-            color = MissaInk,
-        )
-        if (sousTitreRes != null) {
-            Text(
-                text = stringResource(sousTitreRes),
-                fontSize = 11.5.sp,
-                color = MissaMuted,
-            )
-        }
-    }
-}
-
-/** Carte blanche standard regroupant des champs de l'écran entreprise. */
-@Composable
-private fun OnbEntrepriseCarte(contenu: @Composable () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MissaBorder),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            contenu()
-        }
-    }
-}
-
 /**
- * Bloc champ de la maquette : icône + libellé au-dessus du champ, dans la même carte.
+ * Section logo : vignette, formats acceptés et actions sur une seule ligne.
+ *
+ * Le cadre de dépôt en pointillés de la maquette web n'a pas de sens sur
+ * téléphone — on n'y fait pas glisser de fichier — mais il en garde la trace
+ * visuelle quand aucun logo n'est encore choisi.
  */
 @Composable
-private fun OnbChamp(
-    icone: ImageVector,
-    labelRes: Int,
-    content: @Composable () -> Unit,
-) {
-    OnbChamp(icone = icone, label = stringResource(labelRes), content = content)
-}
-
-/** Variante à libellé dynamique (identifiants légaux dépendant du pays). */
-@Composable
-private fun OnbChamp(
-    icone: ImageVector,
-    label: String,
-    content: @Composable () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-    ) {
-        Icon(
-            imageVector = icone,
-            contentDescription = null,
-            tint = BrandBlue,
-            modifier = Modifier
-                .padding(top = 15.dp)
-                .size(18.dp),
-        )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 10.dp),
-        ) {
-            Text(
-                text = label,
-                fontSize = 12.5.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MissaInk,
-            )
-            Spacer(Modifier.height(5.dp))
-            content()
-        }
-    }
-}
-
-/**
- * Zone de logo de la maquette : cadre pointillé, nuage de dépôt, bouton
- * « Parcourir », formats acceptés et limite 2MB vérifiée avant acceptation.
- */
-@Composable
-private fun OnbLogoCard(
+private fun OnbLogoSection(
     logoUri: String?,
     enabled: Boolean,
+    etiquette: String,
     onLogoSelected: (String) -> Unit,
     onLogoCleared: () -> Unit,
 ) {
@@ -761,129 +795,89 @@ private fun OnbLogoCard(
         }
     }
 
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, MissaBorder),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier.fillMaxWidth(),
+    MissaSectionPliable(
+        titre = stringResource(R.string.obn_logo_titre),
+        icone = Icons.Outlined.Image,
+        resume = if (logoUri == null) {
+            stringResource(R.string.obn_logo_formats)
+        } else {
+            stringResource(R.string.obn_logo_present)
+        },
+        etiquette = etiquette,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(R.string.obn_logo_titre),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MissaInk,
-            )
-            Text(
-                text = stringResource(R.string.obn_logo_optionnel),
-                fontSize = 12.sp,
-                color = MissaMuted,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.obn_logo_description),
-                fontSize = 12.5.sp,
-                color = MissaMuted,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(12.dp))
-
             if (logoUri == null) {
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .dashedBorder(1.2.dp, MissaBorder, 14.dp),
+                    modifier = Modifier.size(56.dp).dashedBorder(1.2.dp, MissaBorder, 12.dp),
                     color = BrandBlue.copy(alpha = 0.025f),
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(12.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Backup,
-                            contentDescription = null,
-                            tint = BrandBlue,
-                            modifier = Modifier.size(38.dp),
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.obn_logo_deposer),
-                            fontSize = 13.sp,
-                            color = MissaInk,
-                        )
-                        Text(
-                            text = stringResource(R.string.obn_logo_ou),
-                            fontSize = 12.sp,
-                            color = MissaMuted,
-                        )
-                        Spacer(Modifier.height(6.dp))
-                        OutlinedButton(
-                            onClick = { launcher.launch(IMAGE_MIME_TYPES) },
-                            enabled = enabled,
-                            shape = RoundedCornerShape(9.dp),
-                        ) {
-                            Text(stringResource(R.string.obn_logo_parcourir), fontSize = 13.sp)
-                        }
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.obn_logo_formats),
-                    fontSize = 11.sp,
-                    color = MissaMuted,
-                    textAlign = TextAlign.Center,
-                )
-            } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CompanyLogo(
-                        logoUri = logoUri,
-                        contentDescription = stringResource(R.string.ob_logo_apercu),
-                        fallbackIcon = Icons.Outlined.Backup,
-                        modifier = Modifier.size(84.dp),
-                        size = 72.dp,
-                        shape = RoundedCornerShape(14.dp),
-                        fallbackTint = BrandBlue,
-                        fallbackBackground = BrandBlue.copy(alpha = 0.07f),
+                    Icon(
+                        imageVector = Icons.Outlined.Backup,
+                        contentDescription = null,
+                        tint = BrandBlue,
+                        modifier = Modifier.padding(16.dp),
                     )
-                    Spacer(Modifier.height(10.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        OutlinedButton(
-                            onClick = { launcher.launch(IMAGE_MIME_TYPES) },
-                            enabled = enabled,
-                            shape = RoundedCornerShape(9.dp),
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(stringResource(R.string.ob_logo_modifier), fontSize = 13.sp)
-                        }
-                        TextButton(onClick = onLogoCleared, enabled = enabled) {
-                            Text(stringResource(R.string.ob_logo_supprimer), fontSize = 13.sp, color = Red40)
-                        }
-                    }
+                }
+            } else {
+                CompanyLogo(
+                    logoUri = logoUri,
+                    contentDescription = stringResource(R.string.ob_logo_apercu),
+                    fallbackIcon = Icons.Outlined.Backup,
+                    modifier = Modifier.size(56.dp),
+                    size = 56.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    fallbackTint = BrandBlue,
+                    fallbackBackground = BrandBlue.copy(alpha = 0.07f),
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.obn_logo_description),
+                    fontSize = 11.5.sp,
+                    color = MissaMuted,
+                )
+                if (logoTropGrand) {
+                    Text(
+                        text = stringResource(R.string.obn_logo_trop_grand),
+                        fontSize = 11.sp,
+                        color = Red40,
+                    )
                 }
             }
-            if (logoTropGrand) {
-                Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.width(8.dp))
+            OutlinedButton(
+                onClick = { launcher.launch(IMAGE_MIME_TYPES) },
+                enabled = enabled,
+                shape = RoundedCornerShape(9.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = 12.dp,
+                    vertical = 6.dp,
+                ),
+            ) {
                 Text(
-                    text = stringResource(R.string.obn_logo_trop_grand),
-                    fontSize = 12.sp,
-                    color = Red40,
+                    text = stringResource(
+                        if (logoUri == null) {
+                            R.string.obn_logo_parcourir
+                        } else {
+                            R.string.ob_logo_modifier
+                        },
+                    ),
+                    fontSize = 12.5.sp,
                 )
+            }
+            if (logoUri != null) {
+                IconButton(onClick = onLogoCleared, enabled = enabled) {
+                    Icon(
+                        imageVector = Icons.Outlined.DeleteOutline,
+                        contentDescription = stringResource(R.string.ob_logo_supprimer),
+                        tint = Red40,
+                        modifier = Modifier.size(19.dp),
+                    )
+                }
             }
         }
     }

@@ -1058,13 +1058,11 @@
     <string name="obn_entreprise_sous">ستُستخدم هذه المعلومات لتخصيص بيئة عملك.</string>
     <string name="obn_nom_ex">مثال: Missa SARL</string>
     <string name="obn_secteur">قطاع النشاط</string>
-    <string name="obn_secteur_ex">اختر</string>
+    <string name="obn_secteur_ex">مثال: تجارة التجزئة</string>
     <string name="obn_devise_principale">العملة الرئيسية</string>
     <string name="obn_logo_titre">أضف شعارك</string>
     <string name="obn_logo_optionnel">اختياري</string>
     <string name="obn_logo_description">خصّص تطبيقك بشعار شركتك.</string>
-    <string name="obn_logo_deposer">أضف شعارك هنا</string>
-    <string name="obn_logo_ou">أو</string>
     <string name="obn_logo_parcourir">تصفح</string>
     <string name="obn_logo_formats">الصيغ المقبولة: PNG، JPG — الحد الأقصى: 2MB</string>
     <string name="obn_logo_trop_grand">الصورة كبيرة جدًا (الحد الأقصى: 2MB)</string>
@@ -1410,7 +1408,6 @@
     <string name="obn_socle_deplier">إظهار الوحدات المساندة</string>
     <string name="obn_socle_replier">إخفاء الوحدات المساندة</string>
     <string name="obn_entreprise_localisation">الموقع والعملة</string>
-    <string name="obn_entreprise_exploitation">الموقع والضرائب</string>
     <string name="obn_taux_suggere">النسبة المقترحة لـ %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1420,7 +1417,6 @@
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">العنوان</string>
     <string name="obn_adresse_ex">الشارع، الحي، المدينة</string>
-    <string name="obn_entreprise_contact">بيانات الاتصال والمعرفات القانونية</string>
     <string name="obn_entreprise_contact_sous">تُستخدم تلقائيًا في عروض الأسعار والفواتير وسندات التسليم.</string>
     <string name="obn_erreur_email_entreprise">عنوان بريد إلكتروني غير صالح.</string>
 
@@ -1444,7 +1440,6 @@
 
     <!-- Pack pays : devise, taxe, indicatif, identifiants -->
     <string name="fisc_pack_titre">حزمة الدولة المطبقة</string>
-    <string name="fisc_pack_note">تم ملؤها حسب %1$s. يمكن تعديل كل شيء أدناه.</string>
     <string name="fisc_pack_identifiants">المعرفات القانونية</string>
     <string name="fisc_pack_indicatif">رمز الاتصال</string>
     <string name="fisc_devise_suggeree">العملة الرسمية لـ %1$s</string>
@@ -1479,4 +1474,10 @@
     <string name="fisc_pack_efacture_facultative">اختيارية · %1$s</string>
     <string name="fisc_pack_efacture_aucune">لا يوجد نظام وطني</string>
     <string name="fisc_pack_seuil_aucun">لا يوجد حد: الضريبة مستحقة من أول عملية</string>
+    <string name="obn_section_identite">هوية الشركة</string>
+    <string name="obn_section_coordonnees">بيانات الاتصال</string>
+    <string name="obn_section_a_completer">مطلوب استكماله</string>
+    <string name="obn_section_format">الصيغة</string>
+    <string name="obn_logo_present">تمت إضافة الشعار</string>
+    <string name="fisc_pack_detail">التفاصيل الضريبية</string>
 </resources>

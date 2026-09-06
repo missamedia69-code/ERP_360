@@ -1058,13 +1058,11 @@
     <string name="obn_entreprise_sous">Esta información se usará para personalizar su entorno.</string>
     <string name="obn_nom_ex">ej.: Missa SARL</string>
     <string name="obn_secteur">Sector de actividad</string>
-    <string name="obn_secteur_ex">Seleccione</string>
+    <string name="obn_secteur_ex">ej.: Comercio minorista</string>
     <string name="obn_devise_principale">Moneda principal</string>
     <string name="obn_logo_titre">Agregue su logo</string>
     <string name="obn_logo_optionnel">Opcional</string>
     <string name="obn_logo_description">Personalice su aplicación con el logo de su empresa.</string>
-    <string name="obn_logo_deposer">Deposite su logo aquí</string>
-    <string name="obn_logo_ou">o</string>
     <string name="obn_logo_parcourir">Examinar</string>
     <string name="obn_logo_formats">Formatos aceptados: PNG, JPG — Tamaño máx.: 2MB</string>
     <string name="obn_logo_trop_grand">Imagen demasiado pesada (tamaño máx.: 2MB)</string>
@@ -1410,7 +1408,6 @@
     <string name="obn_socle_deplier">Mostrar módulos de soporte</string>
     <string name="obn_socle_replier">Ocultar módulos de soporte</string>
     <string name="obn_entreprise_localisation">Ubicación y moneda</string>
-    <string name="obn_entreprise_exploitation">Sede e impuestos</string>
     <string name="obn_taux_suggere">Tasa sugerida para %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1420,7 +1417,6 @@
     <string name="obn_email_ex">contacto@empresa.com</string>
     <string name="obn_adresse">Dirección</string>
     <string name="obn_adresse_ex">Calle, barrio, ciudad</string>
-    <string name="obn_entreprise_contact">Datos de contacto e identificadores legales</string>
     <string name="obn_entreprise_contact_sous">Se reutilizan en presupuestos, facturas y albaranes.</string>
     <string name="obn_erreur_email_entreprise">Dirección de correo no válida.</string>
 
@@ -1444,7 +1440,6 @@
 
     <!-- Pack pays : devise, taxe, indicatif, identifiants -->
     <string name="fisc_pack_titre">Paquete de país aplicado</string>
-    <string name="fisc_pack_note">Rellenado según %1$s. Todo sigue siendo editable abajo.</string>
     <string name="fisc_pack_identifiants">Identificadores legales</string>
     <string name="fisc_pack_indicatif">Prefijo telefónico</string>
     <string name="fisc_devise_suggeree">Moneda oficial de %1$s</string>
@@ -1479,4 +1474,10 @@
     <string name="fisc_pack_efacture_facultative">Opcional · %1$s</string>
     <string name="fisc_pack_efacture_aucune">Sin sistema nacional</string>
     <string name="fisc_pack_seuil_aucun">Sin umbral: impuesto desde la primera venta</string>
+    <string name="obn_section_identite">Identidad de la empresa</string>
+    <string name="obn_section_coordonnees">Datos de contacto</string>
+    <string name="obn_section_a_completer">Por completar</string>
+    <string name="obn_section_format">Formato</string>
+    <string name="obn_logo_present">Logotipo añadido</string>
+    <string name="fisc_pack_detail">Detalle fiscal</string>
 </resources>
