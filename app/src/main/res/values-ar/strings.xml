@@ -1496,4 +1496,5 @@
     <string name="obn_code_message">مرحبًا، أرغب في شراء رمز تفعيل Missa Business 360 لـ: %1$s.</string>
     <string name="obn_code_indispo">لا يوجد تطبيق على هذا الجهاز يمكنه فتح جهة الاتصال هذه.</string>
     <string name="obn_code_a_configurer">بيانات الاتصال التجارية لم تُضبط بعد في res/values/contact.xml.</string>
+    <string name="obn_code_telegram">تيليغرام</string>
 </resources>

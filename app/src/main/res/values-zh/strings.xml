@@ -1496,4 +1496,5 @@
     <string name="obn_code_message">您好，我想为以下企业购买 Missa Business 360 激活码：%1$s。</string>
     <string name="obn_code_indispo">此设备上没有可以打开该联系方式的应用。</string>
     <string name="obn_code_a_configurer">商务联系方式尚未在 res/values/contact.xml 中设置。</string>
+    <string name="obn_code_telegram">Telegram</string>
 </resources>

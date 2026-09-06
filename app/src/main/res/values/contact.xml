@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Coordonnées commerciales de l'éditeur — À REMPLACER AVANT DIFFUSION.
+    Coordonnées commerciales de l'éditeur.
 
-    Ce sont les seules valeurs à modifier pour que le bouton « Obtenir votre
-    code » de l'écran final joigne réellement le service commercial. Les valeurs
-    ci-dessous sont des témoins injoignables :
-      · example.com est un domaine réservé par l'IANA ;
-      · +237 6 00 00 00 00 n'est attribué à aucun abonné.
-    Tant qu'elles sont en place, l'écran affiche un avertissement en clair.
+    Point unique de configuration : ces trois valeurs alimentent les boutons
+    « Obtenir votre code d'activation » de l'écran final de l'onboarding.
+    WhatsApp et Telegram partagent le même numéro. Le format international
+    (indicatif compris) est indispensable : les liens wa.me et tg:// ne
+    retiennent que les chiffres.
 
     Ces chaînes ne sont pas traduites : un numéro et une adresse ne changent
     pas avec la langue.
 -->
 <resources>
-    <string name="contact_commercial_whatsapp" translatable="false">+237600000000</string>
-    <string name="contact_commercial_email" translatable="false">contact@example.com</string>
+    <string name="contact_commercial_whatsapp" translatable="false">+237652996161</string>
+    <string name="contact_commercial_telegram" translatable="false">+237652996161</string>
+    <string name="contact_commercial_email" translatable="false">missamedia69@gmail.com</string>
 </resources>

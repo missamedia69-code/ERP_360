@@ -1517,4 +1517,5 @@
     <string name="obn_code_message">Hello, I would like to buy a Missa Business 360 activation code for: %1$s.</string>
     <string name="obn_code_indispo">No app on this device can open that contact.</string>
     <string name="obn_code_a_configurer">Sales contact details still to be set in res/values/contact.xml.</string>
+    <string name="obn_code_telegram">Telegram</string>
 </resources>

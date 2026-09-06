@@ -7,13 +7,14 @@ import android.net.Uri
 import java.net.URLEncoder
 
 /**
- * Coordonnées commerciales de l'éditeur — **unique point à personnaliser**.
+ * Coordonnées commerciales de l'éditeur.
  *
  * Elles servent à l'utilisateur qui veut acheter son code d'activation
- * (1 code = 1 appareil = 1 an). Les valeurs livrées dans
- * `res/values/contact.xml` sont des témoins volontairement injoignables :
- * `example.com` est un domaine réservé par l'IANA et `+237 6 00 00 00 00`
- * n'est attribué à aucun abonné. Remplacez-les avant toute diffusion.
+ * (1 code = 1 appareil = 1 an) et se règlent en un seul endroit :
+ * `res/values/contact.xml`. Les valeurs de démonstration — domaine
+ * `example.com` réservé par l'IANA, numéro `+237 6 00 00 00 00` attribué à
+ * personne — sont détectées par [estTemoin] afin qu'aucun bouton d'achat ne
+ * soit proposé tant que le canal ne joint réellement quelqu'un.
  */
 object ContactCommercial {
 
@@ -35,6 +36,21 @@ object ContactCommercial {
         val chiffres = numero.filter(Char::isDigit)
         if (chiffres.isEmpty()) return false
         val url = "https://wa.me/$chiffres?text=" + URLEncoder.encode(message, "UTF-8")
+        return lancer(context, Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+
+    /**
+     * Ouvre la conversation Telegram correspondant au numéro.
+     *
+     * `tg://resolve?phone=` est le schéma que gère l'application ; il n'existe
+     * pas d'équivalent web fiable à partir d'un simple numéro (les liens
+     * `t.me/+…` désignent des invitations de groupe, pas des abonnés). Sans
+     * Telegram installé, l'appel échoue proprement et l'écran le signale.
+     */
+    fun ouvrirTelegram(context: Context, numero: String, message: String): Boolean {
+        val chiffres = numero.filter(Char::isDigit)
+        if (chiffres.isEmpty()) return false
+        val url = "tg://resolve?phone=$chiffres&text=" + URLEncoder.encode(message, "UTF-8")
         return lancer(context, Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 

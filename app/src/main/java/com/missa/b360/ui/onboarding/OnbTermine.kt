@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.MailOutline
@@ -235,9 +236,12 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
 private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
     val contexte = LocalContext.current
     val numero = stringResource(R.string.contact_commercial_whatsapp)
+    val telegram = stringResource(R.string.contact_commercial_telegram)
     val adresse = stringResource(R.string.contact_commercial_email)
-    val coordonneesManquantes =
-        ContactCommercial.estTemoin(numero) && ContactCommercial.estTemoin(adresse)
+    val whatsappOk = !ContactCommercial.estTemoin(numero)
+    val telegramOk = !ContactCommercial.estTemoin(telegram)
+    val emailOk = !ContactCommercial.estTemoin(adresse)
+    val coordonneesManquantes = !whatsappOk && !telegramOk && !emailOk
     val objet = stringResource(R.string.obn_code_objet)
     val nomPourMessage = viewModel.nomEntreprise.trim()
         .ifEmpty { stringResource(R.string.obn_recap_entreprise) }
@@ -339,36 +343,55 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                         )
                     }
                 } else {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(9.dp),
-                        modifier = Modifier.fillMaxWidth().padding(top = 3.dp),
-                    ) {
-                        if (!ContactCommercial.estTemoin(numero)) {
-                            OnbContactBouton(
-                                texteRes = R.string.obn_code_whatsapp,
-                                icone = Icons.Outlined.Chat,
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                if (!ContactCommercial.ouvrirWhatsApp(contexte, numero, message)) {
-                                    Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                    // Les deux messageries partagent une ligne, l'e-mail prend la
+                    // suivante : trois libellés côte à côte ne tiendraient pas sur
+                    // un écran étroit sans être tronqués.
+                    if (whatsappOk || telegramOk) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(9.dp),
+                            modifier = Modifier.fillMaxWidth().padding(top = 3.dp),
+                        ) {
+                            if (whatsappOk) {
+                                OnbContactBouton(
+                                    texteRes = R.string.obn_code_whatsapp,
+                                    icone = Icons.Outlined.Chat,
+                                    modifier = Modifier.weight(1f),
+                                ) {
+                                    val ouvert =
+                                        ContactCommercial.ouvrirWhatsApp(contexte, numero, message)
+                                    if (!ouvert) {
+                                        Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                            if (telegramOk) {
+                                OnbContactBouton(
+                                    texteRes = R.string.obn_code_telegram,
+                                    icone = Icons.AutoMirrored.Outlined.Send,
+                                    modifier = Modifier.weight(1f),
+                                ) {
+                                    val ouvert = ContactCommercial.ouvrirTelegram(
+                                        contexte,
+                                        telegram,
+                                        message,
+                                    )
+                                    if (!ouvert) {
+                                        Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                                    }
                                 }
                             }
                         }
-                        if (!ContactCommercial.estTemoin(adresse)) {
-                            OnbContactBouton(
-                                texteRes = R.string.obn_code_email,
-                                icone = Icons.Outlined.MailOutline,
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                val ouvert = ContactCommercial.ouvrirEmail(
-                                    contexte,
-                                    adresse,
-                                    objet,
-                                    message,
-                                )
-                                if (!ouvert) {
-                                    Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
-                                }
+                    }
+                    if (emailOk) {
+                        OnbContactBouton(
+                            texteRes = R.string.obn_code_email,
+                            icone = Icons.Outlined.MailOutline,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            val ouvert =
+                                ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)
+                            if (!ouvert) {
+                                Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
