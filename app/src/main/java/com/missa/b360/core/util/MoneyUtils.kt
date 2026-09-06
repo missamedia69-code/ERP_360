@@ -3,6 +3,7 @@ package com.missa.b360.core.util
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
+import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
@@ -256,6 +257,39 @@ object Iso4217 {
         .associate { item ->
             item.substringBefore(':') to item.substringAfter(':')
         }
+
+    /**
+     * Devise officielle du pays (ISO 4217), déduite du référentiel embarqué du JDK.
+     * Alimente le « pack pays » proposé à l'onboarding ; l'utilisateur reste libre
+     * de choisir une autre devise ensuite.
+     */
+    fun deviseDuPays(codePays: String?): String? {
+        val code = codePays?.trim()?.uppercase()?.takeIf { it.length == 2 } ?: return null
+        return runCatching {
+            Currency.getInstance(Locale.Builder().setRegion(code).build()).currencyCode
+        }.getOrNull()
+    }
+
+    /** Nom de la devise dans la langue de l'interface, avec repli sur le catalogue court. */
+    fun nomDevise(code: String, locale: Locale): String =
+        runCatching { Currency.getInstance(code).getDisplayName(locale) }
+            .getOrNull()
+            ?.replaceFirstChar { premier -> premier.uppercase() }
+            ?: COMMUNES.firstOrNull { it.code == code }?.nom
+            ?: code
+
+    /**
+     * Toutes les devises ISO 4217 actives, nommées dans la langue de l'interface.
+     * Les codes techniques sans décimales définies (XXX, métaux précieux) sont écartés.
+     */
+    fun devisesDisponibles(locale: Locale): List<Devise> =
+        Currency.getAvailableCurrencies()
+            .asSequence()
+            .filter { it.defaultFractionDigits >= 0 && it.currencyCode.all(Char::isLetter) }
+            .map { Devise(code = it.currencyCode, nom = nomDevise(it.currencyCode, locale)) }
+            .distinctBy(Devise::code)
+            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, Devise::nom))
+            .toList()
 
     fun indicatifTelephone(codePays: String?): String? =
         codePays?.trim()?.uppercase()?.let(INDICATIFS_TELEPHONIQUES::get)

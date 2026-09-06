@@ -74,7 +74,6 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.Red40
-import java.util.Locale
 
 private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
 
@@ -95,21 +94,39 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var saisiePaysManuelle by rememberSaveable { mutableStateOf(false) }
     val locale = LocalConfiguration.current.locales[0]
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
+    // Devise officielle de chaque pays : calculée une fois, réutilisée par la liste
+    // des pays (pastille de droite) et par le pack appliqué à la sélection.
+    val devisesParPays = remember(locale) {
+        paysListe.associate { pays -> pays.code to Iso4217.deviseDuPays(pays.code) }
+    }
     val optionsPays = paysListe.map { pays ->
         MissaOption(
             cle = pays.code,
             titre = pays.nom,
-            sousTitre = stringResource(
-                R.string.obn_pays_taux,
-                pays.libelleTaxe,
-                formatTaux(pays.tauxTaxeSuggere),
-            ),
+            // Le taux n'est affiché qu'une fois : le libellé le porte déjà.
+            sousTitre = pays.libelleTaxe,
             badge = pays.code,
+            badgeSecondaire = devisesParPays[pays.code],
         )
     }
-    val optionsDevise = Iso4217.COMMUNES.map { devise ->
-        MissaOption(cle = devise.code, titre = devise.nom, badge = devise.code)
+    val deviseSuggeree = devisesParPays[viewModel.codePays]
+    // Catalogue ISO complet, la devise du pays choisi remontée en tête de liste.
+    val devisesListe = remember(locale, deviseSuggeree) {
+        Iso4217.devisesDisponibles(locale).sortedByDescending { it.code == deviseSuggeree }
     }
+    val optionsDevise = devisesListe
+        .map { devise ->
+            MissaOption(
+                cle = devise.code,
+                titre = devise.nom,
+                sousTitre = if (devise.code == deviseSuggeree && viewModel.pays.isNotBlank()) {
+                    stringResource(R.string.fisc_devise_suggeree, viewModel.pays)
+                } else {
+                    null
+                },
+                badge = devise.code,
+            )
+        }
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
     val emailValide = viewModel.emailEntrepriseEstValide()
     val zoneFiscale = ReferentielFiscal.zone(viewModel.codePays)
@@ -229,6 +246,19 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 }
             }
 
+            // --- Pack appliqué par le pays ---
+            OnbPackPays(
+                pays = viewModel.pays,
+                devise = viewModel.devise,
+                nomDevise = remember(viewModel.devise, locale) {
+                    Iso4217.nomDevise(viewModel.devise, locale)
+                },
+                libelleTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.libelleTaxe,
+                indicatif = Iso4217.indicatifTelephone(viewModel.codePays),
+                zone = zoneFiscale,
+                identifiants = reglesIdentifiants.map { it.libelle },
+            )
+
             // --- Coordonnées et identifiants légaux ---
             OnbEntrepriseSection(
                 titreRes = R.string.obn_entreprise_contact,
@@ -282,7 +312,6 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                OnbZoneFiscale(zone = zoneFiscale)
                 reglesIdentifiants.forEach { regle ->
                     val valeur = when (regle.cle) {
                         CleIdentifiant.FISCAL -> viewModel.numeroFiscal
@@ -384,33 +413,100 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     }
 }
 
-/** Bandeau rappelant la zone fiscale déduite du pays et son référentiel comptable. */
+/**
+ * Récapitulatif de ce que le choix du pays a rempli : devise officielle, taxe,
+ * indicatif téléphonique, zone fiscale et identifiants légaux attendus.
+ * Purement informatif — chaque valeur reste modifiable dans les champs concernés.
+ */
 @Composable
-private fun OnbZoneFiscale(zone: ZoneFiscale) {
-    val libelle = stringResource(zone.libelleRes)
-    val texte = zone.referentielComptable?.let { "$libelle · $it" } ?: libelle
+private fun OnbPackPays(
+    pays: String,
+    devise: String,
+    nomDevise: String,
+    libelleTaxe: String?,
+    indicatif: String?,
+    zone: ZoneFiscale,
+    identifiants: List<String>,
+) {
+    val libelleZone = stringResource(zone.libelleRes)
     Surface(
         color = MissaSoftBlue,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, BrandBlue),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Public,
-                contentDescription = null,
-                tint = BrandBlue,
-                modifier = Modifier.size(16.dp),
-            )
-            Spacer(Modifier.width(8.dp))
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.Public,
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(17.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.fisc_pack_titre),
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MissaInk,
+                )
+            }
+            Spacer(Modifier.height(3.dp))
             Text(
-                text = "${stringResource(R.string.fisc_zone_label)} : $texte",
-                fontSize = 12.sp,
-                color = MissaInk,
+                text = if (pays.isBlank()) {
+                    stringResource(R.string.fisc_pack_aucun_pays)
+                } else {
+                    stringResource(R.string.fisc_pack_note, pays)
+                },
+                fontSize = 11.sp,
+                color = MissaMuted,
             )
+            if (pays.isNotBlank()) {
+                Spacer(Modifier.height(9.dp))
+                OnbPackLigne(
+                    labelRes = R.string.obn_devise_principale,
+                    valeur = "$devise · $nomDevise",
+                )
+                libelleTaxe?.let { taxe ->
+                    OnbPackLigne(labelRes = R.string.ob_taux_taxe, valeur = taxe)
+                }
+                indicatif?.let { code ->
+                    OnbPackLigne(labelRes = R.string.fisc_pack_indicatif, valeur = code)
+                }
+                OnbPackLigne(
+                    labelRes = R.string.fisc_zone_label,
+                    valeur = zone.referentielComptable
+                        ?.let { "$libelleZone · $it" }
+                        ?: libelleZone,
+                )
+                if (identifiants.isNotEmpty()) {
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_identifiants,
+                        valeur = identifiants.joinToString(" · "),
+                    )
+                }
+            }
         }
+    }
+}
+
+/** Ligne « libellé — valeur » du pack pays. */
+@Composable
+private fun OnbPackLigne(labelRes: Int, valeur: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(top = 3.dp), verticalAlignment = Alignment.Top) {
+        Text(
+            text = stringResource(labelRes),
+            fontSize = 11.5.sp,
+            color = MissaMuted,
+            modifier = Modifier.width(112.dp),
+        )
+        Text(
+            text = valeur,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MissaInk,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -452,14 +548,6 @@ private fun OnbEntrepriseCarte(contenu: @Composable () -> Unit) {
         }
     }
 }
-
-/** Taux affiché sans décimale inutile : 19,25 % mais 20 %. */
-private fun formatTaux(taux: Double): String =
-    if (taux % 1.0 == 0.0) {
-        String.format(Locale.getDefault(), "%d %%", taux.toInt())
-    } else {
-        String.format(Locale.getDefault(), "%.2f %%", taux)
-    }
 
 /**
  * Bloc champ de la maquette : icône + libellé au-dessus du champ, dans la même carte.

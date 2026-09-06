@@ -1412,7 +1412,6 @@
     <string name="obn_socle_replier">隐藏支撑模块</string>
     <string name="obn_entreprise_localisation">地区与货币</string>
     <string name="obn_entreprise_exploitation">场所与税务</string>
-    <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">%1$s 的建议税率</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1443,4 +1442,12 @@
     <string name="fisc_id_fiscal">税号</string>
     <string name="fisc_id_registre">工商注册号</string>
     <string name="fisc_format_attendu">预期格式：%1$s</string>
+
+    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    <string name="fisc_pack_titre">已套用国家配置</string>
+    <string name="fisc_pack_note">根据%1$s自动填写，以下内容均可修改。</string>
+    <string name="fisc_pack_identifiants">法定证照</string>
+    <string name="fisc_pack_indicatif">国际区号</string>
+    <string name="fisc_devise_suggeree">%1$s的法定货币</string>
+    <string name="fisc_pack_aucun_pays">选择国家后将自动套用货币、税率和法定证照。</string>
 </resources>

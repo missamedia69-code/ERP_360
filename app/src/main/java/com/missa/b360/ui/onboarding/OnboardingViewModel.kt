@@ -359,14 +359,19 @@ class OnboardingViewModel @Inject constructor(
     // --- Entreprise ---
 
     /**
-     * Applique un pays du catalogue : taux de taxe suggéré et, si le téléphone
-     * est encore vide ou ne porte qu'un ancien indicatif, indicatif pré-rempli.
+     * Applique le « pack pays » : devise officielle, taux de taxe suggéré et
+     * indicatif téléphonique. Chaque valeur reste modifiable ensuite ; seul le
+     * téléphone est préservé s'il porte déjà autre chose que l'ancien indicatif.
+     *
+     * Les identifiants légaux et la zone fiscale, eux, découlent du seul
+     * [codePays] et n'ont donc rien à mémoriser ici.
      */
     fun choisirPays(nom: String, code: String, tauxSuggere: Double) {
         val ancienIndicatif = Iso4217.indicatifTelephone(codePays)
         pays = nom
         codePays = code
         definirTauxTaxe(tauxSuggere)
+        Iso4217.deviseDuPays(code)?.let { devise = it }
         val indicatif = Iso4217.indicatifTelephone(code)
         if (indicatif != null && (telephone.isBlank() || telephone.trim() == ancienIndicatif)) {
             telephone = indicatif

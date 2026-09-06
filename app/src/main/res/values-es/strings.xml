@@ -1412,7 +1412,6 @@
     <string name="obn_socle_replier">Ocultar módulos de soporte</string>
     <string name="obn_entreprise_localisation">Ubicación y moneda</string>
     <string name="obn_entreprise_exploitation">Sede e impuestos</string>
-    <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">Tasa sugerida para %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1443,4 +1442,12 @@
     <string name="fisc_id_fiscal">Número fiscal</string>
     <string name="fisc_id_registre">Registro mercantil</string>
     <string name="fisc_format_attendu">Formato esperado: %1$s</string>
+
+    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    <string name="fisc_pack_titre">Paquete de país aplicado</string>
+    <string name="fisc_pack_note">Rellenado según %1$s. Todo sigue siendo editable abajo.</string>
+    <string name="fisc_pack_identifiants">Identificadores legales</string>
+    <string name="fisc_pack_indicatif">Prefijo telefónico</string>
+    <string name="fisc_devise_suggeree">Moneda oficial de %1$s</string>
+    <string name="fisc_pack_aucun_pays">Elija un país para aplicar automáticamente moneda, impuesto e identificadores legales.</string>
 </resources>

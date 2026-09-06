@@ -1433,7 +1433,6 @@
     <string name="obn_socle_replier">Hide support modules</string>
     <string name="obn_entreprise_localisation">Location and currency</string>
     <string name="obn_entreprise_exploitation">Site and tax</string>
-    <string name="obn_pays_taux">%1$s · %2$s</string>
     <string name="obn_taux_suggere">Suggested rate for %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
@@ -1464,4 +1463,12 @@
     <string name="fisc_id_fiscal">Tax number</string>
     <string name="fisc_id_registre">Trade register</string>
     <string name="fisc_format_attendu">Expected format: %1$s</string>
+
+    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    <string name="fisc_pack_titre">Country pack applied</string>
+    <string name="fisc_pack_note">Filled in from %1$s. Everything remains editable below.</string>
+    <string name="fisc_pack_identifiants">Legal identifiers</string>
+    <string name="fisc_pack_indicatif">Dialling code</string>
+    <string name="fisc_devise_suggeree">Official currency of %1$s</string>
+    <string name="fisc_pack_aucun_pays">Choose a country to apply currency, tax and legal identifiers automatically.</string>
 </resources>

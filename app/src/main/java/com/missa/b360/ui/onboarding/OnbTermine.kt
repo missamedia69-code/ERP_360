@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,8 +59,14 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
     val tailleActuelle = viewModel.palier
     val profilLabel = if (profilActuel != null) stringResource(profilActuel.labelRes) else "—"
     val tailleLabel = if (tailleActuelle != null) stringResource(tailleActuelle.labelRes) else "—"
-    val deviseChoisie = Iso4217.COMMUNES.firstOrNull { it.code == viewModel.devise }
-    val deviseLabel = if (deviseChoisie != null) "${deviseChoisie.code} · ${deviseChoisie.nom}" else viewModel.devise
+    // Le nom vient du référentiel ISO du système : toutes les devises sont couvertes,
+    // pas seulement le catalogue court.
+    val locale = LocalConfiguration.current.locales[0]
+    val deviseLabel = if (viewModel.devise.isBlank()) {
+        viewModel.devise
+    } else {
+        "${viewModel.devise} · ${Iso4217.nomDevise(viewModel.devise, locale)}"
+    }
 
     Box(
         modifier = Modifier
