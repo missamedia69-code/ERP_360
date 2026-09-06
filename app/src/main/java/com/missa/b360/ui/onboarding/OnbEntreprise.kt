@@ -71,6 +71,7 @@ import com.missa.b360.core.domain.model.TypeImpotRevenu
 import com.missa.b360.core.domain.model.TypeTaxe
 import com.missa.b360.core.domain.model.ZoneFiscale
 import com.missa.b360.core.util.Iso4217
+import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaOption
 import com.missa.b360.ui.components.MissaSelecteurLigne
@@ -503,7 +504,7 @@ private fun OnbPackPays(
                 pack?.seuilAssujettissement?.let { seuil ->
                     OnbPackLigne(
                         labelRes = R.string.fisc_pack_seuil,
-                        valeur = Iso4217.format(seuil.toDouble(), devise),
+                        valeur = MoneyUtils.format(seuil.toDouble(), devise),
                     )
                 }
                 pack?.let { detail ->
