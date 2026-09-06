@@ -1166,4 +1166,11 @@
     <string name="obn_retention_30_sous">سجل خفيف، للأجهزة ذات التخزين المحدود</string>
     <string name="obn_retention_90_sous">توازن جيد للمتابعة الفصلية</string>
     <string name="obn_retention_365_sous">موصى به: تدقيق كامل على مدى سنة مالية</string>
+
+    <string name="obn_profil_perso_sous">اختر بنفسك الوحدات التي تريد تفعيلها</string>
+    <string name="obn_profil_perso_compteur">تم اختيار %1$d وحدة</string>
+    <string name="obn_profil_perso_tout">تحديد الكل</string>
+    <string name="obn_profil_perso_rien">إلغاء تحديد الكل</string>
+    <string name="obn_profil_perso_vide">اختر وحدة واحدة على الأقل للمتابعة.</string>
+    <string name="obn_profil_perso_fonctions">%1$d ميزة</string>
 </resources>

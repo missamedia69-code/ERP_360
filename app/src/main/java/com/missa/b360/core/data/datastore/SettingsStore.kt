@@ -34,6 +34,7 @@ class SettingsStore @Inject constructor(
         const val DEVISE = "devise"
         const val PAYS = "pays"
         const val PROFIL_ACTIVITE = "profil_activite"
+        const val MODULES_ACTIFS = "modules_actifs"
         const val PALIER_TAILLE = "palier_taille"
         const val ONBOARDING_TERMINE = "onboarding_termine"
         const val VIDEO_SPLASH_ACTIVE = "video_splash_active"

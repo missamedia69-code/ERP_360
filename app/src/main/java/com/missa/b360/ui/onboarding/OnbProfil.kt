@@ -1,6 +1,7 @@
 package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,18 +21,17 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +40,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ModuleSousElements
+import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.ui.components.MissaOption
@@ -49,6 +52,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.Red40
 
 /**
  * Écran — Profil d'activité : les cinq familles de la maquette sélectionnent les
@@ -56,12 +60,11 @@ import com.missa.b360.ui.theme.MissaSurface
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
-    var detailsVisibles by rememberSaveable { mutableStateOf(false) }
     OnbScaffold(
         titreRes = R.string.obn_profil_titre,
         sousTitreRes = R.string.obn_profil_sous,
         viewModel = viewModel,
-        boutonActive = viewModel.profil != null,
+        boutonActive = viewModel.profilEcranValide(),
         onRetour = viewModel::precedent,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -107,60 +110,15 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 selected = viewModel.profil == ProfilActivite.FULL,
                 onClick = { viewModel.choisirProfil(ProfilActivite.FULL) },
             )
-            TextButton(
-                onClick = { detailsVisibles = !detailsVisibles },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            ) {
-                Text(
-                    stringResource(
-                        if (detailsVisibles) R.string.ob_profil_masquer_details
-                        else R.string.obn_detaux,
-                    ),
-                    fontSize = 13.sp,
-                )
-            }
-            if (detailsVisibles) {
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (profile in ProfilActivite.entries) {
-                        Card(
-                            onClick = { viewModel.choisirProfil(profile) },
-                            shape = RoundedCornerShape(10.dp),
-                            border = BorderStroke(
-                                if (profile == viewModel.profil) 1.5.dp else 1.dp,
-                                if (profile == viewModel.profil) BrandBlue else MissaBorder,
-                            ),
-                            colors = CardDefaults.cardColors(containerColor = MissaSurface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(profile.labelRes),
-                                        fontSize = 13.5.sp,
-                                        color = MissaInk,
-                                    )
-                                    Text(
-                                        text = profile.description,
-                                        fontSize = 11.sp,
-                                        color = MissaMuted,
-                                    )
-                                }
-                                if (profile == viewModel.profil) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.ChevronRight,
-                                        contentDescription = null,
-                                        tint = BrandBlue,
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+            OnbProfilCarte(
+                titreRes = R.string.profil_custom,
+                sousTitreRes = R.string.obn_profil_perso_sous,
+                icone = Icons.Outlined.Tune,
+                selected = viewModel.profil == ProfilActivite.CUSTOM,
+                onClick = viewModel::choisirPersonnalisation,
+            )
+            if (viewModel.profil == ProfilActivite.CUSTOM) {
+                OnbModulesPersonnalises(viewModel = viewModel)
             }
             MissaSelecteurBleu(
                 label = stringResource(R.string.obn_effectif_label),
@@ -176,6 +134,85 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 enabled = !viewModel.enregistrementEnCours,
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
             )
+        }
+    }
+}
+
+/**
+ * Personnalisation des modules (profil « Personnalisé ») : les 14 modules métier
+ * cochables un à un, avec le nombre de fonctionnalités que chacun apporte. La
+ * sélection est conservée immédiatement et pilote les modules actifs de l'app.
+ */
+@Composable
+private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
+    val selection = viewModel.modulesPersonnalises
+    val tousCoches = selection.size == ModuleCode.entries.size
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        border = BorderStroke(1.dp, if (selection.isEmpty()) Red40 else BrandBlue),
+        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.obn_profil_perso_compteur, selection.size),
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (selection.isEmpty()) Red40 else MissaInk,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = viewModel::basculerTousLesModules) {
+                    Text(
+                        text = stringResource(
+                            if (tousCoches) R.string.obn_profil_perso_rien
+                            else R.string.obn_profil_perso_tout,
+                        ),
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+            if (selection.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.obn_profil_perso_vide),
+                    fontSize = 11.5.sp,
+                    color = Red40,
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            for (module in ModuleCode.entries) {
+                val actif = module in selection
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.basculerModule(module) }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = actif,
+                        onCheckedChange = { viewModel.basculerModule(module) },
+                        colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(ModulesPersonnalises.libelleRes(module)),
+                            fontSize = 13.sp,
+                            fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MissaInk,
+                        )
+                        Text(
+                            text = stringResource(
+                                R.string.obn_profil_perso_fonctions,
+                                ModuleSousElements.pourModule(module).size,
+                            ),
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                    }
+                }
+            }
         }
     }
 }

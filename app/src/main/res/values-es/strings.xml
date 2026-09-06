@@ -1166,4 +1166,11 @@
     <string name="obn_retention_30_sous">Registro ligero, dispositivos con poco espacio</string>
     <string name="obn_retention_90_sous">Buen equilibrio para un seguimiento trimestral</string>
     <string name="obn_retention_365_sous">Recomendado: auditoría completa de un ejercicio</string>
+
+    <string name="obn_profil_perso_sous">Elija usted mismo los módulos que desea activar</string>
+    <string name="obn_profil_perso_compteur">%1$d módulo(s) seleccionado(s)</string>
+    <string name="obn_profil_perso_tout">Marcar todo</string>
+    <string name="obn_profil_perso_rien">Desmarcar todo</string>
+    <string name="obn_profil_perso_vide">Seleccione al menos un módulo para continuar.</string>
+    <string name="obn_profil_perso_fonctions">%1$d funcionalidades</string>
 </resources>

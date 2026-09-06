@@ -11,8 +11,11 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.core.domain.model.ProfilConfiguration
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
@@ -57,6 +60,10 @@ class OnboardingViewModel @Inject constructor(
 
     // --- Étape profil ---
     var profil by mutableStateOf<ProfilActivite?>(null)
+        private set
+
+    /** Modules cochés quand le profil « Personnalisé » est retenu. */
+    var modulesPersonnalises by mutableStateOf<Set<ModuleCode>>(emptySet())
         private set
 
     /** Effectif déclaré (P1–P6) — champ compact de l'écran « type d'activité ». */
@@ -136,6 +143,9 @@ class OnboardingViewModel @Inject constructor(
                 profil = progression.profil?.let {
                     runCatching { ProfilActivite.valueOf(it) }.getOrNull()
                 }
+                modulesPersonnalises = ModulesPersonnalises
+                    .deserialiser(settingsStore.get(SettingsStore.Keys.MODULES_ACTIFS))
+                    .toSet()
                 palier = progression.palier?.let {
                     runCatching { PalierTaille.valueOf(it) }.getOrNull()
                 }
@@ -186,7 +196,7 @@ class OnboardingViewModel @Inject constructor(
                 appliquerConfiguration()
                 step = OnboardingStep.PROFIL
             }
-            OnboardingStep.PROFIL -> if (profil != null) step = OnboardingStep.ENTREPRISE
+            OnboardingStep.PROFIL -> if (profilEcranValide()) step = OnboardingStep.ENTREPRISE
             OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
             OnboardingStep.PIN -> validerPinEtProprietaire()
             OnboardingStep.TERMINE -> terminer()
@@ -206,10 +216,58 @@ class OnboardingViewModel @Inject constructor(
 
     // --- Profil d'activité ---
 
-    /** Le profil pilote les modules activés (Configuration.modulesPourProfil). */
+    /** Le profil pilote les modules activés (ProfilConfiguration.modulesPourProfil). */
     fun choisirProfil(p: ProfilActivite) {
         profil = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name) }
+        if (p != ProfilActivite.CUSTOM) {
+            enregistrerModules(ProfilConfiguration.modulesPourProfil(p).toSet())
+        }
+    }
+
+    /**
+     * Bascule sur le profil « Personnalisé » : la sélection démarre des modules
+     * du profil déjà choisi, pour n'avoir qu'à ajuster au lieu de tout cocher.
+     */
+    fun choisirPersonnalisation() {
+        val depart = when {
+            modulesPersonnalises.isNotEmpty() -> modulesPersonnalises
+            profil != null && profil != ProfilActivite.CUSTOM ->
+                ProfilConfiguration.modulesPourProfil(profil!!).toSet()
+            else -> emptySet()
+        }
+        profil = ProfilActivite.CUSTOM
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, ProfilActivite.CUSTOM.name)
+        }
+        enregistrerModules(depart)
+    }
+
+    /** Coche / décoche un module dans la sélection personnalisée. */
+    fun basculerModule(module: ModuleCode) {
+        val nouvelle = modulesPersonnalises.toMutableSet()
+        if (!nouvelle.add(module)) nouvelle.remove(module)
+        enregistrerModules(nouvelle)
+    }
+
+    /** Tout cocher / tout décocher depuis l'en-tête de la liste des modules. */
+    fun basculerTousLesModules() {
+        val tout = ModuleCode.entries.toSet()
+        enregistrerModules(if (modulesPersonnalises.size == tout.size) emptySet() else tout)
+    }
+
+    /** La sélection de modules est conservée immédiatement (reprise d'onboarding). */
+    private fun enregistrerModules(modules: Set<ModuleCode>) {
+        modulesPersonnalises = modules
+        val valeur = ModulesPersonnalises.serialiser(modules)
+        viewModelScope.launch { settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeur) }
+    }
+
+    /** L'écran « type d'activité » n'est valide qu'avec au moins un module actif. */
+    fun profilEcranValide(): Boolean = when (profil) {
+        null -> false
+        ProfilActivite.CUSTOM -> modulesPersonnalises.isNotEmpty()
+        else -> true
     }
 
     /** Effectif choisi dans le champ bleu de l'écran « type d'activité ». */
