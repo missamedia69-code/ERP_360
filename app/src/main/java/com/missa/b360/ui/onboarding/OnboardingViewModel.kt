@@ -424,7 +424,9 @@ class OnboardingViewModel @Inject constructor(
                 )
             }.getOrDefault(false)
             enregistrementEnCours = false
-            if (ok) step = OnboardingStep.CONFIGURATION
+            // L'entreprise enregistrée, l'étape suivante est le PIN (la configuration
+            // initiale a déjà été franchie avant le profil).
+            if (ok) step = OnboardingStep.PIN
             else erreurRes = R.string.ob_erreur_configuration_entreprise
         }
     }

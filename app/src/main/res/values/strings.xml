@@ -1438,4 +1438,8 @@
     <string name="obn_socle_pour">S\'ajoutent à %1$s</string>
     <string name="obn_socle_deplier">Afficher les modules support</string>
     <string name="obn_socle_replier">Masquer les modules support</string>
+    <string name="obn_entreprise_localisation">Localisation et devise</string>
+    <string name="obn_entreprise_exploitation">Site et fiscalité</string>
+    <string name="obn_pays_taux">%1$s · %2$s</string>
+    <string name="obn_taux_suggere">Taux suggéré pour %1$s</string>
 </resources>

@@ -6,7 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,14 +21,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.Percent
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -40,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,40 +56,48 @@ import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.CompanyLogo
+import com.missa.b360.ui.components.MissaOption
+import com.missa.b360.ui.components.MissaSelecteurLigne
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.Red40
+import java.util.Locale
 
 private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
 
 private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 
 /**
- * Écran 4 — Informations sur votre entreprise : identité, pays, devise et
- * **logo de l'entreprise (fusionné dans cet écran selon la maquette)**.
- * Le site principal et le taux de TVA/D5 restent accessibles en « Plus de détails ».
+ * Écran 4 — Informations sur votre entreprise : identité, localisation, devise,
+ * logo, site principal et taux de taxe.
+ *
+ * Pays et devise passent par le sélecteur standard [MissaSelecteurLigne]
+ * (recherche insensible aux accents, catalogue détaillé) ; site principal et
+ * taux de taxe sont visibles directement, sans « Plus de détails » à déplier.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
-    var detailsVisibles by remember { mutableStateOf(false) }
+    var saisiePaysManuelle by rememberSaveable { mutableStateOf(false) }
     val locale = LocalConfiguration.current.locales[0]
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
-    var deviseOuvert by remember { mutableStateOf(false) }
-    var paysOuvert by remember { mutableStateOf(false) }
-    var saisiePaysManuelle by remember { mutableStateOf(false) }
-    var recherchePays by remember { mutableStateOf("") }
-    val deviseChoisie = Iso4217.COMMUNES.firstOrNull { it.code == viewModel.devise }
-    val paysFiltres = remember(paysListe, recherchePays) {
-        val requete = recherchePays.trim()
-        if (requete.isEmpty()) paysListe else paysListe.filter { pays ->
-            pays.nom.contains(requete, ignoreCase = true) ||
-                pays.code.contains(requete, ignoreCase = true)
-        }
+    val optionsPays = paysListe.map { pays ->
+        MissaOption(
+            cle = pays.code,
+            titre = pays.nom,
+            sousTitre = stringResource(
+                R.string.obn_pays_taux,
+                pays.libelleTaxe,
+                formatTaux(pays.tauxTaxeSuggere),
+            ),
+            badge = pays.code,
+        )
+    }
+    val optionsDevise = Iso4217.COMMUNES.map { devise ->
+        MissaOption(cle = devise.code, titre = devise.nom, badge = devise.code)
     }
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
 
@@ -109,6 +114,45 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             // --- Identité de l'entreprise ---
+            OnbEntrepriseCarte {
+                OnbChamp(
+                    icone = Icons.Outlined.Business,
+                    labelRes = R.string.ob_nom_entreprise,
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.nomEntreprise,
+                        onValueChange = { nom ->
+                            val ancienNom = viewModel.nomEntreprise
+                            viewModel.nomEntreprise = nom
+                            if (!siteModifieManuellement || viewModel.nomSitePrincipal == ancienNom) {
+                                viewModel.nomSitePrincipal = nom
+                            }
+                        },
+                        placeholder = { Text(stringResource(R.string.obn_nom_ex)) },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(
+                    icone = Icons.Outlined.Category,
+                    labelRes = R.string.obn_secteur,
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.secteur,
+                        onValueChange = { viewModel.secteur = it },
+                        placeholder = { Text(stringResource(R.string.obn_secteur_ex)) },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            // --- Localisation et devise (sélecteur standard) ---
+            OnbEntrepriseSection(titreRes = R.string.obn_entreprise_localisation)
             Card(
                 shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(1.dp, MissaBorder),
@@ -116,155 +160,58 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    OnbChamp(
-                        icone = Icons.Outlined.Business,
-                        labelRes = R.string.ob_nom_entreprise,
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    MissaSelecteurLigne(
+                        label = stringResource(R.string.ob_pays),
+                        options = optionsPays,
+                        selectionCle = viewModel.codePays,
+                        onSelection = { code ->
+                            paysListe.firstOrNull { it.code == code }?.let { pays ->
+                                saisiePaysManuelle = false
+                                viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
+                            }
+                        },
+                        enabled = !viewModel.enregistrementEnCours,
+                        placeholder = viewModel.pays.ifBlank {
+                            stringResource(R.string.ob_selectionne)
+                        },
+                    )
+                    HorizontalDivider(color = MissaBorder)
+                    MissaSelecteurLigne(
+                        label = stringResource(R.string.obn_devise_principale),
+                        options = optionsDevise,
+                        selectionCle = viewModel.devise,
+                        onSelection = { code -> viewModel.devise = code },
+                        enabled = !viewModel.enregistrementEnCours,
+                    )
+                    TextButton(
+                        onClick = { saisiePaysManuelle = !saisiePaysManuelle },
+                        modifier = Modifier.align(Alignment.Start),
                     ) {
+                        Text(stringResource(R.string.ob_pays_saisie_manuelle), fontSize = 12.5.sp)
+                    }
+                    if (saisiePaysManuelle) {
+                        Text(
+                            text = stringResource(R.string.ob_pays_saisie_manuelle_note),
+                            fontSize = 11.5.sp,
+                            color = MissaMuted,
+                        )
+                        Spacer(Modifier.height(6.dp))
                         OutlinedTextField(
-                            value = viewModel.nomEntreprise,
-                            onValueChange = { nom ->
-                                val ancienNom = viewModel.nomEntreprise
-                                viewModel.nomEntreprise = nom
-                                if (!siteModifieManuellement || viewModel.nomSitePrincipal == ancienNom) {
-                                    viewModel.nomSitePrincipal = nom
-                                }
-                            },
-                            placeholder = { Text(stringResource(R.string.obn_nom_ex)) },
+                            value = viewModel.pays,
+                            onValueChange = viewModel::modifierPaysManuel,
+                            label = { Text(stringResource(R.string.ob_pays_personnalise)) },
                             singleLine = true,
                             enabled = !viewModel.enregistrementEnCours,
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier.fillMaxWidth(),
                         )
-                    }
-                    OnbChamp(
-                        icone = Icons.Outlined.Category,
-                        labelRes = R.string.obn_secteur,
-                    ) {
-                        OutlinedTextField(
-                            value = viewModel.secteur,
-                            onValueChange = { viewModel.secteur = it },
-                            placeholder = { Text(stringResource(R.string.obn_secteur_ex)) },
-                            singleLine = true,
-                            enabled = !viewModel.enregistrementEnCours,
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                    OnbChamp(
-                        icone = Icons.Outlined.Storefront,
-                        labelRes = R.string.ob_pays,
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = paysOuvert,
-                            onExpandedChange = { ouvert ->
-                                paysOuvert = ouvert
-                                if (ouvert) recherchePays = ""
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            OutlinedTextField(
-                                value = if (paysOuvert) recherchePays else viewModel.pays,
-                                onValueChange = {
-                                    recherchePays = it
-                                    paysOuvert = true
-                                },
-                                placeholder = { Text(stringResource(R.string.ob_selectionne)) },
-                                readOnly = viewModel.pays.isNotEmpty() && !paysOuvert,
-                                singleLine = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = paysOuvert) },
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                            )
-                            ExposedDropdownMenu(
-                                expanded = paysOuvert,
-                                onDismissRequest = {
-                                    paysOuvert = false
-                                    recherchePays = ""
-                                },
-                            ) {
-                                if (paysFiltres.isEmpty()) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.ob_pays_aucun_resultat)) },
-                                        onClick = {},
-                                        enabled = false,
-                                    )
-                                } else {
-                                    for (pays in paysFiltres) {
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    "${pays.nom} (${pays.code}) · " +
-                                                        "${stringResource(R.string.ob_tva_gst)} ${pays.libelleTaxe}",
-                                                )
-                                            },
-                                            onClick = {
-                                                viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
-                                                recherchePays = ""
-                                                paysOuvert = false
-                                            },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        TextButton(
-                            onClick = { saisiePaysManuelle = !saisiePaysManuelle },
-                            modifier = Modifier.align(Alignment.Start),
-                        ) {
-                            Text(stringResource(R.string.ob_pays_saisie_manuelle), fontSize = 12.5.sp)
-                        }
-                        if (saisiePaysManuelle) {
-                            OutlinedTextField(
-                                value = viewModel.pays,
-                                onValueChange = viewModel::modifierPaysManuel,
-                                label = { Text(stringResource(R.string.ob_pays_personnalise)) },
-                                singleLine = true,
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    }
-                    OnbChamp(
-                        icone = Icons.Outlined.Payments,
-                        labelRes = R.string.obn_devise_principale,
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = deviseOuvert,
-                            onExpandedChange = { deviseOuvert = it },
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            OutlinedTextField(
-                                value = deviseChoisie?.let { "${it.code} · ${it.nom}" } ?: viewModel.devise,
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = deviseOuvert) },
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.fillMaxWidth().menuAnchor(),
-                            )
-                            ExposedDropdownMenu(
-                                expanded = deviseOuvert,
-                                onDismissRequest = { deviseOuvert = false },
-                            ) {
-                                for (devise in Iso4217.COMMUNES) {
-                                    DropdownMenuItem(
-                                        text = { Text("${devise.code} · ${devise.nom}") },
-                                        onClick = {
-                                            viewModel.devise = devise.code
-                                            deviseOuvert = false
-                                        },
-                                    )
-                                }
-                            }
-                        }
+                        Spacer(Modifier.height(12.dp))
                     }
                 }
             }
 
-            // --- Logo de l'entreprise (jumeau de l'écran informations) ---
+            // --- Logo de l'entreprise ---
             OnbLogoCard(
                 logoUri = viewModel.logoUri,
                 enabled = !viewModel.enregistrementEnCours,
@@ -272,63 +219,89 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 onLogoCleared = { viewModel.definirLogoUri(null) },
             )
 
-            // --- Plus de détails : site principal + taux de taxe ---
-            TextButton(
-                onClick = { detailsVisibles = !detailsVisibles },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            ) {
-                Text(
-                    stringResource(
-                        if (detailsVisibles) R.string.ob_profil_masquer_details else R.string.obn_detaux,
-                    ),
-                    fontSize = 13.sp,
-                )
-            }
-            if (detailsVisibles) {
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, MissaBorder),
-                    colors = CardDefaults.cardColors(containerColor = MissaSurface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier.fillMaxWidth(),
+            // --- Site principal et taxe : visibles d'emblée ---
+            OnbEntrepriseSection(titreRes = R.string.obn_entreprise_exploitation)
+            OnbEntrepriseCarte {
+                OnbChamp(
+                    icone = Icons.Outlined.Storefront,
+                    labelRes = R.string.ob_site_principal,
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
-                    ) {
-                        OutlinedTextField(
-                            value = viewModel.nomSitePrincipal,
-                            onValueChange = {
-                                siteModifieManuellement = true
-                                viewModel.nomSitePrincipal = it
-                            },
-                            label = { Text(stringResource(R.string.ob_site_principal)) },
-                            singleLine = true,
-                            enabled = !viewModel.enregistrementEnCours,
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                        OutlinedTextField(
-                            value = viewModel.tauxTaxeTexte,
-                            onValueChange = viewModel::modifierTauxTaxe,
-                            label = { Text(stringResource(R.string.ob_taux_taxe)) },
-                            singleLine = true,
-                            isError = tauxTaxeInvalide,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            supportingText = if (tauxTaxeInvalide) {
-                                { Text(stringResource(R.string.ob_erreur_taux_taxe)) }
-                            } else {
-                                null
-                            },
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    OutlinedTextField(
+                        value = viewModel.nomSitePrincipal,
+                        onValueChange = {
+                            siteModifieManuellement = true
+                            viewModel.nomSitePrincipal = it
+                        },
+                        singleLine = true,
+                        enabled = !viewModel.enregistrementEnCours,
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                OnbChamp(
+                    icone = Icons.Outlined.Percent,
+                    labelRes = R.string.ob_taux_taxe,
+                ) {
+                    OutlinedTextField(
+                        value = viewModel.tauxTaxeTexte,
+                        onValueChange = viewModel::modifierTauxTaxe,
+                        singleLine = true,
+                        isError = tauxTaxeInvalide,
+                        enabled = !viewModel.enregistrementEnCours,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        supportingText = {
+                            if (tauxTaxeInvalide) {
+                                Text(stringResource(R.string.ob_erreur_taux_taxe), color = Red40)
+                            } else if (viewModel.pays.isNotBlank()) {
+                                Text(stringResource(R.string.obn_taux_suggere, viewModel.pays))
+                            }
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         }
     }
 }
+
+/** Intertitre de section de l'écran entreprise. */
+@Composable
+private fun OnbEntrepriseSection(titreRes: Int) {
+    Text(
+        text = stringResource(titreRes),
+        fontSize = 12.5.sp,
+        fontWeight = FontWeight.Bold,
+        color = MissaInk,
+    )
+}
+
+/** Carte blanche standard regroupant des champs de l'écran entreprise. */
+@Composable
+private fun OnbEntrepriseCarte(contenu: @Composable () -> Unit) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            contenu()
+        }
+    }
+}
+
+/** Taux affiché sans décimale inutile : 19,25 % mais 20 %. */
+private fun formatTaux(taux: Double): String =
+    if (taux % 1.0 == 0.0) {
+        String.format(Locale.getDefault(), "%d %%", taux.toInt())
+    } else {
+        String.format(Locale.getDefault(), "%.2f %%", taux)
+    }
 
 /**
  * Bloc champ de la maquette : icône + libellé au-dessus du champ, dans la même carte.

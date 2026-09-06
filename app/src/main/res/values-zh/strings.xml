@@ -1410,4 +1410,8 @@
     <string name="obn_socle_pour">叠加于 %1$s</string>
     <string name="obn_socle_deplier">显示支撑模块</string>
     <string name="obn_socle_replier">隐藏支撑模块</string>
+    <string name="obn_entreprise_localisation">地区与货币</string>
+    <string name="obn_entreprise_exploitation">场所与税务</string>
+    <string name="obn_pays_taux">%1$s · %2$s</string>
+    <string name="obn_taux_suggere">%1$s 的建议税率</string>
 </resources>

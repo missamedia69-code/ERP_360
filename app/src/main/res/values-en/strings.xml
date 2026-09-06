@@ -1431,4 +1431,8 @@
     <string name="obn_socle_pour">Added on top of %1$s</string>
     <string name="obn_socle_deplier">Show support modules</string>
     <string name="obn_socle_replier">Hide support modules</string>
+    <string name="obn_entreprise_localisation">Location and currency</string>
+    <string name="obn_entreprise_exploitation">Site and tax</string>
+    <string name="obn_pays_taux">%1$s · %2$s</string>
+    <string name="obn_taux_suggere">Suggested rate for %1$s</string>
 </resources>

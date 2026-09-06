@@ -1410,4 +1410,8 @@
     <string name="obn_socle_pour">تُضاف إلى %1$s</string>
     <string name="obn_socle_deplier">إظهار الوحدات المساندة</string>
     <string name="obn_socle_replier">إخفاء الوحدات المساندة</string>
+    <string name="obn_entreprise_localisation">الموقع والعملة</string>
+    <string name="obn_entreprise_exploitation">الموقع والضرائب</string>
+    <string name="obn_pays_taux">%1$s · %2$s</string>
+    <string name="obn_taux_suggere">النسبة المقترحة لـ %1$s</string>
 </resources>
