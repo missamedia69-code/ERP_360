@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Construction
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Info
@@ -125,6 +127,9 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
+    // Panneau déplié sous une carte : indépendant de la sélection, pour qu'un
+    // second clic (ou le retour) le referme sans perdre le profil choisi.
+    var panneauOuvert by rememberSaveable { mutableStateOf<String?>(null) }
     val choisir: (ProfilActivite) -> Unit = { profil ->
         if (profil == ProfilActivite.CUSTOM) {
             viewModel.choisirPersonnalisation()
@@ -132,24 +137,38 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             viewModel.choisirProfil(profil)
         }
     }
+    // Le retour referme d'abord le bloc ouvert, et seulement ensuite l'écran.
+    BackHandler(enabled = panneauOuvert != null) { panneauOuvert = null }
     OnbScaffold(
         titreRes = R.string.obn_profil_titre,
         sousTitreRes = R.string.obn_profil_sous,
         viewModel = viewModel,
         boutonActive = viewModel.profilEcranValide(),
-        onRetour = viewModel::precedent,
+        onRetour = {
+            if (panneauOuvert != null) panneauOuvert = null else viewModel.precedent()
+        },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             for (carte in cartes) {
+                val selectionnee = viewModel.profil == carte.profil
+                val ouvert = selectionnee && panneauOuvert == carte.profil.name
                 OnbProfilCarte(
                     titreRes = carte.titreRes,
                     sousTitreRes = carte.sousTitreRes,
                     icone = carte.icone,
-                    selected = viewModel.profil == carte.profil,
-                    onClick = { choisir(carte.profil) },
+                    selected = selectionnee,
+                    ouvert = ouvert,
+                    onClick = {
+                        if (ouvert) {
+                            panneauOuvert = null
+                        } else {
+                            choisir(carte.profil)
+                            panneauOuvert = carte.profil.name
+                        }
+                    },
                     onInfo = { detailProfil = carte.profil.name },
                 )
-                if (viewModel.profil == carte.profil) {
+                if (ouvert) {
                     if (carte.profil == ProfilActivite.CUSTOM) {
                         OnbModulesPersonnalises(viewModel = viewModel)
                     }
@@ -384,6 +403,7 @@ internal fun OnbProfilCarte(
     icone: ImageVector,
     selected: Boolean,
     onClick: () -> Unit,
+    ouvert: Boolean = false,
     onInfo: (() -> Unit)? = null,
 ) {
     Card(
@@ -435,8 +455,14 @@ internal fun OnbProfilCarte(
             }
             if (selected) {
                 Icon(
-                    imageVector = Icons.Outlined.ChevronRight,
-                    contentDescription = null,
+                    imageVector = if (ouvert) {
+                        Icons.Outlined.ExpandLess
+                    } else {
+                        Icons.Outlined.ExpandMore
+                    },
+                    contentDescription = stringResource(
+                        if (ouvert) R.string.obn_socle_replier else R.string.obn_socle_deplier,
+                    ),
                     tint = BrandBlue,
                     modifier = Modifier.size(20.dp),
                 )

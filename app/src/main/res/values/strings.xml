@@ -1436,4 +1436,6 @@
     <string name="kpi_variation_hausse">+%1$s vs période précédente</string>
     <string name="kpi_variation_baisse">%1$s vs période précédente</string>
     <string name="obn_socle_pour">S\'ajoutent à %1$s</string>
+    <string name="obn_socle_deplier">Afficher les modules support</string>
+    <string name="obn_socle_replier">Masquer les modules support</string>
 </resources>

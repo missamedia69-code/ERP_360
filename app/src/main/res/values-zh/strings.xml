@@ -1408,4 +1408,6 @@
     <string name="kpi_variation_hausse">环比 +%1$s</string>
     <string name="kpi_variation_baisse">环比 %1$s</string>
     <string name="obn_socle_pour">叠加于 %1$s</string>
+    <string name="obn_socle_deplier">显示支撑模块</string>
+    <string name="obn_socle_replier">隐藏支撑模块</string>
 </resources>
