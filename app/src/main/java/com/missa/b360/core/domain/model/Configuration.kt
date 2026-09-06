@@ -176,12 +176,19 @@ object ProfilConfiguration {
         return configurations[profil]?.keys?.toList() ?: emptyList()
     }
 
-    /** Retourne les sous-éléments activés pour un module dans un profil donné. */
+    /**
+     * Retourne les sous-éléments activés pour un module dans un profil donné.
+     *
+     * Dans [configurations], une valeur `null` signifie « module activé en
+     * entier » (Comptabilité, Trésorerie, Logistique, Reporting…) : il faut
+     * alors renvoyer le catalogue complet du module, et non une liste vide.
+     * Un module absent de la table, lui, n'est pas activé par ce profil.
+     */
     fun sousElementsPourModule(profil: ProfilActivite, module: ModuleCode): List<String> {
         if (profil == ProfilActivite.FULL) return ModuleSousElements.pourModule(module)
         val config = configurations[profil] ?: return emptyList()
-        val sousElements = config[module] ?: return emptyList()
-        return sousElements ?: ModuleSousElements.pourModule(module)
+        if (!config.containsKey(module)) return emptyList()
+        return config[module] ?: ModuleSousElements.pourModule(module)
     }
 }
 

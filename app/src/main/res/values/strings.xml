@@ -1342,4 +1342,5 @@
     <string name="obn_profil_detail_actif">Profil sélectionné</string>
     <string name="obn_profil_detail_custom">Catalogue complet : cochez ensuite les modules dont vous avez besoin.</string>
     <string name="obn_profil_detail_modifiable">Vous pourrez activer d\'autres modules plus tard dans les réglages.</string>
+    <string name="obn_profil_detail_complet">Complet</string>
 </resources>

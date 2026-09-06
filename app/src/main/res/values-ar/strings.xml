@@ -1314,4 +1314,5 @@
     <string name="obn_profil_detail_actif">تم اختيار الملف</string>
     <string name="obn_profil_detail_custom">الكتالوج الكامل: اختر بعد ذلك الوحدات التي تحتاجها.</string>
     <string name="obn_profil_detail_modifiable">يمكنك تفعيل وحدات أخرى لاحقًا من الإعدادات.</string>
+    <string name="obn_profil_detail_complet">كامل</string>
 </resources>

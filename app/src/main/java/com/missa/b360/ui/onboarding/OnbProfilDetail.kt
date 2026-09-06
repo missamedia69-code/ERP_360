@@ -66,10 +66,14 @@ internal fun OnbProfilDetailDialogue(
         ProfilConfiguration.modulesPourProfil(profil)
     }
     val blocs: List<Pair<ModuleCode, List<String>>> = modules.map { module ->
+        // Un module activé « en entier » par le profil (valeur null dans la
+        // configuration) doit lister tout son catalogue ; le repli protège
+        // aussi d'une configuration incomplète — jamais de module vide.
         module to if (catalogueComplet) {
             ModuleSousElements.pourModule(module)
         } else {
             ProfilConfiguration.sousElementsPourModule(profil, module)
+                .ifEmpty { ModuleSousElements.pourModule(module) }
         }
     }
     val totalFonctions = blocs.sumOf { it.second.size }
@@ -169,6 +173,7 @@ internal fun OnbProfilDetailDialogue(
 /** Un module de la boîte : puce, nom traduit, compteur et fonctionnalités listées. */
 @Composable
 private fun OnbProfilDetailModule(module: ModuleCode, fonctions: List<String>) {
+    val complet = fonctions.size == ModuleSousElements.pourModule(module).size
     val libelles = ArrayList<String>(fonctions.size)
     for (nom in fonctions) {
         val res = ModuleFonctions.libelleRes(nom)
@@ -190,6 +195,18 @@ private fun OnbProfilDetailModule(module: ModuleCode, fonctions: List<String>) {
                 color = MissaInk,
                 modifier = Modifier.weight(1f),
             )
+            if (complet) {
+                Surface(shape = RoundedCornerShape(6.dp), color = MissaSoftBlue) {
+                    Text(
+                        text = stringResource(R.string.obn_profil_detail_complet),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = BrandBlue,
+                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                    )
+                }
+                Spacer(Modifier.width(6.dp))
+            }
             Text(
                 text = stringResource(R.string.obn_profil_perso_fonctions, libelles.size),
                 fontSize = 11.sp,

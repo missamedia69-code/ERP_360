@@ -1314,4 +1314,5 @@
     <string name="obn_profil_detail_actif">Perfil seleccionado</string>
     <string name="obn_profil_detail_custom">Catálogo completo: marque después los módulos que necesite.</string>
     <string name="obn_profil_detail_modifiable">Podrá activar más módulos más adelante en los ajustes.</string>
+    <string name="obn_profil_detail_complet">Completo</string>
 </resources>

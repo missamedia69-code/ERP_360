@@ -1314,4 +1314,5 @@
     <string name="obn_profil_detail_actif">已选择</string>
     <string name="obn_profil_detail_custom">完整目录：随后勾选您需要的模块。</string>
     <string name="obn_profil_detail_modifiable">您之后可在设置中启用更多模块。</string>
+    <string name="obn_profil_detail_complet">完整</string>
 </resources>
