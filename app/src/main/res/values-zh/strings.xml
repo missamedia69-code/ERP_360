@@ -1422,11 +1422,25 @@
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">地址</string>
     <string name="obn_adresse_ex">街道、区、城市</string>
-    <string name="obn_numero_fiscal">税号</string>
-    <string name="obn_numero_fiscal_ex">91310000MA1K35Q12X</string>
-    <string name="obn_registre">工商注册号</string>
-    <string name="obn_registre_ex">91310000MA1K35Q12X</string>
     <string name="obn_entreprise_contact">联系方式与法定证照</string>
     <string name="obn_entreprise_contact_sous">将自动出现在报价单、发票和送货单上。</string>
     <string name="obn_erreur_email_entreprise">电子邮箱地址无效。</string>
+
+    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    <string name="fisc_zone_cemac">OHADA — 中非经货共同体</string>
+    <string name="fisc_zone_uemoa">OHADA — 西非经货联盟</string>
+    <string name="fisc_zone_ohada">OHADA</string>
+    <string name="fisc_zone_ue">欧盟</string>
+    <string name="fisc_zone_europe">非欧盟欧洲</string>
+    <string name="fisc_zone_gcc">海湾合作委员会</string>
+    <string name="fisc_zone_afrique_nord">北非</string>
+    <string name="fisc_zone_afrique">撒哈拉以南非洲</string>
+    <string name="fisc_zone_amerique_nord">北美</string>
+    <string name="fisc_zone_amerique_latine">拉丁美洲</string>
+    <string name="fisc_zone_asie_pacifique">亚太地区</string>
+    <string name="fisc_zone_autre">其他地区</string>
+    <string name="fisc_zone_label">税务区域</string>
+    <string name="fisc_id_fiscal">税号</string>
+    <string name="fisc_id_registre">工商注册号</string>
+    <string name="fisc_format_attendu">预期格式：%1$s</string>
 </resources>

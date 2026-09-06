@@ -1422,11 +1422,25 @@
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">العنوان</string>
     <string name="obn_adresse_ex">الشارع، الحي، المدينة</string>
-    <string name="obn_numero_fiscal">الرقم الضريبي</string>
-    <string name="obn_numero_fiscal_ex">300012345600003</string>
-    <string name="obn_registre">السجل التجاري</string>
-    <string name="obn_registre_ex">CR-1010123456</string>
     <string name="obn_entreprise_contact">بيانات الاتصال والمعرفات القانونية</string>
     <string name="obn_entreprise_contact_sous">تُستخدم تلقائيًا في عروض الأسعار والفواتير وسندات التسليم.</string>
     <string name="obn_erreur_email_entreprise">عنوان بريد إلكتروني غير صالح.</string>
+
+    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    <string name="fisc_zone_cemac">أوهادا — سيماك</string>
+    <string name="fisc_zone_uemoa">أوهادا — الاتحاد الاقتصادي لغرب إفريقيا</string>
+    <string name="fisc_zone_ohada">أوهادا</string>
+    <string name="fisc_zone_ue">الاتحاد الأوروبي</string>
+    <string name="fisc_zone_europe">أوروبا خارج الاتحاد</string>
+    <string name="fisc_zone_gcc">مجلس التعاون الخليجي</string>
+    <string name="fisc_zone_afrique_nord">شمال إفريقيا</string>
+    <string name="fisc_zone_afrique">إفريقيا جنوب الصحراء</string>
+    <string name="fisc_zone_amerique_nord">أمريكا الشمالية</string>
+    <string name="fisc_zone_amerique_latine">أمريكا اللاتينية</string>
+    <string name="fisc_zone_asie_pacifique">آسيا والمحيط الهادئ</string>
+    <string name="fisc_zone_autre">منطقة أخرى</string>
+    <string name="fisc_zone_label">المنطقة الضريبية</string>
+    <string name="fisc_id_fiscal">الرقم الضريبي</string>
+    <string name="fisc_id_registre">السجل التجاري</string>
+    <string name="fisc_format_attendu">الصيغة المتوقعة: %1$s</string>
 </resources>

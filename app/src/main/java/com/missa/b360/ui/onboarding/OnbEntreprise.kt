@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Percent
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -59,6 +60,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.CleIdentifiant
+import com.missa.b360.core.domain.model.ReferentielFiscal
+import com.missa.b360.core.domain.model.ZoneFiscale
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaOption
@@ -67,6 +71,7 @@ import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.Red40
 import java.util.Locale
@@ -107,6 +112,12 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     }
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
     val emailValide = viewModel.emailEntrepriseEstValide()
+    val zoneFiscale = ReferentielFiscal.zone(viewModel.codePays)
+    val reglesIdentifiants = ReferentielFiscal.regles(
+        codePays = viewModel.codePays,
+        libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
+        libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
+    )
 
     OnbScaffold(
         titreRes = R.string.obn_entreprise_titre,
@@ -271,27 +282,51 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                OnbChamp(icone = Icons.Outlined.Badge, labelRes = R.string.obn_numero_fiscal) {
-                    OutlinedTextField(
-                        value = viewModel.numeroFiscal,
-                        onValueChange = { viewModel.numeroFiscal = it },
-                        placeholder = { Text(stringResource(R.string.obn_numero_fiscal_ex)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OnbChamp(icone = Icons.Outlined.Gavel, labelRes = R.string.obn_registre) {
-                    OutlinedTextField(
-                        value = viewModel.registreCommerce,
-                        onValueChange = { viewModel.registreCommerce = it },
-                        placeholder = { Text(stringResource(R.string.obn_registre_ex)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                OnbZoneFiscale(zone = zoneFiscale)
+                reglesIdentifiants.forEach { regle ->
+                    val valeur = when (regle.cle) {
+                        CleIdentifiant.FISCAL -> viewModel.numeroFiscal
+                        CleIdentifiant.REGISTRE -> viewModel.registreCommerce
+                    }
+                    val formatIncorrect = !regle.estValide(valeur)
+                    OnbChamp(
+                        icone = when (regle.cle) {
+                            CleIdentifiant.FISCAL -> Icons.Outlined.Badge
+                            CleIdentifiant.REGISTRE -> Icons.Outlined.Gavel
+                        },
+                        label = regle.libelle,
+                    ) {
+                        OutlinedTextField(
+                            value = valeur,
+                            onValueChange = { saisie ->
+                                when (regle.cle) {
+                                    CleIdentifiant.FISCAL -> viewModel.numeroFiscal = saisie
+                                    CleIdentifiant.REGISTRE -> viewModel.registreCommerce = saisie
+                                }
+                            },
+                            placeholder = {
+                                if (regle.exemple.isNotEmpty()) Text(regle.exemple)
+                            },
+                            singleLine = true,
+                            isError = formatIncorrect,
+                            enabled = !viewModel.enregistrementEnCours,
+                            supportingText = if (formatIncorrect && regle.exemple.isNotEmpty()) {
+                                {
+                                    Text(
+                                        text = stringResource(
+                                            R.string.fisc_format_attendu,
+                                            regle.exemple,
+                                        ),
+                                        color = MissaMuted,
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
 
@@ -345,6 +380,36 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                     )
                 }
             }
+        }
+    }
+}
+
+/** Bandeau rappelant la zone fiscale déduite du pays et son référentiel comptable. */
+@Composable
+private fun OnbZoneFiscale(zone: ZoneFiscale) {
+    val libelle = stringResource(zone.libelleRes)
+    val texte = zone.referentielComptable?.let { "$libelle · $it" } ?: libelle
+    Surface(
+        color = MissaSoftBlue,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Public,
+                contentDescription = null,
+                tint = BrandBlue,
+                modifier = Modifier.size(16.dp),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = "${stringResource(R.string.fisc_zone_label)} : $texte",
+                fontSize = 12.sp,
+                color = MissaInk,
+            )
         }
     }
 }
@@ -405,6 +470,16 @@ private fun OnbChamp(
     labelRes: Int,
     content: @Composable () -> Unit,
 ) {
+    OnbChamp(icone = icone, label = stringResource(labelRes), content = content)
+}
+
+/** Variante à libellé dynamique (identifiants légaux dépendant du pays). */
+@Composable
+private fun OnbChamp(
+    icone: ImageVector,
+    label: String,
+    content: @Composable () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
@@ -423,7 +498,7 @@ private fun OnbChamp(
                 .padding(start = 10.dp),
         ) {
             Text(
-                text = stringResource(labelRes),
+                text = label,
                 fontSize = 12.5.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MissaInk,

@@ -21,8 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.CleIdentifiant
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.core.domain.model.ReferentielFiscal
+import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.MissaPanel
 import com.missa.b360.ui.components.MissaSectionTitle
 
@@ -97,16 +100,37 @@ fun AdminReglagesScreen(
             state.pays?.let {
                 Text("${stringResource(R.string.ob_pays)} : $it", style = MaterialTheme.typography.bodySmall)
             }
+            val zone = ReferentielFiscal.zone(Iso4217.codePaysDepuisNom(state.pays))
+            val libelleZone = stringResource(zone.libelleRes)
+            Text(
+                text = "${stringResource(R.string.fisc_zone_label)} : " +
+                    (zone.referentielComptable?.let { "$libelleZone · $it" } ?: libelleZone),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            val reglesIdentifiants = ReferentielFiscal.regles(
+                codePays = Iso4217.codePaysDepuisNom(state.pays),
+                libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
+                libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
+            )
             SettingField(state.secteur, viewModel::changerSecteur, R.string.adm_secteur)
             SettingField(state.adresse, viewModel::changerAdresse, R.string.adm_adresse)
             SettingField(state.telephone, viewModel::changerTelephone, R.string.adm_telephone)
             SettingField(state.email, viewModel::changerEmail, R.string.adm_email)
-            SettingField(state.numeroFiscal, viewModel::changerNumeroFiscal, R.string.obn_numero_fiscal)
-            SettingField(
-                value = state.registreCommerce,
-                onValueChange = viewModel::changerRegistreCommerce,
-                labelRes = R.string.obn_registre,
-            )
+            reglesIdentifiants.forEach { regle ->
+                when (regle.cle) {
+                    CleIdentifiant.FISCAL -> SettingField(
+                        value = state.numeroFiscal,
+                        onValueChange = viewModel::changerNumeroFiscal,
+                        label = regle.libelle,
+                    )
+                    CleIdentifiant.REGISTRE -> SettingField(
+                        value = state.registreCommerce,
+                        onValueChange = viewModel::changerRegistreCommerce,
+                        label = regle.libelle,
+                    )
+                }
+            }
             Button(onClick = viewModel::sauvegarderInfos, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.adm_sauvegarder), fontWeight = FontWeight.Bold)
             }
@@ -131,10 +155,16 @@ private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: Strin
 
 @Composable
 private fun SettingField(value: String, onValueChange: (String) -> Unit, labelRes: Int) {
+    SettingField(value = value, onValueChange = onValueChange, label = stringResource(labelRes))
+}
+
+/** Variante à libellé dynamique (identifiants légaux dépendant du pays). */
+@Composable
+private fun SettingField(value: String, onValueChange: (String) -> Unit, label: String) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(stringResource(labelRes)) },
+        label = { Text(label) },
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
     )

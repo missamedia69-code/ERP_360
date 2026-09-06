@@ -1443,11 +1443,25 @@
     <string name="obn_email_ex">contact@company.com</string>
     <string name="obn_adresse">Address</string>
     <string name="obn_adresse_ex">Street, district, city</string>
-    <string name="obn_numero_fiscal">Tax number (TIN / VAT)</string>
-    <string name="obn_numero_fiscal_ex">TIN-123456789</string>
-    <string name="obn_registre">Trade register</string>
-    <string name="obn_registre_ex">REG-2024-001234</string>
     <string name="obn_entreprise_contact">Contact details and legal identifiers</string>
     <string name="obn_entreprise_contact_sous">Automatically reused on your quotes, invoices and delivery notes.</string>
     <string name="obn_erreur_email_entreprise">Invalid email address.</string>
+
+    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    <string name="fisc_zone_cemac">OHADA — CEMAC</string>
+    <string name="fisc_zone_uemoa">OHADA — WAEMU</string>
+    <string name="fisc_zone_ohada">OHADA</string>
+    <string name="fisc_zone_ue">European Union</string>
+    <string name="fisc_zone_europe">Non-EU Europe</string>
+    <string name="fisc_zone_gcc">Gulf Cooperation Council</string>
+    <string name="fisc_zone_afrique_nord">North Africa</string>
+    <string name="fisc_zone_afrique">Sub-Saharan Africa</string>
+    <string name="fisc_zone_amerique_nord">North America</string>
+    <string name="fisc_zone_amerique_latine">Latin America</string>
+    <string name="fisc_zone_asie_pacifique">Asia-Pacific</string>
+    <string name="fisc_zone_autre">Other zone</string>
+    <string name="fisc_zone_label">Tax zone</string>
+    <string name="fisc_id_fiscal">Tax number</string>
+    <string name="fisc_id_registre">Trade register</string>
+    <string name="fisc_format_attendu">Expected format: %1$s</string>
 </resources>

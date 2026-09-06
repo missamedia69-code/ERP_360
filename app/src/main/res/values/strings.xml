@@ -1450,11 +1450,25 @@
     <string name="obn_email_ex">contact@entreprise.com</string>
     <string name="obn_adresse">Adresse</string>
     <string name="obn_adresse_ex">Rue, quartier, ville</string>
-    <string name="obn_numero_fiscal">Numéro fiscal (NIU / NIF)</string>
-    <string name="obn_numero_fiscal_ex">P0123456789X</string>
-    <string name="obn_registre">Registre du commerce (RCCM)</string>
-    <string name="obn_registre_ex">RC/DLA/2024/B/1234</string>
     <string name="obn_entreprise_contact">Coordonnées et identifiants légaux</string>
     <string name="obn_entreprise_contact_sous">Reprises automatiquement sur vos devis, factures et bons de livraison.</string>
     <string name="obn_erreur_email_entreprise">Adresse e-mail invalide.</string>
+
+    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    <string name="fisc_zone_cemac">OHADA — CEMAC</string>
+    <string name="fisc_zone_uemoa">OHADA — UEMOA</string>
+    <string name="fisc_zone_ohada">OHADA</string>
+    <string name="fisc_zone_ue">Union européenne</string>
+    <string name="fisc_zone_europe">Europe hors UE</string>
+    <string name="fisc_zone_gcc">Conseil de coopération du Golfe</string>
+    <string name="fisc_zone_afrique_nord">Afrique du Nord</string>
+    <string name="fisc_zone_afrique">Afrique subsaharienne</string>
+    <string name="fisc_zone_amerique_nord">Amérique du Nord</string>
+    <string name="fisc_zone_amerique_latine">Amérique latine</string>
+    <string name="fisc_zone_asie_pacifique">Asie-Pacifique</string>
+    <string name="fisc_zone_autre">Autre zone</string>
+    <string name="fisc_zone_label">Zone fiscale</string>
+    <string name="fisc_id_fiscal">Numéro fiscal</string>
+    <string name="fisc_id_registre">Registre du commerce</string>
+    <string name="fisc_format_attendu">Format attendu : %1$s</string>
 </resources>
