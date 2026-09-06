@@ -72,6 +72,6 @@ class ReferentielFiscalTest {
 
     @Test
     fun `table chargee sans perte de lignes`() {
-        assertEquals(76, ReferentielFiscal.paysDetailles)
+        assertEquals(89, ReferentielFiscal.paysDetailles)
     }
 }

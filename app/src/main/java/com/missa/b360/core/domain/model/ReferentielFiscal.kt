@@ -134,10 +134,23 @@ object ReferentielFiscal {
         PL|UE|NIP|PL[0-9]{10}|PL1234567890|KRS|D10|0000123456
         RO|UE|CUI|RO[0-9]{2,10}|RO12345678|Nr. ORC|REG|J40/1234/2024
         GB|EUROPE|VAT number|GB[0-9]{9}|GB123456789|Company number|AN|12345678
+        GR|UE|ΑΦΜ (VAT)|EL[0-9]{9}|EL123456789|Αριθμός ΓΕΜΗ|REG|123456789000
+        FI|UE|ALV-numero|FI[0-9]{8}|FI12345678|Y-tunnus|[0-9]{7}-[0-9]|1234567-8
+        SE|UE|Momsregistreringsnummer|SE[0-9]{12}|SE123456789001|Organisationsnummer|[0-9]{6}-[0-9]{4}|556123-4567
+        DK|UE|Momsnummer|DK[0-9]{8}|DK12345678|CVR-nummer|D8|12345678
+        HU|UE|Közösségi adószám|HU[0-9]{8}|HU12345678|Adószám|[0-9]{8}-[0-9]-[0-9]{2}|12345678-2-42
+        CZ|UE|DIČ|CZ[0-9]{8,10}|CZ12345678|IČO|[0-9]{8}|12345678
+        BG|UE|ДДС номер|BG[0-9]{9,10}|BG123456789|ЕИК|[0-9]{9,13}|123456789
+        AD|EUROPE|NRT|[A-Z][0-9]{6}[A-Z]|A123456X|Registre de Societats|REG|12345
+        MC|EUROPE|N° TVA|FR[A-Z0-9]{2}[0-9]{9}|FR12345678901|RCI|REG|24S12345
         CH|EUROPE|N° TVA (IDE)|CHE[0-9]{9}|CHE123456789|N° IDE|CHE[0-9]{9}|CHE123456789
         NO|EUROPE|MVA-nummer|NO[0-9]{9}MVA|NO123456789MVA|Organisasjonsnummer|D9|123456789
         US|AMERIQUE_NORD|EIN|[0-9]{2}-?[0-9]{7}|12-3456789|State registration|REG|C1234567
         CA|AMERIQUE_NORD|Business number (BN)|D9|123456789|GST/HST number|[0-9]{9}RT[0-9]{4}|123456789RT0001
+        CR|AMERIQUE_LATINE|Cédula jurídica|[0-9]{9,12}|3101123456|Registro Nacional|REG|3-101-123456
+        BS|AUTRE|TIN|[0-9]{6,12}|123456789|Company number|REG|123456 B
+        BM|AUTRE|TIN|[0-9]{6,12}|123456789|Registrar of Companies|REG|12345
+        KY|AUTRE|TIN|[0-9]{6,12}|123456789|Company number|REG|123456
         BR|AMERIQUE_LATINE|CNPJ|[0-9./-]{14,18}|12.345.678/0001-95|Inscrição estadual|REG|123.456.789.110
         MX|AMERIQUE_LATINE|RFC|[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}|ABC010203XY1|Folio mercantil|REG|N-2024012345
         CO|AMERIQUE_LATINE|NIT|[0-9]{9,10}-?[0-9]?|900123456-7|Matrícula mercantil|REG|01234567

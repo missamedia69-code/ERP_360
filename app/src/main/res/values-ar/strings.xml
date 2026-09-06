@@ -1451,4 +1451,31 @@
     <string name="fisc_pack_personnaliser">تعديل هذه العناصر يدويًا</string>
     <string name="fisc_pack_personnaliser_note">استخدمه فقط إذا كانت الحزمة لا تطابق وضعك.</string>
     <string name="fisc_pack_aucun_pays">اختر دولة لتطبيق العملة والضريبة والمعرفات القانونية تلقائيًا.</string>
+
+    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taxe_tva">ضريبة القيمة المضافة</string>
+    <string name="fisc_taxe_gst">GST</string>
+    <string name="fisc_taxe_gst_hst">GST/HST</string>
+    <string name="fisc_taxe_sst">SST</string>
+    <string name="fisc_taxe_ventes">ضريبة المبيعات</string>
+    <string name="fisc_taxe_consommation">ضريبة الاستهلاك</string>
+    <string name="fisc_taxe_icms">ICMS/IPI</string>
+    <string name="fisc_taxe_igi">IGI</string>
+    <string name="fisc_taxe_itbms">ITBMS</string>
+    <string name="fisc_taxe_aucune">لا توجد ضريبة استهلاك</string>
+    <string name="fisc_ir_progressif">تصاعدي</string>
+    <string name="fisc_ir_forfaitaire">معدل موحد</string>
+    <string name="fisc_ir_aucun">لا يوجد</string>
+    <string name="fisc_pack_taxe">ضريبة الاستهلاك</string>
+    <string name="fisc_pack_taux_reduits">المعدلات المخفضة</string>
+    <string name="fisc_pack_seuil">حد التسجيل</string>
+    <string name="fisc_pack_impot_societes">ضريبة الشركات</string>
+    <string name="fisc_pack_impot_revenu">ضريبة الدخل</string>
+    <string name="fisc_pack_efacture">الفوترة الإلكترونية</string>
+    <string name="fisc_pack_is_minimum">%1$s (بحد أدنى %2$s من رقم الأعمال)</string>
+    <string name="fisc_pack_ir_valeur">%1$s، حتى %2$s</string>
+    <string name="fisc_pack_efacture_obligatoire">إلزامية · %1$s</string>
+    <string name="fisc_pack_efacture_facultative">اختيارية · %1$s</string>
+    <string name="fisc_pack_efacture_aucune">لا يوجد نظام وطني</string>
+    <string name="fisc_pack_seuil_aucun">لا يوجد حد: الضريبة مستحقة من أول عملية</string>
 </resources>

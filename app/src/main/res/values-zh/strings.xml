@@ -1451,4 +1451,31 @@
     <string name="fisc_pack_personnaliser">手动修改这些项目</string>
     <string name="fisc_pack_personnaliser_note">仅当配置与您的实际情况不符时使用。</string>
     <string name="fisc_pack_aucun_pays">选择国家后将自动套用货币、税率和法定证照。</string>
+
+    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taxe_tva">增值税</string>
+    <string name="fisc_taxe_gst">商品服务税</string>
+    <string name="fisc_taxe_gst_hst">GST/HST</string>
+    <string name="fisc_taxe_sst">销售与服务税</string>
+    <string name="fisc_taxe_ventes">销售税</string>
+    <string name="fisc_taxe_consommation">消费税</string>
+    <string name="fisc_taxe_icms">ICMS/IPI</string>
+    <string name="fisc_taxe_igi">IGI</string>
+    <string name="fisc_taxe_itbms">ITBMS</string>
+    <string name="fisc_taxe_aucune">无消费税</string>
+    <string name="fisc_ir_progressif">累进制</string>
+    <string name="fisc_ir_forfaitaire">单一税率</string>
+    <string name="fisc_ir_aucun">无</string>
+    <string name="fisc_pack_taxe">消费税</string>
+    <string name="fisc_pack_taux_reduits">优惠税率</string>
+    <string name="fisc_pack_seuil">起征点</string>
+    <string name="fisc_pack_impot_societes">企业所得税</string>
+    <string name="fisc_pack_impot_revenu">个人所得税</string>
+    <string name="fisc_pack_efacture">电子发票</string>
+    <string name="fisc_pack_is_minimum">%1$s（营业额最低 %2$s）</string>
+    <string name="fisc_pack_ir_valeur">%1$s，最高 %2$s</string>
+    <string name="fisc_pack_efacture_obligatoire">强制 · %1$s</string>
+    <string name="fisc_pack_efacture_facultative">可选 · %1$s</string>
+    <string name="fisc_pack_efacture_aucune">暂无国家系统</string>
+    <string name="fisc_pack_seuil_aucun">无起征点：首笔交易即计税</string>
 </resources>

@@ -104,3 +104,39 @@ hors ligne.
 * Les motifs de contrôle sont volontairement permissifs : mieux vaut accepter une saisie exacte
   inhabituelle que bloquer un utilisateur.
 * Couverture vérifiée par `app/src/test/java/com/missa/b360/ReferentielFiscalTest.kt`.
+
+## 6. Pack pays (livré)
+
+Sélectionner un pays à l'onboarding applique désormais un **pack complet** : devise officielle,
+taux de taxe, indicatif téléphonique, zone fiscale, identifiants légaux attendus et, quand il
+existe, le dispositif national de facturation électronique. Aucun de ces éléments n'a de champ
+de saisie permanent : ils s'affichent en lecture dans la carte « Pack pays appliqué », et une
+option unique — *Modifier manuellement ces éléments* — déplie devise, taux et pays libre.
+
+### Où vit quelle donnée (une seule source par information)
+
+| Donnée | Source unique |
+| --- | --- |
+| Devise | `Iso4217.deviseDuPays()` — référentiel ISO du système |
+| Taux de taxe standard | `Iso4217.TAXES_SUGGEREES` (136 pays) |
+| Nature de la taxe, taux réduits, seuil, IS, IR, e‑facturation | `ReferentielPackPays.TABLE` (78 pays) |
+| Zone fiscale et identifiants légaux | `ReferentielFiscal` (89 fiches) |
+| Indicatif téléphonique | `Iso4217.INDICATIFS_TELEPHONIQUES` |
+
+`PackPays` ne redéclare donc **ni** la devise **ni** le taux standard : la cohérence entre les
+tables est vérifiée par `app/src/test/java/com/missa/b360/PackPaysTest.kt`.
+
+### Taux arbitrés après vérification en ligne
+
+| Pays | Retenu | Motif |
+| --- | --- | --- |
+| Ghana | 20 % | 15 % de TVA + NHIL 2,5 % + GETFund 2,5 % ; la COVID‑19 Levy est abolie au 1er janvier 2026 |
+| Niger | 19 % | Taux national confirmé (circulaire DGI n° 004 de 2025), au‑dessus des 18 % harmonisés UEMOA |
+| Tchad | 18 % | Taux normal, réduit à 9 % |
+| Congo | 18 % | Corrigé (valait 0 %) ; réduit 5 %, effectif 18,9 % avec les centimes additionnels |
+| Comores | 10 % | Corrigé (valait 15 %) ; réduits 3 %, 5 % et 7,5 % |
+| Brésil | 17 % | ICMS de référence ; CBS 0,9 % et IBS 0,1 % restent symboliques jusqu'en 2027 |
+| Monaco | 20 % | Corrigé (valait 0 %) : TVA française appliquée de plein droit |
+| États‑Unis | 0 % | Pas de taxe fédérale ; la sales tax dépend de l'État et du comté |
+
+Ajouts au catalogue : Centrafrique 19 %, Guinée équatoriale 15 %, Comores 10 %.

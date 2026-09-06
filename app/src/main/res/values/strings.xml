@@ -1479,4 +1479,31 @@
     <string name="fisc_pack_personnaliser">Modifier manuellement ces éléments</string>
     <string name="fisc_pack_personnaliser_note">À n\'utiliser que si le pack ne correspond pas à votre situation.</string>
     <string name="fisc_pack_aucun_pays">Choisissez un pays pour appliquer automatiquement devise, taxe et identifiants légaux.</string>
+
+    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taxe_tva">TVA</string>
+    <string name="fisc_taxe_gst">GST</string>
+    <string name="fisc_taxe_gst_hst">GST/HST</string>
+    <string name="fisc_taxe_sst">SST</string>
+    <string name="fisc_taxe_ventes">Taxe sur les ventes</string>
+    <string name="fisc_taxe_consommation">Taxe à la consommation</string>
+    <string name="fisc_taxe_icms">ICMS/IPI</string>
+    <string name="fisc_taxe_igi">IGI</string>
+    <string name="fisc_taxe_itbms">ITBMS</string>
+    <string name="fisc_taxe_aucune">Aucune taxe à la consommation</string>
+    <string name="fisc_ir_progressif">Progressif</string>
+    <string name="fisc_ir_forfaitaire">Taux unique</string>
+    <string name="fisc_ir_aucun">Aucun</string>
+    <string name="fisc_pack_taxe">Taxe à la consommation</string>
+    <string name="fisc_pack_taux_reduits">Taux réduits</string>
+    <string name="fisc_pack_seuil">Seuil d\'assujettissement</string>
+    <string name="fisc_pack_impot_societes">Impôt sur les sociétés</string>
+    <string name="fisc_pack_impot_revenu">Impôt sur le revenu</string>
+    <string name="fisc_pack_efacture">Facturation électronique</string>
+    <string name="fisc_pack_is_minimum">%1$s (minimum %2$s du chiffre d\'affaires)</string>
+    <string name="fisc_pack_ir_valeur">%1$s, jusqu\'à %2$s</string>
+    <string name="fisc_pack_efacture_obligatoire">Obligatoire · %1$s</string>
+    <string name="fisc_pack_efacture_facultative">Facultative · %1$s</string>
+    <string name="fisc_pack_efacture_aucune">Aucun dispositif national</string>
+    <string name="fisc_pack_seuil_aucun">Aucun seuil : taxe due dès le premier franc</string>
 </resources>

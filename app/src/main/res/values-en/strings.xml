@@ -1472,4 +1472,31 @@
     <string name="fisc_pack_personnaliser">Change these values manually</string>
     <string name="fisc_pack_personnaliser_note">Only needed if the pack does not match your situation.</string>
     <string name="fisc_pack_aucun_pays">Choose a country to apply currency, tax and legal identifiers automatically.</string>
+
+    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    <string name="fisc_taxe_tva">VAT</string>
+    <string name="fisc_taxe_gst">GST</string>
+    <string name="fisc_taxe_gst_hst">GST/HST</string>
+    <string name="fisc_taxe_sst">SST</string>
+    <string name="fisc_taxe_ventes">Sales tax</string>
+    <string name="fisc_taxe_consommation">Consumption tax</string>
+    <string name="fisc_taxe_icms">ICMS/IPI</string>
+    <string name="fisc_taxe_igi">IGI</string>
+    <string name="fisc_taxe_itbms">ITBMS</string>
+    <string name="fisc_taxe_aucune">No consumption tax</string>
+    <string name="fisc_ir_progressif">Progressive</string>
+    <string name="fisc_ir_forfaitaire">Flat rate</string>
+    <string name="fisc_ir_aucun">None</string>
+    <string name="fisc_pack_taxe">Consumption tax</string>
+    <string name="fisc_pack_taux_reduits">Reduced rates</string>
+    <string name="fisc_pack_seuil">Registration threshold</string>
+    <string name="fisc_pack_impot_societes">Corporate income tax</string>
+    <string name="fisc_pack_impot_revenu">Personal income tax</string>
+    <string name="fisc_pack_efacture">Electronic invoicing</string>
+    <string name="fisc_pack_is_minimum">%1$s (minimum %2$s of turnover)</string>
+    <string name="fisc_pack_ir_valeur">%1$s, up to %2$s</string>
+    <string name="fisc_pack_efacture_obligatoire">Mandatory · %1$s</string>
+    <string name="fisc_pack_efacture_facultative">Optional · %1$s</string>
+    <string name="fisc_pack_efacture_aucune">No national system</string>
+    <string name="fisc_pack_seuil_aucun">No threshold: tax due from the first sale</string>
 </resources>

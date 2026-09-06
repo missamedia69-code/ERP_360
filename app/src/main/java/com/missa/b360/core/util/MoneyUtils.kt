@@ -118,7 +118,7 @@ object Iso4217 {
         "RU" to TaxeReference(20.0, "20 %"),
         "RS" to TaxeReference(20.0, "20 %"),
         "UA" to TaxeReference(20.0, "20 %"),
-        "MC" to TaxeReference(0.0, "Aucune (TVA française de facto)"),
+        "MC" to TaxeReference(20.0, "20 % (TVA française)"),
 
         // Afrique
         "DZ" to TaxeReference(19.0, "19 %"),
@@ -128,16 +128,16 @@ object Iso4217 {
         "CM" to TaxeReference(19.25, "19,25 %"),
         "CD" to TaxeReference(16.0, "16 %"),
         "CF" to TaxeReference(19.0, "19 %"),
-        "CG" to TaxeReference(0.0, "TVA sur services numériques"),
+        "CG" to TaxeReference(18.0, "18 %"),
         "CI" to TaxeReference(18.0, "18 %"),
         "EG" to TaxeReference(14.0, "14 %"),
         "ET" to TaxeReference(15.0, "15 %"),
         "GA" to TaxeReference(18.0, "18 %"),
-        "GH" to TaxeReference(20.0, "~20 %"),
+        "GH" to TaxeReference(20.0, "20 % (TVA 15 % + NHIL/GETFund 5 %)"),
         "GN" to TaxeReference(18.0, "18 %"),
         "GQ" to TaxeReference(15.0, "15 %"),
         "KE" to TaxeReference(16.0, "16 %"),
-        "KM" to TaxeReference(15.0, "15 %"),
+        "KM" to TaxeReference(10.0, "10 %"),
         "LR" to TaxeReference(0.0, "GST (variable)"),
         "ML" to TaxeReference(18.0, "18 %"),
         "MA" to TaxeReference(20.0, "20 %"),
@@ -160,7 +160,7 @@ object Iso4217 {
         // Amériques
         "AR" to TaxeReference(21.0, "21 %"),
         "BO" to TaxeReference(13.0, "13 %"),
-        "BR" to TaxeReference(0.0, "Système dual IBS/CBS"),
+        "BR" to TaxeReference(17.0, "17 % (ICMS, variable par État)"),
         "BS" to TaxeReference(0.0, "Aucune"),
         "BM" to TaxeReference(0.0, "Aucune"),
         "CA" to TaxeReference(5.0, "5 % (GST) + HST 13–15 %"),
@@ -266,6 +266,14 @@ object Iso4217 {
      * Alimente le « pack pays » proposé à l'onboarding ; l'utilisateur reste libre
      * de choisir une autre devise ensuite.
      */
+    /** Pourcentage sans décimale inutile : « 19,25 % » mais « 20 % ». */
+    fun formatPourcentage(taux: Double): String =
+        if (taux % 1.0 == 0.0) {
+            String.format(Locale.getDefault(), "%d %%", taux.toInt())
+        } else {
+            String.format(Locale.getDefault(), "%.2f %%", taux)
+        }
+
     fun deviseDuPays(codePays: String?): String? {
         val code = codePays?.trim()?.uppercase()?.takeIf { it.length == 2 } ?: return null
         return runCatching {

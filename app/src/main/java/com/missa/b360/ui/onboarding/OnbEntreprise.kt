@@ -64,7 +64,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.CleIdentifiant
+import com.missa.b360.core.domain.model.PackPays
 import com.missa.b360.core.domain.model.ReferentielFiscal
+import com.missa.b360.core.domain.model.ReferentielPackPays
+import com.missa.b360.core.domain.model.TypeImpotRevenu
+import com.missa.b360.core.domain.model.TypeTaxe
 import com.missa.b360.core.domain.model.ZoneFiscale
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.CompanyLogo
@@ -102,11 +106,18 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
         paysListe.associate { pays -> pays.code to Iso4217.deviseDuPays(pays.code) }
     }
     val optionsPays = paysListe.map { pays ->
+        val typeTaxe = ReferentielPackPays.pack(pays.code)?.typeTaxe
         MissaOption(
             cle = pays.code,
             titre = pays.nom,
-            // Le taux n'est affiché qu'une fois : le libellé le porte déjà.
-            sousTitre = pays.libelleTaxe,
+            // Le taux n'est affiché qu'une fois, suivi de la nature locale de la
+            // taxe (TVA, VAT, GST…) ; repli sur le libellé du catalogue.
+            sousTitre = when (typeTaxe) {
+                null -> pays.libelleTaxe
+                TypeTaxe.AUCUNE -> stringResource(TypeTaxe.AUCUNE.libelleRes)
+                else -> Iso4217.formatPourcentage(pays.tauxTaxeSuggere) +
+                    " · " + stringResource(typeTaxe.libelleRes)
+            },
             badge = pays.code,
             badgeSecondaire = devisesParPays[pays.code],
         )
@@ -226,6 +237,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 },
                 libelleTaxe = paysListe.firstOrNull { it.code == viewModel.codePays }?.libelleTaxe,
                 tauxTaxe = viewModel.tauxTaxeTexte,
+                pack = ReferentielPackPays.pack(viewModel.codePays),
                 indicatif = Iso4217.indicatifTelephone(viewModel.codePays),
                 zone = zoneFiscale,
                 identifiants = reglesIdentifiants.map { it.libelle },
@@ -424,6 +436,7 @@ private fun OnbPackPays(
     nomDevise: String,
     libelleTaxe: String?,
     tauxTaxe: String,
+    pack: PackPays?,
     indicatif: String?,
     zone: ZoneFiscale,
     identifiants: List<String>,
@@ -431,15 +444,14 @@ private fun OnbPackPays(
 ) {
     var personnaliser by rememberSaveable { mutableStateOf(false) }
     val libelleZone = stringResource(zone.libelleRes)
-    // Le taux effectif prime ; le nom local de la taxe (entre parenthèses dans le
-    // référentiel : « 19,25 % (TVA) ») le complète sans répéter la valeur.
-    val nomTaxe = libelleTaxe?.substringAfter('(', "")?.substringBefore(')')?.takeIf {
-        it.isNotBlank()
-    }
+    // Le taux effectif prime, suivi de la nature locale de la taxe issue du
+    // référentiel détaillé ; à défaut, le libellé du catalogue fait foi.
+    val nomTaxe = pack?.typeTaxe?.let { stringResource(it.libelleRes) }
     val valeurTaxe = when {
+        pack?.typeTaxe == TypeTaxe.AUCUNE -> nomTaxe
         tauxTaxe.isBlank() -> libelleTaxe
-        nomTaxe != null -> "$tauxTaxe % ($nomTaxe)"
-        else -> "$tauxTaxe %"
+        nomTaxe != null -> "$tauxTaxe % · $nomTaxe"
+        else -> libelleTaxe ?: "$tauxTaxe %"
     }
     Surface(
         color = MissaSoftBlue,
@@ -480,7 +492,44 @@ private fun OnbPackPays(
                     valeur = "$devise · $nomDevise",
                 )
                 valeurTaxe?.let { taxe ->
-                    OnbPackLigne(labelRes = R.string.ob_taux_taxe, valeur = taxe)
+                    OnbPackLigne(labelRes = R.string.fisc_pack_taxe, valeur = taxe)
+                }
+                pack?.tauxReduits?.takeIf { it.isNotEmpty() }?.let { reduits ->
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_taux_reduits,
+                        valeur = reduits.joinToString(" · ", transform = Iso4217::formatPourcentage),
+                    )
+                }
+                pack?.seuilAssujettissement?.let { seuil ->
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_seuil,
+                        valeur = Iso4217.format(seuil.toDouble(), devise),
+                    )
+                }
+                pack?.let { detail ->
+                    val tauxIs = Iso4217.formatPourcentage(detail.impotSocietes)
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_impot_societes,
+                        valeur = detail.impotSocietesMinimum?.let { minimum ->
+                            stringResource(
+                                R.string.fisc_pack_is_minimum,
+                                tauxIs,
+                                Iso4217.formatPourcentage(minimum),
+                            )
+                        } ?: tauxIs,
+                    )
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_impot_revenu,
+                        valeur = if (detail.impotRevenu == TypeImpotRevenu.AUCUN) {
+                            stringResource(TypeImpotRevenu.AUCUN.libelleRes)
+                        } else {
+                            stringResource(
+                                R.string.fisc_pack_ir_valeur,
+                                stringResource(detail.impotRevenu.libelleRes),
+                                Iso4217.formatPourcentage(detail.impotRevenuMax),
+                            )
+                        },
+                    )
                 }
                 indicatif?.let { code ->
                     OnbPackLigne(labelRes = R.string.fisc_pack_indicatif, valeur = code)
@@ -495,6 +544,27 @@ private fun OnbPackPays(
                     OnbPackLigne(
                         labelRes = R.string.fisc_pack_identifiants,
                         valeur = identifiants.joinToString(" · "),
+                    )
+                }
+                if (pack != null) {
+                    val eFacture = pack.eFacturation
+                    OnbPackLigne(
+                        labelRes = R.string.fisc_pack_efacture,
+                        valeur = if (eFacture == null) {
+                            stringResource(R.string.fisc_pack_efacture_aucune)
+                        } else {
+                            val dispositif = eFacture.format
+                                ?.let { "${eFacture.systeme} ($it)" }
+                                ?: eFacture.systeme
+                            stringResource(
+                                if (eFacture.obligatoire) {
+                                    R.string.fisc_pack_efacture_obligatoire
+                                } else {
+                                    R.string.fisc_pack_efacture_facultative
+                                },
+                                dispositif,
+                            )
+                        },
                     )
                 }
             }
