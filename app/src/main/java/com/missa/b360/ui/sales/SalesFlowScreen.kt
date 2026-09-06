@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Cancel
@@ -45,7 +46,6 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.Print
-import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -92,7 +92,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
@@ -751,7 +751,7 @@ private fun EmptySalesList(onNewSale: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             Surface(modifier = Modifier.size(46.dp), shape = CircleShape, color = FlowBlueSoft) {
-                Icon(Icons.Outlined.ReceiptLong, null, tint = FlowBlue, modifier = Modifier.padding(11.dp))
+                Icon(Icons.AutoMirrored.Outlined.ReceiptLong, null, tint = FlowBlue, modifier = Modifier.padding(11.dp))
             }
             Text(stringResource(R.string.sales_no_sales), color = FlowInk, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.sales_no_sales_description), color = FlowMuted, fontSize = 12.sp, textAlign = TextAlign.Center)
@@ -988,7 +988,7 @@ private fun CartStepContent(
     LazyColumn(modifier = modifier.fillMaxSize(), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
         item { CartTable(lines, devise, stockOf, onQuantityChange, onEditLine, onRemove) }
         item {
-            OutlinedTextField(value = note, onValueChange = onNoteChange, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.sales_add_note)) }, leadingIcon = { Icon(Icons.Outlined.ReceiptLong, null) }, minLines = 1, maxLines = 2)
+            OutlinedTextField(value = note, onValueChange = onNoteChange, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.sales_add_note)) }, leadingIcon = { Icon(Icons.AutoMirrored.Outlined.ReceiptLong, null) }, minLines = 1, maxLines = 2)
         }
         item { CartTotals(totals, taxRate, devise, discount, delivery, onDiscountChange, onDeliveryChange) }
     }
@@ -1321,7 +1321,7 @@ private fun InvoiceOptionsScreen(
             item { InvoiceOption(Icons.Outlined.Share, R.string.sales_share_invoice, R.string.sales_share_invoice_description, onShare) }
             item { InvoiceOption(Icons.Outlined.Download, R.string.sales_download_pdf, R.string.sales_download_pdf_description, onDownload) }
             item { InvoiceOption(Icons.Outlined.Email, R.string.sales_email_invoice, R.string.sales_email_invoice_description, onEmail) }
-            item { InvoiceOption(Icons.Outlined.ReceiptLong, R.string.sales_view_invoice, R.string.sales_view_invoice_description, onView) }
+            item { InvoiceOption(Icons.AutoMirrored.Outlined.ReceiptLong, R.string.sales_view_invoice, R.string.sales_view_invoice_description, onView) }
             item { InvoiceOption(Icons.Outlined.ContentCopy, R.string.sales_duplicate_sale, R.string.sales_duplicate_sale_description, onDuplicate) }
             item { InvoiceOption(Icons.Outlined.History, R.string.sales_return_sale, R.string.sales_return_sale_description, onReturn) }
             item { InvoiceOption(Icons.Outlined.Cancel, R.string.sales_cancel_sale, R.string.sales_cancel_sale_description, onCancel, destructive = true) }
@@ -1354,7 +1354,7 @@ private fun PrintScreen(
     onBack: () -> Unit,
     onPrint: () -> Unit,
 ) {
-    Scaffold(containerColor = Color(0xFF1B1C20), topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_print_title), color = Color.White, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back), tint = Color.White) } }, colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color(0xFF1B1C20))) }, bottomBar = { Button(onClick = onPrint, modifier = Modifier.fillMaxWidth().padding(16.dp).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = FlowBlue)) { Icon(Icons.Outlined.Print, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.sales_print)) } }) { padding ->
+    Scaffold(containerColor = Color(0xFF1B1C20), topBar = { CenterAlignedTopAppBar(title = { Text(stringResource(R.string.sales_print_title), color = Color.White, fontSize = 14.sp) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.sales_back), tint = Color.White) } }, colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF1B1C20))) }, bottomBar = { Button(onClick = onPrint, modifier = Modifier.fillMaxWidth().padding(16.dp).height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = FlowBlue)) { Icon(Icons.Outlined.Print, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.sales_print)) } }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(22.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Surface(modifier = Modifier.fillMaxWidth().height(480.dp), shape = RoundedCornerShape(5.dp), color = Color.White) { Box(modifier = Modifier.padding(14.dp)) { InvoicePaper(receipt, devise, mentions) } }
             Spacer(Modifier.height(14.dp))

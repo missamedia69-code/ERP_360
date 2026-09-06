@@ -26,7 +26,7 @@ private val Context.dataStore: androidx.datastore.core.DataStore<Preferences> by
  */
 @Singleton
 class SettingsStore @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     // --- Clés de réglages ---
     object Keys {

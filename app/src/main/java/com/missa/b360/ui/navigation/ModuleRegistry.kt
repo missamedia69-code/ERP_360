@@ -1,6 +1,7 @@
 package com.missa.b360.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Business
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.RequestQuote
 import androidx.compose.material.icons.outlined.Savings
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.missa.b360.R
@@ -37,7 +37,7 @@ enum class AppModule(
     VENTE("module_vente", R.string.module_vente, Icons.Outlined.PointOfSale, ModuleCode.VEN, bottomBarDefault = true),
     STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, bottomBarDefault = true),
     CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, bottomBarDefault = true),
-    FINANCES("module_finances", R.string.module_finances, Icons.Outlined.TrendingUp, ModuleCode.CPT, bottomBarDefault = true),
+    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT, bottomBarDefault = true),
     ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
     FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
     LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG),

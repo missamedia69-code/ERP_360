@@ -6,13 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.StockMovementType
@@ -28,18 +28,19 @@ import com.missa.b360.ui.clients.ClientsScreen
 import com.missa.b360.ui.comptabilite.ComptabiliteScreen
 import com.missa.b360.ui.crm.CrmScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.logistique.LogistiqueScreen
 import com.missa.b360.ui.maintenance.MaintenanceScreen
-import com.missa.b360.ui.production.ProductionScreen
-import com.missa.b360.ui.purchases.PurchasesScreen
-import com.missa.b360.ui.qualite.QualiteScreen
-import com.missa.b360.ui.home.HomeScreen
-import com.missa.b360.ui.rh.RhScreen
-import com.missa.b360.ui.tasks.TasksScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
+import com.missa.b360.ui.onboarding.OnboardingScreen
+import com.missa.b360.ui.onboarding.PinLockScreen
 import com.missa.b360.ui.operations.OperationFormScreen
 import com.missa.b360.ui.operations.OperationModuleScreen
 import com.missa.b360.ui.operations.ReportingScreen
+import com.missa.b360.ui.production.ProductionScreen
+import com.missa.b360.ui.purchases.PurchasesScreen
+import com.missa.b360.ui.qualite.QualiteScreen
+import com.missa.b360.ui.rh.RhScreen
 import com.missa.b360.ui.sales.DevisCommandeScreen
 import com.missa.b360.ui.sales.ReturnSaleScreen
 import com.missa.b360.ui.sales.SalesScreen
@@ -48,9 +49,8 @@ import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
+import com.missa.b360.ui.tasks.TasksScreen
 import com.missa.b360.ui.tresorerie.TresorerieScreen
-import com.missa.b360.ui.onboarding.OnboardingScreen
-import com.missa.b360.ui.onboarding.PinLockScreen
 
 /** Hôte de navigation de l'application (RA-22 + démarrage Phase B). */
 @Composable

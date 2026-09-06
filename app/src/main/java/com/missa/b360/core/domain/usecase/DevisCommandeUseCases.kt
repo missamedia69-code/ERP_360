@@ -135,7 +135,7 @@ class SaveDevisCommandeUseCase @Inject constructor(
 
         val existant = operationDao.getById(recordId)
         val cible = CommercialTargets.fromRecord(existant ?: return Result.PiecIntrouvable)
-        if (existant == null || cible != target || existant.status == OperationStatus.CANCELLED.name) {
+        if (cible != target || existant.status == OperationStatus.CANCELLED.name) {
             return Result.PiecIntrouvable
         }
         operationDao.update(

@@ -19,12 +19,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SwapVert
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -54,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.dao.StockMovementView
 import com.missa.b360.core.data.entity.StockMovementType
@@ -332,7 +332,7 @@ private fun MovementsTabContent(
         if (movements.isEmpty()) {
             item {
                 MissaEmptyState(
-                    icon = Icons.Outlined.TrendingUp,
+                    icon = Icons.AutoMirrored.Outlined.TrendingUp,
                     title = stringResource(R.string.stock_movements_empty),
                     description = stringResource(R.string.stock_movements_empty_description),
                     action = { TextButton(onClick = onNewMovement) { Text(stringResource(R.string.stock_new_movement)) } },
@@ -351,9 +351,9 @@ private fun MovementRow(movement: StockMovementView) {
     val type = runCatching { StockMovementType.valueOf(movement.type) }.getOrDefault(StockMovementType.ENTREE)
     val (icon, sign, color) = when (type) {
         StockMovementType.ENTREE, StockMovementType.TRANSFERT_ENTREE ->
-            Triple(Icons.Outlined.TrendingUp, "+", Green60)
+            Triple(Icons.AutoMirrored.Outlined.TrendingUp, "+", Green60)
         StockMovementType.SORTIE, StockMovementType.TRANSFERT_SORTIE ->
-            Triple(Icons.Outlined.TrendingDown, "−", Red40)
+            Triple(Icons.AutoMirrored.Outlined.TrendingDown, "−", Red40)
         StockMovementType.AJUSTEMENT ->
             Triple(Icons.Outlined.SwapVert, if (movement.quantite >= 0) "+" else "−", ProfileOrange)
     }

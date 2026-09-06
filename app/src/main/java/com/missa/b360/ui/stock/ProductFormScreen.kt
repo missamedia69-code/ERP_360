@@ -66,7 +66,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.ProductCategoryEntity

@@ -50,7 +50,7 @@ class ClientsViewModel @Inject constructor(
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
     private val siteUseCases: SiteUseCases,
-    private val rappelPaiement: RappelPaiementUseCase,
+    private val rappelPaiementUseCase: RappelPaiementUseCase,
 ) : ViewModel() {
 
     /** Le module Client montre aussi les comptes désactivés, contrairement au sélecteur Vente. */
@@ -115,7 +115,7 @@ class ClientsViewModel @Inject constructor(
             val liste = clients.first()
             _soldes.value = liste.associate { c ->
                 val s = try {
-                    rappelPaiement.soldeClient(c.id)
+                    rappelPaiementUseCase.soldeClient(c.id)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (_: Exception) {
@@ -128,7 +128,7 @@ class ClientsViewModel @Inject constructor(
 
     fun rappelPaiement(clientId: Long) {
         viewModelScope.launch {
-            when (val r = rappelPaiement(clientId)) {
+            when (val r = rappelPaiementUseCase(clientId)) {
                 is RappelPaiementUseCase.Result.Succes -> {
                     _rappelMessage.value = r.reference
                     rafraichirSoldes()

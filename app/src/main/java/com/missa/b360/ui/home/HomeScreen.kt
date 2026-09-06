@@ -26,11 +26,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Business
@@ -40,7 +42,6 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
@@ -50,7 +51,6 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -91,7 +91,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.missa.b360.BuildConfig
@@ -268,7 +268,7 @@ fun HomeScreen(
                         },
                         trailingContent = {
                             Icon(
-                                imageVector = Icons.Outlined.ArrowForwardIos,
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
                                 contentDescription = null,
                                 tint = HomeTextMuted,
                                 modifier = Modifier.size(15.dp),
@@ -528,7 +528,7 @@ private fun HomeDashboard(
                     title = stringResource(R.string.module_vente),
                     value = MoneyUtils.format(state.ventes, currency),
                     subtitle = stringResource(R.string.home_today),
-                    icon = Icons.Outlined.ReceiptLong,
+                    icon = Icons.AutoMirrored.Outlined.ReceiptLong,
                     iconColor = HomeBlue,
                     iconBackground = HomeBlueSoft,
                 )
@@ -706,7 +706,7 @@ private fun DashboardSectionHeader(
 }
 
 private data class QuickAction(
-    @StringRes val titleRes: Int,
+    @param:StringRes val titleRes: Int,
     val icon: ImageVector,
     val color: Color,
     val route: String,
@@ -720,7 +720,7 @@ private fun AppModule.createRoute(direction: OperationDirection? = null): String
 private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
     val rows = listOf(
         listOf(
-            QuickAction(R.string.home_new_sale, Icons.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.createRoute()),
+            QuickAction(R.string.home_new_sale, Icons.AutoMirrored.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.createRoute()),
             QuickAction(R.string.home_new_purchase, Icons.Outlined.AddShoppingCart, HomeGreen, AppModule.ACHATS.createRoute()),
             QuickAction(R.string.home_new_client, Icons.Outlined.PersonAdd, HomePurple, AppModule.CLIENTS.createRoute()),
             QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.createRoute()),
@@ -944,7 +944,7 @@ private fun ReminderCard(onClick: () -> Unit) {
                 )
             }
             Icon(
-                imageVector = Icons.Outlined.ArrowForwardIos,
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
                 contentDescription = null,
                 tint = HomeTextDark,
                 modifier = Modifier.size(15.dp),
@@ -1293,7 +1293,7 @@ private fun MissaBusinessDrawer(
             }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_support))
-            DrawerMenuItem(Icons.Outlined.HelpOutline, stringResource(R.string.home_help_assistance)) {
+            DrawerMenuItem(Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.home_help_assistance)) {
                 onSupport()
             }
             DrawerMenuItem(Icons.Outlined.Info, stringResource(R.string.admin_a_propos), currentRoute == Routes.ADMIN_A_PROPOS) {

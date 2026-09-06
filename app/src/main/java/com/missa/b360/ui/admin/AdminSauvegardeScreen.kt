@@ -25,13 +25,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.ui.components.MissaPanel
-import kotlinx.coroutines.delay
 import java.io.File
+import kotlinx.coroutines.delay
 
 /**
  * Sauvegarde (RA-13) : sauvegarde locale (VACUUM INTO), restauration d'un fichier

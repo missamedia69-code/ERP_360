@@ -18,9 +18,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
@@ -64,8 +64,8 @@ import com.missa.b360.core.domain.usecase.CreatePayslipUseCase
 import com.missa.b360.core.domain.usecase.DeleteAbsenceUseCase
 import com.missa.b360.core.domain.usecase.DesactivateEmployeeUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
-import com.missa.b360.core.domain.usecase.SaveAdvanceUseCase
 import com.missa.b360.core.domain.usecase.SaveAbsenceUseCase
+import com.missa.b360.core.domain.usecase.SaveAdvanceUseCase
 import com.missa.b360.core.domain.usecase.SaveEmployeeUseCase
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
@@ -79,6 +79,8 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.Red40
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Calendar
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -86,8 +88,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import javax.inject.Inject
 
 /**
  * RH (spec §RH / §Paie) — employés, absences, paie (P), avances (AV).
@@ -95,11 +95,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RhViewModel @Inject constructor(
-    private val saveEmployee: SaveEmployeeUseCase,
+    private val saveEmployeeUseCase: SaveEmployeeUseCase,
     private val desactivateEmployee: DesactivateEmployeeUseCase,
-    private val saveAbsence: SaveAbsenceUseCase,
-    private val deleteAbsence: DeleteAbsenceUseCase,
-    private val saveAdvance: SaveAdvanceUseCase,
+    private val saveAbsenceUseCase: SaveAbsenceUseCase,
+    private val deleteAbsenceUseCase: DeleteAbsenceUseCase,
+    private val saveAdvanceUseCase: SaveAdvanceUseCase,
     private val createPayslip: CreatePayslipUseCase,
     employeeDao: EmployeeDao,
     absenceDao: AbsenceDao,
@@ -166,7 +166,7 @@ class RhViewModel @Inject constructor(
 
     fun saveEmployee(recordId: Long?, nom: String, telephone: String, poste: String?, salaireBase: Double, joursMensuels: Double, notes: String?) {
         withBusy {
-            when (val r = saveEmployee(recordId, nom, telephone, poste, salaireBase, joursMensuels, notes)) {
+            when (val r = saveEmployeeUseCase(recordId, nom, telephone, poste, salaireBase, joursMensuels, notes)) {
                 is SaveEmployeeUseCase.Result.Succes -> _message.value = UiMessage(R.string.rh_employe_saved, arg = r.code)
                 SaveEmployeeUseCase.Result.LectureSeule -> _message.value = UiMessage(R.string.rh_read_only, ok = false)
                 SaveEmployeeUseCase.Result.DonneesInvalides -> _message.value = UiMessage(R.string.rh_invalid, ok = false)
@@ -191,7 +191,7 @@ class RhViewModel @Inject constructor(
             return
         }
         withBusy {
-            when (saveAbsence(employeeId, type, dateDebut, dureeJours, motif)) {
+            when (saveAbsenceUseCase(employeeId, type, dateDebut, dureeJours, motif)) {
                 SaveAbsenceUseCase.Result.Succes -> _message.value = UiMessage(R.string.rh_absence_saved)
                 SaveAbsenceUseCase.Result.LectureSeule -> _message.value = UiMessage(R.string.rh_read_only, ok = false)
                 SaveAbsenceUseCase.Result.DonneesInvalides -> _message.value = UiMessage(R.string.rh_invalid, ok = false)
@@ -202,7 +202,7 @@ class RhViewModel @Inject constructor(
 
     fun deleteAbsence(absenceId: Long) {
         withBusy {
-            when (deleteAbsence(absenceId)) {
+            when (deleteAbsenceUseCase(absenceId)) {
                 DeleteAbsenceUseCase.Result.Succes -> _message.value = UiMessage(R.string.rh_absence_deleted)
                 DeleteAbsenceUseCase.Result.LectureSeule -> _message.value = UiMessage(R.string.rh_read_only, ok = false)
             }
@@ -215,7 +215,7 @@ class RhViewModel @Inject constructor(
             return
         }
         withBusy {
-            when (val r = saveAdvance(employeeId, montant, motif)) {
+            when (val r = saveAdvanceUseCase(employeeId, montant, motif)) {
                 is SaveAdvanceUseCase.Result.Succes -> {
                     _message.value = UiMessage(R.string.rh_avance_saved, arg = r.reference)
                     refresh()

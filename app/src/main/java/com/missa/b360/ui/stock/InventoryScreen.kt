@@ -55,7 +55,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.InventoryRules
 import com.missa.b360.core.domain.usecase.SaveInventoryUseCase
@@ -69,14 +71,12 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.Red40
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import javax.inject.Inject
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(

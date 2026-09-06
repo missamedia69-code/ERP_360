@@ -61,7 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.data.entity.StockMovementType
@@ -172,7 +172,7 @@ fun StockMovementFormScreen(
         viewModel.record(
             produitId = pid,
             type = typeEnum,
-            quantite = quantiteValue!!,
+            quantite = quantiteValue,
             motif = motifFinal,
             reference = docReference,
             commentaire = commentaire,
@@ -541,7 +541,7 @@ fun StockTransferFormScreen(
             produitId = pid,
             siteSourceId = srcId,
             siteDestId = dstId,
-            quantite = quantiteValue!!,
+            quantite = quantiteValue,
             motif = motif,
             commentaire = commentaire,
         )

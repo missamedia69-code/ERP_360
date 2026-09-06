@@ -15,7 +15,7 @@ import com.missa.b360.R
  *   (nom propre non traduit : SYSCOHADA, PCG…), ou `null` si non déterminé.
  */
 enum class ZoneFiscale(
-    @StringRes val libelleRes: Int,
+    @param:StringRes val libelleRes: Int,
     val referentielComptable: String? = null,
 ) {
     CEMAC(R.string.fisc_zone_cemac, "SYSCOHADA"),

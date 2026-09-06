@@ -2,13 +2,14 @@ package com.missa.b360.ui.admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.RoleEntity
 import com.missa.b360.core.data.entity.UserEntity
@@ -65,7 +66,7 @@ fun AdminUtilisateursScreen(
                 readOnly = true,
                 label = { Text(stringResource(R.string.adm_users_role)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = roleOuvert) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             )
             ExposedDropdownMenu(expanded = roleOuvert, onDismissRequest = { roleOuvert = false }) {
                 roles.forEach { role ->

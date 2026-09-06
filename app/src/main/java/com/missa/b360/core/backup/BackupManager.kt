@@ -25,7 +25,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class BackupManager @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val database: AppDatabase,
     private val backupDao: BackupDao,
     private val journalManager: JournalManager,

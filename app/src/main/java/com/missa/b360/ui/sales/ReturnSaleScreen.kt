@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -58,15 +58,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.ReturnRules
+import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
-import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.ReturnSaleUseCase
@@ -82,6 +84,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.Red40
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -89,9 +92,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import javax.inject.Inject
 
 /** Ligne retournable : agrégation par clé (produit ou libellé) de la facture d'origine. */
 data class ReturnLineItem(
@@ -335,7 +335,7 @@ fun ReturnSaleScreen(
                 if (sales.isEmpty()) {
                     item {
                         MissaEmptyState(
-                            icon = Icons.Outlined.ReceiptLong,
+                            icon = Icons.AutoMirrored.Outlined.ReceiptLong,
                             title = stringResource(R.string.return_list_empty),
                         )
                     }
@@ -419,7 +419,7 @@ private fun ReturnFormContent(
     onBack: () -> Unit,
     onConfirm: () -> Unit,
 ) {
-    val viewModel = androidx.hilt.navigation.compose.hiltViewModel<ReturnSaleViewModel>()
+    val viewModel = hiltViewModel<ReturnSaleViewModel>()
     val original = SaleRecordCodec.decode(vente.notes)
     val soldeAvoir = viewModel.soldeAvoir()
     val hasSelection = soldeAvoir > 0.0

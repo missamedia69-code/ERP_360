@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
@@ -35,11 +35,11 @@ import com.missa.b360.core.domain.usecase.ValidatePinUseCase
 import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.theme.MissaCanvas
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /** Verrou PIN à chaque ouverture (RA-01/RA-02) : 5 échecs → blocage croissant. */
 @HiltViewModel

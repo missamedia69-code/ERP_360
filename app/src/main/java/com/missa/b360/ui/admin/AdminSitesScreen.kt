@@ -2,13 +2,14 @@ package com.missa.b360.ui.admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.ui.components.MissaPanel
@@ -68,7 +69,7 @@ fun AdminSitesScreen(
                 readOnly = true,
                 label = { Text(stringResource(R.string.adm_sites_type)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeOuvert) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
             )
             ExposedDropdownMenu(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
                 types.forEach { t ->

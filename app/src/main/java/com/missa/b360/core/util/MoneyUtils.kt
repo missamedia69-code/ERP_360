@@ -275,8 +275,8 @@ object Iso4217 {
         val locales = listOf(
             Locale.FRENCH,
             Locale.ENGLISH,
-            Locale("es"),
-            Locale("ar"),
+            Locale.forLanguageTag("es"),
+            Locale.forLanguageTag("ar"),
             Locale.SIMPLIFIED_CHINESE,
         )
         return INDICATIFS_TELEPHONIQUES.keys.firstOrNull { code ->
