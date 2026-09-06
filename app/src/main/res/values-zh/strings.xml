@@ -1137,4 +1137,22 @@
     <string name="fuseau_p1245">查塔姆群岛时间</string>
     <string name="fuseau_p1300">汤加／西萨摩亚时间</string>
     <string name="fuseau_p1400">线岛时间</string>
+
+    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    <string name="obn_retention">日志保留期限</string>
+    <string name="obn_retention_30">30 天</string>
+    <string name="obn_retention_90">90 天</string>
+    <string name="obn_retention_365">12 个月</string>
+    <string name="obn_restaurer_titre">恢复备份</string>
+    <string name="obn_restaurer_sous">已经使用过 Missa Business 360？导入备份文件（.db）即可找回数据。</string>
+    <string name="obn_restaurer_btn">选择备份文件</string>
+    <string name="obn_restaurer_en_cours">正在恢复…</string>
+    <string name="obn_restaurer_confirme_titre">替换当前数据？</string>
+    <string name="obn_restaurer_confirme_texte">备份将替换本设备上的全部数据。系统会先为当前数据库创建安全副本，随后应用将重新启动。</string>
+    <string name="obn_restaurer_confirmer">恢复</string>
+    <string name="obn_restaurer_ok">备份已恢复，正在重启应用…</string>
+    <string name="obn_restaurer_err_fichier">文件无法读取或为空，请另选文件。</string>
+    <string name="obn_restaurer_err_format">该文件不是 Missa Business 360 的备份。</string>
+    <string name="obn_restaurer_err_version">该备份来自更新版本的应用，请先更新应用。</string>
+    <string name="obn_restaurer_err_copie">恢复失败，当前数据未受影响。</string>
 </resources>

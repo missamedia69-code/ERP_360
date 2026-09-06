@@ -1137,4 +1137,22 @@
     <string name="fuseau_p1245">Hora de las islas Chatham</string>
     <string name="fuseau_p1300">Hora de Tonga / Samoa Occidental</string>
     <string name="fuseau_p1400">Hora de las islas de la Línea</string>
+
+    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    <string name="obn_retention">Retención del registro</string>
+    <string name="obn_retention_30">30 días</string>
+    <string name="obn_retention_90">90 días</string>
+    <string name="obn_retention_365">12 meses</string>
+    <string name="obn_restaurer_titre">Restaurar una copia de seguridad</string>
+    <string name="obn_restaurer_sous">¿Ya usó Missa Business 360? Importe su archivo de copia de seguridad (.db) para recuperar sus datos.</string>
+    <string name="obn_restaurer_btn">Elegir un archivo de copia de seguridad</string>
+    <string name="obn_restaurer_en_cours">Restaurando…</string>
+    <string name="obn_restaurer_confirme_titre">¿Reemplazar los datos actuales?</string>
+    <string name="obn_restaurer_confirme_texte">La copia de seguridad reemplazará todos los datos de este dispositivo. Antes se crea una copia de seguridad de la base actual y luego la aplicación se reiniciará.</string>
+    <string name="obn_restaurer_confirmer">Restaurar</string>
+    <string name="obn_restaurer_ok">Copia restaurada. Reiniciando la aplicación…</string>
+    <string name="obn_restaurer_err_fichier">Archivo ilegible o vacío. Elija otro archivo.</string>
+    <string name="obn_restaurer_err_format">Este archivo no es una copia de seguridad de Missa Business 360.</string>
+    <string name="obn_restaurer_err_version">Esta copia proviene de una versión más reciente de la aplicación. Actualice la aplicación primero.</string>
+    <string name="obn_restaurer_err_copie">La restauración falló. Sus datos actuales están intactos.</string>
 </resources>

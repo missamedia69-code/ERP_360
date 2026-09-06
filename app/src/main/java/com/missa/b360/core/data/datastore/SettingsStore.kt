@@ -47,6 +47,7 @@ class SettingsStore @Inject constructor(
         const val FUSEAU_HORAIRE = "fuseau_horaire"
         const val FORMAT_DATE = "format_date"
         const val FORMAT_NOMBRES = "format_nombres"
+        const val RETENTION_JOURNAL = "retention_journal"
         const val PIN_FAIL_COUNT = "pin_fail_count"
         const val PIN_LOCK_UNTIL = "pin_lock_until"
         const val PIN_HASH = "pin_hash"

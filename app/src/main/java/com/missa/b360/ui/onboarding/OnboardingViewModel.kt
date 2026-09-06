@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,14 +9,17 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
+import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
 import com.missa.b360.core.domain.usecase.GetOnboardingProgressUseCase
 import com.missa.b360.core.domain.usecase.SetupEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ValidatePinUseCase
+import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.security.PinHasher
 import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.core.util.Fuseaux
@@ -45,6 +49,7 @@ class OnboardingViewModel @Inject constructor(
     private val createOwner: CreateOwnerUserUseCase,
     private val completeOnboarding: CompleteOnboardingUseCase,
     private val validatePin: ValidatePinUseCase,
+    private val backupUseCases: BackupUseCases,
 ) : ViewModel() {
 
     var step by mutableStateOf(OnboardingStep.BIENVENUE)
@@ -81,6 +86,22 @@ class OnboardingViewModel @Inject constructor(
     var formatJours by mutableStateOf("dd/MM/yyyy")
     var formatNombres by mutableStateOf("fr")
     var sauvegardesActives by mutableStateOf(true)
+
+    /** Rétention du journal d'audit, en jours : 30, 90 ou 365 (RA-18). */
+    var retentionJournal by mutableStateOf(JournalManager.RETENTION_DEFAUT_JOURS)
+        private set
+
+    // --- Restauration d'une sauvegarde existante ---
+    var restaurationEnCours by mutableStateOf(false)
+        private set
+
+    /** Message de restauration (clé de chaîne) : succès ou motif d'échec. */
+    var restaurationMessageRes by mutableStateOf<Int?>(null)
+        private set
+
+    /** Passe à true quand la base a été remplacée : l'écran doit redémarrer l'app. */
+    var restaurationReussie by mutableStateOf(false)
+        private set
 
     // --- Étape PIN + contact de récupération (propriétaire) ---
     var pin by mutableStateOf("")
@@ -130,6 +151,9 @@ class OnboardingViewModel @Inject constructor(
                 formatJours = settingsStore.get(SettingsStore.Keys.FORMAT_DATE) ?: "dd/MM/yyyy"
                 formatNombres = settingsStore.get(SettingsStore.Keys.FORMAT_NOMBRES) ?: "fr"
                 sauvegardesActives = settingsStore.get(SettingsStore.Keys.FREQUENCE_SAUVGARDE) != "off"
+                retentionJournal = JournalManager.retentionEnJours(
+                    settingsStore.get(SettingsStore.Keys.RETENTION_JOURNAL),
+                )
                 pinDejaConfigure = progression.pinConfigure
                 val configurationTerminee =
                     settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE) != null
@@ -320,6 +344,49 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    /** La rétention du journal pilote la purge quotidienne (RA-18). */
+    fun appliquerRetentionJournal(jours: Int) {
+        retentionJournal = JournalManager.retentionEnJours(jours.toString())
+        val valeur = retentionJournal.toString()
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.RETENTION_JOURNAL, valeur)
+        }
+    }
+
+    /**
+     * Restaure une sauvegarde `.db` choisie par l'utilisateur : les données de
+     * l'appareil sont remplacées après copie de sécurité, puis l'application doit
+     * redémarrer pour rouvrir la base restaurée.
+     */
+    fun restaurerSauvegarde(source: Uri) {
+        if (restaurationEnCours) return
+        restaurationEnCours = true
+        restaurationMessageRes = null
+        viewModelScope.launch {
+            val resultat = runCatching { backupUseCases.restaurer(source) }
+                .getOrElse { ResultatRestauration.Echec(ResultatRestauration.Motif.ECHEC_COPIE) }
+            restaurationEnCours = false
+            when (resultat) {
+                is ResultatRestauration.Succes -> {
+                    restaurationMessageRes = R.string.obn_restaurer_ok
+                    restaurationReussie = true
+                }
+                is ResultatRestauration.Echec -> {
+                    restaurationMessageRes = when (resultat.motif) {
+                        ResultatRestauration.Motif.FICHIER_ILLISIBLE ->
+                            R.string.obn_restaurer_err_fichier
+                        ResultatRestauration.Motif.FORMAT_INVALIDE ->
+                            R.string.obn_restaurer_err_format
+                        ResultatRestauration.Motif.VERSION_TROP_RECENTE ->
+                            R.string.obn_restaurer_err_version
+                        ResultatRestauration.Motif.ECHEC_COPIE ->
+                            R.string.obn_restaurer_err_copie
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Enregistre la configuration (déjà appliquée en direct à chaque choix) avant
      * l'étape de sécurité : passage au prochain écran.
@@ -330,6 +397,7 @@ class OnboardingViewModel @Inject constructor(
         val formatJoursCible = formatJours
         val formatNombresCible = formatNombres
         val sauvegardesCibles = if (sauvegardesActives) "auto" else "off"
+        val retentionCible = retentionJournal
         // Application immédiate : la langue recompose l'interface, les formats
         // d'affichage (fuseau, date, nombres) pilotent MoneyUtils/DateUtils partout.
         FormatPrefs.appliquer(fuseauCible, formatJoursCible, formatNombresCible)
@@ -342,6 +410,7 @@ class OnboardingViewModel @Inject constructor(
             settingsStore.set(SettingsStore.Keys.FORMAT_DATE, formatJoursCible)
             settingsStore.set(SettingsStore.Keys.FORMAT_NOMBRES, formatNombresCible)
             settingsStore.set(SettingsStore.Keys.FREQUENCE_SAUVGARDE, sauvegardesCibles)
+            settingsStore.set(SettingsStore.Keys.RETENTION_JOURNAL, retentionCible.toString())
         }
     }
 

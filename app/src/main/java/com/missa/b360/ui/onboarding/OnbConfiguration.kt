@@ -1,5 +1,10 @@
 package com.missa.b360.ui.onboarding
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,6 +35,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -43,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -60,6 +69,7 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.Red40
 import java.text.Normalizer
 import kotlinx.coroutines.delay
 
@@ -125,6 +135,21 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                     enabled = !viewModel.enregistrementEnCours,
                 )
                 HorizontalDivider(color = MissaBorder)
+                val retentions = listOf(
+                    30 to stringResource(R.string.obn_retention_30),
+                    90 to stringResource(R.string.obn_retention_90),
+                    365 to stringResource(R.string.obn_retention_365),
+                )
+                OnbConfigLigne(
+                    labelRes = R.string.obn_retention,
+                    options = retentions,
+                    selectedKey = viewModel.retentionJournal.toString(),
+                    optionKey = { it.first.toString() },
+                    optionLabel = { it.second },
+                    onPick = { viewModel.appliquerRetentionJournal(it.first) },
+                    enabled = !viewModel.enregistrementEnCours,
+                )
+                HorizontalDivider(color = MissaBorder)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -156,7 +181,144 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                 }
             }
         }
+        OnbRestaurationCarte(viewModel = viewModel)
     }
+}
+
+/**
+ * Carte « Restaurer une sauvegarde » : reprise d'un appareil précédent ou d'une
+ * réinstallation. Le fichier `.db` est choisi via le sélecteur système, confirmé
+ * explicitement (les données actuelles sont remplacées), puis l'application
+ * redémarre pour rouvrir la base restaurée.
+ */
+@Composable
+private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
+    val contexte = LocalContext.current
+    var fichierChoisi by remember { mutableStateOf<Uri?>(null) }
+    val selecteur = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri -> if (uri != null) fichierChoisi = uri }
+
+    // Redémarrage une fois la base remplacée : Room pointe encore sur l'ancien fichier.
+    LaunchedEffect(viewModel.restaurationReussie) {
+        if (viewModel.restaurationReussie) {
+            delay(1_200)
+            redemarrerApplication(contexte)
+        }
+    }
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Outlined.Restore,
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.obn_restaurer_titre),
+                    fontSize = 12.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MissaInk,
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.obn_restaurer_sous),
+                fontSize = 11.5.sp,
+                color = MissaMuted,
+            )
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = { selecteur.launch(arrayOf("application/octet-stream", "*/*")) },
+                enabled = !viewModel.restaurationEnCours &&
+                    !viewModel.restaurationReussie &&
+                    !viewModel.enregistrementEnCours,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(
+                        if (viewModel.restaurationEnCours) {
+                            R.string.obn_restaurer_en_cours
+                        } else {
+                            R.string.obn_restaurer_btn
+                        },
+                    ),
+                    fontSize = 12.5.sp,
+                )
+            }
+            if (viewModel.restaurationEnCours) {
+                Spacer(Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = BrandBlue,
+                )
+            }
+            viewModel.restaurationMessageRes?.let { messageRes ->
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(messageRes),
+                    fontSize = 11.5.sp,
+                    color = if (viewModel.restaurationReussie) BrandBlue else Red40,
+                )
+            }
+        }
+    }
+
+    fichierChoisi?.let { uri ->
+        AlertDialog(
+            onDismissRequest = { fichierChoisi = null },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        fichierChoisi = null
+                        viewModel.restaurerSauvegarde(uri)
+                    },
+                ) {
+                    Text(stringResource(R.string.obn_restaurer_confirmer), color = Red40)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { fichierChoisi = null }) {
+                    Text(stringResource(R.string.ops_cancel))
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(R.string.obn_restaurer_confirme_titre),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MissaInk,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.obn_restaurer_confirme_texte),
+                    fontSize = 12.5.sp,
+                    color = MissaMuted,
+                )
+            },
+        )
+    }
+}
+
+/** Relance l'application après une restauration (nouvelle base de données). */
+private fun redemarrerApplication(contexte: Context) {
+    val intention = contexte.packageManager.getLaunchIntentForPackage(contexte.packageName)
+    if (intention != null) {
+        intention.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        contexte.startActivity(intention)
+    }
+    Runtime.getRuntime().exit(0)
 }
 
 /** Langues proposées : code de locale + drapeau + libellé (accessibilité). */

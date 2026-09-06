@@ -1158,4 +1158,22 @@
     <string name="fuseau_p1245">Chatham Islands Time</string>
     <string name="fuseau_p1300">Tonga / West Samoa Time</string>
     <string name="fuseau_p1400">Line Islands Time</string>
+
+    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    <string name="obn_retention">Audit log retention</string>
+    <string name="obn_retention_30">30 days</string>
+    <string name="obn_retention_90">90 days</string>
+    <string name="obn_retention_365">12 months</string>
+    <string name="obn_restaurer_titre">Restore a backup</string>
+    <string name="obn_restaurer_sous">Already used Missa Business 360? Import your backup file (.db) to get your data back.</string>
+    <string name="obn_restaurer_btn">Choose a backup file</string>
+    <string name="obn_restaurer_en_cours">Restoring…</string>
+    <string name="obn_restaurer_confirme_titre">Replace current data?</string>
+    <string name="obn_restaurer_confirme_texte">The backup will replace all data on this device. A safety copy of the current database is created first, then the app will restart.</string>
+    <string name="obn_restaurer_confirmer">Restore</string>
+    <string name="obn_restaurer_ok">Backup restored. Restarting the app…</string>
+    <string name="obn_restaurer_err_fichier">File unreadable or empty. Please choose another file.</string>
+    <string name="obn_restaurer_err_format">This file is not a Missa Business 360 backup.</string>
+    <string name="obn_restaurer_err_version">This backup comes from a newer version of the app. Update the app first.</string>
+    <string name="obn_restaurer_err_copie">Restore failed. Your current data is untouched.</string>
 </resources>

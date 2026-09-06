@@ -1165,4 +1165,22 @@
     <string name="fuseau_p1245">Heure des îles Chatham</string>
     <string name="fuseau_p1300">Heure de Tonga / Samoa occidentales</string>
     <string name="fuseau_p1400">Heure des îles de la Ligne</string>
+
+    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    <string name="obn_retention">Rétention du journal</string>
+    <string name="obn_retention_30">30 jours</string>
+    <string name="obn_retention_90">90 jours</string>
+    <string name="obn_retention_365">12 mois</string>
+    <string name="obn_restaurer_titre">Restaurer une sauvegarde</string>
+    <string name="obn_restaurer_sous">Vous avez déjà utilisé Missa Business 360 ? Importez votre fichier de sauvegarde (.db) pour retrouver vos données.</string>
+    <string name="obn_restaurer_btn">Choisir un fichier de sauvegarde</string>
+    <string name="obn_restaurer_en_cours">Restauration en cours…</string>
+    <string name="obn_restaurer_confirme_titre">Remplacer les données actuelles ?</string>
+    <string name="obn_restaurer_confirme_texte">La sauvegarde va remplacer toutes les données de cet appareil. Une copie de sécurité de la base actuelle est créée avant l\'opération, puis l\'application redémarrera.</string>
+    <string name="obn_restaurer_confirmer">Restaurer</string>
+    <string name="obn_restaurer_ok">Sauvegarde restaurée. Redémarrage de l\'application…</string>
+    <string name="obn_restaurer_err_fichier">Fichier illisible ou vide. Choisissez un autre fichier.</string>
+    <string name="obn_restaurer_err_format">Ce fichier n\'est pas une sauvegarde Missa Business 360.</string>
+    <string name="obn_restaurer_err_version">Cette sauvegarde provient d\'une version plus récente de l\'application. Mettez d\'abord l\'application à jour.</string>
+    <string name="obn_restaurer_err_copie">La restauration a échoué. Vos données actuelles sont intactes.</string>
 </resources>

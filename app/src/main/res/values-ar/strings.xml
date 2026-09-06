@@ -1137,4 +1137,22 @@
     <string name="fuseau_p1245">توقيت جزر تشاتام</string>
     <string name="fuseau_p1300">توقيت تونغا / ساموا الغربية</string>
     <string name="fuseau_p1400">توقيت جزر لاين</string>
+
+    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    <string name="obn_retention">مدة الاحتفاظ بالسجل</string>
+    <string name="obn_retention_30">30 يومًا</string>
+    <string name="obn_retention_90">90 يومًا</string>
+    <string name="obn_retention_365">12 شهرًا</string>
+    <string name="obn_restaurer_titre">استعادة نسخة احتياطية</string>
+    <string name="obn_restaurer_sous">هل سبق أن استخدمت Missa Business 360؟ استورد ملف النسخة الاحتياطية (.db) لاستعادة بياناتك.</string>
+    <string name="obn_restaurer_btn">اختر ملف النسخة الاحتياطية</string>
+    <string name="obn_restaurer_en_cours">جارٍ الاستعادة…</string>
+    <string name="obn_restaurer_confirme_titre">استبدال البيانات الحالية؟</string>
+    <string name="obn_restaurer_confirme_texte">ستحل النسخة الاحتياطية محل جميع بيانات هذا الجهاز. يتم أولًا إنشاء نسخة أمان من قاعدة البيانات الحالية، ثم يُعاد تشغيل التطبيق.</string>
+    <string name="obn_restaurer_confirmer">استعادة</string>
+    <string name="obn_restaurer_ok">تمت استعادة النسخة الاحتياطية. جارٍ إعادة تشغيل التطبيق…</string>
+    <string name="obn_restaurer_err_fichier">الملف غير قابل للقراءة أو فارغ. اختر ملفًا آخر.</string>
+    <string name="obn_restaurer_err_format">هذا الملف ليس نسخة احتياطية من Missa Business 360.</string>
+    <string name="obn_restaurer_err_version">هذه النسخة الاحتياطية من إصدار أحدث للتطبيق. حدّث التطبيق أولًا.</string>
+    <string name="obn_restaurer_err_copie">فشلت الاستعادة. بياناتك الحالية سليمة.</string>
 </resources>

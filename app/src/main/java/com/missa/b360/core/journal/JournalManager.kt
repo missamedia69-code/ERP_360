@@ -37,9 +37,36 @@ class JournalManager @Inject constructor(
 
     /** Purge des entrées de plus de 12 mois (RA-18). @return nombre d'entrées supprimées. */
     suspend fun purgePlusDe12Mois(now: Long = System.currentTimeMillis()): Int =
-        journalDao.purgeAvant(now - DUREE_RETENTION_MS)
+        purgeSelonRetention(RETENTION_DEFAUT_JOURS, now)
+
+    /**
+     * Purge selon la durée de rétention choisie à la configuration
+     * (30 jours, 90 jours ou 12 mois). @return nombre d'entrées supprimées.
+     */
+    suspend fun purgeSelonRetention(
+        jours: Int,
+        now: Long = System.currentTimeMillis(),
+    ): Int = journalDao.purgeAvant(now - jours * JOUR_MS)
 
     companion object {
-        const val DUREE_RETENTION_MS: Long = 365L * 24 * 60 * 60 * 1000 // 12 mois
+        const val JOUR_MS: Long = 24L * 60 * 60 * 1000
+
+        /** Rétentions proposées à la configuration initiale (en jours). */
+        val RETENTIONS_DISPONIBLES = listOf(30, 90, 365)
+
+        /** Valeur par défaut : 12 mois (RA-18). */
+        const val RETENTION_DEFAUT_JOURS: Int = 365
+
+        /** Rétention par défaut exprimée en millisecondes (12 mois). */
+        const val DUREE_RETENTION_MS: Long = 365L * 24 * 60 * 60 * 1000
+
+        /**
+         * Lit la rétention enregistrée (« 30 », « 90 », « 365 ») en retombant sur
+         * 12 mois si la valeur est absente, illisible ou hors catalogue.
+         */
+        fun retentionEnJours(valeur: String?): Int =
+            valeur?.trim()?.toIntOrNull()
+                ?.takeIf { it in RETENTIONS_DISPONIBLES }
+                ?: RETENTION_DEFAUT_JOURS
     }
 }
