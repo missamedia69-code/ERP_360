@@ -155,3 +155,13 @@ python3 .github/scripts/verifier_traductions.py
 
 Il liste en outre les clés jamais référencées dans le code — simple avertissement,
 une chaîne pouvant être prévue pour un écran à venir.
+
+Quand la compilation ou un test échoue,
+[`.github/scripts/annoter_echecs.py`](.github/scripts/annoter_echecs.py) relit la sortie
+Gradle et les rapports JUnit pour republier chaque erreur en **annotation** rattachée à
+son fichier et à sa ligne, et en tableau récapitulatif sur la page de l'exécution. La
+cause d'un échec se lit ainsi d'un coup d'œil, sans dérouler dix mille lignes de journal :
+
+```bash
+gh run view <id>   # section ANNOTATIONS
+```
