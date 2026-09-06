@@ -1164,7 +1164,6 @@
     <string name="obn_retention_90_sous">季度跟踪的良好折中</string>
     <string name="obn_retention_365_sous">推荐：覆盖一个会计年度的完整审计</string>
 
-    <string name="obn_profil_perso_sous">自行选择要启用的模块</string>
     <string name="obn_profil_perso_vide">请至少选择一个模块以继续。</string>
     <string name="obn_profil_perso_fonctions">%1$d 项功能</string>
 

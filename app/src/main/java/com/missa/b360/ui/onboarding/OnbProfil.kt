@@ -27,7 +27,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -78,9 +77,13 @@ private data class OnbProfilCarteInfo(
 )
 
 /**
- * Écran — Profil d'activité : les six familles de la maquette plus l'option
- * « Personnalisé ». Chaque carte porte un bouton « i » qui ouvre une boîte
- * détaillant les modules et les fonctionnalités réellement activés par ce choix.
+ * Écran — Profil d'activité : les six familles de la maquette. Chaque carte
+ * porte un bouton « i » qui ouvre une boîte détaillant les modules et les
+ * fonctionnalités réellement activés par ce choix.
+ *
+ * Il n'y a plus de septième carte « Personnalisé » : puisque tout module hors
+ * pack se coche depuis n'importe quel profil, partir d'une feuille blanche
+ * n'apportait qu'une décision de plus à prendre avant d'avoir vu le produit.
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
@@ -121,24 +124,11 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             R.string.obn_profil_full_sous,
             Icons.Outlined.Business,
         ),
-        OnbProfilCarteInfo(
-            ProfilActivite.CUSTOM,
-            R.string.profil_custom,
-            R.string.obn_profil_perso_sous,
-            Icons.Outlined.Tune,
-        ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
     // Panneau déplié sous une carte : indépendant de la sélection, pour qu'un
     // second clic (ou le retour) le referme sans perdre le profil choisi.
     var panneauOuvert by rememberSaveable { mutableStateOf<String?>(null) }
-    val choisir: (ProfilActivite) -> Unit = { profil ->
-        if (profil == ProfilActivite.CUSTOM) {
-            viewModel.choisirPersonnalisation()
-        } else {
-            viewModel.choisirProfil(profil)
-        }
-    }
     // Le retour referme d'abord le bloc ouvert, et seulement ensuite l'écran.
     BackHandler(enabled = panneauOuvert != null) { panneauOuvert = null }
     OnbScaffold(
@@ -164,7 +154,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                         if (ouvert) {
                             panneauOuvert = null
                         } else {
-                            choisir(carte.profil)
+                            viewModel.choisirProfil(carte.profil)
                             panneauOuvert = carte.profil.name
                         }
                     },
@@ -200,7 +190,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             palier = viewModel.palier,
             dejaChoisi = viewModel.profil == carteDetaillee.profil,
             onChoisir = {
-                choisir(carteDetaillee.profil)
+                viewModel.choisirProfil(carteDetaillee.profil)
                 detailProfil = null
             },
             onFermer = { detailProfil = null },

@@ -1192,7 +1192,6 @@
     <string name="obn_retention_90_sous">Bon compromis pour un suivi trimestriel</string>
     <string name="obn_retention_365_sous">Recommandé : audit complet sur un exercice</string>
 
-    <string name="obn_profil_perso_sous">Choisissez vous-même les modules à activer</string>
     <string name="obn_profil_perso_vide">Sélectionnez au moins un module pour continuer.</string>
     <string name="obn_profil_perso_fonctions">%1$d fonctionnalités</string>
 

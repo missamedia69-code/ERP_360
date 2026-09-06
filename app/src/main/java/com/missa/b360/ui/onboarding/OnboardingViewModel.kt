@@ -16,7 +16,6 @@ import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
-import com.missa.b360.core.domain.model.ProfilConfiguration
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
@@ -285,26 +284,6 @@ class OnboardingViewModel @Inject constructor(
     }
 
     /**
-     * Bascule sur le profil « Personnalisé » : la sélection métier démarre de
-     * celle du profil déjà choisi, pour n'avoir qu'à ajuster au lieu de tout cocher.
-     */
-    fun choisirPersonnalisation() {
-        val depart = when {
-            modulesPersonnalises.isNotEmpty() -> modulesPersonnalises
-            profil != null && profil != ProfilActivite.CUSTOM ->
-                ModulesSocle.filtrerMetier(ProfilConfiguration.modulesPourProfil(profil!!)).toSet()
-            else -> emptySet()
-        }
-        profil = ProfilActivite.CUSTOM
-        viewModelScope.launch {
-            settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, ProfilActivite.CUSTOM.name)
-        }
-        modulesPersonnalises = depart
-        rafraichirSocle()
-        enregistrerModules()
-    }
-
-    /**
      * Ajoute ou retire un module métier **hors pack**. Un module inclus dans le
      * profil est verrouillé : l'appel est sans effet, la cohérence du pack
      * prime sur le clic.
@@ -370,7 +349,13 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    /** L'écran « type d'activité » n'est valide qu'avec au moins un module métier. */
+    /**
+     * L'écran « type d'activité » n'est valide qu'avec au moins un module métier.
+     *
+     * Le cas « Personnalisé » n'est plus proposé à l'installation, mais reste
+     * traité : une application installée avant ce changement peut avoir ce
+     * profil enregistré et doit continuer à s'ouvrir normalement.
+     */
     fun profilEcranValide(): Boolean = when (profil) {
         null -> false
         ProfilActivite.CUSTOM -> modulesPersonnalises.isNotEmpty()

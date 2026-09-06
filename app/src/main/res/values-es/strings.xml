@@ -1164,7 +1164,6 @@
     <string name="obn_retention_90_sous">Buen equilibrio para un seguimiento trimestral</string>
     <string name="obn_retention_365_sous">Recomendado: auditoría completa de un ejercicio</string>
 
-    <string name="obn_profil_perso_sous">Elija usted mismo los módulos que desea activar</string>
     <string name="obn_profil_perso_vide">Seleccione al menos un módulo para continuar.</string>
     <string name="obn_profil_perso_fonctions">%1$d funcionalidades</string>
 
