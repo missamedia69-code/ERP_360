@@ -1407,4 +1407,5 @@
     <string name="kpi_aucun_module">لا توجد وحدة مفعّلة: فعّلها من الإعدادات.</string>
     <string name="kpi_variation_hausse">+%1$s مقارنة بالفترة السابقة</string>
     <string name="kpi_variation_baisse">%1$s مقارنة بالفترة السابقة</string>
+    <string name="obn_socle_pour">تُضاف إلى %1$s</string>
 </resources>

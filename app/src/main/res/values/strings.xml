@@ -1435,4 +1435,5 @@
     <string name="kpi_aucun_module">Aucun module actif : activez-en depuis les réglages.</string>
     <string name="kpi_variation_hausse">+%1$s vs période précédente</string>
     <string name="kpi_variation_baisse">%1$s vs période précédente</string>
+    <string name="obn_socle_pour">S\'ajoutent à %1$s</string>
 </resources>

@@ -149,10 +149,11 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                     onClick = { choisir(carte.profil) },
                     onInfo = { detailProfil = carte.profil.name },
                 )
-                if (carte.profil == ProfilActivite.CUSTOM &&
-                    viewModel.profil == ProfilActivite.CUSTOM
-                ) {
-                    OnbModulesPersonnalises(viewModel = viewModel)
+                if (viewModel.profil == carte.profil) {
+                    if (carte.profil == ProfilActivite.CUSTOM) {
+                        OnbModulesPersonnalises(viewModel = viewModel)
+                    }
+                    OnbModulesSocle(viewModel = viewModel, profilTitreRes = carte.titreRes)
                 }
             }
             MissaSelecteurBleu(
@@ -169,9 +170,6 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 enabled = !viewModel.enregistrementEnCours,
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
             )
-            if (viewModel.profil != null) {
-                OnbModulesSocle(viewModel = viewModel)
-            }
         }
     }
     val carteDetaillee = cartes.firstOrNull { it.profil.name == detailProfil }
@@ -278,21 +276,21 @@ private fun OnbModulesPersonnalises(viewModel: OnboardingViewModel) {
 }
 
 /**
- * Niveau 2 — options socle : les briques transverses (Comptabilité, Trésorerie,
- * Logistique, Reporting, CRM, RH, Qualité, Maintenance) s'ajoutent au profil
- * métier. Elles sont pré-cochées selon des règles simples (comptabilité et
+ * Niveau 2 — options socle, dépliées **sous la tranche métier choisie** : les
+ * briques transverses (Comptabilité, Trésorerie, Logistique, Reporting, CRM, RH,
+ * Qualité, Maintenance) s'ajoutent au profil sélectionné juste au-dessus. Elles sont pré-cochées selon des règles simples (comptabilité et
  * reporting systématiques, trésorerie dès qu'il y a achat ou vente, logistique
  * avec le stock, qualité et maintenance avec la production, RH selon
  * l'effectif) ; l'utilisateur reste libre de les activer ou non.
  */
 @Composable
-private fun OnbModulesSocle(viewModel: OnboardingViewModel) {
+private fun OnbModulesSocle(viewModel: OnboardingViewModel, profilTitreRes: Int) {
     val selection = viewModel.modulesSupport
     val recommandes = viewModel.socleRecommande()
     Card(
         shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, MissaBorder),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.45f)),
+        colors = CardDefaults.cardColors(containerColor = MissaSoftBlue),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -306,7 +304,10 @@ private fun OnbModulesSocle(viewModel: OnboardingViewModel) {
                         color = MissaInk,
                     )
                     Text(
-                        text = stringResource(R.string.obn_socle_sous),
+                        text = stringResource(
+                            R.string.obn_socle_pour,
+                            stringResource(profilTitreRes),
+                        ),
                         fontSize = 11.5.sp,
                         color = MissaMuted,
                     )
@@ -338,7 +339,7 @@ private fun OnbModulesSocle(viewModel: OnboardingViewModel) {
                             )
                             if (module in recommandes) {
                                 Spacer(Modifier.width(6.dp))
-                                Surface(shape = RoundedCornerShape(6.dp), color = MissaSoftBlue) {
+                                Surface(shape = RoundedCornerShape(6.dp), color = MissaSurface) {
                                     Text(
                                         text = stringResource(R.string.obn_socle_recommande),
                                         fontSize = 10.sp,

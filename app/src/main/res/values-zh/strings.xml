@@ -1407,4 +1407,5 @@
     <string name="kpi_aucun_module">没有启用的模块：请在设置中启用。</string>
     <string name="kpi_variation_hausse">环比 +%1$s</string>
     <string name="kpi_variation_baisse">环比 %1$s</string>
+    <string name="obn_socle_pour">叠加于 %1$s</string>
 </resources>
