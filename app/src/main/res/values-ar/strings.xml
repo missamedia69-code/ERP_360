@@ -1066,7 +1066,6 @@
     <string name="obn_logo_parcourir">تصفح</string>
     <string name="obn_logo_formats">الصيغ المقبولة: PNG، JPG — الحد الأقصى: 2MB</string>
     <string name="obn_logo_trop_grand">الصورة كبيرة جدًا (الحد الأقصى: 2MB)</string>
-    <string name="obn_detaux">المزيد من التفاصيل</string>
     <string name="obn_config_titre">التهيئة الأولية</string>
     <string name="obn_config_sous">بعض الإعدادات للانطلاق الجيد.</string>
     <string name="obn_langue">اللغة</string>
@@ -1477,4 +1476,8 @@
     <string name="obn_pack_ajouter_note">اختياري: يمكن تفعيلها أو إيقافها لاحقًا من الإعدادات.</string>
     <string name="obn_pack_complet">تفعّل هذه الحزمة جميع الوحدات الأربع عشرة.</string>
     <string name="obn_pack_compteur">%1$d وحدة مفعَّلة</string>
+    <string name="obn_pin_confirme">تم تأكيد رمز PIN</string>
+    <string name="obn_pin_premier_ok">تم حفظ الرمز الأول، أدخله مرة أخرى.</string>
+    <string name="obn_pin_recommencer">البدء من جديد</string>
+    <string name="obn_pin_effacer">حذف آخر رقم</string>
 </resources>

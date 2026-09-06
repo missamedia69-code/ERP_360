@@ -1087,7 +1087,6 @@
     <string name="obn_logo_parcourir">Browse</string>
     <string name="obn_logo_formats">Accepted formats: PNG, JPG — Max size: 2MB</string>
     <string name="obn_logo_trop_grand">Image too large (max size: 2MB)</string>
-    <string name="obn_detaux">More details</string>
     <string name="obn_config_titre">Initial setup</string>
     <string name="obn_config_sous">A few settings to get started.</string>
     <string name="obn_langue">Language</string>
@@ -1498,4 +1497,8 @@
     <string name="obn_pack_ajouter_note">Optional: can be turned on or off later in settings.</string>
     <string name="obn_pack_complet">This pack already enables all 14 modules.</string>
     <string name="obn_pack_compteur">%1$d active modules</string>
+    <string name="obn_pin_confirme">PIN confirmed</string>
+    <string name="obn_pin_premier_ok">First code saved, enter it once more.</string>
+    <string name="obn_pin_recommencer">Start over</string>
+    <string name="obn_pin_effacer">Delete last digit</string>
 </resources>

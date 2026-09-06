@@ -1066,7 +1066,6 @@
     <string name="obn_logo_parcourir">浏览</string>
     <string name="obn_logo_formats">接受的格式：PNG、JPG — 最大 2MB</string>
     <string name="obn_logo_trop_grand">图片过大（最大 2MB）</string>
-    <string name="obn_detaux">更多详情</string>
     <string name="obn_config_titre">初始设置</string>
     <string name="obn_config_sous">一些用于良好起步的参数。</string>
     <string name="obn_langue">语言</string>
@@ -1477,4 +1476,8 @@
     <string name="obn_pack_ajouter_note">可选：稍后可在设置中开启或关闭。</string>
     <string name="obn_pack_complet">该方案已启用全部 14 个模块。</string>
     <string name="obn_pack_compteur">已启用 %1$d 个模块</string>
+    <string name="obn_pin_confirme">PIN 码已确认</string>
+    <string name="obn_pin_premier_ok">已记录第一次输入，请再输入一次。</string>
+    <string name="obn_pin_recommencer">重新开始</string>
+    <string name="obn_pin_effacer">删除最后一位</string>
 </resources>

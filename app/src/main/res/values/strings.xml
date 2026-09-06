@@ -1094,7 +1094,6 @@
     <string name="obn_logo_parcourir">Parcourir</string>
     <string name="obn_logo_formats">Formats acceptés : PNG, JPG — Taille max : 2MB</string>
     <string name="obn_logo_trop_grand">Image trop lourde (taille max : 2MB)</string>
-    <string name="obn_detaux">Plus de détails</string>
     <string name="obn_config_titre">Configuration initiale</string>
     <string name="obn_config_sous">Quelques paramètres pour bien démarrer.</string>
     <string name="obn_langue">Langue</string>
@@ -1505,4 +1504,8 @@
     <string name="obn_pack_ajouter_note">Facultatif : activable ou désactivable plus tard dans les réglages.</string>
     <string name="obn_pack_complet">Ce pack active déjà les 14 modules.</string>
     <string name="obn_pack_compteur">%1$d modules actifs</string>
+    <string name="obn_pin_confirme">Code PIN confirmé</string>
+    <string name="obn_pin_premier_ok">Premier code enregistré, saisissez-le à nouveau.</string>
+    <string name="obn_pin_recommencer">Recommencer</string>
+    <string name="obn_pin_effacer">Effacer le dernier chiffre</string>
 </resources>

@@ -1066,7 +1066,6 @@
     <string name="obn_logo_parcourir">Examinar</string>
     <string name="obn_logo_formats">Formatos aceptados: PNG, JPG — Tamaño máx.: 2MB</string>
     <string name="obn_logo_trop_grand">Imagen demasiado pesada (tamaño máx.: 2MB)</string>
-    <string name="obn_detaux">Más detalles</string>
     <string name="obn_config_titre">Configuración inicial</string>
     <string name="obn_config_sous">Algunos ajustes para comenzar bien.</string>
     <string name="obn_langue">Idioma</string>
@@ -1477,4 +1476,8 @@
     <string name="obn_pack_ajouter_note">Opcional: puede activarse o desactivarse más tarde en los ajustes.</string>
     <string name="obn_pack_complet">Este paquete ya activa los 14 módulos.</string>
     <string name="obn_pack_compteur">%1$d módulos activos</string>
+    <string name="obn_pin_confirme">PIN confirmado</string>
+    <string name="obn_pin_premier_ok">Primer código guardado, introdúzcalo de nuevo.</string>
+    <string name="obn_pin_recommencer">Empezar de nuevo</string>
+    <string name="obn_pin_effacer">Borrar el último dígito</string>
 </resources>

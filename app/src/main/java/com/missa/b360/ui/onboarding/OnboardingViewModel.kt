@@ -146,6 +146,12 @@ class OnboardingViewModel @Inject constructor(
 
     // --- Étape PIN + contact de récupération (propriétaire) ---
     var pin by mutableStateOf("")
+        private set
+
+    /** Seconde saisie du code : un PIN mal tapé enfermerait dehors. */
+    var pinConfirmation by mutableStateOf("")
+        private set
+
     var votreNom by mutableStateOf("")
     var emailSecours by mutableStateOf("")
     var pinDejaConfigure by mutableStateOf(false)
@@ -619,8 +625,59 @@ class OnboardingViewModel @Inject constructor(
 
     // --- PIN + propriétaire ---
 
-    /** Écran : le bouton « Suivant » n'est actif qu'avec un PIN de 4 chiffres saisis. */
-    fun pinEcranValide(): Boolean = pinDejaConfigure || PinHasher.isValidFormat(pin)
+    /** Le code est saisi deux fois : d'abord [pin], puis [pinConfirmation]. */
+    val pinConfirme: Boolean
+        get() = pin.length == PIN_LONGUEUR && pin == pinConfirmation
+
+    /** Étape courante du pavé : vrai tant que le premier code n'est pas complet. */
+    val pinEnPremiereSaisie: Boolean get() = pin.length < PIN_LONGUEUR
+
+    /**
+     * Ajoute un chiffre à la saisie en cours. Quand la confirmation s'achève
+     * sur un code différent, tout est remis à zéro avec un message : mieux vaut
+     * recommencer deux saisies que se retrouver dehors à la première ouverture.
+     */
+    fun saisirChiffrePin(chiffre: String) {
+        if (pinDejaConfigure) return
+        erreurRes = null
+        when {
+            pin.length < PIN_LONGUEUR -> pin += chiffre
+            pinConfirmation.length < PIN_LONGUEUR -> {
+                pinConfirmation += chiffre
+                if (pinConfirmation.length == PIN_LONGUEUR && pinConfirmation != pin) {
+                    erreurRes = R.string.ob_pin_differents
+                    pin = ""
+                    pinConfirmation = ""
+                }
+            }
+        }
+    }
+
+    /** Efface le dernier chiffre de la saisie en cours. */
+    fun effacerChiffrePin() {
+        if (pinDejaConfigure) return
+        erreurRes = null
+        if (pinConfirmation.isNotEmpty()) {
+            pinConfirmation = pinConfirmation.dropLast(1)
+        } else {
+            pin = pin.dropLast(1)
+        }
+    }
+
+    /** Repart d'un code vierge (bouton « Recommencer »). */
+    fun reinitialiserPin() {
+        if (pinDejaConfigure) return
+        erreurRes = null
+        pin = ""
+        pinConfirmation = ""
+    }
+
+    /**
+     * Écran : le bouton « Suivant » exige un code de quatre chiffres saisi
+     * deux fois à l'identique.
+     */
+    fun pinEcranValide(): Boolean =
+        pinDejaConfigure || (PinHasher.isValidFormat(pin) && pinConfirme)
 
     /** Règle partagée avec l'écriture du propriétaire. */
     fun emailEstValide(): Boolean = CreateOwnerUserUseCase.emailEstValide(emailSecours)
@@ -676,5 +733,10 @@ class OnboardingViewModel @Inject constructor(
             if (termine) onboardingTermine = true
             else erreurRes = R.string.ob_erreur_finalisation
         }
+    }
+
+    companion object {
+        /** Longueur du code PIN de la maquette. */
+        const val PIN_LONGUEUR = 4
     }
 }
