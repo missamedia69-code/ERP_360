@@ -1176,4 +1176,7 @@
     <string name="obn_restaurer_err_format">This file is not a Missa Business 360 backup.</string>
     <string name="obn_restaurer_err_version">This backup comes from a newer version of the app. Update the app first.</string>
     <string name="obn_restaurer_err_copie">Restore failed. Your current data is untouched.</string>
+
+    <string name="obn_effectif_label">Number of employees</string>
+    <string name="obn_effectif_placeholder">Select a headcount</string>
 </resources>

@@ -39,7 +39,7 @@ import javax.inject.Inject
  * La configuration (langue, fuseau, formats, sauvegardes) est appliquée en direct
  * via FormatPrefs pour toute l'application.
  */
-enum class OnboardingStep { BIENVENUE, CONFIGURATION, PROFIL, TAILLE, ENTREPRISE, PIN, TERMINE }
+enum class OnboardingStep { BIENVENUE, CONFIGURATION, PROFIL, ENTREPRISE, PIN, TERMINE }
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -58,6 +58,8 @@ class OnboardingViewModel @Inject constructor(
     // --- Étape profil ---
     var profil by mutableStateOf<ProfilActivite?>(null)
         private set
+
+    /** Effectif déclaré (P1–P6) — champ compact de l'écran « type d'activité ». */
     var palier by mutableStateOf<PalierTaille?>(null)
         private set
 
@@ -161,8 +163,7 @@ class OnboardingViewModel @Inject constructor(
                     progression.entreprise != null && !progression.pinConfigure -> OnboardingStep.PIN
                     progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.PIN
                     progression.entreprise != null -> OnboardingStep.TERMINE
-                    profil != null && palier != null -> OnboardingStep.ENTREPRISE
-                    profil != null -> OnboardingStep.TAILLE
+                    profil != null -> OnboardingStep.ENTREPRISE
                     !configurationTerminee -> OnboardingStep.CONFIGURATION
                     else -> OnboardingStep.PROFIL
                 }
@@ -185,8 +186,7 @@ class OnboardingViewModel @Inject constructor(
                 appliquerConfiguration()
                 step = OnboardingStep.PROFIL
             }
-            OnboardingStep.PROFIL -> if (profil != null) step = OnboardingStep.TAILLE
-            OnboardingStep.TAILLE -> if (palier != null) step = OnboardingStep.ENTREPRISE
+            OnboardingStep.PROFIL -> if (profil != null) step = OnboardingStep.ENTREPRISE
             OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
             OnboardingStep.PIN -> validerPinEtProprietaire()
             OnboardingStep.TERMINE -> terminer()
@@ -198,20 +198,21 @@ class OnboardingViewModel @Inject constructor(
         step = when (step) {
             OnboardingStep.CONFIGURATION -> OnboardingStep.BIENVENUE
             OnboardingStep.PROFIL -> OnboardingStep.CONFIGURATION
-            OnboardingStep.TAILLE -> OnboardingStep.PROFIL
-            OnboardingStep.ENTREPRISE -> OnboardingStep.TAILLE
+            OnboardingStep.ENTREPRISE -> OnboardingStep.PROFIL
             OnboardingStep.PIN -> OnboardingStep.ENTREPRISE
             else -> step
         }
     }
 
-    // --- Profil / taille ---
+    // --- Profil d'activité ---
 
+    /** Le profil pilote les modules activés (Configuration.modulesPourProfil). */
     fun choisirProfil(p: ProfilActivite) {
         profil = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name) }
     }
 
+    /** Effectif choisi dans le champ bleu de l'écran « type d'activité ». */
     fun choisirPalier(p: PalierTaille) {
         palier = p
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PALIER_TAILLE, p.name) }

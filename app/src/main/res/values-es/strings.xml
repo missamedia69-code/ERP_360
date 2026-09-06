@@ -1155,4 +1155,7 @@
     <string name="obn_restaurer_err_format">Este archivo no es una copia de seguridad de Missa Business 360.</string>
     <string name="obn_restaurer_err_version">Esta copia proviene de una versión más reciente de la aplicación. Actualice la aplicación primero.</string>
     <string name="obn_restaurer_err_copie">La restauración falló. Sus datos actuales están intactos.</string>
+
+    <string name="obn_effectif_label">Número de empleados</string>
+    <string name="obn_effectif_placeholder">Seleccione una plantilla</string>
 </resources>

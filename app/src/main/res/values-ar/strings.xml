@@ -1155,4 +1155,7 @@
     <string name="obn_restaurer_err_format">هذا الملف ليس نسخة احتياطية من Missa Business 360.</string>
     <string name="obn_restaurer_err_version">هذه النسخة الاحتياطية من إصدار أحدث للتطبيق. حدّث التطبيق أولًا.</string>
     <string name="obn_restaurer_err_copie">فشلت الاستعادة. بياناتك الحالية سليمة.</string>
+
+    <string name="obn_effectif_label">عدد الموظفين</string>
+    <string name="obn_effectif_placeholder">اختر عدد الموظفين</string>
 </resources>

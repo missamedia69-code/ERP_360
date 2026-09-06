@@ -1183,4 +1183,7 @@
     <string name="obn_restaurer_err_format">Ce fichier n\'est pas une sauvegarde Missa Business 360.</string>
     <string name="obn_restaurer_err_version">Cette sauvegarde provient d\'une version plus récente de l\'application. Mettez d\'abord l\'application à jour.</string>
     <string name="obn_restaurer_err_copie">La restauration a échoué. Vos données actuelles sont intactes.</string>
+
+    <string name="obn_effectif_label">Nombre d\'employés</string>
+    <string name="obn_effectif_placeholder">Sélectionner un effectif</string>
 </resources>

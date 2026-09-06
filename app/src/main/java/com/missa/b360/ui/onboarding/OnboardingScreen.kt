@@ -57,8 +57,8 @@ import com.missa.b360.ui.theme.OnboardingStepGray
 
 /**
  * Hôte de l'onboarding — maquette Missa Business 360 :
- * bienvenue → profil d'activité → taille → informations entreprise (+ logo)
- * → configuration initiale → code PIN → récapitulatif.
+ * bienvenue → configuration initiale → profil d'activité → informations
+ * entreprise (+ logo) → code PIN → récapitulatif.
  *
  * Les validations métier (entreprise transactionnelle, PIN, propriétaire, clôture)
  * restent portées par le ViewModel et les use cases existants.
@@ -92,7 +92,6 @@ fun OnboardingScreen(
                 OnboardingStep.BIENVENUE -> WelcomeStep(onCommencer = viewModel::suivant)
                 OnboardingStep.CONFIGURATION -> OnbConfigurationStep(viewModel)
                 OnboardingStep.PROFIL -> OnbProfilStep(viewModel)
-                OnboardingStep.TAILLE -> OnbTailleStep(viewModel)
                 OnboardingStep.ENTREPRISE -> OnbEntrepriseStep(viewModel)
                 OnboardingStep.PIN -> OnbPinStep(viewModel)
                 OnboardingStep.TERMINE -> OnbTermineStep(viewModel)

@@ -1155,4 +1155,7 @@
     <string name="obn_restaurer_err_format">该文件不是 Missa Business 360 的备份。</string>
     <string name="obn_restaurer_err_version">该备份来自更新版本的应用，请先更新应用。</string>
     <string name="obn_restaurer_err_copie">恢复失败，当前数据未受影响。</string>
+
+    <string name="obn_effectif_label">员工人数</string>
+    <string name="obn_effectif_placeholder">选择员工规模</string>
 </resources>

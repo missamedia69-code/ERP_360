@@ -1,6 +1,7 @@
 package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,20 +14,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Construction
-import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Store
-import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,6 +34,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,8 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
@@ -54,7 +55,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
 
 /**
- * Écran 2 — Profil d'activité : les cinq familles de la maquette sélectionnent les
+ * Écran — Profil d'activité : les cinq familles de la maquette sélectionnent les
  * profils détaillés existants (A–H) ; « Plus de détails » conserve le choix fin.
  */
 @Composable
@@ -165,6 +166,90 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                     }
                 }
             }
+            OnbEffectifChamp(
+                selection = viewModel.palier,
+                onSelect = viewModel::choisirPalier,
+                enabled = !viewModel.enregistrementEnCours,
+            )
+        }
+    }
+}
+
+/**
+ * Champ bleu « Nombre d'employés » en bas de l'écran : liste déroulante des six
+ * paliers d'effectif (P1–P6). Le choix remplace l'ancien écran dédié : il est
+ * conservé immédiatement et repris sur la fiche entreprise.
+ */
+@Composable
+private fun OnbEffectifChamp(
+    selection: PalierTaille?,
+    onSelect: (PalierTaille) -> Unit,
+    enabled: Boolean,
+) {
+    var ouvert by remember { mutableStateOf(false) }
+    val libelle = selection?.let { stringResource(it.labelRes) }
+        ?: stringResource(R.string.obn_effectif_placeholder)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            color = BrandBlue,
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (enabled) Modifier.clickable { ouvert = !ouvert } else Modifier),
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 15.dp, vertical = 13.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Groups,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.obn_effectif_label),
+                        fontSize = 11.5.sp,
+                        color = Color.White.copy(alpha = 0.75f),
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = libelle,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
+                Icon(
+                    imageVector = Icons.Outlined.ArrowDropDown,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = ouvert,
+            onDismissRequest = { ouvert = false },
+        ) {
+            for (palier in PalierTaille.entries) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = stringResource(palier.labelRes),
+                            fontSize = 13.sp,
+                            fontWeight = if (palier == selection) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (palier == selection) BrandBlue else MissaInk,
+                        )
+                    },
+                    onClick = {
+                        onSelect(palier)
+                        ouvert = false
+                    },
+                )
+            }
         }
     }
 }
@@ -232,86 +317,6 @@ internal fun OnbProfilCarte(
                     tint = BrandBlue,
                     modifier = Modifier.size(22.dp),
                 )
-            }
-        }
-    }
-}
-
-/**
- * Écran 3 — Taille de l'entreprise : les six paliers existants (P1–P6) avec leurs
- * fourchettes d'effectif, présentés comme des options de la maquette.
- */
-@Composable
-internal fun OnbTailleStep(viewModel: OnboardingViewModel) {
-    val icones = listOf(
-        Icons.Outlined.Person,
-        Icons.Outlined.Group,
-        Icons.Outlined.Groups,
-        Icons.Outlined.Store,
-        Icons.Outlined.Storefront,
-        Icons.Outlined.Business,
-    )
-    OnbScaffold(
-        titreRes = R.string.obn_taille_titre,
-        sousTitreRes = R.string.obn_taille_sous,
-        viewModel = viewModel,
-        boutonActive = viewModel.palier != null,
-        onRetour = viewModel::precedent,
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            for (index in PalierTaille.entries.indices) {
-                val palier = PalierTaille.entries[index]
-                Card(
-                    onClick = { viewModel.choisirPalier(palier) },
-                    shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(
-                        if (palier == viewModel.palier) 1.5.dp else 1.dp,
-                        if (palier == viewModel.palier) BrandBlue else MissaBorder,
-                    ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (palier == viewModel.palier) BrandBlue.copy(alpha = 0.045f) else MissaSurface,
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp, vertical = 13.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(11.dp),
-                            color = BrandBlue.copy(alpha = 0.09f),
-                            modifier = Modifier.size(42.dp),
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = icones.getOrElse(index) { Icons.Outlined.Business },
-                                    contentDescription = null,
-                                    tint = BrandBlue,
-                                    modifier = Modifier.size(22.dp),
-                                )
-                            }
-                        }
-                        Spacer(Modifier.width(14.dp))
-                        Text(
-                            text = stringResource(palier.labelRes),
-                            fontSize = 14.5.sp,
-                            fontWeight = if (palier == viewModel.palier) FontWeight.SemiBold else FontWeight.Normal,
-                            color = MissaInk,
-                            modifier = Modifier.weight(1f),
-                        )
-                        if (palier == viewModel.palier) {
-                            Icon(
-                                imageVector = Icons.Outlined.ChevronRight,
-                                contentDescription = null,
-                                tint = BrandBlue,
-                                modifier = Modifier.size(22.dp),
-                            )
-                        }
-                    }
-                }
             }
         }
     }
