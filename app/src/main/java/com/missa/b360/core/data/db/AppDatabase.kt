@@ -9,11 +9,14 @@ import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EmployeeDao
+import com.missa.b360.core.data.dao.EquipementDao
 import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
+import com.missa.b360.core.data.dao.InterventionDao
+import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
@@ -36,11 +39,14 @@ import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
 import com.missa.b360.core.data.entity.EmployeeEntity
+import com.missa.b360.core.data.entity.EquipementEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
+import com.missa.b360.core.data.entity.InterventionEntity
+import com.missa.b360.core.data.entity.NonConformiteEntity
 import com.missa.b360.core.data.entity.NotificationEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.PaymentMethodEntity
@@ -87,6 +93,9 @@ import com.missa.b360.core.data.entity.UserEntity
         OperationRecordEntity::class,
         CompteTresorerieEntity::class,
         MouvementTresorerieEntity::class,
+        NonConformiteEntity::class,
+        EquipementEntity::class,
+        InterventionEntity::class,
         ProductCategoryEntity::class,
         ProductEntity::class,
         ProductStockEntity::class,
@@ -95,7 +104,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -122,6 +131,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun compteTresorerieDao(): CompteTresorerieDao
     abstract fun mouvementTresorerieDao(): MouvementTresorerieDao
+    abstract fun nonConformiteDao(): NonConformiteDao
+    abstract fun equipementDao(): EquipementDao
+    abstract fun interventionDao(): InterventionDao
 
     companion object {
         /** Version du schéma — doit rester alignée sur l'annotation @Database. */
@@ -317,6 +329,60 @@ abstract class AppDatabase : RoomDatabase() {
          * et mouvements. Deux tables neuves : aucune donnée existante n'est
          * touchée, la migration est donc sans risque de perte.
          */
+        /**
+         * v9 → v10 : modules Qualité et Maintenance — registre des
+         * non-conformités, parc d'équipements et interventions. Trois tables
+         * neuves, aucune donnée existante touchée.
+         */
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `qualite_non_conformites` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`date` INTEGER NOT NULL, `titre` TEXT NOT NULL, `description` TEXT, " +
+                        "`gravite` TEXT NOT NULL, `origine` TEXT NOT NULL, `statut` TEXT NOT NULL, " +
+                        "`reference` TEXT, `responsable` TEXT, `actionCorrective` TEXT, " +
+                        "`cout` REAL NOT NULL, `dateResolution` INTEGER, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_qualite_non_conformites_statut` " +
+                        "ON `qualite_non_conformites` (`statut`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_qualite_non_conformites_date` " +
+                        "ON `qualite_non_conformites` (`date`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `maintenance_equipements` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`nom` TEXT NOT NULL, `code` TEXT, `type` TEXT NOT NULL, " +
+                        "`siteId` INTEGER, `dateMiseEnService` INTEGER, " +
+                        "`periodiciteJours` INTEGER NOT NULL, `actif` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_maintenance_equipements_nom` " +
+                        "ON `maintenance_equipements` (`nom`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `maintenance_interventions` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`equipementId` INTEGER NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`type` TEXT NOT NULL, `description` TEXT NOT NULL, `technicien` TEXT, " +
+                        "`cout` REAL NOT NULL, `dureeHeures` REAL NOT NULL, " +
+                        "`statut` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_maintenance_interventions_equipementId` " +
+                        "ON `maintenance_interventions` (`equipementId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_maintenance_interventions_date` " +
+                        "ON `maintenance_interventions` (`date`)",
+                )
+            }
+        }
+
         val MIGRATION_8_9 = object : Migration(8, 9) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
