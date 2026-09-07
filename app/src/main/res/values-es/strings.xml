@@ -205,15 +205,10 @@
     <string name="home_profile_format">Perfil: %1$s</string>
     <string name="home_size_format">Tamaño: %1$s</string>
     <string name="home_today">Hoy</string>
-    <string name="home_total">Total</string>
     <string name="home_cash">Tesorería</string>
     <string name="home_available">Disponible</string>
     <string name="home_quick_actions">Acciones rápidas</string>
     <string name="home_personalize">Personalizar</string>
-    <string name="home_activity_summary">Resumen de actividad</string>
-    <string name="home_reminders">Recordatorios importantes</string>
-    <string name="home_no_pending_tasks">• Ninguna tarea pendiente</string>
-    <string name="home_no_overdue_invoices">• Ninguna factura de cliente vencida</string>
     <string name="home_recent_documents">Documentos recientes</string>
     <string name="home_see_all">Ver todo</string>
     <string name="home_no_documents">Ningún documento generado</string>
@@ -225,11 +220,9 @@
     <string name="home_stock_entry">Entrada de stock</string>
     <string name="home_transfer">Transferencia</string>
     <string name="home_payment_received">Pago recibido</string>
-    <string name="home_expense">Gasto</string>
     <string name="home_gross_margin">Margen bruto</string>
     <string name="home_more_short">Más</string>
     <string name="home_company_active">Empresa activa</string>
-    <string name="home_drawer_primary">PRINCIPAL</string>
 
     <!-- Navigation latérale détaillée -->
     <string name="home_active">ACTIVA</string>
@@ -1643,4 +1636,5 @@
     <string name="prj_champ_avancement">Avance (%)</string>
     <string name="prj_champ_consomme">Presupuesto consumido</string>
     <string name="prj_actualiser_aide">Rellene ambos: es la diferencia entre presupuesto gastado y avance lo que revela un desvío.</string>
+    <string name="home_new_delivery">Albarán</string>
 </resources>

@@ -205,15 +205,10 @@
     <string name="home_profile_format">الملف: %1$s</string>
     <string name="home_size_format">الحجم: %1$s</string>
     <string name="home_today">اليوم</string>
-    <string name="home_total">الإجمالي</string>
     <string name="home_cash">الخزينة</string>
     <string name="home_available">المتاح</string>
     <string name="home_quick_actions">إجراءات سريعة</string>
     <string name="home_personalize">تخصيص</string>
-    <string name="home_activity_summary">ملخص النشاط</string>
-    <string name="home_reminders">تذكيرات مهمة</string>
-    <string name="home_no_pending_tasks">• لا توجد مهام معلّقة</string>
-    <string name="home_no_overdue_invoices">• لا توجد فواتير عملاء متأخرة</string>
     <string name="home_recent_documents">المستندات الأخيرة</string>
     <string name="home_see_all">عرض الكل</string>
     <string name="home_no_documents">لم يتم إنشاء أي مستند</string>
@@ -225,11 +220,9 @@
     <string name="home_stock_entry">إدخال مخزون</string>
     <string name="home_transfer">تحويل</string>
     <string name="home_payment_received">دفعة مستلمة</string>
-    <string name="home_expense">مصروف</string>
     <string name="home_gross_margin">الهامش الإجمالي</string>
     <string name="home_more_short">المزيد</string>
     <string name="home_company_active">شركة نشطة</string>
-    <string name="home_drawer_primary">الرئيسي</string>
 
     <!-- Navigation latérale détaillée -->
     <string name="home_active">نشط</string>
@@ -1643,4 +1636,5 @@
     <string name="prj_champ_avancement">التقدم (%)</string>
     <string name="prj_champ_consomme">الميزانية المستهلكة</string>
     <string name="prj_actualiser_aide">املأ الحقلين معًا: الفارق بين الميزانية المستهلكة ونسبة التقدم هو ما يكشف الانحراف.</string>
+    <string name="home_new_delivery">سند تسليم</string>
 </resources>

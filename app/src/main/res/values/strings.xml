@@ -306,15 +306,10 @@
     <string name="home_profile_format">Profil : %1$s</string>
     <string name="home_size_format">Taille : %1$s</string>
     <string name="home_today">Aujourd’hui</string>
-    <string name="home_total">Total</string>
     <string name="home_cash">Trésorerie</string>
     <string name="home_available">Disponible</string>
     <string name="home_quick_actions">Actions rapides</string>
     <string name="home_personalize">Personnaliser</string>
-    <string name="home_activity_summary">Résumé de l’activité</string>
-    <string name="home_reminders">Rappels importants</string>
-    <string name="home_no_pending_tasks">• Aucune tâche en attente</string>
-    <string name="home_no_overdue_invoices">• Aucune facture client en retard</string>
     <string name="home_recent_documents">Documents récents</string>
     <string name="home_see_all">Voir tout</string>
     <string name="home_no_documents">Aucun document généré</string>
@@ -326,11 +321,9 @@
     <string name="home_stock_entry">Entrée stock</string>
     <string name="home_transfer">Transfert</string>
     <string name="home_payment_received">Paiement reçu</string>
-    <string name="home_expense">Dépense</string>
     <string name="home_gross_margin">Marge brute</string>
     <string name="home_more_short">Plus</string>
     <string name="home_company_active">Entreprise active</string>
-    <string name="home_drawer_primary">PRINCIPAL</string>
 
     <!-- Navigation latérale détaillée -->
     <string name="home_active">ACTIF</string>
@@ -1671,4 +1664,5 @@
     <string name="prj_champ_avancement">Avancement (%)</string>
     <string name="prj_champ_consomme">Budget consommé</string>
     <string name="prj_actualiser_aide">Renseignez les deux : c\'est l\'écart entre le budget brûlé et l\'avancement qui révèle une dérive.</string>
+    <string name="home_new_delivery">Bon de livraison</string>
 </resources>

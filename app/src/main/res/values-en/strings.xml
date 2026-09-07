@@ -299,15 +299,10 @@
     <string name="home_profile_format">Profile: %1$s</string>
     <string name="home_size_format">Size: %1$s</string>
     <string name="home_today">Today</string>
-    <string name="home_total">Total</string>
     <string name="home_cash">Cash flow</string>
     <string name="home_available">Available</string>
     <string name="home_quick_actions">Quick actions</string>
     <string name="home_personalize">Customize</string>
-    <string name="home_activity_summary">Activity summary</string>
-    <string name="home_reminders">Important reminders</string>
-    <string name="home_no_pending_tasks">• No pending tasks</string>
-    <string name="home_no_overdue_invoices">• No overdue customer invoices</string>
     <string name="home_recent_documents">Recent documents</string>
     <string name="home_see_all">View all</string>
     <string name="home_no_documents">No documents generated</string>
@@ -319,11 +314,9 @@
     <string name="home_stock_entry">Stock entry</string>
     <string name="home_transfer">Transfer</string>
     <string name="home_payment_received">Payment received</string>
-    <string name="home_expense">Expense</string>
     <string name="home_gross_margin">Gross margin</string>
     <string name="home_more_short">More</string>
     <string name="home_company_active">Active company</string>
-    <string name="home_drawer_primary">MAIN</string>
 
     <!-- Navigation latérale détaillée -->
     <string name="home_active">ACTIVE</string>
@@ -1664,4 +1657,5 @@
     <string name="prj_champ_avancement">Progress (%)</string>
     <string name="prj_champ_consomme">Budget spent</string>
     <string name="prj_actualiser_aide">Fill both: the gap between budget burned and progress made is what reveals a drift.</string>
+    <string name="home_new_delivery">Delivery note</string>
 </resources>

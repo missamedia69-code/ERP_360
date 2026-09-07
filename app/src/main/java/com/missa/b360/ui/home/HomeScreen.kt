@@ -29,23 +29,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Backup
-import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Payments
@@ -53,7 +51,6 @@ import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material.icons.outlined.TransferWithinAStation
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -99,6 +96,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
@@ -214,6 +212,7 @@ fun HomeScreen(
         ) { padding ->
             HomeDashboard(
                 state = uiState,
+                modulesActifs = modulesActifs,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
@@ -511,6 +510,7 @@ private fun HomeHeader(
 @Composable
 private fun HomeDashboard(
     state: HomeUiState,
+    modulesActifs: List<ModuleCode>,
     modifier: Modifier,
     onNavigate: (String) -> Unit,
 ) {
@@ -521,6 +521,9 @@ private fun HomeDashboard(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
+            // Quatre chiffres, quatre modules, aucun répété plus bas : les
+            // ventes, les achats, ce qu'il reste entre les deux, et l'argent
+            // réellement disponible.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -533,6 +536,7 @@ private fun HomeDashboard(
                     icon = Icons.AutoMirrored.Outlined.ReceiptLong,
                     iconColor = HomeBlue,
                     iconBackground = HomeBlueSoft,
+                    onClick = { onNavigate(AppModule.VENTE.route) },
                 )
                 MetricCard(
                     modifier = Modifier.weight(1f),
@@ -542,6 +546,17 @@ private fun HomeDashboard(
                     icon = Icons.Outlined.AddShoppingCart,
                     iconColor = HomeGreen,
                     iconBackground = HomeGreenSoft,
+                    onClick = { onNavigate(AppModule.ACHATS.route) },
+                )
+                MetricCard(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.home_gross_margin),
+                    value = MoneyUtils.format(state.marge, currency),
+                    subtitle = stringResource(R.string.home_today),
+                    icon = Icons.AutoMirrored.Outlined.TrendingUp,
+                    iconColor = HomePurple,
+                    iconBackground = HomePurpleSoft,
+                    onClick = { onNavigate(AppModule.REPORTING.route) },
                 )
                 MetricCard(
                     modifier = Modifier.weight(1f),
@@ -551,15 +566,7 @@ private fun HomeDashboard(
                     icon = Icons.Outlined.Payments,
                     iconColor = HomeOrange,
                     iconBackground = HomeOrangeSoft,
-                )
-                MetricCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.module_clients),
-                    value = state.nombreClients.toString(),
-                    subtitle = stringResource(R.string.home_total),
-                    icon = Icons.Outlined.Groups,
-                    iconColor = HomePurple,
-                    iconBackground = HomePurpleSoft,
+                    onClick = { onNavigate(AppModule.TRESORERIE.route) },
                 )
             }
         }
@@ -570,27 +577,10 @@ private fun HomeDashboard(
                 onAction = { onNavigate(Routes.ADMIN_REGLAGES) },
             )
             Spacer(Modifier.height(7.dp))
-            QuickActionsGrid(onNavigate = onNavigate)
-        }
-        item {
-            DashboardSectionHeader(
-                title = stringResource(R.string.home_activity_summary),
-                action = stringResource(R.string.home_today),
-                actionHasDropDown = true,
-            )
-            Spacer(Modifier.height(7.dp))
-            ActivitySummary(
-                currency = currency,
-                sales = state.ventes,
-                purchases = state.achats,
-                stockQuantity = state.quantiteStock,
-            )
+            QuickActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
         }
         item {
             HomeAlertesCard(onVoirTout = { onNavigate(AppModule.REPORTING.route) })
-        }
-        item {
-            ReminderCard(onClick = { onNavigate(Routes.NOTIFICATIONS) })
         }
         item {
             DashboardSectionHeader(
@@ -617,9 +607,14 @@ private fun MetricCard(
     icon: ImageVector,
     iconColor: Color,
     iconBackground: Color,
+    onClick: (() -> Unit)? = null,
 ) {
     Surface(
-        modifier = modifier.height(112.dp),
+        // Une carte qui nomme un module doit y conduire : l'utilisateur la
+        // touche de toute façon.
+        modifier = modifier
+            .height(112.dp)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         shape = RoundedCornerShape(15.dp),
         color = Color.White,
         border = BorderStroke(1.dp, HomeBorder),
@@ -712,6 +707,8 @@ private data class QuickAction(
     val icon: ImageVector,
     val color: Color,
     val route: String,
+    /** Module dont dépend le raccourci : il disparaît si le pack ne l'a pas retenu. */
+    val module: ModuleCode,
 )
 
 /** Ouvre le formulaire en plus de la liste depuis une action rapide de l'accueil. */
@@ -719,33 +716,75 @@ private fun AppModule.createRoute(direction: OperationDirection? = null): String
     "$route?create=true" + direction?.let { "&direction=${it.name}" }.orEmpty()
 
 @Composable
-private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
-    val rows = listOf(
-        listOf(
-            QuickAction(R.string.home_new_sale, Icons.AutoMirrored.Outlined.ReceiptLong, HomeBlue, AppModule.VENTE.createRoute()),
-            QuickAction(R.string.home_new_purchase, Icons.Outlined.AddShoppingCart, HomeGreen, AppModule.ACHATS.createRoute()),
-            QuickAction(R.string.home_new_client, Icons.Outlined.PersonAdd, HomePurple, AppModule.CLIENTS.createRoute()),
-            QuickAction(R.string.home_new_supplier, Icons.Outlined.AddBusiness, HomeOrange, AppModule.FOURNISSEURS.createRoute()),
+private fun QuickActionsGrid(
+    modulesActifs: List<ModuleCode>,
+    onNavigate: (String) -> Unit,
+) {
+    // Un raccourci vers un module que le pack n'a pas retenu mène à un écran
+    // que l'utilisateur n'a pas demandé : la grille suit donc la même règle que
+    // le menu. L'argent passe par la Trésorerie, seul endroit où un encaissement
+    // se rattache à un compte.
+    val actions = listOf(
+        QuickAction(
+            R.string.home_new_sale,
+            Icons.AutoMirrored.Outlined.ReceiptLong,
+            HomeBlue,
+            AppModule.VENTE.createRoute(),
+            ModuleCode.VEN,
         ),
-        listOf(
-            QuickAction(R.string.home_stock_entry, Icons.Outlined.Inventory2, HomeTeal, AppModule.STOCK.createRoute()),
-            QuickAction(R.string.home_transfer, Icons.Outlined.TransferWithinAStation, HomeBlue, Routes.STOCK_TRANSFER_FORM),
-            QuickAction(
-                R.string.home_payment_received,
-                Icons.Outlined.Payments,
-                HomeGreen,
-                AppModule.FINANCES.createRoute(OperationDirection.IN),
-            ),
-            QuickAction(
-                R.string.home_expense,
-                Icons.Outlined.Description,
-                HomeOrange,
-                AppModule.FINANCES.createRoute(OperationDirection.OUT),
-            ),
+        QuickAction(
+            R.string.home_new_purchase,
+            Icons.Outlined.AddShoppingCart,
+            HomeGreen,
+            AppModule.ACHATS.createRoute(),
+            ModuleCode.ACH,
         ),
-    )
+        QuickAction(
+            R.string.home_new_client,
+            Icons.Outlined.PersonAdd,
+            HomePurple,
+            AppModule.CLIENTS.createRoute(),
+            ModuleCode.VEN,
+        ),
+        QuickAction(
+            R.string.home_new_supplier,
+            Icons.Outlined.AddBusiness,
+            HomeOrange,
+            AppModule.FOURNISSEURS.createRoute(),
+            ModuleCode.ACH,
+        ),
+        QuickAction(
+            R.string.home_stock_entry,
+            Icons.Outlined.Inventory2,
+            HomeTeal,
+            AppModule.STOCK.createRoute(),
+            ModuleCode.STK,
+        ),
+        QuickAction(
+            R.string.home_transfer,
+            Icons.Outlined.TransferWithinAStation,
+            HomeBlue,
+            Routes.STOCK_TRANSFER_FORM,
+            ModuleCode.STK,
+        ),
+        QuickAction(
+            R.string.home_payment_received,
+            Icons.Outlined.Payments,
+            HomeGreen,
+            AppModule.TRESORERIE.route,
+            ModuleCode.TRE,
+        ),
+        QuickAction(
+            R.string.home_new_delivery,
+            Icons.Outlined.LocalShipping,
+            HomeOrange,
+            AppModule.LIVRAISON.createRoute(),
+            ModuleCode.LOG,
+        ),
+    ).filter { modulesActifs.isEmpty() || it.module in modulesActifs }
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        rows.forEach { row ->
+        actions.chunked(4).forEach { row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -759,6 +798,9 @@ private fun QuickActionsGrid(onNavigate: (String) -> Unit) {
                         onClick = { onNavigate(action.route) },
                     )
                 }
+                // Une rangée incomplète garde ses cases à la même largeur que
+                // les autres plutôt que de s'étirer.
+                repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
@@ -802,154 +844,6 @@ private fun QuickActionCard(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ActivitySummary(
-    currency: String,
-    sales: Double,
-    purchases: Double,
-    stockQuantity: Double,
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(17.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 13.dp),
-        ) {
-            SummaryItem(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.module_vente),
-                value = MoneyUtils.format(sales, currency),
-                icon = Icons.Outlined.BarChart,
-                color = HomeBlue,
-            )
-            SummaryDivider()
-            SummaryItem(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.module_achats),
-                value = MoneyUtils.format(purchases, currency),
-                icon = Icons.Outlined.ShoppingCart,
-                color = HomeGreen,
-            )
-            SummaryDivider()
-            SummaryItem(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.module_stock),
-                value = stockQuantity.displayQuantity(),
-                icon = Icons.Outlined.Inventory2,
-                color = HomeOrange,
-            )
-            SummaryDivider()
-            SummaryItem(
-                modifier = Modifier.weight(1f),
-                title = stringResource(R.string.home_gross_margin),
-                value = MoneyUtils.format(sales - purchases, currency),
-                icon = Icons.Outlined.Payments,
-                color = HomePurple,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SummaryItem(
-    modifier: Modifier,
-    title: String,
-    value: String,
-    icon: ImageVector,
-    color: Color,
-) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = color,
-            modifier = Modifier.size(23.dp),
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(text = title, color = HomeTextMuted, fontSize = 9.sp, maxLines = 1)
-        Spacer(Modifier.height(2.dp))
-        Text(
-            text = value,
-            color = HomeTextDark,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
-
-@Composable
-private fun SummaryDivider() {
-    Box(
-        modifier = Modifier
-            .width(1.dp)
-            .height(60.dp)
-            .background(HomeBorder),
-    )
-}
-
-@Composable
-private fun ReminderCard(onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFFFFBF3),
-        border = BorderStroke(1.dp, Color(0xFFF5DDA8)),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.size(42.dp),
-                shape = CircleShape,
-                color = Color(0xFFFFB52E),
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.WarningAmber,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.padding(10.dp),
-                )
-            }
-            Spacer(Modifier.width(11.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.home_reminders),
-                    color = HomeTextDark,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.home_no_pending_tasks),
-                    color = HomeTextDark,
-                    fontSize = 10.sp,
-                )
-                Text(
-                    text = stringResource(R.string.home_no_overdue_invoices),
-                    color = HomeTextDark,
-                    fontSize = 10.sp,
-                )
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                contentDescription = null,
-                tint = HomeTextDark,
-                modifier = Modifier.size(15.dp),
             )
         }
     }
@@ -1255,14 +1149,6 @@ private fun MissaBusinessDrawer(
                 }
             }
 
-            DrawerSectionTitle(stringResource(R.string.home_drawer_primary))
-            DrawerMenuItem(
-                icon = Icons.Outlined.Home,
-                title = stringResource(R.string.home_title),
-                selected = currentRoute == Routes.HOME,
-            ) {
-                onNavigate(Routes.HOME)
-            }
 
             DrawerSectionTitle(stringResource(R.string.drawer_section_administration))
             DrawerMenuItem(Icons.Outlined.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {

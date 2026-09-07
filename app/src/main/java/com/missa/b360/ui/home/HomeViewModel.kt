@@ -2,9 +2,12 @@ package com.missa.b360.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
@@ -40,6 +43,8 @@ data class HomeUiState(
     val derniereSauvegarde: Long? = null,
     val ventes: Double = 0.0,
     val achats: Double = 0.0,
+    /** Marge brute du jour : ventes − achats, calculée une seule fois. */
+    val marge: Double = 0.0,
     val tresorerie: Double = 0.0,
     val quantiteStock: Double = 0.0,
     val recentOperations: List<OperationRecordEntity> = emptyList(),
@@ -53,6 +58,8 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
     settingsStore: SettingsStore,
+    compteTresorerieDao: CompteTresorerieDao,
+    mouvementTresorerieDao: MouvementTresorerieDao,
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
@@ -97,7 +104,16 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    val uiState: StateFlow<HomeUiState> = combine(baseState, operations.observeAll()) { base, records ->
+    private val soldeTresorerie = combine(
+        compteTresorerieDao.observeAll(),
+        mouvementTresorerieDao.observeAll(),
+    ) { comptes, mouvements -> TresorerieRules.soldeGlobal(comptes, mouvements) }
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        baseState,
+        operations.observeAll(),
+        soldeTresorerie,
+    ) { base, records, soldeComptes ->
         val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
         // Les deux cartes libellées « Aujourd’hui » ne doivent jamais agréger les
         // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
@@ -110,7 +126,11 @@ class HomeViewModel @Inject constructor(
         val validatedToday = validated.filter { it.createdAt >= startOfToday }
         val ventes = validatedToday.amountFor(OperationModule.VENTE)
         val achats = validatedToday.amountFor(OperationModule.ACHATS)
-        val tresorerie = validated
+        // Le solde affiché à l'accueil doit être celui du module Trésorerie, à
+        // l'unité près : deux écrans qui annoncent deux soldes différents font
+        // perdre confiance dans les deux. Même formule que le tableau de bord —
+        // comptes de trésorerie plus anciennes pièces FINANCES.
+        val fluxFinances = validated
             .filter { it.module == OperationModule.FINANCES.name }
             .sumOf { record ->
                 when (record.direction) {
@@ -119,12 +139,14 @@ class HomeViewModel @Inject constructor(
                     else -> 0.0
                 }
             }
+        val tresorerie = soldeComptes + fluxFinances
         val quantiteStock = validated
             .filter { it.module == OperationModule.STOCK.name }
             .sumOf { it.quantity ?: 0.0 }
         base.copy(
             ventes = ventes,
             achats = achats,
+            marge = ventes - achats,
             tresorerie = tresorerie,
             quantiteStock = quantiteStock,
             recentOperations = records.take(3),
