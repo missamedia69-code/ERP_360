@@ -303,8 +303,6 @@
     <string name="sales_no_customer">لا يوجد عميل يطابق هذا البحث.</string>
     <string name="sales_cash">نقداً</string>
     <string name="sales_receipt_name">فاتورة</string>
-    <string name="sales_home">الرئيسية</string>
-    <string name="sales_nav_sales">المبيعات</string>
 
     <!-- مسار المبيعات: القائمة والفاتورة والخيارات والطباعة -->
     <string name="sales_all">الكل</string>

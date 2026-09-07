@@ -1,5 +1,7 @@
 package com.missa.b360.ui.sales
 
+import androidx.compose.runtime.DisposableEffect
+import com.missa.b360.ui.components.LocalBarreNavigation
 import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
@@ -42,7 +44,6 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.PointOfSale
 import androidx.compose.material.icons.outlined.Print
@@ -104,7 +105,6 @@ import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.toInputAmount
 import com.missa.b360.ui.components.MissaBrandMark
-import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.Blue40
 import com.missa.b360.ui.theme.BrandBlue
@@ -143,6 +143,9 @@ fun SalesScreen(
     openCreate: Boolean = false,
     viewModel: SalesViewModel = hiltViewModel(),
 ) {
+    // Le flux de vente occupe tout l'écran et pose son propre bouton en bas :
+    // la barre de navigation se retire le temps de la saisie, puis revient.
+    val barreNavigation = LocalBarreNavigation.current
     val sale by viewModel.uiState.collectAsState()
     val clients by viewModel.clients.collectAsState(initial = emptyList())
     val products by viewModel.products.collectAsState(initial = emptyList())
@@ -176,6 +179,13 @@ fun SalesScreen(
     var paymentMethod by rememberSaveable { mutableStateOf("") }
     var scannerUnavailable by remember { mutableStateOf(false) }
     val currentStep = runCatching { SalesStep.valueOf(stepName) }.getOrDefault(SalesStep.LIST)
+
+    // Seule la liste est une destination de premier niveau ; les étapes du flux
+    // sont une tâche, dont on sort par « retour ».
+    DisposableEffect(currentStep) {
+        barreNavigation.value = currentStep == SalesStep.LIST
+        onDispose { barreNavigation.value = true }
+    }
     val fallbackPayment = stringResource(R.string.sales_cash)
     val selectedPayment = paymentMethod.ifBlank { paymentMethods.firstOrNull() ?: fallbackPayment }
     val totals = sale.totals(taxRate)
@@ -660,7 +670,6 @@ private fun SalesListScreen(
                 },
             )
         },
-        bottomBar = { FlowBottomBar(onNavigate) },
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -1360,27 +1369,6 @@ private fun PrintScreen(
             Spacer(Modifier.height(14.dp))
             Text(stringResource(R.string.sales_print_ready), color = Color.White.copy(alpha = .82f), fontSize = 12.sp)
         }
-    }
-}
-
-@Composable
-private fun FlowBottomBar(onNavigate: (String) -> Unit) {
-    Surface(color = Color.White, shadowElevation = 8.dp) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceAround) {
-            FlowNav(Icons.Outlined.Home, R.string.sales_home) { onNavigate(Routes.HOME) }
-            FlowNav(Icons.Outlined.ShoppingCart, R.string.sales_nav_sales, selected = true) { }
-            FlowNav(Icons.Outlined.Inventory2, R.string.module_achats) { onNavigate(AppModule.ACHATS.route) }
-            FlowNav(Icons.Outlined.PersonOutline, R.string.module_clients) { onNavigate(AppModule.CLIENTS.route) }
-            FlowNav(Icons.Outlined.MoreVert, R.string.more_modules) { onNavigate(AppModule.REPORTING.route) }
-        }
-    }
-}
-
-@Composable
-private fun FlowNav(icon: androidx.compose.ui.graphics.vector.ImageVector, label: Int, selected: Boolean = false, onClick: () -> Unit) {
-    Column(modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(icon, null, tint = if (selected) FlowBlue else FlowMuted, modifier = Modifier.size(21.dp))
-        Text(stringResource(label), color = if (selected) FlowBlue else FlowMuted, fontSize = 9.sp)
     }
 }
 

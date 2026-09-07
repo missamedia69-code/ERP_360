@@ -303,8 +303,6 @@
     <string name="sales_no_customer">Ningún cliente coincide con esta búsqueda.</string>
     <string name="sales_cash">Efectivo</string>
     <string name="sales_receipt_name">Factura</string>
-    <string name="sales_home">Inicio</string>
-    <string name="sales_nav_sales">Ventas</string>
 
     <!-- Flujo de ventas: lista, factura, opciones e impresión -->
     <string name="sales_all">Todas</string>

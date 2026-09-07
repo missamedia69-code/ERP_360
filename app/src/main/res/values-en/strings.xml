@@ -397,8 +397,6 @@
     <string name="sales_no_customer">No customer matches this search.</string>
     <string name="sales_cash">Cash</string>
     <string name="sales_receipt_name">Invoice</string>
-    <string name="sales_home">Home</string>
-    <string name="sales_nav_sales">Sales</string>
 
     <!-- Sales flow: list, invoice, options and print -->
     <string name="sales_all">All</string>

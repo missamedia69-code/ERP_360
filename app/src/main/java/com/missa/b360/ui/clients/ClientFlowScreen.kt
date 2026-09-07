@@ -35,13 +35,10 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -105,8 +102,6 @@ import com.missa.b360.core.domain.usecase.ClientValidation
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.MissaBrandMark
-import com.missa.b360.ui.navigation.AppModule
-import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.Green90
@@ -532,7 +527,6 @@ private fun ClientListScreen(
                 actions = { IconButton(onClick = onSearch) { Icon(Icons.Outlined.Search, stringResource(R.string.clients_flow_search), tint = ClientInk) } },
             )
         },
-        bottomBar = { ClientBottomBar(onNavigate) },
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
@@ -1322,24 +1316,6 @@ private fun ClientPageTitle(title: String) {
 @Composable
 private fun ClientReadOnlyLine(label: Int, value: String) {
     Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(9.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) { Row(Modifier.padding(11.dp)) { Text(stringResource(label), color = ClientMuted, fontSize = 10.sp, modifier = Modifier.weight(1f)); Text(value, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 10.sp) } }
-}
-
-@Composable
-private fun ClientBottomBar(onNavigate: (String) -> Unit) {
-    Surface(color = Color.White, shadowElevation = 7.dp) {
-        Row(modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp), horizontalArrangement = Arrangement.SpaceAround) {
-            ClientNav(Icons.Outlined.Home, R.string.sales_home) { onNavigate(Routes.HOME) }
-            ClientNav(Icons.Outlined.ShoppingCart, R.string.sales_nav_sales) { onNavigate(AppModule.VENTE.route) }
-            ClientNav(Icons.Outlined.PersonOutline, R.string.module_clients, selected = true) { }
-            ClientNav(Icons.Outlined.Inventory2, R.string.module_achats) { onNavigate(AppModule.ACHATS.route) }
-            ClientNav(Icons.Outlined.MoreVert, R.string.more_modules) { onNavigate(AppModule.REPORTING.route) }
-        }
-    }
-}
-
-@Composable
-private fun ClientNav(icon: androidx.compose.ui.graphics.vector.ImageVector, label: Int, selected: Boolean = false, click: () -> Unit) {
-    Column(modifier = Modifier.clickable(onClick = click).padding(horizontal = 5.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(icon, null, tint = if (selected) ClientBlue else ClientMuted, modifier = Modifier.size(20.dp)); Text(stringResource(label), color = if (selected) ClientBlue else ClientMuted, fontSize = 9.sp) }
 }
 
 private fun ClientEntity.isActive(): Boolean = active && statut == ClientStatus.ACTIF

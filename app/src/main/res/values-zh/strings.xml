@@ -303,8 +303,6 @@
     <string name="sales_no_customer">没有客户与此搜索匹配。</string>
     <string name="sales_cash">现金</string>
     <string name="sales_receipt_name">发票</string>
-    <string name="sales_home">首页</string>
-    <string name="sales_nav_sales">销售</string>
 
     <!-- 销售流程：列表、发票、选项和打印 -->
     <string name="sales_all">全部</string>

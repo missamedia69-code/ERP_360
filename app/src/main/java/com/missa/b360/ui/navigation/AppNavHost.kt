@@ -1,5 +1,7 @@
 package com.missa.b360.ui.navigation
 
+import androidx.compose.runtime.CompositionLocalProvider
+import com.missa.b360.ui.components.LocalBarreNavigation
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
@@ -129,8 +131,11 @@ private fun MainNavHost() {
     // Barre unique, déclarée ici et nulle part ailleurs. L'accueil en avait sa
     // propre copie : selon l'écran, on en voyait une, deux superposées, ou
     // aucune.
-    val afficherBarre = AppModule.barreVisibleSur(routeCourante) ||
-        routeCourante == Routes.HOME
+    // Un écran peut réclamer tout le bas de l'écran le temps d'une saisie.
+    val barreDemandee = remember { mutableStateOf(true) }
+    val afficherBarre = (
+        AppModule.barreVisibleSur(routeCourante) || routeCourante == Routes.HOME
+        ) && barreDemandee.value
 
     val nomEntreprise = etatAccueil.entrepriseNom.ifBlank {
         stringResource(R.string.home_company_placeholder)
@@ -139,6 +144,7 @@ private fun MainNavHost() {
         stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(it))
     } ?: stringResource(R.string.home_backup_never)
 
+    CompositionLocalProvider(LocalBarreNavigation provides barreDemandee) {
     ModalNavigationDrawer(
         drawerState = etatTiroir,
         drawerContent = {
@@ -496,6 +502,7 @@ private fun MainNavHost() {
     }
     }
 
+    }
     }
 
     if (assistance) {

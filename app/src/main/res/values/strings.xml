@@ -404,8 +404,6 @@
     <string name="sales_no_customer">Aucun client ne correspond à cette recherche.</string>
     <string name="sales_cash">Espèces</string>
     <string name="sales_receipt_name">Facture</string>
-    <string name="sales_home">Accueil</string>
-    <string name="sales_nav_sales">Ventes</string>
 
     <!-- Parcours Vente : liste, facture, options et impression -->
     <string name="sales_all">Toutes</string>
