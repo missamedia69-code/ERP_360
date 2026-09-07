@@ -1670,4 +1670,20 @@
     <string name="home_personalize_aide">Choisissez jusqu\'à %1$d modules à épingler dans la barre du bas.</string>
     <string name="home_personalize_defaut">Par défaut</string>
     <string name="nav_accueil">Accueil</string>
+    <string name="home_ventes_jour">Ventes du jour</string>
+    <string name="home_achats_jour">Achats du jour</string>
+    <string name="home_solde_disponible">Solde disponible</string>
+    <string name="home_total">Total</string>
+    <string name="home_vs_hier">vs hier</string>
+    <string name="home_activity_summary">Résumé de l\'activité</string>
+    <string name="home_mouvements_stock">Mouvements stock</string>
+    <string name="home_gross_margin_court">Marge brute</string>
+    <string name="home_reminders">Rappels importants</string>
+    <string name="home_no_pending_tasks">Aucune tâche en attente</string>
+    <string name="home_pending_tasks">%1$d tâche(s) en attente</string>
+    <string name="home_no_overdue_invoices">Aucune facture client en retard</string>
+    <string name="home_overdue_invoices">%1$d facture(s) client en retard</string>
+    <string name="home_documents_hint">Vos documents (factures, bons, reçus…) apparaîtront ici.</string>
+    <string name="home_profil_ligne">Profil : %1$s</string>
+    <string name="home_taille_ligne">Taille : %1$s</string>
 </resources>

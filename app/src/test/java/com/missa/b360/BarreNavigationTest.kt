@@ -52,8 +52,9 @@ class BarreNavigationTest {
     }
 
     @Test
-    fun `un ecran de saisie n affiche pas la barre`() {
-        assertFalse(AppModule.barreVisibleSur(AppModule.FINANCES.route))
+    fun `la disposition d usine correspond a la maquette`() {
+        val defaut = AppModule.barreBas(ModuleCode.entries.toList())
+        assertEquals(listOf(AppModule.VENTE, AppModule.STOCK, AppModule.FINANCES), defaut)
     }
 
     @Test

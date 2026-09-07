@@ -3,10 +3,13 @@ package com.missa.b360.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.RappelsAccueil
+import com.missa.b360.core.domain.model.RappelsRules
 import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
@@ -37,6 +40,8 @@ data class HomeUiState(
     val devise: String = Iso4217.DEVISE_REPLI,
     val entrepriseLogoUri: String? = null,
     val profilActivite: String? = null,
+    /** Secteur déclaré : affiché sous le nom, comme sur la maquette. */
+    val secteur: String = "",
     val palierTaille: String? = null,
     val prenomUtilisateur: String? = null,
     val nombreClients: Int = 0,
@@ -49,6 +54,8 @@ data class HomeUiState(
     val tresorerie: Double = 0.0,
     val quantiteStock: Double = 0.0,
     val recentOperations: List<OperationRecordEntity> = emptyList(),
+    /** Ce que l'accueil doit signaler : tâches ouvertes et impayés échus. */
+    val rappels: RappelsAccueil = RappelsAccueil(),
 )
 
 /**
@@ -61,6 +68,7 @@ class HomeViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     compteTresorerieDao: CompteTresorerieDao,
     mouvementTresorerieDao: MouvementTresorerieDao,
+    taskDao: TaskDao,
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
@@ -108,6 +116,7 @@ class HomeViewModel @Inject constructor(
             devise = entreprise?.devise ?: Iso4217.DEVISE_REPLI,
             entrepriseLogoUri = entreprise?.logoUri,
             profilActivite = entreprise?.profilActivite,
+            secteur = entreprise?.secteur.orEmpty(),
             palierTaille = entreprise?.palierTaille,
             prenomUtilisateur = utilisateurs.firstOrNull { it.actif }
                 ?.nom
@@ -120,6 +129,8 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private val taches = taskDao.observeAll()
+
     private val soldeTresorerie = combine(
         compteTresorerieDao.observeAll(),
         mouvementTresorerieDao.observeAll(),
@@ -129,7 +140,8 @@ class HomeViewModel @Inject constructor(
         baseState,
         operations.observeAll(),
         soldeTresorerie,
-    ) { base, records, soldeComptes ->
+        taches,
+    ) { base, records, soldeComptes, listeTaches ->
         val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
         // Les deux cartes libellées « Aujourd’hui » ne doivent jamais agréger les
         // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
@@ -166,6 +178,7 @@ class HomeViewModel @Inject constructor(
             tresorerie = tresorerie,
             quantiteStock = quantiteStock,
             recentOperations = records.take(3),
+            rappels = RappelsRules.rappels(listeTaches, records, System.currentTimeMillis()),
         )
     }.stateIn(
         scope = viewModelScope,

@@ -1663,4 +1663,20 @@
     <string name="home_personalize_aide">Pin up to %1$d modules to the bottom bar.</string>
     <string name="home_personalize_defaut">Reset</string>
     <string name="nav_accueil">Home</string>
+    <string name="home_ventes_jour">Today's sales</string>
+    <string name="home_achats_jour">Today's purchases</string>
+    <string name="home_solde_disponible">Available balance</string>
+    <string name="home_total">Total</string>
+    <string name="home_vs_hier">vs yesterday</string>
+    <string name="home_activity_summary">Activity summary</string>
+    <string name="home_mouvements_stock">Stock movements</string>
+    <string name="home_gross_margin_court">Gross margin</string>
+    <string name="home_reminders">Key reminders</string>
+    <string name="home_no_pending_tasks">No pending task</string>
+    <string name="home_pending_tasks">%1$d pending task(s)</string>
+    <string name="home_no_overdue_invoices">No overdue customer invoice</string>
+    <string name="home_overdue_invoices">%1$d overdue customer invoice(s)</string>
+    <string name="home_documents_hint">Your documents (invoices, notes, receipts…) will appear here.</string>
+    <string name="home_profil_ligne">Profile: %1$s</string>
+    <string name="home_taille_ligne">Size: %1$s</string>
 </resources>

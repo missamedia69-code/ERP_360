@@ -1642,4 +1642,20 @@
     <string name="home_personalize_aide">Elija hasta %1$d módulos para la barra inferior.</string>
     <string name="home_personalize_defaut">Por defecto</string>
     <string name="nav_accueil">Inicio</string>
+    <string name="home_ventes_jour">Ventas del día</string>
+    <string name="home_achats_jour">Compras del día</string>
+    <string name="home_solde_disponible">Saldo disponible</string>
+    <string name="home_total">Total</string>
+    <string name="home_vs_hier">vs ayer</string>
+    <string name="home_activity_summary">Resumen de actividad</string>
+    <string name="home_mouvements_stock">Movimientos de stock</string>
+    <string name="home_gross_margin_court">Margen bruto</string>
+    <string name="home_reminders">Recordatorios</string>
+    <string name="home_no_pending_tasks">No hay tareas pendientes</string>
+    <string name="home_pending_tasks">%1$d tarea(s) pendiente(s)</string>
+    <string name="home_no_overdue_invoices">No hay facturas de cliente vencidas</string>
+    <string name="home_overdue_invoices">%1$d factura(s) de cliente vencida(s)</string>
+    <string name="home_documents_hint">Sus documentos (facturas, albaranes, recibos…) aparecerán aquí.</string>
+    <string name="home_profil_ligne">Perfil: %1$s</string>
+    <string name="home_taille_ligne">Tamaño: %1$s</string>
 </resources>

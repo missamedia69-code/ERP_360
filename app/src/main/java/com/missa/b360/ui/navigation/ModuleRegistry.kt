@@ -42,7 +42,7 @@ enum class AppModule(
     VENTE("module_vente", R.string.module_vente, Icons.Outlined.PointOfSale, ModuleCode.VEN, bottomBarDefault = true),
     STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, bottomBarDefault = true),
     CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN),
-    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
+    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT, bottomBarDefault = true),
     ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
     FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
     LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG),
@@ -51,7 +51,7 @@ enum class AppModule(
     RH("module_rh", R.string.module_rh, Icons.Outlined.Person, ModuleCode.RH),
     PROJETS("module_projets", R.string.module_projets, Icons.Outlined.Workspaces, ModuleCode.PRJ),
     COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Icons.Outlined.Savings, ModuleCode.CPT),
-    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE, bottomBarDefault = true),
+    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE),
     CRM("module_crm", R.string.module_crm, Icons.Outlined.Campaign, ModuleCode.CRM),
     QUALITE("module_qualite", R.string.module_qualite, Icons.Outlined.Build, ModuleCode.QUA),
     MAINTENANCE("module_maintenance", R.string.module_maintenance, Icons.Outlined.Build, ModuleCode.MAI),
@@ -102,15 +102,15 @@ enum class AppModule(
 
         /**
          * Modules dont la route ouvre un **formulaire de saisie** et non une
-         * liste : la barre de navigation n'y a pas sa place, on ne propose pas
-         * de changer de module à quelqu'un qui remplit une pièce.
+         * liste : la barre de navigation n'y aurait pas sa place.
          *
-         * La liste est volontairement minimale. Une première version excluait
-         * six modules sur la foi d'une mauvaise association écran/route —
-         * `module_stock` mène à `StockScreen` et non à `InventoryScreen` — ce
-         * qui faisait disparaître la barre sur les onglets les plus utilisés.
+         * L'ensemble est vide aujourd'hui : chaque module épinglable mène à un
+         * écran où la barre reste visible. Une première version en excluait six
+         * sur la foi d'une mauvaise association écran/route — `module_stock`
+         * mène à `StockScreen` et non à `InventoryScreen` — ce qui faisait
+         * disparaître la barre sur les onglets les plus utilisés.
          */
-        private val SANS_BARRE = setOf(FINANCES)
+        private val SANS_BARRE = emptySet<AppModule>()
 
         /**
          * Vrai si la barre de navigation doit rester visible sur cette route.

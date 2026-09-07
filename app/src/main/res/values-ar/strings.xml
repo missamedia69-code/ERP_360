@@ -1642,4 +1642,20 @@
     <string name="home_personalize_aide">اختر حتى %1$d وحدات لتثبيتها في الشريط السفلي.</string>
     <string name="home_personalize_defaut">الوضع الافتراضي</string>
     <string name="nav_accueil">الرئيسية</string>
+    <string name="home_ventes_jour">مبيعات اليوم</string>
+    <string name="home_achats_jour">مشتريات اليوم</string>
+    <string name="home_solde_disponible">الرصيد المتاح</string>
+    <string name="home_total">الإجمالي</string>
+    <string name="home_vs_hier">مقارنة بالأمس</string>
+    <string name="home_activity_summary">ملخص النشاط</string>
+    <string name="home_mouvements_stock">حركات المخزون</string>
+    <string name="home_gross_margin_court">الهامش الإجمالي</string>
+    <string name="home_reminders">تذكيرات مهمة</string>
+    <string name="home_no_pending_tasks">لا توجد مهام معلقة</string>
+    <string name="home_pending_tasks">%1$d مهمة معلقة</string>
+    <string name="home_no_overdue_invoices">لا توجد فواتير عملاء متأخرة</string>
+    <string name="home_overdue_invoices">%1$d فاتورة عميل متأخرة</string>
+    <string name="home_documents_hint">ستظهر هنا مستنداتك (الفواتير، السندات، الإيصالات…).</string>
+    <string name="home_profil_ligne">الملف: %1$s</string>
+    <string name="home_taille_ligne">الحجم: %1$s</string>
 </resources>
