@@ -1669,4 +1669,5 @@
     <string name="home_support_corps">Bonjour, j\'ai besoin d\'aide sur Missa Business 360.\nEntreprise : %1$s\nVersion : %2$s</string>
     <string name="home_personalize_aide">Choisissez jusqu\'à %1$d modules à épingler dans la barre du bas.</string>
     <string name="home_personalize_defaut">Par défaut</string>
+    <string name="nav_accueil">Accueil</string>
 </resources>

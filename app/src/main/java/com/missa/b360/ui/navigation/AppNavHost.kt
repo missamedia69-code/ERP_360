@@ -1,5 +1,35 @@
 package com.missa.b360.ui.navigation
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.missa.b360.R
+import com.missa.b360.ui.components.MissaBarreModules
+import com.missa.b360.ui.home.HomeViewModel
+import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaSoftBlue
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -78,7 +108,34 @@ fun AppNavHost() {
 @Composable
 private fun MainNavHost() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Routes.HOME) {
+    val accueilViewModel: HomeViewModel = hiltViewModel()
+    val modulesActifs by accueilViewModel.modulesActifs.collectAsState()
+    val modulesEpingles by accueilViewModel.modulesEpingles.collectAsState()
+    val routeCourante = navController.currentBackStackEntryAsState().value?.destination?.route
+    var plusDeModules by remember { mutableStateOf(false) }
+
+    // L'accueil porte sa propre barre, sous son tiroir : l'ajouter ici la
+    // dessinerait par-dessus le voile du menu latéral.
+    val afficherBarre = AppModule.barreVisibleSur(routeCourante)
+
+    Scaffold(
+        bottomBar = {
+            if (afficherBarre) {
+                MissaBarreModules(
+                    modules = AppModule.barreBas(modulesActifs, modulesEpingles),
+                    routeCourante = routeCourante,
+                    onAccueil = { navController.naviguerVers(Routes.HOME) },
+                    onModule = { navController.naviguerVers(it.route) },
+                    onPlus = { plusDeModules = true },
+                )
+            }
+        },
+    ) { padding ->
+    NavHost(
+        navController = navController,
+        startDestination = Routes.HOME,
+        modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+    ) {
         composable(Routes.HOME) {
             HomeScreen(navController)
         }
@@ -393,6 +450,18 @@ private fun MainNavHost() {
             ReportingScreen(onBack = { navController.popBackStack() })
         }
     }
+    }
+
+    if (plusDeModules) {
+        PlusDeModulesFeuille(
+            modules = AppModule.secondaires(modulesActifs),
+            onFermer = { plusDeModules = false },
+            onModule = { module ->
+                plusDeModules = false
+                navController.naviguerVers(module.route)
+            },
+        )
+    }
 }
 
 /** Route commune aux opérations : le paramètre crée un document immédiatement si demandé. */
@@ -423,5 +492,74 @@ private fun NavGraphBuilder.operationDestination(
                 it.name == entry.arguments?.getString("direction")
             } ?: OperationDirection.NONE,
         )
+    }
+}
+
+/**
+ * Navigation par onglet : sans ces garde-fous, chaque appui empile un écran de
+ * plus et le retour arrière devient interminable.
+ */
+private fun NavController.naviguerVers(route: String) {
+    navigate(route) {
+        popUpTo(Routes.HOME) { inclusive = route == Routes.HOME }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+/**
+ * Liste des modules hors barre, ouverte par le bouton « Plus ».
+ *
+ * Elle est ici, au niveau du graphe, et non dans l'accueil : sinon changer de
+ * module depuis un module obligerait à repasser par l'accueil.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PlusDeModulesFeuille(
+    modules: List<AppModule>,
+    onFermer: () -> Unit,
+    onModule: (AppModule) -> Unit,
+) {
+    ModalBottomSheet(onDismissRequest = onFermer) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 18.dp, end = 18.dp, bottom = 24.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.more_modules),
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.home_more_modules_description),
+                fontSize = 12.5.sp,
+                color = MissaMuted,
+            )
+            Spacer(Modifier.height(12.dp))
+            modules.forEach { module ->
+                ListItem(
+                    headlineContent = {
+                        Text(stringResource(module.titleRes), fontWeight = FontWeight.SemiBold)
+                    },
+                    leadingContent = {
+                        Surface(
+                            modifier = Modifier.size(42.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            color = MissaSoftBlue,
+                        ) {
+                            Icon(
+                                imageVector = module.icon,
+                                contentDescription = null,
+                                tint = BrandBlue,
+                                modifier = Modifier.padding(10.dp),
+                            )
+                        }
+                    },
+                    modifier = Modifier.clickable { onModule(module) },
+                )
+            }
+        }
     }
 }

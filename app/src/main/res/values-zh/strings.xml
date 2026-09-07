@@ -1641,4 +1641,5 @@
     <string name="home_support_corps">您好，我在使用 Missa Business 360 时需要帮助。\n企业：%1$s\n版本：%2$s</string>
     <string name="home_personalize_aide">最多可将 %1$d 个模块固定到底部栏。</string>
     <string name="home_personalize_defaut">恢复默认</string>
+    <string name="nav_accueil">首页</string>
 </resources>

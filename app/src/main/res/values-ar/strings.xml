@@ -1641,4 +1641,5 @@
     <string name="home_support_corps">مرحبًا، أحتاج إلى مساعدة بخصوص Missa Business 360.\nالشركة: %1$s\nالإصدار: %2$s</string>
     <string name="home_personalize_aide">اختر حتى %1$d وحدات لتثبيتها في الشريط السفلي.</string>
     <string name="home_personalize_defaut">الوضع الافتراضي</string>
+    <string name="nav_accueil">الرئيسية</string>
 </resources>

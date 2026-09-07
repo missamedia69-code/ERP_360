@@ -44,7 +44,6 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MailOutline
@@ -70,8 +69,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -110,6 +107,7 @@ import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
+import com.missa.b360.ui.components.MissaBarreModules
 import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -216,12 +214,12 @@ fun HomeScreen(
                 )
             },
             bottomBar = {
-                HomeBottomBar(
+                MissaBarreModules(
                     modules = AppModule.barreBas(modulesActifs, modulesEpingles),
-                    currentRoute = currentRoute,
+                    routeCourante = currentRoute,
                     onAccueil = { navController.naviguerOnglet(Routes.HOME) },
-                    onModuleClick = { navController.naviguerOnglet(it.route) },
-                    onMore = { showMoreModules = true },
+                    onModule = { navController.naviguerOnglet(it.route) },
+                    onPlus = { showMoreModules = true },
                 )
             },
         ) { padding ->
@@ -958,65 +956,6 @@ private fun String.appModuleRoute(): String = when (this) {
 
 private fun Double.displayQuantity(): String =
     if (this % 1.0 == 0.0) toInt().toString() else toString()
-
-@Composable
-private fun HomeBottomBar(
-    modules: List<AppModule>,
-    currentRoute: String?,
-    onAccueil: () -> Unit,
-    onModuleClick: (AppModule) -> Unit,
-    onMore: () -> Unit,
-) {
-    // La route enregistrée porte ses arguments (« module_vente?create={create} ») :
-    // comparer les chaînes entières ne désignerait jamais l'onglet courant.
-    val racine = currentRoute?.substringBefore('?')
-    Surface(color = Color.White, shadowElevation = 10.dp) {
-        NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
-            NavigationBarItem(
-                selected = racine == Routes.HOME,
-                onClick = onAccueil,
-                icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
-                label = { Text(stringResource(R.string.home_title), fontSize = 10.sp) },
-            )
-            // Trois modules au plus : au-delà, les libellés se tronquent et
-            // l'onglet « Plus » devient illisible sur un écran étroit.
-            modules.take(3).forEach { module ->
-                NavigationBarItem(
-                    selected = racine == module.route,
-                    onClick = { onModuleClick(module) },
-                    icon = { Icon(module.icon, contentDescription = null) },
-                    label = { Text(stringResource(module.titleRes), fontSize = 10.sp) },
-                )
-            }
-            NavigationBarItem(
-                selected = false,
-                onClick = onMore,
-                icon = {
-                    Surface(
-                        modifier = Modifier.size(31.dp),
-                        shape = CircleShape,
-                        color = HomeBlueSoft,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.more_modules),
-                            tint = HomeBlue,
-                            modifier = Modifier.padding(6.dp),
-                        )
-                    }
-                },
-                label = {
-                    Text(
-                        text = stringResource(R.string.home_more_short),
-                        color = HomeBlue,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                },
-            )
-        }
-    }
-}
 
 @Composable
 private fun MissaBusinessDrawer(

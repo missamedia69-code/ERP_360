@@ -1662,4 +1662,5 @@
     <string name="home_support_corps">Hello, I need help with Missa Business 360.\nCompany: %1$s\nVersion: %2$s</string>
     <string name="home_personalize_aide">Pin up to %1$d modules to the bottom bar.</string>
     <string name="home_personalize_defaut">Reset</string>
+    <string name="nav_accueil">Home</string>
 </resources>

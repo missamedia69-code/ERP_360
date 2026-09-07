@@ -95,6 +95,29 @@ enum class AppModule(
         /** Nombre maximal d'onglets, l'accueil et « Plus » occupant déjà deux places. */
         const val MAX_ONGLETS = 3
 
+        /**
+         * Modules dont l'écran-liste porte déjà une barre d'action en bas
+         * (« Enregistrer », « Encaisser »…).
+         *
+         * La barre de navigation n'y est pas ajoutée : deux barres empilées
+         * mangeraient le tiers de l'écran, et surtout on ne propose pas de
+         * changer de module à quelqu'un qui est en train de saisir une pièce.
+         */
+        private val SANS_BARRE = setOf(VENTE, ACHATS, STOCK, FINANCES, RH, PRODUCTION)
+
+        /**
+         * Vrai si la barre de navigation doit rester visible sur cette route.
+         *
+         * Le critère est la profondeur : les écrans-liste d'un module sont des
+         * destinations de premier niveau, les formulaires et les écrans
+         * d'administration sont des tâches dont on sort par « retour ».
+         */
+        fun barreVisibleSur(route: String?): Boolean {
+            val racine = route?.substringBefore('?') ?: return false
+            val module = entries.firstOrNull { it.route == racine } ?: return false
+            return module !in SANS_BARRE
+        }
+
         /** Modules actifs hors barre du bas → menu « Plus de modules ». */
         fun secondaires(actifs: List<ModuleCode>): List<AppModule> =
             visibles(actifs).filterNot { it.bottomBarDefault }
