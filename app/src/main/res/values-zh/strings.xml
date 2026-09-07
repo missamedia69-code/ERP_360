@@ -1595,4 +1595,19 @@
     <string name="crm_aucun_client">此视图中没有客户。</string>
     <string name="crm_jamais_achete">从未购买</string>
     <string name="crm_nb_achats">%1$d 次购买</string>
+    <!-- Module Logistique -->
+    <string name="log_transfert_recu">已接收</string>
+    <string name="log_transfert_transit">在途</string>
+    <string name="log_transfert_orphelin">记录不完整</string>
+    <string name="log_valeur_stock">库存价值</string>
+    <string name="log_sites">站点</string>
+    <string name="log_taux_service">服务率</string>
+    <string name="log_livraisons_detail">已完成 %1$d 次配送，%2$d 次备货中。</string>
+    <string name="log_alerte_transit">有 %1$d 笔调拨已发出但未登记到货。</string>
+    <string name="log_implantation">各站点库存</string>
+    <string name="log_transferts">站点间调拨</string>
+    <string name="log_aucun_site">暂无站点记录。</string>
+    <string name="log_aucun_transfert">暂无调拨记录。</string>
+    <string name="log_references">%1$d 个品项</string>
+    <string name="log_ruptures">%1$d 项缺货</string>
 </resources>

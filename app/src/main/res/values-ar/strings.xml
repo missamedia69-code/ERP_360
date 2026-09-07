@@ -1595,4 +1595,19 @@
     <string name="crm_aucun_client">لا يوجد عملاء في هذا العرض.</string>
     <string name="crm_jamais_achete">لم يشترِ مطلقًا</string>
     <string name="crm_nb_achats">%1$d عملية شراء</string>
+    <!-- Module Logistique -->
+    <string name="log_transfert_recu">تم الاستلام</string>
+    <string name="log_transfert_transit">في الطريق</string>
+    <string name="log_transfert_orphelin">تسجيل ناقص</string>
+    <string name="log_valeur_stock">قيمة المخزون</string>
+    <string name="log_sites">المواقع</string>
+    <string name="log_taux_service">معدل الخدمة</string>
+    <string name="log_livraisons_detail">%1$d عملية تسليم منجزة، و%2$d قيد التحضير.</string>
+    <string name="log_alerte_transit">%1$d تحويل غادر دون تسجيل استلام.</string>
+    <string name="log_implantation">توزيع المخزون</string>
+    <string name="log_transferts">التحويلات بين المواقع</string>
+    <string name="log_aucun_site">لا توجد مواقع مسجلة.</string>
+    <string name="log_aucun_transfert">لا توجد تحويلات مسجلة.</string>
+    <string name="log_references">%1$d صنف</string>
+    <string name="log_ruptures">%1$d نفاد مخزون</string>
 </resources>

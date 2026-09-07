@@ -1623,4 +1623,19 @@
     <string name="crm_aucun_client">Aucun client dans cette vue.</string>
     <string name="crm_jamais_achete">Jamais acheté</string>
     <string name="crm_nb_achats">%1$d achat(s)</string>
+    <!-- Module Logistique -->
+    <string name="log_transfert_recu">Reçu</string>
+    <string name="log_transfert_transit">En transit</string>
+    <string name="log_transfert_orphelin">Saisie incomplète</string>
+    <string name="log_valeur_stock">Valeur du stock</string>
+    <string name="log_sites">Sites</string>
+    <string name="log_taux_service">Taux de service</string>
+    <string name="log_livraisons_detail">%1$d livraison(s) effectuée(s), %2$d en préparation.</string>
+    <string name="log_alerte_transit">%1$d transfert(s) parti(s) sans réception enregistrée.</string>
+    <string name="log_implantation">Implantation du stock</string>
+    <string name="log_transferts">Transferts inter-sites</string>
+    <string name="log_aucun_site">Aucun site enregistré.</string>
+    <string name="log_aucun_transfert">Aucun transfert enregistré.</string>
+    <string name="log_references">%1$d référence(s)</string>
+    <string name="log_ruptures">%1$d rupture(s)</string>
 </resources>

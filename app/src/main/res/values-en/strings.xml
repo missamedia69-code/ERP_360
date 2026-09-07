@@ -1616,4 +1616,19 @@
     <string name="crm_aucun_client">No customer in this view.</string>
     <string name="crm_jamais_achete">Never purchased</string>
     <string name="crm_nb_achats">%1$d purchase(s)</string>
+    <!-- Module Logistique -->
+    <string name="log_transfert_recu">Received</string>
+    <string name="log_transfert_transit">In transit</string>
+    <string name="log_transfert_orphelin">Incomplete entry</string>
+    <string name="log_valeur_stock">Stock value</string>
+    <string name="log_sites">Sites</string>
+    <string name="log_taux_service">Service rate</string>
+    <string name="log_livraisons_detail">%1$d delivery(ies) completed, %2$d being prepared.</string>
+    <string name="log_alerte_transit">%1$d transfer(s) shipped with no recorded arrival.</string>
+    <string name="log_implantation">Stock by site</string>
+    <string name="log_transferts">Inter-site transfers</string>
+    <string name="log_aucun_site">No site recorded.</string>
+    <string name="log_aucun_transfert">No transfer recorded.</string>
+    <string name="log_references">%1$d item(s)</string>
+    <string name="log_ruptures">%1$d out of stock</string>
 </resources>
