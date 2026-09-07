@@ -1610,4 +1610,30 @@
     <string name="liv_champ_colis">Number of parcels</string>
     <string name="liv_champ_origine">Source order</string>
     <string name="liv_origine_aide">Reference of the order or invoice this note accompanies.</string>
+    <!-- Module Services -->
+    <string name="srv_etape_planifiee">Scheduled</string>
+    <string name="srv_etape_en_cours">In progress</string>
+    <string name="srv_etape_terminee">Completed</string>
+    <string name="srv_mode_forfait">Flat fee</string>
+    <string name="srv_mode_horaire">Hourly</string>
+    <string name="srv_nouvelle">New service</string>
+    <string name="srv_aucune">No service.</string>
+    <string name="srv_realise">Completed value</string>
+    <string name="srv_carnet">Pipeline</string>
+    <string name="srv_heures">Hours</string>
+    <string name="srv_heures_valeur">%1$s h</string>
+    <string name="srv_avancer">Next step</string>
+    <string name="srv_saisir_heures">Enter hours</string>
+    <string name="srv_msg_creee">Service %1$s created.</string>
+    <string name="srv_msg_avance">Step saved.</string>
+    <string name="srv_msg_annulee">Service cancelled.</string>
+    <string name="srv_msg_heures">Hours updated.</string>
+    <string name="srv_msg_etape_finale">This service is completed.</string>
+    <string name="srv_champ_intitule">Service title</string>
+    <string name="srv_champ_client">Customer</string>
+    <string name="srv_champ_forfait">Flat amount</string>
+    <string name="srv_champ_taux_horaire">Hourly rate</string>
+    <string name="srv_champ_heures">Hours spent</string>
+    <string name="srv_champ_intervenant">Assignee</string>
+    <string name="srv_champ_lieu">Location</string>
 </resources>

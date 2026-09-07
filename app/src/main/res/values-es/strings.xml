@@ -1589,4 +1589,30 @@
     <string name="liv_champ_colis">Número de bultos</string>
     <string name="liv_champ_origine">Pedido de origen</string>
     <string name="liv_origine_aide">Referencia del pedido o de la factura que acompaña este albarán.</string>
+    <!-- Module Services -->
+    <string name="srv_etape_planifiee">Planificada</string>
+    <string name="srv_etape_en_cours">En curso</string>
+    <string name="srv_etape_terminee">Terminada</string>
+    <string name="srv_mode_forfait">Precio cerrado</string>
+    <string name="srv_mode_horaire">Por horas</string>
+    <string name="srv_nouvelle">Nueva prestación</string>
+    <string name="srv_aucune">No hay prestaciones.</string>
+    <string name="srv_realise">Realizado</string>
+    <string name="srv_carnet">Cartera</string>
+    <string name="srv_heures">Horas</string>
+    <string name="srv_heures_valeur">%1$s h</string>
+    <string name="srv_avancer">Siguiente etapa</string>
+    <string name="srv_saisir_heures">Registrar horas</string>
+    <string name="srv_msg_creee">Prestación %1$s creada.</string>
+    <string name="srv_msg_avance">Etapa guardada.</string>
+    <string name="srv_msg_annulee">Prestación anulada.</string>
+    <string name="srv_msg_heures">Horas actualizadas.</string>
+    <string name="srv_msg_etape_finale">Esta prestación está terminada.</string>
+    <string name="srv_champ_intitule">Título de la prestación</string>
+    <string name="srv_champ_client">Cliente</string>
+    <string name="srv_champ_forfait">Importe cerrado</string>
+    <string name="srv_champ_taux_horaire">Tarifa por hora</string>
+    <string name="srv_champ_heures">Horas dedicadas</string>
+    <string name="srv_champ_intervenant">Responsable</string>
+    <string name="srv_champ_lieu">Lugar</string>
 </resources>

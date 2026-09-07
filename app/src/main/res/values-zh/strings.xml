@@ -1589,4 +1589,30 @@
     <string name="liv_champ_colis">包裹件数</string>
     <string name="liv_champ_origine">来源订单</string>
     <string name="liv_origine_aide">该送货单对应的订单或发票编号。</string>
+    <!-- Module Services -->
+    <string name="srv_etape_planifiee">已计划</string>
+    <string name="srv_etape_en_cours">进行中</string>
+    <string name="srv_etape_terminee">已完成</string>
+    <string name="srv_mode_forfait">一口价</string>
+    <string name="srv_mode_horaire">按小时</string>
+    <string name="srv_nouvelle">新增服务</string>
+    <string name="srv_aucune">暂无服务。</string>
+    <string name="srv_realise">已完成金额</string>
+    <string name="srv_carnet">在手金额</string>
+    <string name="srv_heures">工时</string>
+    <string name="srv_heures_valeur">%1$s 小时</string>
+    <string name="srv_avancer">下一步</string>
+    <string name="srv_saisir_heures">录入工时</string>
+    <string name="srv_msg_creee">已创建服务 %1$s。</string>
+    <string name="srv_msg_avance">已保存步骤。</string>
+    <string name="srv_msg_annulee">服务已取消。</string>
+    <string name="srv_msg_heures">工时已更新。</string>
+    <string name="srv_msg_etape_finale">该服务已完成。</string>
+    <string name="srv_champ_intitule">服务名称</string>
+    <string name="srv_champ_client">客户</string>
+    <string name="srv_champ_forfait">一口价金额</string>
+    <string name="srv_champ_taux_horaire">小时费率</string>
+    <string name="srv_champ_heures">已用工时</string>
+    <string name="srv_champ_intervenant">执行人</string>
+    <string name="srv_champ_lieu">地点</string>
 </resources>

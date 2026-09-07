@@ -1589,4 +1589,30 @@
     <string name="liv_champ_colis">عدد الطرود</string>
     <string name="liv_champ_origine">الطلب الأصلي</string>
     <string name="liv_origine_aide">مرجع الطلب أو الفاتورة المرافقة لهذا السند.</string>
+    <!-- Module Services -->
+    <string name="srv_etape_planifiee">مجدولة</string>
+    <string name="srv_etape_en_cours">قيد التنفيذ</string>
+    <string name="srv_etape_terminee">منجزة</string>
+    <string name="srv_mode_forfait">سعر مقطوع</string>
+    <string name="srv_mode_horaire">بالساعة</string>
+    <string name="srv_nouvelle">خدمة جديدة</string>
+    <string name="srv_aucune">لا توجد خدمات.</string>
+    <string name="srv_realise">المنجز</string>
+    <string name="srv_carnet">المحفظة</string>
+    <string name="srv_heures">الساعات</string>
+    <string name="srv_heures_valeur">%1$s س</string>
+    <string name="srv_avancer">المرحلة التالية</string>
+    <string name="srv_saisir_heures">إدخال الساعات</string>
+    <string name="srv_msg_creee">تم إنشاء الخدمة %1$s.</string>
+    <string name="srv_msg_avance">تم حفظ المرحلة.</string>
+    <string name="srv_msg_annulee">تم إلغاء الخدمة.</string>
+    <string name="srv_msg_heures">تم تحديث الساعات.</string>
+    <string name="srv_msg_etape_finale">هذه الخدمة منجزة.</string>
+    <string name="srv_champ_intitule">عنوان الخدمة</string>
+    <string name="srv_champ_client">العميل</string>
+    <string name="srv_champ_forfait">المبلغ المقطوع</string>
+    <string name="srv_champ_taux_horaire">الأجر بالساعة</string>
+    <string name="srv_champ_heures">الساعات المستغرقة</string>
+    <string name="srv_champ_intervenant">المنفّذ</string>
+    <string name="srv_champ_lieu">المكان</string>
 </resources>

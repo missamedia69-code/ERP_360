@@ -41,6 +41,7 @@ import com.missa.b360.ui.operations.ReportingScreen
 import com.missa.b360.ui.production.ProductionScreen
 import com.missa.b360.ui.purchases.PurchasesScreen
 import com.missa.b360.ui.qualite.QualiteScreen
+import com.missa.b360.ui.services.ServicesScreen
 import com.missa.b360.ui.rh.RhScreen
 import com.missa.b360.ui.sales.DevisCommandeScreen
 import com.missa.b360.ui.sales.ReturnSaleScreen
@@ -306,7 +307,20 @@ private fun MainNavHost() {
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
-        operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
+        composable(
+            route = "${'$'}{AppModule.SERVICES.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) { entry ->
+            ServicesScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
+        }
         operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
         // Nouveaux modules (structure ERP 360 complète)
         composable(AppModule.COMPTABILITE.route) {

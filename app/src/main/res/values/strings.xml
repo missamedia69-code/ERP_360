@@ -1617,4 +1617,30 @@
     <string name="liv_champ_colis">Nombre de colis</string>
     <string name="liv_champ_origine">Commande d\'origine</string>
     <string name="liv_origine_aide">Référence de la commande ou de la facture que ce bon accompagne.</string>
+    <!-- Module Services -->
+    <string name="srv_etape_planifiee">Planifiée</string>
+    <string name="srv_etape_en_cours">En cours</string>
+    <string name="srv_etape_terminee">Terminée</string>
+    <string name="srv_mode_forfait">Forfait</string>
+    <string name="srv_mode_horaire">À l\'heure</string>
+    <string name="srv_nouvelle">Nouvelle prestation</string>
+    <string name="srv_aucune">Aucune prestation.</string>
+    <string name="srv_realise">Réalisé</string>
+    <string name="srv_carnet">Carnet</string>
+    <string name="srv_heures">Heures</string>
+    <string name="srv_heures_valeur">%1$s h</string>
+    <string name="srv_avancer">Étape suivante</string>
+    <string name="srv_saisir_heures">Saisir les heures</string>
+    <string name="srv_msg_creee">Prestation %1$s créée.</string>
+    <string name="srv_msg_avance">Étape enregistrée.</string>
+    <string name="srv_msg_annulee">Prestation annulée.</string>
+    <string name="srv_msg_heures">Heures mises à jour.</string>
+    <string name="srv_msg_etape_finale">Cette prestation est terminée.</string>
+    <string name="srv_champ_intitule">Intitulé de la prestation</string>
+    <string name="srv_champ_client">Client</string>
+    <string name="srv_champ_forfait">Montant forfaitaire</string>
+    <string name="srv_champ_taux_horaire">Taux horaire</string>
+    <string name="srv_champ_heures">Heures passées</string>
+    <string name="srv_champ_intervenant">Intervenant</string>
+    <string name="srv_champ_lieu">Lieu</string>
 </resources>
