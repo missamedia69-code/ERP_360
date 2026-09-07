@@ -163,6 +163,36 @@ object TresorerieRules {
             if (it.sens == SensMouvement.IN.name) it.montant else -it.montant
         }
 
+    /**
+     * Compte crédité par un encaissement, déduit du mode de règlement.
+     *
+     * Des espèces vont en caisse, un virement à la banque, un paiement mobile
+     * sur le portefeuille : router au hasard fausserait chaque solde pris
+     * isolément, même si le total resterait juste. Sans correspondance, le
+     * premier compte ouvert sert de destination par défaut.
+     */
+    fun compteCible(
+        modePaiement: String?,
+        comptes: List<CompteTresorerieEntity>,
+    ): CompteTresorerieEntity? {
+        val ouverts = comptes.filter { it.actif }
+        if (ouverts.isEmpty()) return null
+        val texte = modePaiement.orEmpty().lowercase(java.util.Locale.ROOT)
+        val vise = when {
+            MOTS_CAISSE.any { texte.contains(it) } -> TypeCompteTresorerie.CAISSE
+            MOTS_MOBILE.any { texte.contains(it) } -> TypeCompteTresorerie.MOBILE_MONEY
+            MOTS_BANQUE.any { texte.contains(it) } -> TypeCompteTresorerie.BANQUE
+            else -> null
+        }
+        return vise?.let { type -> ouverts.firstOrNull { it.type == type.name } } ?: ouverts.first()
+    }
+
+    private val MOTS_CAISSE = listOf("espèce", "espece", "cash", "caisse", "liquide")
+    private val MOTS_MOBILE = listOf("mobile", "momo", "orange money", "mtn", "wave", "airtel")
+    private val MOTS_BANQUE = listOf(
+        "virement", "chèque", "cheque", "carte", "banque", "bank", "transfer", "card",
+    )
+
     /** Lecture défensive : une valeur inconnue en base ne doit pas faire planter l'écran. */
     fun categorie(nom: String?): CategorieTresorerie =
         CategorieTresorerie.entries.firstOrNull { it.name == nom } ?: CategorieTresorerie.AUTRE

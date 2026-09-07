@@ -224,7 +224,10 @@ class SaveSaleUseCase @Inject constructor(
             // Aucun compte configuré ⇒ rien n'est écrit, l'utilisateur n'a pas
             // encore ouvert sa caisse et le solde n'a donc pas de sens.
             val referenceEncaissement = TresorerieRules.referenceEncaissement(reference)
-            val compteEncaissement = comptesTresorerieDao.getAll().firstOrNull { it.actif }
+            val compteEncaissement = TresorerieRules.compteCible(
+                payload.paymentMethod,
+                comptesTresorerieDao.getAll(),
+            )
             val montantEncaisse = TresorerieRules.encaissementAEnregistrer(
                 montantPaye = payload.paidAmount,
                 dejaEnregistre = mouvementsTresorerieDao

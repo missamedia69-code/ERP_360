@@ -261,6 +261,41 @@ class TresorerieRulesTest {
     }
 
     @Test
+    fun `l encaissement rejoint le compte correspondant au mode de reglement`() {
+        val caisse = compte(1, "Caisse").copy(type = TypeCompteTresorerie.CAISSE.name)
+        val banque = compte(2, "Banque").copy(type = TypeCompteTresorerie.BANQUE.name)
+        val mobile = compte(3, "MoMo").copy(type = TypeCompteTresorerie.MOBILE_MONEY.name)
+        val comptes = listOf(banque, caisse, mobile)
+        assertEquals(caisse.id, TresorerieRules.compteCible("Espèces", comptes)!!.id)
+        assertEquals(banque.id, TresorerieRules.compteCible("Virement bancaire", comptes)!!.id)
+        assertEquals(banque.id, TresorerieRules.compteCible("Carte", comptes)!!.id)
+        assertEquals(mobile.id, TresorerieRules.compteCible("Orange Money", comptes)!!.id)
+        assertEquals(mobile.id, TresorerieRules.compteCible("MTN MoMo", comptes)!!.id)
+    }
+
+    @Test
+    fun `un mode inconnu retombe sur le premier compte ouvert`() {
+        val comptes = listOf(compte(1, "Principal"), compte(2, "Secondaire"))
+        assertEquals(1L, TresorerieRules.compteCible("Troc", comptes)!!.id)
+        assertEquals(1L, TresorerieRules.compteCible(null, comptes)!!.id)
+    }
+
+    @Test
+    fun `un compte ferme ne recoit jamais d encaissement`() {
+        val comptes = listOf(
+            compte(1, "Ancienne caisse", actif = false)
+                .copy(type = TypeCompteTresorerie.CAISSE.name),
+            compte(2, "Banque").copy(type = TypeCompteTresorerie.BANQUE.name),
+        )
+        assertEquals(2L, TresorerieRules.compteCible("Espèces", comptes)!!.id)
+    }
+
+    @Test
+    fun `sans aucun compte le routage ne renvoie rien`() {
+        assertNull(TresorerieRules.compteCible("Espèces", emptyList()))
+    }
+
+    @Test
     fun `chaque categorie et chaque type possede un libelle traduit`() {
         CategorieTresorerie.entries.forEach {
             assertTrue(TresorerieRules.libelleCategorie(it) != 0)
