@@ -109,14 +109,6 @@ fun AdminReglagesScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        RadioButton(selected = selected, onClick = onSelect)
-        Text(label, style = MaterialTheme.typography.bodySmall)
 
         MissaPanel(modifier = Modifier.fillMaxWidth()) {
             MissaSectionTitle(title = stringResource(R.string.adm_profil))
@@ -141,8 +133,8 @@ private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: Strin
         }
 
         // La langue se choisit à l'installation, sur l'écran d'accueil : elle
-        // reste modifiable ici, mais elle n'est pas ce qu'on vient chercher
-        // dans les réglages, contrairement à la fiche entreprise.
+        // reste modifiable ici, mais ce n'est pas ce qu'on vient chercher dans
+        // les réglages, contrairement à la fiche entreprise.
         MissaPanel(modifier = Modifier.fillMaxWidth()) {
             MissaSectionTitle(title = stringResource(R.string.adm_langue))
             langues.forEach { (code, labelRes) ->
@@ -153,6 +145,15 @@ private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: Strin
                 )
             }
         }
+
+    }
+}
+
+@Composable
+private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        RadioButton(selected = selected, onClick = onSelect)
+        Text(label, style = MaterialTheme.typography.bodySmall)
     }
 }
 
