@@ -1689,4 +1689,8 @@
     <string name="alerte_transfert_d">有 %1$d 笔调拨未登记到货</string>
     <string name="alerte_relance">销售跟进</string>
     <string name="alerte_relance_d">有 %1$d 位客户待联系</string>
+    <string name="dc_piece_devis">报价单</string>
+    <string name="dc_piece_commande">订单</string>
+    <string name="dc_partager">分享</string>
+    <string name="dc_email">电子邮件</string>
 </resources>

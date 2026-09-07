@@ -1689,4 +1689,8 @@
     <string name="alerte_transfert_d">%1$d تحويل دون استلام</string>
     <string name="alerte_relance">متابعات تجارية</string>
     <string name="alerte_relance_d">%1$d عميل بحاجة إلى تواصل</string>
+    <string name="dc_piece_devis">عرض سعر</string>
+    <string name="dc_piece_commande">طلب</string>
+    <string name="dc_partager">مشاركة</string>
+    <string name="dc_email">البريد الإلكتروني</string>
 </resources>

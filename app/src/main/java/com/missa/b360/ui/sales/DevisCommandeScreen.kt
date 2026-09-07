@@ -1,5 +1,8 @@
 package com.missa.b360.ui.sales
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +29,9 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -76,6 +81,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleCalculator
@@ -86,6 +92,7 @@ import com.missa.b360.core.domain.usecase.CommercialTarget
 import com.missa.b360.core.domain.usecase.CommercialTargets
 import com.missa.b360.core.domain.usecase.ConvertDevisToOrderUseCase
 import com.missa.b360.core.domain.usecase.ConvertOrderToSaleUseCase
+import com.missa.b360.core.domain.model.MentionsLegales
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
@@ -209,6 +216,10 @@ class DevisCommandeViewModel @Inject constructor(
     val devise: StateFlow<String> = getEnterprise.observer()
         .map { it?.devise ?: Iso4217.DEVISE_REPLI }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
+
+    /** Fiche entreprise : alimente les mentions légales imprimées sur les pièces. */
+    val entreprise: StateFlow<EnterpriseEntity?> = getEnterprise.observer()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     data class DcUiState(
         val target: CommercialTarget = CommercialTarget.Devis,
@@ -492,6 +503,13 @@ fun DevisCommandeScreen(
     val devise by viewModel.devise.collectAsState()
     val ui by viewModel.uiState.collectAsState()
     val busy by viewModel.busy.collectAsState()
+    val entreprise by viewModel.entreprise.collectAsState()
+    val mentions = MentionsLegales.depuis(
+        entreprise = entreprise,
+        libelleFiscalGenerique = stringResource(R.string.fisc_id_fiscal),
+        libelleRegistreGenerique = stringResource(R.string.fisc_id_registre),
+        nomParDefaut = stringResource(R.string.app_name),
+    )
 
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -1017,6 +1035,47 @@ fun DevisCommandeScreen(
                         enabled = !busy,
                         modifier = Modifier.fillMaxWidth().height(44.dp),
                     ) { Text(stringResource(R.string.dc_duplicate)) }
+                    // Une pièce commerciale doit pouvoir quitter l'application avec
+                    // les mentions légales de l'émetteur, comme la facture.
+                    payload?.let { contenu ->
+                        val titrePiece = stringResource(
+                            if (estCommande) R.string.dc_piece_commande else R.string.dc_piece_devis,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    context.partagerPieceCommerciale(
+                                        titrePiece,
+                                        record.reference,
+                                        contenu.clientName,
+                                        saleMoney(contenu.total, devise),
+                                        mentions,
+                                    )
+                                },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                            ) {
+                                Icon(Icons.Outlined.Share, null, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(R.string.dc_partager), fontSize = 13.sp)
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    context.envoyerPieceCommerciale(
+                                        titrePiece,
+                                        record.reference,
+                                        contenu.clientName,
+                                        saleMoney(contenu.total, devise),
+                                        mentions,
+                                    )
+                                },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                            ) {
+                                Icon(Icons.Outlined.MailOutline, null, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(R.string.dc_email), fontSize = 13.sp)
+                            }
+                        }
+                    }
                     if (!isCancelled) {
                         OutlinedButton(
                             onClick = { cancelVisible = true },
@@ -1206,4 +1265,51 @@ private fun ClientPickerSheet(
             }
         }
     }
+}
+
+/**
+ * Partage d'une pièce commerciale (devis, commande, bon de livraison).
+ *
+ * L'en-tête reprend les mentions légales de l'émetteur : un devis sans numéro
+ * fiscal ni registre du commerce n'a pas la même valeur devant un client
+ * professionnel, et certaines administrations l'exigent.
+ */
+private fun Context.partagerPieceCommerciale(
+    titrePiece: String,
+    reference: String,
+    client: String,
+    total: String,
+    mentions: MentionsLegales,
+) {
+    val texte = mentions.texte() + "\n\n" + "$titrePiece $reference\n$client\n" +
+        "${getString(R.string.sales_total)}: $total"
+    startActivity(
+        Intent.createChooser(
+            Intent(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .putExtra(Intent.EXTRA_SUBJECT, "$titrePiece $reference")
+                .putExtra(Intent.EXTRA_TEXT, texte),
+            getString(R.string.dc_partager),
+        ),
+    )
+}
+
+/** Envoi de la même pièce par courrier électronique. */
+private fun Context.envoyerPieceCommerciale(
+    titrePiece: String,
+    reference: String,
+    client: String,
+    total: String,
+    mentions: MentionsLegales,
+) {
+    val corps = mentions.texte() + "\n\n" + "$titrePiece $reference\n$client\n" +
+        "${getString(R.string.sales_total)}: $total"
+    startActivity(
+        Intent.createChooser(
+            Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+                .putExtra(Intent.EXTRA_SUBJECT, "$titrePiece $reference")
+                .putExtra(Intent.EXTRA_TEXT, corps),
+            getString(R.string.dc_email),
+        ),
+    )
 }

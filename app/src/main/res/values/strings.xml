@@ -1717,4 +1717,8 @@
     <string name="alerte_transfert_d">%1$d transfert(s) sans réception</string>
     <string name="alerte_relance">Relances commerciales</string>
     <string name="alerte_relance_d">%1$d client(s) à recontacter</string>
+    <string name="dc_piece_devis">Devis</string>
+    <string name="dc_piece_commande">Commande</string>
+    <string name="dc_partager">Partager</string>
+    <string name="dc_email">E-mail</string>
 </resources>

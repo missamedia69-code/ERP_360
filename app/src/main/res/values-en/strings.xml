@@ -1710,4 +1710,8 @@
     <string name="alerte_transfert_d">%1$d transfer(s) with no arrival</string>
     <string name="alerte_relance">Sales follow-ups</string>
     <string name="alerte_relance_d">%1$d customer(s) to contact</string>
+    <string name="dc_piece_devis">Quotation</string>
+    <string name="dc_piece_commande">Order</string>
+    <string name="dc_partager">Share</string>
+    <string name="dc_email">Email</string>
 </resources>

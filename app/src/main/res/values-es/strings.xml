@@ -1689,4 +1689,8 @@
     <string name="alerte_transfert_d">%1$d traslado(s) sin recepción</string>
     <string name="alerte_relance">Seguimiento comercial</string>
     <string name="alerte_relance_d">%1$d cliente(s) por contactar</string>
+    <string name="dc_piece_devis">Presupuesto</string>
+    <string name="dc_piece_commande">Pedido</string>
+    <string name="dc_partager">Compartir</string>
+    <string name="dc_email">Correo</string>
 </resources>
