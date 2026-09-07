@@ -109,7 +109,12 @@ class MaintenanceUseCases @Inject constructor(
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
 ) {
-    companion object { const val MODULE = "MAINTENANCE" }
+    companion object {
+        const val MODULE = "MAINTENANCE"
+
+        /** Dix ans : au-delà, la périodicité saisie est une erreur de frappe. */
+        private const val MAX_PERIODICITE_JOURS = 3_650
+    }
 
     fun observerEquipements(): Flow<List<EquipementEntity>> = equipementDao.observeAll()
 
@@ -174,10 +179,5 @@ class MaintenanceUseCases @Inject constructor(
         )
         journalManager.log(MODULE, "INTERVENTION_${type.name}", "${equipement.nom} — $libelle")
         return ResultatSaisie.Succes(id)
-    }
-
-    private companion object {
-        /** Dix ans : au-delà, la périodicité saisie est une erreur de frappe. */
-        const val MAX_PERIODICITE_JOURS = 3_650
     }
 }
