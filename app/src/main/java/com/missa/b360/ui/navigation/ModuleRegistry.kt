@@ -125,7 +125,14 @@ enum class AppModule(
             return module !in SANS_BARRE
         }
 
-        /** Modules actifs hors barre du bas → menu « Plus de modules ». */
+        /**
+         * Modules actifs hors barre du bas.
+         *
+         * Le menu « Plus » ne s'en sert plus : il présente le pack entier, y
+         * compris les modules épinglés. Chercher un module et ne pas l'y
+         * trouver parce qu'il est ailleurs oblige à se souvenir de sa propre
+         * configuration ; un catalogue complet ne pose pas cette question.
+         */
         fun secondaires(actifs: List<ModuleCode>): List<AppModule> =
             visibles(actifs).filterNot { it.bottomBarDefault }
     }

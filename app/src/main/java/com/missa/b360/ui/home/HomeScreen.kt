@@ -365,10 +365,10 @@ private fun HomeHeader(
                     painter = painterResource(R.drawable.fond_entrepot),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
-                    alpha = 0.16f,
+                    alpha = 0.30f,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
-                        .fillMaxWidth(0.62f),
+                        .fillMaxWidth(0.70f),
                 )
                 Column {
                     Text(
@@ -574,7 +574,7 @@ private fun ResumeActivite(state: HomeUiState, currency: String) {
                 painter = painterResource(R.drawable.fond_documents),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                alpha = 0.13f,
+                alpha = 0.26f,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .fillMaxWidth(0.55f),
@@ -1016,7 +1016,7 @@ private fun RecentDocuments(
                     painter = painterResource(R.drawable.fond_documents),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
-                    alpha = 0.13f,
+                    alpha = 0.26f,
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .fillMaxWidth(0.45f),

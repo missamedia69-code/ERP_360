@@ -31,7 +31,14 @@ val MissaSurface = Color(0xFFFFFFFF)
 val MissaSoftBlue = Color(0xFFF0F5FF)
 val MissaInk = Color(0xFF101C43)
 val MissaMuted = Color(0xFF65718F)
-val MissaBorder = Color(0xFFE2E7F2)
+/**
+ * Bordure commune des cartes, champs et sélecteurs.
+ *
+ * Le ton précédent (#E2E7F2) se confondait avec le fond des écrans (#F8F9FD) :
+ * les cadres de sélection paraissaient absents. Ce gris-bleu reste discret
+ * mais dessine réellement le contour.
+ */
+val MissaBorder = Color(0xFFCBD5E8)
 val MissaLime = Color(0xFFB6E52B)
 
 // Écrans d'onboarding « maquette » : bleu roi d'accueil et fond vert clair du récapitulatif.

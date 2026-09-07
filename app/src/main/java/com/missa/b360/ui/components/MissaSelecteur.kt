@@ -1,6 +1,7 @@
 package com.missa.b360.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.MissaBorder
+import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
@@ -90,11 +93,19 @@ fun MissaSelecteurLigne(
 ) {
     var ouvert by remember { mutableStateOf(false) }
     val choisie = options.firstOrNull { it.cle == selectionCle }
+    // Un cadre franc et un fond blanc : sans eux, le sélecteur se confondait
+    // avec l'arrière-plan et rien ne signalait la zone à toucher.
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = if (enabled) MissaSurface else MissaCanvas,
+        border = BorderStroke(1.dp, MissaBorder),
+    ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable { ouvert = true } else Modifier)
-            .padding(vertical = 13.dp),
+            .padding(horizontal = 13.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -124,6 +135,8 @@ fun MissaSelecteurLigne(
             modifier = Modifier.size(18.dp),
         )
     }
+    }
+
     if (ouvert) {
         MissaSelecteurDialogue(
             titre = titreDialogue,

@@ -32,6 +32,20 @@ class StartupViewModel @Inject constructor(
     private val backupManager: BackupManager,
 ) : ViewModel() {
 
+    /**
+     * Vrai dès que l'introduction vidéo a été jouée une fois.
+     *
+     * L'état vit ici, et non dans l'activité : changer de langue recrée
+     * l'activité, ce qui relançait la vidéo — d'où le bref écran noir le temps
+     * que la surface se prépare. Un ViewModel, lui, survit à cette recréation.
+     */
+    var introVue: Boolean = false
+        private set
+
+    fun marquerIntroVue() {
+        introVue = true
+    }
+
     private val _state = MutableStateFlow<StartupState>(StartupState.Chargement)
     val state: StateFlow<StartupState> = _state
 

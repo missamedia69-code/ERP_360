@@ -92,6 +92,7 @@ import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
+import com.missa.b360.ui.screens.SplashVideoScreen
 import com.missa.b360.ui.tasks.TasksScreen
 import com.missa.b360.ui.tresorerie.TresorerieScreen
 
@@ -104,11 +105,19 @@ fun AppNavHost() {
     when (state) {
         StartupState.Chargement -> Box(Modifier.fillMaxSize())
 
-        // 1re ouverture : parcours d'onboarding complet (Phase B)
+        // 1re ouverture : l'écran bleu de bienvenue s'affiche immédiatement.
+        // L'introduction vidéo attend que l'installation soit configurée — la
+        // faire précéder l'onboarding retardait de cinq secondes le tout
+        // premier écran, sans rien apprendre à personne.
         StartupState.Onboarding -> OnboardingScreen(onFinished = startup::evaluer)
 
-        // RA-01 : verrou PIN demandé à chaque ouverture
-        StartupState.VerrouPin -> PinLockScreen(onUnlocked = startup::deverrouiller)
+        // RA-01 : verrou PIN demandé à chaque ouverture, précédé une seule fois
+        // par l'introduction.
+        StartupState.VerrouPin -> if (startup.introVue) {
+            PinLockScreen(onUnlocked = startup::deverrouiller)
+        } else {
+            SplashVideoScreen(onFinished = startup::marquerIntroVue)
+        }
 
         // Accueil + modules métier
         StartupState.Pret -> MainNavHost()
@@ -514,7 +523,7 @@ private fun MainNavHost() {
 
     if (plusDeModules) {
         PlusDeModulesFeuille(
-            modules = AppModule.secondaires(modulesActifs),
+            modules = AppModule.epinglables(modulesActifs),
             onFermer = { plusDeModules = false },
             onModule = { module ->
                 plusDeModules = false
