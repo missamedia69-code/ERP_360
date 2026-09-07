@@ -210,8 +210,9 @@ fun HomeScreen(
                     notificationCount = nonLues,
                     onMenuClick = { scope.launch { drawerState.open() } },
                     onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                    // L'avatar mène au compte, pas aux réglages de l'entreprise.
-                    onProfileClick = { navController.navigate(Routes.ADMIN_UTILISATEURS) },
+                    // Le bloc porte le logo et le nom de l'entreprise : il ouvre
+                    // sa fiche. Le compte utilisateur a son entrée au tiroir.
+                    onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
                 )
             },
             bottomBar = {
@@ -343,11 +344,15 @@ private fun HomeHeader(
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),
         ) {
+            // Une seule identité dans la barre : celle de l'entreprise. La marque
+            // Missa Business 360 tient l'en-tête du tiroir — deux blocs
+            // identitaires côte à côte se disputaient l'attention et
+            // écrasaient les libellés jusqu'à 7 sp.
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onMenuClick, modifier = Modifier.size(42.dp)) {
                     Icon(
                         imageVector = Icons.Outlined.Menu,
                         contentDescription = stringResource(R.string.drawer_admin),
@@ -355,89 +360,46 @@ private fun HomeHeader(
                         modifier = Modifier.size(25.dp),
                     )
                 }
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(8.dp))
                 Row(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(13.dp))
+                        .clickable(onClick = onProfileClick)
+                        .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    MissaBrandMark(size = 36.dp)
-                    Spacer(Modifier.width(6.dp))
-                    Column {
+                    CompanyLogo(
+                        logoUri = companyLogoUri,
+                        contentDescription = null,
+                        fallbackIcon = Icons.Outlined.Business,
+                        modifier = Modifier.size(42.dp),
+                        size = 42.dp,
+                        shape = RoundedCornerShape(12.dp),
+                        fallbackTint = HomeBlue,
+                        fallbackBackground = HomeBlueSoft,
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "MISSA",
+                            text = companyName,
                             color = HomeTextDark,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
                             maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "BUSINESS",
-                                color = HomeTextDark,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = "360",
-                                color = Color(0xFF4BAE27),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
-                            )
-                        }
-                    }
-                }
-                Surface(
-                    modifier = Modifier
-                        .width(122.dp)
-                        .clickable(onClick = onProfileClick),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, HomeBorder),
-                    shadowElevation = 3.dp,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        CompanyLogo(
-                            logoUri = companyLogoUri,
-                            contentDescription = null,
-                            fallbackIcon = Icons.Outlined.Business,
-                            modifier = Modifier.size(28.dp),
-                            size = 28.dp,
-                            shape = RoundedCornerShape(8.dp),
-                            fallbackTint = HomeGreen,
-                            fallbackBackground = HomeGreenSoft,
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = companyName,
-                                color = HomeTextDark,
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = profileLabel,
-                                color = HomeTextMuted,
-                                fontSize = 7.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                        Icon(
-                            imageVector = Icons.Outlined.ArrowDropDown,
-                            contentDescription = null,
-                            tint = HomeTextDark,
-                            modifier = Modifier.size(17.dp),
+                        Text(
+                            text = "$profileLabel · $sizeLabel",
+                            color = HomeTextMuted,
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
-                IconButton(onClick = onNotificationClick, modifier = Modifier.size(40.dp)) {
+                Spacer(Modifier.width(6.dp))
+                IconButton(onClick = onNotificationClick, modifier = Modifier.size(42.dp)) {
                     BadgedBox(
                         badge = {
                             if (notificationCount > 0) {
@@ -677,7 +639,7 @@ private fun MetricCard(
             Text(
                 text = subtitle,
                 color = HomeTextMuted,
-                fontSize = 9.sp,
+                fontSize = 10.5.sp,
                 maxLines = 1,
             )
         }
@@ -862,7 +824,7 @@ private fun QuickActionCard(
             Text(
                 text = title,
                 color = HomeTextDark,
-                fontSize = 9.sp,
+                fontSize = 10.5.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -1084,47 +1046,35 @@ private fun MissaBusinessDrawer(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Surface(
-                    modifier = Modifier.size(48.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    color = HomeBlue,
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Business,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.padding(11.dp),
-                    )
-                }
-                Spacer(Modifier.width(11.dp))
+                // Le vrai logo de la marque, et non une icône générique : le
+                // tiroir est le seul endroit où l'application se présente, la
+                // barre du haut appartenant désormais à l'entreprise.
+                MissaBrandMark(size = 48.dp)
+                Spacer(Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "MISSA BUSINESS",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = HomeTextDark,
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = "MISSA BUSINESS",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = HomeTextDark,
+                        )
+                        Spacer(Modifier.width(4.dp))
                         Text(
                             text = "360",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.ExtraBold,
                             color = HomeBlue,
                         )
-                        Spacer(Modifier.width(5.dp))
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = HomeGreenSoft,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.home_active),
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF16A34A),
-                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
-                            )
-                        }
                     }
+                    // La version remplace le badge « Actif », déjà porté par la
+                    // carte entreprise juste en dessous : c'est le premier
+                    // renseignement que demande l'assistance.
+                    Text(
+                        text = stringResource(R.string.home_version_format, BuildConfig.VERSION_NAME),
+                        fontSize = 11.sp,
+                        color = HomeTextMuted,
+                    )
                 }
                 IconButton(onClick = onClose, modifier = Modifier.size(38.dp)) {
                     Icon(
@@ -1148,21 +1098,23 @@ private fun MissaBusinessDrawer(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    // Le conteneur et le contenu partagent la même taille :
+                    // 42 dp d'un côté et 30 de l'autre décentraient la vignette.
                     CompanyLogo(
                         logoUri = logoUri,
                         contentDescription = null,
                         fallbackIcon = Icons.Outlined.Store,
                         modifier = Modifier.size(42.dp),
-                        size = 30.dp,
+                        size = 42.dp,
                         shape = CircleShape,
                         fallbackTint = HomeBlue,
                         fallbackBackground = Color.White,
                     )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(11.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = companyName,
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = HomeTextDark,
                             maxLines = 1,
@@ -1170,7 +1122,7 @@ private fun MissaBusinessDrawer(
                         )
                         Text(
                             text = stringResource(R.string.home_company_active),
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             color = HomeTextMuted,
                         )
                     }
@@ -1247,23 +1199,17 @@ private fun MissaBusinessDrawer(
                         Column {
                             Text(
                                 text = stringResource(R.string.home_data_secured),
-                                fontSize = 10.sp,
+                                fontSize = 11.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = HomeTextDark,
                             )
                             Text(
                                 text = backupStatus,
-                                fontSize = 9.sp,
+                                fontSize = 10.5.sp,
                                 color = HomeTextMuted,
                             )
                         }
                     }
-                    Spacer(Modifier.height(10.dp))
-                    Text(
-                        text = stringResource(R.string.home_version_format, BuildConfig.VERSION_NAME),
-                        fontSize = 9.sp,
-                        color = Color(0xFF9AA3B8),
-                    )
                 }
             }
         }
@@ -1275,7 +1221,7 @@ private fun DrawerSectionTitle(title: String) {
     Text(
         text = title,
         color = Color(0xFF8A94AA),
-        fontSize = 9.sp,
+        fontSize = 10.5.sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = 0.8.sp,
         modifier = Modifier.padding(start = 10.dp, top = 18.dp, bottom = 5.dp),
