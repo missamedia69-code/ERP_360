@@ -1689,4 +1689,25 @@
     <string name="mai_champ_technicien">Technician</string>
     <string name="mai_msg_ok">Work order saved.</string>
     <string name="mai_msg_nom_pris">Equipment name already used.</string>
+    <!-- Indicateurs et alertes des modules v9/v10 -->
+    <string name="kpi_nc_ouvertes">Open quality issues</string>
+    <string name="kpi_nc_ouvertes_f">Non-conformities not yet closed</string>
+    <string name="kpi_taux_resolution">Resolution rate</string>
+    <string name="kpi_taux_resolution_f">Closed issues ÷ reported issues</string>
+    <string name="kpi_equipements_retard">Overdue servicing</string>
+    <string name="kpi_equipements_retard_f">Equipment past its preventive due date</string>
+    <string name="kpi_taux_preventif">Preventive share</string>
+    <string name="kpi_taux_preventif_f">Preventive work orders ÷ total completed</string>
+    <string name="kpi_transferts_transit">Transfers in transit</string>
+    <string name="kpi_transferts_transit_f">Stock shipped with no recorded arrival</string>
+    <string name="kpi_clients_relancer">Customers to follow up</string>
+    <string name="kpi_clients_relancer_f">Customers and prospects with no recent purchase</string>
+    <string name="alerte_nc">Critical quality issue</string>
+    <string name="alerte_nc_d">%1$d critical issue(s) to handle</string>
+    <string name="alerte_entretien">Overdue servicing</string>
+    <string name="alerte_entretien_d">%1$d item(s) due for service</string>
+    <string name="alerte_transfert">Transfer not received</string>
+    <string name="alerte_transfert_d">%1$d transfer(s) with no arrival</string>
+    <string name="alerte_relance">Sales follow-ups</string>
+    <string name="alerte_relance_d">%1$d customer(s) to contact</string>
 </resources>

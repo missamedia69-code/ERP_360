@@ -201,6 +201,56 @@ enum class IndicateurCode(
         sens = SensIndicateur.HAUT_BON,
     ),
 
+    // --- Qualité ---
+    NC_OUVERTES(
+        module = ModuleCode.QUA,
+        libelleRes = R.string.kpi_nc_ouvertes,
+        formuleRes = R.string.kpi_nc_ouvertes_f,
+        format = FormatIndicateur.NOMBRE,
+        sens = SensIndicateur.BAS_BON,
+    ),
+    TAUX_RESOLUTION_NC(
+        module = ModuleCode.QUA,
+        libelleRes = R.string.kpi_taux_resolution,
+        formuleRes = R.string.kpi_taux_resolution_f,
+        format = FormatIndicateur.POURCENTAGE,
+        sens = SensIndicateur.HAUT_BON,
+    ),
+
+    // --- Maintenance ---
+    EQUIPEMENTS_EN_RETARD(
+        module = ModuleCode.MAI,
+        libelleRes = R.string.kpi_equipements_retard,
+        formuleRes = R.string.kpi_equipements_retard_f,
+        format = FormatIndicateur.NOMBRE,
+        sens = SensIndicateur.BAS_BON,
+    ),
+    TAUX_PREVENTIF(
+        module = ModuleCode.MAI,
+        libelleRes = R.string.kpi_taux_preventif,
+        formuleRes = R.string.kpi_taux_preventif_f,
+        format = FormatIndicateur.POURCENTAGE,
+        sens = SensIndicateur.HAUT_BON,
+    ),
+
+    // --- Logistique ---
+    TRANSFERTS_EN_TRANSIT(
+        module = ModuleCode.LOG,
+        libelleRes = R.string.kpi_transferts_transit,
+        formuleRes = R.string.kpi_transferts_transit_f,
+        format = FormatIndicateur.NOMBRE,
+        sens = SensIndicateur.BAS_BON,
+    ),
+
+    // --- CRM ---
+    CLIENTS_A_RELANCER(
+        module = ModuleCode.CRM,
+        libelleRes = R.string.kpi_clients_relancer,
+        formuleRes = R.string.kpi_clients_relancer_f,
+        format = FormatIndicateur.NOMBRE,
+        sens = SensIndicateur.BAS_BON,
+    ),
+
     // --- Reporting ---
     PIECES_VALIDEES(
         module = ModuleCode.REP,
@@ -228,6 +278,10 @@ enum class AlerteCode(
     PIECES_A_VALIDER(ModuleCode.CPT, R.string.alerte_brouillons, R.string.alerte_brouillons_d),
     DEVIS_A_RELANCER(ModuleCode.VEN, R.string.alerte_devis, R.string.alerte_devis_d),
     MARGE_FAIBLE(ModuleCode.CPT, R.string.alerte_marge, R.string.alerte_marge_d, true),
+    NC_CRITIQUE(ModuleCode.QUA, R.string.alerte_nc, R.string.alerte_nc_d),
+    ENTRETIEN_EN_RETARD(ModuleCode.MAI, R.string.alerte_entretien, R.string.alerte_entretien_d),
+    TRANSFERT_NON_RECU(ModuleCode.LOG, R.string.alerte_transfert, R.string.alerte_transfert_d),
+    CLIENTS_A_RELANCER(ModuleCode.CRM, R.string.alerte_relance, R.string.alerte_relance_d),
 }
 
 /** Sélection des indicateurs et alertes pertinents pour les modules actifs. */

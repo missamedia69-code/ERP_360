@@ -2,15 +2,21 @@ package com.missa.b360.core.domain.usecase
 
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.EquipementDao
+import com.missa.b360.core.data.dao.InterventionDao
 import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
+import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
+import com.missa.b360.core.data.entity.EquipementEntity
+import com.missa.b360.core.data.entity.InterventionEntity
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
+import com.missa.b360.core.data.entity.NonConformiteEntity
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
@@ -22,6 +28,9 @@ import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.AlerteCode
 import com.missa.b360.core.domain.model.IndicateurCode
 import com.missa.b360.core.domain.model.Indicateurs
+import com.missa.b360.core.domain.model.CrmRules
+import com.missa.b360.core.domain.model.LogistiqueRules
+import com.missa.b360.core.domain.model.QualiteMaintenanceRules
 import com.missa.b360.core.domain.model.TresorerieRules
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -69,6 +78,9 @@ class ObserveTableauDeBordUseCase @Inject constructor(
     private val clientDao: ClientDao,
     private val compteTresorerieDao: CompteTresorerieDao,
     private val mouvementTresorerieDao: MouvementTresorerieDao,
+    private val nonConformiteDao: NonConformiteDao,
+    private val equipementDao: EquipementDao,
+    private val interventionDao: InterventionDao,
 ) {
 
     private data class Sources(
@@ -79,6 +91,9 @@ class ObserveTableauDeBordUseCase @Inject constructor(
         val employes: Int,
         val comptes: List<CompteTresorerieEntity> = emptyList(),
         val mouvementsTresorerie: List<MouvementTresorerieEntity> = emptyList(),
+        val nonConformites: List<NonConformiteEntity> = emptyList(),
+        val equipements: List<EquipementEntity> = emptyList(),
+        val interventions: List<InterventionEntity> = emptyList(),
     )
 
     operator fun invoke(maintenant: () -> Long = System::currentTimeMillis): Flow<TableauDeBord> {
@@ -91,14 +106,29 @@ class ObserveTableauDeBordUseCase @Inject constructor(
         ) { pieces, produits, stocks, mouvements, employes ->
             Sources(pieces, produits, stocks, mouvements, employes.size)
         }
+        val tresorerie = combine(
+            compteTresorerieDao.observeAll(),
+            mouvementTresorerieDao.observeAll(),
+        ) { comptes, mouvements -> comptes to mouvements }
+        val qualiteMaintenance = combine(
+            nonConformiteDao.observeAll(),
+            equipementDao.observeAll(),
+            interventionDao.observeAll(),
+        ) { nc, equipements, interventions -> Triple(nc, equipements, interventions) }
         return combine(
             socle,
             clientDao.observeAllIncludingInactive(),
-            compteTresorerieDao.observeAll(),
-            mouvementTresorerieDao.observeAll(),
-        ) { sources, clients, comptes, mouvementsTresorerie ->
+            tresorerie,
+            qualiteMaintenance,
+        ) { sources, clients, (comptes, mouvements), (nc, equipements, interventions) ->
             calculer(
-                sources.copy(comptes = comptes, mouvementsTresorerie = mouvementsTresorerie),
+                sources.copy(
+                    comptes = comptes,
+                    mouvementsTresorerie = mouvements,
+                    nonConformites = nc,
+                    equipements = equipements,
+                    interventions = interventions,
+                ),
                 clients,
                 maintenant(),
             )
@@ -211,6 +241,21 @@ class ObserveTableauDeBordUseCase @Inject constructor(
         val nouveauxClients = clients.count { it.createdAt >= debut }.toDouble()
         val nouveauxPrecedent = clients.count { it.createdAt in debutPrecedent until debut }.toDouble()
 
+        // --- Qualité, maintenance, logistique et CRM (modules v9/v10) ---
+        val bilanQualite = QualiteMaintenanceRules.bilan(sources.nonConformites)
+        val parc = QualiteMaintenanceRules.etatDuParc(
+            sources.equipements,
+            sources.interventions,
+            maintenant,
+        )
+        val entretiensEnRetard = QualiteMaintenanceRules.enRetard(parc)
+        val tauxPreventif = QualiteMaintenanceRules.tauxPreventif(sources.interventions)
+        val transfertsEnTransit = LogistiqueRules.enTransit(
+            LogistiqueRules.transferts(sources.mouvements),
+        )
+        val fichesCrm = CrmRules.fiches(clients, sources.pieces, maintenant)
+        val clientsARelancer = CrmRules.aRelancer(fichesCrm)
+
         val valeurs = listOf(
             valeur(IndicateurCode.CA_PERIODE, ca, caPrecedent),
             valeur(
@@ -263,6 +308,15 @@ class ObserveTableauDeBordUseCase @Inject constructor(
             valeur(IndicateurCode.CLIENTS_ACTIFS, clientsActifs),
             valeur(IndicateurCode.NOUVEAUX_CLIENTS, nouveauxClients, nouveauxPrecedent),
             valeur(
+                IndicateurCode.NC_OUVERTES,
+                (bilanQualite.ouvertes + bilanQualite.enCours).toDouble(),
+            ),
+            valeur(IndicateurCode.TAUX_RESOLUTION_NC, bilanQualite.tauxResolution),
+            valeur(IndicateurCode.EQUIPEMENTS_EN_RETARD, entretiensEnRetard.size.toDouble()),
+            valeur(IndicateurCode.TAUX_PREVENTIF, tauxPreventif),
+            valeur(IndicateurCode.TRANSFERTS_EN_TRANSIT, transfertsEnTransit.size.toDouble()),
+            valeur(IndicateurCode.CLIENTS_A_RELANCER, clientsARelancer.size.toDouble()),
+            valeur(
                 IndicateurCode.PIECES_VALIDEES,
                 courant.size.toDouble(),
                 precedent.size.toDouble(),
@@ -297,13 +351,44 @@ class ObserveTableauDeBordUseCase @Inject constructor(
             if (devisAnciens > 0) {
                 add(ValeurAlerte(code = AlerteCode.DEVIS_A_RELANCER, nombre = devisAnciens))
             }
+            if (bilanQualite.critiques > 0) {
+                add(ValeurAlerte(code = AlerteCode.NC_CRITIQUE, nombre = bilanQualite.critiques))
+            }
+            if (entretiensEnRetard.isNotEmpty()) {
+                add(
+                    ValeurAlerte(
+                        code = AlerteCode.ENTRETIEN_EN_RETARD,
+                        nombre = entretiensEnRetard.size,
+                        exemple = entretiensEnRetard.first().equipement.nom,
+                    ),
+                )
+            }
+            if (transfertsEnTransit.isNotEmpty()) {
+                add(
+                    ValeurAlerte(
+                        code = AlerteCode.TRANSFERT_NON_RECU,
+                        nombre = transfertsEnTransit.size,
+                        exemple = transfertsEnTransit.first().reference,
+                    ),
+                )
+            }
+            if (clientsARelancer.isNotEmpty()) {
+                add(
+                    ValeurAlerte(
+                        code = AlerteCode.CLIENTS_A_RELANCER,
+                        nombre = clientsARelancer.size,
+                        exemple = clientsARelancer.first().client.nom,
+                    ),
+                )
+            }
             if (ca > 0 && tauxMarge < Indicateurs.SEUIL_MARGE_FAIBLE) {
                 add(ValeurAlerte(code = AlerteCode.MARGE_FAIBLE, montant = tauxMarge))
             }
         }
 
         val vide = sources.pieces.isEmpty() && sources.produits.isEmpty() &&
-            clients.isEmpty() && sources.comptes.isEmpty()
+            clients.isEmpty() && sources.comptes.isEmpty() &&
+            sources.nonConformites.isEmpty() && sources.equipements.isEmpty()
         return TableauDeBord(
             indicateurs = valeurs,
             alertes = alertes,

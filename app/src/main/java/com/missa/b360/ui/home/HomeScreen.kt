@@ -149,6 +149,7 @@ fun HomeScreen(
     var showSupport by remember { mutableStateOf(false) }
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
+    val modulesActifs by viewModel.modulesActifs.collectAsState()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     val companyName = uiState.entrepriseNom.ifBlank {
@@ -204,6 +205,7 @@ fun HomeScreen(
             },
             bottomBar = {
                 HomeBottomBar(
+                    modules = AppModule.barreBas(modulesActifs),
                     currentRoute = currentRoute,
                     onModuleClick = { navController.navigate(it.route) },
                     onMore = { showMoreModules = true },
@@ -243,7 +245,7 @@ fun HomeScreen(
                     fontSize = 13.sp,
                 )
                 Spacer(Modifier.height(12.dp))
-                AppModule.modulesSecondaires().forEach { module ->
+                AppModule.secondaires(modulesActifs).forEach { module ->
                     ListItem(
                         headlineContent = {
                             Text(
@@ -1081,13 +1083,14 @@ private fun Double.displayQuantity(): String =
 
 @Composable
 private fun HomeBottomBar(
+    modules: List<AppModule>,
     currentRoute: String?,
     onModuleClick: (AppModule) -> Unit,
     onMore: () -> Unit,
 ) {
     Surface(color = Color.White, shadowElevation = 10.dp) {
         NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
-            AppModule.modulesBarreBas().take(4).forEach { module ->
+            modules.take(4).forEach { module ->
                 NavigationBarItem(
                     selected = currentRoute == module.route,
                     onClick = { onModuleClick(module) },

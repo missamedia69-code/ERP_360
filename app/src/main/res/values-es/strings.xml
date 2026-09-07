@@ -1668,4 +1668,25 @@
     <string name="mai_champ_technicien">Técnico</string>
     <string name="mai_msg_ok">Intervención guardada.</string>
     <string name="mai_msg_nom_pris">Ya existe un equipo con ese nombre.</string>
+    <!-- Indicateurs et alertes des modules v9/v10 -->
+    <string name="kpi_nc_ouvertes">Incidencias abiertas</string>
+    <string name="kpi_nc_ouvertes_f">No conformidades aún sin resolver</string>
+    <string name="kpi_taux_resolution">Tasa de resolución</string>
+    <string name="kpi_taux_resolution_f">Incidencias resueltas ÷ declaradas</string>
+    <string name="kpi_equipements_retard">Mantenimientos atrasados</string>
+    <string name="kpi_equipements_retard_f">Equipos con la fecha preventiva superada</string>
+    <string name="kpi_taux_preventif">Tasa de preventivo</string>
+    <string name="kpi_taux_preventif_f">Intervenciones preventivas ÷ total realizado</string>
+    <string name="kpi_transferts_transit">Traslados en tránsito</string>
+    <string name="kpi_transferts_transit_f">Salidas de stock sin recepción registrada</string>
+    <string name="kpi_clients_relancer">Clientes por contactar</string>
+    <string name="kpi_clients_relancer_f">Clientes y prospectos sin compra reciente</string>
+    <string name="alerte_nc">Incidencia crítica</string>
+    <string name="alerte_nc_d">%1$d incidencia(s) crítica(s) por tratar</string>
+    <string name="alerte_entretien">Mantenimiento atrasado</string>
+    <string name="alerte_entretien_d">%1$d equipo(s) por revisar</string>
+    <string name="alerte_transfert">Traslado no recibido</string>
+    <string name="alerte_transfert_d">%1$d traslado(s) sin recepción</string>
+    <string name="alerte_relance">Seguimiento comercial</string>
+    <string name="alerte_relance_d">%1$d cliente(s) por contactar</string>
 </resources>

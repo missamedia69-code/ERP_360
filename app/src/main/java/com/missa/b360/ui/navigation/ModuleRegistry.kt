@@ -64,5 +64,24 @@ enum class AppModule(
         /** Retourne les modules correspondant à une liste de ModuleCode. */
         fun fromCodes(codes: List<ModuleCode>): List<AppModule> =
             entries.filter { it.moduleCode in codes }
+
+        /**
+         * Modules à présenter compte tenu du pack choisi à l'onboarding.
+         *
+         * Une liste vide signifie « configuration inconnue » — installation
+         * antérieure au pack, ou réglage jamais écrit : on montre alors tout.
+         * Masquer par défaut priverait l'utilisateur de ses modules sans qu'il
+         * comprenne pourquoi.
+         */
+        fun visibles(actifs: List<ModuleCode>): List<AppModule> =
+            if (actifs.isEmpty()) entries.toList() else entries.filter { it.moduleCode in actifs }
+
+        /** Barre du bas restreinte aux modules réellement actifs. */
+        fun barreBas(actifs: List<ModuleCode>): List<AppModule> =
+            visibles(actifs).filter { it.bottomBarDefault }
+
+        /** Modules actifs hors barre du bas → menu « Plus de modules ». */
+        fun secondaires(actifs: List<ModuleCode>): List<AppModule> =
+            visibles(actifs).filterNot { it.bottomBarDefault }
     }
 }

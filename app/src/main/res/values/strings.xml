@@ -1696,4 +1696,25 @@
     <string name="mai_champ_technicien">Technicien</string>
     <string name="mai_msg_ok">Intervention enregistrée.</string>
     <string name="mai_msg_nom_pris">Un équipement porte déjà ce nom.</string>
+    <!-- Indicateurs et alertes des modules v9/v10 -->
+    <string name="kpi_nc_ouvertes">Écarts qualité ouverts</string>
+    <string name="kpi_nc_ouvertes_f">Non-conformités non encore résolues</string>
+    <string name="kpi_taux_resolution">Taux de résolution</string>
+    <string name="kpi_taux_resolution_f">Écarts résolus ÷ écarts déclarés</string>
+    <string name="kpi_equipements_retard">Entretiens en retard</string>
+    <string name="kpi_equipements_retard_f">Équipements dont l\'échéance préventive est dépassée</string>
+    <string name="kpi_taux_preventif">Taux de préventif</string>
+    <string name="kpi_taux_preventif_f">Interventions préventives ÷ total réalisé</string>
+    <string name="kpi_transferts_transit">Transferts en transit</string>
+    <string name="kpi_transferts_transit_f">Sorties de stock sans réception enregistrée</string>
+    <string name="kpi_clients_relancer">Clients à relancer</string>
+    <string name="kpi_clients_relancer_f">Clients et prospects sans achat récent</string>
+    <string name="alerte_nc">Écart qualité critique</string>
+    <string name="alerte_nc_d">%1$d écart(s) critique(s) à traiter</string>
+    <string name="alerte_entretien">Entretien en retard</string>
+    <string name="alerte_entretien_d">%1$d équipement(s) à réviser</string>
+    <string name="alerte_transfert">Transfert non reçu</string>
+    <string name="alerte_transfert_d">%1$d transfert(s) sans réception</string>
+    <string name="alerte_relance">Relances commerciales</string>
+    <string name="alerte_relance_d">%1$d client(s) à recontacter</string>
 </resources>

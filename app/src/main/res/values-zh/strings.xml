@@ -1668,4 +1668,25 @@
     <string name="mai_champ_technicien">技师</string>
     <string name="mai_msg_ok">工单已保存。</string>
     <string name="mai_msg_nom_pris">已有同名设备。</string>
+    <!-- Indicateurs et alertes des modules v9/v10 -->
+    <string name="kpi_nc_ouvertes">未结质量异常</string>
+    <string name="kpi_nc_ouvertes_f">尚未关闭的不合格项</string>
+    <string name="kpi_taux_resolution">解决率</string>
+    <string name="kpi_taux_resolution_f">已关闭异常 ÷ 已登记异常</string>
+    <string name="kpi_equipements_retard">逾期保养</string>
+    <string name="kpi_equipements_retard_f">已超过预防保养日期的设备</string>
+    <string name="kpi_taux_preventif">预防性占比</string>
+    <string name="kpi_taux_preventif_f">预防性工单 ÷ 已完成总数</string>
+    <string name="kpi_transferts_transit">在途调拨</string>
+    <string name="kpi_transferts_transit_f">已发出但未登记到货的库存</string>
+    <string name="kpi_clients_relancer">待跟进客户</string>
+    <string name="kpi_clients_relancer_f">近期无购买的客户与潜在客户</string>
+    <string name="alerte_nc">致命质量异常</string>
+    <string name="alerte_nc_d">有 %1$d 项致命异常待处理</string>
+    <string name="alerte_entretien">保养逾期</string>
+    <string name="alerte_entretien_d">有 %1$d 台设备待检修</string>
+    <string name="alerte_transfert">调拨未到货</string>
+    <string name="alerte_transfert_d">有 %1$d 笔调拨未登记到货</string>
+    <string name="alerte_relance">销售跟进</string>
+    <string name="alerte_relance_d">有 %1$d 位客户待联系</string>
 </resources>

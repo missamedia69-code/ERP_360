@@ -2,6 +2,9 @@ package com.missa.b360.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
 import javax.inject.Inject
@@ -48,6 +52,7 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
+    settingsStore: SettingsStore,
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
@@ -57,6 +62,16 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
+
+    /**
+     * Modules retenus au moment du choix du pack. La liste pilote l'accueil :
+     * un module non retenu n'a pas à encombrer le menu d'une TPE qui ne s'en
+     * servira jamais.
+     */
+    val modulesActifs: StateFlow<List<ModuleCode>> =
+        settingsStore.observe(SettingsStore.Keys.MODULES_ACTIFS)
+            .map { ModulesPersonnalises.deserialiser(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val baseState = combine(
         getEnterprise.observer(),

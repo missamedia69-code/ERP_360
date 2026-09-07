@@ -1668,4 +1668,25 @@
     <string name="mai_champ_technicien">الفني</string>
     <string name="mai_msg_ok">تم حفظ عملية الصيانة.</string>
     <string name="mai_msg_nom_pris">يوجد معدة بهذا الاسم بالفعل.</string>
+    <!-- Indicateurs et alertes des modules v9/v10 -->
+    <string name="kpi_nc_ouvertes">حالات جودة مفتوحة</string>
+    <string name="kpi_nc_ouvertes_f">حالات عدم مطابقة لم تُغلق بعد</string>
+    <string name="kpi_taux_resolution">معدل المعالجة</string>
+    <string name="kpi_taux_resolution_f">الحالات المغلقة ÷ الحالات المسجلة</string>
+    <string name="kpi_equipements_retard">صيانة متأخرة</string>
+    <string name="kpi_equipements_retard_f">معدات تجاوزت موعد الصيانة الوقائية</string>
+    <string name="kpi_taux_preventif">نسبة الصيانة الوقائية</string>
+    <string name="kpi_taux_preventif_f">الصيانة الوقائية ÷ إجمالي المنجز</string>
+    <string name="kpi_transferts_transit">تحويلات في الطريق</string>
+    <string name="kpi_transferts_transit_f">مخزون غادر دون تسجيل استلام</string>
+    <string name="kpi_clients_relancer">عملاء للمتابعة</string>
+    <string name="kpi_clients_relancer_f">عملاء ومحتملون دون شراء حديث</string>
+    <string name="alerte_nc">حالة جودة حرجة</string>
+    <string name="alerte_nc_d">%1$d حالة حرجة بحاجة إلى معالجة</string>
+    <string name="alerte_entretien">صيانة متأخرة</string>
+    <string name="alerte_entretien_d">%1$d معدة بحاجة إلى مراجعة</string>
+    <string name="alerte_transfert">تحويل لم يُستلم</string>
+    <string name="alerte_transfert_d">%1$d تحويل دون استلام</string>
+    <string name="alerte_relance">متابعات تجارية</string>
+    <string name="alerte_relance_d">%1$d عميل بحاجة إلى تواصل</string>
 </resources>
