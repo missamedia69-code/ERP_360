@@ -1577,4 +1577,22 @@
     <string name="cpt_journal">Libro diario</string>
     <string name="cpt_journal_vide">No hay apuntes en este periodo.</string>
     <string name="cpt_origine_tresorerie">Apunte procedente de tesorería</string>
+    <!-- Module CRM -->
+    <string name="crm_seg_a_relancer">Para contactar</string>
+    <string name="crm_seg_prospect">Prospecto</string>
+    <string name="crm_seg_nouveau">Nuevo</string>
+    <string name="crm_seg_fidele">Fiel</string>
+    <string name="crm_seg_occasionnel">Ocasional</string>
+    <string name="crm_seg_dormant">Inactivo reciente</string>
+    <string name="crm_seg_inactif">Inactivo</string>
+    <string name="crm_ca_portefeuille">Ingresos de la cartera</string>
+    <string name="crm_taux_conversion">Tasa de conversión</string>
+    <string name="crm_panier_moyen">Ticket medio</string>
+    <string name="crm_relances_message">%1$d cliente(s) por contactar.</string>
+    <string name="crm_top_clients">Mejores clientes</string>
+    <string name="crm_portefeuille">Cartera</string>
+    <string name="crm_selection">Selección</string>
+    <string name="crm_aucun_client">No hay clientes en esta vista.</string>
+    <string name="crm_jamais_achete">Nunca ha comprado</string>
+    <string name="crm_nb_achats">%1$d compra(s)</string>
 </resources>

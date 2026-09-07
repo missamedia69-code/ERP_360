@@ -1577,4 +1577,22 @@
     <string name="cpt_journal">دفتر اليومية</string>
     <string name="cpt_journal_vide">لا توجد قيود في هذه الفترة.</string>
     <string name="cpt_origine_tresorerie">قيد من الخزينة</string>
+    <!-- Module CRM -->
+    <string name="crm_seg_a_relancer">للمتابعة</string>
+    <string name="crm_seg_prospect">عميل محتمل</string>
+    <string name="crm_seg_nouveau">جديد</string>
+    <string name="crm_seg_fidele">وفي</string>
+    <string name="crm_seg_occasionnel">عرضي</string>
+    <string name="crm_seg_dormant">خامل</string>
+    <string name="crm_seg_inactif">غير نشط</string>
+    <string name="crm_ca_portefeuille">إيرادات المحفظة</string>
+    <string name="crm_taux_conversion">معدل التحويل</string>
+    <string name="crm_panier_moyen">متوسط السلة</string>
+    <string name="crm_relances_message">%1$d عميل بحاجة إلى متابعة.</string>
+    <string name="crm_top_clients">أفضل العملاء</string>
+    <string name="crm_portefeuille">المحفظة</string>
+    <string name="crm_selection">التحديد</string>
+    <string name="crm_aucun_client">لا يوجد عملاء في هذا العرض.</string>
+    <string name="crm_jamais_achete">لم يشترِ مطلقًا</string>
+    <string name="crm_nb_achats">%1$d عملية شراء</string>
 </resources>

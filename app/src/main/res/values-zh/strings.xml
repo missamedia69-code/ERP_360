@@ -1577,4 +1577,22 @@
     <string name="cpt_journal">记账日记账</string>
     <string name="cpt_journal_vide">本期间没有记录。</string>
     <string name="cpt_origine_tresorerie">来自资金模块的记录</string>
+    <!-- Module CRM -->
+    <string name="crm_seg_a_relancer">待跟进</string>
+    <string name="crm_seg_prospect">潜在客户</string>
+    <string name="crm_seg_nouveau">新客户</string>
+    <string name="crm_seg_fidele">忠实客户</string>
+    <string name="crm_seg_occasionnel">偶尔购买</string>
+    <string name="crm_seg_dormant">沉睡客户</string>
+    <string name="crm_seg_inactif">已停用</string>
+    <string name="crm_ca_portefeuille">客户群收入</string>
+    <string name="crm_taux_conversion">转化率</string>
+    <string name="crm_panier_moyen">客单价</string>
+    <string name="crm_relances_message">有 %1$d 位客户需要跟进。</string>
+    <string name="crm_top_clients">重点客户</string>
+    <string name="crm_portefeuille">客户群</string>
+    <string name="crm_selection">已筛选</string>
+    <string name="crm_aucun_client">此视图中没有客户。</string>
+    <string name="crm_jamais_achete">从未购买</string>
+    <string name="crm_nb_achats">%1$d 次购买</string>
 </resources>

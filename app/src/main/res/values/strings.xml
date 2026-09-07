@@ -1605,4 +1605,22 @@
     <string name="cpt_journal">Journal des écritures</string>
     <string name="cpt_journal_vide">Aucune écriture sur cette période.</string>
     <string name="cpt_origine_tresorerie">Écriture issue de la trésorerie</string>
+    <!-- Module CRM -->
+    <string name="crm_seg_a_relancer">À relancer</string>
+    <string name="crm_seg_prospect">Prospect</string>
+    <string name="crm_seg_nouveau">Nouveau</string>
+    <string name="crm_seg_fidele">Fidèle</string>
+    <string name="crm_seg_occasionnel">Occasionnel</string>
+    <string name="crm_seg_dormant">Dormant</string>
+    <string name="crm_seg_inactif">Inactif</string>
+    <string name="crm_ca_portefeuille">CA du portefeuille</string>
+    <string name="crm_taux_conversion">Taux de conversion</string>
+    <string name="crm_panier_moyen">Panier moyen</string>
+    <string name="crm_relances_message">%1$d client(s) à relancer.</string>
+    <string name="crm_top_clients">Meilleurs clients</string>
+    <string name="crm_portefeuille">Portefeuille</string>
+    <string name="crm_selection">Sélection</string>
+    <string name="crm_aucun_client">Aucun client dans cette vue.</string>
+    <string name="crm_jamais_achete">Jamais acheté</string>
+    <string name="crm_nb_achats">%1$d achat(s)</string>
 </resources>

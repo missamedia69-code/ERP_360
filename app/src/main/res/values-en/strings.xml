@@ -1598,4 +1598,22 @@
     <string name="cpt_journal">Journal entries</string>
     <string name="cpt_journal_vide">No entry for this period.</string>
     <string name="cpt_origine_tresorerie">Entry from treasury</string>
+    <!-- Module CRM -->
+    <string name="crm_seg_a_relancer">To follow up</string>
+    <string name="crm_seg_prospect">Prospect</string>
+    <string name="crm_seg_nouveau">New</string>
+    <string name="crm_seg_fidele">Loyal</string>
+    <string name="crm_seg_occasionnel">Occasional</string>
+    <string name="crm_seg_dormant">Dormant</string>
+    <string name="crm_seg_inactif">Inactive</string>
+    <string name="crm_ca_portefeuille">Portfolio revenue</string>
+    <string name="crm_taux_conversion">Conversion rate</string>
+    <string name="crm_panier_moyen">Average basket</string>
+    <string name="crm_relances_message">%1$d customer(s) to follow up.</string>
+    <string name="crm_top_clients">Top customers</string>
+    <string name="crm_portefeuille">Portfolio</string>
+    <string name="crm_selection">Selection</string>
+    <string name="crm_aucun_client">No customer in this view.</string>
+    <string name="crm_jamais_achete">Never purchased</string>
+    <string name="crm_nb_achats">%1$d purchase(s)</string>
 </resources>
