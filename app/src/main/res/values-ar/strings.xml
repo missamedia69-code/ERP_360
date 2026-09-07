@@ -1615,4 +1615,32 @@
     <string name="srv_champ_heures">الساعات المستغرقة</string>
     <string name="srv_champ_intervenant">المنفّذ</string>
     <string name="srv_champ_lieu">المكان</string>
+    <!-- Module Projets -->
+    <string name="prj_etat_preparation">قيد الإعداد</string>
+    <string name="prj_etat_en_cours">قيد التنفيذ</string>
+    <string name="prj_etat_livre">تم التسليم</string>
+    <string name="prj_etat_suspendu">معلّق</string>
+    <string name="prj_nouveau">مشروع جديد</string>
+    <string name="prj_aucun">لا توجد مشاريع.</string>
+    <string name="prj_budget">الميزانية</string>
+    <string name="prj_consomme">المستهلك</string>
+    <string name="prj_avancement_moyen">متوسط التقدم</string>
+    <string name="prj_alerte_derive">%1$d مشروع منحرف</string>
+    <string name="prj_alerte_retard">%1$d متأخر</string>
+    <string name="prj_avancement">%1$d %% منجز</string>
+    <string name="prj_budget_ligne">%1$s من %2$s</string>
+    <string name="prj_actualiser">تحديث</string>
+    <string name="prj_demarrer">بدء</string>
+    <string name="prj_livrer">تسليم</string>
+    <string name="prj_msg_cree">تم إنشاء المشروع %1$s.</string>
+    <string name="prj_msg_actualise">تم تحديث التقدم.</string>
+    <string name="prj_msg_etat">تم تغيير حالة المشروع.</string>
+    <string name="prj_msg_annule">تم إلغاء المشروع.</string>
+    <string name="prj_champ_nom">اسم المشروع</string>
+    <string name="prj_champ_client">العميل</string>
+    <string name="prj_champ_responsable">المسؤول</string>
+    <string name="prj_champ_budget">الميزانية المخصصة</string>
+    <string name="prj_champ_avancement">التقدم (%)</string>
+    <string name="prj_champ_consomme">الميزانية المستهلكة</string>
+    <string name="prj_actualiser_aide">املأ الحقلين معًا: الفارق بين الميزانية المستهلكة ونسبة التقدم هو ما يكشف الانحراف.</string>
 </resources>

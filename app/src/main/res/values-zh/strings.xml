@@ -1615,4 +1615,32 @@
     <string name="srv_champ_heures">已用工时</string>
     <string name="srv_champ_intervenant">执行人</string>
     <string name="srv_champ_lieu">地点</string>
+    <!-- Module Projets -->
+    <string name="prj_etat_preparation">筹备中</string>
+    <string name="prj_etat_en_cours">进行中</string>
+    <string name="prj_etat_livre">已交付</string>
+    <string name="prj_etat_suspendu">已暂停</string>
+    <string name="prj_nouveau">新建项目</string>
+    <string name="prj_aucun">暂无项目。</string>
+    <string name="prj_budget">预算</string>
+    <string name="prj_consomme">已消耗</string>
+    <string name="prj_avancement_moyen">平均进度</string>
+    <string name="prj_alerte_derive">%1$d 个项目偏离</string>
+    <string name="prj_alerte_retard">%1$d 个逾期</string>
+    <string name="prj_avancement">已完成 %1$d %%</string>
+    <string name="prj_budget_ligne">%1$s / %2$s</string>
+    <string name="prj_actualiser">更新</string>
+    <string name="prj_demarrer">启动</string>
+    <string name="prj_livrer">交付</string>
+    <string name="prj_msg_cree">已创建项目 %1$s。</string>
+    <string name="prj_msg_actualise">进度已更新。</string>
+    <string name="prj_msg_etat">项目状态已更改。</string>
+    <string name="prj_msg_annule">项目已取消。</string>
+    <string name="prj_champ_nom">项目名称</string>
+    <string name="prj_champ_client">客户</string>
+    <string name="prj_champ_responsable">负责人</string>
+    <string name="prj_champ_budget">分配预算</string>
+    <string name="prj_champ_avancement">进度（%）</string>
+    <string name="prj_champ_consomme">已消耗预算</string>
+    <string name="prj_actualiser_aide">两项都要填写：预算消耗与进度之间的差距才能揭示偏离。</string>
 </resources>

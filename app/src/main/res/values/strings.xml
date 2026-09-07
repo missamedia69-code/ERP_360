@@ -1643,4 +1643,32 @@
     <string name="srv_champ_heures">Heures passées</string>
     <string name="srv_champ_intervenant">Intervenant</string>
     <string name="srv_champ_lieu">Lieu</string>
+    <!-- Module Projets -->
+    <string name="prj_etat_preparation">En préparation</string>
+    <string name="prj_etat_en_cours">En cours</string>
+    <string name="prj_etat_livre">Livré</string>
+    <string name="prj_etat_suspendu">Suspendu</string>
+    <string name="prj_nouveau">Nouveau projet</string>
+    <string name="prj_aucun">Aucun projet.</string>
+    <string name="prj_budget">Budget</string>
+    <string name="prj_consomme">Consommé</string>
+    <string name="prj_avancement_moyen">Avancement moyen</string>
+    <string name="prj_alerte_derive">%1$d projet(s) en dérive</string>
+    <string name="prj_alerte_retard">%1$d en retard</string>
+    <string name="prj_avancement">%1$d %% réalisé</string>
+    <string name="prj_budget_ligne">%1$s sur %2$s</string>
+    <string name="prj_actualiser">Actualiser</string>
+    <string name="prj_demarrer">Démarrer</string>
+    <string name="prj_livrer">Livrer</string>
+    <string name="prj_msg_cree">Projet %1$s créé.</string>
+    <string name="prj_msg_actualise">Avancement mis à jour.</string>
+    <string name="prj_msg_etat">État du projet modifié.</string>
+    <string name="prj_msg_annule">Projet annulé.</string>
+    <string name="prj_champ_nom">Nom du projet</string>
+    <string name="prj_champ_client">Client</string>
+    <string name="prj_champ_responsable">Responsable</string>
+    <string name="prj_champ_budget">Budget alloué</string>
+    <string name="prj_champ_avancement">Avancement (%)</string>
+    <string name="prj_champ_consomme">Budget consommé</string>
+    <string name="prj_actualiser_aide">Renseignez les deux : c\'est l\'écart entre le budget brûlé et l\'avancement qui révèle une dérive.</string>
 </resources>

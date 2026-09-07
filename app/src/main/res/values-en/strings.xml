@@ -1636,4 +1636,32 @@
     <string name="srv_champ_heures">Hours spent</string>
     <string name="srv_champ_intervenant">Assignee</string>
     <string name="srv_champ_lieu">Location</string>
+    <!-- Module Projets -->
+    <string name="prj_etat_preparation">Preparing</string>
+    <string name="prj_etat_en_cours">In progress</string>
+    <string name="prj_etat_livre">Delivered</string>
+    <string name="prj_etat_suspendu">On hold</string>
+    <string name="prj_nouveau">New project</string>
+    <string name="prj_aucun">No project.</string>
+    <string name="prj_budget">Budget</string>
+    <string name="prj_consomme">Spent</string>
+    <string name="prj_avancement_moyen">Average progress</string>
+    <string name="prj_alerte_derive">%1$d project(s) drifting</string>
+    <string name="prj_alerte_retard">%1$d overdue</string>
+    <string name="prj_avancement">%1$d %% done</string>
+    <string name="prj_budget_ligne">%1$s of %2$s</string>
+    <string name="prj_actualiser">Update</string>
+    <string name="prj_demarrer">Start</string>
+    <string name="prj_livrer">Deliver</string>
+    <string name="prj_msg_cree">Project %1$s created.</string>
+    <string name="prj_msg_actualise">Progress updated.</string>
+    <string name="prj_msg_etat">Project status changed.</string>
+    <string name="prj_msg_annule">Project cancelled.</string>
+    <string name="prj_champ_nom">Project name</string>
+    <string name="prj_champ_client">Customer</string>
+    <string name="prj_champ_responsable">Owner</string>
+    <string name="prj_champ_budget">Allocated budget</string>
+    <string name="prj_champ_avancement">Progress (%)</string>
+    <string name="prj_champ_consomme">Budget spent</string>
+    <string name="prj_actualiser_aide">Fill both: the gap between budget burned and progress made is what reveals a drift.</string>
 </resources>
