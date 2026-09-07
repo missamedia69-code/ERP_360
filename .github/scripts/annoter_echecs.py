@@ -31,6 +31,17 @@ MOTIF_KOTLIN = re.compile(
 )
 # app/src/main/res/values/strings.xml:12: AAPT: error: ...
 MOTIF_AAPT = re.compile(r"^(?P<fichier>[^\s:]+\.xml):(?P<ligne>\d+):\s+(?P<message>.*error.*)$")
+# ERROR: /chemin/fichier.png: AAPT: error: file failed to compile.
+MOTIF_RESSOURCE = re.compile(
+    r"^(?:ERROR:\s*)?(?P<fichier>\S+\.(?:png|jpg|webp|xml)):?\s*(?:AAPT:)?\s*(?P<message>.*(?:error|failed).*)$",
+    re.IGNORECASE,
+)
+# Dernier filet : toute ligne que Gradle marque comme cause d'échec.
+MOTIFS_GENERIQUES = (
+    re.compile(r"^(?:FAILURE|Execution failed for task|Caused by:|> )(?P<message>.+)$"),
+    re.compile(r"^e: (?P<message>.+)$"),
+    re.compile(r"^.*\b(?:error|Error):\s+(?P<message>.+)$"),
+)
 
 LIMITE = 30
 
@@ -97,6 +108,32 @@ def erreurs_compilation(journaux: list[pathlib.Path]) -> list[str]:
                     f"| Ressources | `{fichier}:{trouve.group('ligne')}` | "
                     f"{trouve.group('message')} |"
                 )
+                continue
+
+            trouve = MOTIF_RESSOURCE.match(ligne)
+            if trouve and "warning" not in ligne.lower():
+                cle = (trouve.group("fichier"), trouve.group("message"))
+                if cle in vues:
+                    continue
+                vues.add(cle)
+                fichier = relatif(trouve.group("fichier"))
+                annoter(trouve.group("message").strip(), fichier)
+                resume.append(f"| Ressources | `{fichier}` | {trouve.group('message').strip()} |")
+                continue
+
+            # Dernier filet : sans lui, un échec inconnu ne laisse aucune trace
+            # exploitable, les journaux bruts n'étant pas téléchargeables.
+            for motif in MOTIFS_GENERIQUES:
+                trouve = motif.match(ligne)
+                if not trouve:
+                    continue
+                message = trouve.group("message").strip()
+                if not message or message in vues:
+                    break
+                vues.add(message)
+                annoter(message[:400])
+                resume.append(f"| Build | — | {message[:400]} |")
+                break
     return resume
 
 
