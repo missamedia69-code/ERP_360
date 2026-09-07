@@ -31,12 +31,17 @@ enum class AppModule(
     val titleRes: Int,
     val icon: ImageVector,
     val moduleCode: ModuleCode,
-    /** true = présent par défaut dans la barre du bas (personnalisable par le Propriétaire). */
+    /**
+     * true = épinglé d'office dans la barre du bas (personnalisable par le
+     * Propriétaire). Trois au maximum : l'accueil et « Plus » occupent déjà
+     * deux des cinq places. Le choix d'usine retient les flux consultés chaque
+     * jour — ce que je vends, ce que j'ai en stock, ce que j'ai encaissé.
+     */
     val bottomBarDefault: Boolean = false,
 ) {
     VENTE("module_vente", R.string.module_vente, Icons.Outlined.PointOfSale, ModuleCode.VEN, bottomBarDefault = true),
     STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, bottomBarDefault = true),
-    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, bottomBarDefault = true),
+    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN),
     FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
     ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
     FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
