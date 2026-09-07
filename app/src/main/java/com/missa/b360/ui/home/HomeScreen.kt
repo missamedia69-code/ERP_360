@@ -60,6 +60,7 @@ import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material.icons.outlined.TransferWithinAStation
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Badge as NotificationBadge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DrawerValue
@@ -80,6 +81,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -156,6 +158,8 @@ fun HomeScreen(
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
     val modulesActifs by viewModel.modulesActifs.collectAsState()
+    val modulesEpingles by viewModel.modulesEpingles.collectAsState()
+    var showPersonnaliser by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     val companyName = uiState.entrepriseNom.ifBlank {
@@ -206,12 +210,13 @@ fun HomeScreen(
                     notificationCount = nonLues,
                     onMenuClick = { scope.launch { drawerState.open() } },
                     onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                    onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
+                    // L'avatar mène au compte, pas aux réglages de l'entreprise.
+                    onProfileClick = { navController.navigate(Routes.ADMIN_UTILISATEURS) },
                 )
             },
             bottomBar = {
                 HomeBottomBar(
-                    modules = AppModule.barreBas(modulesActifs),
+                    modules = AppModule.barreBas(modulesActifs, modulesEpingles),
                     currentRoute = currentRoute,
                     onAccueil = { navController.naviguerOnglet(Routes.HOME) },
                     onModuleClick = { navController.naviguerOnglet(it.route) },
@@ -222,6 +227,7 @@ fun HomeScreen(
             HomeDashboard(
                 state = uiState,
                 modulesActifs = modulesActifs,
+                onPersonnaliser = { showPersonnaliser = true },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
@@ -292,6 +298,18 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (showPersonnaliser) {
+        HomePersonnaliserDialogue(
+            disponibles = AppModule.epinglables(modulesActifs),
+            selection = AppModule.barreBas(modulesActifs, modulesEpingles).map { it.name },
+            onFermer = { showPersonnaliser = false },
+            onValider = { choix ->
+                viewModel.epinglerModules(choix)
+                showPersonnaliser = false
+            },
+        )
     }
 
     if (showSupport) {
@@ -514,6 +532,7 @@ private fun HomeHeader(
 private fun HomeDashboard(
     state: HomeUiState,
     modulesActifs: List<ModuleCode>,
+    onPersonnaliser: () -> Unit,
     modifier: Modifier,
     onNavigate: (String) -> Unit,
 ) {
@@ -577,7 +596,7 @@ private fun HomeDashboard(
             DashboardSectionHeader(
                 title = stringResource(R.string.home_quick_actions),
                 action = stringResource(R.string.home_personalize),
-                onAction = { onNavigate(Routes.ADMIN_REGLAGES) },
+                onAction = onPersonnaliser,
             )
             Spacer(Modifier.height(7.dp))
             QuickActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
@@ -1513,4 +1532,87 @@ private fun HomeSupportBouton(
         Spacer(Modifier.width(8.dp))
         Text(stringResource(texteRes), fontSize = 13.sp, color = HomeBlue)
     }
+}
+
+/**
+ * Choix des modules épinglés dans la barre du bas (RA-22).
+ *
+ * C'est ce que promet le lien « Personnaliser » posé au-dessus des actions
+ * rapides : il n'a rien à voir avec les réglages de l'entreprise, où il menait
+ * jusqu'ici. Trois onglets au maximum, l'accueil et « Plus » occupant déjà deux
+ * places sur cinq.
+ */
+@Composable
+private fun HomePersonnaliserDialogue(
+    disponibles: List<AppModule>,
+    selection: List<String>,
+    onFermer: () -> Unit,
+    onValider: (List<String>) -> Unit,
+) {
+    val choix = remember { mutableStateListOf<String>().apply { addAll(selection) } }
+    AlertDialog(
+        onDismissRequest = onFermer,
+        title = { Text(stringResource(R.string.home_personalize)) },
+        text = {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.home_personalize_aide, AppModule.MAX_ONGLETS),
+                    fontSize = 12.sp,
+                    color = HomeTextMuted,
+                )
+                Spacer(Modifier.height(6.dp))
+                disponibles.forEach { module ->
+                    val coche = module.name in choix
+                    // Au-delà de la limite, les cases non cochées se figent :
+                    // mieux vaut un choix impossible visible qu'un enregistrement
+                    // silencieusement tronqué.
+                    val autorise = coche || choix.size < AppModule.MAX_ONGLETS
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(enabled = autorise) {
+                                if (coche) choix.remove(module.name) else choix.add(module.name)
+                            }
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = coche,
+                            onCheckedChange = {
+                                if (coche) choix.remove(module.name) else choix.add(module.name)
+                            },
+                            enabled = autorise,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = module.icon,
+                            contentDescription = null,
+                            tint = if (autorise) HomeBlue else HomeTextMuted,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(module.titleRes),
+                            fontSize = 13.sp,
+                            color = if (autorise) HomeTextDark else HomeTextMuted,
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onValider(choix.toList()) }) {
+                Text(stringResource(R.string.ops_save))
+            }
+        },
+        dismissButton = {
+            // Vider la sélection rétablit la disposition d'usine.
+            TextButton(onClick = { onValider(emptyList()) }) {
+                Text(stringResource(R.string.home_personalize_defaut))
+            }
+        },
+    )
 }

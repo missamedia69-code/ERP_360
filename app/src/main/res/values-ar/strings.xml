@@ -1639,4 +1639,6 @@
     <string name="home_support_intro">يجيبك فريقنا عبر القناة التي تختارها.</string>
     <string name="home_support_objet">دعم Missa Business 360</string>
     <string name="home_support_corps">مرحبًا، أحتاج إلى مساعدة بخصوص Missa Business 360.\nالشركة: %1$s\nالإصدار: %2$s</string>
+    <string name="home_personalize_aide">اختر حتى %1$d وحدات لتثبيتها في الشريط السفلي.</string>
+    <string name="home_personalize_defaut">الوضع الافتراضي</string>
 </resources>

@@ -76,9 +76,24 @@ enum class AppModule(
         fun visibles(actifs: List<ModuleCode>): List<AppModule> =
             if (actifs.isEmpty()) entries.toList() else entries.filter { it.moduleCode in actifs }
 
-        /** Barre du bas restreinte aux modules réellement actifs. */
-        fun barreBas(actifs: List<ModuleCode>): List<AppModule> =
-            visibles(actifs).filter { it.bottomBarDefault }
+        /**
+         * Barre du bas : les modules épinglés par le Propriétaire, à défaut les
+         * modules marqués par défaut. Un épinglage devenu inactif — le pack a
+         * changé — est simplement ignoré plutôt que d'ouvrir un écran vide.
+         */
+        fun barreBas(actifs: List<ModuleCode>, epingles: List<String> = emptyList()): List<AppModule> {
+            val disponibles = visibles(actifs)
+            val choisis = epingles.mapNotNull { nom ->
+                disponibles.firstOrNull { it.name == nom }
+            }
+            return choisis.ifEmpty { disponibles.filter { it.bottomBarDefault } }
+        }
+
+        /** Modules qu'il est permis d'épingler : tous ceux du pack. */
+        fun epinglables(actifs: List<ModuleCode>): List<AppModule> = visibles(actifs)
+
+        /** Nombre maximal d'onglets, l'accueil et « Plus » occupant déjà deux places. */
+        const val MAX_ONGLETS = 3
 
         /** Modules actifs hors barre du bas → menu « Plus de modules ». */
         fun secondaires(actifs: List<ModuleCode>): List<AppModule> =

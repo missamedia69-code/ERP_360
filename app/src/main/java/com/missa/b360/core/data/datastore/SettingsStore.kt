@@ -36,6 +36,9 @@ class SettingsStore @Inject constructor(
         const val PROFIL_ACTIVITE = "profil_activite"
         const val MODULES_ACTIFS = "modules_actifs"
         const val MODULES_SUPPORT = "modules_support"
+
+        /** Modules épinglés dans la barre du bas (RA-22), choisis par le Propriétaire. */
+        const val BARRE_MODULES = "barre_modules"
         const val PALIER_TAILLE = "palier_taille"
         const val ONBOARDING_TERMINE = "onboarding_termine"
         const val VIDEO_SPLASH_ACTIVE = "video_splash_active"

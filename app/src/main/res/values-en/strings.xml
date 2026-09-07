@@ -1660,4 +1660,6 @@
     <string name="home_support_intro">Our team answers on the channel you prefer.</string>
     <string name="home_support_objet">Missa Business 360 support</string>
     <string name="home_support_corps">Hello, I need help with Missa Business 360.\nCompany: %1$s\nVersion: %2$s</string>
+    <string name="home_personalize_aide">Pin up to %1$d modules to the bottom bar.</string>
+    <string name="home_personalize_defaut">Reset</string>
 </resources>

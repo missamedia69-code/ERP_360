@@ -51,39 +51,6 @@ fun AdminReglagesScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        MissaPanel(modifier = Modifier.fillMaxWidth()) {
-            MissaSectionTitle(title = stringResource(R.string.adm_langue))
-            langues.forEach { (code, labelRes) ->
-                SettingsChoice(
-                    selected = state.langue == code,
-                    onSelect = { viewModel.changerLangue(code) },
-                    label = stringResource(labelRes),
-                )
-            }
-        }
-
-        MissaPanel(modifier = Modifier.fillMaxWidth()) {
-            MissaSectionTitle(title = stringResource(R.string.adm_profil))
-            ProfilActivite.entries.forEach { profil ->
-                SettingsChoice(
-                    selected = state.profil == profil,
-                    onSelect = { viewModel.changerProfil(profil) },
-                    label = stringResource(profil.labelRes),
-                )
-            }
-        }
-
-        MissaPanel(modifier = Modifier.fillMaxWidth()) {
-            MissaSectionTitle(title = stringResource(R.string.adm_palier))
-            PalierTaille.entries.forEach { palier ->
-                SettingsChoice(
-                    selected = state.palier == palier,
-                    onSelect = { viewModel.changerPalier(palier) },
-                    label = stringResource(palier.labelRes),
-                )
-            }
-        }
-
         MissaPanel(modifier = Modifier.fillMaxWidth(), accent = MaterialTheme.colorScheme.primary) {
             MissaSectionTitle(
                 title = stringResource(R.string.adm_infos_entreprise),
@@ -150,6 +117,42 @@ private fun SettingsChoice(selected: Boolean, onSelect: () -> Unit, label: Strin
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         RadioButton(selected = selected, onClick = onSelect)
         Text(label, style = MaterialTheme.typography.bodySmall)
+
+        MissaPanel(modifier = Modifier.fillMaxWidth()) {
+            MissaSectionTitle(title = stringResource(R.string.adm_profil))
+            ProfilActivite.entries.forEach { profil ->
+                SettingsChoice(
+                    selected = state.profil == profil,
+                    onSelect = { viewModel.changerProfil(profil) },
+                    label = stringResource(profil.labelRes),
+                )
+            }
+        }
+
+        MissaPanel(modifier = Modifier.fillMaxWidth()) {
+            MissaSectionTitle(title = stringResource(R.string.adm_palier))
+            PalierTaille.entries.forEach { palier ->
+                SettingsChoice(
+                    selected = state.palier == palier,
+                    onSelect = { viewModel.changerPalier(palier) },
+                    label = stringResource(palier.labelRes),
+                )
+            }
+        }
+
+        // La langue se choisit à l'installation, sur l'écran d'accueil : elle
+        // reste modifiable ici, mais elle n'est pas ce qu'on vient chercher
+        // dans les réglages, contrairement à la fiche entreprise.
+        MissaPanel(modifier = Modifier.fillMaxWidth()) {
+            MissaSectionTitle(title = stringResource(R.string.adm_langue))
+            langues.forEach { (code, labelRes) ->
+                SettingsChoice(
+                    selected = state.langue == code,
+                    onSelect = { viewModel.changerLangue(code) },
+                    label = stringResource(labelRes),
+                )
+            }
+        }
     }
 }
 

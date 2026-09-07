@@ -1639,4 +1639,6 @@
     <string name="home_support_intro">Nuestro equipo le responde por el canal que prefiera.</string>
     <string name="home_support_objet">Asistencia Missa Business 360</string>
     <string name="home_support_corps">Hola, necesito ayuda con Missa Business 360.\nEmpresa: %1$s\nVersión: %2$s</string>
+    <string name="home_personalize_aide">Elija hasta %1$d módulos para la barra inferior.</string>
+    <string name="home_personalize_defaut">Por defecto</string>
 </resources>

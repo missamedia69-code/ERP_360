@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 import com.missa.b360.core.util.Iso4217
@@ -57,7 +58,7 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
-    settingsStore: SettingsStore,
+    private val settingsStore: SettingsStore,
     compteTresorerieDao: CompteTresorerieDao,
     mouvementTresorerieDao: MouvementTresorerieDao,
     getEnterprise: GetEnterpriseUseCase,
@@ -75,6 +76,21 @@ class HomeViewModel @Inject constructor(
      * un module non retenu n'a pas à encombrer le menu d'une TPE qui ne s'en
      * servira jamais.
      */
+    /** Modules épinglés dans la barre du bas ; vide = disposition d'usine. */
+    val modulesEpingles: StateFlow<List<String>> =
+        settingsStore.observe(SettingsStore.Keys.BARRE_MODULES)
+            .map { valeur ->
+                valeur.orEmpty().split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** Enregistre la sélection ; une liste vide rétablit la disposition d'usine. */
+    fun epinglerModules(modules: List<String>) {
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.BARRE_MODULES, modules.joinToString(","))
+        }
+    }
+
     val modulesActifs: StateFlow<List<ModuleCode>> =
         settingsStore.observe(SettingsStore.Keys.MODULES_ACTIFS)
             .map { ModulesPersonnalises.deserialiser(it) }
