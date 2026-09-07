@@ -1,12 +1,16 @@
 package com.missa.b360.core.domain.usecase
 
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EmployeeDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.CompteTresorerieEntity
+import com.missa.b360.core.data.entity.MouvementTresorerieEntity
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
@@ -18,6 +22,7 @@ import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.AlerteCode
 import com.missa.b360.core.domain.model.IndicateurCode
 import com.missa.b360.core.domain.model.Indicateurs
+import com.missa.b360.core.domain.model.TresorerieRules
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -62,6 +67,8 @@ class ObserveTableauDeBordUseCase @Inject constructor(
     private val movementDao: StockMovementDao,
     private val employeeDao: EmployeeDao,
     private val clientDao: ClientDao,
+    private val compteTresorerieDao: CompteTresorerieDao,
+    private val mouvementTresorerieDao: MouvementTresorerieDao,
 ) {
 
     private data class Sources(
@@ -70,6 +77,8 @@ class ObserveTableauDeBordUseCase @Inject constructor(
         val stocks: List<ProductStockEntity>,
         val mouvements: List<StockMovementEntity>,
         val employes: Int,
+        val comptes: List<CompteTresorerieEntity> = emptyList(),
+        val mouvementsTresorerie: List<MouvementTresorerieEntity> = emptyList(),
     )
 
     operator fun invoke(maintenant: () -> Long = System::currentTimeMillis): Flow<TableauDeBord> {
@@ -82,8 +91,17 @@ class ObserveTableauDeBordUseCase @Inject constructor(
         ) { pieces, produits, stocks, mouvements, employes ->
             Sources(pieces, produits, stocks, mouvements, employes.size)
         }
-        return combine(socle, clientDao.observeAllIncludingInactive()) { sources, clients ->
-            calculer(sources, clients, maintenant())
+        return combine(
+            socle,
+            clientDao.observeAllIncludingInactive(),
+            compteTresorerieDao.observeAll(),
+            mouvementTresorerieDao.observeAll(),
+        ) { sources, clients, comptes, mouvementsTresorerie ->
+            calculer(
+                sources.copy(comptes = comptes, mouvementsTresorerie = mouvementsTresorerie),
+                clients,
+                maintenant(),
+            )
         }
     }
 
@@ -129,12 +147,31 @@ class ObserveTableauDeBordUseCase @Inject constructor(
             it.createdAt < maintenant - Indicateurs.JOURS_DEVIS_ANCIEN * jour
         }
 
-        // --- Trésorerie (solde cumulé, flux de la période) ---
+        // --- Trésorerie ---
+        // Deux gisements coexistent : les comptes du module Trésorerie (source
+        // principale depuis la v9) et les anciennes pièces FINANCES saisies
+        // avant lui. Ce sont des enregistrements distincts : les additionner ne
+        // double aucun montant, et ignorer les seconds ferait disparaître de
+        // l'argent des installations existantes.
+        val soldeComptes = TresorerieRules.soldeGlobal(
+            sources.comptes,
+            sources.mouvementsTresorerie,
+        )
+        val fluxTresorerie = TresorerieRules.flux(
+            sources.mouvementsTresorerie,
+            debut,
+            maintenant,
+        )
+        val fluxPrecedent = TresorerieRules.flux(
+            sources.mouvementsTresorerie,
+            debutPrecedent,
+            debut - 1,
+        )
         val entrees = tresorerie(validees, OperationDirection.IN)
         val sorties = tresorerie(validees, OperationDirection.OUT)
-        val solde = entrees - sorties
-        val entreesPeriode = tresorerie(courant, OperationDirection.IN)
-        val sortiesPeriode = tresorerie(courant, OperationDirection.OUT)
+        val solde = soldeComptes + entrees - sorties
+        val entreesPeriode = tresorerie(courant, OperationDirection.IN) + fluxTresorerie.entrees
+        val sortiesPeriode = tresorerie(courant, OperationDirection.OUT) + fluxTresorerie.sorties
 
         // --- Stock ---
         val quantiteParProduit = sources.stocks.groupBy { it.produitId }
@@ -187,8 +224,16 @@ class ObserveTableauDeBordUseCase @Inject constructor(
             valeur(IndicateurCode.TAUX_MARGE, tauxMarge),
             valeur(IndicateurCode.PIECES_BROUILLON, brouillons.toDouble()),
             valeur(IndicateurCode.SOLDE_TRESORERIE, solde),
-            valeur(IndicateurCode.ENCAISSEMENTS, entreesPeriode, tresorerie(precedent, OperationDirection.IN)),
-            valeur(IndicateurCode.DECAISSEMENTS, sortiesPeriode, tresorerie(precedent, OperationDirection.OUT)),
+            valeur(
+                IndicateurCode.ENCAISSEMENTS,
+                entreesPeriode,
+                tresorerie(precedent, OperationDirection.IN) + fluxPrecedent.entrees,
+            ),
+            valeur(
+                IndicateurCode.DECAISSEMENTS,
+                sortiesPeriode,
+                tresorerie(precedent, OperationDirection.OUT) + fluxPrecedent.sorties,
+            ),
             valeur(IndicateurCode.VALEUR_STOCK, valeurStock),
             valeur(IndicateurCode.ARTICLES_SOUS_SEUIL, sousSeuil.size.toDouble()),
             valeur(IndicateurCode.ARTICLES_DORMANTS, dormants.size.toDouble()),
@@ -257,7 +302,8 @@ class ObserveTableauDeBordUseCase @Inject constructor(
             }
         }
 
-        val vide = sources.pieces.isEmpty() && sources.produits.isEmpty() && clients.isEmpty()
+        val vide = sources.pieces.isEmpty() && sources.produits.isEmpty() &&
+            clients.isEmpty() && sources.comptes.isEmpty()
         return TableauDeBord(
             indicateurs = valeurs,
             alertes = alertes,
