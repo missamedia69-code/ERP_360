@@ -2,18 +2,14 @@
     <string name="app_name">Missa Business 360</string>
 
     <string name="home_title">Missa Business 360</string>
-    <string name="home_subtitle">¡Bienvenido! Cree sus primeros clientes y productos para comenzar.</string>
     <string name="more_modules">Más módulos</string>
     <string name="notifications">Notificaciones</string>
     <string name="mark_all_read">Marcar todo como leído</string>
     <string name="no_notifications">Sin notificaciones</string>
     <string name="module_placeholder">Próximamente — por implementar</string>
-    <string name="phase_c">Por implementar en la Fase C (módulo 9.1)</string>
 
     <string name="drawer_admin">Administración &amp; Configuración</string>
-    <string name="drawer_section_entreprise">Empresa</string>
     <string name="drawer_section_administration">Administración</string>
-    <string name="drawer_section_application">Aplicación</string>
     <string name="admin_reglages">Configuración</string>
     <string name="admin_licence">Licencia</string>
     <string name="admin_sauvegarde">Copia de seguridad</string>
@@ -41,7 +37,6 @@
     <string name="module_maintenance">Mantenimiento</string>
     <string name="module_logistique">Logística</string>
 
-    <string name="ob_langue_title">Elija su idioma</string>
     <string name="langue_fr">Français</string>
     <string name="langue_en">English</string>
     <string name="langue_es">Español</string>
@@ -50,21 +45,13 @@
     <string name="ob_suivant">Siguiente</string>
     <string name="ob_retour">Atrás</string>
 
-    <string name="ob_profil_title">Su perfil de actividad</string>
     <string name="profil_av">Compra - Venta</string>
-    <string name="profil_av_sous">Comercio simple sin gestión de stock</string>
     <string name="profil_asv">Compra - Stock - Venta</string>
-    <string name="profil_asv_sous">Comercio clásico con stock y entregas</string>
     <string name="profil_apsv">Compra - Producción - Stock - Venta</string>
-    <string name="profil_apsv_sous">Fabricación / industria</string>
     <string name="profil_ser">Servicio</string>
-    <string name="profil_ser_sous">Prestaciones de servicio</string>
     <string name="profil_prj">Proyecto</string>
-    <string name="profil_prj_sous">Empresa de proyectos / ingeniería</string>
     <string name="profil_full">Completo</string>
-    <string name="profil_full_sous">Todos los módulos activados</string>
     <string name="profil_custom">Personalizado</string>
-    <string name="profil_custom_sous">Activación manual de los módulos</string>
     <string name="obn_profil_av">Compra - Venta</string>
     <string name="obn_profil_av_sous">Comercio simple</string>
     <string name="obn_profil_asv">Compra - Stock - Venta</string>
@@ -78,7 +65,6 @@
     <string name="obn_profil_full">Completo</string>
     <string name="obn_profil_full_sous">Todos los módulos</string>
 
-    <string name="ob_palier_title">Personal de la empresa</string>
     <string name="palier_p1">Solo / Nano (1)</string>
     <string name="palier_p2">Micro (2–9)</string>
     <string name="palier_p3">Pequeña (10–49)</string>
@@ -86,20 +72,13 @@
     <string name="palier_p5">Grande (250–999)</string>
     <string name="palier_p6">Muy grande / Grupo (1000+)</string>
 
-    <string name="ob_entreprise_title">Su empresa</string>
     <string name="ob_nom_entreprise">Nombre de la empresa</string>
     <string name="ob_votre_nom">Su nombre</string>
-    <string name="ob_devise">Moneda (ISO 4217)</string>
     <string name="ob_pays">País</string>
-    <string name="ob_pays_recherche">Buscar un país</string>
-    <string name="ob_pays_aucun_resultat">No se encontró ningún país</string>
     <string name="ob_pays_personnalise">País personalizado</string>
     <string name="ob_pays_saisie_manuelle_note">Introduzca un país que no esté en la lista y ajuste abajo la tasa de IVA/GST.</string>
-    <string name="ob_tva_gst">IVA / GST</string>
     <string name="ob_taux_taxe">Tasa de impuesto (%)</string>
     <string name="ob_site_principal">Nombre de la sede principal</string>
-    <string name="ob_verrous_note">⚠ La moneda, los impuestos, la numeración y los pagos se bloquearán en el primer uso (no modificables después).</string>
-    <string name="ob_erreur_nom">Introduzca el nombre de la empresa y de la sede principal.</string>
     <string name="ob_erreur_nom_entreprise">Introduzca el nombre de la empresa.</string>
     <string name="ob_erreur_site_principal">Introduzca el nombre de la sede principal.</string>
     <string name="ob_erreur_taux_taxe">Introduzca una tasa de impuesto entre 0 y 100 %.</string>
@@ -107,34 +86,15 @@
     <string name="ob_erreur_finalisation">No se pudo finalizar la configuración. Inténtelo de nuevo.</string>
 
     <string name="ob_pin_title">Cree su PIN</string>
-    <string name="ob_pin_subtitle">4 a 6 dígitos — se solicitará en cada inicio de la aplicación.</string>
     <string name="ob_pin_confirmer">Confirme el PIN</string>
     <string name="ob_pin_invalide">El PIN debe contener de 4 a 6 dígitos.</string>
     <string name="ob_pin_differents">Los dos PIN no coinciden.</string>
 
-    <string name="ob_email_title">Correo de recuperación</string>
-    <string name="ob_email_subtitle">Obligatorio: se usará para recuperar el acceso si olvida su PIN.</string>
     <string name="ob_email">Correo electrónico</string>
     <string name="ob_email_invalide">Correo electrónico no válido o ya utilizado.</string>
 
-    <string name="ob_licence_title">Licencia</string>
-    <string name="ob_licence_essai">✓ Prueba gratuita de 7 días iniciada. Sin activación al finalizar la prueba, la aplicación pasará a modo de solo lectura.</string>
-    <string name="ob_licence_active">✓ Licencia activada — válida por 1 año en este dispositivo.</string>
-    <string name="ob_code_licence">Código de activación (opcional)</string>
-    <string name="ob_activer">Activar</string>
-    <string name="ob_code_invalide">Código no válido. Formato esperado: MB360-XXXX-XXXX-XXXX</string>
     <string name="ob_licence_note">1 código = 1 dispositivo = 1 año. Desvinculación posible 3 veces al año.</string>
 
-    <string name="ob_checklist_title">Configuración completada</string>
-    <string name="check_entreprise">Empresa y sede principal creadas</string>
-    <string name="check_devise">Moneda de la empresa</string>
-    <string name="check_taxes">Impuestos</string>
-    <string name="check_numerotation">Numeración de documentos</string>
-    <string name="check_paiements">Métodos de pago</string>
-    <string name="check_utilisateur">Usuario Propietario + PIN</string>
-    <string name="check_licence">Licencia (prueba de 7 días)</string>
-    <string name="check_verrouille">Bloqueado — no modificable</string>
-    <string name="ob_checklist_note">Podrá activar más módulos y añadir usuarios en Administración &amp; Configuración.</string>
     <string name="ob_terminer">Empezar a usar Missa 360</string>
 
     <string name="lock_title">Introduzca su PIN</string>
@@ -146,7 +106,6 @@
     <string name="clients_recherche">Buscar un cliente…</string>
     <string name="clients_total">%1$d cliente(s)</string>
     <string name="clients_vide">No hay clientes. Toque + para crear uno.</string>
-    <string name="clients_ajouter">Añadir un cliente</string>
     <string name="clients_modifier">Modificar el cliente</string>
     <string name="clients_nom">Nombre</string>
     <string name="clients_telephone">Teléfono</string>
@@ -194,7 +153,6 @@
     <string name="clients_telephone_invalide">Introduzca un teléfono válido de 7 a 15 dígitos.</string>
     <string name="clients_email_invalide">Introduzca un correo electrónico válido o deje este campo vacío.</string>
     <string name="clients_remise_invalide">El descuento debe estar entre 0 y 100%.</string>
-    <string name="clients_limite_credit_invalide">Introduzca un límite de crédito positivo.</string>
 
     <!-- Types de clients -->
     <string name="clients_type_particulier">Particular</string>
@@ -220,66 +178,19 @@
 
 
     <!-- Dirección artística: onboarding móvil -->
-    <string name="ob_plus_tard">Más tarde</string>
-    <string name="ob_langue_subtitle">Podrá cambiarlo en cualquier momento desde los ajustes.</string>
-    <string name="ob_profil_subtitle">Esta elección adapta la aplicación a sus necesidades.</string>
-    <string name="ob_entreprise_subtitle">Introduzca la información básica de su empresa.</string>
-    <string name="ob_informations_entreprise">Información de la empresa</string>
-    <string name="ob_nouveau_pin">Nuevo código PIN</string>
-    <string name="ob_pin_securite_titre">Su acceso está protegido</string>
-    <string name="ob_pin_securite_note">Este código PIN se solicitará cada vez que abra la aplicación.</string>
-    <string name="ob_licence_subtitle">Active su licencia ahora o continúe con la prueba gratuita.</string>
-    <string name="ob_jours">días</string>
-    <string name="ob_licence_hero_title">Dispone de un periodo de prueba gratuito de 7 días</string>
     <string name="ob_licence_avantage_fonctions">Todas las funciones están disponibles durante 7 días</string>
     <string name="ob_licence_avantage_sans_carte">No se requiere tarjeta bancaria</string>
-    <string name="ob_licence_avantage_securite">Sus datos están 100% protegidos</string>
-    <string name="ob_checklist_subtitle">Su espacio está listo. Revise los elementos configurados antes de empezar.</string>
-    <string name="ob_checklist_bienvenue">La configuración se completó correctamente</string>
     <string name="ob_selectionne">Seleccionado</string>
 
 
     <!-- Páginas de descubrimiento y perfiles del diseño de onboarding -->
-    <string name="ob_passer">Omitir</string>
-    <string name="ob_intro_tagline">Su empresa, al alcance de su mano.</string>
-    <string name="ob_intro_title">Gestione, supervise y haga crecer su actividad con facilidad.</string>
-    <string name="ob_intro_dashboard_label">Panel de control</string>
-    <string name="ob_intro_business_title">Todo su negocio en un solo lugar</string>
-    <string name="ob_intro_business_description">Ventas, compras, inventario, clientes y finanzas: gestione cada aspecto de su empresa.</string>
-    <string name="ob_intro_secure_title">Seguro y 100% privado</string>
-    <string name="ob_intro_secure_description">Sus datos se almacenan localmente en su dispositivo.</string>
-    <string name="ob_intro_offline_title">Funciona incluso sin conexión</string>
-    <string name="ob_intro_offline_description">Trabaje en cualquier lugar y momento, incluso sin conexión.</string>
-    <string name="ob_profil_producteur">Productor</string>
-    <string name="ob_profil_producteur_description">Agricultura, ganadería, pesca, producción…</string>
-    <string name="ob_profil_commercant">Comerciante</string>
-    <string name="ob_profil_commercant_description">Comercio minorista, mayorista, distribución…</string>
-    <string name="ob_profil_prestataire">Proveedor de servicios</string>
-    <string name="ob_profil_prestataire_description">Servicios, consultoría, mantenimiento…</string>
-    <string name="ob_profil_autre">Otra actividad</string>
-    <string name="ob_profil_autre_description">Otros tipos de actividad</string>
-    <string name="ob_profil_voir_details">Mostrar perfiles detallados</string>
-    <string name="ob_profil_masquer_details">Ocultar perfiles detallados</string>
 
 
     <!-- Estructura de onboarding: encabezado, ayuda y progreso -->
-    <string name="ob_aide">Ayuda</string>
     <string name="ob_fermer">Cerrar</string>
-    <string name="ob_progress_langue">Idioma</string>
-    <string name="ob_progress_profil">Perfil</string>
-    <string name="ob_progress_entreprise">Empresa</string>
-    <string name="ob_progress_securite">Seguridad</string>
-    <string name="ob_progress_validation">Validación</string>
-    <string name="ob_langue_note">El francés se selecciona por defecto para los usuarios de Camerún.</string>
-    <string name="ob_activite_title">Su actividad</string>
-    <string name="ob_activite_subtitle">Seleccione el perfil que mejor corresponda a su empresa.</string>
-    <string name="ob_effectif_subtitle">Esta información ajusta las funciones disponibles.</string>
 
 
     <!-- Logo de l’entreprise pendant l’onboarding -->
-    <string name="ob_logo_entreprise">Logotipo de la empresa</string>
-    <string name="ob_logo_facultatif">Opcional · PNG, JPG o WebP</string>
-    <string name="ob_logo_ajouter">Añadir un logotipo</string>
     <string name="ob_logo_modifier">Cambiar el logotipo</string>
     <string name="ob_logo_supprimer">Eliminar</string>
     <string name="ob_logo_apercu">Vista previa del logotipo de la empresa</string>
@@ -319,7 +230,6 @@
     <string name="home_more_short">Más</string>
     <string name="home_company_active">Empresa activa</string>
     <string name="home_drawer_primary">PRINCIPAL</string>
-    <string name="home_drawer_other">OTROS</string>
 
     <!-- Navigation latérale détaillée -->
     <string name="home_active">ACTIVA</string>
@@ -371,15 +281,8 @@
     <string name="ops_hint_services">Centralice sus intervenciones y prestaciones de servicio.</string>
     <string name="ops_hint_hr">Siga la información operativa relacionada con su personal.</string>
     <string name="ops_hint_projects">Organice las actividades, presupuestos y seguimiento de sus proyectos.</string>
-    <string name="reporting_subtitle">Análisis local de sus operaciones validadas.</string>
-    <string name="reporting_module_activity">Actividad por módulo</string>
-    <string name="reporting_empty">Aún no hay operaciones para analizar.</string>
-    <string name="reporting_current_totals">Totales actuales</string>
-    <string name="reporting_records_count">%1$d documento(s)</string>
     <string name="home_recent_record_detail">%1$s · %2$s</string>
     <string name="sales_new_sale">Nueva venta</string>
-    <string name="sales_create_invoice">Cree una factura de cliente</string>
-    <string name="sales_history">Historial</string>
     <string name="sales_customer">Cliente</string>
     <string name="sales_select_customer">Seleccionar un cliente</string>
     <string name="sales_new_customer">Nuevo cliente</string>
@@ -387,15 +290,12 @@
     <string name="sales_scan">Escanear un código de barras</string>
     <string name="sales_scanner_unavailable">No hay una aplicación de escaneo compatible. Escriba o añada un producto libre.</string>
     <string name="sales_free_product">Producto libre</string>
-    <string name="sales_empty_cart">Su carrito está vacío</string>
-    <string name="sales_empty_cart_description">Añada un producto libre para iniciar esta venta.</string>
     <string name="sales_product">PRODUCTO</string>
     <string name="sales_qty">CANT.</string>
     <string name="sales_unit_price">PRECIO UNIT.</string>
     <string name="sales_total">TOTAL</string>
     <string name="sales_free_item">Producto libre</string>
     <string name="sales_add_note">Añadir una nota</string>
-    <string name="sales_clear_cart">Vaciar carrito</string>
     <string name="sales_summary">RESUMEN</string>
     <string name="sales_subtotal">Subtotal</string>
     <string name="sales_discount">Descuento</string>
@@ -405,14 +305,7 @@
     <string name="sales_payment_method">Método de pago</string>
     <string name="sales_paid_amount">Importe pagado</string>
     <string name="sales_remaining">Pendiente de pago</string>
-    <string name="sales_loyalty_points">Puntos de fidelidad</string>
-    <string name="sales_points_pending">Calculados al validar</string>
-    <string name="sales_points_description">para esta venta</string>
-    <string name="sales_current_balance">Saldo actual del cliente</string>
-    <string name="sales_no_amount_due">Sin saldo pendiente</string>
-    <string name="sales_amount_due">Saldo pendiente</string>
     <string name="sales_save_draft">Guardar borrador</string>
-    <string name="sales_save_print">Guardar e imprimir</string>
     <string name="sales_remove_item">Quitar producto</string>
     <string name="sales_free_product_title">Añadir un producto libre</string>
     <string name="sales_product_name">Nombre del producto</string>
@@ -420,17 +313,10 @@
     <string name="sales_customer_required">Seleccione un cliente antes de guardar la venta.</string>
     <string name="sales_cart_required">Añada al menos un producto al carrito.</string>
     <string name="sales_invalid_amount">Revise los importes y el pago introducidos.</string>
-    <string name="sales_saved_and_printing">Venta %1$s guardada. Abriendo impresión…</string>
     <string name="sales_draft_saved">Borrador %1$s guardado.</string>
-    <string name="sales_history_description">Facturas y borradores guardados en este dispositivo.</string>
-    <string name="sales_history_empty">Aún no hay ventas guardadas.</string>
     <string name="sales_no_customer">Ningún cliente coincide con esta búsqueda.</string>
-    <string name="sales_clear_title">¿Vaciar el carrito?</string>
-    <string name="sales_clear_message">Los productos y la nota actual se quitarán del carrito.</string>
     <string name="sales_cash">Efectivo</string>
     <string name="sales_receipt_name">Factura</string>
-    <string name="sales_no_product">No se encontró ningún producto</string>
-    <string name="sales_no_product_description">Cambie la búsqueda o añada un producto libre.</string>
     <string name="sales_home">Inicio</string>
     <string name="sales_nav_sales">Ventas</string>
 
@@ -470,8 +356,6 @@
     <string name="sales_print_invoice_description">Abre el servicio de impresión Android</string>
     <string name="sales_print_ready">La factura está lista para imprimir.</string>
     <string name="sales_print_title">Impresión</string>
-    <string name="sales_products_empty">No hay productos en esta venta</string>
-    <string name="sales_products_empty_description">Añada un producto libre o busque una línea ya añadida.</string>
     <string name="sales_products_title">Añadir productos</string>
     <string name="sales_sale_date">Venta del %1$s</string>
     <string name="sales_save_sale">Guardar venta</string>
@@ -789,9 +673,6 @@
     <string name="adm_devise_locked">Moneda (bloqueada en el primer uso)</string>
     <string name="adm_email">Correo electrónico</string>
     <string name="adm_infos_entreprise">Información de la empresa</string>
-    <string name="adm_journal_action">Acción</string>
-    <string name="adm_journal_details">Detalles</string>
-    <string name="adm_journal_module">Módulo</string>
     <string name="adm_journal_purge">Purgar entradas con más de 12 meses</string>
     <string name="adm_journal_purge_ok">Purga realizada.</string>
     <string name="adm_journal_vide">Ninguna entrada de registro.</string>
@@ -815,7 +696,6 @@
     <string name="adm_palier">Plantilla de la empresa</string>
     <string name="adm_profil">Perfil de actividad</string>
     <string name="adm_reglages_subtitle">Idioma, perfil de actividad, plantilla e información de la empresa.</string>
-    <string name="adm_roles_titre">Roles disponibles</string>
     <string name="adm_sauvegarde_btn">Guardar ahora</string>
     <string name="adm_sauvegarde_en_cours">Guardando…</string>
     <string name="adm_sauvegarde_err">Error al guardar.</string>
@@ -842,7 +722,6 @@
     <string name="adm_sites_supprimer">Eliminar</string>
     <string name="adm_sites_type">Tipo</string>
     <string name="adm_telephone">Teléfono</string>
-    <string name="adm_users_actif">Activo</string>
     <string name="adm_users_add">Añadir un usuario</string>
     <string name="adm_users_creer">Crear el usuario</string>
     <string name="adm_users_desactiver">Desactivar</string>
@@ -1052,8 +931,6 @@
     <string name="obn_commencer">Comenzar</string>
     <string name="obn_profil_titre">Elija su perfil de actividad</string>
     <string name="obn_profil_sous">Adaptaremos Missa Business 360 a sus necesidades.</string>
-    <string name="obn_taille_titre">¿Cuál es el tamaño de su empresa?</string>
-    <string name="obn_taille_sous">Ajustamos las funciones según sus necesidades.</string>
     <string name="obn_entreprise_titre">Información de su empresa</string>
     <string name="obn_entreprise_sous">Esta información se usará para personalizar su entorno.</string>
     <string name="obn_nom_ex">ej.: Missa SARL</string>
@@ -1068,7 +945,6 @@
     <string name="obn_logo_trop_grand">Imagen demasiado pesada (tamaño máx.: 2MB)</string>
     <string name="obn_config_titre">Configuración inicial</string>
     <string name="obn_config_sous">Algunos ajustes para comenzar bien.</string>
-    <string name="obn_langue">Idioma</string>
     <string name="obn_fuseau">Zona horaria</string>
     <string name="obn_format_date">Formato de fecha</string>
     <string name="obn_format_nombres">Formato de números</string>
@@ -1093,7 +969,6 @@
     <!-- Fuseaux horaires (catalogue UTC-12:00 → UTC+14:00) -->
     <string name="fuseau_titre">Zona horaria</string>
     <string name="fuseau_recherche">Buscar una ciudad, un código o UTC…</string>
-    <string name="fuseau_aucun">Ninguna zona horaria coincide con esta búsqueda.</string>
     <string name="fuseau_heure_locale">Hora local</string>
     <string name="fuseau_m1200">Hora de las islas Baker y Howland</string>
     <string name="fuseau_m1100">Hora estándar de Samoa</string>
@@ -1399,7 +1274,6 @@
     <string name="obn_socle_deplier">Mostrar módulos de soporte</string>
     <string name="obn_socle_replier">Ocultar módulos de soporte</string>
     <string name="obn_entreprise_localisation">Ubicación y moneda</string>
-    <string name="obn_taux_suggere">Tasa sugerida para %1$s</string>
 
     <!-- Entreprise : coordonnees et identifiants legaux -->
     <string name="obn_telephone">Teléfono</string>
