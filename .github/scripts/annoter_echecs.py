@@ -36,11 +36,18 @@ MOTIF_RESSOURCE = re.compile(
     r"^(?:ERROR:\s*)?(?P<fichier>\S+\.(?:png|jpg|webp|xml)):?\s*(?:AAPT:)?\s*(?P<message>.*(?:error|failed).*)$",
     re.IGNORECASE,
 )
-# Dernier filet : toute ligne que Gradle marque comme cause d'échec.
+# Dernier filet : uniquement les lignes qui désignent vraiment une cause
+# d'échec. Une version trop large captait chaque « > Task :app:… » et noyait
+# l'information utile sous quarante annotations sans intérêt.
 MOTIFS_GENERIQUES = (
-    re.compile(r"^(?:FAILURE|Execution failed for task|Caused by:|> )(?P<message>.+)$"),
-    re.compile(r"^e: (?P<message>.+)$"),
-    re.compile(r"^.*\b(?:error|Error):\s+(?P<message>.+)$"),
+    re.compile(r"^> Task \S+ FAILED\s*$"),
+    re.compile(r"^FAILURE: (?P<message>.+)$"),
+    re.compile(r"^Caused by: (?P<message>.+)$"),
+    re.compile(r"^Execution failed for task (?P<message>.+)$"),
+    # Erreurs de génération de code (KSP, Dagger, javac), invisibles pour les
+    # motifs Kotlin car préfixées d'un chemin de fichier généré.
+    re.compile(r"^.*\berror:\s+(?P<message>.+)$"),
+    re.compile(r"^\s*\[Dagger/\w+\]\s*(?P<message>.+)$"),
 )
 
 LIMITE = 30
@@ -127,7 +134,9 @@ def erreurs_compilation(journaux: list[pathlib.Path]) -> list[str]:
                 trouve = motif.match(ligne)
                 if not trouve:
                     continue
-                message = trouve.group("message").strip()
+                message = (
+                    trouve.groupdict().get("message") or trouve.group(0)
+                ).strip()
                 if not message or message in vues:
                     break
                 vues.add(message)
