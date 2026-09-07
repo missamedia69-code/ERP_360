@@ -177,7 +177,7 @@ fun HomeScreen(
     // redéclarer ici en donnait deux exemplaires, dont l'un se superposait à
     // l'autre sur certains écrans.
     Scaffold(
-        containerColor = HomeCanvas,
+        containerColor = HomeBackground,
         topBar = {
             HomeHeader(
                 companyName = companyName,
