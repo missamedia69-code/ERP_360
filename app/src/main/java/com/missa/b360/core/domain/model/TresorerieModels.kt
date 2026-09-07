@@ -35,6 +35,31 @@ object TresorerieRules {
     /** Un virement interne se saisit d'un seul geste mais crée deux mouvements. */
     const val PREFIXE_TRANSFERT = "TRF"
 
+    /**
+     * Un encaissement de vente est identifié par la référence de sa facture :
+     * c'est cette clé qui empêche de créditer deux fois la caisse quand une
+     * vente est rouverte puis revalidée.
+     */
+    fun referenceEncaissement(referenceVente: String): String = referenceVente.trim()
+
+    /**
+     * Décide si une vente doit alimenter la trésorerie.
+     *
+     * Trois conditions : un montant réellement encaissé, un compte disponible,
+     * et aucun mouvement déjà enregistré pour cette facture. Le montant retenu
+     * est celui **effectivement payé**, jamais le total : une vente réglée à
+     * moitié ne fait pas entrer la totalité en caisse.
+     */
+    fun encaissementAEnregistrer(
+        montantPaye: Double,
+        dejaEnregistre: Boolean,
+        compteDisponible: Boolean,
+    ): Double? {
+        if (dejaEnregistre || !compteDisponible) return null
+        if (!montantPaye.isFinite() || montantPaye <= 0.0) return null
+        return Math.round(montantPaye * 100.0) / 100.0
+    }
+
     /** Montant maximal accepté : au-delà, c'est une faute de frappe. */
     const val MONTANT_MAX = 1_000_000_000_000.0
 

@@ -1,15 +1,20 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.OperationDirection
+import com.missa.b360.core.data.entity.CategorieTresorerie
+import com.missa.b360.core.data.entity.MouvementTresorerieEntity
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.data.entity.SensMouvement
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
@@ -17,6 +22,7 @@ import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
 import com.missa.b360.core.domain.model.SaleStockEffects
+import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
@@ -40,6 +46,8 @@ import kotlin.math.abs
  */
 class SaveSaleUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
+    private val comptesTresorerieDao: CompteTresorerieDao,
+    private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val productDao: ProductDao,
     private val stockDao: ProductStockDao,
     private val movementDao: StockMovementDao,
@@ -206,6 +214,36 @@ class SaveSaleUseCase @Inject constructor(
                         motif = "VENTE",
                         reference = reference,
                         horodatage = now,
+                    ),
+                )
+            }
+
+            // La somme réellement encaissée entre en trésorerie, sur le premier
+            // compte ouvert, avec la référence de la facture comme garde-fou :
+            // rouvrir puis revalider la vente ne crédite jamais deux fois.
+            // Aucun compte configuré ⇒ rien n'est écrit, l'utilisateur n'a pas
+            // encore ouvert sa caisse et le solde n'a donc pas de sens.
+            val referenceEncaissement = TresorerieRules.referenceEncaissement(reference)
+            val compteEncaissement = comptesTresorerieDao.getAll().firstOrNull { it.actif }
+            val montantEncaisse = TresorerieRules.encaissementAEnregistrer(
+                montantPaye = payload.paidAmount,
+                dejaEnregistre = mouvementsTresorerieDao
+                    .compterParReference(referenceEncaissement) > 0,
+                compteDisponible = compteEncaissement != null,
+            )
+            if (montantEncaisse != null && compteEncaissement != null) {
+                mouvementsTresorerieDao.insert(
+                    MouvementTresorerieEntity(
+                        compteId = compteEncaissement.id,
+                        date = now,
+                        sens = SensMouvement.IN.name,
+                        montant = montantEncaisse,
+                        categorie = CategorieTresorerie.VENTE.name,
+                        libelle = payload.clientName,
+                        tiers = payload.clientName,
+                        modePaiement = payload.paymentMethod,
+                        reference = referenceEncaissement,
+                        createdAt = now,
                     ),
                 )
             }

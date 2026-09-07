@@ -45,6 +45,10 @@ interface MouvementTresorerieDao {
     @Query("SELECT * FROM tresorerie_mouvements WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): MouvementTresorerieEntity?
 
+    /** Anti-doublon des encaissements automatiques : une facture, un mouvement. */
+    @Query("SELECT COUNT(*) FROM tresorerie_mouvements WHERE reference = :reference")
+    suspend fun compterParReference(reference: String): Int
+
     @Insert
     suspend fun insert(mouvement: MouvementTresorerieEntity): Long
 

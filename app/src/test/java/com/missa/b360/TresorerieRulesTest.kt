@@ -199,6 +199,68 @@ class TresorerieRulesTest {
     }
 
     @Test
+    fun `une vente payee alimente la tresorerie une seule fois`() {
+        val premier = TresorerieRules.encaissementAEnregistrer(
+            montantPaye = 150_000.0,
+            dejaEnregistre = false,
+            compteDisponible = true,
+        )
+        assertEquals(150_000.0, premier!!, 0.001)
+        // Revalidation de la même facture : le mouvement existe déjà.
+        assertNull(
+            TresorerieRules.encaissementAEnregistrer(
+                montantPaye = 150_000.0,
+                dejaEnregistre = true,
+                compteDisponible = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `sans compte ouvert aucun encaissement n est ecrit`() {
+        assertNull(
+            TresorerieRules.encaissementAEnregistrer(
+                montantPaye = 90_000.0,
+                dejaEnregistre = false,
+                compteDisponible = false,
+            ),
+        )
+    }
+
+    @Test
+    fun `une vente non reglee ne credite pas la caisse`() {
+        assertNull(
+            TresorerieRules.encaissementAEnregistrer(
+                montantPaye = 0.0,
+                dejaEnregistre = false,
+                compteDisponible = true,
+            ),
+        )
+        assertNull(
+            TresorerieRules.encaissementAEnregistrer(
+                montantPaye = -10.0,
+                dejaEnregistre = false,
+                compteDisponible = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `l encaissement est arrondi au centime`() {
+        val montant = TresorerieRules.encaissementAEnregistrer(
+            montantPaye = 33_333.339,
+            dejaEnregistre = false,
+            compteDisponible = true,
+        )
+        assertEquals(33_333.34, montant!!, 0.0001)
+    }
+
+    @Test
+    fun `la reference d encaissement reprend le numero de facture`() {
+        assertEquals("FAC-2026-0001", TresorerieRules.referenceEncaissement(" FAC-2026-0001 "))
+    }
+
+    @Test
     fun `chaque categorie et chaque type possede un libelle traduit`() {
         CategorieTresorerie.entries.forEach {
             assertTrue(TresorerieRules.libelleCategorie(it) != 0)
