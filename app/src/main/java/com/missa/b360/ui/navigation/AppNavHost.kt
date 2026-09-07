@@ -102,22 +102,22 @@ fun AppNavHost() {
     val startup: StartupViewModel = hiltViewModel()
     val state by startup.state.collectAsState()
 
+    // L'introduction de marque ouvre l'application, une fois par lancement.
+    // Son drapeau vit dans le ViewModel : un changement de langue recrée
+    // l'activité, et la vidéo se rejouait — c'était le bref écran noir.
+    if (!startup.introVue) {
+        SplashVideoScreen(onFinished = startup::marquerIntroVue)
+        return
+    }
+
     when (state) {
         StartupState.Chargement -> Box(Modifier.fillMaxSize())
 
-        // 1re ouverture : l'écran bleu de bienvenue s'affiche immédiatement.
-        // L'introduction vidéo attend que l'installation soit configurée — la
-        // faire précéder l'onboarding retardait de cinq secondes le tout
-        // premier écran, sans rien apprendre à personne.
+        // 1re ouverture : parcours d'onboarding, à partir de l'écran bleu.
         StartupState.Onboarding -> OnboardingScreen(onFinished = startup::evaluer)
 
-        // RA-01 : verrou PIN demandé à chaque ouverture, précédé une seule fois
-        // par l'introduction.
-        StartupState.VerrouPin -> if (startup.introVue) {
-            PinLockScreen(onUnlocked = startup::deverrouiller)
-        } else {
-            SplashVideoScreen(onFinished = startup::marquerIntroVue)
-        }
+        // RA-01 : verrou PIN demandé à chaque ouverture
+        StartupState.VerrouPin -> PinLockScreen(onUnlocked = startup::deverrouiller)
 
         // Accueil + modules métier
         StartupState.Pret -> MainNavHost()

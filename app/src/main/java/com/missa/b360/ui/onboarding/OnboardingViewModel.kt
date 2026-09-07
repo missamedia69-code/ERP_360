@@ -248,8 +248,12 @@ class OnboardingViewModel @Inject constructor(
                     progression.entreprise != null && !progression.proprietaireCree -> OnboardingStep.PIN
                     progression.entreprise != null -> OnboardingStep.TERMINE
                     profil != null -> OnboardingStep.ENTREPRISE
-                    !configurationTerminee -> OnboardingStep.CONFIGURATION
-                    else -> OnboardingStep.PROFIL
+                    configurationTerminee -> OnboardingStep.PROFIL
+                    // Rien d'enregistré : c'est la toute première ouverture.
+                    // L'écran bleu de bienvenue s'impose — la reprise de
+                    // progression ne doit pas le sauter, ce qui faisait démarrer
+                    // l'application sur la configuration initiale.
+                    else -> OnboardingStep.BIENVENUE
                 }
                 // Les préférences déjà enregistrées rechargent l'affichage global.
                 FormatPrefs.charger(settingsStore)

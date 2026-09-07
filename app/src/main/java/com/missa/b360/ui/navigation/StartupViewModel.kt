@@ -1,5 +1,8 @@
 package com.missa.b360.ui.navigation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.backup.BackupManager
@@ -39,7 +42,7 @@ class StartupViewModel @Inject constructor(
      * l'activité, ce qui relançait la vidéo — d'où le bref écran noir le temps
      * que la surface se prépare. Un ViewModel, lui, survit à cette recréation.
      */
-    var introVue: Boolean = false
+    var introVue: Boolean by mutableStateOf(false)
         private set
 
     fun marquerIntroVue() {
