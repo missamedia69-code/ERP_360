@@ -1567,4 +1567,26 @@
     <string name="dc_piece_commande">طلب</string>
     <string name="dc_partager">مشاركة</string>
     <string name="dc_email">البريد الإلكتروني</string>
+    <!-- Module Livraison -->
+    <string name="liv_etape_a_preparer">قيد التحضير</string>
+    <string name="liv_etape_expediee">تم الشحن</string>
+    <string name="liv_etape_livree">تم التسليم</string>
+    <string name="liv_nouveau">سند جديد</string>
+    <string name="liv_aucun_bon">لا توجد سندات تسليم.</string>
+    <string name="liv_en_cours">قيد التنفيذ</string>
+    <string name="liv_taux">معدل التسليم</string>
+    <string name="liv_delai_moyen">متوسط المهلة</string>
+    <string name="liv_colis">%1$d طرد</string>
+    <string name="liv_avancer">المرحلة التالية</string>
+    <string name="liv_msg_cree">تم إنشاء السند %1$s.</string>
+    <string name="liv_msg_avance">تم حفظ المرحلة.</string>
+    <string name="liv_msg_annule">تم إلغاء السند.</string>
+    <string name="liv_msg_etape_finale">بلغ هذا السند مرحلته النهائية.</string>
+    <string name="liv_champ_client">العميل</string>
+    <string name="liv_champ_destinataire">المستلم</string>
+    <string name="liv_champ_adresse">عنوان التسليم</string>
+    <string name="liv_champ_transporteur">الناقل</string>
+    <string name="liv_champ_colis">عدد الطرود</string>
+    <string name="liv_champ_origine">الطلب الأصلي</string>
+    <string name="liv_origine_aide">مرجع الطلب أو الفاتورة المرافقة لهذا السند.</string>
 </resources>

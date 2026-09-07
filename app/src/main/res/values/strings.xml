@@ -1595,4 +1595,26 @@
     <string name="dc_piece_commande">Commande</string>
     <string name="dc_partager">Partager</string>
     <string name="dc_email">E-mail</string>
+    <!-- Module Livraison -->
+    <string name="liv_etape_a_preparer">À préparer</string>
+    <string name="liv_etape_expediee">Expédiée</string>
+    <string name="liv_etape_livree">Livrée</string>
+    <string name="liv_nouveau">Nouveau bon</string>
+    <string name="liv_aucun_bon">Aucun bon de livraison.</string>
+    <string name="liv_en_cours">En cours</string>
+    <string name="liv_taux">Taux de livraison</string>
+    <string name="liv_delai_moyen">Délai moyen</string>
+    <string name="liv_colis">%1$d colis</string>
+    <string name="liv_avancer">Étape suivante</string>
+    <string name="liv_msg_cree">Bon %1$s créé.</string>
+    <string name="liv_msg_avance">Étape enregistrée.</string>
+    <string name="liv_msg_annule">Bon annulé.</string>
+    <string name="liv_msg_etape_finale">Ce bon a atteint son étape finale.</string>
+    <string name="liv_champ_client">Client</string>
+    <string name="liv_champ_destinataire">Destinataire</string>
+    <string name="liv_champ_adresse">Adresse de livraison</string>
+    <string name="liv_champ_transporteur">Transporteur</string>
+    <string name="liv_champ_colis">Nombre de colis</string>
+    <string name="liv_champ_origine">Commande d\'origine</string>
+    <string name="liv_origine_aide">Référence de la commande ou de la facture que ce bon accompagne.</string>
 </resources>

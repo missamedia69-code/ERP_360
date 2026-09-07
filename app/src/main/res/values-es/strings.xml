@@ -1567,4 +1567,26 @@
     <string name="dc_piece_commande">Pedido</string>
     <string name="dc_partager">Compartir</string>
     <string name="dc_email">Correo</string>
+    <!-- Module Livraison -->
+    <string name="liv_etape_a_preparer">Por preparar</string>
+    <string name="liv_etape_expediee">Enviada</string>
+    <string name="liv_etape_livree">Entregada</string>
+    <string name="liv_nouveau">Nuevo albarán</string>
+    <string name="liv_aucun_bon">No hay albaranes.</string>
+    <string name="liv_en_cours">En curso</string>
+    <string name="liv_taux">Tasa de entrega</string>
+    <string name="liv_delai_moyen">Plazo medio</string>
+    <string name="liv_colis">%1$d bulto(s)</string>
+    <string name="liv_avancer">Siguiente etapa</string>
+    <string name="liv_msg_cree">Albarán %1$s creado.</string>
+    <string name="liv_msg_avance">Etapa guardada.</string>
+    <string name="liv_msg_annule">Albarán anulado.</string>
+    <string name="liv_msg_etape_finale">Este albarán ya está en su etapa final.</string>
+    <string name="liv_champ_client">Cliente</string>
+    <string name="liv_champ_destinataire">Destinatario</string>
+    <string name="liv_champ_adresse">Dirección de entrega</string>
+    <string name="liv_champ_transporteur">Transportista</string>
+    <string name="liv_champ_colis">Número de bultos</string>
+    <string name="liv_champ_origine">Pedido de origen</string>
+    <string name="liv_origine_aide">Referencia del pedido o de la factura que acompaña este albarán.</string>
 </resources>

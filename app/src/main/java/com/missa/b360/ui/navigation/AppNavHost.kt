@@ -29,6 +29,7 @@ import com.missa.b360.ui.comptabilite.ComptabiliteScreen
 import com.missa.b360.ui.crm.CrmScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
 import com.missa.b360.ui.home.HomeScreen
+import com.missa.b360.ui.livraison.LivraisonScreen
 import com.missa.b360.ui.logistique.LogistiqueScreen
 import com.missa.b360.ui.maintenance.MaintenanceScreen
 import com.missa.b360.ui.notifications.NotificationsScreen
@@ -291,7 +292,20 @@ private fun MainNavHost() {
             )
         }
         operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
-        operationDestination(AppModule.LIVRAISON, OperationModule.LIVRAISON, navController)
+        composable(
+            route = "${'$'}{AppModule.LIVRAISON.route}?create={create}",
+            arguments = listOf(
+                navArgument("create") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                },
+            ),
+        ) { entry ->
+            LivraisonScreen(
+                onBack = { navController.popBackStack() },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+            )
+        }
         operationDestination(AppModule.SERVICES, OperationModule.SERVICES, navController)
         operationDestination(AppModule.PROJETS, OperationModule.PROJETS, navController)
         // Nouveaux modules (structure ERP 360 complète)

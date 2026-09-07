@@ -1588,4 +1588,26 @@
     <string name="dc_piece_commande">Order</string>
     <string name="dc_partager">Share</string>
     <string name="dc_email">Email</string>
+    <!-- Module Livraison -->
+    <string name="liv_etape_a_preparer">To prepare</string>
+    <string name="liv_etape_expediee">Shipped</string>
+    <string name="liv_etape_livree">Delivered</string>
+    <string name="liv_nouveau">New note</string>
+    <string name="liv_aucun_bon">No delivery note.</string>
+    <string name="liv_en_cours">In progress</string>
+    <string name="liv_taux">Delivery rate</string>
+    <string name="liv_delai_moyen">Average lead time</string>
+    <string name="liv_colis">%1$d parcel(s)</string>
+    <string name="liv_avancer">Next step</string>
+    <string name="liv_msg_cree">Note %1$s created.</string>
+    <string name="liv_msg_avance">Step saved.</string>
+    <string name="liv_msg_annule">Note cancelled.</string>
+    <string name="liv_msg_etape_finale">This note has reached its final step.</string>
+    <string name="liv_champ_client">Customer</string>
+    <string name="liv_champ_destinataire">Recipient</string>
+    <string name="liv_champ_adresse">Delivery address</string>
+    <string name="liv_champ_transporteur">Carrier</string>
+    <string name="liv_champ_colis">Number of parcels</string>
+    <string name="liv_champ_origine">Source order</string>
+    <string name="liv_origine_aide">Reference of the order or invoice this note accompanies.</string>
 </resources>
