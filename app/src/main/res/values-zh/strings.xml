@@ -238,7 +238,6 @@
     <string name="home_backup_never">尚无备份记录</string>
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">帮助与支持</string>
-    <string name="home_support_message">支持功能即将从此处提供。请查看“设置”或“关于”页面以获取安装信息。</string>
 
     <!-- Modules opérationnels et reporting -->
     <string name="ops_record_detail">%1$s · %2$s</string>
@@ -1637,4 +1636,7 @@
     <string name="prj_champ_consomme">已消耗预算</string>
     <string name="prj_actualiser_aide">两项都要填写：预算消耗与进度之间的差距才能揭示偏离。</string>
     <string name="home_new_delivery">送货单</string>
+    <string name="home_support_intro">我们的团队将通过您选择的渠道回复。</string>
+    <string name="home_support_objet">Missa Business 360 支持</string>
+    <string name="home_support_corps">您好，我在使用 Missa Business 360 时需要帮助。\n企业：%1$s\n版本：%2$s</string>
 </resources>

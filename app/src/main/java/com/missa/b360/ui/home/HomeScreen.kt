@@ -1,5 +1,6 @@
 package com.missa.b360.ui.home
 
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
@@ -36,6 +38,7 @@ import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.CloudDone
@@ -43,6 +46,7 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
@@ -66,6 +70,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +85,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -98,6 +104,7 @@ import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
+import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
 import com.missa.b360.ui.components.MissaBrandMark
@@ -205,7 +212,8 @@ fun HomeScreen(
                 HomeBottomBar(
                     modules = AppModule.barreBas(modulesActifs),
                     currentRoute = currentRoute,
-                    onModuleClick = { navController.navigate(it.route) },
+                    onAccueil = { navController.naviguerOnglet(Routes.HOME) },
+                    onModuleClick = { navController.naviguerOnglet(it.route) },
                     onMore = { showMoreModules = true },
                 )
             },
@@ -277,7 +285,7 @@ fun HomeScreen(
                         },
                         modifier = Modifier.clickable {
                             showMoreModules = false
-                            navController.navigate(module.route)
+                            navController.naviguerOnglet(module.route)
                         },
                     )
                 }
@@ -286,15 +294,9 @@ fun HomeScreen(
     }
 
     if (showSupport) {
-        AlertDialog(
-            onDismissRequest = { showSupport = false },
-            title = { Text(stringResource(R.string.home_support_title)) },
-            text = { Text(stringResource(R.string.home_support_message)) },
-            confirmButton = {
-                TextButton(onClick = { showSupport = false }) {
-                    Text(stringResource(R.string.home_close))
-                }
-            },
+        HomeSupportDialogue(
+            entrepriseNom = uiState.entrepriseNom,
+            onFermer = { showSupport = false },
         )
     }
 }
@@ -979,14 +981,26 @@ private fun Double.displayQuantity(): String =
 private fun HomeBottomBar(
     modules: List<AppModule>,
     currentRoute: String?,
+    onAccueil: () -> Unit,
     onModuleClick: (AppModule) -> Unit,
     onMore: () -> Unit,
 ) {
+    // La route enregistrée porte ses arguments (« module_vente?create={create} ») :
+    // comparer les chaînes entières ne désignerait jamais l'onglet courant.
+    val racine = currentRoute?.substringBefore('?')
     Surface(color = Color.White, shadowElevation = 10.dp) {
         NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
-            modules.take(4).forEach { module ->
+            NavigationBarItem(
+                selected = racine == Routes.HOME,
+                onClick = onAccueil,
+                icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+                label = { Text(stringResource(R.string.home_title), fontSize = 10.sp) },
+            )
+            // Trois modules au plus : au-delà, les libellés se tronquent et
+            // l'onglet « Plus » devient illisible sur un écran étroit.
+            modules.take(3).forEach { module ->
                 NavigationBarItem(
-                    selected = currentRoute == module.route,
+                    selected = racine == module.route,
                     onClick = { onModuleClick(module) },
                     icon = { Icon(module.icon, contentDescription = null) },
                     label = { Text(stringResource(module.titleRes), fontSize = 10.sp) },
@@ -1391,5 +1405,111 @@ private fun HomeAlertesCard(
                 }
             }
         }
+    }
+}
+
+/**
+ * Navigation depuis la barre du bas.
+ *
+ * Sans ces deux garde-fous, chaque appui empile un écran de plus : cinq appuis
+ * sur « Stock » obligeaient à revenir cinq fois en arrière pour retrouver
+ * l'accueil. `launchSingleTop` évite le doublon en sommet de pile, et le
+ * `popUpTo` ramène l'accueil comme unique racine.
+ */
+private fun NavController.naviguerOnglet(route: String) {
+    navigate(route) {
+        popUpTo(Routes.HOME) { inclusive = route == Routes.HOME }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+/**
+ * Assistance : trois canaux réels plutôt qu'un message d'attente.
+ *
+ * Les coordonnées viennent de `res/values/contact.xml`, comme pour l'achat du
+ * code d'activation — un seul endroit à tenir à jour. Un canal non configuré
+ * disparaît au lieu d'ouvrir une conversation vide.
+ */
+@Composable
+private fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
+    val contexte = LocalContext.current
+    val numero = stringResource(R.string.contact_commercial_whatsapp)
+    val telegram = stringResource(R.string.contact_commercial_telegram)
+    val adresse = stringResource(R.string.contact_commercial_email)
+    val whatsappOk = !ContactCommercial.estTemoin(numero)
+    val telegramOk = !ContactCommercial.estTemoin(telegram)
+    val emailOk = !ContactCommercial.estTemoin(adresse)
+    val aucunCanal = !whatsappOk && !telegramOk && !emailOk
+    val objet = stringResource(R.string.home_support_objet)
+    val message = stringResource(
+        R.string.home_support_corps,
+        entrepriseNom.ifBlank { stringResource(R.string.home_company_placeholder) },
+        BuildConfig.VERSION_NAME,
+    )
+    val echec = stringResource(R.string.obn_code_indispo)
+
+    AlertDialog(
+        onDismissRequest = onFermer,
+        title = { Text(stringResource(R.string.home_support_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                Text(
+                    text = stringResource(
+                        if (aucunCanal) R.string.obn_code_a_configurer else R.string.home_support_intro,
+                    ),
+                    fontSize = 12.5.sp,
+                    color = HomeTextMuted,
+                )
+                if (whatsappOk) {
+                    HomeSupportBouton(R.string.obn_code_whatsapp, Icons.Outlined.Chat) {
+                        if (!ContactCommercial.ouvrirWhatsApp(contexte, numero, message)) {
+                            Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                        }
+                        onFermer()
+                    }
+                }
+                if (telegramOk) {
+                    HomeSupportBouton(
+                        R.string.obn_code_telegram,
+                        Icons.AutoMirrored.Outlined.Send,
+                    ) {
+                        if (!ContactCommercial.ouvrirTelegram(contexte, telegram, message)) {
+                            Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                        }
+                        onFermer()
+                    }
+                }
+                if (emailOk) {
+                    HomeSupportBouton(R.string.obn_code_email, Icons.Outlined.MailOutline) {
+                        if (!ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)) {
+                            Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
+                        }
+                        onFermer()
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onFermer) { Text(stringResource(R.string.home_close)) }
+        },
+    )
+}
+
+@Composable
+private fun HomeSupportBouton(
+    texteRes: Int,
+    icone: ImageVector,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().height(44.dp),
+        shape = RoundedCornerShape(11.dp),
+        border = BorderStroke(1.dp, HomeBlue),
+    ) {
+        Icon(icone, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(17.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(texteRes), fontSize = 13.sp, color = HomeBlue)
     }
 }

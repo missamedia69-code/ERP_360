@@ -238,7 +238,6 @@
     <string name="home_backup_never">لا توجد نسخة احتياطية مسجلة</string>
     <string name="home_version_format">MISSA BUSINESS 360 • الإصدار %1$s</string>
     <string name="home_support_title">المساعدة والدعم</string>
-    <string name="home_support_message">سيصبح الدعم متاحاً قريباً من هذا القسم. راجع الإعدادات أو شاشة حول التطبيق لمعلومات عن تثبيتك.</string>
 
     <!-- Modules opérationnels et reporting -->
     <string name="ops_record_detail">%1$s · %2$s</string>
@@ -1637,4 +1636,7 @@
     <string name="prj_champ_consomme">الميزانية المستهلكة</string>
     <string name="prj_actualiser_aide">املأ الحقلين معًا: الفارق بين الميزانية المستهلكة ونسبة التقدم هو ما يكشف الانحراف.</string>
     <string name="home_new_delivery">سند تسليم</string>
+    <string name="home_support_intro">يجيبك فريقنا عبر القناة التي تختارها.</string>
+    <string name="home_support_objet">دعم Missa Business 360</string>
+    <string name="home_support_corps">مرحبًا، أحتاج إلى مساعدة بخصوص Missa Business 360.\nالشركة: %1$s\nالإصدار: %2$s</string>
 </resources>

@@ -332,7 +332,6 @@
     <string name="home_backup_never">No backup recorded</string>
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Help &amp; support</string>
-    <string name="home_support_message">Support will be available from this section soon. Check Settings or the About screen for information about your installation.</string>
 
     <!-- Modules opérationnels et reporting -->
     <string name="ops_record_detail">%1$s · %2$s</string>
@@ -1658,4 +1657,7 @@
     <string name="prj_champ_consomme">Budget spent</string>
     <string name="prj_actualiser_aide">Fill both: the gap between budget burned and progress made is what reveals a drift.</string>
     <string name="home_new_delivery">Delivery note</string>
+    <string name="home_support_intro">Our team answers on the channel you prefer.</string>
+    <string name="home_support_objet">Missa Business 360 support</string>
+    <string name="home_support_corps">Hello, I need help with Missa Business 360.\nCompany: %1$s\nVersion: %2$s</string>
 </resources>

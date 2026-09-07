@@ -238,7 +238,6 @@
     <string name="home_backup_never">No hay copias de seguridad registradas</string>
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Ayuda y asistencia</string>
-    <string name="home_support_message">La asistencia estará disponible próximamente desde esta sección. Consulte Ajustes o la pantalla Acerca de para conocer los datos de su instalación.</string>
 
     <!-- Modules opérationnels et reporting -->
     <string name="ops_record_detail">%1$s · %2$s</string>
@@ -1637,4 +1636,7 @@
     <string name="prj_champ_consomme">Presupuesto consumido</string>
     <string name="prj_actualiser_aide">Rellene ambos: es la diferencia entre presupuesto gastado y avance lo que revela un desvío.</string>
     <string name="home_new_delivery">Albarán</string>
+    <string name="home_support_intro">Nuestro equipo le responde por el canal que prefiera.</string>
+    <string name="home_support_objet">Asistencia Missa Business 360</string>
+    <string name="home_support_corps">Hola, necesito ayuda con Missa Business 360.\nEmpresa: %1$s\nVersión: %2$s</string>
 </resources>
