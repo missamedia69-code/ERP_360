@@ -1552,4 +1552,29 @@
     <string name="tre_champ_destination">الحساب الدائن</string>
     <string name="tre_virement_libelle">تحويل داخلي</string>
     <string name="tre_virement_aide">ينشئ التحويل قيدين مرتبطين: صادر ووارد بالمبلغ نفسه.</string>
+    <!-- Module Comptabilite -->
+    <string name="cpt_rub_ventes">المبيعات</string>
+    <string name="cpt_rub_autres_produits">إيرادات أخرى</string>
+    <string name="cpt_rub_achats">المشتريات</string>
+    <string name="cpt_rub_salaires">الرواتب</string>
+    <string name="cpt_rub_charges_externes">مصاريف خارجية</string>
+    <string name="cpt_rub_impots">الضرائب والرسوم</string>
+    <string name="cpt_periode_mois">هذا الشهر</string>
+    <string name="cpt_periode_mois_precedent">الشهر الماضي</string>
+    <string name="cpt_periode_annee">السنة</string>
+    <string name="cpt_resultat_titre">حساب النتيجة</string>
+    <string name="cpt_total_produits">إجمالي الإيرادات</string>
+    <string name="cpt_total_charges">إجمالي المصاريف</string>
+    <string name="cpt_benefice">ربح</string>
+    <string name="cpt_perte">خسارة</string>
+    <string name="cpt_taux_marge">هامش الربح الصافي: %1$s</string>
+    <string name="cpt_tva_titre">ضريبة القيمة المضافة %1$s</string>
+    <string name="cpt_tva_collectee">الضريبة المحصّلة</string>
+    <string name="cpt_tva_deductible">الضريبة القابلة للخصم</string>
+    <string name="cpt_tva_a_payer">الضريبة المستحقة</string>
+    <string name="cpt_tva_credit">رصيد ضريبي دائن</string>
+    <string name="cpt_tva_note">تقدير من المبالغ المسجلة شاملة الضريبة؛ يُرجى التأكد مع المحاسب.</string>
+    <string name="cpt_journal">دفتر اليومية</string>
+    <string name="cpt_journal_vide">لا توجد قيود في هذه الفترة.</string>
+    <string name="cpt_origine_tresorerie">قيد من الخزينة</string>
 </resources>

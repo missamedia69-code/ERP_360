@@ -1573,4 +1573,29 @@
     <string name="tre_champ_destination">To account</string>
     <string name="tre_virement_libelle">Internal transfer</string>
     <string name="tre_virement_aide">A transfer creates two linked entries: one out and one in, for the same amount.</string>
+    <!-- Module Comptabilite -->
+    <string name="cpt_rub_ventes">Sales</string>
+    <string name="cpt_rub_autres_produits">Other income</string>
+    <string name="cpt_rub_achats">Purchases</string>
+    <string name="cpt_rub_salaires">Payroll</string>
+    <string name="cpt_rub_charges_externes">External charges</string>
+    <string name="cpt_rub_impots">Taxes</string>
+    <string name="cpt_periode_mois">This month</string>
+    <string name="cpt_periode_mois_precedent">Last month</string>
+    <string name="cpt_periode_annee">Year</string>
+    <string name="cpt_resultat_titre">Income statement</string>
+    <string name="cpt_total_produits">Total income</string>
+    <string name="cpt_total_charges">Total charges</string>
+    <string name="cpt_benefice">Profit</string>
+    <string name="cpt_perte">Loss</string>
+    <string name="cpt_taux_marge">Net margin: %1$s</string>
+    <string name="cpt_tva_titre">VAT %1$s</string>
+    <string name="cpt_tva_collectee">Output VAT</string>
+    <string name="cpt_tva_deductible">Input VAT</string>
+    <string name="cpt_tva_a_payer">VAT payable</string>
+    <string name="cpt_tva_credit">VAT credit</string>
+    <string name="cpt_tva_note">Estimated from recorded tax-inclusive amounts; confirm with your accountant.</string>
+    <string name="cpt_journal">Journal entries</string>
+    <string name="cpt_journal_vide">No entry for this period.</string>
+    <string name="cpt_origine_tresorerie">Entry from treasury</string>
 </resources>

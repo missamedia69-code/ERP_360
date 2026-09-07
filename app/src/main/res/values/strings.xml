@@ -1580,4 +1580,29 @@
     <string name="tre_champ_destination">Compte crédité</string>
     <string name="tre_virement_libelle">Virement interne</string>
     <string name="tre_virement_aide">Un virement crée deux écritures liées : une sortie et une entrée du même montant.</string>
+    <!-- Module Comptabilite -->
+    <string name="cpt_rub_ventes">Ventes</string>
+    <string name="cpt_rub_autres_produits">Autres produits</string>
+    <string name="cpt_rub_achats">Achats</string>
+    <string name="cpt_rub_salaires">Salaires</string>
+    <string name="cpt_rub_charges_externes">Charges externes</string>
+    <string name="cpt_rub_impots">Impôts et taxes</string>
+    <string name="cpt_periode_mois">Ce mois</string>
+    <string name="cpt_periode_mois_precedent">Mois dernier</string>
+    <string name="cpt_periode_annee">Année</string>
+    <string name="cpt_resultat_titre">Compte de résultat</string>
+    <string name="cpt_total_produits">Total des produits</string>
+    <string name="cpt_total_charges">Total des charges</string>
+    <string name="cpt_benefice">Bénéfice</string>
+    <string name="cpt_perte">Perte</string>
+    <string name="cpt_taux_marge">Marge nette : %1$s</string>
+    <string name="cpt_tva_titre">TVA %1$s</string>
+    <string name="cpt_tva_collectee">TVA collectée</string>
+    <string name="cpt_tva_deductible">TVA déductible</string>
+    <string name="cpt_tva_a_payer">TVA à payer</string>
+    <string name="cpt_tva_credit">Crédit de TVA</string>
+    <string name="cpt_tva_note">Estimation à partir des montants TTC enregistrés ; à confirmer avec votre comptable.</string>
+    <string name="cpt_journal">Journal des écritures</string>
+    <string name="cpt_journal_vide">Aucune écriture sur cette période.</string>
+    <string name="cpt_origine_tresorerie">Écriture issue de la trésorerie</string>
 </resources>

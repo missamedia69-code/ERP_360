@@ -1552,4 +1552,29 @@
     <string name="tre_champ_destination">Cuenta de destino</string>
     <string name="tre_virement_libelle">Transferencia interna</string>
     <string name="tre_virement_aide">Una transferencia crea dos apuntes vinculados: una salida y una entrada del mismo importe.</string>
+    <!-- Module Comptabilite -->
+    <string name="cpt_rub_ventes">Ventas</string>
+    <string name="cpt_rub_autres_produits">Otros ingresos</string>
+    <string name="cpt_rub_achats">Compras</string>
+    <string name="cpt_rub_salaires">Salarios</string>
+    <string name="cpt_rub_charges_externes">Gastos externos</string>
+    <string name="cpt_rub_impots">Impuestos</string>
+    <string name="cpt_periode_mois">Este mes</string>
+    <string name="cpt_periode_mois_precedent">Mes pasado</string>
+    <string name="cpt_periode_annee">Año</string>
+    <string name="cpt_resultat_titre">Cuenta de resultados</string>
+    <string name="cpt_total_produits">Total de ingresos</string>
+    <string name="cpt_total_charges">Total de gastos</string>
+    <string name="cpt_benefice">Beneficio</string>
+    <string name="cpt_perte">Pérdida</string>
+    <string name="cpt_taux_marge">Margen neto: %1$s</string>
+    <string name="cpt_tva_titre">IVA %1$s</string>
+    <string name="cpt_tva_collectee">IVA repercutido</string>
+    <string name="cpt_tva_deductible">IVA soportado</string>
+    <string name="cpt_tva_a_payer">IVA a pagar</string>
+    <string name="cpt_tva_credit">Crédito de IVA</string>
+    <string name="cpt_tva_note">Estimación a partir de los importes con impuestos registrados; confírmelo con su contable.</string>
+    <string name="cpt_journal">Libro diario</string>
+    <string name="cpt_journal_vide">No hay apuntes en este periodo.</string>
+    <string name="cpt_origine_tresorerie">Apunte procedente de tesorería</string>
 </resources>

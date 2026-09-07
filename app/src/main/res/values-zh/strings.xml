@@ -1552,4 +1552,29 @@
     <string name="tre_champ_destination">转入账户</string>
     <string name="tre_virement_libelle">内部转账</string>
     <string name="tre_virement_aide">一笔转账会生成两条关联流水：等额的一出一进。</string>
+    <!-- Module Comptabilite -->
+    <string name="cpt_rub_ventes">销售</string>
+    <string name="cpt_rub_autres_produits">其他收入</string>
+    <string name="cpt_rub_achats">采购</string>
+    <string name="cpt_rub_salaires">工资</string>
+    <string name="cpt_rub_charges_externes">外部费用</string>
+    <string name="cpt_rub_impots">税费</string>
+    <string name="cpt_periode_mois">本月</string>
+    <string name="cpt_periode_mois_precedent">上月</string>
+    <string name="cpt_periode_annee">本年</string>
+    <string name="cpt_resultat_titre">利润表</string>
+    <string name="cpt_total_produits">收入合计</string>
+    <string name="cpt_total_charges">费用合计</string>
+    <string name="cpt_benefice">盈利</string>
+    <string name="cpt_perte">亏损</string>
+    <string name="cpt_taux_marge">净利率：%1$s</string>
+    <string name="cpt_tva_titre">增值税 %1$s</string>
+    <string name="cpt_tva_collectee">销项税额</string>
+    <string name="cpt_tva_deductible">进项税额</string>
+    <string name="cpt_tva_a_payer">应缴增值税</string>
+    <string name="cpt_tva_credit">增值税留抵</string>
+    <string name="cpt_tva_note">根据已记录的含税金额估算，请与会计师确认。</string>
+    <string name="cpt_journal">记账日记账</string>
+    <string name="cpt_journal_vide">本期间没有记录。</string>
+    <string name="cpt_origine_tresorerie">来自资金模块的记录</string>
 </resources>
