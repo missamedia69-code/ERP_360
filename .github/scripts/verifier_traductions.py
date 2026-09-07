@@ -70,15 +70,20 @@ def main() -> int:
         print("Aucune chaîne de référence : vérification impossible.", file=sys.stderr)
         return 1
 
-    # Apostrophes : aapt refuse ' non échappée hors CDATA.
-    brut = (RESSOURCES / REFERENCE / "strings.xml").read_text(encoding="utf-8")
-    for ligne in brut.splitlines():
-        corps = re.search(r"<string name=\"([^\"]+)\">(.*)</string>", ligne)
-        if corps and MOTIF_APOSTROPHE.search(corps.group(2)):
-            erreur(
-                f"{REFERENCE} : apostrophe non échappée dans « {corps.group(1)} » "
-                "— écrire \\' pour qu'aapt accepte la chaîne."
-            )
+    # Apostrophes : aapt refuse ' non échappée hors CDATA. Le contrôle porte sur
+    # toutes les langues, pas seulement la référence : une apostrophe oubliée
+    # dans la traduction anglaise fait échouer la compilation aussi sûrement,
+    # avec un message d'AAPT parlant d'« unicode escape sequence » qui n'oriente
+    # vers rien.
+    for dossier in (REFERENCE, *TRADUCTIONS):
+        brut = (RESSOURCES / dossier / "strings.xml").read_text(encoding="utf-8")
+        for ligne in brut.splitlines():
+            corps = re.search(r"<string name=\"([^\"]+)\">(.*)</string>", ligne)
+            if corps and MOTIF_APOSTROPHE.search(corps.group(2)):
+                erreur(
+                    f"{dossier} : apostrophe non échappée dans « {corps.group(1)} » "
+                    "— écrire \\' pour qu'aapt accepte la chaîne."
+                )
 
     for langue in TRADUCTIONS:
         traduites = chaines(langue)

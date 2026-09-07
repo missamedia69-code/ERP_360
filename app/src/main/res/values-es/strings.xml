@@ -202,17 +202,13 @@
     <string name="home_greeting_anonymous">Hola 👋</string>
     <string name="home_more_modules_description">Acceda a las funciones complementarias de su ERP.</string>
     <string name="home_overview">Aquí tiene una visión general de su actividad.</string>
-    <string name="home_profile_format">Perfil: %1$s</string>
-    <string name="home_size_format">Tamaño: %1$s</string>
     <string name="home_today">Hoy</string>
     <string name="home_cash">Tesorería</string>
-    <string name="home_available">Disponible</string>
     <string name="home_quick_actions">Acciones rápidas</string>
     <string name="home_personalize">Personalizar</string>
     <string name="home_recent_documents">Documentos recientes</string>
     <string name="home_see_all">Ver todo</string>
     <string name="home_no_documents">Ningún documento generado</string>
-    <string name="home_no_documents_description">Sus facturas, albaranes y recibos aparecerán aquí.</string>
     <string name="home_new_sale">Nueva venta</string>
     <string name="home_new_purchase">Nueva compra</string>
     <string name="home_new_client">Nuevo cliente</string>
@@ -220,12 +216,10 @@
     <string name="home_stock_entry">Entrada de stock</string>
     <string name="home_transfer">Transferencia</string>
     <string name="home_payment_received">Pago recibido</string>
-    <string name="home_gross_margin">Margen bruto</string>
     <string name="home_more_short">Más</string>
     <string name="home_company_active">Empresa activa</string>
 
     <!-- Navigation latérale détaillée -->
-    <string name="home_active">ACTIVA</string>
     <string name="home_close">Cerrar</string>
     <string name="home_settings">Ajustes</string>
     <string name="home_licence_activation">Licencia y activación</string>

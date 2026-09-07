@@ -296,17 +296,13 @@
     <string name="home_greeting_anonymous">Hello 👋</string>
     <string name="home_more_modules_description">Access the additional features of your ERP.</string>
     <string name="home_overview">Here is an overview of your business.</string>
-    <string name="home_profile_format">Profile: %1$s</string>
-    <string name="home_size_format">Size: %1$s</string>
     <string name="home_today">Today</string>
     <string name="home_cash">Cash flow</string>
-    <string name="home_available">Available</string>
     <string name="home_quick_actions">Quick actions</string>
     <string name="home_personalize">Customize</string>
     <string name="home_recent_documents">Recent documents</string>
     <string name="home_see_all">View all</string>
     <string name="home_no_documents">No documents generated</string>
-    <string name="home_no_documents_description">Your invoices, delivery notes and receipts will appear here.</string>
     <string name="home_new_sale">New sale</string>
     <string name="home_new_purchase">New purchase</string>
     <string name="home_new_client">New customer</string>
@@ -314,12 +310,10 @@
     <string name="home_stock_entry">Stock entry</string>
     <string name="home_transfer">Transfer</string>
     <string name="home_payment_received">Payment received</string>
-    <string name="home_gross_margin">Gross margin</string>
     <string name="home_more_short">More</string>
     <string name="home_company_active">Active company</string>
 
     <!-- Navigation latérale détaillée -->
-    <string name="home_active">ACTIVE</string>
     <string name="home_close">Close</string>
     <string name="home_settings">Settings</string>
     <string name="home_licence_activation">Licence &amp; activation</string>
@@ -1663,8 +1657,8 @@
     <string name="home_personalize_aide">Pin up to %1$d modules to the bottom bar.</string>
     <string name="home_personalize_defaut">Reset</string>
     <string name="nav_accueil">Home</string>
-    <string name="home_ventes_jour">Today's sales</string>
-    <string name="home_achats_jour">Today's purchases</string>
+    <string name="home_ventes_jour">Today\'s sales</string>
+    <string name="home_achats_jour">Today\'s purchases</string>
     <string name="home_solde_disponible">Available balance</string>
     <string name="home_total">Total</string>
     <string name="home_vs_hier">vs yesterday</string>

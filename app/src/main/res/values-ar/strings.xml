@@ -202,17 +202,13 @@
     <string name="home_greeting_anonymous">مرحباً 👋</string>
     <string name="home_more_modules_description">يمكنك الوصول إلى الوظائف الإضافية لنظام ERP الخاص بك.</string>
     <string name="home_overview">إليك نظرة عامة على نشاطك.</string>
-    <string name="home_profile_format">الملف: %1$s</string>
-    <string name="home_size_format">الحجم: %1$s</string>
     <string name="home_today">اليوم</string>
     <string name="home_cash">الخزينة</string>
-    <string name="home_available">المتاح</string>
     <string name="home_quick_actions">إجراءات سريعة</string>
     <string name="home_personalize">تخصيص</string>
     <string name="home_recent_documents">المستندات الأخيرة</string>
     <string name="home_see_all">عرض الكل</string>
     <string name="home_no_documents">لم يتم إنشاء أي مستند</string>
-    <string name="home_no_documents_description">ستظهر فواتيرك وإيصالاتك ومستنداتك هنا.</string>
     <string name="home_new_sale">عملية بيع جديدة</string>
     <string name="home_new_purchase">عملية شراء جديدة</string>
     <string name="home_new_client">عميل جديد</string>
@@ -220,12 +216,10 @@
     <string name="home_stock_entry">إدخال مخزون</string>
     <string name="home_transfer">تحويل</string>
     <string name="home_payment_received">دفعة مستلمة</string>
-    <string name="home_gross_margin">الهامش الإجمالي</string>
     <string name="home_more_short">المزيد</string>
     <string name="home_company_active">شركة نشطة</string>
 
     <!-- Navigation latérale détaillée -->
-    <string name="home_active">نشط</string>
     <string name="home_close">إغلاق</string>
     <string name="home_settings">الإعدادات</string>
     <string name="home_licence_activation">الترخيص والتفعيل</string>

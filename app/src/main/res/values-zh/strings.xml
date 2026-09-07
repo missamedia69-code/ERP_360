@@ -202,17 +202,13 @@
     <string name="home_greeting_anonymous">您好 👋</string>
     <string name="home_more_modules_description">访问 ERP 的补充功能。</string>
     <string name="home_overview">以下是您的业务概览。</string>
-    <string name="home_profile_format">业务类型：%1$s</string>
-    <string name="home_size_format">规模：%1$s</string>
     <string name="home_today">今天</string>
     <string name="home_cash">资金</string>
-    <string name="home_available">可用</string>
     <string name="home_quick_actions">快捷操作</string>
     <string name="home_personalize">自定义</string>
     <string name="home_recent_documents">最近单据</string>
     <string name="home_see_all">查看全部</string>
     <string name="home_no_documents">尚未生成单据</string>
-    <string name="home_no_documents_description">您的发票、单据和收据将显示在这里。</string>
     <string name="home_new_sale">新建销售</string>
     <string name="home_new_purchase">新建采购</string>
     <string name="home_new_client">新建客户</string>
@@ -220,12 +216,10 @@
     <string name="home_stock_entry">库存入库</string>
     <string name="home_transfer">调拨</string>
     <string name="home_payment_received">收到付款</string>
-    <string name="home_gross_margin">毛利</string>
     <string name="home_more_short">更多</string>
     <string name="home_company_active">当前企业</string>
 
     <!-- Navigation latérale détaillée -->
-    <string name="home_active">已启用</string>
     <string name="home_close">关闭</string>
     <string name="home_settings">设置</string>
     <string name="home_licence_activation">许可证和激活</string>
