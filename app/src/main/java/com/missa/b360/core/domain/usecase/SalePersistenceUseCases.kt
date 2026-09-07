@@ -98,6 +98,7 @@ class SaveSaleUseCase @Inject constructor(
                             reference = reference,
                             title = payload.clientName,
                             counterpart = payload.clientName,
+                            tiersId = payload.clientId.takeIf { it > 0 },
                             amount = totals.total,
                             status = OperationStatus.DRAFT.name,
                             notes = detail,
@@ -119,6 +120,7 @@ class SaveSaleUseCase @Inject constructor(
                         existant.copy(
                             title = payload.clientName,
                             counterpart = payload.clientName,
+                            tiersId = payload.clientId.takeIf { it > 0 },
                             amount = totals.total,
                             notes = detail,
                         ),
@@ -156,6 +158,7 @@ class SaveSaleUseCase @Inject constructor(
                             reference = ref,
                             title = payload.clientName,
                             counterpart = payload.clientName,
+                            tiersId = payload.clientId.takeIf { it > 0 },
                             amount = totals.total,
                             status = OperationStatus.VALIDATED.name,
                             notes = detail,
@@ -176,6 +179,7 @@ class SaveSaleUseCase @Inject constructor(
                         existant.copy(
                             title = payload.clientName,
                             counterpart = payload.clientName,
+                            tiersId = payload.clientId.takeIf { it > 0 },
                             amount = totals.total,
                             status = OperationStatus.VALIDATED.name,
                             notes = detail,

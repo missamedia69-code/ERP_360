@@ -213,7 +213,7 @@ enum class IndicateurCode(
         module = ModuleCode.QUA,
         libelleRes = R.string.kpi_taux_resolution,
         formuleRes = R.string.kpi_taux_resolution_f,
-        format = FormatIndicateur.POURCENTAGE,
+        format = FormatIndicateur.POURCENT,
         sens = SensIndicateur.HAUT_BON,
     ),
 
@@ -229,7 +229,7 @@ enum class IndicateurCode(
         module = ModuleCode.MAI,
         libelleRes = R.string.kpi_taux_preventif,
         formuleRes = R.string.kpi_taux_preventif_f,
-        format = FormatIndicateur.POURCENTAGE,
+        format = FormatIndicateur.POURCENT,
         sens = SensIndicateur.HAUT_BON,
     ),
 

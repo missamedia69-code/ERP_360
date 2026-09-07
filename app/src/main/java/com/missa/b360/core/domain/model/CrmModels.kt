@@ -35,12 +35,12 @@ data class CompteurSegment(val segment: SegmentClient, val nombre: Int)
 /**
  * Règles du module CRM — sans dépendance Android ni Room.
  *
- * **Limite assumée du modèle actuel** : une vente ne porte pas l'identifiant du
- * client mais son nom (`counterpart`). Le rapprochement se fait donc sur un nom
- * normalisé — casse, accents d'espacement et espaces multiples neutralisés. Un
- * client renommé après ses achats perdra son historique tant que les pièces ne
- * porteront pas de clé étrangère ; c'est le prix d'un modèle de pièces
- * générique, et cela se corrigera avec la phase « identifiants des tiers ».
+ * **Rapprochement vente ↔ client** : depuis la base v11, une pièce porte
+ * `tiersId`, l'identifiant du client. C'est lui qui fait foi — un client
+ * renommé garde ainsi tout son historique. Les pièces antérieures à cette
+ * version n'ont pas d'identifiant : elles sont rattachées par nom normalisé
+ * (casse, espaces multiples et espaces insécables neutralisés), ce qui évite de
+ * perdre l'historique déjà saisi.
  */
 object CrmRules {
 
@@ -80,9 +80,14 @@ object CrmRules {
             it.module == OperationModule.VENTE.name &&
                 it.status == OperationStatus.VALIDATED.name
         }
-        val parClient = ventes.groupBy { cleRapprochement(it.counterpart) }
+        val parIdentifiant = ventes.filter { it.tiersId != null }.groupBy { it.tiersId }
+        val parNom = ventes.filter { it.tiersId == null }
+            .groupBy { cleRapprochement(it.counterpart) }
         return clients.map { client ->
-            val lignes = parClient[cleRapprochement(client.nom)].orEmpty()
+            // Identifiant d'abord, nom ensuite : les deux gisements se cumulent
+            // le temps que les pièces anciennes disparaissent naturellement.
+            val lignes = parIdentifiant[client.id].orEmpty() +
+                parNom[cleRapprochement(client.nom)].orEmpty()
             val dernier = lignes.maxOfOrNull { it.createdAt }
             val jours = dernier?.let { ((maintenant - it) / JOUR_MS).toInt().coerceAtLeast(0) }
             FicheCrm(

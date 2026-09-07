@@ -35,12 +35,14 @@ class CrmRulesTest {
         montant: Double,
         ilYaJours: Int,
         statut: OperationStatus = OperationStatus.VALIDATED,
+        tiersId: Long? = null,
     ) = OperationRecordEntity(
         id = ++sequence,
         module = OperationModule.VENTE.name,
         reference = "VTE-$sequence",
         title = "Vente $sequence",
         counterpart = client,
+        tiersId = tiersId,
         amount = montant,
         status = statut.name,
         createdAt = maintenant - ilYaJours * jour,
@@ -203,6 +205,58 @@ class CrmRulesTest {
             maintenant,
         )
         assertEquals(fiches.size, CrmRules.compteurs(fiches).sumOf { it.nombre })
+    }
+
+    @Test
+    fun `une vente identifiee suit le client meme apres un changement de nom`() {
+        val client = client("Nouvelle raison sociale")
+        val fiches = CrmRules.fiches(
+            listOf(client),
+            listOf(vente("Ancienne raison sociale", 75_000.0, ilYaJours = 3, tiersId = client.id)),
+            maintenant,
+        )
+        assertEquals(1, fiches.first().nombreAchats)
+        assertEquals(75_000.0, fiches.first().chiffreAffaires, 0.001)
+    }
+
+    @Test
+    fun `les ventes identifiees et les anciennes ventes par nom se cumulent`() {
+        val client = client("Alpha")
+        val fiches = CrmRules.fiches(
+            listOf(client),
+            listOf(
+                vente("Alpha", 10_000.0, ilYaJours = 10),
+                vente("Alpha", 20_000.0, ilYaJours = 5, tiersId = client.id),
+            ),
+            maintenant,
+        )
+        assertEquals(2, fiches.first().nombreAchats)
+        assertEquals(30_000.0, fiches.first().chiffreAffaires, 0.001)
+    }
+
+    @Test
+    fun `une vente identifiee n est jamais comptee deux fois`() {
+        val client = client("Beta")
+        val fiches = CrmRules.fiches(
+            listOf(client),
+            listOf(vente("Beta", 40_000.0, ilYaJours = 4, tiersId = client.id)),
+            maintenant,
+        )
+        assertEquals(1, fiches.first().nombreAchats)
+        assertEquals(40_000.0, fiches.first().chiffreAffaires, 0.001)
+    }
+
+    @Test
+    fun `une vente rattachee a un autre client n entre pas dans la fiche`() {
+        val alpha = client("Alpha")
+        val beta = client("Beta")
+        val fiches = CrmRules.fiches(
+            listOf(alpha, beta),
+            listOf(vente("Alpha", 10_000.0, ilYaJours = 3, tiersId = beta.id)),
+            maintenant,
+        ).associateBy { it.client.nom }
+        assertEquals(0, fiches.getValue("Alpha").nombreAchats)
+        assertEquals(1, fiches.getValue("Beta").nombreAchats)
     }
 
     @Test

@@ -104,7 +104,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 10,
+    version = 11,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -334,6 +334,22 @@ abstract class AppDatabase : RoomDatabase() {
          * non-conformités, parc d'équipements et interventions. Trois tables
          * neuves, aucune donnée existante touchée.
          */
+        /**
+         * v10 → v11 : les pièces portent l'identifiant du tiers concerné.
+         *
+         * Les pièces existantes gardent `tiersId` à NULL ; le rapprochement par
+         * nom reste actif pour elles, ce qui préserve l'historique déjà saisi.
+         */
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `operation_records` ADD COLUMN `tiersId` INTEGER")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_operation_records_tiersId` " +
+                        "ON `operation_records` (`tiersId`)",
+                )
+            }
+        }
+
         val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
