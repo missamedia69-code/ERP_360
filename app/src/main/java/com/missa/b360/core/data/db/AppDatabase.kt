@@ -7,11 +7,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
@@ -32,11 +34,13 @@ import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.CompteTresorerieEntity
 import com.missa.b360.core.data.entity.EmployeeEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
+import com.missa.b360.core.data.entity.MouvementTresorerieEntity
 import com.missa.b360.core.data.entity.NotificationEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.PaymentMethodEntity
@@ -81,6 +85,8 @@ import com.missa.b360.core.data.entity.UserEntity
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
         OperationRecordEntity::class,
+        CompteTresorerieEntity::class,
+        MouvementTresorerieEntity::class,
         ProductCategoryEntity::class,
         ProductEntity::class,
         ProductStockEntity::class,
@@ -89,7 +95,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -114,6 +120,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun employeeDao(): EmployeeDao
     abstract fun absenceDao(): AbsenceDao
     abstract fun taskDao(): TaskDao
+    abstract fun compteTresorerieDao(): CompteTresorerieDao
+    abstract fun mouvementTresorerieDao(): MouvementTresorerieDao
 
     companion object {
         /** Version du schéma — doit rester alignée sur l'annotation @Database. */
@@ -301,6 +309,49 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `numeroFiscal` TEXT")
                 db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `registreCommerce` TEXT")
+            }
+        }
+
+        /**
+         * v8 → v9 : module Trésorerie — comptes (caisse, banque, mobile money)
+         * et mouvements. Deux tables neuves : aucune donnée existante n'est
+         * touchée, la migration est donc sans risque de perte.
+         */
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tresorerie_comptes` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`nom` TEXT NOT NULL, `type` TEXT NOT NULL, `etablissement` TEXT, " +
+                        "`numero` TEXT, `soldeInitial` REAL NOT NULL, " +
+                        "`actif` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_tresorerie_comptes_nom` " +
+                        "ON `tresorerie_comptes` (`nom`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tresorerie_mouvements` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`compteId` INTEGER NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`sens` TEXT NOT NULL, `montant` REAL NOT NULL, " +
+                        "`categorie` TEXT NOT NULL, `libelle` TEXT NOT NULL, " +
+                        "`tiers` TEXT, `modePaiement` TEXT, `reference` TEXT, " +
+                        "`transfertId` TEXT, `rapproche` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_compteId` " +
+                        "ON `tresorerie_mouvements` (`compteId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_date` " +
+                        "ON `tresorerie_mouvements` (`date`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_transfertId` " +
+                        "ON `tresorerie_mouvements` (`transfertId`)",
+                )
             }
         }
     }
