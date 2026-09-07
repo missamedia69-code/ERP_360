@@ -41,8 +41,8 @@ enum class AppModule(
 ) {
     VENTE("module_vente", R.string.module_vente, Icons.Outlined.PointOfSale, ModuleCode.VEN, bottomBarDefault = true),
     STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, bottomBarDefault = true),
-    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN),
-    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT, bottomBarDefault = true),
+    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, bottomBarDefault = true),
+    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
     ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
     FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
     LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG),
@@ -104,13 +104,13 @@ enum class AppModule(
          * Modules dont la route ouvre un **formulaire de saisie** et non une
          * liste : la barre de navigation n'y aurait pas sa place.
          *
-         * L'ensemble est vide aujourd'hui : chaque module épinglable mène à un
-         * écran où la barre reste visible. Une première version en excluait six
-         * sur la foi d'une mauvaise association écran/route — `module_stock`
-         * mène à `StockScreen` et non à `InventoryScreen` — ce qui faisait
-         * disparaître la barre sur les onglets les plus utilisés.
+         * Achats et Finances ouvrent leur formulaire **en surimpression** de la
+         * liste, avec sa propre barre « Annuler / Valider » : la barre de
+         * navigation apparaîtrait dessous, deux barres empilées. Ils sont donc
+         * exclus, et ne figurent pas non plus dans la disposition d'usine — un
+         * onglet dont l'écran masque la barre est une contradiction.
          */
-        private val SANS_BARRE = emptySet<AppModule>()
+        private val SANS_BARRE = setOf(ACHATS, FINANCES)
 
         /**
          * Vrai si la barre de navigation doit rester visible sur cette route.

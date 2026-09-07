@@ -1,5 +1,13 @@
 package com.missa.b360.ui.navigation
 
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
+import com.missa.b360.core.util.DateUtils
+import com.missa.b360.ui.home.HomeSupportDialogue
+import com.missa.b360.ui.home.MissaBusinessDrawer
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -113,11 +121,44 @@ private fun MainNavHost() {
     val modulesEpingles by accueilViewModel.modulesEpingles.collectAsState()
     val routeCourante = navController.currentBackStackEntryAsState().value?.destination?.route
     var plusDeModules by remember { mutableStateOf(false) }
+    var assistance by remember { mutableStateOf(false) }
+    val etatTiroir = rememberDrawerState(DrawerValue.Closed)
+    val portee = rememberCoroutineScope()
+    val etatAccueil by accueilViewModel.uiState.collectAsState()
 
-    // L'accueil porte sa propre barre, sous son tiroir : l'ajouter ici la
-    // dessinerait par-dessus le voile du menu latéral.
-    val afficherBarre = AppModule.barreVisibleSur(routeCourante)
+    // Barre unique, déclarée ici et nulle part ailleurs. L'accueil en avait sa
+    // propre copie : selon l'écran, on en voyait une, deux superposées, ou
+    // aucune.
+    val afficherBarre = AppModule.barreVisibleSur(routeCourante) ||
+        routeCourante == Routes.HOME
 
+    val nomEntreprise = etatAccueil.entrepriseNom.ifBlank {
+        stringResource(R.string.home_company_placeholder)
+    }
+    val etatSauvegarde = etatAccueil.derniereSauvegarde?.let {
+        stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(it))
+    } ?: stringResource(R.string.home_backup_never)
+
+    ModalNavigationDrawer(
+        drawerState = etatTiroir,
+        drawerContent = {
+            MissaBusinessDrawer(
+                companyName = nomEntreprise,
+                logoUri = etatAccueil.entrepriseLogoUri,
+                backupStatus = etatSauvegarde,
+                currentRoute = routeCourante,
+                onClose = { portee.launch { etatTiroir.close() } },
+                onNavigate = { route ->
+                    portee.launch { etatTiroir.close() }
+                    navController.navigate(route)
+                },
+                onSupport = {
+                    portee.launch { etatTiroir.close() }
+                    assistance = true
+                },
+            )
+        },
+    ) {
     Scaffold(
         bottomBar = {
             if (afficherBarre) {
@@ -137,7 +178,10 @@ private fun MainNavHost() {
         modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
     ) {
         composable(Routes.HOME) {
-            HomeScreen(navController)
+            HomeScreen(
+                navController = navController,
+                onOuvrirMenu = { portee.launch { etatTiroir.open() } },
+            )
         }
         composable(Routes.NOTIFICATIONS) {
             NotificationsScreen(onBack = { navController.popBackStack() })
@@ -450,6 +494,15 @@ private fun MainNavHost() {
             ReportingScreen(onBack = { navController.popBackStack() })
         }
     }
+    }
+
+    }
+
+    if (assistance) {
+        HomeSupportDialogue(
+            entrepriseNom = etatAccueil.entrepriseNom,
+            onFermer = { assistance = false },
+        )
     }
 
     if (plusDeModules) {

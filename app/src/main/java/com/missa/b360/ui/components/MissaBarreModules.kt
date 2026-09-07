@@ -1,5 +1,7 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -44,7 +46,14 @@ fun MissaBarreModules(
     // comparer les chaînes entières ne désignerait jamais l'onglet courant.
     val racine = routeCourante?.substringBefore('?')
     Surface(color = Color.White, shadowElevation = 10.dp) {
-        NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
+        NavigationBar(
+            containerColor = Color.White,
+            tonalElevation = 0.dp,
+            // Sans cette contrainte, Material réserve deux fois la place de la
+            // barre gestuelle : la barre paraît alors surélevée, décollée du
+            // bord de l'écran.
+            windowInsets = WindowInsets.navigationBars,
+        ) {
             NavigationBarItem(
                 selected = racine == com.missa.b360.ui.navigation.Routes.HOME,
                 onClick = onAccueil,

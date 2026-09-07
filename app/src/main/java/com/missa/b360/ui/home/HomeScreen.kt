@@ -32,7 +32,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -67,26 +66,20 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Badge as NotificationBadge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
@@ -116,7 +109,6 @@ import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.CompanyLogo
-import com.missa.b360.ui.components.MissaBarreModules
 import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -131,7 +123,6 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.Red40
-import kotlinx.coroutines.launch
 
 /* Palette du tableau de bord mobile. */
 private val HomeBlue = BrandBlue
@@ -159,12 +150,9 @@ private val HomeBorder = MissaBorder
 @Composable
 fun HomeScreen(
     navController: NavController,
+    onOuvrirMenu: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    var showMoreModules by remember { mutableStateOf(false) }
-    var showSupport by remember { mutableStateOf(false) }
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
     val modulesActifs by viewModel.modulesActifs.collectAsState()
@@ -184,132 +172,38 @@ fun HomeScreen(
     val greeting = uiState.prenomUtilisateur?.let {
         stringResource(R.string.home_greeting, it)
     } ?: stringResource(R.string.home_greeting_anonymous)
-    val backupStatus = uiState.derniereSauvegarde?.let { date ->
-        stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(date))
-    } ?: stringResource(R.string.home_backup_never)
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MissaBusinessDrawer(
+    // Le tiroir et la barre du bas appartiennent au graphe de navigation : les
+    // redéclarer ici en donnait deux exemplaires, dont l'un se superposait à
+    // l'autre sur certains écrans.
+    Scaffold(
+        containerColor = HomeCanvas,
+        topBar = {
+            HomeHeader(
                 companyName = companyName,
-                logoUri = uiState.entrepriseLogoUri,
-                backupStatus = backupStatus,
-                currentRoute = currentRoute,
-                onClose = { scope.launch { drawerState.close() } },
-                onNavigate = { route ->
-                    scope.launch { drawerState.close() }
-                    navController.navigate(route)
-                },
-                onSupport = {
-                    scope.launch { drawerState.close() }
-                    showSupport = true
-                },
+                companyLogoUri = uiState.entrepriseLogoUri,
+                secteur = uiState.secteur,
+                profileLabel = profileLabel,
+                sizeLabel = sizeLabel,
+                greeting = greeting,
+                notificationCount = nonLues,
+                onMenuClick = onOuvrirMenu,
+                onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
+                // Le bloc porte le logo et le nom de l'entreprise : il ouvre
+                // sa fiche. Le compte utilisateur a son entrée au tiroir.
+                onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
             )
         },
-    ) {
-        Scaffold(
-            containerColor = HomeBackground,
-            topBar = {
-                HomeHeader(
-                    companyName = companyName,
-                    companyLogoUri = uiState.entrepriseLogoUri,
-                secteur = uiState.secteur,
-                    profileLabel = profileLabel,
-                    sizeLabel = sizeLabel,
-                    greeting = greeting,
-                    notificationCount = nonLues,
-                    onMenuClick = { scope.launch { drawerState.open() } },
-                    onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                    // Le bloc porte le logo et le nom de l'entreprise : il ouvre
-                    // sa fiche. Le compte utilisateur a son entrée au tiroir.
-                    onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
-                )
-            },
-            bottomBar = {
-                MissaBarreModules(
-                    modules = AppModule.barreBas(modulesActifs, modulesEpingles),
-                    routeCourante = currentRoute,
-                    onAccueil = { navController.naviguerOnglet(Routes.HOME) },
-                    onModule = { navController.naviguerOnglet(it.route) },
-                    onPlus = { showMoreModules = true },
-                )
-            },
-        ) { padding ->
-            HomeDashboard(
-                state = uiState,
-                modulesActifs = modulesActifs,
-                onPersonnaliser = { showPersonnaliser = true },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                onNavigate = { navController.navigate(it) },
-            )
-        }
-    }
-
-    if (showMoreModules) {
-        ModalBottomSheet(
-            onDismissRequest = { showMoreModules = false },
-            containerColor = Color.White,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 18.dp, end = 18.dp, bottom = 24.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.more_modules),
-                    color = HomeTextDark,
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_more_modules_description),
-                    color = HomeTextMuted,
-                    fontSize = 13.sp,
-                )
-                Spacer(Modifier.height(12.dp))
-                AppModule.secondaires(modulesActifs).forEach { module ->
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                text = stringResource(module.titleRes),
-                                color = HomeTextDark,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        },
-                        leadingContent = {
-                            Surface(
-                                modifier = Modifier.size(42.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                color = HomeBlueSoft,
-                            ) {
-                                Icon(
-                                    imageVector = module.icon,
-                                    contentDescription = null,
-                                    tint = HomeBlue,
-                                    modifier = Modifier.padding(10.dp),
-                                )
-                            }
-                        },
-                        trailingContent = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                                contentDescription = null,
-                                tint = HomeTextMuted,
-                                modifier = Modifier.size(15.dp),
-                            )
-                        },
-                        modifier = Modifier.clickable {
-                            showMoreModules = false
-                            navController.naviguerOnglet(module.route)
-                        },
-                    )
-                }
-            }
-        }
+    ) { padding ->
+        HomeDashboard(
+            state = uiState,
+            modulesActifs = modulesActifs,
+            onPersonnaliser = { showPersonnaliser = true },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            onNavigate = { navController.navigate(it) },
+        )
     }
 
     if (showPersonnaliser) {
@@ -324,12 +218,6 @@ fun HomeScreen(
         )
     }
 
-    if (showSupport) {
-        HomeSupportDialogue(
-            entrepriseNom = uiState.entrepriseNom,
-            onFermer = { showSupport = false },
-        )
-    }
 }
 
 @Composable
@@ -1248,7 +1136,7 @@ private fun Double.displayQuantity(): String =
     if (this % 1.0 == 0.0) toInt().toString() else toString()
 
 @Composable
-private fun MissaBusinessDrawer(
+internal fun MissaBusinessDrawer(
     companyName: String,
     logoUri: String?,
     backupStatus: String,
@@ -1627,7 +1515,7 @@ private fun NavController.naviguerOnglet(route: String) {
  * disparaît au lieu d'ouvrir une conversation vide.
  */
 @Composable
-private fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
+internal fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
     val contexte = LocalContext.current
     val numero = stringResource(R.string.contact_commercial_whatsapp)
     val telegram = stringResource(R.string.contact_commercial_telegram)

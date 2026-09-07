@@ -54,13 +54,25 @@ class BarreNavigationTest {
     @Test
     fun `la disposition d usine correspond a la maquette`() {
         val defaut = AppModule.barreBas(ModuleCode.entries.toList())
-        assertEquals(listOf(AppModule.VENTE, AppModule.STOCK, AppModule.FINANCES), defaut)
+        assertEquals(listOf(AppModule.VENTE, AppModule.STOCK, AppModule.CLIENTS), defaut)
+    }
+
+    @Test
+    fun `l accueil affiche la barre`() {
+        // L'accueil est la destination racine : la barre y est posée par le
+        // graphe, comme sur tous les écrans-liste.
+        assertTrue(AppModule.barreVisibleSur(AppModule.VENTE.route))
+    }
+
+    @Test
+    fun `un formulaire en surimpression n affiche pas la barre`() {
+        assertFalse(AppModule.barreVisibleSur(AppModule.FINANCES.route))
+        assertFalse(AppModule.barreVisibleSur(AppModule.ACHATS.route))
     }
 
     @Test
     fun `les ecrans hors modules n affichent pas la barre`() {
         listOf(
-            Routes.HOME,
             Routes.ADMIN_REGLAGES,
             Routes.ADMIN_JOURNAL,
             Routes.NOTIFICATIONS,
