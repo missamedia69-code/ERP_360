@@ -57,6 +57,7 @@ import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.Filigrane
 import com.missa.b360.ui.components.MissaFondFiligrane
+import com.missa.b360.ui.components.sectionFonctionsModule
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -78,6 +79,7 @@ import com.missa.b360.ui.theme.Red40
 @Composable
 fun ComptabiliteScreen(
     onBack: () -> Unit,
+    onNaviguer: (String) -> Unit,
     viewModel: ComptabiliteViewModel = hiltViewModel(),
 ) {
     val synthese by viewModel.synthese.collectAsState()
@@ -175,6 +177,9 @@ fun ComptabiliteScreen(
                     CptEcritureLigne(it, devise)
                 }
             }
+
+            // Sommaire des fonctionnalités du module, disponibles et prévues.
+            sectionFonctionsModule(ModuleCode.CPT) { route -> onNaviguer(route) }
         }
         }
     }

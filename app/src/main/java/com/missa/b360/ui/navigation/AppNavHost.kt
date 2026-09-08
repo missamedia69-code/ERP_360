@@ -421,6 +421,7 @@ private fun MainNavHost() {
         ) { entry ->
             LivraisonScreen(
                 onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
@@ -435,6 +436,7 @@ private fun MainNavHost() {
         ) { entry ->
             ServicesScreen(
                 onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
@@ -449,27 +451,46 @@ private fun MainNavHost() {
         ) { entry ->
             ProjetsScreen(
                 onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
                 openCreate = entry.arguments?.getBoolean("create") == true,
             )
         }
         // Nouveaux modules (structure ERP 360 complète)
         composable(AppModule.COMPTABILITE.route) {
-            ComptabiliteScreen(onBack = { navController.popBackStack() })
+            ComptabiliteScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         composable(AppModule.TRESORERIE.route) {
-            TresorerieScreen(onBack = { navController.popBackStack() })
+            TresorerieScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         composable(AppModule.CRM.route) {
-            CrmScreen(onBack = { navController.popBackStack() })
+            CrmScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         composable(AppModule.QUALITE.route) {
-            QualiteScreen(onBack = { navController.popBackStack() })
+            QualiteScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         composable(AppModule.MAINTENANCE.route) {
-            MaintenanceScreen(onBack = { navController.popBackStack() })
+            MaintenanceScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         composable(AppModule.LOGISTIQUE.route) {
-            LogistiqueScreen(onBack = { navController.popBackStack() })
+            LogistiqueScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
         // Référentiels (spec §30) — moyens de paiement, taxes, unités.
         composable(Routes.ADMIN_REFERENTIELS) {

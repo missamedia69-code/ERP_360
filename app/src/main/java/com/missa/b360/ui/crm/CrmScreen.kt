@@ -55,6 +55,7 @@ import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.Filigrane
 import com.missa.b360.ui.components.MissaFondFiligrane
+import com.missa.b360.ui.components.sectionFonctionsModule
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -77,6 +78,7 @@ import com.missa.b360.ui.theme.Red40
 @Composable
 fun CrmScreen(
     onBack: () -> Unit,
+    onNaviguer: (String) -> Unit,
     viewModel: CrmViewModel = hiltViewModel(),
 ) {
     val etat by viewModel.etat.collectAsState()
@@ -166,6 +168,9 @@ fun CrmScreen(
                     CrmFicheLigne(fiche, devise)
                 }
             }
+
+            // Sommaire des fonctionnalités du module, disponibles et prévues.
+            sectionFonctionsModule(ModuleCode.CRM) { route -> onNaviguer(route) }
         }
         }
     }

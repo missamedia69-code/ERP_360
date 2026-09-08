@@ -1671,4 +1671,7 @@
     <string name="home_documents_hint">Your documents (invoices, notes, receipts…) will appear here.</string>
     <string name="home_profil_ligne">Profile: %1$s</string>
     <string name="home_taille_ligne">Size: %1$s</string>
+    <string name="mod_actions">Actions</string>
+    <string name="mod_fonctions_disponibles">Available features</string>
+    <string name="mod_fonctions_a_venir">Planned in this module (%1$d)</string>
 </resources>

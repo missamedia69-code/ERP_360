@@ -1650,4 +1650,7 @@
     <string name="home_documents_hint">ستظهر هنا مستنداتك (الفواتير، السندات، الإيصالات…).</string>
     <string name="home_profil_ligne">الملف: %1$s</string>
     <string name="home_taille_ligne">الحجم: %1$s</string>
+    <string name="mod_actions">الإجراءات</string>
+    <string name="mod_fonctions_disponibles">الوظائف المتاحة</string>
+    <string name="mod_fonctions_a_venir">مخطط لها في هذه الوحدة (%1$d)</string>
 </resources>

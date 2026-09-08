@@ -1678,4 +1678,7 @@
     <string name="home_documents_hint">Vos documents (factures, bons, reçus…) apparaîtront ici.</string>
     <string name="home_profil_ligne">Profil : %1$s</string>
     <string name="home_taille_ligne">Taille : %1$s</string>
+    <string name="mod_actions">Actions</string>
+    <string name="mod_fonctions_disponibles">Fonctionnalités disponibles</string>
+    <string name="mod_fonctions_a_venir">Prévues dans ce module (%1$d)</string>
 </resources>

@@ -1650,4 +1650,7 @@
     <string name="home_documents_hint">Sus documentos (facturas, albaranes, recibos…) aparecerán aquí.</string>
     <string name="home_profil_ligne">Perfil: %1$s</string>
     <string name="home_taille_ligne">Tamaño: %1$s</string>
+    <string name="mod_actions">Acciones</string>
+    <string name="mod_fonctions_disponibles">Funciones disponibles</string>
+    <string name="mod_fonctions_a_venir">Previstas en este módulo (%1$d)</string>
 </resources>
