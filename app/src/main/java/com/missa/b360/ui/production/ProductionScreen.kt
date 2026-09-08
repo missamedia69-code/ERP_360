@@ -56,6 +56,7 @@ import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.domain.model.ProductionCodec
 import com.missa.b360.core.domain.model.ProductionComponent
 import com.missa.b360.core.domain.model.ProductionRecordPayload
+import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.SaveProductionOrderUseCase
 import com.missa.b360.core.util.DateUtils
@@ -94,6 +95,22 @@ class ProductionViewModel @Inject constructor(
     data class UiMessage(val key: Int, val ok: Boolean = true, val args: List<Any> = emptyList())
 
     val products: StateFlow<List<ProductEntity>> = productDao.observeAll()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /**
+     * Ce qu'un ordre peut produire : un article fabriqué ou composé. Proposer
+     * une matière première reviendrait à la fabriquer à partir d'elle-même.
+     */
+    val produitsFinis: StateFlow<List<ProductEntity>> = productDao.observeAll()
+        .map { ProduitRules.fabricables(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /**
+     * Ce qu'un ordre peut consommer : matières premières, articles achetés et
+     * sous-ensembles. Un produit fini n'entre pas dans sa propre fabrication.
+     */
+    val composantsPossibles: StateFlow<List<ProductEntity>> = productDao.observeAll()
+        .map { ProduitRules.composants(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val devise: StateFlow<String> = getEnterprise.observer()
         .map { it?.devise ?: Iso4217.DEVISE_REPLI }
@@ -225,6 +242,8 @@ fun ProductionScreen(
 ) {
     val context = LocalContext.current
     val products by viewModel.products.collectAsState(initial = emptyList())
+    val produitsFinis by viewModel.produitsFinis.collectAsState(initial = emptyList())
+    val composantsPossibles by viewModel.composantsPossibles.collectAsState(initial = emptyList())
     val ops by viewModel.ops.collectAsState(initial = emptyList())
     val busy by viewModel.busy.collectAsState()
     val snackbar = remember { SnackbarHostState() }
@@ -289,7 +308,7 @@ fun ProductionScreen(
             if (formVisible) {
                 ProductSelectorField(
                     label = R.string.prod_produit,
-                    choices = products.map { it.id to it.nom },
+                    choices = produitsFinis.map { it.id to it.nom },
                     selectedId = produitId,
                     onSelect = { produitId = it },
                     emptyLabel = stringResource(R.string.prod_choisir_produit),
@@ -313,7 +332,7 @@ fun ProductionScreen(
                     ) {
                         ComposantSelector(
                             keyIndex = index,
-                            choices = products,
+                            choices = composantsPossibles,
                             selectedId = ligne.produitId,
                             onSelect = { p ->
                                 lignes = lignes.toMutableList().apply {
