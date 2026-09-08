@@ -27,7 +27,7 @@ class ModuleRegistryTest {
     @Test
     fun `la barre du bas ne propose que des modules actifs`() {
         val barre = AppModule.barreBas(listOf(ModuleCode.VEN))
-        assertTrue(barre.all { it.bottomBarDefault })
+        assertTrue(barre.all { it.prioriteBarre > 0 })
         assertTrue(barre.none { it.moduleCode == ModuleCode.STK })
     }
 

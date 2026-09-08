@@ -52,9 +52,50 @@ class BarreNavigationTest {
     }
 
     @Test
-    fun `la disposition d usine correspond a la maquette`() {
-        val defaut = AppModule.barreBas(ModuleCode.entries.toList())
-        assertEquals(listOf(AppModule.VENTE, AppModule.STOCK, AppModule.CLIENTS), defaut)
+    fun `la barre suit le metier du pack`() {
+        // Un négoce voit sa vente et son stock…
+        assertEquals(
+            listOf(AppModule.VENTE, AppModule.STOCK),
+            AppModule.barreBas(listOf(ModuleCode.VEN, ModuleCode.STK)),
+        )
+        // …un prestataire ses services, sans stock ni production.
+        val service = AppModule.barreBas(listOf(ModuleCode.SER, ModuleCode.VEN))
+        assertTrue(AppModule.SERVICES in service)
+        assertTrue(AppModule.STOCK !in service)
+        // …un bureau d'études ses projets.
+        assertTrue(AppModule.PROJETS in AppModule.barreBas(listOf(ModuleCode.PRJ, ModuleCode.VEN)))
+    }
+
+    @Test
+    fun `la barre et le menu Plus se partagent le pack sans doublon`() {
+        val actifs = ModuleCode.entries.toList()
+        val barre = AppModule.barreBas(actifs)
+        val plus = AppModule.secondaires(actifs)
+        assertTrue("un module figure dans les deux", barre.intersect(plus.toSet()).isEmpty())
+        assertEquals(AppModule.visibles(actifs).size, barre.size + plus.size)
+    }
+
+    @Test
+    fun `epingler un module le retire du menu Plus`() {
+        val actifs = ModuleCode.entries.toList()
+        val epingles = listOf(AppModule.QUALITE.name, AppModule.CRM.name)
+        assertEquals(
+            listOf(AppModule.QUALITE, AppModule.CRM),
+            AppModule.barreBas(actifs, epingles),
+        )
+        val plus = AppModule.secondaires(actifs, epingles)
+        assertTrue(AppModule.QUALITE !in plus)
+        assertTrue(AppModule.CRM !in plus)
+        // Les anciens onglets reviennent dans le menu.
+        assertTrue(AppModule.VENTE in plus)
+    }
+
+    @Test
+    fun `un module dont l ecran masque la barre n est jamais epinglable`() {
+        val actifs = ModuleCode.entries.toList()
+        assertTrue(AppModule.FINANCES !in AppModule.epinglables(actifs))
+        assertTrue(AppModule.ACHATS !in AppModule.epinglables(actifs))
+        assertTrue(AppModule.FINANCES !in AppModule.barreBas(actifs, listOf(AppModule.FINANCES.name)))
     }
 
     @Test
@@ -89,13 +130,6 @@ class BarreNavigationTest {
         val defaut = AppModule.barreBas(ModuleCode.entries.toList())
         assertTrue(defaut.size <= AppModule.MAX_ONGLETS)
         assertTrue(defaut.isNotEmpty())
-    }
-
-    @Test
-    fun `un epinglage prend le pas sur la disposition d usine`() {
-        val actifs = ModuleCode.entries.toList()
-        val choisis = AppModule.barreBas(actifs, listOf(AppModule.QUALITE.name, AppModule.CRM.name))
-        assertEquals(listOf(AppModule.QUALITE, AppModule.CRM), choisis)
     }
 
     @Test

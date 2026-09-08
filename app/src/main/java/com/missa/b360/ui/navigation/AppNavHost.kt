@@ -523,7 +523,7 @@ private fun MainNavHost() {
 
     if (plusDeModules) {
         PlusDeModulesFeuille(
-            modules = AppModule.epinglables(modulesActifs),
+            modules = AppModule.secondaires(modulesActifs, modulesEpingles),
             onFermer = { plusDeModules = false },
             onModule = { module ->
                 plusDeModules = false
