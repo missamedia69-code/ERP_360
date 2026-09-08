@@ -23,8 +23,11 @@ import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
-import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.core.util.Iso4217
+import com.missa.b360.core.util.MoneyUtils
 
 /** Écran Clients (9.2) : liste + recherche + catégories + badges + désactivation. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,6 +128,9 @@ private fun LegacyClientsScreen(
             }
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.VEN),
+        ) {
         Column(
             Modifier
                 .fillMaxSize()
@@ -176,6 +182,7 @@ private fun LegacyClientsScreen(
                     }
                 }
             }
+        }
         }
     }
 

@@ -69,8 +69,11 @@ import com.missa.b360.core.data.entity.SensMouvement
 import com.missa.b360.core.data.entity.TypeCompteTresorerie
 import com.missa.b360.core.domain.model.SoldeCompte
 import com.missa.b360.core.domain.model.TresorerieRules
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -171,8 +174,12 @@ fun TresorerieScreen(
             }
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.TRE),
+            modifier = Modifier.padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 92.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -235,6 +242,7 @@ fun TresorerieScreen(
                     )
                 }
             }
+        }
         }
     }
 

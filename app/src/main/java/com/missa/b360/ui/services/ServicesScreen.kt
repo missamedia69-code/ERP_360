@@ -66,10 +66,13 @@ import com.missa.b360.core.domain.model.EtapePrestation
 import com.missa.b360.core.domain.model.ModeFacturation
 import com.missa.b360.core.domain.model.Prestation
 import com.missa.b360.core.domain.model.PrestationRules
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.MissaOption
 import com.missa.b360.ui.components.MissaSelecteurBleu
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -148,8 +151,12 @@ fun ServicesScreen(
             }
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.SER),
+            modifier = Modifier.padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 92.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -198,6 +205,7 @@ fun ServicesScreen(
                     )
                 }
             }
+        }
         }
     }
 

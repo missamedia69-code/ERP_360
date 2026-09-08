@@ -70,10 +70,13 @@ import com.missa.b360.core.domain.model.BonLivraison
 import com.missa.b360.core.domain.model.EtapeLivraison
 import com.missa.b360.core.domain.model.LivraisonRules
 import com.missa.b360.core.domain.model.MentionsLegales
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.components.MissaOption
 import com.missa.b360.ui.components.MissaSelecteurBleu
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -159,8 +162,12 @@ fun LivraisonScreen(
             }
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.LOG),
+            modifier = Modifier.padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 92.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -208,6 +215,7 @@ fun LivraisonScreen(
                     )
                 }
             }
+        }
         }
     }
 

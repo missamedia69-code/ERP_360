@@ -51,9 +51,12 @@ import com.missa.b360.R
 import com.missa.b360.core.domain.model.EcritureComptable
 import com.missa.b360.core.domain.model.ResultatPeriode
 import com.missa.b360.core.domain.model.TotalRubrique
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -97,8 +100,12 @@ fun ComptabiliteScreen(
             )
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.CPT),
+            modifier = Modifier.padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -168,6 +175,7 @@ fun ComptabiliteScreen(
                     CptEcritureLigne(it, devise)
                 }
             }
+        }
         }
     }
 }

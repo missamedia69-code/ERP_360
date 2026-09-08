@@ -49,9 +49,12 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.FicheCrm
 import com.missa.b360.core.domain.model.SegmentClient
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.util.MoneyUtils
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -96,8 +99,12 @@ fun CrmScreen(
             )
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.CRM),
+            modifier = Modifier.padding(padding),
+        ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(11.dp),
         ) {
@@ -159,6 +166,7 @@ fun CrmScreen(
                     CrmFicheLigne(fiche, devise)
                 }
             }
+        }
         }
     }
 }

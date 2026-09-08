@@ -67,6 +67,9 @@ import com.missa.b360.ui.components.MissaSectionTitle
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.ui.components.Filigrane
+import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
@@ -129,6 +132,9 @@ fun StockScreen(
             )
         },
     ) { padding ->
+        MissaFondFiligrane(
+            filigrane = Filigrane.pour(ModuleCode.STK),
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -184,6 +190,7 @@ fun StockScreen(
                     modifier = Modifier.weight(1f),
                 )
             }
+        }
         }
     }
 }
