@@ -7,6 +7,7 @@ import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EquipementDao
+import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.InterventionDao
 import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.EmployeeDao
@@ -47,10 +48,11 @@ object DatabaseModule {
         Room.databaseBuilder(context, AppDatabase::class.java, "missa_b360.db")
             .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7,
-                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11)
+                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12)
             .fallbackToDestructiveMigration(false)
             .build()
 
+    @Provides fun provideGroupeArticleDao(db: AppDatabase): GroupeArticleDao = db.groupeArticleDao()
     @Provides fun provideNonConformiteDao(db: AppDatabase): NonConformiteDao = db.nonConformiteDao()
     @Provides fun provideEquipementDao(db: AppDatabase): EquipementDao = db.equipementDao()
     @Provides fun provideInterventionDao(db: AppDatabase): InterventionDao = db.interventionDao()
