@@ -53,9 +53,10 @@ class BarreNavigationTest {
 
     @Test
     fun `la barre suit le metier du pack`() {
-        // Un négoce voit sa vente et son stock…
+        // Un négoce voit sa vente et son stock en tête ; Clients, qui relève
+        // du même module que la vente, complète la troisième place.
         assertEquals(
-            listOf(AppModule.VENTE, AppModule.STOCK),
+            listOf(AppModule.VENTE, AppModule.STOCK, AppModule.CLIENTS),
             AppModule.barreBas(listOf(ModuleCode.VEN, ModuleCode.STK)),
         )
         // …un prestataire ses services, sans stock ni production.
