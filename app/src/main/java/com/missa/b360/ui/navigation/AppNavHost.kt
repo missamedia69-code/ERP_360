@@ -90,6 +90,7 @@ import com.missa.b360.ui.sales.SalesScreen
 import com.missa.b360.ui.stock.InventoryScreen
 import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
+import com.missa.b360.ui.stock.StockAccueilScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
 import com.missa.b360.ui.screens.SplashVideoScreen
@@ -268,18 +269,17 @@ private fun MainNavHost() {
                     defaultValue = "NONE"
                 },
             ),
-        ) { entry ->
-            val direction = OperationDirection.entries.firstOrNull {
-                it.name == entry.arguments?.getString("direction")
-            } ?: OperationDirection.NONE
+        ) {
+            StockAccueilScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.navigate(route) },
+            )
+        }
+        composable(Routes.STOCK_ARTICLES) {
             StockScreen(
                 onBack = { navController.popBackStack() },
                 onNavigate = { route -> navController.navigate(route) },
-                initialMovement = if (entry.arguments?.getBoolean("create") == true) {
-                    if (direction == OperationDirection.OUT) StockMovementType.SORTIE else StockMovementType.ENTREE
-                } else {
-                    null
-                },
+                initialMovement = null,
             )
         }
         composable(
