@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +21,10 @@ import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -69,110 +70,113 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
         viewModel = viewModel,
         onRetour = viewModel::precedent,
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, MissaBorder),
-            colors = CardDefaults.cardColors(containerColor = MissaSurface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        // Cartes autonomes, espacées : chaque sélecteur a son propre cadre
+        // depuis qu'il est encadré, empiler le tout dans une carte unique les
+        // faisait se toucher.
+        Column(
             modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                OnbFuseauLigne(
-                    selection = viewModel.fuseau,
-                    onSelect = viewModel::appliquerFuseau,
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
-                val formatsJours = listOf(
-                    MissaOption(cle = "dd/MM/yyyy", titre = "31/12/2025", badge = "JJ/MM/AAAA"),
-                    MissaOption(cle = "MM/dd/yyyy", titre = "12/31/2025", badge = "MM/JJ/AAAA"),
-                    MissaOption(cle = "dd.MM.yyyy", titre = "31.12.2025", badge = "JJ.MM.AAAA"),
-                    MissaOption(cle = "yyyy-MM-dd", titre = "2025-12-31", badge = "AAAA-MM-JJ"),
-                )
-                MissaSelecteurLigne(
-                    label = stringResource(R.string.obn_format_date),
-                    options = formatsJours,
-                    selectionCle = viewModel.formatJours,
-                    onSelection = viewModel::appliquerFormatDate,
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
-                val formatsNombres = listOf(
-                    MissaOption(
-                        cle = "fr",
-                        titre = "1 234 567,89",
-                        sousTitre = stringResource(R.string.obn_format_nombres_fr),
-                    ),
-                    MissaOption(
-                        cle = "en",
-                        titre = "1,234,567.89",
-                        sousTitre = stringResource(R.string.obn_format_nombres_en),
-                    ),
-                )
-                MissaSelecteurLigne(
-                    label = stringResource(R.string.obn_format_nombres),
-                    options = formatsNombres,
-                    selectionCle = viewModel.formatNombres,
-                    onSelection = viewModel::appliquerFormatNombres,
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
-                val retentions = listOf(
-                    MissaOption(
-                        cle = "30",
-                        titre = stringResource(R.string.obn_retention_30),
-                        sousTitre = stringResource(R.string.obn_retention_30_sous),
-                    ),
-                    MissaOption(
-                        cle = "90",
-                        titre = stringResource(R.string.obn_retention_90),
-                        sousTitre = stringResource(R.string.obn_retention_90_sous),
-                    ),
-                    MissaOption(
-                        cle = "365",
-                        titre = stringResource(R.string.obn_retention_365),
-                        sousTitre = stringResource(R.string.obn_retention_365_sous),
-                    ),
-                )
-                MissaSelecteurLigne(
-                    label = stringResource(R.string.obn_retention),
-                    options = retentions,
-                    selectionCle = viewModel.retentionJournal.toString(),
-                    onSelection = { cle ->
-                        cle.toIntOrNull()?.let(viewModel::appliquerRetentionJournal)
-                    },
-                    enabled = !viewModel.enregistrementEnCours,
-                )
-                HorizontalDivider(color = MissaBorder)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 13.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.obn_sauvegardes),
-                            fontSize = 12.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MissaInk,
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = stringResource(R.string.obn_sauvegardes_sous),
-                            fontSize = 11.5.sp,
-                            color = MissaMuted,
-                        )
-                    }
-                    Switch(
-                        checked = viewModel.sauvegardesActives,
-                        onCheckedChange = { viewModel.appliquerSauvegardes(it) },
-                        enabled = !viewModel.enregistrementEnCours,
-                        colors = androidx.compose.material3.SwitchDefaults.colors(
-                            checkedTrackColor = BrandBlue,
-                        ),
+            OnbFuseauLigne(
+                selection = viewModel.fuseau,
+                onSelect = viewModel::appliquerFuseau,
+                enabled = !viewModel.enregistrementEnCours,
+            )
+            val formatsJours = listOf(
+                MissaOption(cle = "dd/MM/yyyy", titre = "31/12/2025", badge = "JJ/MM/AAAA"),
+                MissaOption(cle = "MM/dd/yyyy", titre = "12/31/2025", badge = "MM/JJ/AAAA"),
+                MissaOption(cle = "dd.MM.yyyy", titre = "31.12.2025", badge = "JJ.MM.AAAA"),
+                MissaOption(cle = "yyyy-MM-dd", titre = "2025-12-31", badge = "AAAA-MM-JJ"),
+            )
+            MissaSelecteurLigne(
+                label = stringResource(R.string.obn_format_date),
+                options = formatsJours,
+                selectionCle = viewModel.formatJours,
+                onSelection = viewModel::appliquerFormatDate,
+                enabled = !viewModel.enregistrementEnCours,
+            )
+            val formatsNombres = listOf(
+                MissaOption(
+                    cle = "fr",
+                    titre = "1 234 567,89",
+                    sousTitre = stringResource(R.string.obn_format_nombres_fr),
+                ),
+                MissaOption(
+                    cle = "en",
+                    titre = "1,234,567.89",
+                    sousTitre = stringResource(R.string.obn_format_nombres_en),
+                ),
+            )
+            MissaSelecteurLigne(
+                label = stringResource(R.string.obn_format_nombres),
+                options = formatsNombres,
+                selectionCle = viewModel.formatNombres,
+                onSelection = viewModel::appliquerFormatNombres,
+                enabled = !viewModel.enregistrementEnCours,
+            )
+            val retentions = listOf(
+                MissaOption(
+                    cle = "30",
+                    titre = stringResource(R.string.obn_retention_30),
+                    sousTitre = stringResource(R.string.obn_retention_30_sous),
+                ),
+                MissaOption(
+                    cle = "90",
+                    titre = stringResource(R.string.obn_retention_90),
+                    sousTitre = stringResource(R.string.obn_retention_90_sous),
+                ),
+                MissaOption(
+                    cle = "365",
+                    titre = stringResource(R.string.obn_retention_365),
+                    sousTitre = stringResource(R.string.obn_retention_365_sous),
+                ),
+            )
+            MissaSelecteurLigne(
+                label = stringResource(R.string.obn_retention),
+                options = retentions,
+                selectionCle = viewModel.retentionJournal.toString(),
+                onSelection = { cle ->
+                    cle.toIntOrNull()?.let(viewModel::appliquerRetentionJournal)
+                },
+                enabled = !viewModel.enregistrementEnCours,
+            )
+            // Même cadre que les sélecteurs voisins : une ligne nue au milieu
+            // de cartes encadrées se lit comme un oubli.
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                color = MissaSurface,
+                border = BorderStroke(1.dp, MissaBorder),
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 13.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.obn_sauvegardes),
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MissaInk,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(R.string.obn_sauvegardes_sous),
+                        fontSize = 11.5.sp,
+                        color = MissaMuted,
                     )
                 }
+                Switch(
+                    checked = viewModel.sauvegardesActives,
+                    onCheckedChange = { viewModel.appliquerSauvegardes(it) },
+                    enabled = !viewModel.enregistrementEnCours,
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedTrackColor = BrandBlue,
+                    ),
+                )
+            }
             }
         }
         OnbRestaurationCarte(viewModel = viewModel)
