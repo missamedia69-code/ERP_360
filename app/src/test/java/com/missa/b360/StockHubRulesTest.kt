@@ -81,7 +81,8 @@ class StockHubRulesTest {
         assertEquals(3200.0, marchX.valeur, 0.0001)
         val matX = resultat.first { it.code == "MP" }
         assertEquals(2, matX.nombreArticles)
-        assertEquals(2200.0, matX.valeur, 0.0001)
+        // Cacao : 800 * 2 + Farine : 300 * 3 = 2 500.
+        assertEquals(2500.0, matX.valeur, 0.0001)
         assertTrue(resultat[0].valeur >= resultat[1].valeur)
     }
 
