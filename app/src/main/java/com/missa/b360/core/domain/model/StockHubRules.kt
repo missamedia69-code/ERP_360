@@ -1,9 +1,10 @@
 package com.missa.b360.core.domain.model
 
+import com.missa.b360.core.data.dao.StockMovementView
+import com.missa.b360.core.data.entity.GroupeArticleEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.SiteEntity
-import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
 
 /** Article dont la quantité est passée sous son seuil de réapprovisionnement. */
@@ -16,19 +17,60 @@ data class LigneSousSeuil(
     val manque: Double get() = (seuil - quantite).coerceAtLeast(0.0)
 }
 
-/** Photographie du module Stock, pour son écran d'accueil. */
+/** Un mouvement récent, prêt à l'affichage : nom du produit, sens et montant. */
+data class LigneMouvementRecente(
+    val produitNom: String,
+    val produitCode: String,
+    val type: StockMovementType,
+    /** Quantité signée pour le sens (positive en entrée, négative en sortie). */
+    val quantite: Double,
+    val reference: String?,
+    val horodatage: Long,
+) {
+    /** Vrai pour une sortie de stock. */
+    val estSortie: Boolean get() = type == StockMovementType.SORTIE ||
+        type == StockMovementType.TRANSFERT_SORTIE
+
+    val estEntree: Boolean get() = type == StockMovementType.ENTREE ||
+        type == StockMovementType.TRANSFERT_ENTREE
+}
+
+/** Répartition de la valeur et du nombre d'articles par groupe. */
+data class LigneGroupeStock(
+    val code: String,
+    val nom: String,
+    val nombreArticles: Int,
+    val valeur: Double,
+)
+
+/**
+ * Photographie du module Stock, pour son écran d'accueil.
+ *
+ * La valeur du stock, les alertes et les mouvements sont toujours calculés pour
+ * le dépôt sélectionné ; les fiches articles restent communes à l'entreprise.
+ */
 data class StockHub(
     val valeurStock: Double = 0.0,
     val nombreArticles: Int = 0,
     val articlesSousSeuil: List<LigneSousSeuil> = emptyList(),
     val ruptures: Int = 0,
     val mouvementsDuJour: Int = 0,
-    val derniersMouvements: List<StockMovementEntity> = emptyList(),
+    val mouvementsHier: Int = 0,
+    val derniersMouvements: List<LigneMouvementRecente> = emptyList(),
+    val groupes: List<LigneGroupeStock> = emptyList(),
     val quantiteTotale: Double = 0.0,
     val nomDepot: String? = null,
+    /** Minutes écoulées depuis le dernier mouvement ; null si aucun mouvement. */
+    val minutesDepuisActivite: Int? = null,
 ) {
     /** Ce qui appelle une action : ruptures et articles sous seuil. */
     val alertes: Int get() = articlesSousSeuil.size + ruptures
+
+    /** Vrai quand un indicateur de tendance peut être affiché (mouvements connus). */
+    val tendanceMouvements: Double? get() {
+        if (mouvementsHier <= 0) return null
+        return (mouvementsDuJour - mouvementsHier).toDouble() / mouvementsHier
+    }
 }
 
 /**
@@ -41,6 +83,7 @@ data class StockHub(
 object StockHubRules {
 
     private const val JOUR_MS = 86_400_000L
+    private const val MINUTE_MS = 60_000L
 
     /**
      * Valeur du stock au coût de revient, à défaut au prix d'achat.
@@ -90,13 +133,64 @@ object StockHubRules {
     }
 
     /** Mouvements enregistrés depuis le début de la journée. */
-    fun mouvementsDuJour(mouvements: List<StockMovementEntity>, maintenant: Long): Int {
+    fun mouvementsDuJour(mouvements: List<StockMovementView>, maintenant: Long): Int {
         val debut = maintenant - (maintenant % JOUR_MS)
         return mouvements.count { it.horodatage >= debut }
     }
 
-    /** Libellé court d'un type de mouvement, pour les raccourcis. */
-    fun natureMouvement(type: StockMovementType): String = type.name
+    /** Mouvements enregistrés hier (journée civile précédente). */
+    fun mouvementsHier(mouvements: List<StockMovementView>, maintenant: Long): Int {
+        val debutAujourdhui = maintenant - (maintenant % JOUR_MS)
+        val debutHier = debutAujourdhui - JOUR_MS
+        return mouvements.count { it.horodatage >= debutHier && it.horodatage < debutAujourdhui }
+    }
+
+    /**
+     * Répartition par groupe d'articles : nombre de fiches actives rattachées au
+     * groupe et valeur de leur stock. Les groupes vides restent visibles, car un
+     * magasinier veut savoir qu'une famille n'a encore rien.
+     */
+    fun parGroupe(
+        produits: List<ProductEntity>,
+        stocks: List<ProductStockEntity>,
+        groupes: List<GroupeArticleEntity>,
+    ): List<LigneGroupeStock> {
+        val parProduit = produits.associateBy { it.id }.filterValues { it.active }
+        val stocksFiltres = stocks.filter { parProduit.containsKey(it.produitId) }
+        val quantites = stocksFiltres.groupBy { it.produitId }
+            .mapValues { (_, lignes) -> lignes.sumOf { it.quantite } }
+
+        return groupes
+            .filter { it.actif }
+            .map { groupe ->
+                val membres = parProduit.values.filter { it.itemGroupId == groupe.id }
+                val valeur = membres.sumOf { produit ->
+                    val cout = produit.prixRevient ?: produit.prixAchat ?: 0.0
+                    cout * (quantites[produit.id] ?: 0.0)
+                }
+                LigneGroupeStock(
+                    code = groupe.code,
+                    nom = groupe.nom,
+                    nombreArticles = membres.size,
+                    valeur = valeur,
+                )
+            }
+            .sortedWith(compareByDescending<LigneGroupeStock> { it.valeur })
+    }
+
+    /** Type de mouvement à partir de son nom stocké, avec repli sur ENTRÉE. */
+    fun typeDe(nom: String?): StockMovementType = runCatching {
+        StockMovementType.valueOf(nom.orEmpty())
+    }.getOrDefault(StockMovementType.ENTREE)
+
+    /** Minutes écoulées depuis le dernier mouvement ; null si aucun mouvement. */
+    fun minutesDepuisDerniereActivite(
+        mouvements: List<StockMovementView>,
+        maintenant: Long,
+    ): Int? {
+        val derniere = mouvements.maxOfOrNull { it.horodatage } ?: return null
+        return ((maintenant - derniere) / MINUTE_MS).toInt().coerceAtLeast(0)
+    }
 
     /**
      * Assemble la photographie complète du module pour un dépôt donné.
@@ -108,7 +202,8 @@ object StockHubRules {
     fun construire(
         produits: List<ProductEntity>,
         stocks: List<ProductStockEntity>,
-        mouvements: List<StockMovementEntity>,
+        mouvements: List<StockMovementView>,
+        groupes: List<GroupeArticleEntity>,
         sites: List<SiteEntity>,
         depotId: Long?,
         maintenant: Long,
@@ -122,12 +217,26 @@ object StockHubRules {
             articlesSousSeuil = sousSeuil(produits, stocksFiltres),
             ruptures = ruptures(produits, stocksFiltres),
             mouvementsDuJour = mouvementsDuJour(mouvementsFiltres, maintenant),
-            derniersMouvements = mouvementsFiltres.take(RACCOURCIS_AFFICHES),
+            mouvementsHier = mouvementsHier(mouvementsFiltres, maintenant),
+            derniersMouvements = mouvementsFiltres
+                .take(RACCOURCIS_AFFICHES)
+                .map { vue ->
+                    LigneMouvementRecente(
+                        produitNom = vue.produitNom,
+                        produitCode = vue.produitCode,
+                        type = typeDe(vue.type),
+                        quantite = vue.quantite,
+                        reference = vue.reference,
+                        horodatage = vue.horodatage,
+                    )
+                },
+            groupes = parGroupe(produits, stocksFiltres, groupes),
             quantiteTotale = stocksFiltres.sumOf { it.quantite },
             nomDepot = depotId?.let { id -> sites.firstOrNull { it.id == id }?.nom },
+            minutesDepuisActivite = minutesDepuisDerniereActivite(mouvementsFiltres, maintenant),
         )
     }
 
-    /** Quatre raccourcis suffisent : au-delà, la rangée devient un inventaire. */
+    /** Six raccourcis suffisent : au-delà, la rangée devient un inventaire. */
     const val RACCOURCIS_AFFICHES = 6
 }

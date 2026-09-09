@@ -426,4 +426,12 @@ object DateUtils {
 
     /** Date + heure au format choisi à l'onboarding, dans le fuseau choisi. */
     fun formatDateHeure(timestamp: Long): String = formatteur(true).format(Date(timestamp))
+
+    /** Heure seule — « HH:mm » — dans le fuseau choisi (mouvements, horodatages courts). */
+    fun formatHeure(timestamp: Long): String {
+        val motif = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            timeZone = FormatPrefs.fuseau
+        }
+        return motif.format(Date(timestamp))
+    }
 }

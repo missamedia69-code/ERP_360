@@ -119,7 +119,7 @@ interface StockMovementDao {
 
     /** Mouvements joints au produit et au site, prêts à afficher. */
     @Query(
-        "SELECT m.id, COALESCE(p.nom, 'Produit') AS produitNom, COALESCE(p.code, '') AS produitCode, " +
+        "SELECT m.id, m.siteId, COALESCE(p.nom, 'Produit') AS produitNom, COALESCE(p.code, '') AS produitCode, " +
             "s.nom AS siteNom, m.type, m.quantite, m.motif, m.reference, m.commentaire, m.horodatage " +
             "FROM stock_movements m " +
             "LEFT JOIN products p ON p.id = m.produitId " +
@@ -132,6 +132,8 @@ interface StockMovementDao {
 /** Ligne d'historique de mouvements, jointe pour l'affichage (pas de rechargement). */
 data class StockMovementView(
     val id: Long,
+    /** Site dans lequel le mouvement a été comptabilisé. */
+    val siteId: Long,
     val produitNom: String,
     val produitCode: String,
     val siteNom: String?,

@@ -20,6 +20,12 @@ val ProfileGreen = Color(0xFF20934A)
 val ProfileCommerceBlue = BrandBlue
 val ProfilePurple = Color(0xFF7047E8)
 val ProfileOrange = Color(0xFFF28A16)
+/** Teal des produits finis et des familles « stock » dans les carrefours. */
+val ProfileTeal = Color(0xFF0E9AA7)
+/** Violet soutenu des familles techniques (machines, équipements, chimie). */
+val ProfileViolet = Color(0xFF8B5CF6)
+/** Vert de la tendance positive, plus vif que le vert de marque. */
+val TendrePositive = Color(0xFF16A34A)
 
 // Alerte.
 val Red40 = Color(0xFFEC5A67)

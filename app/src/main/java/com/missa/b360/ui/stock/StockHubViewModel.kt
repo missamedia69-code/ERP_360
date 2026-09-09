@@ -2,13 +2,15 @@ package com.missa.b360.ui.stock
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.StockMovementDao
+import com.missa.b360.core.data.entity.GroupeArticleEntity
 import com.missa.b360.core.data.entity.ProductEntity
+import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.SiteEntity
-import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.domain.model.StockHub
 import com.missa.b360.core.domain.model.StockHubRules
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
@@ -27,7 +29,7 @@ import javax.inject.Inject
 /**
  * État du hub Stock.
  *
- * Le dépôt sélectionné filtre tout l'écran : indicateurs, alertes et
+ * Le dépôt sélectionné filtre tout l'écran : indicateurs, alertes, groupes et
  * raccourcis. Tant que la gestion des dépôts et emplacements n'est pas livrée,
  * ce sont les sites de l'entreprise qui jouent ce rôle — la notion est la même
  * vue de l'utilisateur, et la bascule se fera sans changer cet écran.
@@ -39,6 +41,7 @@ class StockHubViewModel @Inject constructor(
     productDao: ProductDao,
     stockDao: ProductStockDao,
     movementDao: StockMovementDao,
+    groupeDao: GroupeArticleDao,
     getEnterprise: GetEnterpriseUseCase,
 ) : ViewModel() {
 
@@ -57,21 +60,29 @@ class StockHubViewModel @Inject constructor(
     val depots: StateFlow<List<SiteEntity>> = siteDao.observeAll()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    private val groupes: StateFlow<List<GroupeArticleEntity>> = groupeDao.observerComplets()
+        .map { complets -> complets.map { it.groupe } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     private val sources = combine(
         productDao.observeAll(),
         stockDao.observeToutes(),
-        movementDao.observeRecent(LIMITE_MOUVEMENTS),
-    ) { produits, stocks, mouvements -> Triple(produits, stocks, mouvements) }
+        movementDao.observeJoints(LIMITE_MOUVEMENTS),
+        groupes,
+    ) { produits, stocks, mouvements, listes ->
+        StockSources(produits, stocks, mouvements, listes)
+    }
 
     val etat: StateFlow<StockHub> = combine(
         sources,
         _depotChoisi,
         siteDao.observeAll(),
-    ) { (produits, stocks, mouvements), depot, sites ->
+    ) { src, depot, sites ->
         StockHubRules.construire(
-            produits = produits,
-            stocks = stocks,
-            mouvements = mouvements,
+            produits = src.produits,
+            stocks = src.stocks,
+            mouvements = src.mouvements,
+            groupes = src.groupes,
             sites = sites,
             depotId = depot,
             maintenant = System.currentTimeMillis(),
@@ -99,22 +110,16 @@ class StockHubViewModel @Inject constructor(
     fun nomDepot(sites: List<SiteEntity>, id: Long?): String? =
         id?.let { choisi -> sites.firstOrNull { it.id == choisi }?.nom }
 
+    private data class StockSources(
+        val produits: List<ProductEntity>,
+        val stocks: List<ProductStockEntity>,
+        val mouvements: List<com.missa.b360.core.data.dao.StockMovementView>,
+        val groupes: List<GroupeArticleEntity>,
+    )
+
     private companion object {
         /** Fenêtre de mouvements relus : au-delà, c'est l'écran Mouvements qui prend le relais. */
         const val LIMITE_MOUVEMENTS = 300
         const val DUREE_RETOUR_VISUEL = 450L
     }
 }
-
-/** Raccourci exposé à l'écran, sans dépendance à l'entité Room. */
-data class RaccourciStock(
-    val libelle: String,
-    val detail: String,
-    val mouvement: StockMovementEntity,
-)
-
-/** Article sous son seuil, prêt pour l'affichage. */
-data class ArticleSousSeuil(
-    val produit: ProductEntity,
-    val quantite: Double,
-)
