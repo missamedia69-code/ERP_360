@@ -25,6 +25,23 @@ object MoneyUtils {
         val df = DecimalFormat("0.00", DecimalFormatSymbols(Locale.ROOT))
         return df.format(montant)
     }
+
+    /**
+     * Format compact pour les tableaux de bord : rapetisse les grands montants
+     * (« 72,3 M », « 55,8 K ») tout en gardant le code devise. La valeur exacte
+     * reste dans [format] pour les écrans de gestion.
+     */
+    fun formatCompact(montant: Double, devise: String): String {
+        val abs = kotlin.math.abs(montant)
+        val df = DecimalFormat("#,##0.0", FormatPrefs.symboles())
+        val corps = when {
+            abs >= 1_000_000_000.0 -> "${df.format(montant / 1_000_000_000.0)} Md"
+            abs >= 1_000_000.0 -> "${df.format(montant / 1_000_000.0)} M"
+            abs >= 1_000.0 -> "${df.format(montant / 1_000.0)} K"
+            else -> return format(montant, devise)
+        }
+        return "$corps $devise"
+    }
 }
 
 /** Devises ISO 4217 courantes (réglage 9.1, verrou au premier usage — D4, défaut USD). */

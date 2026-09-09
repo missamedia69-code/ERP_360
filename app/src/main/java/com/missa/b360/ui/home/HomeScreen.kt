@@ -32,6 +32,9 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddBusiness
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -104,6 +107,7 @@ import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.PointPerformance
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.util.ContactCommercial
@@ -137,6 +141,7 @@ private val HomePurple = Color(0xFF7047E8)
 private val MarqueVert = Color(0xFF4BAE27)
 private val HomePurpleSoft = Color(0xFFF1ECFF)
 private val HomeTeal = Color(0xFF00A5A5)
+private val HomeRed = Red40
 private val HomeTextDark = MissaInk
 private val HomeTextMuted = MissaMuted
 private val HomeBackground = MissaCanvas
@@ -457,57 +462,82 @@ private fun HomeDashboard(
     val currency = state.devise
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        // Sélecteur d'entité + action principale : la barre de commande du cockpit.
         item {
-            // Les quatre chiffres de la maquette : ventes et achats du jour,
-            // solde disponible, portefeuille clients.
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                MetricCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_ventes_jour),
-                    subtitle = "",
-                    value = MoneyUtils.format(state.ventes, currency),
-                    icon = Icons.Outlined.ShoppingCart,
-                    iconColor = HomeBlue,
-                    iconBackground = HomeBlueSoft,
-                    onClick = { onNavigate(AppModule.VENTE.route) },
-                )
-                MetricCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_achats_jour),
-                    subtitle = "",
-                    value = MoneyUtils.format(state.achats, currency),
-                    icon = Icons.Outlined.Inventory2,
-                    iconColor = MarqueVert,
-                    iconBackground = HomeGreenSoft,
-                    onClick = { onNavigate(AppModule.ACHATS.route) },
-                )
-                MetricCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.home_cash),
-                    subtitle = stringResource(R.string.home_solde_disponible),
-                    value = MoneyUtils.format(state.tresorerie, currency),
-                    icon = Icons.Outlined.Payments,
-                    iconColor = HomeOrange,
-                    iconBackground = HomeOrangeSoft,
-                    onClick = { onNavigate(AppModule.TRESORERIE.route) },
-                )
-                MetricCard(
-                    modifier = Modifier.weight(1f),
-                    title = stringResource(R.string.module_clients),
-                    subtitle = stringResource(R.string.home_total),
-                    value = state.nombreClients.toString(),
-                    icon = Icons.Outlined.Groups,
-                    iconColor = HomePurple,
-                    iconBackground = HomePurpleSoft,
-                    onClick = { onNavigate(AppModule.CLIENTS.route) },
-                )
+            CockpitBarreEntite(
+                nomEntreprise = state.entrepriseNom.ifBlank { stringResource(R.string.home_company_placeholder) },
+                secteur = state.secteur,
+                logoUri = state.entrepriseLogoUri,
+                onNouvelleVente = { onNavigate(AppModule.VENTE.createRoute(OperationDirection.IN)) },
+            )
+        }
+
+        // Les quatre chiffres clés du jour : ventes, marge, trésorerie, stock.
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CockpitKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = stringResource(R.string.home_ventes),
+                        valeur = MoneyUtils.formatCompact(state.ventes, currency),
+                        tendance = state.tendanceVentes,
+                        icone = Icons.Outlined.ShoppingCart,
+                        couleur = HomeBlue,
+                        onClick = { onNavigate(AppModule.VENTE.route) },
+                    )
+                    CockpitKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = stringResource(R.string.home_marge),
+                        valeur = tauxMarge(state.marge, state.ventes),
+                        tendance = state.tendanceMarge,
+                        icone = Icons.AutoMirrored.Outlined.TrendingUp,
+                        couleur = HomeGreen,
+                        onClick = { onNavigate(AppModule.REPORTING.route) },
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CockpitKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = stringResource(R.string.home_resultat),
+                        valeur = MoneyUtils.formatCompact(state.tresorerie, currency),
+                        tendance = state.tendanceTresorerie,
+                        icone = Icons.Outlined.Payments,
+                        couleur = HomeOrange,
+                        onClick = { onNavigate(AppModule.TRESORERIE.route) },
+                    )
+                    CockpitKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = stringResource(R.string.home_stock),
+                        valeur = state.quantiteStock.displayQuantity(),
+                        tendance = null,
+                        icone = Icons.Outlined.Inventory2,
+                        couleur = HomePurple,
+                        onClick = { onNavigate(AppModule.STOCK.route) },
+                    )
+                }
             }
+        }
+
+        // Performance : encaissements des six derniers mois.
+        item {
+            CockpitPerformanceCard(
+                points = state.performanceMensuelle,
+                devise = currency,
+            )
+        }
+
+        // Centre d'activité : documents, alertes et santé de l'entreprise.
+        item {
+            CockpitCentreActivite(
+                rappels = state.rappels,
+                derniereSauvegarde = state.derniereSauvegarde,
+                onVoirFactures = { onNavigate(AppModule.REPORTING.route) },
+                onVoirAlertes = { onNavigate(Routes.TASKS) },
+                onVoirSante = { onNavigate(Routes.ADMIN_REGLAGES) },
+            )
         }
 
         item {
@@ -518,24 +548,6 @@ private fun HomeDashboard(
             )
             Spacer(Modifier.height(7.dp))
             QuickActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
-        }
-        item {
-            DashboardSectionHeader(
-                title = stringResource(R.string.home_activity_summary),
-                action = stringResource(R.string.home_today),
-                actionHasDropDown = true,
-            )
-            Spacer(Modifier.height(7.dp))
-            ResumeActivite(state, currency)
-        }
-        item {
-            RappelsCard(
-                rappels = state.rappels,
-                onClick = { onNavigate(Routes.TASKS) },
-            )
-        }
-        item {
-            HomeAlertesCard(onVoirTout = { onNavigate(AppModule.REPORTING.route) })
         }
         item {
             DashboardSectionHeader(
@@ -551,6 +563,13 @@ private fun HomeDashboard(
             )
         }
     }
+}
+
+@Composable
+private fun tauxMarge(marge: Double, ventes: Double): String {
+    if (ventes <= 0.0) return "—"
+    val pct = marge / ventes * 100.0
+    return String.format(java.util.Locale.ROOT, "%.1f %%", pct)
 }
 
 /**
@@ -808,6 +827,426 @@ private fun MetricCard(
             )
         }
     }
+}
+
+/** Barre de commande du cockpit : entité active d'un côté, « Nouvelle vente » de l'autre. */
+@Composable
+private fun CockpitBarreEntite(
+    nomEntreprise: String,
+    secteur: String,
+    logoUri: String?,
+    onNouvelleVente: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, HomeBorder),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CompanyLogo(
+                logoUri = logoUri,
+                contentDescription = null,
+                fallbackIcon = Icons.Outlined.Business,
+                modifier = Modifier.size(30.dp),
+                size = 30.dp,
+                shape = RoundedCornerShape(9.dp),
+                fallbackTint = MarqueVert,
+                fallbackBackground = HomeGreenSoft,
+            )
+            Spacer(Modifier.width(9.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.home_entite),
+                    color = HomeTextMuted,
+                    fontSize = 10.sp,
+                )
+                Text(
+                    text = nomEntreprise,
+                    color = HomeTextDark,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (secteur.isNotBlank()) {
+                    Text(
+                        text = secteur,
+                        color = HomeTextMuted,
+                        fontSize = 9.5.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.Outlined.ArrowDropDown,
+                contentDescription = null,
+                tint = HomeTextMuted,
+                modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(8.dp))
+            Surface(
+                modifier = Modifier.clickable(onClick = onNouvelleVente),
+                shape = RoundedCornerShape(10.dp),
+                color = MarqueVert,
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(15.dp),
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.home_new_sale),
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
+    }
+}
+
+/** Carte KPI compacte du cockpit : valeur, libellé et tendance en un coup d'œil. */
+@Composable
+private fun CockpitKpiCard(
+    modifier: Modifier,
+    titre: String,
+    valeur: String,
+    tendance: Double?,
+    icone: ImageVector,
+    couleur: Color,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = modifier
+            .height(108.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, HomeBorder),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = titre,
+                    modifier = Modifier.weight(1f),
+                    color = HomeTextMuted,
+                    fontSize = 10.5.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Surface(
+                    modifier = Modifier.size(26.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = couleur.copy(alpha = 0.12f),
+                ) {
+                    Icon(
+                        imageVector = icone,
+                        contentDescription = null,
+                        tint = couleur,
+                        modifier = Modifier.padding(5.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = valeur,
+                color = HomeTextDark,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(Modifier.height(4.dp))
+            TendanceLine(tendance)
+        }
+    }
+}
+
+/** Ligne de tendance : flèche + pourcentage coloré, ou tiret si non comparable. */
+@Composable
+private fun TendanceLine(tendance: Double?) {
+    if (tendance == null) {
+        Text(
+            text = stringResource(R.string.home_vs_hier),
+            color = HomeTextMuted,
+            fontSize = 9.sp,
+        )
+        return
+    }
+    val positive = tendance >= 0.0
+    val couleur = if (positive) HomeGreen else HomeRed
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = if (positive) Icons.AutoMirrored.Outlined.TrendingUp
+            else Icons.AutoMirrored.Outlined.TrendingDown,
+            contentDescription = null,
+            tint = couleur,
+            modifier = Modifier.size(12.dp),
+        )
+        Spacer(Modifier.width(2.dp))
+        Text(
+            text = String.format(java.util.Locale.ROOT, "%+.1f %%", tendance),
+            color = couleur,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(Modifier.width(4.dp))
+        Text(
+            text = stringResource(R.string.home_vs_hier),
+            color = HomeTextMuted,
+            fontSize = 9.sp,
+        )
+    }
+}
+
+/** Graphique de performance : encaissements des mois récents, en clair. */
+@Composable
+private fun CockpitPerformanceCard(
+    points: List<PointPerformance>,
+    devise: String,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, HomeBorder),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 13.dp, vertical = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = stringResource(R.string.home_performance),
+                    modifier = Modifier.weight(1f),
+                    color = HomeTextDark,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(R.string.home_encaissements),
+                    color = HomeBlue,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            Spacer(Modifier.height(12.dp))
+            if (points.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.home_no_documents),
+                    color = HomeTextMuted,
+                    fontSize = 11.sp,
+                )
+            } else {
+                Column {
+                    val max = points.maxOf { it.montant }.coerceAtLeast(1.0)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(96.dp),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        points.forEach { point ->
+                            val hauteur = (point.montant / max).coerceIn(0.06, 1.0)
+                            BarrePerformance(
+                                fraction = hauteur,
+                                isCurrent = point == points.last(),
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(7.dp),
+                    ) {
+                        points.forEach { point ->
+                            Text(
+                                text = stringResource(moisCourtRes(point.moisIndex)),
+                                modifier = Modifier.weight(1f),
+                                color = HomeTextMuted,
+                                fontSize = 8.5.sp,
+                                maxLines = 1,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BarrePerformance(fraction: Double, isCurrent: Boolean, modifier: Modifier) {
+    Column(
+        modifier = modifier.fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(fraction)
+                .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
+                .background(if (isCurrent) HomeGreen else HomeGreenSoft),
+        )
+    }
+}
+
+/** Résumé du « centre d'activité » : factures, alertes et santé de l'entreprise. */
+@Composable
+private fun CockpitCentreActivite(
+    rappels: RappelsAccueil,
+    derniereSauvegarde: Long?,
+    onVoirFactures: () -> Unit,
+    onVoirAlertes: () -> Unit,
+    onVoirSante: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, HomeBorder),
+    ) {
+        Column(modifier = Modifier.padding(vertical = 7.dp)) {
+            Text(
+                text = stringResource(R.string.home_centre_activite),
+                modifier = Modifier.padding(horizontal = 13.dp, vertical = 6.dp),
+                color = HomeTextDark,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            CockpitActiviteLigne(
+                titre = stringResource(R.string.home_factures),
+                detail = stringResource(
+                    R.string.home_factures_detail,
+                    rappels.facturesEnRetard,
+                ),
+                statutRes = statutFactures(rappels),
+                icone = Icons.Outlined.ReceiptLong,
+                onClick = onVoirFactures,
+            )
+            CockpitActiviteLigne(
+                titre = stringResource(R.string.home_alertes),
+                detail = stringResource(
+                    R.string.home_alertes_detail,
+                    rappels.tachesOuvertes,
+                ),
+                statutRes = statutAlertes(rappels),
+                icone = Icons.Outlined.Notifications,
+                onClick = onVoirAlertes,
+            )
+            CockpitActiviteLigne(
+                titre = stringResource(R.string.home_sante),
+                detail = derniereSauvegarde?.let {
+                    stringResource(R.string.home_backup_date, DateUtils.formatDate(it))
+                } ?: stringResource(R.string.home_backup_never),
+                statutRes = R.string.home_statut_ok,
+                icone = Icons.Outlined.Security,
+                onClick = onVoirSante,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CockpitActiviteLigne(
+    titre: String,
+    detail: String,
+    statutRes: Int,
+    icone: ImageVector,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 9.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(
+            modifier = Modifier.size(30.dp),
+            shape = RoundedCornerShape(9.dp),
+            color = HomeBlueSoft,
+        ) {
+            Icon(
+                imageVector = icone,
+                contentDescription = null,
+                tint = HomeBlue,
+                modifier = Modifier.padding(7.dp),
+            )
+        }
+        Spacer(Modifier.width(9.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = titre,
+                color = HomeTextDark,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = detail,
+                color = HomeTextMuted,
+                fontSize = 9.5.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        StatutBadge(statutRes)
+    }
+}
+
+@Composable
+private fun StatutBadge(statutRes: Int) {
+    Surface(
+        shape = RoundedCornerShape(7.dp),
+        color = HomeGreenSoft,
+    ) {
+        Text(
+            text = stringResource(statutRes),
+            color = HomeGreen,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+        )
+    }
+}
+
+@Composable
+private fun statutFactures(rappels: RappelsAccueil): Int =
+    if (rappels.facturesEnRetard > 0) R.string.home_statut_a_suivre else R.string.home_statut_ok
+
+@Composable
+private fun statutAlertes(rappels: RappelsAccueil): Int =
+    if (rappels.tachesEnAttente > 0) R.string.home_statut_a_suivre else R.string.home_statut_ok
+
+/** Ressource du libellé court d'un mois (1 = janvier … 12 = décembre). */
+private fun moisCourtRes(mois: Int): Int = when (mois) {
+    1 -> R.string.mois_jan
+    2 -> R.string.mois_fev
+    3 -> R.string.mois_mar
+    4 -> R.string.mois_avr
+    5 -> R.string.mois_mai
+    6 -> R.string.mois_juin
+    7 -> R.string.mois_juil
+    8 -> R.string.mois_aout
+    9 -> R.string.mois_sep
+    10 -> R.string.mois_oct
+    11 -> R.string.mois_nov
+    else -> R.string.mois_dec
 }
 
 @Composable
