@@ -1132,7 +1132,7 @@ private fun CockpitCentreActivite(
                     rappels.facturesEnRetard,
                 ),
                 statutRes = statutFactures(rappels),
-                icone = Icons.Outlined.ReceiptLong,
+                icone = Icons.AutoMirrored.Outlined.ReceiptLong,
                 onClick = onVoirFactures,
             )
             CockpitActiviteLigne(
