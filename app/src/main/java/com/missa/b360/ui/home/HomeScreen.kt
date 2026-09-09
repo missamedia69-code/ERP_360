@@ -525,7 +525,6 @@ private fun HomeDashboard(
         item {
             CockpitPerformanceCard(
                 points = state.performanceMensuelle,
-                devise = currency,
             )
         }
 
@@ -1015,7 +1014,6 @@ private fun TendanceLine(tendance: Double?) {
 @Composable
 private fun CockpitPerformanceCard(
     points: List<PointPerformance>,
-    devise: String,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -1059,7 +1057,7 @@ private fun CockpitPerformanceCard(
                         points.forEach { point ->
                             val hauteur = (point.montant / max).coerceIn(0.06, 1.0)
                             BarrePerformance(
-                                fraction = hauteur,
+                                fraction = hauteur.toFloat(),
                                 isCurrent = point == points.last(),
                                 modifier = Modifier.weight(1f),
                             )
@@ -1088,7 +1086,7 @@ private fun CockpitPerformanceCard(
 }
 
 @Composable
-private fun BarrePerformance(fraction: Double, isCurrent: Boolean, modifier: Modifier) {
+private fun BarrePerformance(fraction: Float, isCurrent: Boolean, modifier: Modifier) {
     Column(
         modifier = modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -1141,7 +1139,7 @@ private fun CockpitCentreActivite(
                 titre = stringResource(R.string.home_alertes),
                 detail = stringResource(
                     R.string.home_alertes_detail,
-                    rappels.tachesOuvertes,
+                    rappels.tachesEnAttente,
                 ),
                 statutRes = statutAlertes(rappels),
                 icone = Icons.Outlined.Notifications,
