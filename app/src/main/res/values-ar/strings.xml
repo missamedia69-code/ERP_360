@@ -1666,6 +1666,7 @@
     <string name="stk_valeur">قيمة المخزون</string>
     <string name="stk_valeur_detail">بسعر التكلفة</string>
     <string name="stk_articles">الأصناف</string>
+    <string name="stk_total_articles">إجمالي الأصناف</string>
     <string name="stk_articles_detail">%1$d تحت الحد</string>
     <string name="stk_alertes">التنبيهات</string>
     <string name="stk_alertes_detail">تحت الحد / نفاد</string>

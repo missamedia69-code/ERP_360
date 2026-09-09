@@ -91,6 +91,7 @@ import com.missa.b360.ui.components.MissaFondFiligrane
 import com.missa.b360.ui.components.sectionFonctionsModule
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.ui.theme.Blue40
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -107,14 +108,17 @@ import com.missa.b360.ui.theme.Red40
 import com.missa.b360.ui.theme.TendrePositive
 import kotlin.math.roundToInt
 
-/** Couleurs du bandeau et des fonds de l'accueil Stock. */
-private val HeaderBlueStart = Color(0xFF0B3FBF)
-private val HeaderBlueEnd = Color(0xFF1554E8)
+/** Couleurs de l'en-tête et des fonds de l'accueil Stock — celles de l'accueil. */
+private val HomeBlue = BrandBlue
+private val MarqueVert = Color(0xFF4BAE27)
+private val AccueilTextDark = MissaInk
+private val AccueilBorder = MissaBorder
 
 /**
  * Accueil du module Stock — carrefour du module, fidèle à la maquette :
- * bandeau marque, sélecteur de dépôt, bannière de prise en main, tableau de
- * bord, répartition par groupe, ce qu'il y a à traiter, derniers mouvements et
+ * en-tête blanc à la charte de l'accueil, sélecteur de dépôt, bannière de prise
+ * en main, tableau de bord (valeur du stock et total des articles à la fois),
+ * répartition par groupe, ce qu'il y a à traiter, derniers mouvements et
  * raccourcis d'action. Chaque chiffre et chaque tuile mène à un écran réel.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,10 +141,10 @@ fun StockAccueilScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 92.dp),
         ) {
-            // Bandeau marque + actions, sous la barre de statut système.
+            // En-tête blanc à la charte de l'accueil, sous la barre de statut.
             item {
                 Box(Modifier.fillMaxWidth().statusBarsPadding()) {
-                    BandeauStock(
+                    EnTeteStock(
                         rechargement = rechargement,
                         onRechercher = { onNaviguer(Routes.STOCK_ARTICLES) },
                         onActualiser = viewModel::recharger,
@@ -169,7 +173,8 @@ fun StockAccueilScreen(
                 }
             }
 
-            // Tableau de bord.
+            // Tableau de bord : une seule carte réunissant valeur du stock et
+            // total des articles, puis deux indicateurs secondaires.
             item {
                 Column(
                     modifier = Modifier
@@ -181,29 +186,17 @@ fun StockAccueilScreen(
                         onVoirTout = { onNaviguer(AppModule.REPORTING.route) },
                     )
                     Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                            CarteKpi(
-                                titre = stringResource(R.string.stk_valeur),
-                                valeur = MoneyUtils.format(etat.valeurStock, devise),
-                                detail = stringResource(R.string.stk_valeur_detail),
-                                icone = Icons.Outlined.Payments,
-                                couleur = ProfileCommerceBlue,
-                                decor = Icons.Outlined.Payments,
-                                modifier = Modifier.weight(1f),
-                            ) { onNaviguer(AppModule.REPORTING.route) }
-                            CarteKpi(
-                                titre = stringResource(R.string.stk_articles),
-                                valeur = etat.nombreArticles.toString(),
-                                detail = stringResource(
-                                    R.string.stk_articles_detail,
-                                    etat.articlesSousSeuil.size,
-                                ),
-                                icone = Icons.Outlined.Inventory2,
-                                couleur = ProfileGreen,
-                                decor = Icons.Outlined.Inventory2,
-                                modifier = Modifier.weight(1f),
-                            ) { onNaviguer(Routes.STOCK_ARTICLES) }
-                        }
+                        CarteTableauBord(
+                            valeur = MoneyUtils.format(etat.valeurStock, devise),
+                            detailValeur = stringResource(R.string.stk_valeur_detail),
+                            nombreArticles = etat.nombreArticles,
+                            detailArticles = stringResource(
+                                R.string.stk_articles_detail,
+                                etat.articlesSousSeuil.size,
+                            ),
+                            onValeur = { onNaviguer(AppModule.REPORTING.route) },
+                            onArticles = { onNaviguer(Routes.STOCK_ARTICLES) },
+                        )
                         Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                             CarteKpi(
                                 titre = stringResource(R.string.stk_alertes),
@@ -314,9 +307,9 @@ private fun detailMouvements(etat: StockHub): String {
     return stringResource(R.string.stk_tendance_vs_hier, "$signe$pct%")
 }
 
-/** Bandeau bleu de la marque : logo, nom, titre du module et actions. */
+/** En-tête blanc à la charte de l'accueil : marque, titre du module et actions. */
 @Composable
-private fun BandeauStock(
+private fun EnTeteStock(
     rechargement: Boolean,
     onRechercher: () -> Unit,
     onActualiser: () -> Unit,
@@ -325,99 +318,106 @@ private fun BandeauStock(
     onAide: () -> Unit,
 ) {
     var menuOuvert by remember { mutableStateOf(false) }
-    Surface(color = Color.Transparent) {
-        Box(
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = Color.White,
+        shadowElevation = 0.dp,
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(HeaderBlueStart, HeaderBlueEnd))),
+                .padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                MissaBrandMark(size = 32.dp)
-                Spacer(Modifier.width(8.dp))
-                Column {
-                    Text(
-                        text = stringResource(R.string.stk_marque),
-                        color = Color.White,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 14.sp,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = stringResource(R.string.stk_marque_suite),
-                        color = Color.White.copy(alpha = 0.95f),
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        lineHeight = 11.sp,
-                        maxLines = 1,
-                    )
-                }
-                Spacer(Modifier.width(10.dp))
-                Box(
-                    modifier = Modifier
-                        .height(30.dp)
-                        .width(1.dp)
-                        .background(Color.White.copy(alpha = 0.35f)),
-                )
-                Spacer(Modifier.width(11.dp))
+            MissaBrandMark(size = 34.dp)
+            Spacer(Modifier.width(7.dp))
+            Column {
                 Text(
-                    text = stringResource(R.string.stk_titre),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
+                    text = "MISSA",
+                    color = HomeBlue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 14.sp,
                     maxLines = 1,
                 )
-                Spacer(Modifier.weight(1f))
-                IconButton(onClick = onRechercher) {
+                Text(
+                    text = "BUSINESS",
+                    color = HomeBlue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 14.sp,
+                    maxLines = 1,
+                )
+                Text(
+                    text = "360",
+                    color = MarqueVert,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 14.sp,
+                    maxLines = 1,
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+            Box(
+                modifier = Modifier
+                    .height(38.dp)
+                    .width(1.dp)
+                    .background(AccueilBorder),
+            )
+            Spacer(Modifier.width(11.dp))
+            Text(
+                text = stringResource(R.string.stk_titre),
+                color = AccueilTextDark,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = onRechercher) {
+                Icon(
+                    Icons.Outlined.Search,
+                    contentDescription = stringResource(R.string.stk_recherche),
+                    tint = AccueilTextDark,
+                )
+            }
+            IconButton(onClick = onActualiser, enabled = !rechargement) {
+                if (rechargement) {
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(18.dp),
+                        color = BrandBlue,
+                    )
+                } else {
                     Icon(
-                        Icons.Outlined.Search,
-                        contentDescription = stringResource(R.string.stk_recherche),
-                        tint = Color.White,
+                        Icons.Outlined.Refresh,
+                        contentDescription = stringResource(R.string.stk_actualiser),
+                        tint = AccueilTextDark,
                     )
                 }
-                IconButton(onClick = onActualiser, enabled = !rechargement) {
-                    if (rechargement) {
-                        CircularProgressIndicator(
-                            strokeWidth = 2.dp,
-                            modifier = Modifier.size(18.dp),
-                            color = Color.White,
-                        )
-                    } else {
-                        Icon(
-                            Icons.Outlined.Refresh,
-                            contentDescription = stringResource(R.string.stk_actualiser),
-                            tint = Color.White,
-                        )
-                    }
+            }
+            Box {
+                IconButton(onClick = { menuOuvert = true }) {
+                    Icon(
+                        Icons.Outlined.MoreVert,
+                        contentDescription = stringResource(R.string.stk_menu),
+                        tint = AccueilTextDark,
+                    )
                 }
-                Box {
-                    IconButton(onClick = { menuOuvert = true }) {
-                        Icon(
-                            Icons.Outlined.MoreVert,
-                            contentDescription = stringResource(R.string.stk_menu),
-                            tint = Color.White,
-                        )
-                    }
-                    DropdownMenu(expanded = menuOuvert, onDismissRequest = { menuOuvert = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.stk_menu_parametres)) },
-                            onClick = { menuOuvert = false; onParametres() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.stk_menu_depots)) },
-                            onClick = { menuOuvert = false; onDepots() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.stk_menu_aide)) },
-                            leadingIcon = { Icon(Icons.AutoMirrored.Outlined.HelpOutline, null) },
-                            onClick = { menuOuvert = false; onAide() },
-                        )
-                    }
+                DropdownMenu(expanded = menuOuvert, onDismissRequest = { menuOuvert = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.stk_menu_parametres)) },
+                        onClick = { menuOuvert = false; onParametres() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.stk_menu_depots)) },
+                        onClick = { menuOuvert = false; onDepots() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.stk_menu_aide)) },
+                        leadingIcon = { Icon(Icons.AutoMirrored.Outlined.HelpOutline, null) },
+                        onClick = { menuOuvert = false; onAide() },
+                    )
                 }
             }
         }
@@ -539,7 +539,7 @@ private fun BanniereStock(onClick: () -> Unit) {
             .fillMaxWidth()
             .height(88.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(Brush.linearGradient(listOf(HeaderBlueStart, HeaderBlueEnd)))
+            .background(Brush.linearGradient(listOf(BrandBlue, Blue40)))
             .clickable(onClick = onClick),
     ) {
         Image(
@@ -718,6 +718,114 @@ private fun CarteKpi(
                 )
             }
         }
+    }
+}
+
+/**
+ * Carte unique du tableau de bord : la valeur du stock et le total des
+ * articles côte à côte, réunis dans une seule carte (chacune des deux zones
+ * reste cliquable vers son propre écran).
+ */
+@Composable
+private fun CarteTableauBord(
+    valeur: String,
+    detailValeur: String,
+    nombreArticles: Int,
+    detailArticles: String,
+    onValeur: () -> Unit,
+    onArticles: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        color = MissaSurface,
+        border = BorderStroke(1.dp, MissaBorder),
+        shadowElevation = 1.dp,
+    ) {
+        Row(modifier = Modifier.height(112.dp)) {
+            RegionTableauBord(
+                titre = stringResource(R.string.stk_valeur),
+                valeur = valeur,
+                detail = detailValeur,
+                icone = Icons.Outlined.Payments,
+                couleur = ProfileCommerceBlue,
+                modifier = Modifier.weight(1f),
+                onClick = onValeur,
+            )
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(MissaBorder),
+            )
+            RegionTableauBord(
+                titre = stringResource(R.string.stk_total_articles),
+                valeur = nombreArticles.toString(),
+                detail = detailArticles,
+                icone = Icons.Outlined.Inventory2,
+                couleur = ProfileGreen,
+                modifier = Modifier.weight(1f),
+                onClick = onArticles,
+            )
+        }
+    }
+}
+
+/** Moitié de la carte unique du tableau de bord. */
+@Composable
+private fun RegionTableauBord(
+    titre: String,
+    valeur: String,
+    detail: String,
+    icone: ImageVector,
+    couleur: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(
+            modifier = Modifier.size(36.dp),
+            shape = RoundedCornerShape(10.dp),
+            color = couleur.copy(alpha = 0.13f),
+        ) {
+            Icon(icone, contentDescription = null, tint = couleur, modifier = Modifier.padding(8.dp))
+        }
+        Spacer(Modifier.width(9.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = titre,
+                fontSize = 10.sp,
+                color = MissaMuted,
+                maxLines = 1,
+            )
+            Text(
+                text = valeur,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = detail,
+                fontSize = 9.sp,
+                color = MissaMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Icon(
+            Icons.AutoMirrored.Outlined.ArrowForwardIos,
+            contentDescription = null,
+            tint = MissaMuted,
+            modifier = Modifier.size(11.dp),
+        )
     }
 }
 

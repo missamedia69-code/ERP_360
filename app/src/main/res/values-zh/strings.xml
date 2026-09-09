@@ -1666,6 +1666,7 @@
     <string name="stk_valeur">库存价值</string>
     <string name="stk_valeur_detail">按成本价</string>
     <string name="stk_articles">品项</string>
+    <string name="stk_total_articles">商品总数</string>
     <string name="stk_articles_detail">%1$d 项低于下限</string>
     <string name="stk_alertes">预警</string>
     <string name="stk_alertes_detail">低于下限 / 缺货</string>

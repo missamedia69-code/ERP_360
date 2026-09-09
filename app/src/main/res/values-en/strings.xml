@@ -1687,6 +1687,7 @@
     <string name="stk_valeur">Stock value</string>
     <string name="stk_valeur_detail">at cost price</string>
     <string name="stk_articles">Items</string>
+    <string name="stk_total_articles">Total items</string>
     <string name="stk_articles_detail">%1$d below threshold</string>
     <string name="stk_alertes">Alerts</string>
     <string name="stk_alertes_detail">below threshold / out of stock</string>

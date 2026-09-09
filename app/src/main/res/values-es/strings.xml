@@ -1666,6 +1666,7 @@
     <string name="stk_valeur">Valor del stock</string>
     <string name="stk_valeur_detail">a precio de coste</string>
     <string name="stk_articles">Artículos</string>
+    <string name="stk_total_articles">Total de artículos</string>
     <string name="stk_articles_detail">%1$d bajo el umbral</string>
     <string name="stk_alertes">Alertas</string>
     <string name="stk_alertes_detail">bajo umbral / sin stock</string>

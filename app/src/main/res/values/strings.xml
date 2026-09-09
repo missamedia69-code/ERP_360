@@ -1694,6 +1694,7 @@
     <string name="stk_valeur">Valeur du stock</string>
     <string name="stk_valeur_detail">au coût de revient</string>
     <string name="stk_articles">Articles</string>
+    <string name="stk_total_articles">Total des articles</string>
     <string name="stk_articles_detail">dont %1$d sous le seuil</string>
     <string name="stk_alertes">Alertes</string>
     <string name="stk_alertes_detail">sous seuil / ruptures</string>
