@@ -1723,7 +1723,7 @@
     <string name="stk_titre">Stock</string>
     <string name="stk_a_jour">À jour</string>
     <string name="stk_a_jour_court">en temps réel</string>
-    <string name="stk_a_jour_instant">à l\\'instant</string>
+    <string name="stk_a_jour_instant">à l\'instant</string>
     <string name="stk_a_jour_relatif">il y a %1$s</string>
     <string name="stk_minutes">%1$d min</string>
     <string name="stk_heures">%1$d h</string>
@@ -1734,7 +1734,7 @@
     <string name="stk_derniers_mouvements">Derniers mouvements</string>
     <string name="stk_aucun_mouvement">Aucun mouvement pour le moment.</string>
     <string name="stk_tendance_vs_hier">%1$s vs hier</string>
-    <string name="stk_a_traiter_inventaire">Écarts d\\'inventaire non validés</string>
+    <string name="stk_a_traiter_inventaire">Écarts d\'inventaire non validés</string>
     <string name="stk_a_traiter_peremption">Articles à date de péremption proche</string>
     <string name="stk_a_traiter_exemples">Ex : %1$s</string>
     <string name="stk_urgence_urgent">Urgent</string>

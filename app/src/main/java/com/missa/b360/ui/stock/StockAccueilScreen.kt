@@ -27,24 +27,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.outlined.CompareArrows
 import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.AddBox
-import androidx.compose.material.icons.outlined.ArrowDownward
-import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Assignment
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.Eco
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.EventBusy
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Package
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.ReportProblem
-import androidx.compose.material.icons.outlined.Science
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -52,7 +49,6 @@ import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -803,12 +799,12 @@ private data class StyleGroupe(val icone: ImageVector, val couleur: Color)
 private fun styleGroupe(code: String): StyleGroupe = when (code) {
     "MARCH" -> StyleGroupe(Icons.Outlined.ShoppingCart, ProfileCommerceBlue)
     "EQUIP" -> StyleGroupe(Icons.Outlined.Settings, ProfileViolet)
-    "MP" -> StyleGroupe(Icons.Outlined.Eco, ProfileGreen)
-    "CONSO" -> StyleGroupe(Icons.Outlined.Package, ProfileOrange)
+    "MP" -> StyleGroupe(Icons.Outlined.Build, ProfileGreen)
+    "CONSO" -> StyleGroupe(Icons.Outlined.AddBox, ProfileOrange)
     "PF" -> StyleGroupe(Icons.Outlined.Inventory2, ProfileTeal)
-    "SE" -> StyleGroupe(Icons.Outlined.Build, ProfilePurple)
-    "SERV" -> StyleGroupe(Icons.Outlined.Work, ProfileCommerceBlue)
-    "CHIM" -> StyleGroupe(Icons.Outlined.Science, ProfileViolet)
+    "SE" -> StyleGroupe(Icons.Outlined.Category, ProfilePurple)
+    "SERV" -> StyleGroupe(Icons.Outlined.Assignment, ProfileCommerceBlue)
+    "CHIM" -> StyleGroupe(Icons.Outlined.Settings, ProfileViolet)
     else -> StyleGroupe(Icons.Outlined.Category, MissaMuted)
 }
 
@@ -976,8 +972,8 @@ private fun CarteDerniersMouvements(
 @Composable
 private fun LigneMouvement(mouvement: LigneMouvementRecente) {
     val (sens, couleur, signe) = when {
-        mouvement.estSortie -> Triple(Icons.Outlined.ArrowDownward, Red40, "-")
-        mouvement.estEntree -> Triple(Icons.Outlined.ArrowUpward, ProfileGreen, "+")
+        mouvement.estSortie -> Triple(Icons.AutoMirrored.Outlined.TrendingDown, Red40, "-")
+        mouvement.estEntree -> Triple(Icons.AutoMirrored.Outlined.TrendingUp, ProfileGreen, "+")
         else -> Triple(
             Icons.Outlined.SwapVert,
             ProfileOrange,
