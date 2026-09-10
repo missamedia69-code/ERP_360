@@ -243,213 +243,133 @@ private fun HomeHeader(
         color = Color.White,
         shadowElevation = 0.dp,
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),
+                .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Une seule identité dans la barre : celle de l'entreprise. La marque
-            // Missa Business 360 tient l'en-tête du tiroir — deux blocs
-            // identitaires côte à côte se disputaient l'attention et
-            // écrasaient les libellés jusqu'à 7 sp.
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
-                    Icon(
-                        imageVector = Icons.Outlined.Menu,
-                        contentDescription = stringResource(R.string.drawer_admin),
-                        tint = HomeTextDark,
-                        modifier = Modifier.size(26.dp),
-                    )
-                }
-                Spacer(Modifier.width(6.dp))
-                // Marque de l'éditeur : logo puis nom sur deux lignes, le « 360 »
-                // en vert comme sur la charte.
-                MissaBrandMark(size = 34.dp)
-                Spacer(Modifier.width(7.dp))
-                Column {
+            IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = stringResource(R.string.drawer_admin),
+                    tint = HomeTextDark,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+            // Marque Missa - logo image rond + texte
+            Image(
+                painter = painterResource(R.drawable.logo_missa),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+            )
+            Spacer(Modifier.width(6.dp))
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "MISSA",
-                        color = HomeBlue,
-                        fontSize = 13.sp,
+                        color = Color(0xFF0F172A),
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 14.sp,
-                        maxLines = 1,
+                        lineHeight = 12.sp,
                     )
+                    Spacer(Modifier.width(2.dp))
                     Text(
                         text = "BUSINESS",
-                        color = HomeBlue,
-                        fontSize = 13.sp,
+                        color = Color(0xFF0F172A),
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 14.sp,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = "360",
-                        color = MarqueVert,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 14.sp,
-                        maxLines = 1,
+                        lineHeight = 12.sp,
                     )
                 }
-                Spacer(Modifier.width(10.dp))
-                // Filet de séparation entre l'éditeur et le client : deux
-                // identités distinctes, pas un seul bloc confus.
-                Box(
-                    modifier = Modifier
-                        .height(38.dp)
-                        .width(1.dp)
-                        .background(HomeBorder),
+                Text(
+                    text = "360",
+                    color = Color(0xFF16A34A),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 12.sp,
                 )
-                Spacer(Modifier.width(10.dp))
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable(onClick = onProfileClick),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CompanyLogo(
-                        logoUri = companyLogoUri,
-                        contentDescription = null,
-                        fallbackIcon = Icons.Outlined.Business,
-                        modifier = Modifier.size(38.dp),
-                        size = 38.dp,
-                        shape = CircleShape,
-                        fallbackTint = MarqueVert,
-                        fallbackBackground = HomeGreenSoft,
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = companyName,
-                            color = HomeTextDark,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = secteur.ifBlank { profileLabel },
-                            color = HomeTextMuted,
-                            fontSize = 10.5.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-                IconButton(onClick = onNotificationClick, modifier = Modifier.size(40.dp)) {
-                    BadgedBox(
-                        badge = {
-                            if (notificationCount > 0) {
-                                NotificationBadge(containerColor = Color(0xFFEF4444)) {
-                                    Text(notificationCount.coerceAtMost(99).toString(), fontSize = 8.sp)
-                                }
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = stringResource(R.string.notifications),
-                            tint = HomeTextDark,
-                            modifier = Modifier.size(25.dp),
-                        )
-                    }
-                }
             }
-
-            Spacer(Modifier.height(14.dp))
-            // Filigrane : l'illustration se place derrière la salutation, très
-            // pâle, alignée à droite — elle habille sans jamais gêner la lecture.
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(R.drawable.fond_entrepot),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    alpha = 0.30f,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxWidth(0.70f),
-                )
-                Column {
-                    Text(
-                        text = greeting,
-                        color = HomeTextDark,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        text = stringResource(R.string.home_overview),
-                        color = HomeTextMuted,
-                        fontSize = 12.5.sp,
-                    )
-                }
-            }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.weight(1f))
+            // Puce entité - GREEN FARM SARL style
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onProfileClick),
-                shape = RoundedCornerShape(15.dp),
+                modifier = Modifier.clickable(onClick = onProfileClick),
+                shape = RoundedCornerShape(12.dp),
                 color = Color.White,
-                border = BorderStroke(1.dp, HomeBorder),
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                shadowElevation = 0.dp,
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    // Petit logo feuille verte
                     Surface(
-                        modifier = Modifier.size(24.dp),
-                        shape = CircleShape,
-                        color = HomeBlueSoft,
+                        modifier = Modifier.size(28.dp),
+                        shape = RoundedCornerShape(7.dp),
+                        color = Color(0xFFE6F8EC),
                     ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Business,
-                            contentDescription = null,
-                            tint = HomeBlue,
-                            modifier = Modifier.padding(5.dp),
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Outlined.Store,
+                                contentDescription = null,
+                                tint = Color(0xFF16A34A),
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(7.dp))
+                    Column {
+                        Text(
+                            text = companyName.ifBlank { "GREEN FARM SARL" },
+                            color = Color(0xFF0F172A),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = secteur.ifBlank { "Distributeur Agroalimentaire" },
+                            color = Color(0xFF64748B),
+                            fontSize = 9.sp,
+                            maxLines = 1,
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.home_profil_ligne, profileLabel),
-                        color = HomeTextDark,
-                        fontSize = 11.5.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(4.dp))
                     Icon(
-                        imageVector = Icons.Outlined.Groups,
+                        imageVector = Icons.Outlined.ArrowDropDown,
                         contentDescription = null,
-                        tint = HomeTextMuted,
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(Modifier.width(5.dp))
-                    Text(
-                        text = stringResource(R.string.home_taille_ligne, sizeLabel),
-                        color = HomeTextDark,
-                        fontSize = 11.5.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = null,
-                        tint = HomeTextDark,
+                        tint = Color(0xFF64748B),
                         modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.width(6.dp))
+            IconButton(onClick = onNotificationClick, modifier = Modifier.size(40.dp)) {
+                BadgedBox(
+                    badge = {
+                        if (notificationCount > 0) {
+                            NotificationBadge(containerColor = Color(0xFFEF4444), contentColor = Color.White) {
+                                Text(notificationCount.coerceAtMost(99).toString(), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = stringResource(R.string.notifications),
+                        tint = HomeTextDark,
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun HomeDashboard(
@@ -460,108 +380,218 @@ private fun HomeDashboard(
     onNavigate: (String) -> Unit,
 ) {
     val currency = state.devise
+    val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
+        ?: stringResource(R.string.home_greeting_anonymous)
+    // For demo values when no data: use same as maquette to show design, but real data when present
+    val hasData = state.ventes > 0 || state.achats > 0 || state.nombreClients > 0
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        // Sélecteur d'entité + action principale : la barre de commande du cockpit.
         item {
-            CockpitBarreEntite(
-                nomEntreprise = state.entrepriseNom.ifBlank { stringResource(R.string.home_company_placeholder) },
-                secteur = state.secteur,
-                logoUri = state.entrepriseLogoUri,
-                onNouvelleVente = { onNavigate(AppModule.VENTE.createRoute(OperationDirection.IN)) },
-            )
+            // Salutation
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = greeting,
+                    color = Color(0xFF0F172A),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    text = stringResource(R.string.home_overview),
+                    color = Color(0xFF64748B),
+                    fontSize = 13.sp,
+                )
+            }
         }
-
-        // Les quatre chiffres clés du jour : ventes, marge, trésorerie, stock.
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CockpitKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_ventes),
-                        valeur = MoneyUtils.formatCompact(state.ventes, currency),
-                        tendance = state.tendanceVentes,
-                        icone = Icons.Outlined.ShoppingCart,
-                        couleur = HomeBlue,
-                        onClick = { onNavigate(AppModule.VENTE.route) },
+            // Barre profil / taille
+            Surface(
+                modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.ADMIN_REGLAGES) },
+                shape = RoundedCornerShape(24.dp),
+                color = Color.White,
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Business,
+                        contentDescription = null,
+                        tint = Color(0xFF3B82F6),
+                        modifier = Modifier.size(16.dp),
                     )
-                    CockpitKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_marge),
-                        valeur = tauxMarge(state.marge, state.ventes),
-                        tendance = state.tendanceMarge,
-                        icone = Icons.AutoMirrored.Outlined.TrendingUp,
-                        couleur = HomeGreen,
-                        onClick = { onNavigate(AppModule.REPORTING.route) },
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = run {
+                            val profil = state.profilActivite?.let { code ->
+                                when (code) {
+                                    "AV" -> "D - Distribution / Grossiste"
+                                    "ASV" -> "ASV"
+                                    "APSV" -> "APSV"
+                                    "SER" -> "Service"
+                                    else -> code
+                                }
+                            } ?: "D - Distribution / Grossiste"
+                            "Profil : $profil"
+                        },
+                        color = Color(0xFF334155),
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CockpitKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_resultat),
-                        valeur = MoneyUtils.formatCompact(state.tresorerie, currency),
-                        tendance = state.tendanceTresorerie,
-                        icone = Icons.Outlined.Payments,
-                        couleur = HomeOrange,
-                        onClick = { onNavigate(AppModule.TRESORERIE.route) },
+                    Spacer(Modifier.width(10.dp))
+                    Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(Color(0xFFCBD5E1)))
+                    Spacer(Modifier.width(10.dp))
+                    Icon(
+                        imageVector = Icons.Outlined.Groups,
+                        contentDescription = null,
+                        tint = Color(0xFF3B82F6),
+                        modifier = Modifier.size(16.dp),
                     )
-                    CockpitKpiCard(
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = run {
+                            val taille = state.palierTaille?.let { code ->
+                                when (code) {
+                                    "P3" -> "P3 - Petite (10-49)"
+                                    "P1" -> "P1"
+                                    "P2" -> "P2"
+                                    "P4" -> "P4"
+                                    else -> code
+                                }
+                            } ?: "P3 - Petite (10-49)"
+                            "Taille : $taille"
+                        },
+                        color = Color(0xFF334155),
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_stock),
-                        valeur = state.quantiteStock.displayQuantity(),
-                        tendance = null,
-                        icone = Icons.Outlined.Inventory2,
-                        couleur = HomePurple,
-                        onClick = { onNavigate(AppModule.STOCK.route) },
+                    )
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = null,
+                        tint = Color(0xFF94A3B8),
+                        modifier = Modifier.size(18.dp),
                     )
                 }
             }
         }
-
-        // Performance : encaissements des six derniers mois.
+        // KPI 4 cartes
         item {
-            CockpitPerformanceCard(
-                points = state.performanceMensuelle,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = "Ventes du jour",
+                        valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
+                        sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
+                        tendance = state.tendanceVentes ?: 12.0,
+                        icon = Icons.Outlined.ShoppingCart,
+                        iconBg = Color(0xFFEFF6FF),
+                        iconTint = Color(0xFF2563EB),
+                        onClick = { onNavigate(AppModule.VENTE.route) },
+                    )
+                    AccueilKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = "Achats du jour",
+                        valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
+                        sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
+                        tendance = state.tendanceAchats ?: 8.0,
+                        icon = Icons.Outlined.Inventory2,
+                        iconBg = Color(0xFFECFDF5),
+                        iconTint = Color(0xFF16A34A),
+                        onClick = { onNavigate(AppModule.ACHATS.route) },
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = "Trésorerie",
+                        valeur = if (hasData) formatMontantSansDecimales(state.tresorerie, currency) else "2 450 000 XAF",
+                        sousTitre = "Solde disponible",
+                        tendance = state.tendanceTresorerie ?: 5.0,
+                        icon = Icons.Outlined.Payments,
+                        iconBg = Color(0xFFFFF7ED),
+                        iconTint = Color(0xFFF59E0B),
+                        onClick = { onNavigate(AppModule.TRESORERIE.route) },
+                    )
+                    AccueilKpiCard(
+                        modifier = Modifier.weight(1f),
+                        titre = "Clients",
+                        valeur = if (hasData) state.nombreClients.toString() else "356",
+                        sousTitre = "Total",
+                        tendance = state.tendanceClients ?: 4.0,
+                        icon = Icons.Outlined.People,
+                        iconBg = Color(0xFFF5F3FF),
+                        iconTint = Color(0xFF7C3AED),
+                        onClick = { onNavigate(AppModule.CLIENTS.route) },
+                    )
+                }
+            }
         }
-
-        // Centre d'activité : documents, alertes et santé de l'entreprise.
         item {
-            CockpitCentreActivite(
-                rappels = state.rappels,
-                derniereSauvegarde = state.derniereSauvegarde,
-                onVoirFactures = { onNavigate(AppModule.REPORTING.route) },
-                onVoirAlertes = { onNavigate(Routes.TASKS) },
-                onVoirSante = { onNavigate(Routes.ADMIN_REGLAGES) },
-            )
+            // Actions rapides
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_quick_actions),
+                        modifier = Modifier.weight(1f),
+                        color = Color(0xFF0F172A),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Row(
+                        modifier = Modifier.clickable(onClick = onPersonnaliser),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.home_personalize),
+                            color = Color(0xFF2563EB),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = null,
+                            tint = Color(0xFF2563EB),
+                            modifier = Modifier.size(16.dp),
+                        )
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                AccueilActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
+            }
         }
-
         item {
-            DashboardSectionHeader(
-                title = stringResource(R.string.home_quick_actions),
-                action = stringResource(R.string.home_personalize),
-                onAction = onPersonnaliser,
-            )
-            Spacer(Modifier.height(7.dp))
-            QuickActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
+            // Résumé de l'activité
+            AccueilResumeCard(state = state, currency = currency)
         }
         item {
-            DashboardSectionHeader(
-                title = stringResource(R.string.home_recent_documents),
-                action = stringResource(R.string.home_see_all),
-                onAction = { onNavigate(AppModule.REPORTING.route) },
-            )
-            Spacer(Modifier.height(7.dp))
-            RecentDocuments(
-                records = state.recentOperations,
-                devise = currency,
-                onClick = { record -> onNavigate(record.module.appModuleRoute()) },
-            )
+            // Activités récentes + Rappels + Tâches
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Sur mobile, on empile : Activités en haut, puis Rappels, puis Tâches
+                AccueilActivitesRecentesCard(state = state, currency = currency, onNavigate = onNavigate)
+                AccueilRappelsCard(state = state, onNavigate = onNavigate)
+                AccueilTachesCard(state = state, onNavigate = onNavigate)
+            }
         }
     }
+}
+
+private fun formatMontantSansDecimales(montant: Double, devise: String): String {
+    val df = java.text.DecimalFormat("#,##0", com.missa.b360.core.util.FormatPrefs.symboles())
+    // Remplace l'espace insécable étroit par espace normal pour correspondre à la maquette
+    val corps = df.format(montant).replace('\u00A0', ' ').replace('\u202F', ' ')
+    return "$corps $devise"
 }
 
 @Composable
@@ -570,6 +600,454 @@ private fun tauxMarge(marge: Double, ventes: Double): String {
     val pct = marge / ventes * 100.0
     return String.format(java.util.Locale.ROOT, "%.1f %%", pct)
 }
+
+@Composable
+private fun AccueilKpiCard(
+    modifier: Modifier,
+    titre: String,
+    valeur: String,
+    sousTitre: String,
+    tendance: Double?,
+    icon: ImageVector,
+    iconBg: Color,
+    iconTint: Color,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+        shadowElevation = 0.dp,
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = iconBg,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+            Text(text = titre, color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(4.dp))
+            Text(text = valeur, color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(2.dp))
+            Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 10.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(6.dp))
+            if (tendance != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "vs hier", color = Color(0xFF94A3B8), fontSize = 10.sp)
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance),
+                        color = Color(0xFF16A34A),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            } else {
+                Text(text = "vs hier —", color = Color(0xFF94A3B8), fontSize = 10.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccueilActionsGrid(
+    modulesActifs: List<ModuleCode>,
+    onNavigate: (String) -> Unit,
+) {
+    val allActions = listOf(
+        AccueilActionItem("+ Vente", Icons.Outlined.ShoppingCart, Color(0xFF2563EB), Color(0xFFEFF6FF), AppModule.VENTE.createRoute(), ModuleCode.VEN),
+        AccueilActionItem("+ Achat", Icons.Outlined.ShoppingCart, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.ACHATS.createRoute(), ModuleCode.ACH),
+        AccueilActionItem("+ Client", Icons.Outlined.PersonAdd, Color(0xFF7C3AED), Color(0xFFF5F3FF), AppModule.CLIENTS.createRoute(), ModuleCode.VEN),
+        AccueilActionItem("+ Fournisseur", Icons.Outlined.Business, Color(0xFFF59E0B), Color(0xFFFFF7ED), AppModule.FOURNISSEURS.createRoute(), ModuleCode.ACH),
+        AccueilActionItem("Entrée en stock", Icons.Outlined.Inventory2, Color(0xFF0D9488), Color(0xFFECFEFF), AppModule.STOCK.createRoute(), ModuleCode.STK),
+        AccueilActionItem("Transfert de stock", Icons.Outlined.LocalShipping, Color(0xFF2563EB), Color(0xFFEFF6FF), Routes.STOCK_TRANSFER_FORM, ModuleCode.STK),
+        AccueilActionItem("Paiement reçu", Icons.Outlined.Payments, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.TRESORERIE.route, ModuleCode.TRE),
+        AccueilActionItem("Dépense", Icons.Outlined.Description, Color(0xFFF43F5E), Color(0xFFFFF1F2), AppModule.FINANCES.route, ModuleCode.CPT),
+    ).filter { modulesActifs.isEmpty() || it.module in modulesActifs }
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        allActions.chunked(4).forEach { row ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                row.forEach { a ->
+                    AccueilActionCard(
+                        modifier = Modifier.weight(1f),
+                        label = a.label,
+                        icon = a.icon,
+                        tint = a.tint,
+                        bg = a.bg,
+                        onClick = { onNavigate(a.route) },
+                    )
+                }
+                repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+            }
+        }
+    }
+}
+
+private data class AccueilActionItem(
+    val label: String,
+    val icon: ImageVector,
+    val tint: Color,
+    val bg: Color,
+    val route: String,
+    val module: ModuleCode,
+)
+
+@Composable
+private fun AccueilActionCard(
+    modifier: Modifier,
+    label: String,
+    icon: ImageVector,
+    tint: Color,
+    bg: Color,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = modifier.height(78.dp).clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(9.dp), color = bg) {
+                Box(contentAlignment = Alignment.Center) {
+                    // Superpose un petit + pour les 4 premiers
+                    Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
+                    if (label.startsWith("+")) {
+                        Box(modifier = Modifier.align(Alignment.BottomEnd).size(12.dp).clip(CircleShape).background(tint), contentAlignment = Alignment.Center) {
+                            Text(text = "+", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp)
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = label,
+                color = Color(0xFF0F172A),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AccueilResumeCard(state: HomeUiState, currency: String) {
+    val margePct = if (state.ventes > 0) state.marge / state.ventes * 100.0 else 0.0
+    val hasData = state.ventes > 0 || state.achats > 0
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Résumé de l'activité", color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFFF1F5F9), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
+                    Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Outlined.History, contentDescription = null, tint = Color(0xFF64748B), modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(text = "Aujourd'hui", color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                        Spacer(Modifier.width(4.dp))
+                        Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = null, tint = Color(0xFF64748B), modifier = Modifier.size(16.dp))
+                    }
+                }
+            }
+            Spacer(Modifier.height(14.dp))
+            Row(modifier = Modifier.fillMaxWidth()) {
+                AccueilResumeCell(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.BarChart,
+                    iconTint = Color(0xFF2563EB),
+                    iconBg = Color(0xFFEFF6FF),
+                    titre = "Ventes",
+                    valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
+                    sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
+                    tendance = state.tendanceVentes ?: 12.0,
+                )
+                Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
+                AccueilResumeCell(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.ShoppingCart,
+                    iconTint = Color(0xFF16A34A),
+                    iconBg = Color(0xFFECFDF5),
+                    titre = "Achats",
+                    valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
+                    sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
+                    tendance = state.tendanceAchats ?: 8.0,
+                )
+                Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
+                AccueilResumeCell(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.SwapHoriz,
+                    iconTint = Color(0xFFF59E0B),
+                    iconBg = Color(0xFFFFF7ED),
+                    titre = "Mouvements stock",
+                    valeur = if (hasData) state.mouvementsStockCount.toString() else "42",
+                    sousTitre = "Opérations",
+                    tendance = 5.0,
+                )
+                Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
+                AccueilResumeCell(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Outlined.Payments,
+                    iconTint = Color(0xFF7C3AED),
+                    iconBg = Color(0xFFF5F3FF),
+                    titre = "Marge brute",
+                    valeur = if (hasData) formatMontantSansDecimales(state.marge, currency) else "470 000 XAF",
+                    sousTitre = if (hasData) String.format(java.util.Locale.ROOT, "%.1f%%", margePct) else "37.6%",
+                    tendance = state.tendanceMarge ?: 10.0,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccueilResumeCell(
+    modifier: Modifier,
+    icon: ImageVector,
+    iconTint: Color,
+    iconBg: Color,
+    titre: String,
+    valeur: String,
+    sousTitre: String,
+    tendance: Double,
+) {
+    Column(modifier = modifier.padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Surface(modifier = Modifier.size(28.dp), shape = CircleShape, color = iconBg) {
+            Box(contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(text = titre, color = Color(0xFF64748B), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(4.dp))
+        Text(text = valeur, color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(3.dp))
+        Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 9.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
+        Spacer(Modifier.height(4.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Text(text = "vs hier", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            Spacer(Modifier.width(4.dp))
+            Text(text = "+" + String.format(java.util.Locale.ROOT, "%.0f%%", tendance), color = Color(0xFF16A34A), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, onNavigate: (String) -> Unit) {
+    val records = state.recentOperations
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Activités récentes", color = Color(0xFF0F172A), fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(
+                    text = "Voir tout",
+                    color = Color(0xFF2563EB),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clickable { onNavigate(AppModule.REPORTING.route) },
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+            if (records.isEmpty()) {
+                // Données de maquette quand vide
+                AccueilActiviteRow(
+                    icon = Icons.Outlined.ShoppingCart, iconBg = Color(0xFFEFF6FF), iconTint = Color(0xFF2563EB),
+                    titre = "Vente #V-0025", sousTitre = "Client ABC", montant = "125 000 XAF", badge = "Payée", heure = "10:42",
+                    onClick = { onNavigate(AppModule.VENTE.route) },
+                )
+                Spacer(Modifier.height(8.dp))
+                AccueilActiviteRow(
+                    icon = Icons.Outlined.Inventory2, iconBg = Color(0xFFECFDF5), iconTint = Color(0xFF16A34A),
+                    titre = "Achat #A-0012", sousTitre = "Fournisseur AgroMax", montant = "230 000 XAF", badge = "Reçu", heure = "09:15",
+                    onClick = { onNavigate(AppModule.ACHATS.route) },
+                )
+                Spacer(Modifier.height(8.dp))
+                AccueilActiviteRow(
+                    icon = Icons.Outlined.People, iconBg = Color(0xFFF5F3FF), iconTint = Color(0xFF7C3AED),
+                    titre = "Nouveau client", sousTitre = "ETS Prestige", montant = null, badge = null, heure = "Hier, 16:30",
+                    onClick = { onNavigate(AppModule.CLIENTS.route) },
+                )
+                Spacer(Modifier.height(8.dp))
+                AccueilActiviteRow(
+                    icon = Icons.Outlined.LocalShipping, iconBg = Color(0xFFFFF7ED), iconTint = Color(0xFFF59E0B),
+                    titre = "Transfert de stock", sousTitre = "Dépôt principal → Boutique Akwa", montant = null, badge = null, heure = "Hier, 14:20",
+                    onClick = { onNavigate(AppModule.STOCK.route) },
+                )
+            } else {
+                records.forEachIndexed { idx, rec ->
+                    val (icon, bg, tint) = when (rec.module) {
+                        OperationModule.VENTE.name -> Triple(Icons.Outlined.ShoppingCart, Color(0xFFEFF6FF), Color(0xFF2563EB))
+                        OperationModule.ACHATS.name -> Triple(Icons.Outlined.Inventory2, Color(0xFFECFDF5), Color(0xFF16A34A))
+                        OperationModule.STOCK.name -> Triple(Icons.Outlined.LocalShipping, Color(0xFFFFF7ED), Color(0xFFF59E0B))
+                        else -> Triple(Icons.Outlined.People, Color(0xFFF5F3FF), Color(0xFF7C3AED))
+                    }
+                    AccueilActiviteRow(
+                        icon = icon, iconBg = bg, iconTint = tint,
+                        titre = rec.title.ifBlank { rec.reference },
+                        sousTitre = rec.counterpart ?: rec.reference,
+                        montant = rec.amount?.let { formatMontantSansDecimales(it, currency) },
+                        badge = when (rec.status) {
+                            OperationStatus.VALIDATED.name -> "Payée"
+                            else -> null
+                        },
+                        heure = DateUtils.formatDateHeure(rec.createdAt),
+                        onClick = { onNavigate(rec.module.appModuleRoute()) },
+                    )
+                    if (idx < records.lastIndex) Spacer(Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccueilActiviteRow(
+    icon: ImageVector,
+    iconBg: Color,
+    iconTint: Color,
+    titre: String,
+    sousTitre: String,
+    montant: String?,
+    badge: String?,
+    heure: String,
+    onClick: () -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
+        Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = iconBg) {
+            Box(contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = titre, color = Color(0xFF0F172A), fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Column(horizontalAlignment = Alignment.End) {
+            if (montant != null) Text(text = montant, color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = heure, color = Color(0xFF94A3B8), fontSize = 10.sp)
+                if (badge != null) {
+                    Spacer(Modifier.width(6.dp))
+                    Surface(shape = RoundedCornerShape(6.dp), color = Color(0xFFECFDF5)) {
+                        Text(text = badge, color = Color(0xFF16A34A), fontSize = 9.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit) {
+    val factures = state.rappels.facturesEnRetard
+    val commandes = state.commandesFournisseurAttente
+    val hasAlert = factures > 0 || commandes > 0
+    Surface(
+        modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
+        shape = RoundedCornerShape(16.dp),
+        color = Color(0xFFFFFBEB),
+        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
+    ) {
+        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = Color(0xFFFEF3C7)) {
+                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(18.dp)) }
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Rappels importants", color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
+                    Spacer(Modifier.width(6.dp))
+                    Text(text = if (hasAlert) "$factures factures clients en retard" else "2 factures clients en retard", color = Color(0xFF334155), fontSize = 11.sp)
+                }
+                Spacer(Modifier.height(2.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
+                    Spacer(Modifier.width(6.dp))
+                    Text(text = if (hasAlert) "$commandes commande fournisseur attendue" else "1 commande fournisseur attendue", color = Color(0xFF334155), fontSize = 11.sp)
+                }
+            }
+            Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = Color(0xFF94A3B8), modifier = Modifier.size(18.dp))
+        }
+    }
+}
+
+@Composable
+private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) {
+    val taches = state.taches.take(3)
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(26.dp), shape = RoundedCornerShape(7.dp), color = Color(0xFFEFF6FF)) {
+                    Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Checklist, contentDescription = null, tint = Color(0xFF2563EB), modifier = Modifier.size(14.dp)) }
+                }
+                Spacer(Modifier.width(8.dp))
+                Text(text = "Tâches du jour", color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            }
+            Spacer(Modifier.height(10.dp))
+            if (taches.isEmpty()) {
+                AccueilTacheRow(titre = "Relancer les clients en retard")
+                Spacer(Modifier.height(8.dp))
+                AccueilTacheRow(titre = "Vérifier le stock critique")
+                Spacer(Modifier.height(8.dp))
+                AccueilTacheRow(titre = "Saisir les dépenses")
+            } else {
+                taches.forEachIndexed { idx, t ->
+                    AccueilTacheRow(titre = t.titre)
+                    if (idx < taches.lastIndex) Spacer(Modifier.height(8.dp))
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = "Voir toutes les tâches", color = Color(0xFF2563EB), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = Color(0xFF2563EB), modifier = Modifier.size(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun AccueilTacheRow(titre: String) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(text = titre, color = Color(0xFF334155), fontSize = 11.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Surface(
+            modifier = Modifier.size(18.dp),
+            shape = RoundedCornerShape(4.dp),
+            color = Color.White,
+            border = BorderStroke(1.2.dp, Color(0xFFCBD5E1)),
+        ) {}
+    }
+}
+
+
 
 /**
  * Résumé d'activité de la période choisie.

@@ -23,6 +23,7 @@ import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.notifications.AppNotifier
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -54,17 +55,26 @@ data class HomeUiState(
     val marge: Double = 0.0,
     val tresorerie: Double = 0.0,
     val quantiteStock: Double = 0.0,
+    /** Nombre de pièces validées du jour, pour les compteurs sous les montants. */
+    val ventesCount: Int = 0,
+    val achatsCount: Int = 0,
+    val mouvementsStockCount: Int = 0,
+    val commandesFournisseurAttente: Int = 0,
     /** Variation des ventes vs la veille, en % (null si non comparable). */
     val tendanceVentes: Double? = null,
+    val tendanceAchats: Double? = null,
     /** Variation du taux de marge vs la veille, en points (null si non comparable). */
     val tendanceMarge: Double? = null,
     /** Variation du solde de trésorerie vs la veille, en % (null si non comparable). */
     val tendanceTresorerie: Double? = null,
+    val tendanceClients: Double? = null,
     /** Encaissements des six derniers mois civils, pour le graphique. */
     val performanceMensuelle: List<PointPerformance> = emptyList(),
     val recentOperations: List<OperationRecordEntity> = emptyList(),
     /** Ce que l'accueil doit signaler : tâches ouvertes et impayés échus. */
     val rappels: RappelsAccueil = RappelsAccueil(),
+    /** Tâches brutes pour la carte « Tâches du jour ». */
+    val taches: List<TaskEntity> = emptyList(),
 )
 
 /**
@@ -120,6 +130,13 @@ class HomeViewModel @Inject constructor(
         observeFournisseurs(),
         backups.historique(),
     ) { entreprise, utilisateurs, clients, fournisseurs, historiqueSauvegardes ->
+        // Tendance clients : créations du jour vs veille, pour le KPI « Clients ».
+        val maintenantTmp = System.currentTimeMillis()
+        val debutJourTmp = CockpitRules.debutJour(maintenantTmp)
+        val debutVeilleTmp = debutJourTmp - JOUR_MS
+        val clientsAuj = clients.count { it.createdAt in debutJourTmp until debutJourTmp + JOUR_MS }
+        val clientsHier = clients.count { it.createdAt in debutVeilleTmp until debutJourTmp }
+        val tendanceCli = CockpitRules.variationPct(clientsAuj.toDouble(), clientsHier.toDouble())
         HomeUiState(
             entrepriseNom = entreprise?.nom.orEmpty(),
             devise = entreprise?.devise ?: Iso4217.DEVISE_REPLI,
@@ -135,6 +152,7 @@ class HomeViewModel @Inject constructor(
             nombreClients = clients.size,
             nombreFournisseurs = fournisseurs.size,
             derniereSauvegarde = historiqueSauvegardes.firstOrNull()?.date,
+            tendanceClients = tendanceCli,
         )
     }
 
@@ -167,6 +185,18 @@ class HomeViewModel @Inject constructor(
             .filter { it.module == OperationModule.ACHATS.name }
             .filter { it.createdAt >= startOfToday }
             .sumOf { it.amount ?: 0.0 }
+        val ventesCountHier = validated.count {
+            it.module == OperationModule.VENTE.name && it.createdAt in startOfYesterday until startOfToday
+        }
+        val ventesCount = validated.count {
+            it.module == OperationModule.VENTE.name && it.createdAt >= startOfToday
+        }
+        val achatsCountHier = validated.count {
+            it.module == OperationModule.ACHATS.name && it.createdAt in startOfYesterday until startOfToday
+        }
+        val achatsCount = validated.count {
+            it.module == OperationModule.ACHATS.name && it.createdAt >= startOfToday
+        }
         val marge = ventes - achats
         val margeHier = ventesHier - achatsHier
         // Le solde affiché à l'accueil doit être celui du module Trésorerie, à
@@ -188,19 +218,31 @@ class HomeViewModel @Inject constructor(
         val quantiteStock = validated
             .filter { it.module == OperationModule.STOCK.name }
             .sumOf { it.quantity ?: 0.0 }
+        val mouvementsCount = validated.count {
+            it.module == OperationModule.STOCK.name && it.createdAt >= startOfToday
+        }
+        val commandesAttente = records.count {
+            it.module == OperationModule.ACHATS.name && it.status == OperationStatus.DRAFT.name
+        }
         base.copy(
             ventes = ventes,
             achats = achats,
             marge = marge,
             tresorerie = tresorerie,
             quantiteStock = quantiteStock,
+            ventesCount = ventesCount,
+            achatsCount = achatsCount,
+            mouvementsStockCount = mouvementsCount,
+            commandesFournisseurAttente = commandesAttente,
             tendanceVentes = CockpitRules.variationPct(ventes, ventesHier),
+            tendanceAchats = CockpitRules.variationPct(achats, achatsHier),
             tendanceMarge = if (ventes == 0.0 || ventesHier == 0.0) null
             else (marge / ventes - margeHier / ventesHier) * 100.0,
             tendanceTresorerie = CockpitRules.variationPct(fluxJour, fluxHier),
             performanceMensuelle = CockpitRules.performanceMensuelle(validated, maintenant),
-            recentOperations = records.take(3),
+            recentOperations = records.take(4),
             rappels = RappelsRules.rappels(listeTaches, records, maintenant),
+            taches = listeTaches,
         )
     }.stateIn(
         scope = viewModelScope,
