@@ -308,19 +308,39 @@ private fun HomeHeader(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // Petit logo feuille verte
-                    Surface(
-                        modifier = Modifier.size(28.dp),
-                        shape = RoundedCornerShape(7.dp),
-                        color = Color(0xFFE6F8EC),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                imageVector = Icons.Outlined.Store,
-                                contentDescription = null,
-                                tint = Color(0xFF16A34A),
-                                modifier = Modifier.size(16.dp),
-                            )
+                    // Petit logo feuille verte - utilise le logo genere pour GREEN FARM
+                    if (companyLogoUri != null) {
+                        CompanyLogo(
+                            logoUri = companyLogoUri,
+                            contentDescription = null,
+                            fallbackIcon = Icons.Outlined.Store,
+                            modifier = Modifier.size(28.dp),
+                            size = 28.dp,
+                            shape = RoundedCornerShape(7.dp),
+                            fallbackTint = Color(0xFF16A34A),
+                            fallbackBackground = Color(0xFFE6F8EC),
+                        )
+                    } else if (companyName.contains("GREEN FARM")) {
+                        Image(
+                            painter = painterResource(R.drawable.logo_green_farm),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(28.dp).clip(RoundedCornerShape(7.dp)),
+                        )
+                    } else {
+                        Surface(
+                            modifier = Modifier.size(28.dp),
+                            shape = RoundedCornerShape(7.dp),
+                            color = Color(0xFFE6F8EC),
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Store,
+                                    contentDescription = null,
+                                    tint = Color(0xFF16A34A),
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
                         }
                     }
                     Spacer(Modifier.width(7.dp))
