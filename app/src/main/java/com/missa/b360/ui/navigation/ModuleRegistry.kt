@@ -47,7 +47,7 @@ enum class AppModule(
     VENTE("module_vente", R.string.module_vente, Icons.Outlined.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1),
     STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, prioriteBarre = 2),
     CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, prioriteBarre = 7),
-    FINANCES("module_finances", R.string.module_finances, Icons.Outlined.Savings, ModuleCode.CPT, prioriteBarre = 3),
+    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
     ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
     FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
     LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG, prioriteBarre = 8),
@@ -56,7 +56,7 @@ enum class AppModule(
     RH("module_rh", R.string.module_rh, Icons.Outlined.Person, ModuleCode.RH, prioriteBarre = 9),
     PROJETS("module_projets", R.string.module_projets, Icons.Outlined.Workspaces, ModuleCode.PRJ, prioriteBarre = 5),
     COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Icons.Outlined.Savings, ModuleCode.CPT),
-    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE, prioriteBarre = 10),
+    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE, prioriteBarre = 3),
     CRM("module_crm", R.string.module_crm, Icons.Outlined.Campaign, ModuleCode.CRM),
     QUALITE("module_qualite", R.string.module_qualite, Icons.Outlined.Build, ModuleCode.QUA),
     MAINTENANCE("module_maintenance", R.string.module_maintenance, Icons.Outlined.Build, ModuleCode.MAI),
@@ -126,7 +126,7 @@ enum class AppModule(
          * exclus, et ne figurent pas non plus dans la disposition d'usine — un
          * onglet dont l'écran masque la barre est une contradiction.
          */
-        private val SANS_BARRE = setOf(ACHATS)
+        private val SANS_BARRE = setOf(ACHATS, FINANCES)
 
         /**
          * Vrai si la barre de navigation doit rester visible sur cette route.

@@ -84,9 +84,17 @@ fun MissaBarreModules(
                 onClick = onAccueil,
             )
             modules.take(AppModule.MAX_ONGLETS).forEach { module ->
+                // La maquette d'accueil affiche « Finances » pour le module
+                // Trésorerie : le libellé technique « Trésorerie » y prêterait
+                // à confusion. On conserve le module mais on affiche le terme
+                // de la capture.
+                val libelleRes = when (module) {
+                    AppModule.TRESORERIE -> R.string.module_finances
+                    else -> module.titleRes
+                }
                 BarreOnglet(
                     icone = module.icon,
-                    libelleRes = module.titleRes,
+                    libelleRes = libelleRes,
                     actif = racine == module.route,
                     onClick = { onModule(module) },
                 )
