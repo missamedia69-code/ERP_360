@@ -437,7 +437,7 @@ private fun HomeDashboard(
                                     else -> code
                                 }
                             } ?: "D - Distribution / Grossiste"
-                            "Profil : $profil"
+                            stringResource(R.string.home_profil_ligne, profil)
                         },
                         color = Color(0xFF334155),
                         fontSize = 11.sp,
@@ -465,7 +465,7 @@ private fun HomeDashboard(
                                     else -> code
                                 }
                             } ?: "P3 - Petite (10-49)"
-                            "Taille : $taille"
+                            stringResource(R.string.home_taille_ligne, taille)
                         },
                         color = Color(0xFF334155),
                         fontSize = 11.sp,
@@ -488,7 +488,7 @@ private fun HomeDashboard(
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
-                        titre = "Ventes du jour",
+                        titre = stringResource(R.string.home_ventes_du_jour),
                         valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
                         sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
                         tendance = state.tendanceVentes ?: 12.0,
@@ -499,7 +499,7 @@ private fun HomeDashboard(
                     )
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
-                        titre = "Achats du jour",
+                        titre = stringResource(R.string.home_achats_du_jour),
                         valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
                         sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
                         tendance = state.tendanceAchats ?: 8.0,
@@ -512,9 +512,9 @@ private fun HomeDashboard(
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
-                        titre = "Trésorerie",
+                        titre = stringResource(R.string.home_tresorerie_card),
                         valeur = if (hasData) formatMontantSansDecimales(state.tresorerie, currency) else "2 450 000 XAF",
-                        sousTitre = "Solde disponible",
+                        sousTitre = stringResource(R.string.home_solde_disponible),
                         tendance = state.tendanceTresorerie ?: 5.0,
                         icon = Icons.Outlined.Payments,
                         iconBg = Color(0xFFFFF7ED),
@@ -523,9 +523,9 @@ private fun HomeDashboard(
                     )
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
-                        titre = "Clients",
+                        titre = stringResource(R.string.home_clients_card),
                         valeur = if (hasData) state.nombreClients.toString() else "356",
-                        sousTitre = "Total",
+                        sousTitre = stringResource(R.string.home_total_label),
                         tendance = state.tendanceClients ?: 4.0,
                         icon = Icons.Outlined.People,
                         iconBg = Color(0xFFF5F3FF),
@@ -640,7 +640,7 @@ private fun AccueilKpiCard(
             Spacer(Modifier.height(6.dp))
             if (tendance != null) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "vs hier", color = Color(0xFF94A3B8), fontSize = 10.sp)
+                    Text(text = stringResource(R.string.home_vs_hier), color = Color(0xFF94A3B8), fontSize = 10.sp)
                     Spacer(Modifier.width(6.dp))
                     Text(
                         text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance),
@@ -650,7 +650,7 @@ private fun AccueilKpiCard(
                     )
                 }
             } else {
-                Text(text = "vs hier —", color = Color(0xFF94A3B8), fontSize = 10.sp)
+                Text(text = stringResource(R.string.home_vs_hier) + " —", color = Color(0xFF94A3B8), fontSize = 10.sp)
             }
         }
     }
@@ -662,14 +662,14 @@ private fun AccueilActionsGrid(
     onNavigate: (String) -> Unit,
 ) {
     val allActions = listOf(
-        AccueilActionItem("+ Vente", Icons.Outlined.ShoppingCart, Color(0xFF2563EB), Color(0xFFEFF6FF), AppModule.VENTE.createRoute(), ModuleCode.VEN),
-        AccueilActionItem("+ Achat", Icons.Outlined.ShoppingCart, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.ACHATS.createRoute(), ModuleCode.ACH),
-        AccueilActionItem("+ Client", Icons.Outlined.PersonAdd, Color(0xFF7C3AED), Color(0xFFF5F3FF), AppModule.CLIENTS.createRoute(), ModuleCode.VEN),
-        AccueilActionItem("+ Fournisseur", Icons.Outlined.Business, Color(0xFFF59E0B), Color(0xFFFFF7ED), AppModule.FOURNISSEURS.createRoute(), ModuleCode.ACH),
-        AccueilActionItem("Entrée en stock", Icons.Outlined.Inventory2, Color(0xFF0D9488), Color(0xFFECFEFF), AppModule.STOCK.createRoute(), ModuleCode.STK),
-        AccueilActionItem("Transfert de stock", Icons.Outlined.LocalShipping, Color(0xFF2563EB), Color(0xFFEFF6FF), Routes.STOCK_TRANSFER_FORM, ModuleCode.STK),
-        AccueilActionItem("Paiement reçu", Icons.Outlined.Payments, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.TRESORERIE.route, ModuleCode.TRE),
-        AccueilActionItem("Dépense", Icons.Outlined.Description, Color(0xFFF43F5E), Color(0xFFFFF1F2), AppModule.FINANCES.route, ModuleCode.CPT),
+        AccueilActionItem(stringResource(R.string.home_plus_vente), Icons.Outlined.ShoppingCart, Color(0xFF2563EB), Color(0xFFEFF6FF), AppModule.VENTE.createRoute(), ModuleCode.VEN),
+        AccueilActionItem(stringResource(R.string.home_plus_achat), Icons.Outlined.ShoppingCart, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.ACHATS.createRoute(), ModuleCode.ACH),
+        AccueilActionItem(stringResource(R.string.home_plus_client), Icons.Outlined.PersonAdd, Color(0xFF7C3AED), Color(0xFFF5F3FF), AppModule.CLIENTS.createRoute(), ModuleCode.VEN),
+        AccueilActionItem(stringResource(R.string.home_plus_fournisseur), Icons.Outlined.Business, Color(0xFFF59E0B), Color(0xFFFFF7ED), AppModule.FOURNISSEURS.createRoute(), ModuleCode.ACH),
+        AccueilActionItem(stringResource(R.string.home_entree_en_stock), Icons.Outlined.Inventory2, Color(0xFF0D9488), Color(0xFFECFEFF), AppModule.STOCK.createRoute(), ModuleCode.STK),
+        AccueilActionItem(stringResource(R.string.home_transfert_de_stock), Icons.Outlined.LocalShipping, Color(0xFF2563EB), Color(0xFFEFF6FF), Routes.STOCK_TRANSFER_FORM, ModuleCode.STK),
+        AccueilActionItem(stringResource(R.string.home_paiement_recu_label), Icons.Outlined.Payments, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.TRESORERIE.route, ModuleCode.TRE),
+        AccueilActionItem(stringResource(R.string.home_depense_label), Icons.Outlined.Description, Color(0xFFF43F5E), Color(0xFFFFF1F2), AppModule.FINANCES.route, ModuleCode.CPT),
     ).filter { modulesActifs.isEmpty() || it.module in modulesActifs }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -757,12 +757,12 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Résumé de l'activité", color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(text = stringResource(R.string.home_resume_activite), color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = Color(0xFFF1F5F9), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(imageVector = Icons.Outlined.History, contentDescription = null, tint = Color(0xFF64748B), modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(text = "Aujourd'hui", color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                        Text(text = stringResource(R.string.home_aujourdhui), color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
                         Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = null, tint = Color(0xFF64748B), modifier = Modifier.size(16.dp))
                     }
@@ -775,7 +775,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     icon = Icons.Outlined.BarChart,
                     iconTint = Color(0xFF2563EB),
                     iconBg = Color(0xFFEFF6FF),
-                    titre = "Ventes",
+                    titre = stringResource(R.string.home_ventes_label),
                     valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
                     sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
                     tendance = state.tendanceVentes ?: 12.0,
@@ -786,7 +786,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     icon = Icons.Outlined.ShoppingCart,
                     iconTint = Color(0xFF16A34A),
                     iconBg = Color(0xFFECFDF5),
-                    titre = "Achats",
+                    titre = stringResource(R.string.home_achats_label),
                     valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
                     sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
                     tendance = state.tendanceAchats ?: 8.0,
@@ -797,9 +797,9 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     icon = Icons.Outlined.SwapHoriz,
                     iconTint = Color(0xFFF59E0B),
                     iconBg = Color(0xFFFFF7ED),
-                    titre = "Mouvements stock",
+                    titre = stringResource(R.string.home_mouvements_stock_label),
                     valeur = if (hasData) state.mouvementsStockCount.toString() else "42",
-                    sousTitre = "Opérations",
+                    sousTitre = stringResource(R.string.home_operations_label),
                     tendance = 5.0,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
@@ -808,7 +808,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     icon = Icons.Outlined.Payments,
                     iconTint = Color(0xFF7C3AED),
                     iconBg = Color(0xFFF5F3FF),
-                    titre = "Marge brute",
+                    titre = stringResource(R.string.home_marge_brute_label),
                     valeur = if (hasData) formatMontantSansDecimales(state.marge, currency) else "470 000 XAF",
                     sousTitre = if (hasData) String.format(java.util.Locale.ROOT, "%.1f%%", margePct) else "37.6%",
                     tendance = state.tendanceMarge ?: 10.0,
@@ -841,7 +841,7 @@ private fun AccueilResumeCell(
         Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 9.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
         Spacer(Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Text(text = "vs hier", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            Text(text = stringResource(R.string.home_vs_hier), color = Color(0xFF94A3B8), fontSize = 9.sp)
             Spacer(Modifier.width(4.dp))
             Text(text = "+" + String.format(java.util.Locale.ROOT, "%.0f%%", tendance), color = Color(0xFF16A34A), fontSize = 9.sp, fontWeight = FontWeight.Bold)
         }
@@ -859,9 +859,9 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Activités récentes", color = Color(0xFF0F172A), fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(text = stringResource(R.string.home_activites_recentes), color = Color(0xFF0F172A), fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text(
-                    text = "Voir tout",
+                    text = stringResource(R.string.home_see_all),
                     color = Color(0xFF2563EB),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -873,13 +873,13 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                 // Données de maquette quand vide
                 AccueilActiviteRow(
                     icon = Icons.Outlined.ShoppingCart, iconBg = Color(0xFFEFF6FF), iconTint = Color(0xFF2563EB),
-                    titre = "Vente #V-0025", sousTitre = "Client ABC", montant = "125 000 XAF", badge = "Payée", heure = "10:42",
+                    titre = "Vente #V-0025", sousTitre = "Client ABC", montant = "125 000 XAF", badge = stringResource(R.string.home_payee), heure = "10:42",
                     onClick = { onNavigate(AppModule.VENTE.route) },
                 )
                 Spacer(Modifier.height(8.dp))
                 AccueilActiviteRow(
                     icon = Icons.Outlined.Inventory2, iconBg = Color(0xFFECFDF5), iconTint = Color(0xFF16A34A),
-                    titre = "Achat #A-0012", sousTitre = "Fournisseur AgroMax", montant = "230 000 XAF", badge = "Reçu", heure = "09:15",
+                    titre = "Achat #A-0012", sousTitre = "Fournisseur AgroMax", montant = "230 000 XAF", badge = stringResource(R.string.home_recu), heure = "09:15",
                     onClick = { onNavigate(AppModule.ACHATS.route) },
                 )
                 Spacer(Modifier.height(8.dp))
@@ -891,7 +891,7 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                 Spacer(Modifier.height(8.dp))
                 AccueilActiviteRow(
                     icon = Icons.Outlined.LocalShipping, iconBg = Color(0xFFFFF7ED), iconTint = Color(0xFFF59E0B),
-                    titre = "Transfert de stock", sousTitre = "Dépôt principal → Boutique Akwa", montant = null, badge = null, heure = "Hier, 14:20",
+                    titre = stringResource(R.string.home_transfert_de_stock), sousTitre = "Dépôt principal → Boutique Akwa", montant = null, badge = null, heure = "Hier, 14:20",
                     onClick = { onNavigate(AppModule.STOCK.route) },
                 )
             } else {
@@ -974,7 +974,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
             }
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Rappels importants", color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.home_rappels_importants), color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
@@ -1008,15 +1008,15 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                     Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Checklist, contentDescription = null, tint = Color(0xFF2563EB), modifier = Modifier.size(14.dp)) }
                 }
                 Spacer(Modifier.width(8.dp))
-                Text(text = "Tâches du jour", color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text(text = stringResource(R.string.home_taches_du_jour), color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             }
             Spacer(Modifier.height(10.dp))
             if (taches.isEmpty()) {
-                AccueilTacheRow(titre = "Relancer les clients en retard")
+                AccueilTacheRow(titre = stringResource(R.string.home_relancer_clients))
                 Spacer(Modifier.height(8.dp))
-                AccueilTacheRow(titre = "Vérifier le stock critique")
+                AccueilTacheRow(titre = stringResource(R.string.home_verifier_stock))
                 Spacer(Modifier.height(8.dp))
-                AccueilTacheRow(titre = "Saisir les dépenses")
+                AccueilTacheRow(titre = stringResource(R.string.home_saisir_depenses))
             } else {
                 taches.forEachIndexed { idx, t ->
                     AccueilTacheRow(titre = t.titre)
@@ -1028,7 +1028,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                 modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(text = "Voir toutes les tâches", color = Color(0xFF2563EB), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                Text(text = stringResource(R.string.home_voir_toutes_taches), color = Color(0xFF2563EB), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
                 Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = Color(0xFF2563EB), modifier = Modifier.size(16.dp))
             }
         }
