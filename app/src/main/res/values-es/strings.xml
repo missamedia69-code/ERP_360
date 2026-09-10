@@ -1667,7 +1667,6 @@
     <string name="nav_accueil">Inicio</string>
     <string name="home_ventes_jour">Ventas del día</string>
     <string name="home_achats_jour">Compras del día</string>
-    <string name="home_solde_disponible">Saldo disponible</string>
     <string name="home_total">Total</string>
     <string name="home_vs_hier">vs ayer</string>
     <string name="home_activity_summary">Resumen de actividad</string>

@@ -1667,7 +1667,6 @@
     <string name="nav_accueil">الرئيسية</string>
     <string name="home_ventes_jour">مبيعات اليوم</string>
     <string name="home_achats_jour">مشتريات اليوم</string>
-    <string name="home_solde_disponible">الرصيد المتاح</string>
     <string name="home_total">الإجمالي</string>
     <string name="home_vs_hier">مقارنة بالأمس</string>
     <string name="home_activity_summary">ملخص النشاط</string>
