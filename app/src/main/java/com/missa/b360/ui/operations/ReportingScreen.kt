@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun ReportingScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.module_reporting)
+    PlaceholderScreen(titleRes = R.string.module_reporting, onBack = onBack)
 }

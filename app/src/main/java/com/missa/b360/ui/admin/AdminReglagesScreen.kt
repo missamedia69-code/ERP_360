@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun AdminReglagesScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.home_settings)
+    PlaceholderScreen(titleRes = R.string.home_settings, onBack = onBack)
 }

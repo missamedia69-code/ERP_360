@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun NotificationsScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.notifications)
+    PlaceholderScreen(titleRes = R.string.notifications, onBack = onBack)
 }

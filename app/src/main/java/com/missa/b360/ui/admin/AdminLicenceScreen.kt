@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun AdminLicenceScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.home_licence_activation)
+    PlaceholderScreen(titleRes = R.string.home_licence_activation, onBack = onBack)
 }

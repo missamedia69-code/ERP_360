@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
-    PlaceholderScreen(titleRes = R.string.module_stock)
+    PlaceholderScreen(titleRes = R.string.module_stock, onBack = onBack)
 }

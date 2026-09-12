@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun AdminJournalScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.admin_journal)
+    PlaceholderScreen(titleRes = R.string.admin_journal, onBack = onBack)
 }

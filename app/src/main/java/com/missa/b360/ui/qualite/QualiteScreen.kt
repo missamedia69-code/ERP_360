@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun QualiteScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
-    PlaceholderScreen(titleRes = R.string.module_qualite)
+    PlaceholderScreen(titleRes = R.string.module_qualite, onBack = onBack)
 }

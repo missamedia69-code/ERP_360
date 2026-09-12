@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun ReferentielsScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.refer_title)
+    PlaceholderScreen(titleRes = R.string.refer_title, onBack = onBack)
 }

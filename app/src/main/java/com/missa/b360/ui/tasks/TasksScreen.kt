@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun TasksScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.tasks_title)
+    PlaceholderScreen(titleRes = R.string.tasks_title, onBack = onBack)
 }

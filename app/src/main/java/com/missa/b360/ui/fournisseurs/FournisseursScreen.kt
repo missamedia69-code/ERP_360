@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun FournisseursScreen(onBack: () -> Unit, openCreate: Boolean = false) {
-    PlaceholderScreen(titleRes = R.string.module_fournisseurs)
+    PlaceholderScreen(titleRes = R.string.module_fournisseurs, onBack = onBack)
 }

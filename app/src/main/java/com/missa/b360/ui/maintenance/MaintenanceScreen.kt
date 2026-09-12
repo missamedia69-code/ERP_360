@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun MaintenanceScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
-    PlaceholderScreen(titleRes = R.string.module_maintenance)
+    PlaceholderScreen(titleRes = R.string.module_maintenance, onBack = onBack)
 }

@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun LivraisonScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}, openCreate: Boolean = false) {
-    PlaceholderScreen(titleRes = R.string.module_livraison)
+    PlaceholderScreen(titleRes = R.string.module_livraison, onBack = onBack)
 }

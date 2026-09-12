@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
-    PlaceholderScreen(titleRes = R.string.module_stock)
+    PlaceholderScreen(titleRes = R.string.module_stock, onBack = onBack)
 }

@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun AdminSauvegardeScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.admin_sauvegarde)
+    PlaceholderScreen(titleRes = R.string.admin_sauvegarde, onBack = onBack)
 }

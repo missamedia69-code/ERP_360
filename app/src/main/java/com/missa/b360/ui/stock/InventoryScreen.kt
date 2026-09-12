@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun InventoryScreen(onBack: () -> Unit) {
-    PlaceholderScreen(titleRes = R.string.module_stock)
+    PlaceholderScreen(titleRes = R.string.module_stock, onBack = onBack)
 }

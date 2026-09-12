@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun CrmScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
-    PlaceholderScreen(titleRes = R.string.module_crm)
+    PlaceholderScreen(titleRes = R.string.module_crm, onBack = onBack)
 }

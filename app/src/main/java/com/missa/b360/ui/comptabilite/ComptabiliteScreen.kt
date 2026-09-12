@@ -11,5 +11,5 @@ import com.missa.b360.ui.components.PlaceholderScreen
  */
 @Composable
 fun ComptabiliteScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
-    PlaceholderScreen(titleRes = R.string.module_comptabilite)
+    PlaceholderScreen(titleRes = R.string.module_comptabilite, onBack = onBack)
 }
