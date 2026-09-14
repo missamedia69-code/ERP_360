@@ -102,7 +102,7 @@
     <string name="lock_bloque">Demasiados intentos. Vuelva a intentarlo en unos minutos.</string>
     <string name="lock_deverrouiller">Desbloquear</string>
 
-    <!-- Clients (9.2) -->
+    
     <string name="clients_recherche">Buscar un cliente…</string>
     <string name="clients_total">%1$d cliente(s)</string>
     <string name="clients_vide">No hay clientes. Toque + para crear uno.</string>
@@ -142,19 +142,19 @@
     <string name="clients_donnees_invalides">Compruebe el descuento y el límite de crédito.</string>
     <string name="clients_erreur_sauvegarde">No se pudo guardar. Inténtelo de nuevo.</string>
     <string name="clients_categorie_utilisee">Esta categoría la utiliza uno o más clientes.</string>
-    <!-- Indicatifs téléphoniques pays -->
+    
     <string name="clients_indicatif_pays">Prefijo de país</string>
     <string name="clients_rechercher_indicatif">Buscar un país o prefijo</string>
     <string name="clients_indicatif_obligatoire">Seleccione el prefijo de país del cliente.</string>
     <string name="clients_aucun_indicatif">No se encontró ningún país ni prefijo.</string>
 
-    <!-- Validation des saisies client -->
+    
     <string name="clients_nom_invalide">Introduzca un nombre de entre 2 y 120 caracteres.</string>
     <string name="clients_telephone_invalide">Introduzca un teléfono válido de 7 a 15 dígitos.</string>
     <string name="clients_email_invalide">Introduzca un correo electrónico válido o deje este campo vacío.</string>
     <string name="clients_remise_invalide">El descuento debe estar entre 0 y 100%.</string>
 
-    <!-- Types de clients -->
+    
     <string name="clients_type_particulier">Particular</string>
     <string name="clients_type_entreprise">Empresa</string>
     <string name="clients_type_administration">Administración</string>
@@ -162,7 +162,7 @@
     <string name="clients_type_revendeur">Revendedor</string>
     <string name="clients_type_prospect">Prospecto</string>
 
-    <!-- Formulario de cliente: información principal -->
+    
     <string name="clients_nouveau">Nuevo cliente</string>
     <string name="clients_informations_principales">Información principal</string>
     <string name="clients_informations_principales_aide">Introduzca la información esencial del cliente.</string>
@@ -177,25 +177,25 @@
     <string name="clients_enregistrer">Guardar</string>
 
 
-    <!-- Dirección artística: onboarding móvil -->
+    
     <string name="ob_licence_avantage_fonctions">Todas las funciones están disponibles durante 7 días</string>
     <string name="ob_licence_avantage_sans_carte">No se requiere tarjeta bancaria</string>
     <string name="ob_selectionne">Seleccionado</string>
 
 
-    <!-- Páginas de descubrimiento y perfiles del diseño de onboarding -->
+    
 
 
-    <!-- Estructura de onboarding: encabezado, ayuda y progreso -->
+    
     <string name="ob_fermer">Cerrar</string>
 
 
-    <!-- Logo de l’entreprise pendant l’onboarding -->
+    
     <string name="ob_logo_modifier">Cambiar el logotipo</string>
     <string name="ob_logo_supprimer">Eliminar</string>
     <string name="ob_logo_apercu">Vista previa del logotipo de la empresa</string>
 
-    <!-- Tableau de bord d’accueil -->
+    
     <string name="home_company_placeholder">Su empresa</string>
     <string name="home_not_configured">Por configurar</string>
     <string name="home_greeting">Hola, %1$s 👋</string>
@@ -250,7 +250,7 @@
     <string name="home_more_short">Más</string>
     <string name="home_company_active">Empresa activa</string>
 
-    <!-- Navigation latérale détaillée -->
+    
     <string name="home_close">Cerrar</string>
     <string name="home_settings">Ajustes</string>
     <string name="home_licence_activation">Licencia y activación</string>
@@ -264,7 +264,7 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Ayuda y asistencia</string>
 
-    <!-- Modules opérationnels et reporting -->
+    
     <string name="ops_record_detail">%1$s · %2$s</string>
     <string name="ops_created">Documento %1$s creado.</string>
     <string name="ops_invalid">Revise la descripción, el importe y la cantidad.</string>
@@ -335,7 +335,7 @@
     <string name="sales_cash">Efectivo</string>
     <string name="sales_receipt_name">Factura</string>
 
-    <!-- Flujo de ventas: lista, factura, opciones e impresión -->
+    
     <string name="sales_all">Todas</string>
     <string name="sales_articles">Artículos</string>
     <string name="sales_back">Volver</string>
@@ -393,7 +393,7 @@
     <string name="sales_view_invoice">Ver factura</string>
     <string name="sales_view_invoice_description">Vuelve a la vista previa de la factura</string>
 
-    <!-- Flujo detallado de clientes -->
+    
     <string name="clients_flow_account">Estado de cuenta</string>
     <string name="clients_flow_account_title">Estado de cuenta</string>
     <string name="clients_flow_active">Activos (%1$d)</string>
@@ -473,7 +473,7 @@
     <string name="clients_flow_to">Hasta</string>
     <string name="clients_flow_total_clients">Total clientes</string>
     <string name="clients_flow_unlimited">Ilimitada</string>
-    <!-- Phase E : produits, stock, mouvements (spec §7/§11/§13) -->
+    
     <string name="stock_tab_products">Productos</string>
     <string name="stock_tab_movements">Movimientos</string>
     <string name="stock_new_product">Nuevo producto</string>
@@ -806,7 +806,7 @@
     <string name="sales_devis_entry">Presupuestos y pedidos</string>
     <string name="sales_devis_entry_desc">Ciclo comercial: presupuesto → pedido → factura</string>
 
-    <!-- Lot v7 : référentiels, RH, production, tâches, rappel, prestations -->
+    
     <string name="refer_title">Datos de referencia</string>
     <string name="refer_tab_paiement">Pago</string>
     <string name="refer_tab_taxes">Impuestos</string>
@@ -940,7 +940,7 @@
     <string name="prest_new_commande">Nuevo pedido</string>
     <string name="prest_edit_devis">Editar presupuesto</string>
     <string name="prest_edit_commande">Editar pedido</string>
-    <!-- Onboarding maquette -->
+    
     <string name="obn_bienvenue_titre">Bienvenido a</string>
     <string name="obn_bienvenue_sous">Su ERP móvil, simple, completo y 100 % adaptado a su actividad.</string>
     <string name="obn_commencer">Comenzar</string>
@@ -981,7 +981,7 @@
     <string name="obn_recap_devise">Moneda</string>
     <string name="obn_acceder">Ir a la aplicación</string>
 
-    <!-- Fuseaux horaires (catalogue UTC-12:00 → UTC+14:00) -->
+    
     <string name="fuseau_titre">Zona horaria</string>
     <string name="fuseau_recherche">Buscar una ciudad, un código o UTC…</string>
     <string name="fuseau_heure_locale">Hora local</string>
@@ -1024,7 +1024,7 @@
     <string name="fuseau_p1300">Hora de Tonga / Samoa Occidental</string>
     <string name="fuseau_p1400">Hora de las islas de la Línea</string>
 
-    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    
     <string name="obn_retention">Retención del registro</string>
     <string name="obn_retention_30">30 días</string>
     <string name="obn_retention_90">90 días</string>
@@ -1056,7 +1056,7 @@
     <string name="obn_profil_perso_vide">Seleccione al menos un módulo para continuar.</string>
     <string name="obn_profil_perso_fonctions">%1$d funcionalidades</string>
 
-    <!-- Fonctionnalites detaillees des modules (popup de detail des profils) -->
+    
     <string name="fonc_fournisseurs">Proveedores</string>
     <string name="fonc_demandes_d_achat">Solicitudes de compra</string>
     <string name="fonc_appels_d_offres">Licitaciones</string>
@@ -1189,7 +1189,7 @@
     <string name="fonc_analyses_multicriteres">Análisis multicriterio</string>
     <string name="fonc_alertes">Alertas</string>
 
-    <!-- Popup de detail d'un profil d'activite -->
+    
     <string name="obn_profil_info">Ver el detalle de este perfil</string>
     <string name="obn_profil_detail_resume">%1$d módulos · %2$d funciones</string>
     <string name="obn_profil_detail_choisir">Elegir este perfil</string>
@@ -1198,7 +1198,7 @@
     <string name="obn_profil_detail_modifiable">Podrá activar más módulos más adelante en los ajustes.</string>
     <string name="obn_profil_detail_complet">Completo</string>
 
-    <!-- Modules metier / modules support (socle) -->
+    
     <string name="module_desc_ach">Proveedores, pedidos, recepciones y facturas de compra.</string>
     <string name="module_desc_ven">Clientes, presupuestos, pedidos, entregas y facturación.</string>
     <string name="module_desc_stk">Artículos, almacenes, movimientos, inventarios y valoración.</string>
@@ -1219,7 +1219,7 @@
     <string name="obn_profil_detail_metier">Módulos de negocio</string>
     <string name="obn_profil_detail_support">Módulos de soporte sugeridos</string>
 
-    <!-- Tableau de bord : indicateurs, alertes -->
+    
     <string name="kpi_ca">Facturación</string>
     <string name="kpi_ca_f">Ventas validadas del periodo</string>
     <string name="kpi_panier">Ticket medio</string>
@@ -1290,7 +1290,7 @@
     <string name="obn_socle_replier">Ocultar módulos de soporte</string>
     <string name="obn_entreprise_localisation">Ubicación y moneda</string>
 
-    <!-- Entreprise : coordonnees et identifiants legaux -->
+    
     <string name="obn_telephone">Teléfono</string>
     <string name="obn_email">Correo electrónico</string>
     <string name="obn_email_ex">contacto@empresa.com</string>
@@ -1299,7 +1299,7 @@
     <string name="obn_entreprise_contact_sous">Se reutilizan en presupuestos, facturas y albaranes.</string>
     <string name="obn_erreur_email_entreprise">Dirección de correo no válida.</string>
 
-    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    
     <string name="fisc_zone_cemac">OHADA — CEMAC</string>
     <string name="fisc_zone_uemoa">OHADA — UEMOA</string>
     <string name="fisc_zone_ohada">OHADA</string>
@@ -1317,7 +1317,7 @@
     <string name="fisc_id_registre">Registro mercantil</string>
     <string name="fisc_format_attendu">Formato esperado: %1$s</string>
 
-    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    
     <string name="fisc_pack_titre">Paquete de país aplicado</string>
     <string name="fisc_pack_identifiants">Identificadores legales</string>
     <string name="fisc_pack_indicatif">Prefijo telefónico</string>
@@ -1326,7 +1326,7 @@
     <string name="fisc_pack_personnaliser_note">Úselo solo si el paquete no corresponde a su situación.</string>
     <string name="fisc_pack_aucun_pays">Elija un país para aplicar automáticamente moneda, impuesto e identificadores legales.</string>
 
-    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    
     <string name="fisc_taux_a_renseigner">Tasa por indicar</string>
     <string name="fisc_taxe_tva">IVA</string>
     <string name="fisc_taxe_gst">GST</string>
@@ -1386,7 +1386,7 @@
     <string name="obn_code_indispo">Ninguna aplicación de este dispositivo puede abrir ese contacto.</string>
     <string name="obn_code_a_configurer">Datos comerciales pendientes de configurar en res/values/contact.xml.</string>
     <string name="obn_code_telegram">Telegram</string>
-    <!-- Module Tresorerie -->
+    
     <string name="tre_type_caisse">Caja</string>
     <string name="tre_type_banque">Banco</string>
     <string name="tre_type_mobile">Dinero móvil</string>
@@ -1441,7 +1441,7 @@
     <string name="tre_champ_destination">Cuenta de destino</string>
     <string name="tre_virement_libelle">Transferencia interna</string>
     <string name="tre_virement_aide">Una transferencia crea dos apuntes vinculados: una salida y una entrada del mismo importe.</string>
-    <!-- Module Comptabilite -->
+    
     <string name="cpt_rub_ventes">Ventas</string>
     <string name="cpt_rub_autres_produits">Otros ingresos</string>
     <string name="cpt_rub_achats">Compras</string>
@@ -1466,7 +1466,7 @@
     <string name="cpt_journal">Libro diario</string>
     <string name="cpt_journal_vide">No hay apuntes en este periodo.</string>
     <string name="cpt_origine_tresorerie">Apunte procedente de tesorería</string>
-    <!-- Module CRM -->
+    
     <string name="crm_seg_a_relancer">Para contactar</string>
     <string name="crm_seg_prospect">Prospecto</string>
     <string name="crm_seg_nouveau">Nuevo</string>
@@ -1484,7 +1484,7 @@
     <string name="crm_aucun_client">No hay clientes en esta vista.</string>
     <string name="crm_jamais_achete">Nunca ha comprado</string>
     <string name="crm_nb_achats">%1$d compra(s)</string>
-    <!-- Module Logistique -->
+    
     <string name="log_transfert_recu">Recibido</string>
     <string name="log_transfert_transit">En tránsito</string>
     <string name="log_transfert_orphelin">Registro incompleto</string>
@@ -1499,7 +1499,7 @@
     <string name="log_aucun_transfert">No hay traslados registrados.</string>
     <string name="log_references">%1$d referencia(s)</string>
     <string name="log_ruptures">%1$d sin stock</string>
-    <!-- Modules Qualite et Maintenance -->
+    
     <string name="qua_gravite_mineure">Menor</string>
     <string name="qua_gravite_majeure">Mayor</string>
     <string name="qua_gravite_critique">Crítica</string>
@@ -1557,7 +1557,7 @@
     <string name="mai_champ_technicien">Técnico</string>
     <string name="mai_msg_ok">Intervención guardada.</string>
     <string name="mai_msg_nom_pris">Ya existe un equipo con ese nombre.</string>
-    <!-- Indicateurs et alertes des modules v9/v10 -->
+    
     <string name="kpi_nc_ouvertes">Incidencias abiertas</string>
     <string name="kpi_nc_ouvertes_f">No conformidades aún sin resolver</string>
     <string name="kpi_taux_resolution">Tasa de resolución</string>
@@ -1582,7 +1582,7 @@
     <string name="dc_piece_commande">Pedido</string>
     <string name="dc_partager">Compartir</string>
     <string name="dc_email">Correo</string>
-    <!-- Module Livraison -->
+    
     <string name="liv_etape_a_preparer">Por preparar</string>
     <string name="liv_etape_expediee">Enviada</string>
     <string name="liv_etape_livree">Entregada</string>
@@ -1604,7 +1604,7 @@
     <string name="liv_champ_colis">Número de bultos</string>
     <string name="liv_champ_origine">Pedido de origen</string>
     <string name="liv_origine_aide">Referencia del pedido o de la factura que acompaña este albarán.</string>
-    <!-- Module Services -->
+    
     <string name="srv_etape_planifiee">Planificada</string>
     <string name="srv_etape_en_cours">En curso</string>
     <string name="srv_etape_terminee">Terminada</string>
@@ -1630,7 +1630,7 @@
     <string name="srv_champ_heures">Horas dedicadas</string>
     <string name="srv_champ_intervenant">Responsable</string>
     <string name="srv_champ_lieu">Lugar</string>
-    <!-- Module Projets -->
+    
     <string name="prj_etat_preparation">En preparación</string>
     <string name="prj_etat_en_cours">En curso</string>
     <string name="prj_etat_livre">Entregado</string>
@@ -1710,7 +1710,7 @@
     <string name="mod_actions">Acciones</string>
     <string name="mod_fonctions_disponibles">Funciones disponibles</string>
     <string name="mod_fonctions_a_venir">Previstas en este módulo (%1$d)</string>
-    <!-- Accueil du module Stock -->
+    
     <string name="stk_recherche">Buscar</string>
     <string name="stk_actualiser">Actualizar</string>
     <string name="stk_menu">Más opciones</string>
@@ -1778,4 +1778,4 @@
     <string name="obn_vente_sans_stock_sous">Permitir vender sin stock físico — dropship, bajo pedido o servicio. El stock podrá ser negativo.</string>
     <string name="obn_regle_dor">Regla de oro: Compras → Stock · Producción → Stock · Ventas → Stock, salvo venta sin stock</string>
     <string name="obn_stock_requis">El stock es obligatorio: si compras o produces, necesitas stock.</string>
-</resources>
+<string name="module_inactif_titre">%1$s no activo</string><string name="module_inactif_message">El módulo %1$s no está activo para el perfil %2$s.</string><string name="module_inactif_explication">Actívalo en ajustes o elige un perfil que lo incluya.</string><string name="module_inactif_retour">Volver al inicio</string><string name="module_inactif_activer">Activar este módulo</string><string name="activation_titre">Activación de módulos</string><string name="activation_sous_titre">Gestiona el perfil de actividad y módulos activos en toda la app.</string><string name="activation_profil_actuel">Perfil actual</string><string name="activation_modules_actifs">Módulos activos (%1$d)</string><string name="activation_elements_actifs">Elementos activos</string><string name="activation_module_actif">Activo</string><string name="activation_module_inactif">Inactivo</string><string name="activation_element_actif">Activo</string><string name="activation_element_inactif">Inactivo</string><string name="activation_ajouter_module">Añadir</string><string name="activation_retirer_module">Quitar</string><string name="activation_vente_sans_stock">Venta sin stock</string><string name="activation_vente_sans_stock_desc">Permite venta sin stock físico (drop, servicio). El stock puede volverse negativo.</string><string name="activation_palier">Tamaño de empresa</string><string name="activation_recommande">Recomendado</string><string name="activation_verrouille">Bloqueado por perfil</string><string name="activation_personnalise">Personalizado</string><string name="activation_elements_titre">Elementos del módulo %1$s</string><string name="activation_elements_sous">Marca funciones activas para este módulo.</string><string name="activation_enregistre">Activación actualizada.</string><string name="activation_changer_profil">Cambiar perfil</string><string name="activation_confirmer_changement">Cambiar perfil recalculará módulos activos. Los módulos personalizados fuera del nuevo perfil se conservarán si compatibles. ¿Continuar?</string><string name="palier_p1_desc">Solo - módulos esenciales, sin RRHH/CRM</string><string name="palier_p2_desc">Micro - gestión simple, sin RRHH/CRM</string><string name="palier_p3_desc">Pequeña - desbloquea RRHH y CRM si ventas</string><string name="palier_p4_desc">Mediana - RRHH y CRM recomendados, Logística si stock</string><string name="palier_p5_desc">Grande - estructura completa</string><string name="palier_p6_desc">Grupo - todos los soportes</string><string name="palier_effectif_badge">Plantilla</string><string name="palier_choisir_titre">Tamaño de empresa</string><string name="palier_choisir_sous">La plantilla influye en módulos recomendados (RRHH, CRM, etc.)</string></resources>

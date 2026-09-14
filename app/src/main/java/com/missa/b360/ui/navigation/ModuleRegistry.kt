@@ -108,15 +108,12 @@ enum class AppModule(
          * qui masquent la barre n'y sont jamais proposés.
          */
         fun barreBas(actifs: List<ModuleCode>, epingles: List<String> = emptyList()): List<AppModule> {
-            val visibles = visibles(actifs)
-            // Pour la rétrocompatibilité : les épinglés peuvent inclure SANS_BARRE s'ils viennent du nouveau système
-            val disponiblesPourEpingle = visibles
-            val disponiblesParDefaut = visibles.filter { it !in SANS_BARRE }
+            val disponibles = visibles(actifs).filter { it !in SANS_BARRE }
             val choisis = epingles.mapNotNull { nom ->
-                disponiblesPourEpingle.firstOrNull { it.name == nom }
+                disponibles.firstOrNull { it.name == nom }
             }
             return choisis.ifEmpty {
-                disponiblesParDefaut
+                disponibles
                     .filter { it.prioriteBarre > 0 }
                     .sortedBy { it.prioriteBarre }
             }.take(MAX_ONGLETS)

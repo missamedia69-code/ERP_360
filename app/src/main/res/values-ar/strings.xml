@@ -102,7 +102,7 @@
     <string name="lock_bloque">محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.</string>
     <string name="lock_deverrouiller">فتح</string>
 
-    <!-- Clients (9.2) -->
+    
     <string name="clients_recherche">البحث عن عميل…</string>
     <string name="clients_total">%1$d عميل</string>
     <string name="clients_vide">لا يوجد عملاء بعد. اضغط + لإضافة عميل.</string>
@@ -142,19 +142,19 @@
     <string name="clients_donnees_invalides">تحقق من الخصم وحد الائتمان.</string>
     <string name="clients_erreur_sauvegarde">تعذر الحفظ. حاول مرة أخرى.</string>
     <string name="clients_categorie_utilisee">تُستخدم هذه الفئة من قبل عميل واحد أو أكثر.</string>
-    <!-- Indicatifs téléphoniques pays -->
+    
     <string name="clients_indicatif_pays">مفتاح الدولة</string>
     <string name="clients_rechercher_indicatif">ابحث عن دولة أو مفتاح اتصال</string>
     <string name="clients_indicatif_obligatoire">اختر مفتاح دولة العميل.</string>
     <string name="clients_aucun_indicatif">لم يتم العثور على دولة أو مفتاح اتصال.</string>
 
-    <!-- Validation des saisies client -->
+    
     <string name="clients_nom_invalide">أدخل اسماً بين حرفين و120 حرفاً.</string>
     <string name="clients_telephone_invalide">أدخل رقم هاتف صالحاً من 7 إلى 15 رقماً.</string>
     <string name="clients_email_invalide">أدخل بريداً إلكترونياً صالحاً أو اترك الحقل فارغاً.</string>
     <string name="clients_remise_invalide">يجب أن يكون الخصم بين 0 و100٪.</string>
 
-    <!-- Types de clients -->
+    
     <string name="clients_type_particulier">فرد</string>
     <string name="clients_type_entreprise">شركة</string>
     <string name="clients_type_administration">إدارة حكومية</string>
@@ -162,7 +162,7 @@
     <string name="clients_type_revendeur">موزع</string>
     <string name="clients_type_prospect">عميل محتمل</string>
 
-    <!-- نموذج العميل: المعلومات الرئيسية -->
+    
     <string name="clients_nouveau">عميل جديد</string>
     <string name="clients_informations_principales">المعلومات الرئيسية</string>
     <string name="clients_informations_principales_aide">أدخل المعلومات الأساسية للعميل.</string>
@@ -177,25 +177,25 @@
     <string name="clients_enregistrer">حفظ</string>
 
 
-    <!-- التوجيه الفني: إعداد التطبيق على الهاتف -->
+    
     <string name="ob_licence_avantage_fonctions">كل الوظائف متاحة لمدة 7 أيام</string>
     <string name="ob_licence_avantage_sans_carte">لا حاجة إلى بطاقة بنكية</string>
     <string name="ob_selectionne">محدد</string>
 
 
-    <!-- صفحات التعريف وفئات النشاط من تصميم الإعداد -->
+    
 
 
-    <!-- هيكل الإعداد: الرأس والمساعدة والتقدم -->
+    
     <string name="ob_fermer">إغلاق</string>
 
 
-    <!-- Logo de l’entreprise pendant l’onboarding -->
+    
     <string name="ob_logo_modifier">تغيير الشعار</string>
     <string name="ob_logo_supprimer">حذف</string>
     <string name="ob_logo_apercu">معاينة شعار الشركة</string>
 
-    <!-- Tableau de bord d’accueil -->
+    
     <string name="home_company_placeholder">شركتك</string>
     <string name="home_not_configured">غير مُعدّ</string>
     <string name="home_greeting">مرحباً، %1$s 👋</string>
@@ -250,7 +250,7 @@
     <string name="home_more_short">المزيد</string>
     <string name="home_company_active">شركة نشطة</string>
 
-    <!-- Navigation latérale détaillée -->
+    
     <string name="home_close">إغلاق</string>
     <string name="home_settings">الإعدادات</string>
     <string name="home_licence_activation">الترخيص والتفعيل</string>
@@ -264,7 +264,7 @@
     <string name="home_version_format">MISSA BUSINESS 360 • الإصدار %1$s</string>
     <string name="home_support_title">المساعدة والدعم</string>
 
-    <!-- Modules opérationnels et reporting -->
+    
     <string name="ops_record_detail">%1$s · %2$s</string>
     <string name="ops_created">تم إنشاء السجل %1$s.</string>
     <string name="ops_invalid">تحقق من الوصف والمبلغ والكمية.</string>
@@ -335,7 +335,7 @@
     <string name="sales_cash">نقداً</string>
     <string name="sales_receipt_name">فاتورة</string>
 
-    <!-- مسار المبيعات: القائمة والفاتورة والخيارات والطباعة -->
+    
     <string name="sales_all">الكل</string>
     <string name="sales_articles">الأصناف</string>
     <string name="sales_back">رجوع</string>
@@ -393,7 +393,7 @@
     <string name="sales_view_invoice">عرض الفاتورة</string>
     <string name="sales_view_invoice_description">العودة إلى معاينة الفاتورة</string>
 
-    <!-- مسار العملاء التفصيلي -->
+    
     <string name="clients_flow_account">كشف الحساب</string>
     <string name="clients_flow_account_title">كشف الحساب</string>
     <string name="clients_flow_active">نشطون (%1$d)</string>
@@ -473,7 +473,7 @@
     <string name="clients_flow_to">إلى</string>
     <string name="clients_flow_total_clients">إجمالي العملاء</string>
     <string name="clients_flow_unlimited">غير محدودة</string>
-    <!-- Phase E : produits, stock, mouvements (spec §7/§11/§13) -->
+    
     <string name="stock_tab_products">المنتجات</string>
     <string name="stock_tab_movements">الحركات</string>
     <string name="stock_new_product">منتج جديد</string>
@@ -806,7 +806,7 @@
     <string name="sales_devis_entry">العروض والطلبات</string>
     <string name="sales_devis_entry_desc">الدورة التجارية: عرض → طلب → فاتورة</string>
 
-    <!-- Lot v7 : référentiels, RH, production, tâches, rappel, prestations -->
+    
     <string name="refer_title">بيانات مرجعية</string>
     <string name="refer_tab_paiement">الدفع</string>
     <string name="refer_tab_taxes">الضرائب</string>
@@ -940,7 +940,7 @@
     <string name="prest_new_commande">طلب جديد</string>
     <string name="prest_edit_devis">تعديل عرض السعر</string>
     <string name="prest_edit_commande">تعديل الطلب</string>
-    <!-- Onboarding maquette -->
+    
     <string name="obn_bienvenue_titre">مرحبًا بكم في</string>
     <string name="obn_bienvenue_sous">نظام ERP المحمول الخاص بك، بسيط، متكامل ومناسب 100% لنشاطك.</string>
     <string name="obn_commencer">ابدأ</string>
@@ -981,7 +981,7 @@
     <string name="obn_recap_devise">العملة</string>
     <string name="obn_acceder">الانتقال إلى التطبيق</string>
 
-    <!-- Fuseaux horaires (catalogue UTC-12:00 → UTC+14:00) -->
+    
     <string name="fuseau_titre">المنطقة الزمنية</string>
     <string name="fuseau_recherche">ابحث عن مدينة أو رمز أو UTC…</string>
     <string name="fuseau_heure_locale">التوقيت المحلي</string>
@@ -1024,7 +1024,7 @@
     <string name="fuseau_p1300">توقيت تونغا / ساموا الغربية</string>
     <string name="fuseau_p1400">توقيت جزر لاين</string>
 
-    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    
     <string name="obn_retention">مدة الاحتفاظ بالسجل</string>
     <string name="obn_retention_30">30 يومًا</string>
     <string name="obn_retention_90">90 يومًا</string>
@@ -1056,7 +1056,7 @@
     <string name="obn_profil_perso_vide">اختر وحدة واحدة على الأقل للمتابعة.</string>
     <string name="obn_profil_perso_fonctions">%1$d ميزة</string>
 
-    <!-- Fonctionnalites detaillees des modules (popup de detail des profils) -->
+    
     <string name="fonc_fournisseurs">الموردون</string>
     <string name="fonc_demandes_d_achat">طلبات الشراء</string>
     <string name="fonc_appels_d_offres">المناقصات</string>
@@ -1189,7 +1189,7 @@
     <string name="fonc_analyses_multicriteres">التحليل متعدد المعايير</string>
     <string name="fonc_alertes">التنبيهات</string>
 
-    <!-- Popup de detail d'un profil d'activite -->
+    
     <string name="obn_profil_info">عرض تفاصيل هذا الملف</string>
     <string name="obn_profil_detail_resume">%1$d وحدات · %2$d وظيفة</string>
     <string name="obn_profil_detail_choisir">اختيار هذا الملف</string>
@@ -1198,7 +1198,7 @@
     <string name="obn_profil_detail_modifiable">يمكنك تفعيل وحدات أخرى لاحقًا من الإعدادات.</string>
     <string name="obn_profil_detail_complet">كامل</string>
 
-    <!-- Modules metier / modules support (socle) -->
+    
     <string name="module_desc_ach">الموردون وأوامر الشراء والاستلامات والفواتير.</string>
     <string name="module_desc_ven">العملاء وعروض الأسعار والطلبات والتسليم والفوترة.</string>
     <string name="module_desc_stk">الأصناف والمستودعات والحركات والجرد والتقييم.</string>
@@ -1219,7 +1219,7 @@
     <string name="obn_profil_detail_metier">وحدات النشاط</string>
     <string name="obn_profil_detail_support">الوحدات المساندة المقترحة</string>
 
-    <!-- Tableau de bord : indicateurs, alertes -->
+    
     <string name="kpi_ca">رقم الأعمال</string>
     <string name="kpi_ca_f">المبيعات المعتمدة خلال الفترة</string>
     <string name="kpi_panier">متوسط قيمة البيع</string>
@@ -1290,7 +1290,7 @@
     <string name="obn_socle_replier">إخفاء الوحدات المساندة</string>
     <string name="obn_entreprise_localisation">الموقع والعملة</string>
 
-    <!-- Entreprise : coordonnees et identifiants legaux -->
+    
     <string name="obn_telephone">الهاتف</string>
     <string name="obn_email">البريد الإلكتروني</string>
     <string name="obn_email_ex">contact@company.com</string>
@@ -1299,7 +1299,7 @@
     <string name="obn_entreprise_contact_sous">تُستخدم تلقائيًا في عروض الأسعار والفواتير وسندات التسليم.</string>
     <string name="obn_erreur_email_entreprise">عنوان بريد إلكتروني غير صالح.</string>
 
-    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    
     <string name="fisc_zone_cemac">أوهادا — سيماك</string>
     <string name="fisc_zone_uemoa">أوهادا — الاتحاد الاقتصادي لغرب إفريقيا</string>
     <string name="fisc_zone_ohada">أوهادا</string>
@@ -1317,7 +1317,7 @@
     <string name="fisc_id_registre">السجل التجاري</string>
     <string name="fisc_format_attendu">الصيغة المتوقعة: %1$s</string>
 
-    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    
     <string name="fisc_pack_titre">حزمة الدولة المطبقة</string>
     <string name="fisc_pack_identifiants">المعرفات القانونية</string>
     <string name="fisc_pack_indicatif">رمز الاتصال</string>
@@ -1326,7 +1326,7 @@
     <string name="fisc_pack_personnaliser_note">استخدمه فقط إذا كانت الحزمة لا تطابق وضعك.</string>
     <string name="fisc_pack_aucun_pays">اختر دولة لتطبيق العملة والضريبة والمعرفات القانونية تلقائيًا.</string>
 
-    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    
     <string name="fisc_taux_a_renseigner">المعدل بحاجة إلى إدخال</string>
     <string name="fisc_taxe_tva">ضريبة القيمة المضافة</string>
     <string name="fisc_taxe_gst">GST</string>
@@ -1386,7 +1386,7 @@
     <string name="obn_code_indispo">لا يوجد تطبيق على هذا الجهاز يمكنه فتح جهة الاتصال هذه.</string>
     <string name="obn_code_a_configurer">بيانات الاتصال التجارية لم تُضبط بعد في res/values/contact.xml.</string>
     <string name="obn_code_telegram">تيليغرام</string>
-    <!-- Module Tresorerie -->
+    
     <string name="tre_type_caisse">الصندوق</string>
     <string name="tre_type_banque">البنك</string>
     <string name="tre_type_mobile">المحفظة الإلكترونية</string>
@@ -1441,7 +1441,7 @@
     <string name="tre_champ_destination">الحساب الدائن</string>
     <string name="tre_virement_libelle">تحويل داخلي</string>
     <string name="tre_virement_aide">ينشئ التحويل قيدين مرتبطين: صادر ووارد بالمبلغ نفسه.</string>
-    <!-- Module Comptabilite -->
+    
     <string name="cpt_rub_ventes">المبيعات</string>
     <string name="cpt_rub_autres_produits">إيرادات أخرى</string>
     <string name="cpt_rub_achats">المشتريات</string>
@@ -1466,7 +1466,7 @@
     <string name="cpt_journal">دفتر اليومية</string>
     <string name="cpt_journal_vide">لا توجد قيود في هذه الفترة.</string>
     <string name="cpt_origine_tresorerie">قيد من الخزينة</string>
-    <!-- Module CRM -->
+    
     <string name="crm_seg_a_relancer">للمتابعة</string>
     <string name="crm_seg_prospect">عميل محتمل</string>
     <string name="crm_seg_nouveau">جديد</string>
@@ -1484,7 +1484,7 @@
     <string name="crm_aucun_client">لا يوجد عملاء في هذا العرض.</string>
     <string name="crm_jamais_achete">لم يشترِ مطلقًا</string>
     <string name="crm_nb_achats">%1$d عملية شراء</string>
-    <!-- Module Logistique -->
+    
     <string name="log_transfert_recu">تم الاستلام</string>
     <string name="log_transfert_transit">في الطريق</string>
     <string name="log_transfert_orphelin">تسجيل ناقص</string>
@@ -1499,7 +1499,7 @@
     <string name="log_aucun_transfert">لا توجد تحويلات مسجلة.</string>
     <string name="log_references">%1$d صنف</string>
     <string name="log_ruptures">%1$d نفاد مخزون</string>
-    <!-- Modules Qualite et Maintenance -->
+    
     <string name="qua_gravite_mineure">بسيطة</string>
     <string name="qua_gravite_majeure">كبيرة</string>
     <string name="qua_gravite_critique">حرجة</string>
@@ -1557,7 +1557,7 @@
     <string name="mai_champ_technicien">الفني</string>
     <string name="mai_msg_ok">تم حفظ عملية الصيانة.</string>
     <string name="mai_msg_nom_pris">يوجد معدة بهذا الاسم بالفعل.</string>
-    <!-- Indicateurs et alertes des modules v9/v10 -->
+    
     <string name="kpi_nc_ouvertes">حالات جودة مفتوحة</string>
     <string name="kpi_nc_ouvertes_f">حالات عدم مطابقة لم تُغلق بعد</string>
     <string name="kpi_taux_resolution">معدل المعالجة</string>
@@ -1582,7 +1582,7 @@
     <string name="dc_piece_commande">طلب</string>
     <string name="dc_partager">مشاركة</string>
     <string name="dc_email">البريد الإلكتروني</string>
-    <!-- Module Livraison -->
+    
     <string name="liv_etape_a_preparer">قيد التحضير</string>
     <string name="liv_etape_expediee">تم الشحن</string>
     <string name="liv_etape_livree">تم التسليم</string>
@@ -1604,7 +1604,7 @@
     <string name="liv_champ_colis">عدد الطرود</string>
     <string name="liv_champ_origine">الطلب الأصلي</string>
     <string name="liv_origine_aide">مرجع الطلب أو الفاتورة المرافقة لهذا السند.</string>
-    <!-- Module Services -->
+    
     <string name="srv_etape_planifiee">مجدولة</string>
     <string name="srv_etape_en_cours">قيد التنفيذ</string>
     <string name="srv_etape_terminee">منجزة</string>
@@ -1630,7 +1630,7 @@
     <string name="srv_champ_heures">الساعات المستغرقة</string>
     <string name="srv_champ_intervenant">المنفّذ</string>
     <string name="srv_champ_lieu">المكان</string>
-    <!-- Module Projets -->
+    
     <string name="prj_etat_preparation">قيد الإعداد</string>
     <string name="prj_etat_en_cours">قيد التنفيذ</string>
     <string name="prj_etat_livre">تم التسليم</string>
@@ -1710,7 +1710,7 @@
     <string name="mod_actions">الإجراءات</string>
     <string name="mod_fonctions_disponibles">الوظائف المتاحة</string>
     <string name="mod_fonctions_a_venir">مخطط لها في هذه الوحدة (%1$d)</string>
-    <!-- Accueil du module Stock -->
+    
     <string name="stk_recherche">بحث</string>
     <string name="stk_actualiser">تحديث</string>
     <string name="stk_menu">خيارات أخرى</string>
@@ -1778,4 +1778,4 @@
     <string name="obn_vente_sans_stock_sous">السماح بالبيع بدون مخزون مادي — إسقاط الشحن، حسب الطلب أو خدمة. قد يصبح المخزون سالباً.</string>
     <string name="obn_regle_dor">القاعدة الذهبية: المشتريات ← المخزون · الإنتاج ← المخزون · المبيعات ← المخزون، إلا البيع بدون مخزون</string>
     <string name="obn_stock_requis">المخزون مطلوب: إذا اشتريت أو أنتجت، فأنت تحتاج إلى مخزون.</string>
-</resources>
+<string name="module_inactif_titre">%1$s غير نشط</string><string name="module_inactif_message">الوحدة %1$s غير نشطة للملف %2$s.</string><string name="module_inactif_explication">فعلها من الإعدادات أو اختر ملفا يتضمنها.</string><string name="module_inactif_retour">العودة للرئيسية</string><string name="module_inactif_activer">تفعيل هذه الوحدة</string><string name="activation_titre">تفعيل الوحدات</string><string name="activation_sous_titre">إدارة ملف النشاط والوحدات النشطة في التطبيق.</string><string name="activation_profil_actuel">الملف الحالي</string><string name="activation_modules_actifs">الوحدات النشطة (%1$d)</string><string name="activation_elements_actifs">العناصر النشطة</string><string name="activation_module_actif">نشط</string><string name="activation_module_inactif">غير نشط</string><string name="activation_element_actif">نشط</string><string name="activation_element_inactif">غير نشط</string><string name="activation_ajouter_module">إضافة</string><string name="activation_retirer_module">إزالة</string><string name="activation_vente_sans_stock">بيع بدون مخزون</string><string name="activation_vente_sans_stock_desc">يسمح بالبيع بدون مخزون فعلي.</string><string name="activation_palier">حجم الشركة</string><string name="activation_recommande">موصى به</string><string name="activation_verrouille">مقفل بالملف</string><string name="activation_personnalise">مخصص</string><string name="activation_elements_titre">عناصر الوحدة %1$s</string><string name="activation_elements_sous">حدد الميزات النشطة لهذه الوحدة.</string><string name="activation_enregistre">تم تحديث التفعيل.</string><string name="activation_changer_profil">تغيير الملف</string><string name="activation_confirmer_changement">تغيير الملف سيعيد حساب الوحدات النشطة. هل تريد المتابعة؟</string><string name="palier_p1_desc">فردي - أساسي بدون موارد بشرية</string><string name="palier_p2_desc">صغير جدا - إدارة بسيطة</string><string name="palier_p3_desc">صغير - يفتح الموارد البشرية و CRM</string><string name="palier_p4_desc">متوسط - موارد بشرية و CRM موصى به</string><string name="palier_p5_desc">كبير - هيكل كامل</string><string name="palier_p6_desc">مجموعة - كل الوحدات</string><string name="palier_effectif_badge">العدد</string><string name="palier_choisir_titre">حجم الشركة</string><string name="palier_choisir_sous">العدد يؤثر على الوحدات الموصى بها</string></resources>

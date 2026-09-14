@@ -101,9 +101,9 @@
     <string name="lock_essais_restants">Wrong PIN — %1$d attempt(s) left before lockout.</string>
     <string name="lock_bloque">Too many attempts. Try again in a few minutes.</string>
     <string name="lock_deverrouiller">Unlock</string>
-<!-- Phase C — Administration & Settings (module 9.1) -->
 
-    <!-- Settings (D4 / RA-19) -->
+
+    
     <string name="adm_reglages_subtitle">Language, activity profile, headcount and company information.</string>
     <string name="adm_langue">Interface language</string>
     <string name="adm_profil">Activity profile</string>
@@ -118,7 +118,7 @@
     <string name="adm_save_ok">Information saved.</string>
     <string name="adm_save_err">Could not save.</string>
 
-    <!-- Licence (RA-04..06) -->
+    
     <string name="adm_licence_statut">Licence status</string>
     <string name="adm_licence_statut_essai">Free trial (7 days)</string>
     <string name="adm_licence_statut_actif">Active licence</string>
@@ -136,7 +136,7 @@
     <string name="adm_licence_msg_max">Maximum dissociations reached (3/year).</string>
     <string name="adm_licence_msg_none">No licence to dissociate.</string>
 
-    <!-- Backup (RA-13) -->
+    
     <string name="adm_sauvegarde_btn">Back up now</string>
     <string name="adm_sauvegarde_en_cours">Backup in progress…</string>
     <string name="adm_sauvegarde_ok">Local backup successful.</string>
@@ -145,12 +145,12 @@
     <string name="adm_sauvegarde_vide">No backup yet.</string>
     <string name="adm_sauvegarde_type">Local</string>
 
-    <!-- Journal (RA-18) -->
+    
     <string name="adm_journal_purge">Purge entries older than 12 months</string>
     <string name="adm_journal_purge_ok">Purge done.</string>
     <string name="adm_journal_vide">No journal entries.</string>
 
-    <!-- Users & roles (D1/D2, RA-14) -->
+    
     <string name="adm_users_add">Add a user</string>
     <string name="adm_users_nom">Name</string>
     <string name="adm_users_email">Recovery email</string>
@@ -160,7 +160,7 @@
     <string name="adm_users_desactiver">Disable</string>
     <string name="adm_users_resultat_ok">User created.</string>
 
-    <!-- Multi-site (RA-21) -->
+    
     <string name="adm_sites_ajouter">Add a site</string>
     <string name="adm_sites_nom">Site name</string>
     <string name="adm_sites_type">Type</string>
@@ -176,13 +176,13 @@
     <string name="adm_site_type_usine">Factory</string>
     <string name="adm_site_type_bureau">Office</string>
 
-    <!-- About -->
+    
     <string name="adm_apropos_version">Version</string>
     <string name="adm_apropos_appareil">Device</string>
     <string name="adm_apropos_societe">Missa Business 360 — Android ERP</string>
     <string name="adm_apropos_mentions">Data is stored locally on this device. Licence and backup are managed under Administration &amp; Settings.</string>
 
-<!-- Phase D — Clients (9.2) -->
+
     <string name="clients_recherche">Search clients…</string>
     <string name="clients_total">%1$d client(s)</string>
     <string name="clients_vide">No clients yet. Tap + to add one.</string>
@@ -213,7 +213,7 @@
     <string name="clients_badge_optionnel">Loyalty badge (optional)</string>
 
 
-    <!-- Clients (9.2) -->
+    
     <string name="clients_doublon_titre">Potential duplicate</string>
     <string name="clients_doublon_message">A client with this name or phone number already exists. Do you still want to create it?</string>
     <string name="clients_creer_malgre_doublon">Create despite duplicate</string>
@@ -226,19 +226,19 @@
     <string name="clients_erreur_sauvegarde">Could not save. Please try again.</string>
     <string name="clients_categorie_utilisee">This category is used by one or more clients.</string>
 
-    <!-- Indicatifs téléphoniques pays -->
+    
     <string name="clients_indicatif_pays">Country calling code</string>
     <string name="clients_rechercher_indicatif">Search for a country or calling code</string>
     <string name="clients_indicatif_obligatoire">Select the customer country calling code.</string>
     <string name="clients_aucun_indicatif">No country or calling code found.</string>
 
-    <!-- Validation des saisies client -->
+    
     <string name="clients_nom_invalide">Enter a name between 2 and 120 characters.</string>
     <string name="clients_telephone_invalide">Enter a valid phone number with 7 to 15 digits.</string>
     <string name="clients_email_invalide">Enter a valid email address or leave this field blank.</string>
     <string name="clients_remise_invalide">The discount must be between 0 and 100%.</string>
 
-    <!-- Types de clients -->
+    
     <string name="clients_type_particulier">Individual</string>
     <string name="clients_type_entreprise">Company</string>
     <string name="clients_type_administration">Government</string>
@@ -246,7 +246,7 @@
     <string name="clients_type_revendeur">Reseller</string>
     <string name="clients_type_prospect">Prospect</string>
 
-    <!-- Phase D — Suppliers (9.3) -->
+    
     <string name="fournisseurs_recherche">Search suppliers…</string>
     <string name="fournisseurs_total">%1$d supplier(s)</string>
     <string name="fournisseurs_vide">No suppliers yet. Tap + to add one.</string>
@@ -256,7 +256,7 @@
     <string name="fournisseurs_telephone">Phone</string>
     <string name="fournisseurs_desactiver">Disable</string>
 
-    <!-- Client form: main information -->
+    
     <string name="clients_nouveau">New client</string>
     <string name="clients_informations_principales">Main information</string>
     <string name="clients_informations_principales_aide">Enter the client’s essential information.</string>
@@ -271,25 +271,25 @@
     <string name="clients_enregistrer">Save</string>
 
 
-    <!-- Art direction: mobile onboarding -->
+    
     <string name="ob_licence_avantage_fonctions">All features are available for 7 days</string>
     <string name="ob_licence_avantage_sans_carte">No bank card is required</string>
     <string name="ob_selectionne">Selected</string>
 
 
-    <!-- Discovery pages and profile families from the onboarding design -->
+    
 
 
-    <!-- Onboarding structure: header, help and progress -->
+    
     <string name="ob_fermer">Close</string>
 
 
-    <!-- Logo de l’entreprise pendant l’onboarding -->
+    
     <string name="ob_logo_modifier">Change logo</string>
     <string name="ob_logo_supprimer">Remove</string>
     <string name="ob_logo_apercu">Company logo preview</string>
 
-    <!-- Tableau de bord d’accueil -->
+    
     <string name="home_company_placeholder">Your company</string>
     <string name="home_not_configured">Not set up</string>
     <string name="home_greeting">Hello, %1$s 👋</string>
@@ -344,7 +344,7 @@
     <string name="home_more_short">More</string>
     <string name="home_company_active">Active company</string>
 
-    <!-- Navigation latérale détaillée -->
+    
     <string name="home_close">Close</string>
     <string name="home_settings">Settings</string>
     <string name="home_licence_activation">Licence &amp; activation</string>
@@ -358,7 +358,7 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">Help &amp; support</string>
 
-    <!-- Modules opérationnels et reporting -->
+    
     <string name="ops_record_detail">%1$s · %2$s</string>
     <string name="ops_created">Record %1$s created.</string>
     <string name="ops_invalid">Check the description, amount and quantity.</string>
@@ -429,7 +429,7 @@
     <string name="sales_cash">Cash</string>
     <string name="sales_receipt_name">Invoice</string>
 
-    <!-- Sales flow: list, invoice, options and print -->
+    
     <string name="sales_all">All</string>
     <string name="sales_articles">Items</string>
     <string name="sales_back">Back</string>
@@ -487,7 +487,7 @@
     <string name="sales_view_invoice">View invoice</string>
     <string name="sales_view_invoice_description">Returns to the invoice preview</string>
 
-    <!-- Detailed customer module flow -->
+    
     <string name="clients_flow_account">Account statement</string>
     <string name="clients_flow_account_title">Account statement</string>
     <string name="clients_flow_active">Active (%1$d)</string>
@@ -567,7 +567,7 @@
     <string name="clients_flow_to">To</string>
     <string name="clients_flow_total_clients">Total customers</string>
     <string name="clients_flow_unlimited">Unlimited</string>
-    <!-- Phase E : produits, stock, mouvements (spec §7/§11/§13) -->
+    
     <string name="stock_tab_products">Products</string>
     <string name="stock_tab_movements">Movements</string>
     <string name="stock_new_product">New product</string>
@@ -827,7 +827,7 @@
     <string name="sales_devis_entry">Quotes &amp; orders</string>
     <string name="sales_devis_entry_desc">Commercial cycle: quote → order → invoice</string>
 
-    <!-- Lot v7 : référentiels, RH, production, tâches, rappel, prestations -->
+    
     <string name="refer_title">Reference data</string>
     <string name="refer_tab_paiement">Payment</string>
     <string name="refer_tab_taxes">Taxes</string>
@@ -961,7 +961,7 @@
     <string name="prest_new_commande">New order</string>
     <string name="prest_edit_devis">Edit quote</string>
     <string name="prest_edit_commande">Edit order</string>
-    <!-- Onboarding maquette -->
+    
     <string name="obn_bienvenue_titre">Welcome to</string>
     <string name="obn_bienvenue_sous">Your mobile ERP, simple, complete and 100 % adapted to your activity.</string>
     <string name="obn_commencer">Get started</string>
@@ -1002,7 +1002,7 @@
     <string name="obn_recap_devise">Currency</string>
     <string name="obn_acceder">Go to the application</string>
 
-    <!-- Fuseaux horaires (catalogue UTC-12:00 → UTC+14:00) -->
+    
     <string name="fuseau_titre">Time zone</string>
     <string name="fuseau_recherche">Search a city, a code or UTC…</string>
     <string name="fuseau_heure_locale">Local time</string>
@@ -1045,7 +1045,7 @@
     <string name="fuseau_p1300">Tonga / West Samoa Time</string>
     <string name="fuseau_p1400">Line Islands Time</string>
 
-    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    
     <string name="obn_retention">Audit log retention</string>
     <string name="obn_retention_30">30 days</string>
     <string name="obn_retention_90">90 days</string>
@@ -1077,7 +1077,7 @@
     <string name="obn_profil_perso_vide">Select at least one module to continue.</string>
     <string name="obn_profil_perso_fonctions">%1$d features</string>
 
-    <!-- Fonctionnalites detaillees des modules (popup de detail des profils) -->
+    
     <string name="fonc_fournisseurs">Suppliers</string>
     <string name="fonc_demandes_d_achat">Purchase requests</string>
     <string name="fonc_appels_d_offres">Calls for tenders</string>
@@ -1210,7 +1210,7 @@
     <string name="fonc_analyses_multicriteres">Multi-criteria analysis</string>
     <string name="fonc_alertes">Alerts</string>
 
-    <!-- Popup de detail d'un profil d'activite -->
+    
     <string name="obn_profil_info">See what this profile includes</string>
     <string name="obn_profil_detail_resume">%1$d modules · %2$d features</string>
     <string name="obn_profil_detail_choisir">Choose this profile</string>
@@ -1219,7 +1219,7 @@
     <string name="obn_profil_detail_modifiable">You can activate more modules later in the settings.</string>
     <string name="obn_profil_detail_complet">Full</string>
 
-    <!-- Modules metier / modules support (socle) -->
+    
     <string name="module_desc_ach">Suppliers, purchase orders, receipts and invoices.</string>
     <string name="module_desc_ven">Customers, quotes, orders, deliveries and invoicing.</string>
     <string name="module_desc_stk">Items, warehouses, movements, counts and valuation.</string>
@@ -1240,7 +1240,7 @@
     <string name="obn_profil_detail_metier">Business modules</string>
     <string name="obn_profil_detail_support">Suggested support modules</string>
 
-    <!-- Tableau de bord : indicateurs, alertes -->
+    
     <string name="kpi_ca">Revenue</string>
     <string name="kpi_ca_f">Validated sales over the period</string>
     <string name="kpi_panier">Average sale</string>
@@ -1311,7 +1311,7 @@
     <string name="obn_socle_replier">Hide support modules</string>
     <string name="obn_entreprise_localisation">Location and currency</string>
 
-    <!-- Entreprise : coordonnees et identifiants legaux -->
+    
     <string name="obn_telephone">Phone</string>
     <string name="obn_email">Email</string>
     <string name="obn_email_ex">contact@company.com</string>
@@ -1320,7 +1320,7 @@
     <string name="obn_entreprise_contact_sous">Automatically reused on your quotes, invoices and delivery notes.</string>
     <string name="obn_erreur_email_entreprise">Invalid email address.</string>
 
-    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    
     <string name="fisc_zone_cemac">OHADA — CEMAC</string>
     <string name="fisc_zone_uemoa">OHADA — WAEMU</string>
     <string name="fisc_zone_ohada">OHADA</string>
@@ -1338,7 +1338,7 @@
     <string name="fisc_id_registre">Trade register</string>
     <string name="fisc_format_attendu">Expected format: %1$s</string>
 
-    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    
     <string name="fisc_pack_titre">Country pack applied</string>
     <string name="fisc_pack_identifiants">Legal identifiers</string>
     <string name="fisc_pack_indicatif">Dialling code</string>
@@ -1347,7 +1347,7 @@
     <string name="fisc_pack_personnaliser_note">Only needed if the pack does not match your situation.</string>
     <string name="fisc_pack_aucun_pays">Choose a country to apply currency, tax and legal identifiers automatically.</string>
 
-    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    
     <string name="fisc_taux_a_renseigner">Rate to be entered</string>
     <string name="fisc_taxe_tva">VAT</string>
     <string name="fisc_taxe_gst">GST</string>
@@ -1407,7 +1407,7 @@
     <string name="obn_code_indispo">No app on this device can open that contact.</string>
     <string name="obn_code_a_configurer">Sales contact details still to be set in res/values/contact.xml.</string>
     <string name="obn_code_telegram">Telegram</string>
-    <!-- Module Tresorerie -->
+    
     <string name="tre_type_caisse">Cash box</string>
     <string name="tre_type_banque">Bank</string>
     <string name="tre_type_mobile">Mobile Money</string>
@@ -1462,7 +1462,7 @@
     <string name="tre_champ_destination">To account</string>
     <string name="tre_virement_libelle">Internal transfer</string>
     <string name="tre_virement_aide">A transfer creates two linked entries: one out and one in, for the same amount.</string>
-    <!-- Module Comptabilite -->
+    
     <string name="cpt_rub_ventes">Sales</string>
     <string name="cpt_rub_autres_produits">Other income</string>
     <string name="cpt_rub_achats">Purchases</string>
@@ -1487,7 +1487,7 @@
     <string name="cpt_journal">Journal entries</string>
     <string name="cpt_journal_vide">No entry for this period.</string>
     <string name="cpt_origine_tresorerie">Entry from treasury</string>
-    <!-- Module CRM -->
+    
     <string name="crm_seg_a_relancer">To follow up</string>
     <string name="crm_seg_prospect">Prospect</string>
     <string name="crm_seg_nouveau">New</string>
@@ -1505,7 +1505,7 @@
     <string name="crm_aucun_client">No customer in this view.</string>
     <string name="crm_jamais_achete">Never purchased</string>
     <string name="crm_nb_achats">%1$d purchase(s)</string>
-    <!-- Module Logistique -->
+    
     <string name="log_transfert_recu">Received</string>
     <string name="log_transfert_transit">In transit</string>
     <string name="log_transfert_orphelin">Incomplete entry</string>
@@ -1520,7 +1520,7 @@
     <string name="log_aucun_transfert">No transfer recorded.</string>
     <string name="log_references">%1$d item(s)</string>
     <string name="log_ruptures">%1$d out of stock</string>
-    <!-- Modules Qualite et Maintenance -->
+    
     <string name="qua_gravite_mineure">Minor</string>
     <string name="qua_gravite_majeure">Major</string>
     <string name="qua_gravite_critique">Critical</string>
@@ -1578,7 +1578,7 @@
     <string name="mai_champ_technicien">Technician</string>
     <string name="mai_msg_ok">Work order saved.</string>
     <string name="mai_msg_nom_pris">Equipment name already used.</string>
-    <!-- Indicateurs et alertes des modules v9/v10 -->
+    
     <string name="kpi_nc_ouvertes">Open quality issues</string>
     <string name="kpi_nc_ouvertes_f">Non-conformities not yet closed</string>
     <string name="kpi_taux_resolution">Resolution rate</string>
@@ -1603,7 +1603,7 @@
     <string name="dc_piece_commande">Order</string>
     <string name="dc_partager">Share</string>
     <string name="dc_email">Email</string>
-    <!-- Module Livraison -->
+    
     <string name="liv_etape_a_preparer">To prepare</string>
     <string name="liv_etape_expediee">Shipped</string>
     <string name="liv_etape_livree">Delivered</string>
@@ -1625,7 +1625,7 @@
     <string name="liv_champ_colis">Number of parcels</string>
     <string name="liv_champ_origine">Source order</string>
     <string name="liv_origine_aide">Reference of the order or invoice this note accompanies.</string>
-    <!-- Module Services -->
+    
     <string name="srv_etape_planifiee">Scheduled</string>
     <string name="srv_etape_en_cours">In progress</string>
     <string name="srv_etape_terminee">Completed</string>
@@ -1651,7 +1651,7 @@
     <string name="srv_champ_heures">Hours spent</string>
     <string name="srv_champ_intervenant">Assignee</string>
     <string name="srv_champ_lieu">Location</string>
-    <!-- Module Projets -->
+    
     <string name="prj_etat_preparation">Preparing</string>
     <string name="prj_etat_en_cours">In progress</string>
     <string name="prj_etat_livre">Delivered</string>
@@ -1731,7 +1731,7 @@
     <string name="mod_actions">Actions</string>
     <string name="mod_fonctions_disponibles">Available features</string>
     <string name="mod_fonctions_a_venir">Planned in this module (%1$d)</string>
-    <!-- Accueil du module Stock -->
+    
     <string name="stk_recherche">Search</string>
     <string name="stk_actualiser">Refresh</string>
     <string name="stk_menu">More options</string>
@@ -1799,4 +1799,4 @@
     <string name="obn_vente_sans_stock_sous">Allow selling without physical stock — dropship, made-to-order or service. Stock may go negative.</string>
     <string name="obn_regle_dor">Golden rule: Purchase → Stock · Production → Stock · Sales → Stock, unless no-stock selling</string>
     <string name="obn_stock_requis">Stock is required: if you buy or produce, you must have stock.</string>
-</resources>
+<string name="module_inactif_titre">%1$s inactive</string><string name="module_inactif_message">Module %1$s is not active for profile %2$s.</string><string name="module_inactif_explication">Enable it in settings or choose a profile that includes it.</string><string name="module_inactif_retour">Back to home</string><string name="module_inactif_activer">Enable this module</string><string name="activation_titre">Module activation</string><string name="activation_sous_titre">Manage activity profile and active modules throughout the app.</string><string name="activation_profil_actuel">Current profile</string><string name="activation_modules_actifs">Active modules (%1$d)</string><string name="activation_elements_actifs">Active elements</string><string name="activation_module_actif">Active</string><string name="activation_module_inactif">Inactive</string><string name="activation_element_actif">Active</string><string name="activation_element_inactif">Inactive</string><string name="activation_ajouter_module">Add</string><string name="activation_retirer_module">Remove</string><string name="activation_vente_sans_stock">Sale without stock</string><string name="activation_vente_sans_stock_desc">Allows sale without physical stock (drop, service). Stock may become negative.</string><string name="activation_palier">Company size</string><string name="activation_recommande">Recommended</string><string name="activation_verrouille">Locked by profile</string><string name="activation_personnalise">Custom</string><string name="activation_elements_titre">Elements of module %1$s</string><string name="activation_elements_sous">Check active features for this module.</string><string name="activation_enregistre">Activation updated.</string><string name="activation_changer_profil">Change profile</string><string name="activation_confirmer_changement">Changing profile will recalculate active modules. Custom modules outside new profile will be kept if compatible. Continue?</string><string name="palier_p1_desc">Solo - essential modules, no HR/CRM</string><string name="palier_p2_desc">Micro team - simple management, no HR/CRM</string><string name="palier_p3_desc">Small - unlocks HR and CRM if sales</string><string name="palier_p4_desc">Medium - HR and CRM recommended, Logistics if stock</string><string name="palier_p5_desc">Large - full structure, all transverse supports</string><string name="palier_p6_desc">Group - all support modules, advanced steering</string><string name="palier_effectif_badge">Headcount</string><string name="palier_choisir_titre">Company size</string><string name="palier_choisir_sous">Headcount influences recommended modules (HR, CRM, etc.)</string></resources>

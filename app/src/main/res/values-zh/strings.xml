@@ -102,7 +102,7 @@
     <string name="lock_bloque">尝试次数过多。请几分钟后再试。</string>
     <string name="lock_deverrouiller">解锁</string>
 
-    <!-- Clients (9.2) -->
+    
     <string name="clients_recherche">搜索客户…</string>
     <string name="clients_total">%1$d 位客户</string>
     <string name="clients_vide">暂无客户。点击 + 新建客户。</string>
@@ -142,19 +142,19 @@
     <string name="clients_donnees_invalides">请检查折扣和信用额度。</string>
     <string name="clients_erreur_sauvegarde">保存失败，请重试。</string>
     <string name="clients_categorie_utilisee">一个或多个客户正在使用此类别。</string>
-    <!-- Indicatifs téléphoniques pays -->
+    
     <string name="clients_indicatif_pays">国家区号</string>
     <string name="clients_rechercher_indicatif">搜索国家或区号</string>
     <string name="clients_indicatif_obligatoire">请选择客户的国家区号。</string>
     <string name="clients_aucun_indicatif">未找到国家或区号。</string>
 
-    <!-- Validation des saisies client -->
+    
     <string name="clients_nom_invalide">请输入 2 到 120 个字符的名称。</string>
     <string name="clients_telephone_invalide">请输入由 7 到 15 位数字组成的有效电话号码。</string>
     <string name="clients_email_invalide">请输入有效的电子邮箱，或将此字段留空。</string>
     <string name="clients_remise_invalide">折扣必须在 0 到 100% 之间。</string>
 
-    <!-- Types de clients -->
+    
     <string name="clients_type_particulier">个人</string>
     <string name="clients_type_entreprise">企业</string>
     <string name="clients_type_administration">政府机构</string>
@@ -162,7 +162,7 @@
     <string name="clients_type_revendeur">经销商</string>
     <string name="clients_type_prospect">潜在客户</string>
 
-    <!-- 客户表单：主要信息 -->
+    
     <string name="clients_nouveau">新建客户</string>
     <string name="clients_informations_principales">主要信息</string>
     <string name="clients_informations_principales_aide">填写客户的基本信息。</string>
@@ -177,25 +177,25 @@
     <string name="clients_enregistrer">保存</string>
 
 
-    <!-- 视觉规范：移动端引导 -->
+    
     <string name="ob_licence_avantage_fonctions">所有功能均可免费使用 7 天</string>
     <string name="ob_licence_avantage_sans_carte">无需银行卡</string>
     <string name="ob_selectionne">已选择</string>
 
 
-    <!-- 引导页与业务类型设计 -->
+    
 
 
-    <!-- 引导结构：标题、帮助和进度 -->
+    
     <string name="ob_fermer">关闭</string>
 
 
-    <!-- Logo de l’entreprise pendant l’onboarding -->
+    
     <string name="ob_logo_modifier">更换标志</string>
     <string name="ob_logo_supprimer">删除</string>
     <string name="ob_logo_apercu">企业标志预览</string>
 
-    <!-- Tableau de bord d’accueil -->
+    
     <string name="home_company_placeholder">您的企业</string>
     <string name="home_not_configured">待设置</string>
     <string name="home_greeting">您好，%1$s 👋</string>
@@ -250,7 +250,7 @@
     <string name="home_more_short">更多</string>
     <string name="home_company_active">当前企业</string>
 
-    <!-- Navigation latérale détaillée -->
+    
     <string name="home_close">关闭</string>
     <string name="home_settings">设置</string>
     <string name="home_licence_activation">许可证和激活</string>
@@ -264,7 +264,7 @@
     <string name="home_version_format">MISSA BUSINESS 360 • v%1$s</string>
     <string name="home_support_title">帮助与支持</string>
 
-    <!-- Modules opérationnels et reporting -->
+    
     <string name="ops_record_detail">%1$s · %2$s</string>
     <string name="ops_created">已创建单据 %1$s。</string>
     <string name="ops_invalid">请检查描述、金额和数量。</string>
@@ -335,7 +335,7 @@
     <string name="sales_cash">现金</string>
     <string name="sales_receipt_name">发票</string>
 
-    <!-- 销售流程：列表、发票、选项和打印 -->
+    
     <string name="sales_all">全部</string>
     <string name="sales_articles">商品</string>
     <string name="sales_back">返回</string>
@@ -393,7 +393,7 @@
     <string name="sales_view_invoice">查看发票</string>
     <string name="sales_view_invoice_description">返回发票预览</string>
 
-    <!-- 客户模块详细流程 -->
+    
     <string name="clients_flow_account">账户报表</string>
     <string name="clients_flow_account_title">账户报表</string>
     <string name="clients_flow_active">活跃（%1$d）</string>
@@ -473,7 +473,7 @@
     <string name="clients_flow_to">至</string>
     <string name="clients_flow_total_clients">客户总数</string>
     <string name="clients_flow_unlimited">不限</string>
-    <!-- Phase E : produits, stock, mouvements (spec §7/§11/§13) -->
+    
     <string name="stock_tab_products">产品</string>
     <string name="stock_tab_movements">库存变动</string>
     <string name="stock_new_product">新建产品</string>
@@ -806,7 +806,7 @@
     <string name="sales_devis_entry">报价单与订单</string>
     <string name="sales_devis_entry_desc">商业流程：报价 → 订单 → 发票</string>
 
-    <!-- Lot v7 : référentiels, RH, production, tâches, rappel, prestations -->
+    
     <string name="refer_title">基础数据</string>
     <string name="refer_tab_paiement">付款方式</string>
     <string name="refer_tab_taxes">税收</string>
@@ -940,7 +940,7 @@
     <string name="prest_new_commande">新订单</string>
     <string name="prest_edit_devis">编辑报价单</string>
     <string name="prest_edit_commande">编辑订单</string>
-    <!-- Onboarding maquette -->
+    
     <string name="obn_bienvenue_titre">欢迎使用</string>
     <string name="obn_bienvenue_sous">您的移动 ERP，简单、完整，100% 适应您的业务。</string>
     <string name="obn_commencer">开始</string>
@@ -981,7 +981,7 @@
     <string name="obn_recap_devise">货币</string>
     <string name="obn_acceder">进入应用</string>
 
-    <!-- Fuseaux horaires (catalogue UTC-12:00 → UTC+14:00) -->
+    
     <string name="fuseau_titre">时区</string>
     <string name="fuseau_recherche">搜索城市、代码或 UTC…</string>
     <string name="fuseau_heure_locale">当地时间</string>
@@ -1024,7 +1024,7 @@
     <string name="fuseau_p1300">汤加／西萨摩亚时间</string>
     <string name="fuseau_p1400">线岛时间</string>
 
-    <!-- Rétention du journal + restauration d'une sauvegarde -->
+    
     <string name="obn_retention">日志保留期限</string>
     <string name="obn_retention_30">30 天</string>
     <string name="obn_retention_90">90 天</string>
@@ -1056,7 +1056,7 @@
     <string name="obn_profil_perso_vide">请至少选择一个模块以继续。</string>
     <string name="obn_profil_perso_fonctions">%1$d 项功能</string>
 
-    <!-- Fonctionnalites detaillees des modules (popup de detail des profils) -->
+    
     <string name="fonc_fournisseurs">供应商</string>
     <string name="fonc_demandes_d_achat">采购申请</string>
     <string name="fonc_appels_d_offres">招标</string>
@@ -1189,7 +1189,7 @@
     <string name="fonc_analyses_multicriteres">多维分析</string>
     <string name="fonc_alertes">提醒</string>
 
-    <!-- Popup de detail d'un profil d'activite -->
+    
     <string name="obn_profil_info">查看该方案详情</string>
     <string name="obn_profil_detail_resume">%1$d 个模块 · %2$d 项功能</string>
     <string name="obn_profil_detail_choisir">选择此方案</string>
@@ -1198,7 +1198,7 @@
     <string name="obn_profil_detail_modifiable">您之后可在设置中启用更多模块。</string>
     <string name="obn_profil_detail_complet">完整</string>
 
-    <!-- Modules metier / modules support (socle) -->
+    
     <string name="module_desc_ach">供应商、采购订单、收货与发票。</string>
     <string name="module_desc_ven">客户、报价、订单、交付与开票。</string>
     <string name="module_desc_stk">物料、仓库、库存移动、盘点与估值。</string>
@@ -1219,7 +1219,7 @@
     <string name="obn_profil_detail_metier">业务模块</string>
     <string name="obn_profil_detail_support">建议的支撑模块</string>
 
-    <!-- Tableau de bord : indicateurs, alertes -->
+    
     <string name="kpi_ca">营业额</string>
     <string name="kpi_ca_f">期间内已确认销售</string>
     <string name="kpi_panier">平均客单价</string>
@@ -1290,7 +1290,7 @@
     <string name="obn_socle_replier">隐藏支撑模块</string>
     <string name="obn_entreprise_localisation">地区与货币</string>
 
-    <!-- Entreprise : coordonnees et identifiants legaux -->
+    
     <string name="obn_telephone">电话</string>
     <string name="obn_email">电子邮箱</string>
     <string name="obn_email_ex">contact@company.com</string>
@@ -1299,7 +1299,7 @@
     <string name="obn_entreprise_contact_sous">将自动出现在报价单、发票和送货单上。</string>
     <string name="obn_erreur_email_entreprise">电子邮箱地址无效。</string>
 
-    <!-- Referentiel fiscal : zones et identifiants legaux -->
+    
     <string name="fisc_zone_cemac">OHADA — 中非经货共同体</string>
     <string name="fisc_zone_uemoa">OHADA — 西非经货联盟</string>
     <string name="fisc_zone_ohada">OHADA</string>
@@ -1317,7 +1317,7 @@
     <string name="fisc_id_registre">工商注册号</string>
     <string name="fisc_format_attendu">预期格式：%1$s</string>
 
-    <!-- Pack pays : devise, taxe, indicatif, identifiants -->
+    
     <string name="fisc_pack_titre">已套用国家配置</string>
     <string name="fisc_pack_identifiants">法定证照</string>
     <string name="fisc_pack_indicatif">国际区号</string>
@@ -1326,7 +1326,7 @@
     <string name="fisc_pack_personnaliser_note">仅当配置与您的实际情况不符时使用。</string>
     <string name="fisc_pack_aucun_pays">选择国家后将自动套用货币、税率和法定证照。</string>
 
-    <!-- Référentiel fiscal détaillé : nature de la taxe, seuils, impôts, e-facturation -->
+    
     <string name="fisc_taux_a_renseigner">税率待填写</string>
     <string name="fisc_taxe_tva">增值税</string>
     <string name="fisc_taxe_gst">商品服务税</string>
@@ -1386,7 +1386,7 @@
     <string name="obn_code_indispo">此设备上没有可以打开该联系方式的应用。</string>
     <string name="obn_code_a_configurer">商务联系方式尚未在 res/values/contact.xml 中设置。</string>
     <string name="obn_code_telegram">Telegram</string>
-    <!-- Module Tresorerie -->
+    
     <string name="tre_type_caisse">现金</string>
     <string name="tre_type_banque">银行</string>
     <string name="tre_type_mobile">移动支付</string>
@@ -1441,7 +1441,7 @@
     <string name="tre_champ_destination">转入账户</string>
     <string name="tre_virement_libelle">内部转账</string>
     <string name="tre_virement_aide">一笔转账会生成两条关联流水：等额的一出一进。</string>
-    <!-- Module Comptabilite -->
+    
     <string name="cpt_rub_ventes">销售</string>
     <string name="cpt_rub_autres_produits">其他收入</string>
     <string name="cpt_rub_achats">采购</string>
@@ -1466,7 +1466,7 @@
     <string name="cpt_journal">记账日记账</string>
     <string name="cpt_journal_vide">本期间没有记录。</string>
     <string name="cpt_origine_tresorerie">来自资金模块的记录</string>
-    <!-- Module CRM -->
+    
     <string name="crm_seg_a_relancer">待跟进</string>
     <string name="crm_seg_prospect">潜在客户</string>
     <string name="crm_seg_nouveau">新客户</string>
@@ -1484,7 +1484,7 @@
     <string name="crm_aucun_client">此视图中没有客户。</string>
     <string name="crm_jamais_achete">从未购买</string>
     <string name="crm_nb_achats">%1$d 次购买</string>
-    <!-- Module Logistique -->
+    
     <string name="log_transfert_recu">已接收</string>
     <string name="log_transfert_transit">在途</string>
     <string name="log_transfert_orphelin">记录不完整</string>
@@ -1499,7 +1499,7 @@
     <string name="log_aucun_transfert">暂无调拨记录。</string>
     <string name="log_references">%1$d 个品项</string>
     <string name="log_ruptures">%1$d 项缺货</string>
-    <!-- Modules Qualite et Maintenance -->
+    
     <string name="qua_gravite_mineure">轻微</string>
     <string name="qua_gravite_majeure">严重</string>
     <string name="qua_gravite_critique">致命</string>
@@ -1557,7 +1557,7 @@
     <string name="mai_champ_technicien">技师</string>
     <string name="mai_msg_ok">工单已保存。</string>
     <string name="mai_msg_nom_pris">已有同名设备。</string>
-    <!-- Indicateurs et alertes des modules v9/v10 -->
+    
     <string name="kpi_nc_ouvertes">未结质量异常</string>
     <string name="kpi_nc_ouvertes_f">尚未关闭的不合格项</string>
     <string name="kpi_taux_resolution">解决率</string>
@@ -1582,7 +1582,7 @@
     <string name="dc_piece_commande">订单</string>
     <string name="dc_partager">分享</string>
     <string name="dc_email">电子邮件</string>
-    <!-- Module Livraison -->
+    
     <string name="liv_etape_a_preparer">待备货</string>
     <string name="liv_etape_expediee">已发货</string>
     <string name="liv_etape_livree">已送达</string>
@@ -1604,7 +1604,7 @@
     <string name="liv_champ_colis">包裹件数</string>
     <string name="liv_champ_origine">来源订单</string>
     <string name="liv_origine_aide">该送货单对应的订单或发票编号。</string>
-    <!-- Module Services -->
+    
     <string name="srv_etape_planifiee">已计划</string>
     <string name="srv_etape_en_cours">进行中</string>
     <string name="srv_etape_terminee">已完成</string>
@@ -1630,7 +1630,7 @@
     <string name="srv_champ_heures">已用工时</string>
     <string name="srv_champ_intervenant">执行人</string>
     <string name="srv_champ_lieu">地点</string>
-    <!-- Module Projets -->
+    
     <string name="prj_etat_preparation">筹备中</string>
     <string name="prj_etat_en_cours">进行中</string>
     <string name="prj_etat_livre">已交付</string>
@@ -1710,7 +1710,7 @@
     <string name="mod_actions">操作</string>
     <string name="mod_fonctions_disponibles">可用功能</string>
     <string name="mod_fonctions_a_venir">本模块规划中的功能（%1$d）</string>
-    <!-- Accueil du module Stock -->
+    
     <string name="stk_recherche">搜索</string>
     <string name="stk_actualiser">刷新</string>
     <string name="stk_menu">更多选项</string>
@@ -1778,4 +1778,4 @@
     <string name="obn_vente_sans_stock_sous">允许无实物库存销售 — 代发货、按单采购或服务。库存可能为负。</string>
     <string name="obn_regle_dor">黄金法则：采购 → 库存 · 生产 → 库存 · 销售 → 库存，除非无库存销售</string>
     <string name="obn_stock_requis">需要库存：如果你采购或生产，你必须有库存。</string>
-</resources>
+<string name="module_inactif_titre">%1$s 未激活</string><string name="module_inactif_message">模块 %1$s 在配置文件 %2$s 中未激活。</string><string name="module_inactif_explication">在设置中启用或选择包含它的配置文件。</string><string name="module_inactif_retour">返回首页</string><string name="module_inactif_activer">启用此模块</string><string name="activation_titre">模块激活</string><string name="activation_sous_titre">在整个应用中管理活动配置文件和活动模块。</string><string name="activation_profil_actuel">当前配置文件</string><string name="activation_modules_actifs">活动模块 (%1$d)</string><string name="activation_elements_actifs">活动元素</string><string name="activation_module_actif">活动</string><string name="activation_module_inactif">未激活</string><string name="activation_element_actif">活动</string><string name="activation_element_inactif">未激活</string><string name="activation_ajouter_module">添加</string><string name="activation_retirer_module">移除</string><string name="activation_vente_sans_stock">无库存销售</string><string name="activation_vente_sans_stock_desc">允许无实物库存销售。</string><string name="activation_palier">公司规模</string><string name="activation_recommande">推荐</string><string name="activation_verrouille">配置文件锁定</string><string name="activation_personnalise">自定义</string><string name="activation_elements_titre">模块 %1$s 的元素</string><string name="activation_elements_sous">勾选此模块的活动功能。</string><string name="activation_enregistre">激活已更新。</string><string name="activation_changer_profil">更改配置文件</string><string name="activation_confirmer_changement">更改配置文件将重新计算活动模块。是否继续？</string><string name="palier_p1_desc">单人 - 基础模块</string><string name="palier_p2_desc">微型 - 简单管理</string><string name="palier_p3_desc">小型 - 解锁HR和CRM</string><string name="palier_p4_desc">中型 - 推荐HR和CRM</string><string name="palier_p5_desc">大型 - 完整结构</string><string name="palier_p6_desc">集团 - 所有支持模块</string><string name="palier_effectif_badge">人数</string><string name="palier_choisir_titre">公司规模</string><string name="palier_choisir_sous">人数影响推荐模块</string></resources>
