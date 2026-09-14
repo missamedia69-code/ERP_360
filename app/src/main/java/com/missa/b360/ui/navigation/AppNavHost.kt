@@ -133,8 +133,25 @@ private fun MainNavHost() {
     val etatAccueil by accueilViewModel.uiState.collectAsState()
 
     val barreDemandee = remember { mutableStateOf(true) }
+    // Barre visible partout sauf sur les formulaires plein écran.
+    // Important pour que le changement de profil dans Réglages se répercute
+    // directement sur la barre du bas et le menu Plus sans retour arrière.
+    val estFormulairePleinEcran = routeCourante?.let { r ->
+        r.startsWith(Routes.STOCK_PRODUCT_FORM) ||
+            r.startsWith(Routes.STOCK_MOVEMENT_FORM) ||
+            r.startsWith(Routes.STOCK_TRANSFER_FORM) ||
+            r.startsWith(Routes.OPERATION_FORM) ||
+            r.startsWith(Routes.SALES_RETURN)
+    } == true
     val afficherBarre = (
-        AppModule.barreVisibleSur(routeCourante) || routeCourante == Routes.HOME
+        !estFormulairePleinEcran && (
+            AppModule.barreVisibleSur(routeCourante) ||
+                routeCourante == Routes.HOME ||
+                routeCourante?.startsWith("admin_") == true ||
+                routeCourante == Routes.TASKS ||
+                routeCourante == Routes.ADMIN_REFERENTIELS ||
+                routeCourante == Routes.NOTIFICATIONS
+            )
         ) && barreDemandee.value
 
     val nomEntreprise = etatAccueil.entrepriseNom.ifBlank {
