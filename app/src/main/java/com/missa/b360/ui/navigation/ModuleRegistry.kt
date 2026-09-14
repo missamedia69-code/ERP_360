@@ -25,6 +25,12 @@ import com.missa.b360.core.domain.model.ModuleCode
  * ModuleRegistry (RA-22) — les 14 modules métier de Missa Business 360.
  * Chaque module = un package `ui/...` avec activation dynamique (profil AV/CUSTOM, 9.1).
  * La barre du bas par défaut : Vente · Stock · Clients · Finances + ➕.
+ *
+ * Ce registre tient lieu d'`UiScreen` de la spec : chacune des 18 entrées est un
+ * écran rattaché à un [ModuleCode] (deux écrans peuvent partager un module, ex.
+ * ACHATS et FOURNISSEURS ≠ ACH). Les profils, équivalents du `ProfileCode` de la
+ * spec, vivent dans `core/domain/model/Configuration.kt` (`ProfilActivite`).
+ * `AppModule.visibles(...)` est l'équivalent de `allowedScreens()`.
  */
 enum class AppModule(
     val route: String,

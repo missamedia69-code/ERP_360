@@ -1776,5 +1776,6 @@
     <string name="stk_type_transfert">تحويل</string>
     <string name="obn_vente_sans_stock">بيع بدون مخزون</string>
     <string name="obn_vente_sans_stock_sous">السماح بالبيع بدون مخزون مادي — إسقاط الشحن، حسب الطلب أو خدمة. قد يصبح المخزون سالباً.</string>
+    <string name="obn_regle_dor">القاعدة الذهبية: المشتريات ← المخزون · الإنتاج ← المخزون · المبيعات ← المخزون، إلا البيع بدون مخزون</string>
     <string name="obn_stock_requis">المخزون مطلوب: إذا اشتريت أو أنتجت، فأنت تحتاج إلى مخزون.</string>
 </resources>

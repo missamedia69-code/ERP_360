@@ -1804,5 +1804,6 @@
     <string name="stk_type_transfert">Transfert</string>
     <string name="obn_vente_sans_stock">Vente sans stock</string>
     <string name="obn_vente_sans_stock_sous">Autoriser la vente sans stock physique — drop, achat à la commande ou service. Le stock pourra devenir négatif.</string>
+    <string name="obn_regle_dor">Règle d\'or : Achat → Stock · Production → Stock · Vente → Stock, sauf vente sans stock</string>
     <string name="obn_stock_requis">Le stock est requis : tu achètes ou tu produis, tu as forcément un stock.</string>
 </resources>

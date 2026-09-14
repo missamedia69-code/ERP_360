@@ -1776,5 +1776,6 @@
     <string name="stk_type_transfert">Transferencia</string>
     <string name="obn_vente_sans_stock">Venta sin stock</string>
     <string name="obn_vente_sans_stock_sous">Permitir vender sin stock físico — dropship, bajo pedido o servicio. El stock podrá ser negativo.</string>
+    <string name="obn_regle_dor">Regla de oro: Compras → Stock · Producción → Stock · Ventas → Stock, salvo venta sin stock</string>
     <string name="obn_stock_requis">El stock es obligatorio: si compras o produces, necesitas stock.</string>
 </resources>

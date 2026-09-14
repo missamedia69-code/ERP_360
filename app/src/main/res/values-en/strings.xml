@@ -1797,5 +1797,6 @@
     <string name="stk_type_transfert">Transfer</string>
     <string name="obn_vente_sans_stock">Sale without stock</string>
     <string name="obn_vente_sans_stock_sous">Allow selling without physical stock — dropship, made-to-order or service. Stock may go negative.</string>
+    <string name="obn_regle_dor">Golden rule: Purchase → Stock · Production → Stock · Sales → Stock, unless no-stock selling</string>
     <string name="obn_stock_requis">Stock is required: if you buy or produce, you must have stock.</string>
 </resources>

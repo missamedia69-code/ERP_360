@@ -327,6 +327,32 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                     Text(text = stringResource(R.string.obn_socle_defaut), fontSize = 12.sp)
                 }
             }
+            if (viewModel.dependancesActives.isNotEmpty()) {
+                Spacer(Modifier.height(9.dp))
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(9.dp),
+                    color = MissaSoftBlue,
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = null,
+                            tint = BrandBlue,
+                            modifier = Modifier.size(15.dp),
+                        )
+                        Spacer(Modifier.width(7.dp))
+                        Text(
+                            text = stringResource(R.string.obn_regle_dor),
+                            fontSize = 11.sp,
+                            color = MissaInk,
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(9.dp))
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.18f))
             Spacer(Modifier.height(9.dp))

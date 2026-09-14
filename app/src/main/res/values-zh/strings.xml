@@ -1776,5 +1776,6 @@
     <string name="stk_type_transfert">调拨</string>
     <string name="obn_vente_sans_stock">无库存销售</string>
     <string name="obn_vente_sans_stock_sous">允许无实物库存销售 — 代发货、按单采购或服务。库存可能为负。</string>
+    <string name="obn_regle_dor">黄金法则：采购 → 库存 · 生产 → 库存 · 销售 → 库存，除非无库存销售</string>
     <string name="obn_stock_requis">需要库存：如果你采购或生产，你必须有库存。</string>
 </resources>
