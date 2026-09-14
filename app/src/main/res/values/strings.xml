@@ -1808,14 +1808,14 @@
     <string name="obn_stock_requis">Le stock est requis : tu achètes ou tu produis, tu as forcément un stock.</string>
     <!-- Activation profil : module inactif -->
     <string name="module_inactif_titre">%1$s non actif</string>
-    <string name="module_inactif_message">Le module %1$s n'est pas activé pour le profil %2$s.</string>
-    <string name="module_inactif_explication">Activez-le depuis les réglages ou choisissez un profil qui l'inclut.</string>
-    <string name="module_inactif_retour">Retour à l'accueil</string>
+    <string name="module_inactif_message">Le module %1$s n\'est pas activé pour le profil %2$s.</string>
+    <string name="module_inactif_explication">Activez-le depuis les réglages ou choisissez un profil qui l\'inclut.</string>
+    <string name="module_inactif_retour">Retour à l\'accueil</string>
     <string name="module_inactif_activer">Activer ce module</string>
 
     <!-- Réglages activation -->
     <string name="activation_titre">Activation des modules</string>
-    <string name="activation_sous_titre">Gérez le profil d'activité et les modules actifs dans toute l'application.</string>
+    <string name="activation_sous_titre">Gérez le profil d\'activité et les modules actifs dans toute l\'application.</string>
     <string name="activation_profil_actuel">Profil actuel</string>
     <string name="activation_modules_actifs">Modules actifs (%1$d)</string>
     <string name="activation_elements_actifs">Éléments actifs</string>
@@ -1827,7 +1827,7 @@
     <string name="activation_retirer_module">Retirer</string>
     <string name="activation_vente_sans_stock">Vente sans stock</string>
     <string name="activation_vente_sans_stock_desc">Autorise la vente sans stock physique (drop, service). Le stock peut devenir négatif.</string>
-    <string name="activation_palier">Taille de l'entreprise</string>
+    <string name="activation_palier">Taille de l\'entreprise</string>
     <string name="activation_recommande">Recommandé</string>
     <string name="activation_verrouille">Verrouillé par le profil</string>
     <string name="activation_personnalise">Personnalisé</string>

@@ -6,6 +6,7 @@ import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -65,9 +66,7 @@ class IsModuleActifUseCase @Inject constructor(
     }
 
     fun observeIsActif(module: ModuleCode): Flow<Boolean> =
-        repository.observeActivation().let { flow ->
-            kotlinx.coroutines.flow.map(flow) { it.isModuleActif(module) }
-        }
+        repository.observeActivation().map { it.isModuleActif(module) }
 }
 
 /**

@@ -48,14 +48,22 @@ class ProfilActivationRepository @Inject constructor(
         val modulesSupportFlow = settingsStore.observe(SettingsStore.Keys.MODULES_SUPPORT)
         val modulesElementsFlow = settingsStore.observe(SettingsStore.Keys.MODULES_ELEMENTS)
 
-        return combine(
+        // Utilise combine à 5 puis combine avec le 6e pour compatibilité coroutines <1.8
+        val cinq = combine(
             profilFlow,
             palierFlow,
             venteSansStockFlow,
             modulesActifsFlow,
             modulesSupportFlow,
-            modulesElementsFlow,
-        ) { profilStr, palierStr, venteSansStockStr, modulesActifsStr, modulesSupportStr, modulesElementsStr ->
+        ) { profilStr, palierStr, venteSansStockStr, modulesActifsStr, modulesSupportStr ->
+            arrayOf(profilStr, palierStr, venteSansStockStr, modulesActifsStr, modulesSupportStr)
+        }
+        return combine(cinq, modulesElementsFlow) { cinqArr, modulesElementsStr ->
+            val profilStr = cinqArr[0] as String?
+            val palierStr = cinqArr[1] as String?
+            val venteSansStockStr = cinqArr[2] as String?
+            val modulesActifsStr = cinqArr[3] as String?
+            val modulesSupportStr = cinqArr[4] as String?
 
             val profil = profilStr?.let { runCatching { ProfilActivite.valueOf(it) }.getOrNull() }
             val palier = palierStr?.let { runCatching { PalierTaille.valueOf(it) }.getOrNull() }
