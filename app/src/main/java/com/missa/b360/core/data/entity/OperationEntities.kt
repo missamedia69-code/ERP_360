@@ -14,6 +14,7 @@ import androidx.room.PrimaryKey
     indices = [
         Index(value = ["module"]),
         Index(value = ["createdAt"]),
+        Index(value = ["tiersId"]),
         Index(value = ["reference"], unique = true),
     ],
 )
@@ -27,6 +28,12 @@ data class OperationRecordEntity(
     val title: String,
     /** Client, fournisseur, collaborateur ou tiers libre selon le module. */
     val counterpart: String? = null,
+    /**
+     * Identifiant du tiers concerné (client ou fournisseur), quand la pièce en
+     * désigne un. Le nom seul ne suffit pas : un client renommé perdrait tout
+     * son historique commercial.
+     */
+    val tiersId: Long? = null,
     /** Montant hors formatage, dans la devise verrouillée de l'entreprise. */
     val amount: Double? = null,
     /** Quantité concernée (stock, production, service, livraison…). */

@@ -176,12 +176,19 @@ object ProfilConfiguration {
         return configurations[profil]?.keys?.toList() ?: emptyList()
     }
 
-    /** Retourne les sous-éléments activés pour un module dans un profil donné. */
+    /**
+     * Retourne les sous-éléments activés pour un module dans un profil donné.
+     *
+     * Dans [configurations], une valeur `null` signifie « module activé en
+     * entier » (Comptabilité, Trésorerie, Logistique, Reporting…) : il faut
+     * alors renvoyer le catalogue complet du module, et non une liste vide.
+     * Un module absent de la table, lui, n'est pas activé par ce profil.
+     */
     fun sousElementsPourModule(profil: ProfilActivite, module: ModuleCode): List<String> {
         if (profil == ProfilActivite.FULL) return ModuleSousElements.pourModule(module)
         val config = configurations[profil] ?: return emptyList()
-        val sousElements = config[module] ?: return emptyList()
-        return sousElements ?: ModuleSousElements.pourModule(module)
+        if (!config.containsKey(module)) return emptyList()
+        return config[module] ?: ModuleSousElements.pourModule(module)
     }
 }
 
@@ -193,4 +200,56 @@ enum class PalierTaille(val labelRes: Int) {
     P4(R.string.palier_p4), // 50–249
     P5(R.string.palier_p5), // 250–999
     P6(R.string.palier_p6), // 1000+
+}
+
+/**
+ * Modules activés manuellement (profil « Personnalisé ») : sérialisation compacte
+ * dans les préférences (« VEN,STK,CPT ») et relecture tolérante aux codes inconnus
+ * — une future version peut retirer un module sans casser une installation.
+ */
+object ModulesPersonnalises {
+
+    /** Libellé traduit d'un module métier (réutilise les chaînes de la navigation). */
+    fun libelleRes(module: ModuleCode): Int = when (module) {
+        ModuleCode.ACH -> R.string.module_achats
+        ModuleCode.VEN -> R.string.module_vente
+        ModuleCode.STK -> R.string.module_stock
+        ModuleCode.PRO -> R.string.module_production
+        ModuleCode.SER -> R.string.module_services
+        ModuleCode.PRJ -> R.string.module_projets
+        ModuleCode.RH -> R.string.module_rh
+        ModuleCode.CPT -> R.string.module_comptabilite
+        ModuleCode.TRE -> R.string.module_tresorerie
+        ModuleCode.CRM -> R.string.module_crm
+        ModuleCode.QUA -> R.string.module_qualite
+        ModuleCode.MAI -> R.string.module_maintenance
+        ModuleCode.LOG -> R.string.module_logistique
+        ModuleCode.REP -> R.string.module_reporting
+    }
+
+    fun serialiser(modules: Collection<ModuleCode>): String =
+        ModuleCode.entries.filter { it in modules }.joinToString(",") { it.name }
+
+    fun deserialiser(valeur: String?): List<ModuleCode> =
+        valeur?.split(',')
+            ?.mapNotNull { code ->
+                runCatching { ModuleCode.valueOf(code.trim()) }.getOrNull()
+            }
+            .orEmpty()
+            .distinct()
+
+    /**
+     * Modules réellement actifs : les modules métier (sélection manuelle en
+     * profil « Personnalisé », configuration du profil sinon) auxquels
+     * s'ajoutent les options socle retenues par l'utilisateur.
+     */
+    fun modulesActifs(
+        profil: ProfilActivite?,
+        personnalises: Collection<ModuleCode>,
+        support: Collection<ModuleCode> = emptyList(),
+    ): List<ModuleCode> {
+        val metier = ModulesSocle.metierActifs(profil, personnalises)
+        val socle = ModulesSocle.filtrerSupport(support)
+        return ModuleCode.entries.filter { it in metier || it in socle }
+    }
 }

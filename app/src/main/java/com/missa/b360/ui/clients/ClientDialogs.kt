@@ -155,7 +155,7 @@ fun BadgesDialog(
                 Button(
                     onClick = {
                         if (nomValide && remiseValide) {
-                            onCreer(nom, remiseValeur ?: 0.0)
+                            onCreer(nom, remiseValeur)
                             nom = ""
                             remise = "5"
                         }

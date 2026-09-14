@@ -1,83 +1,15 @@
 package com.missa.b360.ui.maintenance
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.missa.b360.R
-import com.missa.b360.core.domain.model.ModuleCode
-import com.missa.b360.core.domain.model.ModuleSousElements
+import com.missa.b360.ui.components.PlaceholderScreen
 
 /**
- * Écran Module Maintenance (MAI) — Équipements, parcs machines, interventions,
- * maintenance préventive/corrective, planning, pièces détachées, historique, coûts.
+ * Placeholder coherent — module en reconstruction.
+ * L'accueil reste la reference design ; ce module sera reconstruit
+ * dans la meme charte (MissaCanvas, cartes blanches 14dp, bord E2E8F0).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MaintenanceScreen(onBack: () -> Unit) {
-    val sousElements = ModuleSousElements.pourModule(ModuleCode.MAI)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.module_maintenance)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
-                    }
-                },
-            )
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(16.dp),
-        ) {
-            Text(
-                text = "Module Maintenance",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
-            LazyColumn(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)) {
-                items(sousElements) { element ->
-                    Card(
-                        modifier = Modifier.fillMaxSize(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = element,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = "Gérez votre ${element.lowercase()}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 4.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+fun MaintenanceScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
+    PlaceholderScreen(titleRes = R.string.module_maintenance, onBack = onBack)
 }

@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
 import com.missa.b360.core.domain.model.SaleTotals
+import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.usecase.CheckSaleStockUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.abs
+import com.missa.b360.core.util.Iso4217
 
 /** État d'un panier de vente en cours, jamais prérempli avec des articles fictifs. */
 data class SalesUiState(
@@ -109,14 +112,23 @@ class SalesViewModel @Inject constructor(
         .map { methods -> methods.filter { it.actif }.map { it.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { enterprise -> enterprise?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { enterprise -> enterprise?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
+    /** Fiche entreprise : alimente les mentions légales imprimées sur les pièces. */
+    val entreprise: StateFlow<EnterpriseEntity?> = getEnterprise.observer()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val history: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.VENTE)
-    /** Catalogue produits avec stock courant (spec §9 : ajout par recherche). */
+    /**
+     * Catalogue proposé à la vente (spec §9 : ajout par recherche).
+     *
+     * Filtré par nature : une matière première ou un consommable n'a rien à
+     * faire dans un panier client — il entre par l'achat et sort par la
+     * production ou l'usage interne.
+     */
     val products: StateFlow<List<ProductWithStock>> = combine(
         observeProducts(),
         observeStock(),
-    ) { produits, stocks -> ProductStocks.combine(produits, stocks) }
+    ) { produits, stocks -> ProductStocks.combine(ProduitRules.vendables(produits), stocks) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _saveResult = MutableStateFlow<SaveResult?>(null)

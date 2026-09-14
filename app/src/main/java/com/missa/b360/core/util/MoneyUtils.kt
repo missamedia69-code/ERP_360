@@ -1,8 +1,10 @@
 package com.missa.b360.core.util
 
+import com.missa.b360.core.domain.model.TypeTaxe
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
+import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
@@ -23,6 +25,23 @@ object MoneyUtils {
         val df = DecimalFormat("0.00", DecimalFormatSymbols(Locale.ROOT))
         return df.format(montant)
     }
+
+    /**
+     * Format compact pour les tableaux de bord : rapetisse les grands montants
+     * (« 72,3 M », « 55,8 K ») tout en gardant le code devise. La valeur exacte
+     * reste dans [format] pour les écrans de gestion.
+     */
+    fun formatCompact(montant: Double, devise: String): String {
+        val abs = kotlin.math.abs(montant)
+        val df = DecimalFormat("#,##0.0", FormatPrefs.symboles())
+        val corps = when {
+            abs >= 1_000_000_000.0 -> "${df.format(montant / 1_000_000_000.0)} Md"
+            abs >= 1_000_000.0 -> "${df.format(montant / 1_000_000.0)} M"
+            abs >= 1_000.0 -> "${df.format(montant / 1_000.0)} K"
+            else -> return format(montant, devise)
+        }
+        return "$corps $devise"
+    }
 }
 
 /** Devises ISO 4217 courantes (réglage 9.1, verrou au premier usage — D4, défaut USD). */
@@ -30,21 +49,26 @@ object Iso4217 {
     data class Devise(val code: String, val nom: String)
 
     /** Pays ISO 3166 proposé à l'onboarding, avec son taux numérique et son libellé officiel. */
+    /**
+     * Pays proposé à l'onboarding. [typeTaxe] vaut `null` quand le référentiel
+     * ne connaît pas la fiscalité du territoire : l'interface invite alors à
+     * saisir le taux plutôt que d'afficher un « 0 % » trompeur.
+     */
     data class Pays(
         val code: String,
         val nom: String,
         val tauxTaxeSuggere: Double,
-        val libelleTaxe: String,
+        val typeTaxe: TypeTaxe?,
     )
 
     /**
-     * Certains territoires appliquent une taxe composée, variable ou aucune TVA nationale.
-     * Le libellé conserve l'information métier fournie, tandis que [tauxParDefaut] alimente
-     * le champ éditable de l'entreprise.
+     * Taxe à la consommation d'un pays : son taux de droit commun et sa nature.
+     * Le libellé affiché est construit par l'interface à partir de [type], donc
+     * traduit — le référentiel ne porte plus aucun texte en dur.
      */
     data class TaxeReference(
         val tauxParDefaut: Double,
-        val libelle: String,
+        val type: TypeTaxe,
     )
 
     val DEFAUT = "USD"
@@ -64,7 +88,6 @@ object Iso4217 {
         Devise("INR", "Roupie indienne"),
     )
 
-    private val TAUX_PAR_DEFAUT = TaxeReference(0.0, "0 %")
 
     /**
      * Référentiel TVA/GST 2026 transmis pour l'application.
@@ -73,147 +96,150 @@ object Iso4217 {
      */
     val TAXES_SUGGEREES: Map<String, TaxeReference> = mapOf(
         // Europe
-        "DE" to TaxeReference(19.0, "19 %"),
-        "AT" to TaxeReference(20.0, "20 %"),
-        "BE" to TaxeReference(21.0, "21 %"),
-        "BG" to TaxeReference(20.0, "20 %"),
-        "CY" to TaxeReference(19.0, "19 %"),
-        "HR" to TaxeReference(25.0, "25 %"),
-        "DK" to TaxeReference(25.0, "25 %"),
-        "ES" to TaxeReference(21.0, "21 %"),
-        "EE" to TaxeReference(24.0, "24 %"),
-        "FI" to TaxeReference(25.5, "25,50 %"),
-        "FR" to TaxeReference(20.0, "20 %"),
-        "GR" to TaxeReference(24.0, "24 %"),
-        "HU" to TaxeReference(27.0, "27 %"),
-        "IE" to TaxeReference(23.0, "23 %"),
-        "IT" to TaxeReference(22.0, "22 %"),
-        "LV" to TaxeReference(21.0, "21 %"),
-        "LT" to TaxeReference(21.0, "21 %"),
-        "LU" to TaxeReference(17.0, "17 %"),
-        "MT" to TaxeReference(18.0, "18 %"),
-        "NL" to TaxeReference(21.0, "21 %"),
-        "PL" to TaxeReference(23.0, "23 %"),
-        "PT" to TaxeReference(23.0, "23 %"),
-        "CZ" to TaxeReference(21.0, "21 %"),
-        "RO" to TaxeReference(21.0, "21 %"),
-        "SK" to TaxeReference(23.0, "23 %"),
-        "SI" to TaxeReference(22.0, "22 %"),
-        "SE" to TaxeReference(25.0, "25 %"),
-        "GB" to TaxeReference(20.0, "20 %"),
-        "CH" to TaxeReference(8.1, "8,10 %"),
-        "NO" to TaxeReference(25.0, "25 %"),
-        "IS" to TaxeReference(24.0, "24 %"),
-        "TR" to TaxeReference(20.0, "20 %"),
-        "AL" to TaxeReference(20.0, "20 %"),
-        "AD" to TaxeReference(4.5, "4,50 %"),
-        "BY" to TaxeReference(20.0, "20 %"),
-        "BA" to TaxeReference(17.0, "17 %"),
-        "GE" to TaxeReference(18.0, "18 %"),
-        "GI" to TaxeReference(15.0, "15 %"),
-        "MD" to TaxeReference(20.0, "20 %"),
-        "ME" to TaxeReference(21.0, "21 %"),
-        "MK" to TaxeReference(18.0, "18 %"),
-        "RU" to TaxeReference(20.0, "20 %"),
-        "RS" to TaxeReference(20.0, "20 %"),
-        "UA" to TaxeReference(20.0, "20 %"),
-        "MC" to TaxeReference(0.0, "Aucune (TVA française de facto)"),
+        "DE" to TaxeReference(19.0, TypeTaxe.TVA),
+        "AT" to TaxeReference(20.0, TypeTaxe.TVA),
+        "BE" to TaxeReference(21.0, TypeTaxe.TVA),
+        "BG" to TaxeReference(20.0, TypeTaxe.TVA),
+        "CY" to TaxeReference(19.0, TypeTaxe.TVA),
+        "HR" to TaxeReference(25.0, TypeTaxe.TVA),
+        "DK" to TaxeReference(25.0, TypeTaxe.TVA),
+        "ES" to TaxeReference(21.0, TypeTaxe.TVA),
+        "EE" to TaxeReference(24.0, TypeTaxe.TVA),
+        "FI" to TaxeReference(25.5, TypeTaxe.TVA),
+        "FR" to TaxeReference(20.0, TypeTaxe.TVA),
+        "GR" to TaxeReference(24.0, TypeTaxe.TVA),
+        "HU" to TaxeReference(27.0, TypeTaxe.TVA),
+        "IE" to TaxeReference(23.0, TypeTaxe.TVA),
+        "IT" to TaxeReference(22.0, TypeTaxe.TVA),
+        "LV" to TaxeReference(21.0, TypeTaxe.TVA),
+        "LT" to TaxeReference(21.0, TypeTaxe.TVA),
+        "LU" to TaxeReference(17.0, TypeTaxe.TVA),
+        "MT" to TaxeReference(18.0, TypeTaxe.TVA),
+        "NL" to TaxeReference(21.0, TypeTaxe.TVA),
+        "PL" to TaxeReference(23.0, TypeTaxe.TVA),
+        "PT" to TaxeReference(23.0, TypeTaxe.TVA),
+        "CZ" to TaxeReference(21.0, TypeTaxe.TVA),
+        "RO" to TaxeReference(21.0, TypeTaxe.TVA),
+        "SK" to TaxeReference(23.0, TypeTaxe.TVA),
+        "SI" to TaxeReference(22.0, TypeTaxe.TVA),
+        "SE" to TaxeReference(25.0, TypeTaxe.TVA),
+        "GB" to TaxeReference(20.0, TypeTaxe.TVA),
+        "CH" to TaxeReference(8.1, TypeTaxe.TVA),
+        "NO" to TaxeReference(25.0, TypeTaxe.TVA),
+        "IS" to TaxeReference(24.0, TypeTaxe.TVA),
+        "TR" to TaxeReference(20.0, TypeTaxe.TVA),
+        "AL" to TaxeReference(20.0, TypeTaxe.TVA),
+        "AD" to TaxeReference(4.5, TypeTaxe.IGI),
+        "BY" to TaxeReference(20.0, TypeTaxe.TVA),
+        "BA" to TaxeReference(17.0, TypeTaxe.TVA),
+        "GE" to TaxeReference(18.0, TypeTaxe.TVA),
+        "GI" to TaxeReference(15.0, TypeTaxe.TVA),
+        "MD" to TaxeReference(20.0, TypeTaxe.TVA),
+        "ME" to TaxeReference(21.0, TypeTaxe.TVA),
+        "MK" to TaxeReference(18.0, TypeTaxe.TVA),
+        "RU" to TaxeReference(20.0, TypeTaxe.TVA),
+        "RS" to TaxeReference(20.0, TypeTaxe.TVA),
+        "UA" to TaxeReference(20.0, TypeTaxe.TVA),
+        "MC" to TaxeReference(20.0, TypeTaxe.TVA),
 
         // Afrique
-        "DZ" to TaxeReference(19.0, "19 %"),
-        "AO" to TaxeReference(14.0, "14 %"),
-        "BJ" to TaxeReference(18.0, "18 %"),
-        "BF" to TaxeReference(18.0, "18 %"),
-        "CM" to TaxeReference(19.25, "19,25 %"),
-        "CD" to TaxeReference(16.0, "16 %"),
-        "CG" to TaxeReference(0.0, "TVA sur services numériques"),
-        "CI" to TaxeReference(18.0, "18 %"),
-        "EG" to TaxeReference(14.0, "14 %"),
-        "ET" to TaxeReference(15.0, "15 %"),
-        "GA" to TaxeReference(18.0, "18 %"),
-        "GH" to TaxeReference(20.0, "~20 %"),
-        "GN" to TaxeReference(18.0, "18 %"),
-        "KE" to TaxeReference(16.0, "16 %"),
-        "LR" to TaxeReference(0.0, "GST (variable)"),
-        "ML" to TaxeReference(18.0, "18 %"),
-        "MA" to TaxeReference(20.0, "20 %"),
-        "MW" to TaxeReference(17.5, "17,50 %"),
-        "NE" to TaxeReference(19.0, "19 %"),
-        "NG" to TaxeReference(7.5, "7,50 %"),
-        "RW" to TaxeReference(18.0, "18 %"),
-        "SN" to TaxeReference(18.0, "18 %"),
-        "SO" to TaxeReference(0.0, "Aucune"),
-        "TD" to TaxeReference(18.0, "18 %"),
-        "TG" to TaxeReference(18.0, "18 %"),
-        "TN" to TaxeReference(19.0, "19 %"),
-        "TZ" to TaxeReference(18.0, "18 %"),
-        "UG" to TaxeReference(18.0, "18 %"),
-        "ZA" to TaxeReference(15.0, "15 %"),
-        "ZM" to TaxeReference(16.0, "16 %"),
-        "ZW" to TaxeReference(15.5, "15,50 %"),
-        "EH" to TaxeReference(0.0, "Aucune"),
+        "DZ" to TaxeReference(19.0, TypeTaxe.TVA),
+        "AO" to TaxeReference(14.0, TypeTaxe.TVA),
+        "BJ" to TaxeReference(18.0, TypeTaxe.TVA),
+        "BF" to TaxeReference(18.0, TypeTaxe.TVA),
+        "CM" to TaxeReference(19.25, TypeTaxe.TVA),
+        "CD" to TaxeReference(16.0, TypeTaxe.TVA),
+        "CF" to TaxeReference(19.0, TypeTaxe.TVA),
+        "CG" to TaxeReference(18.0, TypeTaxe.TVA),
+        "CI" to TaxeReference(18.0, TypeTaxe.TVA),
+        "EG" to TaxeReference(14.0, TypeTaxe.TVA),
+        "ET" to TaxeReference(15.0, TypeTaxe.TVA),
+        "GA" to TaxeReference(18.0, TypeTaxe.TVA),
+        "GH" to TaxeReference(20.0, TypeTaxe.TVA),
+        "GN" to TaxeReference(18.0, TypeTaxe.TVA),
+        "GQ" to TaxeReference(15.0, TypeTaxe.TVA),
+        "KE" to TaxeReference(16.0, TypeTaxe.TVA),
+        "KM" to TaxeReference(10.0, TypeTaxe.TVA),
+        "LR" to TaxeReference(0.0, TypeTaxe.GST),
+        "ML" to TaxeReference(18.0, TypeTaxe.TVA),
+        "MA" to TaxeReference(20.0, TypeTaxe.TVA),
+        "MW" to TaxeReference(17.5, TypeTaxe.TVA),
+        "NE" to TaxeReference(19.0, TypeTaxe.TVA),
+        "NG" to TaxeReference(7.5, TypeTaxe.TVA),
+        "RW" to TaxeReference(18.0, TypeTaxe.TVA),
+        "SN" to TaxeReference(18.0, TypeTaxe.TVA),
+        "SO" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "TD" to TaxeReference(18.0, TypeTaxe.TVA),
+        "TG" to TaxeReference(18.0, TypeTaxe.TVA),
+        "TN" to TaxeReference(19.0, TypeTaxe.TVA),
+        "TZ" to TaxeReference(18.0, TypeTaxe.TVA),
+        "UG" to TaxeReference(18.0, TypeTaxe.TVA),
+        "ZA" to TaxeReference(15.0, TypeTaxe.TVA),
+        "ZM" to TaxeReference(16.0, TypeTaxe.TVA),
+        "ZW" to TaxeReference(15.5, TypeTaxe.TVA),
+        "EH" to TaxeReference(0.0, TypeTaxe.AUCUNE),
 
         // Amériques
-        "AR" to TaxeReference(21.0, "21 %"),
-        "BO" to TaxeReference(13.0, "13 %"),
-        "BR" to TaxeReference(0.0, "Système dual IBS/CBS"),
-        "BS" to TaxeReference(0.0, "Aucune"),
-        "BM" to TaxeReference(0.0, "Aucune"),
-        "CA" to TaxeReference(5.0, "5 % (GST) + HST 13–15 %"),
-        "CL" to TaxeReference(19.0, "19 %"),
-        "CO" to TaxeReference(19.0, "19 %"),
-        "CR" to TaxeReference(13.0, "13 %"),
-        "DO" to TaxeReference(18.0, "18 %"),
-        "EC" to TaxeReference(15.0, "15 %"),
-        "KY" to TaxeReference(0.0, "Aucune"),
-        "MX" to TaxeReference(16.0, "16 %"),
-        "PA" to TaxeReference(7.0, "7 %"),
-        "PE" to TaxeReference(18.0, "18 %"),
-        "PY" to TaxeReference(10.0, "10 %"),
-        "TC" to TaxeReference(0.0, "Aucune"),
-        "US" to TaxeReference(0.0, "Aucune (Sales Tax par État)"),
-        "UY" to TaxeReference(22.0, "22 %"),
-        "VG" to TaxeReference(0.0, "Aucune"),
-        "AI" to TaxeReference(0.0, "Aucune"),
+        "AR" to TaxeReference(21.0, TypeTaxe.TVA),
+        "BO" to TaxeReference(13.0, TypeTaxe.TVA),
+        "BR" to TaxeReference(17.0, TypeTaxe.ICMS),
+        "BS" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "BM" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "CA" to TaxeReference(5.0, TypeTaxe.GST_HST),
+        "CL" to TaxeReference(19.0, TypeTaxe.TVA),
+        "CO" to TaxeReference(19.0, TypeTaxe.TVA),
+        "CR" to TaxeReference(13.0, TypeTaxe.TVA),
+        "DO" to TaxeReference(18.0, TypeTaxe.TVA),
+        "EC" to TaxeReference(15.0, TypeTaxe.TVA),
+        "KY" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "MX" to TaxeReference(16.0, TypeTaxe.TVA),
+        "PA" to TaxeReference(7.0, TypeTaxe.ITBMS),
+        "PE" to TaxeReference(18.0, TypeTaxe.TVA),
+        "PY" to TaxeReference(10.0, TypeTaxe.TVA),
+        "TC" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "US" to TaxeReference(0.0, TypeTaxe.VENTES),
+        "UY" to TaxeReference(22.0, TypeTaxe.TVA),
+        "VG" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "AI" to TaxeReference(0.0, TypeTaxe.AUCUNE),
 
         // Moyen-Orient
-        "AE" to TaxeReference(5.0, "5 %"),
-        "BH" to TaxeReference(10.0, "10 %"),
-        "IL" to TaxeReference(18.0, "18 %"),
-        "IR" to TaxeReference(9.0, "9 %"),
-        "JO" to TaxeReference(16.0, "16 %"),
-        "KW" to TaxeReference(0.0, "Aucune"),
-        "LB" to TaxeReference(11.0, "11 %"),
-        "OM" to TaxeReference(5.0, "5 %"),
-        "QA" to TaxeReference(0.0, "Aucune"),
-        "SA" to TaxeReference(15.0, "15 %"),
-        "YE" to TaxeReference(5.0, "5 %"),
+        "AE" to TaxeReference(5.0, TypeTaxe.TVA),
+        "BH" to TaxeReference(10.0, TypeTaxe.TVA),
+        "IL" to TaxeReference(18.0, TypeTaxe.TVA),
+        "IR" to TaxeReference(9.0, TypeTaxe.TVA),
+        "JO" to TaxeReference(16.0, TypeTaxe.TVA),
+        "KW" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "LB" to TaxeReference(11.0, TypeTaxe.TVA),
+        "OM" to TaxeReference(5.0, TypeTaxe.TVA),
+        "QA" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "SA" to TaxeReference(15.0, TypeTaxe.TVA),
+        "YE" to TaxeReference(5.0, TypeTaxe.TVA),
 
         // Asie-Océanie
-        "AU" to TaxeReference(10.0, "10 % (GST)"),
-        "BD" to TaxeReference(15.0, "15 %"),
-        "BT" to TaxeReference(5.0, "5 % (GST)"),
-        "CN" to TaxeReference(13.0, "13 %"),
-        "FJ" to TaxeReference(15.0, "15 %"),
-        "HK" to TaxeReference(0.0, "Aucune"),
-        "ID" to TaxeReference(11.0, "11 %"),
-        "IN" to TaxeReference(18.0, "18 % (GST)"),
-        "JP" to TaxeReference(10.0, "10 %"),
-        "KH" to TaxeReference(10.0, "10 %"),
-        "KR" to TaxeReference(10.0, "10 %"),
-        "LK" to TaxeReference(18.0, "18 %"),
-        "MO" to TaxeReference(0.0, "Aucune"),
-        "MV" to TaxeReference(0.0, "Aucune"),
-        "MY" to TaxeReference(6.0, "6–10 % (SST)"),
-        "NP" to TaxeReference(13.0, "13 %"),
-        "NZ" to TaxeReference(15.0, "15 % (GST)"),
-        "PH" to TaxeReference(12.0, "12 %"),
-        "PK" to TaxeReference(18.0, "18 %"),
-        "SG" to TaxeReference(9.0, "9 % (GST)"),
-        "TH" to TaxeReference(7.0, "7 % (10 % dès oct. 2026)"),
-        "TW" to TaxeReference(5.0, "5 %"),
-        "VN" to TaxeReference(10.0, "10 %"),
-        "VU" to TaxeReference(0.0, "Aucune"),
+        "AU" to TaxeReference(10.0, TypeTaxe.GST),
+        "BD" to TaxeReference(15.0, TypeTaxe.TVA),
+        "BT" to TaxeReference(5.0, TypeTaxe.GST),
+        "CN" to TaxeReference(13.0, TypeTaxe.TVA),
+        "FJ" to TaxeReference(15.0, TypeTaxe.TVA),
+        "HK" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "ID" to TaxeReference(11.0, TypeTaxe.TVA),
+        "IN" to TaxeReference(18.0, TypeTaxe.GST),
+        "JP" to TaxeReference(10.0, TypeTaxe.CONSOMMATION),
+        "KH" to TaxeReference(10.0, TypeTaxe.TVA),
+        "KR" to TaxeReference(10.0, TypeTaxe.TVA),
+        "LK" to TaxeReference(18.0, TypeTaxe.TVA),
+        "MO" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "MV" to TaxeReference(0.0, TypeTaxe.AUCUNE),
+        "MY" to TaxeReference(6.0, TypeTaxe.SST),
+        "NP" to TaxeReference(13.0, TypeTaxe.TVA),
+        "NZ" to TaxeReference(15.0, TypeTaxe.GST),
+        "PH" to TaxeReference(12.0, TypeTaxe.TVA),
+        "PK" to TaxeReference(18.0, TypeTaxe.TVA),
+        "SG" to TaxeReference(9.0, TypeTaxe.GST),
+        "TH" to TaxeReference(7.0, TypeTaxe.TVA),
+        "TW" to TaxeReference(5.0, TypeTaxe.TVA),
+        "VN" to TaxeReference(10.0, TypeTaxe.TVA),
+        "VU" to TaxeReference(0.0, TypeTaxe.AUCUNE),
     )
 
     /** Pays affichable dans le sélecteur d'indicatif téléphonique. */
@@ -257,8 +283,88 @@ object Iso4217 {
             item.substringBefore(':') to item.substringAfter(':')
         }
 
+    /**
+     * Devise officielle du pays (ISO 4217), déduite du référentiel embarqué du JDK.
+     * Alimente le « pack pays » proposé à l'onboarding ; l'utilisateur reste libre
+     * de choisir une autre devise ensuite.
+     */
+    /** Pourcentage sans décimale inutile : « 19,25 % » mais « 20 % ». */
+    fun formatPourcentage(taux: Double): String =
+        if (taux % 1.0 == 0.0) {
+            String.format(Locale.getDefault(), "%d %%", taux.toInt())
+        } else {
+            String.format(Locale.getDefault(), "%.2f %%", taux)
+        }
+
+    fun deviseDuPays(codePays: String?): String? {
+        val code = codePays?.trim()?.uppercase()?.takeIf { it.length == 2 } ?: return null
+        return runCatching {
+            Currency.getInstance(Locale.Builder().setRegion(code).build()).currencyCode
+        }.getOrNull()
+    }
+
+    /** Nom de la devise dans la langue de l'interface, avec repli sur le catalogue court. */
+    fun nomDevise(code: String, locale: Locale): String =
+        runCatching { Currency.getInstance(code).getDisplayName(locale) }
+            .getOrNull()
+            ?.replaceFirstChar { premier -> premier.uppercase() }
+            ?: COMMUNES.firstOrNull { it.code == code }?.nom
+            ?: code
+
+    /**
+     * Toutes les devises ISO 4217 actives, nommées dans la langue de l'interface.
+     * Les codes techniques sans décimales définies (XXX, métaux précieux) sont écartés.
+     */
+    fun devisesDisponibles(locale: Locale): List<Devise> =
+        Currency.getAvailableCurrencies()
+            .asSequence()
+            .filter { it.defaultFractionDigits >= 0 && it.currencyCode.all(Char::isLetter) }
+            .map { Devise(code = it.currencyCode, nom = nomDevise(it.currencyCode, locale)) }
+            .distinctBy(Devise::code)
+            .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, Devise::nom))
+            .toList()
+
+    /**
+     * Devise affichée tant que l'entreprise n'est pas chargée.
+     *
+     * Ce n'est pas un choix éditorial mais un repli technique : les écrans se
+     * composent avant que la base ait répondu. La valeur réelle vient toujours
+     * de `entreprise.devise`, renseignée par le pack pays à l'installation.
+     */
+    const val DEVISE_REPLI: String = "XAF"
+
     fun indicatifTelephone(codePays: String?): String? =
         codePays?.trim()?.uppercase()?.let(INDICATIFS_TELEPHONIQUES::get)
+
+    /**
+     * Remplace l'indicatif d'un numéro lors d'un changement de pays.
+     *
+     * Trois cas seulement : le champ est vide et reçoit le nouvel indicatif ;
+     * il commence par l'ancien, qui est échangé en gardant le numéro national ;
+     * il porte autre chose — un numéro saisi avec un indicatif étranger — et
+     * l'on n'y touche pas, la saisie de l'utilisateur prime.
+     */
+    fun remplacerIndicatif(numero: String, ancien: String?, nouveau: String?): String {
+        if (nouveau == null) return numero
+        val net = numero.trim()
+        return when {
+            net.isEmpty() -> "$nouveau "
+            ancien != null && ancien != nouveau && net.startsWith(ancien) ->
+                nouveau + net.removePrefix(ancien)
+            else -> net
+        }
+    }
+
+    /**
+     * Vrai quand le champ ne contient qu'un indicatif, éventuellement suivi de
+     * séparateurs : c'est un champ resté vide, pas un numéro de téléphone.
+     */
+    fun estIndicatifSeul(numero: String): Boolean {
+        val net = numero.trim()
+        if (!net.startsWith("+")) return false
+        val chiffres = net.drop(1).filter { !it.isWhitespace() && it != '-' && it != '(' && it != ')' }
+        return chiffres.isNotEmpty() && INDICATIFS_TELEPHONIQUES.containsValue("+$chiffres")
+    }
 
     fun paysAvecIndicatif(locale: Locale): List<PaysAvecIndicatif> =
         paysDisponibles(locale).mapNotNull { pays ->
@@ -275,8 +381,8 @@ object Iso4217 {
         val locales = listOf(
             Locale.FRENCH,
             Locale.ENGLISH,
-            Locale("es"),
-            Locale("ar"),
+            Locale.forLanguageTag("es"),
+            Locale.forLanguageTag("ar"),
             Locale.SIMPLIFIED_CHINESE,
         )
         return INDICATIFS_TELEPHONIQUES.keys.firstOrNull { code ->
@@ -311,12 +417,12 @@ object Iso4217 {
                 val countryLocale = Locale.Builder().setRegion(code).build()
                 val nom = countryLocale.getDisplayCountry(locale)
                 nom.takeIf { it.isNotBlank() }?.let {
-                    val taxe = TAXES_SUGGEREES[code] ?: TAUX_PAR_DEFAUT
+                    val taxe = TAXES_SUGGEREES[code]
                     Pays(
                         code = code,
                         nom = it,
-                        tauxTaxeSuggere = taxe.tauxParDefaut,
-                        libelleTaxe = taxe.libelle,
+                        tauxTaxeSuggere = taxe?.tauxParDefaut ?: 0.0,
+                        typeTaxe = taxe?.type,
                     )
                 }
             }
@@ -337,4 +443,12 @@ object DateUtils {
 
     /** Date + heure au format choisi à l'onboarding, dans le fuseau choisi. */
     fun formatDateHeure(timestamp: Long): String = formatteur(true).format(Date(timestamp))
+
+    /** Heure seule — « HH:mm » — dans le fuseau choisi (mouvements, horodatages courts). */
+    fun formatHeure(timestamp: Long): String {
+        val motif = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            timeZone = FormatPrefs.fuseau
+        }
+        return motif.format(Date(timestamp))
+    }
 }

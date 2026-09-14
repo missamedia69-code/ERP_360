@@ -26,6 +26,10 @@ data class EnterpriseEntity(
     val langue: String,
     /** Pays suggérant taxes + référentiels comptable/paie. */
     val pays: String? = null,
+    /** Identifiant fiscal (NIU / NIF / VAT number) imprimé sur les pièces légales. */
+    val numeroFiscal: String? = null,
+    /** Registre du commerce (RCCM / SIRET / company number). */
+    val registreCommerce: String? = null,
     /** URI du logo choisi durant l'onboarding, avec droit de lecture persistant. */
     val logoUri: String? = null,
     /** Profil d'activité A–H (RA-20, modifiable). */

@@ -1,5 +1,8 @@
 package com.missa.b360.ui.navigation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.backup.BackupManager
@@ -31,6 +34,20 @@ class StartupViewModel @Inject constructor(
     private val pinManager: PinManager,
     private val backupManager: BackupManager,
 ) : ViewModel() {
+
+    /**
+     * Vrai dès que l'introduction vidéo a été jouée une fois.
+     *
+     * L'état vit ici, et non dans l'activité : changer de langue recrée
+     * l'activité, ce qui relançait la vidéo — d'où le bref écran noir le temps
+     * que la surface se prépare. Un ViewModel, lui, survit à cette recréation.
+     */
+    var introVue: Boolean by mutableStateOf(false)
+        private set
+
+    fun marquerIntroVue() {
+        introVue = true
+    }
 
     private val _state = MutableStateFlow<StartupState>(StartupState.Chargement)
     val state: StateFlow<StartupState> = _state

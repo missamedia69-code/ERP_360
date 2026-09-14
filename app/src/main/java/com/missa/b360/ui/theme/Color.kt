@@ -20,6 +20,12 @@ val ProfileGreen = Color(0xFF20934A)
 val ProfileCommerceBlue = BrandBlue
 val ProfilePurple = Color(0xFF7047E8)
 val ProfileOrange = Color(0xFFF28A16)
+/** Teal des produits finis et des familles « stock » dans les carrefours. */
+val ProfileTeal = Color(0xFF0E9AA7)
+/** Violet soutenu des familles techniques (machines, équipements, chimie). */
+val ProfileViolet = Color(0xFF8B5CF6)
+/** Vert de la tendance positive, plus vif que le vert de marque. */
+val TendrePositive = Color(0xFF16A34A)
 
 // Alerte.
 val Red40 = Color(0xFFEC5A67)
@@ -31,7 +37,14 @@ val MissaSurface = Color(0xFFFFFFFF)
 val MissaSoftBlue = Color(0xFFF0F5FF)
 val MissaInk = Color(0xFF101C43)
 val MissaMuted = Color(0xFF65718F)
-val MissaBorder = Color(0xFFE2E7F2)
+/**
+ * Bordure commune des cartes, champs et sélecteurs.
+ *
+ * Le ton précédent (#E2E7F2) se confondait avec le fond des écrans (#F8F9FD) :
+ * les cadres de sélection paraissaient absents. Ce gris-bleu reste discret
+ * mais dessine réellement le contour.
+ */
+val MissaBorder = Color(0xFFCBD5E8)
 val MissaLime = Color(0xFFB6E52B)
 
 // Écrans d'onboarding « maquette » : bleu roi d'accueil et fond vert clair du récapitulatif.

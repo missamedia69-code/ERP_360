@@ -54,6 +54,13 @@ data class ProductEntity(
     val code: String,
     val nom: String,
     val type: ProductType = ProductType.ACHATE_REVENDU,
+    /**
+     * Groupe d'articles dont l'article hérite ses règles.
+     *
+     * Facultatif : les fiches créées avant l'arrivée des groupes continuent de
+     * fonctionner sur leur seul [type], qui reste la valeur de repli.
+     */
+    val itemGroupId: Long? = null,
     val reference: String? = null,
     /** Code-barres saisi ou scanné. */
     val barcode: String? = null,

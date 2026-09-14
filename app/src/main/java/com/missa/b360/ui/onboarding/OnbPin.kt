@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,219 +13,135 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.ui.components.MissaSectionPliable
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.ProfileGreen
-
-private const val PIN_LONGUEUR = 4
+import com.missa.b360.ui.theme.Red40
 
 /**
- * Écran 6 — Sécurisez votre accès : pavé numérique de la maquette pour un code
- * PIN à 4 chiffres (RA-01), suivi du contact de récupération qui crée le
- * Propriétaire (RA-03 / D1) avec le hash du PIN déjà écrit.
+ * Écran 6 — Sécurisez votre accès.
+ *
+ * Le code PIN (RA-01) est saisi **deux fois** sur le pavé de la maquette :
+ * quatre chiffres tapés une seule fois, c'est une faute de frappe qui enferme
+ * l'utilisateur dehors dès la première ouverture. Le contact de récupération,
+ * qui crée le Propriétaire (RA-03 / D1), suit dans une section repliable de
+ * même facture que l'écran entreprise — il n'est pas facultatif : sans e-mail
+ * valide, aucun compte ne peut être créé.
  */
 @Composable
 internal fun OnbPinStep(viewModel: OnboardingViewModel) {
-    var detailsVisibles by remember { mutableStateOf(false) }
-    val emailInvalide = viewModel.emailSecours.isNotBlank() && !viewModel.emailEstValide()
+    val emailValide = viewModel.emailEstValide()
+    val emailInvalide = viewModel.emailSecours.isNotBlank() && !emailValide
 
     OnbScaffold(
         titreRes = R.string.obn_pin_titre,
         sousTitreRes = R.string.obn_pin_sous,
         viewModel = viewModel,
-        boutonActive = viewModel.pinEcranValide() && viewModel.emailEstValide(),
+        boutonActive = viewModel.pinEcranValide() && emailValide,
         onRetour = viewModel::precedent,
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (viewModel.pinDejaConfigure) {
-                Surface(
-                    color = ProfileGreen.copy(alpha = 0.10f),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.CheckCircle,
-                            contentDescription = null,
-                            tint = ProfileGreen,
-                            modifier = Modifier.size(22.dp),
-                        )
-                        Text(
-                            text = stringResource(R.string.obn_pin_deja),
-                            fontSize = 13.sp,
-                            color = MissaInk,
-                            modifier = Modifier.padding(start = 10.dp),
-                        )
-                    }
-                }
+                OnbPinBandeau(
+                    texteRes = R.string.obn_pin_deja,
+                    couleur = ProfileGreen,
+                )
             } else {
-                // --- Points du code ---
-                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    for (index in 0 until PIN_LONGUEUR) {
-                        Box(
-                            modifier = Modifier
-                                .size(26.dp)
-                                .border(
-                                    if (index < viewModel.pin.length) 0.dp else 1.5.dp,
-                                    if (index < viewModel.pin.length) Color.Transparent else MissaBorder,
-                                    CircleShape,
-                                )
-                                .background(
-                                    if (index < viewModel.pin.length) BrandBlue else MissaSurface,
-                                    CircleShape,
-                                ),
-                        )
-                    }
-                }
-
-                // --- Pavé numérique ---
-                val taper = { chiffre: String ->
-                    if (viewModel.pin.length < PIN_LONGUEUR) {
-                        viewModel.pin = viewModel.pin + chiffre
-                    }
-                }
-                val effacer = { viewModel.pin = viewModel.pin.dropLast(1) }
-                val touches = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    for (ligne in touches.chunked(3)) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(14.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 7.dp),
-                        ) {
-                            for (chiffre in ligne) {
-                                OnbTouche(
-                                    texte = chiffre,
-                                    onClick = { taper(chiffre) },
-                                    modifier = Modifier.weight(1f),
-                                )
-                            }
-                        }
-                    }
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 7.dp),
-                    ) {
-                        Spacer(Modifier.weight(1f))
-                        OnbTouche(
-                            texte = "0",
-                            onClick = { taper("0") },
-                            modifier = Modifier.weight(1f),
-                        )
-                        OnbTouche(
-                            texte = "⌫",
-                            onClick = effacer,
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                }
+                OnbPinPave(viewModel)
             }
 
-            // --- Note de sécurité ---
+            // --- Note de sécurité, sur une ligne ---
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Lock,
                     contentDescription = null,
                     tint = MissaMuted,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(14.dp),
                 )
                 Text(
                     text = stringResource(R.string.obn_pin_note),
-                    fontSize = 12.sp,
+                    fontSize = 11.5.sp,
                     color = MissaMuted,
-                    textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
                 )
             }
 
-            // --- Contact de récupération (propriétaire) ---
-            TextButton(
-                onClick = { detailsVisibles = !detailsVisibles },
+            // --- Contact de récupération : obligatoire, donc ouvert ---
+            MissaSectionPliable(
+                titre = stringResource(R.string.obn_pin_recup_titre),
+                icone = Icons.Outlined.Person,
+                resume = listOf(viewModel.votreNom, viewModel.emailSecours)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" · ")
+                    .ifBlank { stringResource(R.string.obn_pin_recup_sous) },
+                etiquette = if (emailValide) {
+                    null
+                } else {
+                    stringResource(R.string.obn_section_a_completer)
+                },
+                etiquetteEnErreur = emailInvalide,
+                ouvertParDefaut = true,
+                ouvrirDOffice = !emailValide,
             ) {
-                Text(
-                    stringResource(
-                        if (detailsVisibles) R.string.ob_profil_masquer_details else R.string.obn_detaux,
-                    ),
-                    fontSize = 13.sp,
-                )
-            }
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, MissaBorder),
-                colors = CardDefaults.cardColors(containerColor = MissaSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.obn_pin_recup_titre),
-                        fontSize = 13.5.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MissaInk,
-                    )
-                    Text(
-                        text = stringResource(R.string.obn_pin_recup_sous),
-                        fontSize = 12.sp,
-                        color = MissaMuted,
-                    )
+                Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     OutlinedTextField(
                         value = viewModel.votreNom,
                         onValueChange = { viewModel.votreNom = it },
                         label = { Text(stringResource(R.string.ob_votre_nom)) },
                         singleLine = true,
                         enabled = !viewModel.enregistrementEnCours,
-                        leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null, tint = BrandBlue) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.Person,
+                                contentDescription = null,
+                                tint = BrandBlue,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -235,13 +152,29 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                         singleLine = true,
                         enabled = !viewModel.enregistrementEnCours,
                         isError = emailInvalide,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Email),
-                        leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null, tint = BrandBlue) },
-                        supportingText = if (emailInvalide) {
-                            { Text(stringResource(R.string.ob_email_invalide)) }
-                        } else {
-                            null
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Outlined.Email,
+                                contentDescription = null,
+                                tint = if (emailInvalide) Red40 else BrandBlue,
+                                modifier = Modifier.size(18.dp),
+                            )
                         },
+                        supportingText = {
+                            Text(
+                                text = stringResource(
+                                    if (emailInvalide) {
+                                        R.string.ob_email_invalide
+                                    } else {
+                                        R.string.obn_pin_recup_sous
+                                    },
+                                ),
+                                fontSize = 11.sp,
+                                color = if (emailInvalide) Red40 else MissaMuted,
+                            )
+                        },
+                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
                         shape = RoundedCornerShape(10.dp),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -251,26 +184,199 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
     }
 }
 
-/** Touche carrée du pavé numérique de la maquette. */
+/**
+ * Le pavé et ses quatre points, avec l'étape en cours : création du code, puis
+ * confirmation. Une fois les deux saisies concordantes, le pavé cède la place à
+ * un bandeau vert et au bouton « Recommencer ».
+ */
+@Composable
+private fun OnbPinPave(viewModel: OnboardingViewModel) {
+    val premiereSaisie = viewModel.pinEnPremiereSaisie
+    val saisieCourante = if (premiereSaisie) viewModel.pin else viewModel.pinConfirmation
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, if (viewModel.pinConfirme) ProfileGreen else MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 13.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(
+                    when {
+                        viewModel.pinConfirme -> R.string.obn_pin_confirme
+                        premiereSaisie -> R.string.ob_pin_title
+                        else -> R.string.ob_pin_confirmer
+                    },
+                ),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (viewModel.pinConfirme) ProfileGreen else MissaInk,
+            )
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(13.dp)) {
+                for (index in 0 until OnboardingViewModel.PIN_LONGUEUR) {
+                    val rempli = index < saisieCourante.length
+                    val couleur = when {
+                        viewModel.pinConfirme -> ProfileGreen
+                        rempli -> BrandBlue
+                        else -> MissaSurface
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .border(
+                                if (rempli || viewModel.pinConfirme) 0.dp else 1.5.dp,
+                                if (rempli || viewModel.pinConfirme) Color.Transparent else MissaBorder,
+                                CircleShape,
+                            )
+                            .background(couleur, CircleShape),
+                    )
+                }
+            }
+            Spacer(Modifier.height(6.dp))
+            // Le premier code reste marqué comme acquis pendant la confirmation.
+            AnimatedVisibility(visible = !premiereSaisie) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = null,
+                        tint = ProfileGreen,
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(
+                        text = stringResource(R.string.obn_pin_premier_ok),
+                        fontSize = 11.sp,
+                        color = MissaMuted,
+                    )
+                }
+            }
+
+            if (viewModel.pinConfirme) {
+                Spacer(Modifier.height(4.dp))
+                TextButton(onClick = viewModel::reinitialiserPin) {
+                    Icon(
+                        imageVector = Icons.Outlined.Restore,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Text(stringResource(R.string.obn_pin_recommencer), fontSize = 12.sp)
+                }
+            } else {
+                Spacer(Modifier.height(8.dp))
+                OnbPinTouches(
+                    onChiffre = viewModel::saisirChiffrePin,
+                    onEffacer = viewModel::effacerChiffrePin,
+                    actif = !viewModel.enregistrementEnCours,
+                )
+            }
+        }
+    }
+}
+
+/** Les douze touches, disposées comme sur un clavier téléphonique. */
+@Composable
+private fun OnbPinTouches(
+    onChiffre: (String) -> Unit,
+    onEffacer: () -> Unit,
+    actif: Boolean,
+) {
+    val effacerDescription = stringResource(R.string.obn_pin_effacer)
+    Column(modifier = Modifier.fillMaxWidth()) {
+        for (ligne in listOf("123", "456", "789").map { it.map(Char::toString) }) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            ) {
+                for (chiffre in ligne) {
+                    OnbTouche(
+                        onClick = { onChiffre(chiffre) },
+                        actif = actif,
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Text(text = chiffre, fontSize = 18.sp, color = MissaInk)
+                    }
+                }
+            }
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+        ) {
+            Spacer(Modifier.weight(1f))
+            OnbTouche(
+                onClick = { onChiffre("0") },
+                actif = actif,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(text = "0", fontSize = 18.sp, color = MissaInk)
+            }
+            OnbTouche(
+                onClick = onEffacer,
+                actif = actif,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { contentDescription = effacerDescription },
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.Backspace,
+                    contentDescription = null,
+                    tint = MissaMuted,
+                    modifier = Modifier.size(19.dp),
+                )
+            }
+        }
+    }
+}
+
+/** Touche du pavé : carrée, sobre, assez haute pour le pouce. */
 @Composable
 private fun OnbTouche(
-    texte: String,
     onClick: () -> Unit,
+    actif: Boolean,
     modifier: Modifier = Modifier,
+    contenu: @Composable () -> Unit,
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier
-            .height(56.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        enabled = actif,
+        modifier = modifier.height(52.dp),
+        shape = RoundedCornerShape(13.dp),
         border = BorderStroke(1.dp, MissaBorder),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+        content = { contenu() },
+    )
+}
+
+/** Bandeau d'état pleine largeur (code déjà configuré). */
+@Composable
+private fun OnbPinBandeau(texteRes: Int, couleur: Color) {
+    Surface(
+        color = couleur.copy(alpha = 0.10f),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(
-            text = texte,
-            fontSize = 19.sp,
-            color = MissaInk,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.CheckCircle,
+                contentDescription = null,
+                tint = couleur,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = stringResource(texteRes),
+                fontSize = 12.5.sp,
+                color = MissaInk,
+                modifier = Modifier.padding(start = 10.dp),
+            )
+        }
     }
 }

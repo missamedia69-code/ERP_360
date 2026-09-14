@@ -116,8 +116,8 @@ class StockRulesTest {
                 SaleLine(id = 5, name = "Nul", unitPrice = 5.0, quantity = 0.0, productId = 9L),
             ),
         )
-        assertEquals(3.5, besoins[7L], 0.0001)
-        assertEquals(3.0, besoins[9L], 0.0001)
+        assertEquals(3.5, besoins.getValue(7L), 0.0001)
+        assertEquals(3.0, besoins.getValue(9L), 0.0001)
         assertEquals(2, besoins.size)
     }
 

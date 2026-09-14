@@ -32,14 +32,19 @@ import javax.inject.Inject
 class EnsureEnterprisePrerequisitesUseCase @Inject constructor(
     private val settingsStore: SettingsStore,
     private val licenceManager: LicenceManager,
+    private val groupesArticles: GroupeArticleUseCases,
 ) {
-    suspend operator fun invoke(devise: String) {
+    suspend operator fun invoke(devise: String, pays: String? = null) {
         settingsStore.set(SettingsStore.Keys.DEVISE, devise)
         settingsStore.lock(SettingsStore.Keys.VERROU_DEVISE)
         settingsStore.lock(SettingsStore.Keys.VERROU_TAXES)
         settingsStore.lock(SettingsStore.Keys.VERROU_NUMEROTATION)
         settingsStore.lock(SettingsStore.Keys.VERROU_PAIEMENTS)
         licenceManager.ensureTrialStarted()
+        // Le catalogue a besoin de ses familles avant le premier article : les
+        // installer ici les rend aussi disponibles sur une base antérieure aux
+        // groupes, l'opération étant sans effet si elles existent déjà.
+        groupesArticles.installerGroupesStandards(pays)
     }
 }
 
@@ -73,6 +78,13 @@ class SetupEnterpriseUseCase @Inject constructor(
         val palierTaille: String? = null,
         /** Secteur d'activité libre (champ existant de l'entreprise, optionnel). */
         val secteur: String? = null,
+        /** Coordonnées imprimées sur les devis, factures et bons de livraison. */
+        val telephone: String? = null,
+        val email: String? = null,
+        val adresse: String? = null,
+        /** Identifiants légaux (NIU / NIF, RCCM) exigés sur les pièces de vente. */
+        val numeroFiscal: String? = null,
+        val registreCommerce: String? = null,
         /** URI du logo image sélectionné pendant l'onboarding. */
         val logoUri: String? = null,
     )
@@ -82,7 +94,7 @@ class SetupEnterpriseUseCase @Inject constructor(
         // prérequis DataStore/licence sont toutefois rejoués pour couvrir un arrêt entre
         // les deux phases de l'initialisation.
         enterpriseDao.get()?.let { entreprise ->
-            ensureEnterprisePrerequisites(entreprise.devise)
+            ensureEnterprisePrerequisites(entreprise.devise, entreprise.pays)
             // Couvre aussi une interruption après Room mais avant l'écriture DataStore.
             settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
             return true
@@ -96,6 +108,11 @@ class SetupEnterpriseUseCase @Inject constructor(
                     secteur = params.secteur?.trim()?.ifEmpty { null },
                     langue = settingsStore.get(SettingsStore.Keys.LANGUE) ?: "fr",
                     pays = params.pays,
+                    telephone = params.telephone?.trim()?.ifEmpty { null },
+                    email = params.email?.trim()?.ifEmpty { null },
+                    adresse = params.adresse?.trim()?.ifEmpty { null },
+                    numeroFiscal = params.numeroFiscal?.trim()?.ifEmpty { null },
+                    registreCommerce = params.registreCommerce?.trim()?.ifEmpty { null },
                     logoUri = params.logoUri,
                     profilActivite = params.profilActivite
                         ?: settingsStore.get(SettingsStore.Keys.PROFIL_ACTIVITE),
@@ -122,7 +139,7 @@ class SetupEnterpriseUseCase @Inject constructor(
             seedSystemRoles()
         }
 
-        ensureEnterprisePrerequisites(params.devise)
+        ensureEnterprisePrerequisites(params.devise, params.pays)
         // Le libellé pays est localisé dans Room ; le code ISO stable permet de
         // préremplir l'indicatif téléphonique dans les formulaires métier.
         settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
@@ -180,7 +197,7 @@ class GetOnboardingProgressUseCase @Inject constructor(
         // La reprise démarre directement au PIN lorsque l'entreprise existe. On complète
         // donc les prérequis hors Room avant de laisser l'utilisateur poursuivre.
         entreprise?.let {
-            ensureEnterprisePrerequisites(it.devise)
+            ensureEnterprisePrerequisites(it.devise, it.pays)
             // Mise à niveau idempotente des installations créées avant l'indicatif pays.
             if (settingsStore.get(SettingsStore.Keys.PAYS).isNullOrBlank()) {
                 settingsStore.set(

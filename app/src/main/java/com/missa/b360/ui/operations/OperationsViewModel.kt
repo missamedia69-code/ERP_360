@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.missa.b360.core.util.Iso4217
 
 @HiltViewModel
 class OperationsViewModel @Inject constructor(
@@ -39,8 +40,8 @@ class OperationsViewModel @Inject constructor(
     val enCours: StateFlow<Boolean> = _enCours
 
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { it?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     fun records(module: OperationModule): Flow<List<OperationRecordEntity>> = operations.observe(module)
     fun allRecords(): Flow<List<OperationRecordEntity>> = operations.observeAll()

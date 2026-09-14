@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Coordonnées commerciales de l'éditeur.
+
+    Point unique de configuration : ces trois valeurs alimentent les boutons
+    « Obtenir votre code d'activation » de l'écran final de l'onboarding.
+    WhatsApp et Telegram partagent le même numéro. Le format international
+    (indicatif compris) est indispensable : les liens wa.me et tg:// ne
+    retiennent que les chiffres.
+
+    Ces chaînes ne sont pas traduites : un numéro et une adresse ne changent
+    pas avec la langue.
+-->
+<resources>
+    <string name="contact_commercial_whatsapp" translatable="false">+237652996161</string>
+    <string name="contact_commercial_telegram" translatable="false">+237652996161</string>
+    <string name="contact_commercial_email" translatable="false">missamedia69@gmail.com</string>
+</resources>

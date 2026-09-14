@@ -26,6 +26,8 @@ class OperationUseCases @Inject constructor(
         val module: OperationModule,
         val title: String,
         val counterpart: String? = null,
+        /** Identifiant du client ou fournisseur concerné, quand il est connu. */
+        val tiersId: Long? = null,
         val amount: Double? = null,
         val quantity: Double? = null,
         val direction: OperationDirection = OperationDirection.NONE,
@@ -64,6 +66,7 @@ class OperationUseCases @Inject constructor(
                 reference = reference,
                 title = title,
                 counterpart = params.counterpart?.trim()?.ifBlank { null },
+                tiersId = params.tiersId,
                 amount = amount,
                 quantity = quantity,
                 direction = if (params.module == OperationModule.FINANCES) {

@@ -28,6 +28,8 @@ class UpdateEnterpriseUseCase @Inject constructor(
         adresse: String? = null,
         telephone: String? = null,
         email: String? = null,
+        numeroFiscal: String? = null,
+        registreCommerce: String? = null,
         profilActivite: String? = null,
         palierTaille: String? = null,
     ): Boolean {
@@ -40,6 +42,8 @@ class UpdateEnterpriseUseCase @Inject constructor(
                 adresse = texteMisAJour(adresse, entreprise.adresse),
                 telephone = texteMisAJour(telephone, entreprise.telephone),
                 email = texteMisAJour(email, entreprise.email),
+                numeroFiscal = texteMisAJour(numeroFiscal, entreprise.numeroFiscal),
+                registreCommerce = texteMisAJour(registreCommerce, entreprise.registreCommerce),
                 profilActivite = profilActivite ?: entreprise.profilActivite,
                 palierTaille = palierTaille ?: entreprise.palierTaille,
             ),

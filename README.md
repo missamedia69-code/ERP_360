@@ -5,11 +5,12 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
-pour les TPE/PMI : il fonctionne **100 % hors-ligne**, couvre **13 modules métier**, parle
-**5 langues** (FR · EN · ES · AR-RTL · ZH) et gère le **multi-site** avec des **profils
+pour les TPE/PMI : il fonctionne **100 % hors-ligne**, couvre **18 modules métier et support**,
+parle **5 langues** (FR · EN · ES · AR-RTL · ZH) et gère le **multi-site** avec des **profils
 d'activité A–H**. Implémentation du cahier de charge **E9** (`e9-cahier-de-charge.md`).
 
 > **Offline-first** : aucune donnée ne quitte le téléphone. L'application démarre
@@ -17,7 +18,7 @@ d'activité A–H**. Implémentation du cahier de charge **E9** (`e9-cahier-de-c
 
 ---
 
-## 🧩 Les 13 modules
+## 🧩 Les modules
 
 | Module | Barre du bas | Description |
 |---|:---:|---|
@@ -34,6 +35,12 @@ d'activité A–H**. Implémentation du cahier de charge **E9** (`e9-cahier-de-c
 | **RH** | ➕ | Employés et paie |
 | **Projets** | ➕ | Suivi de projets |
 | **Reporting** | ➕ | Tableaux de bord et indicateurs |
+| **Trésorerie** | ➕ | Comptes caisse/banque/mobile money, encaissements, décaissements, virements internes, rapprochement |
+| **Comptabilité** | ➕ | Compte de résultat, position de TVA et journal consolidé — lecture seule, aucune double saisie |
+| **CRM** | ➕ | Portefeuille segmenté, relances commerciales, meilleurs clients, taux de conversion |
+| **Logistique** | ➕ | Implantation du stock par site, transferts inter-sites et détection des transferts non reçus |
+| **Qualité** | ➕ | Registre des non-conformités, gravité, action corrective, délai de résolution |
+| **Maintenance** | ➕ | Parc d'équipements, plan préventif, interventions, coût et immobilisation |
 
 Navigation **RA-22** : menu ☰ (admin), cloche 🔔 (notifications internes), barre du bas
 personnalisable (Vente · Stock · Clients · Finances par défaut) et bouton **➕** donnant
@@ -57,7 +64,7 @@ AppCompatDelegate).
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle Kotlin DSL (version catalog) |
 | UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
-| Persistance | **Room 2.8 (KSP)** — 25 entités, schémas exportés, migrations manuelles |
+| Persistance | **Room 2.8 (KSP)** — 30 entités, base **v11**, migrations manuelles enchaînées 1→11 |
 | Réglages | **DataStore** (préférences + verrous d'amont) |
 | Injection | **Hilt 2.60** (+ `hilt-navigation-compose`, `@HiltWorker`) |
 | Tâches de fond | **WorkManager** (purge du journal à 12 mois, sauvegarde auto) |
@@ -71,7 +78,7 @@ AppCompatDelegate).
 app/src/main/java/com/missa/b360/
 ├── MissaApp.kt / MainActivity.kt          # Application Hilt + splash vidéo
 ├── core/
-│   ├── data/          # Room : db (25 entités, v6), dao, entity, datastore (SettingsStore + verrous)
+│   ├── data/          # Room : db (30 entités, v11), dao, entity, datastore (SettingsStore + verrous)
 │   ├── domain/        # model + usecase (1 règle métier = 1 UseCase, commentée // RA-xx)
 │   ├── security/      # PinHasher (PBKDF2), PinManager (verrou RA-02)
 │   ├── licensing/     # LicenceManager (essai 7 j RA-04, activation RA-05/06)
@@ -129,3 +136,38 @@ et use cases du socle (`SocleUseCasesTest`).
 - `branding/` — logo officiel `logo_missa.png` + script `gen_icons.ps1` de génération des icônes
 - `app/schemas/` — schémas Room exportés (traçabilité des migrations)
 - `LICENSE` — Apache License 2.0
+
+---
+
+## 🔁 Intégration continue
+
+Chaque poussée sur `main` ou sur une branche `arena/**` déclenche
+[`.github/workflows/android.yml`](.github/workflows/android.yml), en deux temps :
+
+| Étape | Durée | Ce qu'elle garantit |
+|---|---|---|
+| **Traductions** | ~10 s | Les cinq `strings.xml` portent exactement les mêmes clés, avec les mêmes paramètres `%1$s`, et aucune apostrophe non échappée |
+| **Compilation et tests** | ~10 min | `assembleDebug` puis `testDebugUnitTest` sur JDK 21 et SDK 36 |
+
+L'**APK de débogage** est publié en artefact de chaque exécution réussie (14 jours) :
+onglet *Actions* → exécution → *erp360-debug-apk*. En cas d'échec des tests, les rapports
+HTML sont joints à la place.
+
+Le contrôle des traductions s'exécute aussi à la main, sans rien installer :
+
+```bash
+python3 .github/scripts/verifier_traductions.py
+```
+
+Il liste en outre les clés jamais référencées dans le code — simple avertissement,
+une chaîne pouvant être prévue pour un écran à venir.
+
+Quand la compilation ou un test échoue,
+[`.github/scripts/annoter_echecs.py`](.github/scripts/annoter_echecs.py) relit la sortie
+Gradle et les rapports JUnit pour republier chaque erreur en **annotation** rattachée à
+son fichier et à sa ligne, et en tableau récapitulatif sur la page de l'exécution. La
+cause d'un échec se lit ainsi d'un coup d'œil, sans dérouler dix mille lignes de journal :
+
+```bash
+gh run view <id>   # section ANNOTATIONS
+```
