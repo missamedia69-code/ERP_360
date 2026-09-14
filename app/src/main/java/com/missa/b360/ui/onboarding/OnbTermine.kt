@@ -1,8 +1,8 @@
 package com.missa.b360.ui.onboarding
 
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,9 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Warning
@@ -366,7 +366,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                         if (whatsappOk) {
                             OnbContactBouton(
                                 R.string.obn_code_whatsapp,
-                                Icons.Outlined.Chat,
+                                Icons.AutoMirrored.Outlined.Chat,
                                 Modifier.weight(1f),
                             ) {
                                 val ouvert = ContactCommercial.ouvrirWhatsApp(contexte, numero, message)
