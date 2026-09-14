@@ -26,7 +26,7 @@ d'activité**. Implémentation du cahier de charge **E9**.
 |---|:---:|:---:|---|
 | **Accueil** | 🏠 | ✅ **Réel** | Tableau de bord (4 KPI + 8 actions + résumé + activités) — référence `HomeScreen.kt` + logo `GREEN FARM` |
 | **Vente** | ✅ | ⏳ Placeholder | Devis → commande → facture (prévu bloc `ACH-STK-VEN`) |
-| **Stock** | ✅ | ⏳ Placeholder | Produits, mouvements, transferts, inventaires — hub à reconstruire en 1er |
+| **Stock** | ✅ | ⏳ Placeholder | Produits, **groupes d'articles transverse**, mouvements, transferts, inventaires — hub à reconstruire en 1er |
 | **Clients** | ✅ | ⏳ Placeholder | Fiches NIF, contacts multiples |
 | **Finances** | ✅ | ⏳ Placeholder | Encaissements/dépenses |
 | **Achats** | ➕ | ⏳ Placeholder | *1er bloc* avec Stock — `ACH→STK` obligatoire |
@@ -47,6 +47,12 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 * **2e bloc : `A-P-S-V`** (industrie) — profil `APSV` en 2e
 * `AV (A+V sans stock)` dépriorisé (legacy)
 * **Option `Vente sans stock`** (`SettingsStore.VENTE_SANS_STOCK`, `false` par défaut) : autorise `VEN` sans `STK` pour drop / achat à la commande / service. Toggle `Switch` dans l'onboarding (`OnbProfil`). Quand `OFF`, `VEN + ACH/PRO` sans `STK` → `STK` auto-ajouté. Stock négatif autorisé seulement si option `ON`.
+* Les règles ci-dessus sont **déclarées** dans `DependancesModules` (`ModuleDependency`,
+  condition `SAUF_SI_VENTE_SANS_STOCK`) et **contrôlées** par `ValidationProfil.validateProfileConfig()`
+  (spec §7.2/§9) : toute configuration modifiable (profil CUSTOM notamment) qui violerait
+  `ACH→STK` ou `PRO→STK` est bloquée. Le profil AV (legacy « Achat-Vente sans stock ») est un
+  profil figé maintenu pour rétro-compatibilité et **non soumis** à cette validation — il est
+  recommandé de migrer vers ASV.
 
 ---
 
@@ -63,7 +69,7 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle Kotlin DSL (version catalog) |
 | UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) — `MissaDesign` (`MissaCanvas` `#E6FFFA`, `MissaPanel` 14dp/bord `#E2E8F0`, `MissaTopAppBar` blanche) |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
-| Persistance | **Room 2.8 (KSP)** — 30 entités, base **v11**, migrations 1→11 |
+| Persistance | **Room 2.8 (KSP)** — 40 entités, base **v12**, migrations 1→12 |
 | Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
 | Injection | **Hilt 2.60** |
 | Tâches de fond | **WorkManager** (purge journal 12 mois) |
@@ -77,13 +83,69 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 ```
 app/src/main/java/com/missa/b360/
 ├── core/data/          # db, dao, entity, datastore (+ VENTE_SANS_STOCK)
-├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules)
+├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules),
+│                       #   DependancesModules/ValidationProfil (règle d'or + validation),
+│                       #   ReglesGroupesArticles (groupes transverses), OptionsProfil
 ├── ui/onboarding/      # langue → profil (ASV/APSV en tête) → entreprise → PIN
 ├── ui/home/            # HomeScreen.kt — référence visuelle
 ├── ui/components/      # PlaceholderScreen.kt (Scaffold + MissaTopAppBar + MissaEmptyState)
 ├── ui/stock|sales|purchases|...  # ⏳ placeholders (à reconstruire)
 └── ui/navigation/      # ModuleRegistry (14 modules, barre 3 onglets max)
 ```
+
+---
+
+## 📐 Architecture — modules, écrans, profils et groupes d'articles
+
+Complément de la doc `docs/fiscalite-multizones.md`. Décrit l'architecture des modules, les
+écrans UI, les dépendances entre modules, les profils utilisateurs et le rôle **transverse
+des groupes d'articles du module Stock**.
+
+### Vue d'ensemble
+* **6 modules Métier** (ACH, STK, PRO, VEN, SER, PRJ) + **8 modules Support** (CPT, TRE, LOG,
+  REP, CRM, RH, QUA, MAI) — codes dans `core/domain/model/Configuration.kt` (`ModuleCode`).
+* **18 écrans UI** enregistrés dans `ModuleRegistry.kt` (`AppModule`, équivalent `UiScreen` de
+  la spec) : VENTE, STOCK, CLIENTS, FINANCES, ACHATS, FOURNISSEURS, LIVRAISON, LOGISTIQUE,
+  PRODUCTION, SERVICES, PROJETS, COMPTABILITE, TRESORERIE, CRM, QUALITE, MAINTENANCE, REPORTING, RH.
+* **7 profils** (`ProfilActivite`, équivalent `ProfileCode`) : AV, ASV, APSV, SER, PRJ, FULL, CUSTOM.
+* **1 module central Stock** avec un système de groupes d'articles utilisé par tous les modules.
+
+### Règles de dépendance (règle d'or)
+Déclarées dans `DependancesModules` (spec §9 `ModuleDependency`, `moduleDependencies`) :
+
+| Dépendance | Condition |
+|---|---|
+| ACH → STK | **Toujours** : tout achat alimente un stock (même « non stocké », via le référentiel) |
+| PRO → STK | **Toujours** : la production consomme et produit du stock |
+| VEN → STK | **Par défaut** ; tombe si option `vente_sans_stock` = `ON` (drop, services, produits digitaux) |
+
+Ces règles sont **appliquées** automatiquement par `ModulesSocle.avecDependances()` dans le
+pack, et **vérifiées** par `ValidationProfil.validateProfileConfig(modules, options)` (spec
+§7.2) : toute violation **bloque l'enregistrement** de la configuration avec un message clair.
+Exception : le profil **AV** (legacy, figé, à migrer vers ASV).
+
+### Groupes d'articles — mécanisme transverse (spec §5.2, §8)
+Le module Stock porte le référentiel `item_groups` + 6 tables d'extension (stock, achat, vente,
+production, maintenance, comptabilité) ; `GroupeArticleDao.GroupeArticleComplet` les assemble.
+Règles exposées par `ReglesGroupesArticles` (le groupe prime ; les fiches sans groupe retombent
+sur `ProductType` via `ProduitRules`) :
+
+| Module | Ce qu'il lit sur le groupe |
+|---|---|
+| ACH | `achetable`, comptes de charge / immobilisation |
+| VEN | `vendable`, compte de produit |
+| PRO | `produisible`, nomenclature requise |
+| MAI | `equipementMaintenable` |
+| STK | `stocke`, méthode et comptes de stock |
+| CPT | `valorise`, comptes de stock/charge/produit |
+| SER | familles de type prestation (`service`) |
+| REP | agrégations par groupe (valeur, CA, marges) |
+| LOG | familles stockées (expéditions) |
+
+### Validation et options de profil (spec §7)
+* `OptionsConfigProfil` — options par profil (`vente_sans_stock`, extensible) ; clés dans `OptionsProfil`.
+* `ViolationProfil` — violations typées (`ACH_SANS_STOCK`, `PRO_SANS_STOCK`, `VEN_SANS_STOCK`)
+  avec message prêt à l'affichage.
 
 ---
 
