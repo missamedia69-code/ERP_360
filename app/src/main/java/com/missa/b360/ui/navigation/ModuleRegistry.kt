@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 
 /**
@@ -72,7 +73,6 @@ enum class AppModule(
 
     companion object {
 
-
         /** Retourne les modules correspondant à une liste de ModuleCode. */
         fun fromCodes(codes: List<ModuleCode>): List<AppModule> =
             entries.filter { it.moduleCode in codes }
@@ -87,6 +87,15 @@ enum class AppModule(
          */
         fun visibles(actifs: List<ModuleCode>): List<AppModule> =
             if (actifs.isEmpty()) entries.toList() else entries.filter { it.moduleCode in actifs }
+
+        /** Version qui prend l'activation effective du profil (nouveau système) */
+        fun visibles(activation: ActivationProfil): List<AppModule> =
+            if (activation.modulesActifs.isEmpty()) entries.toList()
+            else entries.filter { it.moduleCode in activation.modulesActifs }
+
+        /** Vérifie si un module est actif selon l'activation */
+        fun isActif(module: AppModule, activation: ActivationProfil): Boolean =
+            activation.isModuleActif(module.moduleCode)
 
         /**
          * Barre du bas : les modules épinglés par le Propriétaire, à défaut les
@@ -110,6 +119,9 @@ enum class AppModule(
             }.take(MAX_ONGLETS)
         }
 
+        fun barreBas(activation: ActivationProfil, epingles: List<String> = emptyList()): List<AppModule> =
+            barreBas(activation.modulesActifs.toList(), epingles)
+
         /**
          * Modules qu'il est permis d'épingler.
          *
@@ -118,6 +130,9 @@ enum class AppModule(
          */
         fun epinglables(actifs: List<ModuleCode>): List<AppModule> =
             visibles(actifs).filter { it !in SANS_BARRE }
+
+        fun epinglables(activation: ActivationProfil): List<AppModule> =
+            epinglables(activation.modulesActifs.toList())
 
         /** Nombre maximal d'onglets, l'accueil et « Plus » occupant déjà deux places. */
         const val MAX_ONGLETS = 3
@@ -160,6 +175,14 @@ enum class AppModule(
         ): List<AppModule> {
             val barre = barreBas(actifs, epingles).toSet()
             return visibles(actifs).filterNot { it in barre }
+        }
+
+        fun secondaires(
+            activation: ActivationProfil,
+            epingles: List<String> = emptyList(),
+        ): List<AppModule> {
+            val barre = barreBas(activation, epingles).toSet()
+            return visibles(activation).filterNot { it in barre }
         }
     }
 }

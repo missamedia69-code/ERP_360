@@ -10,6 +10,8 @@ import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
@@ -52,6 +54,7 @@ sealed class StockMovementResult {
     /** Aucun site de sortie résolvable (ni site principal ni stock ailleurs). */
     data object SiteIntrouvable : StockMovementResult()
     data class StockInsuffisant(val disponible: Double, val demande: Double) : StockMovementResult()
+    data object ModuleInactif : StockMovementResult()
 }
 
 /**
@@ -67,6 +70,7 @@ class RecordStockMovementUseCase @Inject constructor(
     private val database: AppDatabase,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
 ) {
     suspend operator fun invoke(
         produitId: Long,
@@ -90,6 +94,11 @@ class RecordStockMovementUseCase @Inject constructor(
             else -> false
         }) {
             return StockMovementResult.Invalid
+        }
+        // Activation profil : Stock doit être actif
+        val activation = activationRepository.getActivation()
+        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+            return StockMovementResult.ModuleInactif
         }
         if (licenceManager.isReadOnly()) return StockMovementResult.LectureSeule
         val produit = productDao.getById(produitId)
@@ -150,6 +159,7 @@ class TransferStockUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
 ) {
     sealed class Result {
         data class Succes(
@@ -162,6 +172,7 @@ class TransferStockUseCase @Inject constructor(
         data object Invalid : Result()
         data object ProduitIntrouvable : Result()
         data class StockInsuffisant(val disponible: Double, val demande: Double) : Result()
+        data object ModuleInactif : Result()
     }
 
     suspend operator fun invoke(
@@ -175,6 +186,10 @@ class TransferStockUseCase @Inject constructor(
     ): Result {
         if (!StockValidation.transfertEstValide(siteSourceId, siteDestId, quantite)) {
             return Result.Invalid
+        }
+        val activation = activationRepository.getActivation()
+        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+            return Result.ModuleInactif
         }
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         val produit = productDao.getById(produitId)

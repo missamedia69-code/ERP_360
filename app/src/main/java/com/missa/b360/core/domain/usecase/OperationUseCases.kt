@@ -5,6 +5,8 @@ import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
@@ -14,13 +16,15 @@ import javax.inject.Inject
 
 /**
  * Règles communes aux pièces opérationnelles : validation, licence lecture seule, référence
- * atomique et journalisation. Les modules gardent ainsi un comportement cohérent offline.
+ * atomique, activation profil et journalisation. Les modules gardent ainsi un comportement cohérent offline.
+ * Chaque profil actif active réellement les modules qui lui ont été affectés.
  */
 class OperationUseCases @Inject constructor(
     private val dao: OperationRecordDao,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
 ) {
     data class CreateParams(
         val module: OperationModule,
@@ -38,6 +42,7 @@ class OperationUseCases @Inject constructor(
         data class Success(val id: Long, val reference: String) : CreateResult()
         data object ReadOnly : CreateResult()
         data object Invalid : CreateResult()
+        data object ModuleInactif : CreateResult()
     }
 
     sealed class UpdateDraftResult {
@@ -45,6 +50,7 @@ class OperationUseCases @Inject constructor(
         data object ReadOnly : UpdateDraftResult()
         data object Invalid : UpdateDraftResult()
         data object NotDraft : UpdateDraftResult()
+        data object ModuleInactif : UpdateDraftResult()
     }
 
     fun observe(module: OperationModule): Flow<List<OperationRecordEntity>> =
@@ -52,8 +58,29 @@ class OperationUseCases @Inject constructor(
 
     fun observeAll(): Flow<List<OperationRecordEntity>> = dao.observeAll()
 
+    private fun OperationModule.toModuleCode(): ModuleCode? = when (this) {
+        OperationModule.VENTE -> ModuleCode.VEN
+        OperationModule.ACHATS -> ModuleCode.ACH
+        OperationModule.STOCK -> ModuleCode.STK
+        OperationModule.FINANCES -> ModuleCode.CPT
+        OperationModule.LIVRAISON -> ModuleCode.LOG
+        OperationModule.PRODUCTION -> ModuleCode.PRO
+        OperationModule.SERVICES -> ModuleCode.SER
+        OperationModule.RH -> ModuleCode.RH
+        OperationModule.PROJETS -> ModuleCode.PRJ
+        else -> null
+    }
+
     suspend fun create(params: CreateParams): CreateResult {
         if (!OperationValidation.isValid(params)) return CreateResult.Invalid
+        // Vérification activation profil : chaque profil actif active réellement ses modules
+        val moduleCode = params.module.toModuleCode()
+        if (moduleCode != null) {
+            val activation = activationRepository.getActivation()
+            if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(moduleCode)) {
+                return CreateResult.ModuleInactif
+            }
+        }
         val title = params.title.trim()
         val amount = params.amount
         val quantity = params.quantity
@@ -92,6 +119,13 @@ class OperationUseCases @Inject constructor(
      */
     suspend fun updateDraft(id: Long, params: CreateParams): UpdateDraftResult {
         if (!OperationValidation.isValid(params)) return UpdateDraftResult.Invalid
+        val moduleCode = params.module.toModuleCode()
+        if (moduleCode != null) {
+            val activation = activationRepository.getActivation()
+            if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(moduleCode)) {
+                return UpdateDraftResult.ModuleInactif
+            }
+        }
         if (licenceManager.isReadOnly()) return UpdateDraftResult.ReadOnly
         val existing = dao.getById(id) ?: return UpdateDraftResult.NotDraft
         if (existing.status != OperationStatus.DRAFT.name || existing.module != params.module.name) {

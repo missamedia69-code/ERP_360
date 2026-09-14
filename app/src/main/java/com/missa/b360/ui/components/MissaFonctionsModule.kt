@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.ui.navigation.DestinationsFonctions
 import com.missa.b360.ui.navigation.FonctionModule
@@ -53,9 +54,18 @@ import com.missa.b360.ui.theme.ProfileGreen
 fun LazyListScope.sectionFonctionsModule(
     module: ModuleCode,
     onNaviguer: (String) -> Unit,
+    activation: ActivationProfil? = null,
 ) {
-    val disponibles = DestinationsFonctions.disponibles(module)
-    val aVenir = DestinationsFonctions.aVenir(module)
+    val disponibles = if (activation != null) {
+        DestinationsFonctions.disponibles(module, activation)
+    } else {
+        DestinationsFonctions.disponibles(module)
+    }
+    val aVenir = if (activation != null) {
+        DestinationsFonctions.aVenir(module, activation)
+    } else {
+        DestinationsFonctions.aVenir(module)
+    }
 
     if (disponibles.isNotEmpty()) {
         item { TitreSectionModule(stringResource(R.string.mod_fonctions_disponibles)) }

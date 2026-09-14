@@ -6,9 +6,10 @@ import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.CockpitRules
 import com.missa.b360.core.domain.model.ModuleCode
-import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.PointPerformance
 import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.domain.model.RappelsRules
@@ -85,6 +86,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
     private val settingsStore: SettingsStore,
+    private val activationRepository: ProfilActivationRepository,
     compteTresorerieDao: CompteTresorerieDao,
     mouvementTresorerieDao: MouvementTresorerieDao,
     taskDao: TaskDao,
@@ -97,6 +99,11 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
+
+    /** Activation effective du profil : source de vérité unique pour toute l'app */
+    val activation: StateFlow<ActivationProfil> =
+        activationRepository.observeActivation()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ActivationProfil.VIDE)
 
     /**
      * Modules retenus au moment du choix du pack. La liste pilote l'accueil :
@@ -119,8 +126,7 @@ class HomeViewModel @Inject constructor(
     }
 
     val modulesActifs: StateFlow<List<ModuleCode>> =
-        settingsStore.observe(SettingsStore.Keys.MODULES_ACTIFS)
-            .map { ModulesPersonnalises.deserialiser(it) }
+        activation.map { it.modulesActifs.toList() }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val baseState = combine(
@@ -168,9 +174,26 @@ class HomeViewModel @Inject constructor(
         operations.observeAll(),
         soldeTresorerie,
         taches,
-    ) { base, records, soldeComptes, listeTaches ->
+        activation,
+    ) { base, records, soldeComptes, listeTaches, act ->
         val maintenant = System.currentTimeMillis()
-        val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
+        // Filtre les opérations par modules actifs si activation définie
+        val recordsFiltres = if (act.modulesActifs.isEmpty()) records else records.filter { rec ->
+            val code = when (rec.module) {
+                OperationModule.VENTE.name -> ModuleCode.VEN
+                OperationModule.ACHATS.name -> ModuleCode.ACH
+                OperationModule.STOCK.name -> ModuleCode.STK
+                OperationModule.FINANCES.name -> ModuleCode.CPT
+                OperationModule.LIVRAISON.name -> ModuleCode.LOG
+                OperationModule.PRODUCTION.name -> ModuleCode.PRO
+                OperationModule.SERVICES.name -> ModuleCode.SER
+                OperationModule.RH.name -> ModuleCode.RH
+                OperationModule.PROJETS.name -> ModuleCode.PRJ
+                else -> null
+            }
+            code == null || act.isModuleActif(code)
+        }
+        val validated = recordsFiltres.filter { it.status == OperationStatus.VALIDATED.name }
         // Les cartes libellées « Aujourd’hui » ne doivent jamais agréger les
         // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
         val startOfToday = CockpitRules.debutJour(maintenant)
@@ -240,8 +263,8 @@ class HomeViewModel @Inject constructor(
             else (marge / ventes - margeHier / ventesHier) * 100.0,
             tendanceTresorerie = CockpitRules.variationPct(fluxJour, fluxHier),
             performanceMensuelle = CockpitRules.performanceMensuelle(validated, maintenant),
-            recentOperations = records.take(4),
-            rappels = RappelsRules.rappels(listeTaches, records, maintenant),
+            recentOperations = recordsFiltres.take(4),
+            rappels = RappelsRules.rappels(listeTaches, recordsFiltres, maintenant),
             taches = listeTaches,
         )
     }.stateIn(

@@ -227,6 +227,16 @@ object ModulesPersonnalises {
         ModuleCode.REP -> R.string.module_reporting
     }
 
+    fun libelleRes(profil: ProfilActivite): Int = when (profil) {
+        ProfilActivite.AV -> R.string.profil_av
+        ProfilActivite.ASV -> R.string.profil_asv
+        ProfilActivite.APSV -> R.string.profil_apsv
+        ProfilActivite.SER -> R.string.profil_ser
+        ProfilActivite.PRJ -> R.string.profil_prj
+        ProfilActivite.FULL -> R.string.profil_full
+        ProfilActivite.CUSTOM -> R.string.profil_custom
+    }
+
     fun serialiser(modules: Collection<ModuleCode>): String =
         ModuleCode.entries.filter { it in modules }.joinToString(",") { it.name }
 

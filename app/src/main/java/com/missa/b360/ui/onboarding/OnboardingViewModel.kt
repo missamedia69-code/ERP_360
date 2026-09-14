@@ -449,6 +449,12 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeurActifs)
             settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurExtras)
+            // Nouveau système : vide les éléments personnalisés à l'onboarding
+            // (les éléments par défaut du profil seront calculés par ActivationProfil)
+            // On ne touche pas à MODULES_ELEMENTS s'il existe déjà pour permettre reprise
+            if (settingsStore.get(SettingsStore.Keys.MODULES_ELEMENTS) == null) {
+                settingsStore.set(SettingsStore.Keys.MODULES_ELEMENTS, "")
+            }
         }
     }
 

@@ -1806,4 +1806,35 @@
     <string name="obn_vente_sans_stock_sous">Autoriser la vente sans stock physique — drop, achat à la commande ou service. Le stock pourra devenir négatif.</string>
     <string name="obn_regle_dor">Règle d\'or : Achat → Stock · Production → Stock · Vente → Stock, sauf vente sans stock</string>
     <string name="obn_stock_requis">Le stock est requis : tu achètes ou tu produis, tu as forcément un stock.</string>
+    <!-- Activation profil : module inactif -->
+    <string name="module_inactif_titre">%1$s non actif</string>
+    <string name="module_inactif_message">Le module %1$s n'est pas activé pour le profil %2$s.</string>
+    <string name="module_inactif_explication">Activez-le depuis les réglages ou choisissez un profil qui l'inclut.</string>
+    <string name="module_inactif_retour">Retour à l'accueil</string>
+    <string name="module_inactif_activer">Activer ce module</string>
+
+    <!-- Réglages activation -->
+    <string name="activation_titre">Activation des modules</string>
+    <string name="activation_sous_titre">Gérez le profil d'activité et les modules actifs dans toute l'application.</string>
+    <string name="activation_profil_actuel">Profil actuel</string>
+    <string name="activation_modules_actifs">Modules actifs (%1$d)</string>
+    <string name="activation_elements_actifs">Éléments actifs</string>
+    <string name="activation_module_actif">Actif</string>
+    <string name="activation_module_inactif">Inactif</string>
+    <string name="activation_element_actif">Actif</string>
+    <string name="activation_element_inactif">Inactif</string>
+    <string name="activation_ajouter_module">Ajouter</string>
+    <string name="activation_retirer_module">Retirer</string>
+    <string name="activation_vente_sans_stock">Vente sans stock</string>
+    <string name="activation_vente_sans_stock_desc">Autorise la vente sans stock physique (drop, service). Le stock peut devenir négatif.</string>
+    <string name="activation_palier">Taille de l'entreprise</string>
+    <string name="activation_recommande">Recommandé</string>
+    <string name="activation_verrouille">Verrouillé par le profil</string>
+    <string name="activation_personnalise">Personnalisé</string>
+    <string name="activation_elements_titre">Éléments du module %1$s</string>
+    <string name="activation_elements_sous">Cochez les fonctionnalités actives pour ce module.</string>
+    <string name="activation_enregistre">Activation mise à jour.</string>
+    <string name="activation_changer_profil">Changer de profil</string>
+    <string name="activation_confirmer_changement">Changer de profil va recalculer les modules actifs. Les modules personnalisés hors nouveau profil seront conservés si compatibles. Continuer ?</string>
 </resources>
+<!-- Temp insert will be replaced -->

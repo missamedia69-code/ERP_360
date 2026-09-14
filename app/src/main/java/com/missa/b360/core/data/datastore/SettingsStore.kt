@@ -36,6 +36,8 @@ class SettingsStore @Inject constructor(
         const val PROFIL_ACTIVITE = "profil_activite"
         const val MODULES_ACTIFS = "modules_actifs"
         const val MODULES_SUPPORT = "modules_support"
+        /** Éléments (sous-fonctionnalités) personnalisés par module : JSON {"ACH":["Fournisseurs",...]} */
+        const val MODULES_ELEMENTS = "modules_elements"
 
         /** Modules épinglés dans la barre du bas (RA-22), choisis par le Propriétaire. */
         const val BARRE_MODULES = "barre_modules"
