@@ -134,13 +134,22 @@ fun AdminReglagesScreen(
                 Spacer(Modifier.height(10.dp))
                 HorizontalDivider(color = MissaBorder)
                 Spacer(Modifier.height(10.dp))
-                // Palier
+                // Palier — amélioré avec badges et descriptions d'impact
                 MissaSelecteurBleu(
                     label = stringResource(R.string.activation_palier),
-                    options = PalierTaille.entries.map { MissaOption(it.name, stringResource(it.labelRes)) },
+                    options = PalierTaille.entries.map { palier ->
+                        MissaOption(
+                            cle = palier.name,
+                            titre = stringResource(palier.labelRes),
+                            sousTitre = stringResource(palier.impactRes),
+                            badge = palier.tranche,
+                            badgeSecondaire = "${palier.emoji} ${palier.modulesDebloques}",
+                        )
+                    },
                     selectionCle = activation.palier?.name,
                     onSelection = { cle -> runCatching { PalierTaille.valueOf(cle) }.getOrNull()?.let { viewModel.changerPalier(it) } },
                     placeholder = stringResource(R.string.obn_effectif_placeholder),
+                    titreDialogue = stringResource(R.string.palier_choisir_titre),
                 )
                 Spacer(Modifier.height(10.dp))
                 // Vente sans stock

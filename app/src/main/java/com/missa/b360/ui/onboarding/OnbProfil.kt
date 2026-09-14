@@ -169,7 +169,13 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             MissaSelecteurBleu(
                 label = stringResource(R.string.obn_effectif_label),
                 options = PalierTaille.entries.map { palier ->
-                    MissaOption(cle = palier.name, titre = stringResource(palier.labelRes))
+                    MissaOption(
+                        cle = palier.name,
+                        titre = stringResource(palier.labelRes),
+                        sousTitre = stringResource(palier.impactRes),
+                        badge = palier.tranche,
+                        badgeSecondaire = "${palier.emoji} ${palier.modulesDebloques}",
+                    )
                 },
                 selectionCle = viewModel.palier?.name,
                 onSelection = { cle ->
@@ -179,6 +185,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 icone = Icons.Outlined.Groups,
                 enabled = !viewModel.enregistrementEnCours,
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
+                titreDialogue = stringResource(R.string.palier_choisir_titre),
             )
         }
     }

@@ -200,12 +200,38 @@ fun MissaSelecteurBleu(
                     color = Color.White.copy(alpha = 0.75f),
                 )
                 Spacer(Modifier.height(2.dp))
-                Text(
-                    text = choisie?.titre ?: placeholder,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (choisie?.badge != null) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = Color.White.copy(alpha = 0.22f),
+                        ) {
+                            Text(
+                                text = choisie.badge,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(7.dp))
+                    }
+                    Text(
+                        text = choisie?.titre ?: placeholder,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
+                if (choisie?.sousTitre != null) {
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = choisie.sousTitre,
+                        fontSize = 11.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        maxLines = 1,
+                    )
+                }
             }
             Icon(
                 imageVector = Icons.Outlined.ArrowDropDown,

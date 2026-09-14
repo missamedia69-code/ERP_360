@@ -76,6 +76,16 @@
     <string name="palier_p5">Grande (250–999)</string>
     <string name="palier_p6">Très grande / Groupe (1000+)</string>
 
+    <string name="palier_p1_desc">Solo - modules essentiels, sans RH/CRM</string>
+    <string name="palier_p2_desc">Micro-équipe - gestion simple, sans RH/CRM</string>
+    <string name="palier_p3_desc">Petite - débloque RH et CRM si vente</string>
+    <string name="palier_p4_desc">Moyenne - RH et CRM recommandés, Logistique si stock</string>
+    <string name="palier_p5_desc">Grande - structure complète, tous supports transverses</string>
+    <string name="palier_p6_desc">Groupe - tous modules support, pilotage avancé</string>
+    <string name="palier_effectif_badge">Effectif</string>
+    <string name="palier_choisir_titre">Taille de l'entreprise</string>
+    <string name="palier_choisir_sous">L'effectif influence les modules recommandés (RH, CRM, etc.)</string>
+
     <string name="ob_nom_entreprise">Nom de l\'entreprise</string>
     <string name="ob_votre_nom">Votre nom</string>
     <string name="ob_pays">Pays</string>
