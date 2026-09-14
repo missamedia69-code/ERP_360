@@ -67,12 +67,6 @@ class SettingsStore @Inject constructor(
         Keys.VERROU_PAIEMENTS,
     )
 
-    private val lockedValues = setOf(
-        Keys.DEVISE,
-        Keys.REFERENTIEL_COMPTABLE,
-        Keys.REFERENTIEL_PAIE,
-    )
-
     fun observe(key: String): Flow<String?> =
         context.dataStore.data.map { prefs -> prefs[stringPreferencesKey(key)] }
 

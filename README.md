@@ -5,7 +5,7 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
-  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0773a-erp-360">
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a0db-erp-360">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
@@ -16,7 +16,9 @@ d'activité**. Implémentation du cahier de charge **E9**.
 > **Offline-first** : aucune donnée ne quitte le téléphone. L'application démarre
 > **sans aucune donnée d'exemple** — tout est créé par l'utilisateur au fil de l'onboarding.
 
-> **Branche de travail actuelle : `arena/01a0773a-erp-360` — version *Accueil seul*.** L'accueil est la référence visuelle figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par un dans la même charte.
+> **Branche de travail actuelle : `arena/01a0a0db-erp-360` — version *Accueil seul*.** Elle
+> intègre la fusion de `arena/01a0773a-erp-360` (schéma Room 12, règles de validation des
+> modules/profils, PIN à 4 chiffres). L'accueil est la référence visuelle figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par un dans la même charte.
 
 ---
 
@@ -58,7 +60,7 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 
 ## 🌍 Internationalisation
 
-5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文. Changement à chaud (per-app language). `python3 .github/scripts/verifier_traductions.py` garantit la parité (1695 clés).
+5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文. Changement à chaud (per-app language). `python3 .github/scripts/verifier_traductions.py` garantit la parité (1699 clés).
 
 ---
 
@@ -67,13 +69,13 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 | Couche | Choix |
 |---|---|
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle Kotlin DSL (version catalog) |
-| UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) — `MissaDesign` (`MissaCanvas` `#E6FFFA`, `MissaPanel` 14dp/bord `#E2E8F0`, `MissaTopAppBar` blanche) |
+| UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) — `MissaDesign` (`MissaCanvas` `#F8F9FD`, `MissaPanel` 14dp/bord `#CBD5E8`, `MissaTopAppBar` blanche) |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
 | Persistance | **Room 2.8 (KSP)** — 40 entités, base **v12**, migrations 1→12 |
 | Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
 | Injection | **Hilt 2.60** |
 | Tâches de fond | **WorkManager** (purge journal 12 mois) |
-| Sécurité | **security-crypto**, PIN PBKDF2 |
+| Sécurité | PIN PBKDF2 (PBKDF2WithHmacSHA256, 120 000 itérations, sel 128 bits) — aucune dépendance de chiffrement tierce |
 | Cible | minSdk **26** · targetSdk **36** |
 
 ---
@@ -89,6 +91,7 @@ app/src/main/java/com/missa/b360/
 ├── ui/onboarding/      # langue → profil (ASV/APSV en tête) → entreprise → PIN
 ├── ui/home/            # HomeScreen.kt — référence visuelle
 ├── ui/components/      # PlaceholderScreen.kt (Scaffold + MissaTopAppBar + MissaEmptyState)
+├── ui/clients/         # ⏳ placeholder + parcours client réel conservé (ClientFlowScreen.kt)
 ├── ui/stock|sales|purchases|...  # ⏳ placeholders (à reconstruire)
 └── ui/navigation/      # ModuleRegistry (14 modules, barre 3 onglets max)
 ```
@@ -156,7 +159,7 @@ sur `ProductType` via `ProduitRules`) :
 | **A — Socle** | Gradle, Hilt, Room, DataStore, PIN, Licence, Journal, Séquences, Nav | ✅ |
 | **B — Onboarding** | langue → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK + vente sans stock) |
 | **C — Accueil** | `HomeScreen` à l'identique maquette + barre 5 items + logo GREEN FARM | ✅ |
-| **D — Placeholders** | 35 écrans en placeholder cohérent pour repartir propre | ✅ (actuel) |
+| **D — Placeholders** | 36 écrans en placeholder cohérent pour repartir propre | ✅ (actuel) |
 | **E — Stock** | Hub Stock (valeur, alertes, actions) | ⏳ prochain |
 | **F — Achats** | Hub Achats (fournisseurs, commandes, réceptions) | ⏳ |
 | **G — Ventes** | Hub Ventes (devis, commandes, retours) + `venteSansStock` | ⏳ |
@@ -169,20 +172,21 @@ sur `ProductType` via `ProduitRules`) :
 Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
 
 ```bash
-git clone -b arena/01a0773a-erp-360 https://github.com/missamedia69-code/ERP_360.git
+git clone -b arena/01a0a0db-erp-360 https://github.com/missamedia69-code/ERP_360.git
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 python3 .github/scripts/verifier_traductions.py
 ```
 
 > Après `git clean -fdx`, recrée `local.properties` :
-> `sdk.dir=D:/Android_Studio` (ton SDK contient `platforms`/`build-tools` directement)
+> `sdk.dir=<chemin de ton SDK Android>` — par exemple `D:/Android_Studio` sous Windows
+> ou `~/Android/Sdk` sous Linux/macOS.
 
 ---
 
 ## 🔁 Intégration continue
 
-Chaque poussée sur `arena/01a0773a-erp-360` déclenche `.github/workflows/android.yml` :
+Chaque poussée sur `arena/01a0a0db-erp-360` déclenche `.github/workflows/android.yml` :
 
 | Étape | Ce qu'elle garantit |
 |---|---|
