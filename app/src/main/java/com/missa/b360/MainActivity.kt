@@ -4,14 +4,9 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.ui.navigation.AppNavHost
-import com.missa.b360.ui.screens.SplashVideoScreen
 import com.missa.b360.ui.theme.Erp360Theme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -25,39 +20,21 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsStore: SettingsStore
 
-    /**
-     * État de secours pour qu'une recréation exceptionnelle ne relance pas
-     * l'introduction vidéo au milieu de l'onboarding ou des réglages.
-     */
-    private var introTerminee = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        introTerminee = savedInstanceState?.getBoolean(STATE_INTRO_TERMINEE, false) ?: false
         enableEdgeToEdge()
         applyStoredLocale()
         applyStoredFormats()
         setContent {
             Erp360Theme {
-                var showSplashVideo by remember { mutableStateOf(!introTerminee) }
-                if (showSplashVideo) {
-                    SplashVideoScreen(
-                        onFinished = {
-                            introTerminee = true
-                            showSplashVideo = false
-                        },
-                    )
-                } else {
-                    AppNavHost()
-                }
+                // L'introduction est décidée par le graphe de navigation, qui
+                // sait si l'installation est déjà configurée. La jouer ici la
+                // relançait à chaque recréation d'activité.
+                AppNavHost()
             }
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_INTRO_TERMINEE, introTerminee)
-        super.onSaveInstanceState(outState)
-    }
 
     /** Applique au démarrage la langue déjà enregistrée lorsqu'elle diffère réellement. */
     private fun applyStoredLocale() {
@@ -90,6 +67,5 @@ class MainActivity : AppCompatActivity() {
     }
 
     private companion object {
-        const val STATE_INTRO_TERMINEE = "intro_terminee"
     }
 }

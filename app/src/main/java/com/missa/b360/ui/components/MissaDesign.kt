@@ -124,7 +124,7 @@ fun MissaTopAppBar(
             }
         },
         actions = actions,
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.White,
             titleContentColor = MissaInk,
             navigationIconContentColor = MissaInk,

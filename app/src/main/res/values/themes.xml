@@ -12,5 +12,12 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
+        <!-- Aucune animation de bascule : le fondu par défaut laissait
+             apparaître un fond sombre lors d'un changement de langue. -->
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">false</item>
+        <!-- Le fond reste opaque : une fenêtre translucide montre ce qu'il y a
+             derrière, c'est-à-dire du noir. -->
+        <item name="android:windowIsTranslucent">false</item>
     </style>
 </resources>

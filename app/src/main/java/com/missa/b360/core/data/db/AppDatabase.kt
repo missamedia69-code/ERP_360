@@ -7,11 +7,17 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EmployeeDao
+import com.missa.b360.core.data.dao.EquipementDao
+import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.EnterpriseDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
+import com.missa.b360.core.data.dao.InterventionDao
+import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
@@ -32,11 +38,23 @@ import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.CompteTresorerieEntity
 import com.missa.b360.core.data.entity.EmployeeEntity
+import com.missa.b360.core.data.entity.EquipementEntity
+import com.missa.b360.core.data.entity.GroupeAchatEntity
+import com.missa.b360.core.data.entity.GroupeArticleEntity
+import com.missa.b360.core.data.entity.GroupeComptabiliteEntity
+import com.missa.b360.core.data.entity.GroupeMaintenanceEntity
+import com.missa.b360.core.data.entity.GroupeProductionEntity
+import com.missa.b360.core.data.entity.GroupeStockEntity
+import com.missa.b360.core.data.entity.GroupeVenteEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
+import com.missa.b360.core.data.entity.MouvementTresorerieEntity
+import com.missa.b360.core.data.entity.InterventionEntity
+import com.missa.b360.core.data.entity.NonConformiteEntity
 import com.missa.b360.core.data.entity.NotificationEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.PaymentMethodEntity
@@ -81,6 +99,18 @@ import com.missa.b360.core.data.entity.UserEntity
         BadgeLoyaltyEntity::class,
         FournisseurEntity::class,
         OperationRecordEntity::class,
+        CompteTresorerieEntity::class,
+        MouvementTresorerieEntity::class,
+        NonConformiteEntity::class,
+        EquipementEntity::class,
+        InterventionEntity::class,
+        GroupeArticleEntity::class,
+        GroupeStockEntity::class,
+        GroupeAchatEntity::class,
+        GroupeVenteEntity::class,
+        GroupeProductionEntity::class,
+        GroupeMaintenanceEntity::class,
+        GroupeComptabiliteEntity::class,
         ProductCategoryEntity::class,
         ProductEntity::class,
         ProductStockEntity::class,
@@ -89,7 +119,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 7,
+    version = 12,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -114,8 +144,17 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun employeeDao(): EmployeeDao
     abstract fun absenceDao(): AbsenceDao
     abstract fun taskDao(): TaskDao
+    abstract fun compteTresorerieDao(): CompteTresorerieDao
+    abstract fun mouvementTresorerieDao(): MouvementTresorerieDao
+    abstract fun nonConformiteDao(): NonConformiteDao
+    abstract fun equipementDao(): EquipementDao
+    abstract fun interventionDao(): InterventionDao
+    abstract fun groupeArticleDao(): GroupeArticleDao
 
     companion object {
+        /** Version du schéma — doit rester alignée sur l'annotation @Database. */
+        const val VERSION_SCHEMA = 7
+
         /** v1 → v2 (Phase D) : table fournisseurs. */
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
@@ -285,6 +324,225 @@ abstract class AppDatabase : RoomDatabase() {
                     "CREATE TABLE IF NOT EXISTS `tasks` (" +
                         "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `titre` TEXT NOT NULL, " +
                         "`notes` TEXT, `statut` TEXT NOT NULL, `echeance` INTEGER, `createdAt` INTEGER NOT NULL)",
+                )
+            }
+        }
+
+        /**
+         * v7 → v8 : identifiants légaux de l'entreprise (numéro fiscal NIU/NIF et
+         * registre du commerce RCCM), obligatoires sur les pièces de vente.
+         * Colonnes nullables : aucune donnée existante n'est perdue.
+         */
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `numeroFiscal` TEXT")
+                db.execSQL("ALTER TABLE `enterprise` ADD COLUMN `registreCommerce` TEXT")
+            }
+        }
+
+        /**
+         * v8 → v9 : module Trésorerie — comptes (caisse, banque, mobile money)
+         * et mouvements. Deux tables neuves : aucune donnée existante n'est
+         * touchée, la migration est donc sans risque de perte.
+         */
+        /**
+         * v9 → v10 : modules Qualité et Maintenance — registre des
+         * non-conformités, parc d'équipements et interventions. Trois tables
+         * neuves, aucune donnée existante touchée.
+         */
+        /**
+         * v10 → v11 : les pièces portent l'identifiant du tiers concerné.
+         *
+         * Les pièces existantes gardent `tiersId` à NULL ; le rapprochement par
+         * nom reste actif pour elles, ce qui préserve l'historique déjà saisi.
+         */
+        /**
+         * v11 → v12 : groupes d'articles et leurs extensions métier.
+         *
+         * Les règles jusqu'ici codées en dur dans `ProductType` deviennent des
+         * données : chaque groupe déclare s'il est stocké, valorisé, vendable,
+         * maintenable, et porte ses comptes selon le référentiel comptable en
+         * vigueur. Les articles reçoivent un rattachement facultatif, ce qui
+         * laisse fonctionner les fiches déjà saisies.
+         */
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`code` TEXT NOT NULL, `nom` TEXT NOT NULL, `description` TEXT, " +
+                        "`actif` INTEGER NOT NULL, `stocke` INTEGER NOT NULL, " +
+                        "`valorise` INTEGER NOT NULL, `immobilisation` INTEGER NOT NULL, " +
+                        "`methodeValorisation` TEXT, `createdAt` INTEGER NOT NULL, " +
+                        "`updatedAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_code` " +
+                        "ON `item_groups` (`code`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_stock` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `compteStock` TEXT, `compteEcartInventaire` TEXT, `gestionLotObligatoire` INTEGER NOT NULL, `gestionSerieObligatoire` INTEGER NOT NULL, `gestionPeremptionObligatoire` INTEGER NOT NULL, `stockNegatifAutorise` INTEGER NOT NULL, `seuilReapproDefaut` REAL NOT NULL, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_stock_itemGroupId` " +
+                        "ON `item_groups_stock` (`itemGroupId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_purchase` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `compteCharge` TEXT, `compteImmobilisation` TEXT, `achetable` INTEGER NOT NULL, `consommable` INTEGER NOT NULL, `immobilisable` INTEGER NOT NULL, `delaiLivraisonJours` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_purchase_itemGroupId` " +
+                        "ON `item_groups_purchase` (`itemGroupId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_sales` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `compteProduit` TEXT, `vendable` INTEGER NOT NULL, `service` INTEGER NOT NULL, `soumisTaxe` INTEGER NOT NULL, `livraisonRequise` INTEGER NOT NULL, `garantieApplicable` INTEGER NOT NULL, `garantieMois` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_sales_itemGroupId` " +
+                        "ON `item_groups_sales` (`itemGroupId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_production` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `produisible` INTEGER NOT NULL, `fantome` INTEGER NOT NULL, `coProduit` INTEGER NOT NULL, `sousProduit` INTEGER NOT NULL, `gammeRequise` INTEGER NOT NULL, `nomenclatureRequise` INTEGER NOT NULL, `soustraitable` INTEGER NOT NULL, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_production_itemGroupId` " +
+                        "ON `item_groups_production` (`itemGroupId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_maintenance` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `equipementMaintenable` INTEGER NOT NULL, `planRequis` INTEGER NOT NULL, `suiviHeures` INTEGER NOT NULL, `suiviCompteur` INTEGER NOT NULL, `critiqueSecurite` INTEGER NOT NULL, `etalonnageRequis` INTEGER NOT NULL, `mtbfHeures` REAL NOT NULL, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_maintenance_itemGroupId` " +
+                        "ON `item_groups_maintenance` (`itemGroupId`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `item_groups_accounting` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`itemGroupId` INTEGER NOT NULL, `categorieTaxe` TEXT, `amortissable` INTEGER NOT NULL, `methodeAmortissement` TEXT, `dureeAmortissementAnnees` INTEGER NOT NULL, `stockValorise` INTEGER NOT NULL, `centreCout` TEXT, `centreProfit` TEXT, " +
+                        "FOREIGN KEY(`itemGroupId`) REFERENCES `item_groups`(`id`) " +
+                        "ON UPDATE NO ACTION ON DELETE CASCADE)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_groups_accounting_itemGroupId` " +
+                        "ON `item_groups_accounting` (`itemGroupId`)",
+                )
+                db.execSQL("ALTER TABLE `products` ADD COLUMN `itemGroupId` INTEGER")
+            }
+        }
+
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE `operation_records` ADD COLUMN `tiersId` INTEGER")
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_operation_records_tiersId` " +
+                        "ON `operation_records` (`tiersId`)",
+                )
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `qualite_non_conformites` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`date` INTEGER NOT NULL, `titre` TEXT NOT NULL, `description` TEXT, " +
+                        "`gravite` TEXT NOT NULL, `origine` TEXT NOT NULL, `statut` TEXT NOT NULL, " +
+                        "`reference` TEXT, `responsable` TEXT, `actionCorrective` TEXT, " +
+                        "`cout` REAL NOT NULL, `dateResolution` INTEGER, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_qualite_non_conformites_statut` " +
+                        "ON `qualite_non_conformites` (`statut`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_qualite_non_conformites_date` " +
+                        "ON `qualite_non_conformites` (`date`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `maintenance_equipements` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`nom` TEXT NOT NULL, `code` TEXT, `type` TEXT NOT NULL, " +
+                        "`siteId` INTEGER, `dateMiseEnService` INTEGER, " +
+                        "`periodiciteJours` INTEGER NOT NULL, `actif` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_maintenance_equipements_nom` " +
+                        "ON `maintenance_equipements` (`nom`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `maintenance_interventions` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`equipementId` INTEGER NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`type` TEXT NOT NULL, `description` TEXT NOT NULL, `technicien` TEXT, " +
+                        "`cout` REAL NOT NULL, `dureeHeures` REAL NOT NULL, " +
+                        "`statut` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_maintenance_interventions_equipementId` " +
+                        "ON `maintenance_interventions` (`equipementId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_maintenance_interventions_date` " +
+                        "ON `maintenance_interventions` (`date`)",
+                )
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tresorerie_comptes` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`nom` TEXT NOT NULL, `type` TEXT NOT NULL, `etablissement` TEXT, " +
+                        "`numero` TEXT, `soldeInitial` REAL NOT NULL, " +
+                        "`actif` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_tresorerie_comptes_nom` " +
+                        "ON `tresorerie_comptes` (`nom`)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `tresorerie_mouvements` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`compteId` INTEGER NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`sens` TEXT NOT NULL, `montant` REAL NOT NULL, " +
+                        "`categorie` TEXT NOT NULL, `libelle` TEXT NOT NULL, " +
+                        "`tiers` TEXT, `modePaiement` TEXT, `reference` TEXT, " +
+                        "`transfertId` TEXT, `rapproche` INTEGER NOT NULL, " +
+                        "`notes` TEXT, `createdAt` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_compteId` " +
+                        "ON `tresorerie_mouvements` (`compteId`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_date` " +
+                        "ON `tresorerie_mouvements` (`date`)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_tresorerie_mouvements_transfertId` " +
+                        "ON `tresorerie_mouvements` (`transfertId`)",
                 )
             }
         }

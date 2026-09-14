@@ -57,14 +57,14 @@ class ReturnRulesTest {
     fun `le restant retournable est la quantité vendue moins les avoirs precedents`() {
         val original = facture()
         val sansAvoirs = ReturnRules.restantParLigne(original, emptyList())
-        assertEquals(5.0, sansAvoirs[ReturnRules.lineKey(original.lines[0])], 0.0001)
-        assertEquals(2.0, sansAvoirs[ReturnRules.lineKey(original.lines[1])], 0.0001)
+        assertEquals(5.0, sansAvoirs.getValue(ReturnRules.lineKey(original.lines[0])), 0.0001)
+        assertEquals(2.0, sansAvoirs.getValue(ReturnRules.lineKey(original.lines[1])), 0.0001)
 
         val avecRetour = ReturnRules.restantParLigne(
             original,
             listOf(avoir(listOf(SaleLine(id = 9, name = "A", unitPrice = 10.0, quantity = 2.0, productId = 7L)))),
         )
-        assertEquals(3.0, avecRetour[ReturnRules.lineKey(original.lines[0])], 0.0001)
+        assertEquals(3.0, avecRetour.getValue(ReturnRules.lineKey(original.lines[0])), 0.0001)
     }
 
     @Test
@@ -124,7 +124,7 @@ class ReturnRulesTest {
                 PurchaseLine(4, "Nul", 5.0, 0.0, productId = 9L),
             ),
         )
-        assertEquals(3.5, besoins[7L], 0.0001)
+        assertEquals(3.5, besoins.getValue(7L), 0.0001)
         assertEquals(1, besoins.size)
     }
 

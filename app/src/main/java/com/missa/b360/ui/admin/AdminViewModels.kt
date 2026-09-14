@@ -35,6 +35,8 @@ class ReglagesViewModel @Inject constructor(
         val adresse: String = "",
         val telephone: String = "",
         val email: String = "",
+        val numeroFiscal: String = "",
+        val registreCommerce: String = "",
         val profil: ProfilActivite? = null,
         val palier: PalierTaille? = null,
         val langue: String = "fr",
@@ -65,6 +67,8 @@ class ReglagesViewModel @Inject constructor(
                 adresse = e?.adresse ?: "",
                 telephone = e?.telephone ?: "",
                 email = e?.email ?: "",
+                numeroFiscal = e?.numeroFiscal ?: "",
+                registreCommerce = e?.registreCommerce ?: "",
                 profil = profilEnregistre?.let { runCatching { ProfilActivite.valueOf(it) }.getOrNull() },
                 palier = palierEnregistre?.let { runCatching { PalierTaille.valueOf(it) }.getOrNull() },
                 langue = langue,
@@ -97,6 +101,10 @@ class ReglagesViewModel @Inject constructor(
     fun changerAdresse(v: String) { _state.value = _state.value.copy(adresse = v) }
     fun changerTelephone(v: String) { _state.value = _state.value.copy(telephone = v) }
     fun changerEmail(v: String) { _state.value = _state.value.copy(email = v) }
+    fun changerNumeroFiscal(v: String) { _state.value = _state.value.copy(numeroFiscal = v) }
+    fun changerRegistreCommerce(v: String) {
+        _state.value = _state.value.copy(registreCommerce = v)
+    }
 
     fun sauvegarderInfos() {
         val s = _state.value
@@ -106,6 +114,8 @@ class ReglagesViewModel @Inject constructor(
                 adresse = s.adresse,
                 telephone = s.telephone,
                 email = s.email,
+                numeroFiscal = s.numeroFiscal,
+                registreCommerce = s.registreCommerce,
             )
             _state.value = _state.value.copy(sauvegardeMsg = if (ok) "ok" else "err")
         }

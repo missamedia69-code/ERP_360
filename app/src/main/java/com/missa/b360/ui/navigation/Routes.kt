@@ -9,6 +9,8 @@ object Routes {
     const val NOTIFICATIONS = "notifications"
 
     // Module Stock — formulaires dédiés (Phase E : produits & mouvements)
+    /** Liste des articles : le module ouvre désormais sur son hub. */
+    const val STOCK_ARTICLES = "stock_articles"
     const val STOCK_PRODUCT_FORM = "stock_product_form"
     const val STOCK_MOVEMENT_FORM = "stock_movement_form"
     const val STOCK_TRANSFER_FORM = "stock_transfer_form"

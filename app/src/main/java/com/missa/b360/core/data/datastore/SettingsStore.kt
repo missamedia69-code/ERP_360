@@ -26,7 +26,7 @@ private val Context.dataStore: androidx.datastore.core.DataStore<Preferences> by
  */
 @Singleton
 class SettingsStore @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) {
     // --- Clés de réglages ---
     object Keys {
@@ -34,6 +34,11 @@ class SettingsStore @Inject constructor(
         const val DEVISE = "devise"
         const val PAYS = "pays"
         const val PROFIL_ACTIVITE = "profil_activite"
+        const val MODULES_ACTIFS = "modules_actifs"
+        const val MODULES_SUPPORT = "modules_support"
+
+        /** Modules épinglés dans la barre du bas (RA-22), choisis par le Propriétaire. */
+        const val BARRE_MODULES = "barre_modules"
         const val PALIER_TAILLE = "palier_taille"
         const val ONBOARDING_TERMINE = "onboarding_termine"
         const val VIDEO_SPLASH_ACTIVE = "video_splash_active"
@@ -47,6 +52,8 @@ class SettingsStore @Inject constructor(
         const val FUSEAU_HORAIRE = "fuseau_horaire"
         const val FORMAT_DATE = "format_date"
         const val FORMAT_NOMBRES = "format_nombres"
+        const val RETENTION_JOURNAL = "retention_journal"
+        const val VENTE_SANS_STOCK = "vente_sans_stock"
         const val PIN_FAIL_COUNT = "pin_fail_count"
         const val PIN_LOCK_UNTIL = "pin_lock_until"
         const val PIN_HASH = "pin_hash"

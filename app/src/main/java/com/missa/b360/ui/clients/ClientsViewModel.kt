@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
+import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
@@ -49,7 +50,7 @@ class ClientsViewModel @Inject constructor(
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
     private val siteUseCases: SiteUseCases,
-    private val rappelPaiement: RappelPaiementUseCase,
+    private val rappelPaiementUseCase: RappelPaiementUseCase,
 ) : ViewModel() {
 
     /** Le module Client montre aussi les comptes désactivés, contrairement au sélecteur Vente. */
@@ -61,6 +62,10 @@ class ClientsViewModel @Inject constructor(
 
     private val _deviseEntreprise = MutableStateFlow<String?>(null)
     val deviseEntreprise: StateFlow<String?> = _deviseEntreprise
+
+    /** Fiche entreprise : mentions légales du relevé de compte client. */
+    private val _entreprise = MutableStateFlow<EnterpriseEntity?>(null)
+    val entreprise: StateFlow<EnterpriseEntity?> = _entreprise
 
     private val _codePaysParDefaut = MutableStateFlow<String?>(null)
     val codePaysParDefaut: StateFlow<String?> = _codePaysParDefaut
@@ -110,7 +115,7 @@ class ClientsViewModel @Inject constructor(
             val liste = clients.first()
             _soldes.value = liste.associate { c ->
                 val s = try {
-                    rappelPaiement.soldeClient(c.id)
+                    rappelPaiementUseCase.soldeClient(c.id)
                 } catch (e: CancellationException) {
                     throw e
                 } catch (_: Exception) {
@@ -123,7 +128,7 @@ class ClientsViewModel @Inject constructor(
 
     fun rappelPaiement(clientId: Long) {
         viewModelScope.launch {
-            when (val r = rappelPaiement(clientId)) {
+            when (val r = rappelPaiementUseCase(clientId)) {
                 is RappelPaiementUseCase.Result.Succes -> {
                     _rappelMessage.value = r.reference
                     rafraichirSoldes()
@@ -141,6 +146,7 @@ class ClientsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val entreprise = getEnterprise()
+            _entreprise.value = entreprise
             _deviseEntreprise.value = entreprise?.devise
             val codeEnregistre = settingsStore.get(SettingsStore.Keys.PAYS)
                 ?.takeIf { Iso4217.indicatifTelephone(it) != null }

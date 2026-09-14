@@ -11,6 +11,7 @@ import com.missa.b360.core.domain.model.PurchaseLine
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.missa.b360.core.util.Iso4217
 
 /** Panier d'une facture fournisseur en cours — jamais prérempli (aucune donnée fictive). */
 data class PurchaseUiState(
@@ -67,10 +69,16 @@ class PurchasesViewModel @Inject constructor(
     val purchases: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.ACHATS)
 
     /** Catalogue produits avec stock courant — les prix affichés sont les prix d'achat. */
+    /**
+     * Catalogue commandable auprès d'un fournisseur.
+     *
+     * Un produit fabriqué en interne en est exclu : s'il fallait
+     * l'approvisionner, ce serait un article acheté-revendu.
+     */
     val products: StateFlow<List<ProductWithStock>> = combine(
         observeProducts(),
         observeStock(),
-    ) { produits, stocks -> ProductStocks.combine(produits, stocks) }
+    ) { produits, stocks -> ProductStocks.combine(ProduitRules.achetables(produits), stocks) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val suppliers: StateFlow<List<FournisseurEntity>> = fournisseurDao.observeAll()
@@ -85,8 +93,8 @@ class PurchasesViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val devise: StateFlow<String> = getEnterprise.observer()
-        .map { it?.devise ?: "XAF" }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "XAF")
+        .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     private val _uiState = MutableStateFlow(PurchaseUiState())
     val uiState: StateFlow<PurchaseUiState> = _uiState

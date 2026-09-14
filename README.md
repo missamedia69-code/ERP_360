@@ -5,127 +5,130 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0773a-erp-360">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
-pour les TPE/PMI : il fonctionne **100 % hors-ligne**, couvre **13 modules métier**, parle
-**5 langues** (FR · EN · ES · AR-RTL · ZH) et gère le **multi-site** avec des **profils
-d'activité A–H**. Implémentation du cahier de charge **E9** (`e9-cahier-de-charge.md`).
+pour les TPE/PMI : il fonctionne **100 % hors-ligne**, couvre **14 modules métier et support**,
+parle **5 langues** (FR · EN · ES · AR-RTL · ZH) et gère le **multi-site** avec des **profils
+d'activité**. Implémentation du cahier de charge **E9**.
 
 > **Offline-first** : aucune donnée ne quitte le téléphone. L'application démarre
 > **sans aucune donnée d'exemple** — tout est créé par l'utilisateur au fil de l'onboarding.
 
+> **Branche de travail actuelle : `arena/01a0773a-erp-360` — version *Accueil seul*.** L'accueil est la référence visuelle figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par un dans la même charte.
+
 ---
 
-## 🧩 Les 13 modules
+## 🧩 Modules — état au 14/09/2026
 
-| Module | Barre du bas | Description |
-|---|:---:|---|
-| **9.1 Administration & Paramétrage** | ☰ | Réglages verrouillables, licence, sauvegarde, journal d'audit, utilisateurs & rôles, multi-site |
-| **Vente** | ✅ | Devis → commande → facture, numérotation automatique, calculs taxes |
-| **Stock** | ✅ | Produits (form. 1 page §7), mouvements entrées/sorties/ajustements + transferts entre entrepôts, alertes de seuil — persistance réelle, transactionnelle |
-| **Clients** | ✅ | Fiches détaillées (NIF, contacts & adresses multiples, conditions de paiement), catégories, tarifs, fidélité |
-| **Finances** | ✅ | Encaissements, dépenses, moyens de paiement |
-| **Fournisseurs** | ➕ | Référentiel fournisseurs |
-| **Achats** | ➕ | Commandes et réceptions fournisseurs |
-| **Livraison** | ➕ | Suivi des livraisons |
-| **Production** | ➕ | Ordres et suivi de production |
-| **Services** | ➕ | Prestations de services |
-| **RH** | ➕ | Employés et paie |
-| **Projets** | ➕ | Suivi de projets |
-| **Reporting** | ➕ | Tableaux de bord et indicateurs |
+| Module | Barre | État | Description |
+|---|:---:|:---:|---|
+| **Accueil** | 🏠 | ✅ **Réel** | Tableau de bord (4 KPI + 8 actions + résumé + activités) — référence `HomeScreen.kt` + logo `GREEN FARM` |
+| **Vente** | ✅ | ⏳ Placeholder | Devis → commande → facture (prévu bloc `ACH-STK-VEN`) |
+| **Stock** | ✅ | ⏳ Placeholder | Produits, mouvements, transferts, inventaires — hub à reconstruire en 1er |
+| **Clients** | ✅ | ⏳ Placeholder | Fiches NIF, contacts multiples |
+| **Finances** | ✅ | ⏳ Placeholder | Encaissements/dépenses |
+| **Achats** | ➕ | ⏳ Placeholder | *1er bloc* avec Stock — `ACH→STK` obligatoire |
+| **Fournisseurs** | ➕ | ⏳ Placeholder | Référentiel fournisseurs |
+| **Livraison / Logistique / Production / Services / RH / Projets / Trésorerie / Comptabilité / CRM / Qualité / Maintenance / Reporting** | ➕ | ⏳ Placeholder | Placeholder `MissaCanvas + MissaTopAppBar + MissaEmptyState` — reconstruction progressive |
+| **9.1 Administration** | ☰ | ⏳ Placeholder | Réglages, licence, sauvegarde, journal, utilisateurs, multi-site |
 
-Navigation **RA-22** : menu ☰ (admin), cloche 🔔 (notifications internes), barre du bas
-personnalisable (Vente · Stock · Clients · Finances par défaut) et bouton **➕** donnant
-accès aux modules secondaires.
+Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 items : Accueil/Ventes/Stock/Finances/Plus) et bouton **➕**.
 
-## 👥 Profils d'activité A–H (RA-20)
+---
 
-Choisi à l'onboarding et modifiable ensuite, le profil **active dynamiquement les modules**
-pertinents pour le métier de l'entreprise (commerce, production, services…).
+## 🔀 Flux métier — règle d'or
+
+> **Tu achètes ou tu produis → t'as forcément un stock.**
+
+* `ACH → STK` et `PRO → STK` ajoutés automatiquement par `ModulesSocle.avecDependances()`
+* **1er bloc : `A-S-V`** (négoce classique) — profil `ASV` en tête
+* **2e bloc : `A-P-S-V`** (industrie) — profil `APSV` en 2e
+* `AV (A+V sans stock)` dépriorisé (legacy)
+* **Option `Vente sans stock`** (`SettingsStore.VENTE_SANS_STOCK`, `false` par défaut) : autorise `VEN` sans `STK` pour drop / achat à la commande / service. Toggle `Switch` dans l'onboarding (`OnbProfil`). Quand `OFF`, `VEN + ACH/PRO` sans `STK` → `STK` auto-ajouté. Stock négatif autorisé seulement si option `ON`.
+
+---
 
 ## 🌍 Internationalisation
 
-5 langues intégrales, y compris **arabe avec mise en page RTL** : Français (défaut) ·
-English · Español · العربية · 中文. Changement de langue à chaud (per-app language,
-AppCompatDelegate).
+5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文. Changement à chaud (per-app language). `python3 .github/scripts/verifier_traductions.py` garantit la parité (1695 clés).
+
+---
 
 ## 🛠️ Stack technique
 
 | Couche | Choix |
 |---|---|
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle Kotlin DSL (version catalog) |
-| UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) |
+| UI | **Jetpack Compose** + **Material 3** (BOM 2025.09) — `MissaDesign` (`MissaCanvas` `#E6FFFA`, `MissaPanel` 14dp/bord `#E2E8F0`, `MissaTopAppBar` blanche) |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
-| Persistance | **Room 2.8 (KSP)** — 25 entités, schémas exportés, migrations manuelles |
-| Réglages | **DataStore** (préférences + verrous d'amont) |
-| Injection | **Hilt 2.60** (+ `hilt-navigation-compose`, `@HiltWorker`) |
-| Tâches de fond | **WorkManager** (purge du journal à 12 mois, sauvegarde auto) |
-| Sécurité | **security-crypto**, PIN hashé **PBKDF2** (jamais en clair) |
-| Export | **kotlinx-serialization** (JSON) |
+| Persistance | **Room 2.8 (KSP)** — 30 entités, base **v11**, migrations 1→11 |
+| Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
+| Injection | **Hilt 2.60** |
+| Tâches de fond | **WorkManager** (purge journal 12 mois) |
+| Sécurité | **security-crypto**, PIN PBKDF2 |
 | Cible | minSdk **26** · targetSdk **36** |
+
+---
 
 ## 🏗️ Structure du code
 
 ```
 app/src/main/java/com/missa/b360/
-├── MissaApp.kt / MainActivity.kt          # Application Hilt + splash vidéo
-├── core/
-│   ├── data/          # Room : db (25 entités, v6), dao, entity, datastore (SettingsStore + verrous)
-│   ├── domain/        # model + usecase (1 règle métier = 1 UseCase, commentée // RA-xx)
-│   ├── security/      # PinHasher (PBKDF2), PinManager (verrou RA-02)
-│   ├── licensing/     # LicenceManager (essai 7 j RA-04, activation RA-05/06)
-│   ├── numbering/     # SequenceManager — numérotation atomique en transaction Room
-│   ├── journal/       # JournalManager — audit immuable (RA-18)
-│   ├── backup/        # BackupManager (RA-13)
-│   ├── notifications/ # AppNotifier — notifications internes
-│   ├── permissions/   # PermissionChecker — rôles & droits (D1/D2)
-│   └── workers/       # JournalPurgeWorker (purge 12 mois)
-├── di/                # Modules Hilt
-└── ui/
-    ├── onboarding/    # langue → profil A–H → entreprise → PIN → email → licence → checklist
-    ├── home/          # tableau de bord
-    ├── navigation/    # NavHost, Routes, ModuleRegistry (13 modules)
-    ├── admin/         # 7 écrans du module 9.1
-    ├── clients/ · fournisseurs/ · sales/ · operations/   # modules métier
-    └── components/ · theme/ · screens/
+├── core/data/          # db, dao, entity, datastore (+ VENTE_SANS_STOCK)
+├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules)
+├── ui/onboarding/      # langue → profil (ASV/APSV en tête) → entreprise → PIN
+├── ui/home/            # HomeScreen.kt — référence visuelle
+├── ui/components/      # PlaceholderScreen.kt (Scaffold + MissaTopAppBar + MissaEmptyState)
+├── ui/stock|sales|purchases|...  # ⏳ placeholders (à reconstruire)
+└── ui/navigation/      # ModuleRegistry (14 modules, barre 3 onglets max)
 ```
 
-## 📈 Avancement (phasage E9 : A → K)
+---
+
+## 📈 Avancement
 
 | Phase | Contenu | État |
 |---|---|---|
-| **A — Socle** | Gradle, Hilt, Room (schéma v6, migrations 1→6), DAOs, SettingsStore + verrous, services transverses (Pin, Licence, Journal, Séquences, Notifications, Sauvegarde, Permissions), navigation (RA-22), WorkManager purge (RA-18), 5 langues, tests unitaires | ✅ |
-| **B — Onboarding** | langue → profil A–H → entreprise/défauts → PIN (RA-01) → email (RA-03) → licence essai 7 j (RA-04) → checklist (RA-11), verrou PIN (RA-02) | ✅ |
-| **C — 9.1 Admin** | réglages (D4/RA-19), licence (RA-05/06), sauvegarde (RA-13), journal (RA-18), utilisateurs & rôles (D1/D2), multi-site (RA-21), à propos | ✅ |
-| **D → K** | Clients · Stock · Vente · Fournisseurs/Achats · Finances · Livraison/Production/Services · RH/Projets · Reporting | ⏳ En cours |
+| **A — Socle** | Gradle, Hilt, Room, DataStore, PIN, Licence, Journal, Séquences, Nav | ✅ |
+| **B — Onboarding** | langue → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK + vente sans stock) |
+| **C — Accueil** | `HomeScreen` à l'identique maquette + barre 5 items + logo GREEN FARM | ✅ |
+| **D — Placeholders** | 35 écrans en placeholder cohérent pour repartir propre | ✅ (actuel) |
+| **E — Stock** | Hub Stock (valeur, alertes, actions) | ⏳ prochain |
+| **F — Achats** | Hub Achats (fournisseurs, commandes, réceptions) | ⏳ |
+| **G — Ventes** | Hub Ventes (devis, commandes, retours) + `venteSansStock` | ⏳ |
+| **H+** | Production, Services, Projets, Finances... | ⏳ |
 
-## 📏 Conventions métier (cahier de charge §5)
-
-- **1 règle métier = 1 UseCase**, commentée de sa référence (`// RA-01`, `// RC-05`…)
-- Annulation = **compensation** — jamais de `DELETE` physique sur les pièces métier
-- Écriture unique du stock : use cases transactionnels `RecordStockMovementUseCase` / `TransferStockUseCase` — vérification de disponibilité → mise à jour du stock → mouvement + journal dans une seule transaction (§43/§44)
-- **Verrous d'amont** (devise, taxes, numérotation, paiements) : modification refusée une fois `locked` (RA-19)
-- Numérotation atomique `SequenceManager.next(type)` **en transaction Room** (aucun doublon de n° de pièce)
-- PIN hashé **PBKDF2** ; **journal d'audit immuable**, purgé automatiquement à 12 mois
-- Multi-devise/taxes figées au premier usage ; sauvegarde locale chiffrable
-- **Aucune donnée d'exemple** : la base démarre vide
+---
 
 ## 🚀 Build & lancement
 
-Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 11+.
+Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
 
 ```bash
-./gradlew assembleDebug      # compilation
-./gradlew testDebugUnitTest  # tests unitaires des règles métier (UseCases)
+git clone -b arena/01a0773a-erp-360 https://github.com/missamedia69-code/ERP_360.git
+./gradlew assembleDebug
+./gradlew testDebugUnitTest
+python3 .github/scripts/verifier_traductions.py
 ```
 
-Les tests couvrent notamment : validation clients (`ClientValidationTest`), pièces
-opérationnelles (`OperationValidationTest`), calculateur de vente (`SaleCalculatorTest`)
-et use cases du socle (`SocleUseCasesTest`).
+> Après `git clean -fdx`, recrée `local.properties` :
+> `sdk.dir=D:/Android_Studio` (ton SDK contient `platforms`/`build-tools` directement)
 
-## 📁 Annexes
+---
 
-- `branding/` — logo officiel `logo_missa.png` + script `gen_icons.ps1` de génération des icônes
-- `app/schemas/` — schémas Room exportés (traçabilité des migrations)
-- `LICENSE` — Apache License 2.0
+## 🔁 Intégration continue
+
+Chaque poussée sur `arena/01a0773a-erp-360` déclenche `.github/workflows/android.yml` :
+
+| Étape | Ce qu'elle garantit |
+|---|---|
+| **Traductions** | 5 `strings.xml` parité parfaite |
+| **Compilation et tests** | `assembleDebug` + `testDebugUnitTest` (JDK 21, SDK 36) |
+
+APK : onglet *Actions* → exécution → *erp360-debug-apk*.
+
+---
+
+*README tenu à jour à chaque boucle `Plan → Applique → Teste → Corrige`.*
