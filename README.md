@@ -15,6 +15,12 @@ d'activité**. Implémentation du cahier de charge **E9**.
 
 > **Offline-first** : aucune donnée ne quitte le téléphone. L'application démarre
 > **sans aucune donnée d'exemple** — tout est créé par l'utilisateur au fil de l'onboarding.
+>
+> **Sauvegarde Google exclue** : la base Room, ses annexes WAL/SHM, les réglages
+> DataStore (dont l'empreinte du PIN) et les copies locales du dossier `backups/`
+> ne sont pas téléversés (`res/xml/backup_rules.xml`, `res/xml/data_extraction_rules.xml`).
+> Le transfert direct d'un téléphone à l'autre reste autorisé, et la restauration
+> manuelle passe par **Admin › Sauvegarde**.
 
 > **Branche de travail actuelle : `arena/01a0a0db-erp-360` — version *Accueil seul*.** Elle
 > intègre la fusion de `arena/01a0773a-erp-360` (schéma Room 12, règles de validation des
@@ -75,7 +81,7 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 | Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
 | Injection | **Hilt 2.60** |
 | Tâches de fond | **WorkManager** (purge journal 12 mois) |
-| Sécurité | PIN PBKDF2 (PBKDF2WithHmacSHA256, 120 000 itérations, sel 128 bits) — aucune dépendance de chiffrement tierce |
+| Sécurité | PIN PBKDF2 (PBKDF2WithHmacSHA256, 120 000 itérations, sel 128 bits), aucune dépendance de chiffrement tierce · sauvegarde Google exclue (base, réglages, copies locales) |
 | Cible | minSdk **26** · targetSdk **36** |
 
 ---
