@@ -446,9 +446,49 @@ class OnboardingViewModel @Inject constructor(
         val actifs = ModulesPersonnalises.modulesActifs(profil, modulesPersonnalises, modulesSupport)
         val valeurActifs = ModulesPersonnalises.serialiser(actifs)
         val valeurExtras = ModulesPersonnalises.serialiser(ModulesSocle.filtrerSupport(extrasSupport))
+        // Barre du bas : place directement les modules du profil sur la barre (max 3)
+        // Ex: Achat-Vente => VENTE, ACHATS, TRESORERIE sur la barre, le reste dans Plus
+        val ordrePrioritaire = listOf(
+            ModuleCode.VEN,
+            ModuleCode.ACH,
+            ModuleCode.STK,
+            ModuleCode.TRE,
+            ModuleCode.CPT,
+            ModuleCode.PRO,
+            ModuleCode.SER,
+            ModuleCode.PRJ,
+            ModuleCode.LOG,
+            ModuleCode.CRM,
+            ModuleCode.RH,
+            ModuleCode.QUA,
+            ModuleCode.MAI,
+            ModuleCode.REP,
+        )
+        val tries = actifs.sortedBy { code ->
+            val idx = ordrePrioritaire.indexOf(code)
+            if (idx == -1) 99 else idx
+        }
+        val mapPrincipal = mapOf(
+            ModuleCode.ACH to "ACHATS",
+            ModuleCode.VEN to "VENTE",
+            ModuleCode.STK to "STOCK",
+            ModuleCode.PRO to "PRODUCTION",
+            ModuleCode.SER to "SERVICES",
+            ModuleCode.PRJ to "PROJETS",
+            ModuleCode.RH to "RH",
+            ModuleCode.CPT to "COMPTABILITE",
+            ModuleCode.TRE to "TRESORERIE",
+            ModuleCode.CRM to "CRM",
+            ModuleCode.QUA to "QUALITE",
+            ModuleCode.MAI to "MAINTENANCE",
+            ModuleCode.LOG to "LOGISTIQUE",
+            ModuleCode.REP to "REPORTING",
+        )
+        val barre = tries.mapNotNull { mapPrincipal[it] }.take(3).joinToString(",")
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeurActifs)
             settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurExtras)
+            settingsStore.set(SettingsStore.Keys.BARRE_MODULES, barre)
             // Nouveau système : vide les éléments personnalisés à l'onboarding
             // (les éléments par défaut du profil seront calculés par ActivationProfil)
             // On ne touche pas à MODULES_ELEMENTS s'il existe déjà pour permettre reprise

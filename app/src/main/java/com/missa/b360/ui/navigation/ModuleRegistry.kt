@@ -108,19 +108,89 @@ enum class AppModule(
          * qui masquent la barre n'y sont jamais proposés.
          */
         fun barreBas(actifs: List<ModuleCode>, epingles: List<String> = emptyList()): List<AppModule> {
-            val disponibles = visibles(actifs).filter { it !in SANS_BARRE }
+            val visibles = visibles(actifs)
+            // Pour la rétrocompatibilité : les épinglés peuvent inclure SANS_BARRE s'ils viennent du nouveau système
+            val disponiblesPourEpingle = visibles
+            val disponiblesParDefaut = visibles.filter { it !in SANS_BARRE }
             val choisis = epingles.mapNotNull { nom ->
-                disponibles.firstOrNull { it.name == nom }
+                disponiblesPourEpingle.firstOrNull { it.name == nom }
             }
             return choisis.ifEmpty {
-                disponibles
+                disponiblesParDefaut
                     .filter { it.prioriteBarre > 0 }
                     .sortedBy { it.prioriteBarre }
             }.take(MAX_ONGLETS)
         }
 
-        fun barreBas(activation: ActivationProfil, epingles: List<String> = emptyList()): List<AppModule> =
-            barreBas(activation.modulesActifs.toList(), epingles)
+        fun barreBas(activation: ActivationProfil, epingles: List<String> = emptyList()): List<AppModule> {
+            if (activation.modulesActifs.isEmpty()) {
+                return barreBas(emptyList(), epingles)
+            }
+            val visibles = visibles(activation)
+            // Si l'utilisateur a épinglé (via profil auto), on respecte même SANS_BARRE
+            if (epingles.isNotEmpty()) {
+                val choisis = epingles.mapNotNull { nom -> visibles.firstOrNull { it.name == nom } }
+                if (choisis.isNotEmpty()) return choisis.take(MAX_ONGLETS)
+            }
+            // Sinon : place directement les modules du profil sur la barre (max 3)
+            // Ordre prioritaire demandé : VEN, ACH, STK, TRE, CPT, PRO, SER, PRJ, LOG, CRM, RH, QUA, MAI, REP
+            val ordrePrioritaire = listOf(
+                ModuleCode.VEN,
+                ModuleCode.ACH,
+                ModuleCode.STK,
+                ModuleCode.TRE,
+                ModuleCode.CPT,
+                ModuleCode.PRO,
+                ModuleCode.SER,
+                ModuleCode.PRJ,
+                ModuleCode.LOG,
+                ModuleCode.CRM,
+                ModuleCode.RH,
+                ModuleCode.QUA,
+                ModuleCode.MAI,
+                ModuleCode.REP,
+            )
+            // Map ModuleCode -> AppModule principal (pour éviter doublons VEN->VENTE+CLIENTS)
+            val principalParCode = mapOf(
+                ModuleCode.ACH to ACHATS,
+                ModuleCode.VEN to VENTE,
+                ModuleCode.STK to STOCK,
+                ModuleCode.PRO to PRODUCTION,
+                ModuleCode.SER to SERVICES,
+                ModuleCode.PRJ to PROJETS,
+                ModuleCode.RH to RH,
+                ModuleCode.CPT to COMPTABILITE,
+                ModuleCode.TRE to TRESORERIE,
+                ModuleCode.CRM to CRM,
+                ModuleCode.QUA to QUALITE,
+                ModuleCode.MAI to MAINTENANCE,
+                ModuleCode.LOG to LOGISTIQUE,
+                ModuleCode.REP to REPORTING,
+            )
+            val triesCodes = activation.modulesActifs.sortedBy { code ->
+                val idx = ordrePrioritaire.indexOf(code)
+                if (idx == -1) 99 else idx
+            }
+            val result = mutableListOf<AppModule>()
+            val vus = mutableSetOf<ModuleCode>()
+            for (code in triesCodes) {
+                if (code in vus) continue
+                vus.add(code)
+                val app = principalParCode[code] ?: visibles.firstOrNull { it.moduleCode == code } ?: continue
+                // On autorise même SANS_BARRE pour le profil (ex: ACHATS)
+                if (app.moduleCode in activation.modulesActifs) {
+                    result.add(app)
+                    if (result.size >= MAX_ONGLETS) break
+                }
+            }
+            // Si moins de 3, complète avec les autres visibles (ex: CLIENTS, FOURNISSEURS)
+            if (result.size < MAX_ONGLETS) {
+                val complement = visibles.filter { it !in result && it.moduleCode in activation.modulesActifs }
+                    .sortedBy { it.prioriteBarre.let { p -> if (p == 0) 99 else p } }
+                result.addAll(complement.take(MAX_ONGLETS - result.size))
+            }
+            return result.take(MAX_ONGLETS)
+        }
 
         /**
          * Modules qu'il est permis d'épingler.
@@ -181,8 +251,38 @@ enum class AppModule(
             activation: ActivationProfil,
             epingles: List<String> = emptyList(),
         ): List<AppModule> {
-            val barre = barreBas(activation, epingles).toSet()
-            return visibles(activation).filterNot { it in barre }
+            val barre = barreBas(activation, epingles)
+            val barreCodes = barre.map { it.moduleCode }.toSet()
+            val visibles = visibles(activation)
+            // Pour Plus, on veut les modules restants du profil, pas tous les AppModule doublons
+            // On garde un seul AppModule par ModuleCode restant (le principal)
+            val principalParCode = mapOf(
+                ModuleCode.ACH to ACHATS,
+                ModuleCode.VEN to VENTE,
+                ModuleCode.STK to STOCK,
+                ModuleCode.PRO to PRODUCTION,
+                ModuleCode.SER to SERVICES,
+                ModuleCode.PRJ to PROJETS,
+                ModuleCode.RH to RH,
+                ModuleCode.CPT to COMPTABILITE,
+                ModuleCode.TRE to TRESORERIE,
+                ModuleCode.CRM to CRM,
+                ModuleCode.QUA to QUALITE,
+                ModuleCode.MAI to MAINTENANCE,
+                ModuleCode.LOG to LOGISTIQUE,
+                ModuleCode.REP to REPORTING,
+            )
+            val restantsCodes = activation.modulesActifs.filterNot { it in barreCodes }
+            val result = mutableListOf<AppModule>()
+            for (code in restantsCodes) {
+                val app = principalParCode[code] ?: visibles.firstOrNull { it.moduleCode == code } ?: continue
+                if (app !in barre) result.add(app)
+            }
+            // Ajoute aussi les AppModule secondaires du même ModuleCode qui sont dans le pack mais pas principaux
+            // (ex: CLIENTS pour VEN, FOURNISSEURS pour ACH) s'ils sont actifs et non dans la barre
+            val secondairesDoublons = visibles.filter { it.moduleCode in restantsCodes && it !in result && it !in barre }
+            result.addAll(secondairesDoublons)
+            return result.distinctBy { it.name }
         }
     }
 }

@@ -125,6 +125,8 @@ class ProfilActivationRepository @Inject constructor(
     /**
      * Met à jour le profil et recalcule les modules actifs.
      * Persiste à la fois dans SettingsStore et dans l'entité Enterprise (si elle existe).
+     * Met aussi à jour la barre du bas pour que le profil choisi place directement
+     * ses modules sur la barre (max 3) et le reste dans Plus.
      */
     suspend fun mettreAJourProfil(
         profil: ProfilActivite,
@@ -171,6 +173,12 @@ class ProfilActivationRepository @Inject constructor(
         val elementsSerialises = ElementsPersonnalises.serialiser(nouvelleActivation.elementsPersonnalises)
         settingsStore.set(SettingsStore.Keys.MODULES_ELEMENTS, elementsSerialises)
 
+        // Barre du bas : place directement les modules du profil sur la barre (max 3)
+        // L'utilisateur a demandé que choisir un profil (ex: Achat-Vente) mette
+        // ses modules sur la barre du bas, le reste allant dans Plus.
+        val barreModules = calculerBarrePourActivation(nouvelleActivation)
+        settingsStore.set(SettingsStore.Keys.BARRE_MODULES, barreModules.joinToString(","))
+
         // Met à jour l'entreprise si elle existe
         val entreprise = enterpriseDao.get()
         if (entreprise != null) {
@@ -181,6 +189,68 @@ class ProfilActivationRepository @Inject constructor(
                 ),
             )
         }
+    }
+
+    /**
+     * Calcule les 3 modules à mettre sur la barre du bas pour une activation donnée.
+     * Règle : prend les modules actifs dans l'ordre métier puis support, mappe chaque
+     * ModuleCode vers son AppModule principal (ex: ACH->ACHATS, VEN->VENTE) et garde
+     * les 3 premiers distincts. Cela garantit que choisir Achat-Vente met bien
+     * Achats + Vente sur la barre, le reste (Compta, Tréso, Reporting) allant dans Plus.
+     */
+    private fun calculerBarrePourActivation(activation: ActivationProfil): List<String> {
+        if (activation.modulesActifs.isEmpty()) return emptyList()
+        // Ordre canonique : métier d'abord (ACH, STK, PRO, VEN, SER, PRJ) puis support
+        // Mais pour l'UX, on veut VEN en premier pour un commerçant, donc on utilise
+        // l'ordre de ModulesSocle.metier + support mais en priorisant VEN, ACH, STK
+        val ordrePrioritaire = listOf(
+            ModuleCode.VEN,
+            ModuleCode.ACH,
+            ModuleCode.STK,
+            ModuleCode.TRE,
+            ModuleCode.CPT,
+            ModuleCode.PRO,
+            ModuleCode.SER,
+            ModuleCode.PRJ,
+            ModuleCode.LOG,
+            ModuleCode.CRM,
+            ModuleCode.RH,
+            ModuleCode.QUA,
+            ModuleCode.MAI,
+            ModuleCode.REP,
+        )
+        val tries = activation.modulesActifs.sortedBy { code ->
+            val idx = ordrePrioritaire.indexOf(code)
+            if (idx == -1) 99 else idx
+        }
+        // Map ModuleCode -> nom AppModule principal (celui qui apparaît dans la barre)
+        val mapPrincipal = mapOf(
+            ModuleCode.ACH to "ACHATS",
+            ModuleCode.VEN to "VENTE",
+            ModuleCode.STK to "STOCK",
+            ModuleCode.PRO to "PRODUCTION",
+            ModuleCode.SER to "SERVICES",
+            ModuleCode.PRJ to "PROJETS",
+            ModuleCode.RH to "RH",
+            ModuleCode.CPT to "COMPTABILITE",
+            ModuleCode.TRE to "TRESORERIE",
+            ModuleCode.CRM to "CRM",
+            ModuleCode.QUA to "QUALITE",
+            ModuleCode.MAI to "MAINTENANCE",
+            ModuleCode.LOG to "LOGISTIQUE",
+            ModuleCode.REP to "REPORTING",
+        )
+        val result = mutableListOf<String>()
+        val vus = mutableSetOf<ModuleCode>()
+        for (code in tries) {
+            if (code in vus) continue
+            vus.add(code)
+            val appName = mapPrincipal[code] ?: continue
+            // Évite les doublons de ModuleCode déjà représentés (ex: VEN a VENTE et CLIENTS, on ne garde que VENTE)
+            result.add(appName)
+            if (result.size >= 3) break
+        }
+        return result
     }
 
     /**
