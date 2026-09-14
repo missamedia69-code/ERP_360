@@ -83,8 +83,8 @@
     <string name="palier_p5_desc">Grande - structure complète, tous supports transverses</string>
     <string name="palier_p6_desc">Groupe - tous modules support, pilotage avancé</string>
     <string name="palier_effectif_badge">Effectif</string>
-    <string name="palier_choisir_titre">Taille de l'entreprise</string>
-    <string name="palier_choisir_sous">L'effectif influence les modules recommandés (RH, CRM, etc.)</string>
+    <string name="palier_choisir_titre">Taille de l\'entreprise</string>
+    <string name="palier_choisir_sous">L\'effectif influence les modules recommandés (RH, CRM, etc.)</string>
 
     <string name="ob_nom_entreprise">Nom de l\'entreprise</string>
     <string name="ob_votre_nom">Votre nom</string>
