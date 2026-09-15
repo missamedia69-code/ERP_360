@@ -248,7 +248,6 @@ fun HomeScreen(
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
     val modulesActifs by viewModel.modulesActifs.collectAsState()
-    val modulesEpingles by viewModel.modulesEpingles.collectAsState()
     val actionsEpingles by viewModel.actionsRapidesEpingles.collectAsState()
     var showPersonnaliser by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -302,12 +301,9 @@ fun HomeScreen(
 
     if (showPersonnaliser) {
         HomePersonnaliserDialogue(
-            disponibles = AppModule.epinglables(modulesActifs),
-            selection = AppModule.barreBas(modulesActifs, modulesEpingles).map { it.name },
             actionsSelection = actionsEpingles,
             onFermer = { showPersonnaliser = false },
-            onValider = { choixBarre, choixActions ->
-                viewModel.epinglerModules(choixBarre)
+            onValider = { choixActions ->
                 viewModel.epinglerActionsRapides(choixActions)
                 showPersonnaliser = false
             },
@@ -1538,22 +1534,19 @@ private fun HomeSupportBouton(
 }
 
 /**
- * Choix des modules épinglés dans la barre du bas (RA-22) + actions rapides.
+ * Personnalisation des actions rapides uniquement.
  *
- * Le lien « Personnaliser » au-dessus des actions rapides doit réellement
- * personnaliser ces actions : cocher/décocher => apparition/disparition immédiate.
- * On garde aussi la personnalisation de la barre du bas dans le même dialogue,
- * en deux sections distinctes.
+ * Le menu « Personnaliser » au-dessus des actions rapides ne doit contenir
+ * que les 8 actions rapides (VENTE, ACHAT, CLIENT, FOURNISSEUR, ENTREE_STOCK,
+ * TRANSFERT_STOCK, PAIEMENT_RECU, DEPENSE). Cocher/décocher => apparition/disparition immédiate.
+ * La barre du bas n'est pas configurable ici.
  */
 @Composable
 private fun HomePersonnaliserDialogue(
-    disponibles: List<AppModule>,
-    selection: List<String>,
     actionsSelection: List<String>,
     onFermer: () -> Unit,
-    onValider: (List<String>, List<String>) -> Unit,
+    onValider: (List<String>) -> Unit,
 ) {
-    val choixBarre = remember { mutableStateListOf<String>().apply { addAll(selection) } }
     // Si actionsSelection vide (usine = tout afficher), on pré-coche tout pour que l'utilisateur voie l'état effectif.
     val defs = rememberAccueilActionDefs()
     val choixActions = remember {
@@ -1563,69 +1556,12 @@ private fun HomePersonnaliserDialogue(
     }
     AlertDialog(
         onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.home_personalize)) },
+        title = { Text(stringResource(R.string.home_quick_actions)) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // --- Barre du bas ---
-                Text(
-                    text = stringResource(R.string.home_personalize_barre),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = HomeTextDark,
-                )
-                Text(
-                    text = stringResource(R.string.home_personalize_aide, AppModule.MAX_ONGLETS),
-                    fontSize = 11.sp,
-                    color = HomeTextMuted,
-                )
-                disponibles.forEach { module ->
-                    val coche = module.name in choixBarre
-                    val autorise = coche || choixBarre.size < AppModule.MAX_ONGLETS
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(enabled = autorise) {
-                                if (coche) choixBarre.remove(module.name) else choixBarre.add(module.name)
-                            }
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(
-                            checked = coche,
-                            onCheckedChange = {
-                                if (coche) choixBarre.remove(module.name) else choixBarre.add(module.name)
-                            },
-                            enabled = autorise,
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = module.icon,
-                            contentDescription = null,
-                            tint = if (autorise) HomeBlue else HomeTextMuted,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(module.titleRes),
-                            fontSize = 13.sp,
-                            color = if (autorise) HomeTextDark else HomeTextMuted,
-                        )
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-                // Séparateur
-                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFE2E8F0)))
-                Spacer(Modifier.height(4.dp))
-                // --- Actions rapides ---
-                Text(
-                    text = stringResource(R.string.home_personalize_actions),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = HomeTextDark,
-                )
                 Text(
                     text = stringResource(R.string.home_personalize_actions_aide),
                     fontSize = 11.sp,
@@ -1668,13 +1604,13 @@ private fun HomePersonnaliserDialogue(
             TextButton(onClick = {
                 // Si toutes les actions sont cochées, on enregistre vide = usine (tout afficher).
                 val actionsAEnregistrer = if (choixActions.size == AccueilActionKeys.ALL.size) emptyList() else choixActions.toList()
-                onValider(choixBarre.toList(), actionsAEnregistrer)
+                onValider(actionsAEnregistrer)
             }) {
                 Text(stringResource(R.string.ops_save))
             }
         },
         dismissButton = {
-            TextButton(onClick = { onValider(emptyList(), emptyList()) }) {
+            TextButton(onClick = { onValider(emptyList()) }) {
                 Text(stringResource(R.string.home_personalize_defaut))
             }
         },
