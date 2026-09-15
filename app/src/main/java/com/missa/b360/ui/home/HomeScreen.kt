@@ -101,6 +101,7 @@ import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.ui.components.CompanyLogo
+import com.missa.b360.ui.components.IllustrationFond
 import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -589,7 +590,7 @@ private fun HomeDashboard(
                 }
             }
         }
-        // KPI 4 cartes
+        // KPI 4 cartes – charte 3D isométrique intégrée (fond léger)
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -602,6 +603,7 @@ private fun HomeDashboard(
                         icon = Icons.Outlined.ShoppingCart,
                         iconBg = Color(0xFFEFF6FF),
                         iconTint = Color(0xFF2563EB),
+                        illustrationRes = R.drawable.illustration_ventes,
                         onClick = { onNavigate(AppModule.VENTE.route) },
                     )
                     AccueilKpiCard(
@@ -613,6 +615,7 @@ private fun HomeDashboard(
                         icon = Icons.Outlined.Inventory2,
                         iconBg = Color(0xFFECFDF5),
                         iconTint = Color(0xFF16A34A),
+                        illustrationRes = R.drawable.illustration_stock,
                         onClick = { onNavigate(AppModule.ACHATS.route) },
                     )
                 }
@@ -626,6 +629,7 @@ private fun HomeDashboard(
                         icon = Icons.Outlined.Payments,
                         iconBg = Color(0xFFFFF7ED),
                         iconTint = Color(0xFFF59E0B),
+                        illustrationRes = R.drawable.illustration_tresorerie,
                         onClick = { onNavigate(AppModule.TRESORERIE.route) },
                     )
                     AccueilKpiCard(
@@ -637,6 +641,7 @@ private fun HomeDashboard(
                         icon = Icons.Outlined.People,
                         iconBg = Color(0xFFF5F3FF),
                         iconTint = Color(0xFF7C3AED),
+                        illustrationRes = R.drawable.illustration_clients,
                         onClick = { onNavigate(AppModule.CLIENTS.route) },
                     )
                 }
@@ -716,6 +721,7 @@ private fun AccueilKpiCard(
     icon: ImageVector,
     iconBg: Color,
     iconTint: Color,
+    illustrationRes: Int? = null,
     onClick: () -> Unit,
 ) {
     Surface(
@@ -725,36 +731,46 @@ private fun AccueilKpiCard(
         border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
         shadowElevation = 0.dp,
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Surface(
-                modifier = Modifier.size(36.dp),
-                shape = RoundedCornerShape(10.dp),
-                color = iconBg,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
-                }
+        Box {
+            // Fond 3D isométrique léger selon charte (alpha 0.07)
+            if (illustrationRes != null) {
+                IllustrationFond(
+                    drawableRes = illustrationRes,
+                    alpha = 0.07f,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
-            Spacer(Modifier.height(10.dp))
-            Text(text = titre, color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Spacer(Modifier.height(4.dp))
-            Text(text = valeur, color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Spacer(Modifier.height(2.dp))
-            Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 10.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Spacer(Modifier.height(6.dp))
-            if (tendance != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = stringResource(R.string.home_vs_hier), color = Color(0xFF94A3B8), fontSize = 10.sp)
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance),
-                        color = Color(0xFF16A34A),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
+            Column(modifier = Modifier.padding(12.dp)) {
+                Surface(
+                    modifier = Modifier.size(36.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    color = iconBg,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+                    }
                 }
-            } else {
-                Text(text = stringResource(R.string.home_vs_hier) + " —", color = Color(0xFF94A3B8), fontSize = 10.sp)
+                Spacer(Modifier.height(10.dp))
+                Text(text = titre, color = Color(0xFF334155), fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(4.dp))
+                Text(text = valeur, color = Color(0xFF0F172A), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(2.dp))
+                Text(text = sousTitre, color = Color(0xFF64748B), fontSize = 10.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(6.dp))
+                if (tendance != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = stringResource(R.string.home_vs_hier), color = Color(0xFF94A3B8), fontSize = 10.sp)
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance),
+                            color = Color(0xFF16A34A),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                } else {
+                    Text(text = stringResource(R.string.home_vs_hier) + " —", color = Color(0xFF94A3B8), fontSize = 10.sp)
+                }
             }
         }
     }
