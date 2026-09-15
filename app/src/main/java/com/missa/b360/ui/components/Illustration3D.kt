@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -59,6 +60,10 @@ object Illustration3D {
     fun forDashboardKpiClients(): Int = R.drawable.illustration_clients
 }
 
+/**
+ * Fond léger – ancienne version plein format (conservée pour compat).
+ * Préférer [IllustrationCrop] qui croppe à l'espace occupé.
+ */
 @Composable
 fun IllustrationFond(
     @DrawableRes drawableRes: Int,
@@ -76,4 +81,28 @@ fun IllustrationFond(
                 .alpha(alpha),
         )
     }
+}
+
+/**
+ * Illustration croppée à l'espace qu'elle occupe (ex: 88dp dans coin haut-droit d'une carte KPI).
+ * Corrige le défaut précédent où le format d'origine était gardé en fond plein.
+ */
+@Composable
+fun IllustrationCrop(
+    @DrawableRes drawableRes: Int,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    alpha: Float = 0.12f,
+    cropSize: androidx.compose.ui.unit.Dp = 88.dp,
+    alignment: androidx.compose.ui.Alignment = androidx.compose.ui.Alignment.TopEnd,
+) {
+    Image(
+        painter = painterResource(id = drawableRes),
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .size(cropSize)
+            .clip(RoundedCornerShape(topEnd = 14.dp, bottomStart = 14.dp))
+            .alpha(alpha),
+    )
 }

@@ -77,6 +77,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -101,7 +102,6 @@ import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.ui.components.CompanyLogo
-import com.missa.b360.ui.components.IllustrationFond
 import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
@@ -731,13 +731,19 @@ private fun AccueilKpiCard(
         border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
         shadowElevation = 0.dp,
     ) {
-        Box {
-            // Fond 3D isométrique léger selon charte (alpha 0.07)
+        Box(modifier = Modifier.fillMaxWidth()) {
+            // Illustration 3D croppée à l'espace qu'elle occupe (coin haut-droit)
+            // au lieu de garder le format d'origine en fond plein.
             if (illustrationRes != null) {
-                IllustrationFond(
-                    drawableRes = illustrationRes,
-                    alpha = 0.07f,
-                    modifier = Modifier.fillMaxSize(),
+                Image(
+                    painter = painterResource(id = illustrationRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop, // crop pour correspondre à l'espace 88x88
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(88.dp)
+                        .clip(RoundedCornerShape(topEnd = 14.dp, bottomStart = 14.dp))
+                        .alpha(0.12f),
                 )
             }
             Column(modifier = Modifier.padding(12.dp)) {
