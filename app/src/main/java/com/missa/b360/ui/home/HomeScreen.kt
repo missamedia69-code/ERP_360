@@ -732,18 +732,16 @@ private fun AccueilKpiCard(
         shadowElevation = 0.dp,
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Illustration 3D croppée à l'espace qu'elle occupe (coin haut-droit)
-            // au lieu de garder le format d'origine en fond plein.
+            // Fond 3D plein cadre : remplit tout l'arrière-plan et rogne les parties hors-cadre
             if (illustrationRes != null) {
                 Image(
                     painter = painterResource(id = illustrationRes),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop, // crop pour correspondre à l'espace 88x88
+                    contentScale = ContentScale.Crop, // remplit le cadre, rogne ce qui dépasse
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(88.dp)
-                        .clip(RoundedCornerShape(topEnd = 14.dp, bottomStart = 14.dp))
-                        .alpha(0.12f),
+                        .matchParentSize()
+                        .clip(RoundedCornerShape(14.dp))
+                        .alpha(0.14f),
                 )
             }
             Column(modifier = Modifier.padding(12.dp)) {

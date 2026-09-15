@@ -2,9 +2,6 @@ package com.missa.b360.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -61,48 +58,44 @@ object Illustration3D {
 }
 
 /**
- * Fond léger – ancienne version plein format (conservée pour compat).
- * Préférer [IllustrationCrop] qui croppe à l'espace occupé.
+ * Fond 3D plein cadre – remplit tout l'arrière-plan et rogne les parties hors-cadre.
+ * Usage : dans une Box, mettre en premier avec Modifier.matchParentSize()
+ * Ex: Image avec ContentScale.Crop qui couvre toute la carte KPI.
  */
 @Composable
 fun IllustrationFond(
     @DrawableRes drawableRes: Int,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
-    alpha: Float = 0.08f,
+    alpha: Float = 0.14f,
 ) {
-    Box(modifier = modifier.clip(RoundedCornerShape(14.dp))) {
-        Image(
-            painter = painterResource(id = drawableRes),
-            contentDescription = contentDescription,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .alpha(alpha),
-        )
-    }
+    Image(
+        painter = painterResource(id = drawableRes),
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Crop, // remplit le cadre, rogne ce qui dépasse
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .alpha(alpha),
+    )
 }
 
 /**
- * Illustration croppée à l'espace qu'elle occupe (ex: 88dp dans coin haut-droit d'une carte KPI).
- * Corrige le défaut précédent où le format d'origine était gardé en fond plein.
+ * Alias historique – même comportement plein cadre avec crop.
+ * Gardé pour compatibilité, préférer IllustrationFond.
  */
 @Composable
 fun IllustrationCrop(
     @DrawableRes drawableRes: Int,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,
-    alpha: Float = 0.12f,
-    cropSize: androidx.compose.ui.unit.Dp = 88.dp,
-    alignment: androidx.compose.ui.Alignment = androidx.compose.ui.Alignment.TopEnd,
+    alpha: Float = 0.14f,
+    cropSize: androidx.compose.ui.unit.Dp = 88.dp, // ignoré, conservé pour compat API
+    alignment: androidx.compose.ui.Alignment = androidx.compose.ui.Alignment.TopEnd, // ignoré
 ) {
-    Image(
-        painter = painterResource(id = drawableRes),
+    IllustrationFond(
+        drawableRes = drawableRes,
         contentDescription = contentDescription,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .size(cropSize)
-            .clip(RoundedCornerShape(topEnd = 14.dp, bottomStart = 14.dp))
-            .alpha(alpha),
+        modifier = modifier,
+        alpha = alpha,
     )
 }
