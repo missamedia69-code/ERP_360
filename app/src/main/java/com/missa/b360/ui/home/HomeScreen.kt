@@ -132,6 +132,108 @@ private val HomeTextMuted = MissaMuted
 private val HomeBackground = MissaCanvas
 private val HomeBorder = MissaBorder
 
+/** Identifiants stables des 8 actions rapides de l'accueil (persistés dans SettingsStore). */
+object AccueilActionKeys {
+    const val VENTE = "VENTE"
+    const val ACHAT = "ACHAT"
+    const val CLIENT = "CLIENT"
+    const val FOURNISSEUR = "FOURNISSEUR"
+    const val ENTREE_STOCK = "ENTREE_STOCK"
+    const val TRANSFERT_STOCK = "TRANSFERT_STOCK"
+    const val PAIEMENT_RECU = "PAIEMENT_RECU"
+    const val DEPENSE = "DEPENSE"
+    val ALL: List<String> = listOf(
+        VENTE, ACHAT, CLIENT, FOURNISSEUR,
+        ENTREE_STOCK, TRANSFERT_STOCK, PAIEMENT_RECU, DEPENSE,
+    )
+}
+
+private data class AccueilActionDef(
+    val key: String,
+    @StringRes val labelRes: Int,
+    val icon: ImageVector,
+    val tint: Color,
+    val bg: Color,
+    val route: String,
+    val module: ModuleCode,
+)
+
+@Composable
+private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
+    AccueilActionDef(
+        key = AccueilActionKeys.VENTE,
+        labelRes = R.string.home_plus_vente,
+        icon = Icons.Outlined.ShoppingCart,
+        tint = Color(0xFF2563EB),
+        bg = Color(0xFFEFF6FF),
+        route = AppModule.VENTE.createRoute(),
+        module = ModuleCode.VEN,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.ACHAT,
+        labelRes = R.string.home_plus_achat,
+        icon = Icons.Outlined.ShoppingCart,
+        tint = Color(0xFF16A34A),
+        bg = Color(0xFFECFDF5),
+        route = AppModule.ACHATS.createRoute(),
+        module = ModuleCode.ACH,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.CLIENT,
+        labelRes = R.string.home_plus_client,
+        icon = Icons.Outlined.PersonAdd,
+        tint = Color(0xFF7C3AED),
+        bg = Color(0xFFF5F3FF),
+        route = AppModule.CLIENTS.createRoute(),
+        module = ModuleCode.VEN,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.FOURNISSEUR,
+        labelRes = R.string.home_plus_fournisseur,
+        icon = Icons.Outlined.Business,
+        tint = Color(0xFFF59E0B),
+        bg = Color(0xFFFFF7ED),
+        route = AppModule.FOURNISSEURS.createRoute(),
+        module = ModuleCode.ACH,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.ENTREE_STOCK,
+        labelRes = R.string.home_entree_en_stock,
+        icon = Icons.Outlined.Inventory2,
+        tint = Color(0xFF0D9488),
+        bg = Color(0xFFECFEFF),
+        route = AppModule.STOCK.createRoute(),
+        module = ModuleCode.STK,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.TRANSFERT_STOCK,
+        labelRes = R.string.home_transfert_de_stock,
+        icon = Icons.Outlined.LocalShipping,
+        tint = Color(0xFF2563EB),
+        bg = Color(0xFFEFF6FF),
+        route = Routes.STOCK_TRANSFER_FORM,
+        module = ModuleCode.STK,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.PAIEMENT_RECU,
+        labelRes = R.string.home_paiement_recu_label,
+        icon = Icons.Outlined.Payments,
+        tint = Color(0xFF16A34A),
+        bg = Color(0xFFECFDF5),
+        route = AppModule.TRESORERIE.route,
+        module = ModuleCode.TRE,
+    ),
+    AccueilActionDef(
+        key = AccueilActionKeys.DEPENSE,
+        labelRes = R.string.home_depense_label,
+        icon = Icons.Outlined.Description,
+        tint = Color(0xFFF43F5E),
+        bg = Color(0xFFFFF1F2),
+        route = AppModule.FINANCES.route,
+        module = ModuleCode.CPT,
+    ),
+)
+
 /**
  * Accueil mobile : tableau de bord sans données de démonstration. Les métriques sont
  * recalculées à partir des pièces opérationnelles réellement validées.
@@ -147,6 +249,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val modulesActifs by viewModel.modulesActifs.collectAsState()
     val modulesEpingles by viewModel.modulesEpingles.collectAsState()
+    val actionsEpingles by viewModel.actionsRapidesEpingles.collectAsState()
     var showPersonnaliser by remember { mutableStateOf(false) }
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
@@ -188,6 +291,7 @@ fun HomeScreen(
         HomeDashboard(
             state = uiState,
             modulesActifs = modulesActifs,
+            actionsRapidesSelection = actionsEpingles,
             onPersonnaliser = { showPersonnaliser = true },
             modifier = Modifier
                 .fillMaxSize()
@@ -200,9 +304,11 @@ fun HomeScreen(
         HomePersonnaliserDialogue(
             disponibles = AppModule.epinglables(modulesActifs),
             selection = AppModule.barreBas(modulesActifs, modulesEpingles).map { it.name },
+            actionsSelection = actionsEpingles,
             onFermer = { showPersonnaliser = false },
-            onValider = { choix ->
-                viewModel.epinglerModules(choix)
+            onValider = { choixBarre, choixActions ->
+                viewModel.epinglerModules(choixBarre)
+                viewModel.epinglerActionsRapides(choixActions)
                 showPersonnaliser = false
             },
         )
@@ -380,6 +486,7 @@ private fun HomeHeader(
 private fun HomeDashboard(
     state: HomeUiState,
     modulesActifs: List<ModuleCode>,
+    actionsRapidesSelection: List<String>,
     onPersonnaliser: () -> Unit,
     modifier: Modifier,
     onNavigate: (String) -> Unit,
@@ -573,7 +680,11 @@ private fun HomeDashboard(
                     }
                 }
                 Spacer(Modifier.height(10.dp))
-                AccueilActionsGrid(modulesActifs = modulesActifs, onNavigate = onNavigate)
+                AccueilActionsGrid(
+                    modulesActifs = modulesActifs,
+                    actionsSelection = actionsRapidesSelection,
+                    onNavigate = onNavigate,
+                )
             }
         }
         item {
@@ -656,46 +767,42 @@ private fun AccueilKpiCard(
 @Composable
 private fun AccueilActionsGrid(
     modulesActifs: List<ModuleCode>,
+    actionsSelection: List<String>,
     onNavigate: (String) -> Unit,
 ) {
-    val allActions = listOf(
-        AccueilActionItem(stringResource(R.string.home_plus_vente), Icons.Outlined.ShoppingCart, Color(0xFF2563EB), Color(0xFFEFF6FF), AppModule.VENTE.createRoute(), ModuleCode.VEN),
-        AccueilActionItem(stringResource(R.string.home_plus_achat), Icons.Outlined.ShoppingCart, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.ACHATS.createRoute(), ModuleCode.ACH),
-        AccueilActionItem(stringResource(R.string.home_plus_client), Icons.Outlined.PersonAdd, Color(0xFF7C3AED), Color(0xFFF5F3FF), AppModule.CLIENTS.createRoute(), ModuleCode.VEN),
-        AccueilActionItem(stringResource(R.string.home_plus_fournisseur), Icons.Outlined.Business, Color(0xFFF59E0B), Color(0xFFFFF7ED), AppModule.FOURNISSEURS.createRoute(), ModuleCode.ACH),
-        AccueilActionItem(stringResource(R.string.home_entree_en_stock), Icons.Outlined.Inventory2, Color(0xFF0D9488), Color(0xFFECFEFF), AppModule.STOCK.createRoute(), ModuleCode.STK),
-        AccueilActionItem(stringResource(R.string.home_transfert_de_stock), Icons.Outlined.LocalShipping, Color(0xFF2563EB), Color(0xFFEFF6FF), Routes.STOCK_TRANSFER_FORM, ModuleCode.STK),
-        AccueilActionItem(stringResource(R.string.home_paiement_recu_label), Icons.Outlined.Payments, Color(0xFF16A34A), Color(0xFFECFDF5), AppModule.TRESORERIE.route, ModuleCode.TRE),
-        AccueilActionItem(stringResource(R.string.home_depense_label), Icons.Outlined.Description, Color(0xFFF43F5E), Color(0xFFFFF1F2), AppModule.FINANCES.route, ModuleCode.CPT),
-    ).filter { modulesActifs.isEmpty() || it.module in modulesActifs }
+    val defs = rememberAccueilActionDefs()
+    // 1) filtre par modules actifs (comportement existant)
+    // 2) filtre par sélection utilisateur : vide = tout afficher (usine)
+    val visibles = defs
+        .filter { modulesActifs.isEmpty() || it.module in modulesActifs }
+        .filter { actionsSelection.isEmpty() || it.key in actionsSelection }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        allActions.chunked(4).forEach { row ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                row.forEach { a ->
-                    AccueilActionCard(
-                        modifier = Modifier.weight(1f),
-                        label = a.label,
-                        icon = a.icon,
-                        tint = a.tint,
-                        bg = a.bg,
-                        onClick = { onNavigate(a.route) },
-                    )
+        if (visibles.isEmpty()) {
+            Text(
+                text = stringResource(R.string.home_personalize_actions_aide),
+                color = HomeTextMuted,
+                fontSize = 11.sp,
+            )
+        } else {
+            visibles.chunked(4).forEach { row ->
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    row.forEach { a ->
+                        AccueilActionCard(
+                            modifier = Modifier.weight(1f),
+                            label = stringResource(a.labelRes),
+                            icon = a.icon,
+                            tint = a.tint,
+                            bg = a.bg,
+                            onClick = { onNavigate(a.route) },
+                        )
+                    }
+                    repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
                 }
-                repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
 }
-
-private data class AccueilActionItem(
-    val label: String,
-    val icon: ImageVector,
-    val tint: Color,
-    val bg: Color,
-    val route: String,
-    val module: ModuleCode,
-)
 
 @Composable
 private fun AccueilActionCard(
@@ -1431,54 +1538,65 @@ private fun HomeSupportBouton(
 }
 
 /**
- * Choix des modules épinglés dans la barre du bas (RA-22).
+ * Choix des modules épinglés dans la barre du bas (RA-22) + actions rapides.
  *
- * C'est ce que promet le lien « Personnaliser » posé au-dessus des actions
- * rapides : il n'a rien à voir avec les réglages de l'entreprise, où il menait
- * jusqu'ici. Trois onglets au maximum, l'accueil et « Plus » occupant déjà deux
- * places sur cinq.
+ * Le lien « Personnaliser » au-dessus des actions rapides doit réellement
+ * personnaliser ces actions : cocher/décocher => apparition/disparition immédiate.
+ * On garde aussi la personnalisation de la barre du bas dans le même dialogue,
+ * en deux sections distinctes.
  */
 @Composable
 private fun HomePersonnaliserDialogue(
     disponibles: List<AppModule>,
     selection: List<String>,
+    actionsSelection: List<String>,
     onFermer: () -> Unit,
-    onValider: (List<String>) -> Unit,
+    onValider: (List<String>, List<String>) -> Unit,
 ) {
-    val choix = remember { mutableStateListOf<String>().apply { addAll(selection) } }
+    val choixBarre = remember { mutableStateListOf<String>().apply { addAll(selection) } }
+    // Si actionsSelection vide (usine = tout afficher), on pré-coche tout pour que l'utilisateur voie l'état effectif.
+    val defs = rememberAccueilActionDefs()
+    val choixActions = remember {
+        mutableStateListOf<String>().apply {
+            if (actionsSelection.isEmpty()) addAll(AccueilActionKeys.ALL) else addAll(actionsSelection)
+        }
+    }
     AlertDialog(
         onDismissRequest = onFermer,
         title = { Text(stringResource(R.string.home_personalize)) },
         text = {
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                // --- Barre du bas ---
+                Text(
+                    text = stringResource(R.string.home_personalize_barre),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HomeTextDark,
+                )
                 Text(
                     text = stringResource(R.string.home_personalize_aide, AppModule.MAX_ONGLETS),
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     color = HomeTextMuted,
                 )
-                Spacer(Modifier.height(6.dp))
                 disponibles.forEach { module ->
-                    val coche = module.name in choix
-                    // Au-delà de la limite, les cases non cochées se figent :
-                    // mieux vaut un choix impossible visible qu'un enregistrement
-                    // silencieusement tronqué.
-                    val autorise = coche || choix.size < AppModule.MAX_ONGLETS
+                    val coche = module.name in choixBarre
+                    val autorise = coche || choixBarre.size < AppModule.MAX_ONGLETS
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(enabled = autorise) {
-                                if (coche) choix.remove(module.name) else choix.add(module.name)
+                                if (coche) choixBarre.remove(module.name) else choixBarre.add(module.name)
                             }
-                            .padding(vertical = 6.dp),
+                            .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Checkbox(
                             checked = coche,
                             onCheckedChange = {
-                                if (coche) choix.remove(module.name) else choix.add(module.name)
+                                if (coche) choixBarre.remove(module.name) else choixBarre.add(module.name)
                             },
                             enabled = autorise,
                         )
@@ -1497,16 +1615,66 @@ private fun HomePersonnaliserDialogue(
                         )
                     }
                 }
+                Spacer(Modifier.height(8.dp))
+                // Séparateur
+                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(Color(0xFFE2E8F0)))
+                Spacer(Modifier.height(4.dp))
+                // --- Actions rapides ---
+                Text(
+                    text = stringResource(R.string.home_personalize_actions),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HomeTextDark,
+                )
+                Text(
+                    text = stringResource(R.string.home_personalize_actions_aide),
+                    fontSize = 11.sp,
+                    color = HomeTextMuted,
+                )
+                defs.forEach { def ->
+                    val coche = def.key in choixActions
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                if (coche) choixActions.remove(def.key) else choixActions.add(def.key)
+                            }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = coche,
+                            onCheckedChange = {
+                                if (coche) choixActions.remove(def.key) else choixActions.add(def.key)
+                            },
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Surface(modifier = Modifier.size(28.dp), shape = RoundedCornerShape(7.dp), color = def.bg) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(def.icon, contentDescription = null, tint = def.tint, modifier = Modifier.size(16.dp))
+                            }
+                        }
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(def.labelRes),
+                            fontSize = 13.sp,
+                            color = HomeTextDark,
+                        )
+                    }
+                }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onValider(choix.toList()) }) {
+            TextButton(onClick = {
+                // Si toutes les actions sont cochées, on enregistre vide = usine (tout afficher).
+                val actionsAEnregistrer = if (choixActions.size == AccueilActionKeys.ALL.size) emptyList() else choixActions.toList()
+                onValider(choixBarre.toList(), actionsAEnregistrer)
+            }) {
                 Text(stringResource(R.string.ops_save))
             }
         },
         dismissButton = {
-            // Vider la sélection rétablit la disposition d'usine.
-            TextButton(onClick = { onValider(emptyList()) }) {
+            TextButton(onClick = { onValider(emptyList(), emptyList()) }) {
                 Text(stringResource(R.string.home_personalize_defaut))
             }
         },

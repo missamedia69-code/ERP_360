@@ -118,10 +118,24 @@ class HomeViewModel @Inject constructor(
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /** Actions rapides épinglées sur l'accueil ; vide = tout afficher (comportement d'usine). */
+    val actionsRapidesEpingles: StateFlow<List<String>> =
+        settingsStore.observe(SettingsStore.Keys.ACCUEIL_ACTIONS)
+            .map { valeur ->
+                valeur.orEmpty().split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     /** Enregistre la sélection ; une liste vide rétablit la disposition d'usine. */
     fun epinglerModules(modules: List<String>) {
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.BARRE_MODULES, modules.joinToString(","))
+        }
+    }
+
+    fun epinglerActionsRapides(actions: List<String>) {
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.ACCUEIL_ACTIONS, actions.joinToString(","))
         }
     }
 

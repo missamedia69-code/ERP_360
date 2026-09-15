@@ -41,6 +41,8 @@ class SettingsStore @Inject constructor(
 
         /** Modules épinglés dans la barre du bas (RA-22), choisis par le Propriétaire. */
         const val BARRE_MODULES = "barre_modules"
+        /** Actions rapides épinglées sur l'accueil (personnalisation effective) */
+        const val ACCUEIL_ACTIONS = "accueil_actions"
         const val PALIER_TAILLE = "palier_taille"
         const val ONBOARDING_TERMINE = "onboarding_termine"
         const val VIDEO_SPLASH_ACTIVE = "video_splash_active"

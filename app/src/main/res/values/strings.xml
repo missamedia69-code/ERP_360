@@ -1702,6 +1702,9 @@
     <string name="home_support_corps">Bonjour, j\'ai besoin d\'aide sur Missa Business 360.\nEntreprise : %1$s\nVersion : %2$s</string>
     <string name="home_personalize_aide">Choisissez jusqu\'à %1$d modules à épingler dans la barre du bas.</string>
     <string name="home_personalize_defaut">Par défaut</string>
+    <string name="home_personalize_barre">Barre du bas</string>
+    <string name="home_personalize_actions">Actions rapides</string>
+    <string name="home_personalize_actions_aide">Décochez les actions que vous ne voulez plus voir sur l\'accueil. Si tout est décoché, toutes seront affichées.</string>
     <string name="nav_accueil">Accueil</string>
     <string name="home_ventes_jour">Ventes du jour</string>
     <string name="home_achats_jour">Achats du jour</string>

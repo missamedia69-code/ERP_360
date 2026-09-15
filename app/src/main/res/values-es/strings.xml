@@ -1664,6 +1664,9 @@
     <string name="home_support_corps">Hola, necesito ayuda con Missa Business 360.\nEmpresa: %1$s\nVersión: %2$s</string>
     <string name="home_personalize_aide">Elija hasta %1$d módulos para la barra inferior.</string>
     <string name="home_personalize_defaut">Por defecto</string>
+    <string name="home_personalize_barre">Barra inferior</string>
+    <string name="home_personalize_actions">Acciones rápidas</string>
+    <string name="home_personalize_actions_aide">Desmarque las acciones que no desea ver en el inicio. Si no marca ninguna, se mostrarán todas.</string>
     <string name="nav_accueil">Inicio</string>
     <string name="home_ventes_jour">Ventas del día</string>
     <string name="home_achats_jour">Compras del día</string>

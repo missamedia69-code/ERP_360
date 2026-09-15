@@ -1664,6 +1664,9 @@
     <string name="home_support_corps">您好，我在使用 Missa Business 360 时需要帮助。\n企业：%1$s\n版本：%2$s</string>
     <string name="home_personalize_aide">最多可将 %1$d 个模块固定到底部栏。</string>
     <string name="home_personalize_defaut">恢复默认</string>
+    <string name="home_personalize_barre">底部栏</string>
+    <string name="home_personalize_actions">快捷操作</string>
+    <string name="home_personalize_actions_aide">取消勾选不想在首页显示的操作。如果全部取消勾选，将显示所有操作。</string>
     <string name="nav_accueil">首页</string>
     <string name="home_ventes_jour">当日销售</string>
     <string name="home_achats_jour">当日采购</string>

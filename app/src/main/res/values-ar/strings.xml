@@ -1664,6 +1664,9 @@
     <string name="home_support_corps">مرحبًا، أحتاج إلى مساعدة بخصوص Missa Business 360.\nالشركة: %1$s\nالإصدار: %2$s</string>
     <string name="home_personalize_aide">اختر حتى %1$d وحدات لتثبيتها في الشريط السفلي.</string>
     <string name="home_personalize_defaut">الوضع الافتراضي</string>
+    <string name="home_personalize_barre">الشريط السفلي</string>
+    <string name="home_personalize_actions">إجراءات سريعة</string>
+    <string name="home_personalize_actions_aide">ألغِ تحديد الإجراءات التي لا تريد ظهورها في الشاشة الرئيسية. إذا لم يتم تحديد أي شيء، سيتم عرض الكل.</string>
     <string name="nav_accueil">الرئيسية</string>
     <string name="home_ventes_jour">مبيعات اليوم</string>
     <string name="home_achats_jour">مشتريات اليوم</string>
