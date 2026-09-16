@@ -257,45 +257,45 @@ fun FicheEntrepriseDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 6.dp),
+                        .padding(start = 14.dp, end = 6.dp, top = 10.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     CompanyLogo(
                         logoUri = entreprise?.logoUri,
                         contentDescription = null,
                         fallbackIcon = Icons.Outlined.Store,
-                        modifier = Modifier.size(64.dp),
-                        size = 64.dp,
-                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier.size(48.dp),
+                        size = 48.dp,
+                        shape = RoundedCornerShape(14.dp),
                         fallbackTint = TendrePositive,
                         fallbackBackground = Green90,
                     )
-                    Spacer(Modifier.width(14.dp))
+                    Spacer(Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.fiche_entreprise_titre),
                             color = MissaMuted,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                         )
                         Text(
                             text = nom,
                             color = MissaInk,
-                            fontSize = 17.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 2,
                         )
                         Text(
                             text = dateTexte,
                             color = MissaMuted,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                         )
                     }
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = null,
                             tint = MissaMuted,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(22.dp),
                         )
                     }
                 }
@@ -318,7 +318,7 @@ fun FicheEntrepriseDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     OutlinedButton(
                         onClick = partager,
@@ -328,10 +328,10 @@ fun FicheEntrepriseDialog(
                         Icon(
                             imageVector = Icons.Outlined.Share,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.fiche_partager), fontSize = 13.sp)
+                        Text(text = stringResource(R.string.fiche_partager), fontSize = 12.sp)
                     }
                     Spacer(Modifier.width(10.dp))
                     Button(
@@ -343,10 +343,10 @@ fun FicheEntrepriseDialog(
                         Icon(
                             imageVector = Icons.Outlined.PictureAsPdf,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            modifier = Modifier.size(16.dp),
                         )
                         Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.fiche_partager_pdf), fontSize = 13.sp)
+                        Text(text = stringResource(R.string.fiche_partager_pdf), fontSize = 12.sp)
                     }
                 }
             }
@@ -365,24 +365,24 @@ private fun SectionFiche(
     nonRenseigne: String,
     onCopier: (String) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
         Text(
             text = stringResource(section.titreRes),
             color = BrandBlue,
-            fontSize = 13.sp,
+            fontSize = 11.5.sp,
             fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.height(3.dp))
+        Spacer(Modifier.height(2.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(2.dp)
+                .height(1.dp)
                 .background(
                     Brush.horizontalGradient(listOf(BrandBlue.copy(alpha = 0.55f), BrandBlue.copy(alpha = 0.08f))),
-                    RoundedCornerShape(1.dp),
+                    RoundedCornerShape(0.5.dp),
                 ),
         )
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(3.dp))
         section.lignes.forEach { ligne ->
             LigneFiche(
                 libelle = stringResource(ligne.libelleRes),
@@ -406,16 +406,16 @@ private fun LigneFiche(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
+            .padding(vertical = 1.dp),
         verticalAlignment = Alignment.Top,
     ) {
         Box(
             modifier = Modifier
-                .padding(top = 6.dp)
-                .size(6.dp)
+                .padding(top = 5.dp)
+                .size(5.dp)
                 .background(BrandBlue, CircleShape),
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(7.dp))
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = MissaInk)) {
@@ -428,20 +428,20 @@ private fun LigneFiche(
                     withStyle(SpanStyle(color = MissaInk)) { append(valeur) }
                 }
             },
-            fontSize = 13.sp,
-            lineHeight = 18.sp,
+            fontSize = 12.sp,
+            lineHeight = 15.sp,
             modifier = Modifier.weight(1f),
         )
         if (!vide) {
             IconButton(
                 onClick = { onCopier(valeur) },
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(30.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ContentCopy,
                     contentDescription = stringResource(R.string.fiche_copier),
                     tint = MissaMuted,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(14.dp),
                 )
             }
         }
