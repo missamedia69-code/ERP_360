@@ -5,7 +5,10 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
-  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a0db-erp-360">
+  <!-- Badge pointé sur la branche publiée la plus récente : arena/01a0a9d0-erp-360 n'est pas
+       encore poussée sur origin, son badge resterait « no status ». Dernière exécution verte
+       vérifiée : 35079663745 (arena/01a0a160-erp-360, commit 390d9eb). -->
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a160-erp-360">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
@@ -22,9 +25,13 @@ d'activité**. Implémentation du cahier de charge **E9**.
 > Le transfert direct d'un téléphone à l'autre reste autorisé, et la restauration
 > manuelle passe par **Admin › Sauvegarde**.
 
-> **Branche de travail actuelle : `arena/01a0a0db-erp-360` — version *Accueil seul*.** Elle
-> intègre la fusion de `arena/01a0773a-erp-360` (schéma Room 12, règles de validation des
-> modules/profils, PIN à 4 chiffres). L'accueil est la référence visuelle figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par un dans la même charte.
+> **Branche de travail actuelle : `arena/01a0a9d0-erp-360` — version *Accueil seul*.** Créée depuis
+> `390d9eb`, pointe de `arena/01a0a160-erp-360` sur `origin` (qui ne porte plus que cette branche et
+> `main`). Le socle provient des itérations précédentes — `arena/01a0a0db-erp-360`, puis fusion de
+> `arena/01a0773a-erp-360` : schéma Room 12, règles de validation des modules/profils, PIN à
+> 4 chiffres — branches aujourd'hui supprimées d'`origin`. L'accueil est la référence visuelle
+> figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par
+> un dans la même charte.
 
 ---
 
@@ -42,7 +49,9 @@ d'activité**. Implémentation du cahier de charge **E9**.
 | **Livraison / Logistique / Production / Services / RH / Projets / Trésorerie / Comptabilité / CRM / Qualité / Maintenance / Reporting** | ➕ | ⏳ Placeholder | Placeholder `MissaCanvas + MissaTopAppBar + MissaEmptyState` — reconstruction progressive |
 | **9.1 Administration** | ☰ | ⏳ Placeholder | Réglages, licence, sauvegarde, journal, utilisateurs, multi-site |
 
-Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 items : Accueil/Ventes/Stock/Finances/Plus) et bouton **➕**.
+Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas à **5 emplacements** — Accueil, **3 modules
+du profil** (épinglables ; ordre d'usine `VEN → ACH → STK → TRE → CPT → PRO → SER → PRJ → LOG → CRM →
+RH → QUA → MAI → REP`, plafonné par `AppModule.MAX_ONGLETS = 3`) et **Plus** — plus le bouton **➕**.
 
 ---
 
@@ -66,7 +75,7 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 
 ## 🌍 Internationalisation
 
-5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文. Changement à chaud (per-app language). `python3 .github/scripts/verifier_traductions.py` garantit la parité (1699 clés).
+5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文. Changement à chaud (per-app language). `python3 .github/scripts/verifier_traductions.py` garantit la parité des cinq `strings.xml` — **866 clés** chacune au 16/09/2026 (clé absente, clé surnuméraire, doublon, apostrophe non échappée ou paramètre `%1$s` divergent font échouer la CI).
 
 ---
 
@@ -80,7 +89,7 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 | Persistance | **Room 2.8 (KSP)** — 40 entités, base **v12**, migrations 1→12 |
 | Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
 | Injection | **Hilt 2.60** |
-| Tâches de fond | **WorkManager** (purge journal 12 mois) |
+| Tâches de fond | **WorkManager** — purge du journal selon la rétention choisie (30 j / 90 j / 12 mois, défaut **12 mois**) |
 | Sécurité | PIN PBKDF2 (PBKDF2WithHmacSHA256, 120 000 itérations, sel 128 bits), aucune dépendance de chiffrement tierce · sauvegarde Google exclue (base, réglages, copies locales) |
 | Cible | minSdk **26** · targetSdk **36** |
 
@@ -90,16 +99,18 @@ Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas personnalisable (5 it
 
 ```
 app/src/main/java/com/missa/b360/
-├── core/data/          # db, dao, entity, datastore (+ VENTE_SANS_STOCK)
-├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules),
+├── core/data/          # db (Room v12) · dao · entity (40 @Entity) · datastore (+ VENTE_SANS_STOCK) · repository
+├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules, 7 profils),
 │                       #   DependancesModules/ValidationProfil (règle d'or + validation),
 │                       #   ReglesGroupesArticles (groupes transverses), OptionsProfil
-├── ui/onboarding/      # langue → profil (ASV/APSV en tête) → entreprise → PIN
+├── ui/onboarding/      # langue → profil (ASV/APSV en tête) → entreprise → PIN (+ PinLockScreen)
 ├── ui/home/            # HomeScreen.kt — référence visuelle
-├── ui/components/      # PlaceholderScreen.kt (Scaffold + MissaTopAppBar + MissaEmptyState)
-├── ui/clients/         # ⏳ placeholder + parcours client réel conservé (ClientFlowScreen.kt)
-├── ui/stock|sales|purchases|...  # ⏳ placeholders (à reconstruire)
-└── ui/navigation/      # ModuleRegistry (14 modules, barre 3 onglets max)
+├── ui/components/      # MissaDesign · MissaAppScaffold (+ MissaAppHeader) · MissaBarreModules ·
+│                       #   PlaceholderScreen (Scaffold + MissaTopAppBar + MissaEmptyState)
+├── ui/clients/         # ⏳ ClientsPlaceholderScreen câblé ; le parcours réel (ClientFlowScreen.kt,
+│                       #   1431 l., composable ClientsScreen) est conservé mais non câblé
+├── ui/stock|sales|purchases|...  # ⏳ écrans réduits à un stub PlaceholderScreen — ViewModels métier déjà réels
+└── ui/navigation/      # ModuleRegistry (18 écrans / 14 modules, barre MAX_ONGLETS = 3) + AppNavHost
 ```
 
 ---
@@ -178,7 +189,8 @@ sur `ProductType` via `ProduitRules`) :
 Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
 
 ```bash
-git clone -b arena/01a0a0db-erp-360 https://github.com/missamedia69-code/ERP_360.git
+# Branche publiée la plus récente — arena/01a0a9d0-erp-360 s'y substituera dès sa poussée sur origin
+git clone -b arena/01a0a160-erp-360 https://github.com/missamedia69-code/ERP_360.git
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 python3 .github/scripts/verifier_traductions.py
@@ -192,12 +204,17 @@ python3 .github/scripts/verifier_traductions.py
 
 ## 🔁 Intégration continue
 
-Chaque poussée sur `arena/01a0a0db-erp-360` déclenche `.github/workflows/android.yml` :
+`.github/workflows/android.yml` se déclenche sur toute poussée vers `main` ou `arena/**`, sur toute
+pull request et en manuel (`workflow_dispatch`) ; une poussée successive annule l'exécution
+précédente de la même branche (`concurrency`). Chaque exécution enchaîne :
 
 | Étape | Ce qu'elle garantit |
 |---|---|
 | **Traductions** | 5 `strings.xml` parité parfaite |
 | **Compilation et tests** | `assembleDebug` + `testDebugUnitTest` (JDK 21, SDK 36) |
+
+Dernière exécution verte vérifiée : **35079663745** (branche `arena/01a0a160-erp-360`, commit
+`390d9eb`, 3 min 27 s).
 
 APK : onglet *Actions* → exécution → *erp360-debug-apk*.
 
