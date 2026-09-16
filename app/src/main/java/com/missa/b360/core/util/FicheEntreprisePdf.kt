@@ -1,7 +1,6 @@
 package com.missa.b360.core.util
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
@@ -128,7 +127,7 @@ object FicheEntreprisePdf {
         val fichier = File(dossier, "fiche-${System.currentTimeMillis()}.pdf")
         val flux = java.io.FileOutputStream(fichier)
         try {
-            document.write(flux)
+            document.writeTo(flux)
         } finally {
             flux.close()
         }
