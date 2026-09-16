@@ -33,7 +33,7 @@ class StockHubRepository @Inject constructor(
     fun observeSites(): Flow<List<SiteEntity>> = siteDao.observeAll()
 
     fun observeGroupes(): Flow<List<GroupeArticleEntity>> =
-        groupeDao.observeComplets().map { complets -> complets.map { it.groupe } }
+        groupeDao.observerComplets().map { complets -> complets.map { it.groupe } }
 
 
 
