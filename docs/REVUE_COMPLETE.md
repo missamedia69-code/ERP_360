@@ -1,6 +1,18 @@
-# Revue complète ERP 360 — 2026-09-16 (v5 finale archi + qualité)
+# Revue complète ERP 360 — 2026-09-16 (v6 header compact + limites scroll)
 
-CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert (Traductions 7s + Compilation)
+CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert → 35073598241 header compact 2m58s vert (Traductions 8s + Compilation)
+
+## Fix v6 — Header trop descendu + logos + limites scrollable
+
+18. **Header trop haut (160dp) + logos non Crop**
+    - Chemin : `HomeScreen.kt: HomeHeader` `Box size(160dp/140dp)` align TopEnd/TopStart + watermark `fillMaxWidth(0.62f) height(64dp)` → Box mesurait 160dp, head space descendu, logo watermark ne remplissait pas
+    - Fix v6 : `matchParentSize` pour tous fonds (watermark + halos radialGradient) pour ne pas agrandir layout, watermark `CompanyLogo` `matchParentSize` `alpha 0.09f` avec `ContentScale.Crop` remplit complètement head space et rogne parties invisibles, halos `matchParentSize` radialGradient centrés offset 900/100, hauteur Row réduite `height(52.dp)` vs padding 8+10, icones 36→34dp, logo MISSA 36→32dp, logo entreprise 40→38dp, `WindowInsets.statusBars` vs `safeDrawing` pour éviter espace descendu, `LazyColumn` contentPadding top 8→4dp + `background(HomeBackground)` pour contraste
+    - Résultat : header compact 52dp + statusBars (~76dp total) vs 160dp avant, logos remplissent arrière-plan avec Crop ✅
+
+19. **Limites zone scrollable non marquées**
+    - Chemin : `HomeScreen.kt` header + `MissaBarreModules.kt` bottom bar
+    - Fix v6 : header `Surface shadowElevation 0→4.dp` + colonne basse 1dp `HomeBorder` + 2dp dégradé horizontal `HomeBlue 0.22f / TendrePositive 0.22f`, bottom bar `MissaBarreModules.kt` ajout colonne haute 1dp `MissaBorder` + 2dp dégradé `BrandBlue 0.12f / Green90` + shadowElevation 8dp existante, padding vertical 7→6dp, LazyColumn background `MissaCanvas` vs White header/bar pour contraste net
+    - Résultat : séparation nette header ↔ scrollable ↔ bottom bar ✅
 
 ## Résumé exécutif
 Application Clean Architecture (data/domain/ui), Hilt, Room 12 migrations, DataStore, Compose, 5 langues (fr/en/es/ar/zh). 193 fichiers Kotlin. Header redesigné MISSA gauche / entreprise droite sans dropdown, fond basé sur logo utilisateur (watermark 7% + halos radialGradient + ligne dégradée). Illustrations 3D WebP 512px 80% (33MB → 176KB) avec `ContentScale.Crop` plein cadre. Dette i18n nettoyée : 1750 → 866 clés (-884), 0 inutilisée. Sécurité `!!` 0, `Color(0x)` 0 hors `Color.kt`, `runBlocking/GlobalScope` 0, DAO directs dans ViewModels 0 après v5. Build vert 4m46s.
