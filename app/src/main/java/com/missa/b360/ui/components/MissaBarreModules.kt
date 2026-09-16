@@ -1,6 +1,5 @@
 package com.missa.b360.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +40,6 @@ import com.missa.b360.R
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
-import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaMuted
 
 val LocalBarreNavigation = compositionLocalOf { mutableStateOf(true) }
@@ -77,9 +75,8 @@ fun MissaBarreModules(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(26.dp),
             color = Color.White,
-            shadowElevation = 6.dp,
+            shadowElevation = 8.dp,
             tonalElevation = 0.dp,
-            border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.3f)),
         ) {
             Row(
                 modifier = Modifier
