@@ -3,7 +3,6 @@ package com.missa.b360.ui.components
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,12 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -136,7 +132,9 @@ fun FicheEntrepriseDialog(
     }
 
     val res: (Int) -> String = { context.getString(it) }
-    val lignes = entreprise?.let { lignesEntreprise(it, res) }.orEmpty()
+    val lignesCompletes = entreprise?.let { lignesEntreprise(it, res) }.orEmpty()
+    // Le secteur est déjà affiché sous le nom, dans l'en-tête de la carte.
+    val lignes = lignesCompletes.filterNot { it.first == res(R.string.obn_secteur) }
     val lignesProprietaire = listOfNotNull(
         etat.proprietaireNom?.takeIf { it.isNotBlank() }?.let { res(R.string.obn_recap_proprietaire) to it },
         etat.proprietaireEmail?.takeIf { it.isNotBlank() }?.let { res(R.string.ob_email) to it },
@@ -145,9 +143,8 @@ fun FicheEntrepriseDialog(
     val partager: () -> Unit = {
         val texte = buildString {
             appendLine(nom)
-            entreprise?.secteur?.takeIf { it.isNotBlank() }?.let { appendLine(it) }
             appendLine()
-            lignes.forEach { (libelle, valeur) -> appendLine("$libelle : $valeur") }
+            lignesCompletes.forEach { (libelle, valeur) -> appendLine("$libelle : $valeur") }
             if (lignesProprietaire.isNotEmpty()) {
                 appendLine()
                 lignesProprietaire.forEach { (libelle, valeur) -> appendLine("$libelle : $valeur") }
@@ -181,41 +178,41 @@ fun FicheEntrepriseDialog(
                         .padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (entreprise?.logoUri != null) {
-                        CompanyLogo(
-                            logoUri = entreprise.logoUri,
-                            contentDescription = null,
-                            fallbackIcon = Icons.Outlined.Store,
-                            modifier = Modifier.size(48.dp),
-                            size = 48.dp,
-                            shape = RoundedCornerShape(14.dp),
-                            fallbackTint = TendrePositive,
-                            fallbackBackground = Green90,
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(R.drawable.logo_missa),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(14.dp)),
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
+                    // Carte d'identité : le logo affiché est toujours celui choisi par
+                    // l'utilisateur (CompanyLogo) — jamais celui de MISSA. Sans logo
+                    // enregistré, icône boutique neutre sur fond vert pâle.
+                    CompanyLogo(
+                        logoUri = entreprise?.logoUri,
+                        contentDescription = null,
+                        fallbackIcon = Icons.Outlined.Store,
+                        modifier = Modifier.size(64.dp),
+                        size = 64.dp,
+                        shape = RoundedCornerShape(18.dp),
+                        fallbackTint = TendrePositive,
+                        fallbackBackground = Green90,
+                    )
+                    Spacer(Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = nom,
-                            color = MissaInk,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            maxLines = 2,
-                        )
                         Text(
                             text = stringResource(R.string.fiche_entreprise_titre),
                             color = MissaMuted,
-                            fontSize = 12.sp,
+                            fontSize = 11.sp,
                         )
+                        Text(
+                            text = nom,
+                            color = MissaInk,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            maxLines = 2,
+                        )
+                        entreprise?.secteur?.takeIf { it.isNotBlank() }?.let {
+                            Text(
+                                text = it,
+                                color = MissaMuted,
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                            )
+                        }
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
                         Icon(
