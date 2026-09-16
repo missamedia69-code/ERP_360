@@ -210,8 +210,8 @@ précédente de la même branche (`concurrency`). Chaque exécution enchaîne :
 | **Traductions** | 5 `strings.xml` parité parfaite |
 | **Compilation et tests** | `assembleDebug` + `testDebugUnitTest` (JDK 21, SDK 36) |
 
-Dernière exécution verte vérifiée : **35079663745** (branche `arena/01a0a160-erp-360`, commit
-`390d9eb`, 3 min 27 s).
+Dernière exécution verte vérifiée : **35089341325** (branche `arena/01a0a9d0-erp-360`, commit
+`056f11e` — Traductions + `assembleDebug` + `testDebugUnitTest` + APK).
 
 APK : onglet *Actions* → exécution → *erp360-debug-apk*.
 
