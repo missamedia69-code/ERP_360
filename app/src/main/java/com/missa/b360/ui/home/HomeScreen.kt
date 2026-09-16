@@ -335,108 +335,82 @@ private fun HomeHeader(
     onNotificationClick: () -> Unit,
     onProfileClick: () -> Unit,
 ) {
-    // Header redesigné : MISSA à gauche, entreprise à droite, sans onglet déroulant.
-    // Fond basé sur le logo de l'utilisateur : watermark + dégradé + halos.
+    // Header compact : hauteur réduite, fond logo entreprise remplit complètement le head space avec Crop,
+    // limites bien marquées avec ombre + bordure.
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Color.White,
-        shadowElevation = 0.dp,
+        shadowElevation = 4.dp,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .windowInsetsPadding(WindowInsets.statusBars)
                 .background(Color.White),
         ) {
-            // --- Fond basé sur le logo entreprise ---
-            // Halo vert très léger derrière le logo entreprise (droite)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(160.dp)
-                    .background(
-                        androidx.compose.ui.graphics.Brush.radialGradient(
-                            colors = listOf(Green90.copy(alpha = 0.85f), Color.Transparent),
-                            radius = 200f,
-                        ),
-                    ),
-            )
-            // Halo bleu très léger derrière MISSA (gauche)
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .size(140.dp)
-                    .background(
-                        androidx.compose.ui.graphics.Brush.radialGradient(
-                            colors = listOf(Blue80.copy(alpha = 0.9f), Color.Transparent),
-                            radius = 180f,
-                        ),
-                    ),
-            )
-            // Watermark du logo entreprise en fond, très faible, basé sur le logo réel
+            // --- Fond basé sur le logo entreprise : doit remplir complètement le head space ---
+            // Tous les éléments de fond utilisent matchParentSize pour ne pas agrandir le header
+            // Watermark logo entreprise : remplit tout le header avec Crop, rogne hors-cadre, alpha 0.07
             if (companyLogoUri != null) {
-                CompanyLogoWatermark(
-                    logoUri = companyLogoUri,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxWidth(0.62f)
-                        .height(64.dp)
-                        .alpha(0.07f),
-                )
-            } else {
-                // Fallback pattern quand pas de logo : damier subtil
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(
-                            androidx.compose.ui.graphics.Brush.linearGradient(
-                                colors = listOf(
-                                    MissaCanvas,
-                                    Blue90,
-                                    Green90,
-                                ),
-                            ),
-                        ),
-                )
+                        .alpha(0.09f),
+                ) {
+                    CompanyLogo(
+                        logoUri = companyLogoUri,
+                        contentDescription = null,
+                        fallbackIcon = Icons.Outlined.Store,
+                        modifier = Modifier.matchParentSize(),
+                        size = 200.dp,
+                        shape = RoundedCornerShape(0.dp),
+                        fallbackTint = TendrePositive.copy(alpha = 0.12f),
+                        fallbackBackground = Color.Transparent,
+                    )
+                }
             }
-            // Ligne de séparation basse subtile + mini dégradé marque -> entreprise
+            // Halo vert derrière logo entreprise (droite) - matchParentSize pour ne pas pousser la hauteur
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(HomeBorder),
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .height(2.dp)
+                    .matchParentSize()
                     .background(
-                        androidx.compose.ui.graphics.Brush.horizontalGradient(
-                            colors = listOf(
-                                HomeBlue.copy(alpha = 0.18f),
-                                TendrePositive.copy(alpha = 0.18f),
-                            ),
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(Green90.copy(alpha = 0.55f), Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(900f, 100f),
+                            radius = 400f,
+                        ),
+                    ),
+            )
+            // Halo bleu derrière MISSA (gauche)
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(Blue80.copy(alpha = 0.55f), Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(100f, 100f),
+                            radius = 350f,
                         ),
                     ),
             )
 
+            // Contenu header compact : 52dp de hauteur totale (hors safeDrawing)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 4.dp, end = 10.dp, top = 8.dp, bottom = 10.dp),
+                    .height(52.dp)
+                    .padding(start = 4.dp, end = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onMenuClick, modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = Icons.Outlined.Menu,
                         contentDescription = stringResource(R.string.drawer_admin),
                         tint = HomeTextDark,
-                        modifier = Modifier.size(22.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
-                // MISSA BUSINESS à gauche
+                // MISSA BUSINESS à gauche - logo Crop remplit son cadre 32dp
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable { /* logo MISSA = accueil */ },
@@ -446,42 +420,42 @@ private fun HomeHeader(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(9.dp)),
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(8.dp)),
                     )
-                    Spacer(Modifier.width(7.dp))
+                    Spacer(Modifier.width(6.dp))
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "MISSA",
                                 color = HomeTextDark,
-                                fontSize = 12.5.sp,
+                                fontSize = 11.5.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 12.sp,
-                                letterSpacing = 0.3.sp,
+                                lineHeight = 11.sp,
+                                letterSpacing = 0.2.sp,
                             )
                             Spacer(Modifier.width(2.dp))
                             Text(
                                 text = "BUSINESS",
                                 color = HomeTextDark,
-                                fontSize = 12.5.sp,
+                                fontSize = 11.5.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 12.sp,
-                                letterSpacing = 0.3.sp,
+                                lineHeight = 11.sp,
+                                letterSpacing = 0.2.sp,
                             )
                         }
                         Text(
                             text = "360",
                             color = TendrePositive,
-                            fontSize = 12.5.sp,
+                            fontSize = 11.5.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 12.sp,
+                            lineHeight = 11.sp,
                         )
                     }
                 }
                 Spacer(Modifier.weight(1f))
                 // Notifications
-                IconButton(onClick = onNotificationClick, modifier = Modifier.size(38.dp)) {
+                IconButton(onClick = onNotificationClick, modifier = Modifier.size(34.dp)) {
                     BadgedBox(
                         badge = {
                             if (notificationCount > 0) {
@@ -495,19 +469,19 @@ private fun HomeHeader(
                             imageVector = Icons.Outlined.Notifications,
                             contentDescription = stringResource(R.string.notifications),
                             tint = HomeTextDark,
-                            modifier = Modifier.size(22.dp),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
-                Spacer(Modifier.width(8.dp))
-                // Logo entreprise à droite, sans onglet déroulant – 100% réel, plus de GREEN FARM hardcodé
+                Spacer(Modifier.width(6.dp))
+                // Logo entreprise à droite - Crop remplit complètement le cercle 38dp
                 Surface(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(38.dp)
                         .clickable(onClick = onProfileClick),
                     shape = CircleShape,
                     color = Color.White,
-                    border = BorderStroke(1.dp, HomeBorder),
+                    border = BorderStroke(1.2.dp, HomeBorder),
                     shadowElevation = 2.dp,
                 ) {
                     if (companyLogoUri != null) {
@@ -516,7 +490,7 @@ private fun HomeHeader(
                             contentDescription = stringResource(R.string.home_company_active),
                             fallbackIcon = Icons.Outlined.Store,
                             modifier = Modifier.fillMaxSize(),
-                            size = 40.dp,
+                            size = 38.dp,
                             shape = CircleShape,
                             fallbackTint = TendrePositive,
                             fallbackBackground = Green90,
@@ -527,32 +501,40 @@ private fun HomeHeader(
                                 imageVector = Icons.Outlined.Store,
                                 contentDescription = stringResource(R.string.home_company_active),
                                 tint = TendrePositive,
-                                modifier = Modifier.size(20.dp),
+                                modifier = Modifier.size(18.dp),
                             )
                         }
                     }
                 }
             }
-        }
-    }
-}
 
-@Composable
-private fun CompanyLogoWatermark(
-    logoUri: String?,
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier.clip(RoundedCornerShape(12.dp))) {
-        CompanyLogo(
-            logoUri = logoUri,
-            contentDescription = null,
-            fallbackIcon = Icons.Outlined.Store,
-            modifier = Modifier.fillMaxSize(),
-            size = 120.dp,
-            shape = RoundedCornerShape(12.dp),
-            fallbackTint = TendrePositive.copy(alpha = 0.12f),
-            fallbackBackground = Color.Transparent,
-        )
+            // Limite basse bien marquée : bordure 1dp + dégradé 2dp
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(HomeBorder),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                colors = listOf(
+                                    HomeBlue.copy(alpha = 0.22f),
+                                    TendrePositive.copy(alpha = 0.22f),
+                                ),
+                            ),
+                        ),
+                )
+            }
+        }
     }
 }
 
@@ -570,8 +552,8 @@ private fun HomeDashboard(
     val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
         ?: stringResource(R.string.home_greeting_anonymous)
     LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
+        modifier = modifier.background(HomeBackground),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {

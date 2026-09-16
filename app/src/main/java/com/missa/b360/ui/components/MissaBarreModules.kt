@@ -70,13 +70,34 @@ fun MissaBarreModules(
     // comparer les chaînes entières ne désignerait jamais l'onglet courant.
     val racine = routeCourante?.substringBefore('?')
     Surface(color = Color.White, shadowElevation = 8.dp) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(vertical = 7.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-        ) {
+        androidx.compose.foundation.layout.Column {
+            // Limite haute bien marquée avec zone scrollable
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(com.missa.b360.ui.theme.MissaBorder),
+            )
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            colors = listOf(
+                                BrandBlue.copy(alpha = 0.12f),
+                                com.missa.b360.ui.theme.Green90,
+                            ),
+                        ),
+                    ),
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+            ) {
             BarreOnglet(
                 icone = Icons.Outlined.Home,
                 libelleRes = R.string.nav_accueil,
@@ -105,6 +126,7 @@ fun MissaBarreModules(
                 actif = false,
                 onClick = onPlus,
             )
+            }
         }
     }
 }
