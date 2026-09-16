@@ -1,7 +1,10 @@
 package com.missa.b360.core.util
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.text.SpannableString
@@ -12,20 +15,22 @@ import android.text.style.StyleSpan
 import java.io.File
 
 /**
- * Génère la fiche entreprise en PDF A4 portrait via `android.graphics.pdf`
- * (aucune dépendance tierce) : en-tête nom + titre + date, sections titrées
- * au trait bleu, éléments en puces bleues « Libellé : valeur » avec retour à
- * la ligne propre (StaticLayout) et pagination automatique.
+ * Aperçu d'impression de la fiche entreprise au **format A5 portrait**, avec le
+ * logo de l'entreprise en en-tête (jamais celui de MISSA) et un document bien
+ * structuré : lettre à en-tête (logo + nom + titre + date), trait de
+ * séparation, sections titrées au trait bleu, éléments en puces bleues
+ * « Libellé : valeur » avec retour à la ligne propre et pagination automatique.
+ * Généré 100 % hors-ligne via `android.graphics.pdf`, aucune dépendance tierce.
  */
 object FicheEntreprisePdf {
 
     data class Ligne(val libelle: String, val valeur: String)
     data class Section(val titre: String, val lignes: List<Ligne>)
 
-    /** A4 portrait en points (72 dpi). */
-    private const val LARGEUR = 595f
-    private const val HAUTEUR = 842f
-    private const val MARGE = 48f
+    /** A5 portrait en points (72 dpi) : 148 × 210 mm. */
+    private const val LARGEUR = 420f
+    private const val HAUTEUR = 595f
+    private const val MARGE = 36f
 
     private const val ENCRE = 0xFF101C43.toInt()
     private const val BLEU = 0xFF1554E8.toInt()
@@ -37,6 +42,7 @@ object FicheEntreprisePdf {
         titreDoc: String,
         dateTexte: String,
         sections: List<Section>,
+        logo: Bitmap? = null,
     ): File {
         val document = PdfDocument()
         var numero = 1
@@ -58,43 +64,52 @@ object FicheEntreprisePdf {
 
         val paintTitre = Paint().apply {
             color = ENCRE
-            textSize = 20f
+            textSize = 16f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
         val paintSousTitre = Paint().apply {
             color = BLEU
+            textSize = 9.5f
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            isAntiAlias = true
+        }
+        val paintDate = Paint().apply { color = GRIS; textSize = 8.5f; isAntiAlias = true }
+        val paintSection = Paint().apply {
+            color = BLEU
             textSize = 11f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
-        val paintDate = Paint().apply { color = GRIS; textSize = 9.5f; isAntiAlias = true }
-        val paintSection = Paint().apply {
-            color = BLEU
-            textSize = 13f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            isAntiAlias = true
-        }
-        val paintLigne = TextPaint().apply { color = ENCRE; textSize = 10.5f; isAntiAlias = true }
-        val paintTrait = Paint().apply { color = BLEU; strokeWidth = 1.2f; isAntiAlias = true }
+        val paintLigne = TextPaint().apply { color = ENCRE; textSize = 9.5f; isAntiAlias = true }
+        val paintTrait = Paint().apply { color = BLEU; strokeWidth = 1f; isAntiAlias = true }
         val paintPuce = Paint().apply { color = BLEU; style = Paint.Style.FILL; isAntiAlias = true }
 
-        // En-tête du document : nom, titre, date, trait de séparation.
-        canvas.drawText(nomEntreprise, MARGE, y + 20f, paintTitre)
-        y += 26f
-        canvas.drawText(titreDoc, MARGE, y + 11f, paintSousTitre)
-        y += 16f
-        canvas.drawText(dateTexte, MARGE, y + 9.5f, paintDate)
-        y += 18f
+        // En-tête façon papier à lettres : logo de l'entreprise à gauche,
+        // nom + titre + date à droite, trait de séparation dessous.
+        val coteLogo = 40f
+        val xTexte = if (logo != null) MARGE + coteLogo + 10f else MARGE
+        if (logo != null) {
+            val dst = RectF(MARGE, y, MARGE + coteLogo, y + coteLogo)
+            val arrondi = Path().apply { addRoundRect(dst, 9f, 9f, Path.Direction.CCW) }
+            canvas.save()
+            canvas.clipPath(arrondi)
+            canvas.drawBitmap(logo, null, dst, null)
+            canvas.restore()
+        }
+        canvas.drawText(nomEntreprise, xTexte, y + 15f, paintTitre)
+        canvas.drawText(titreDoc, xTexte, y + 27f, paintSousTitre)
+        canvas.drawText(dateTexte, xTexte, y + 38f, paintDate)
+        y += coteLogo + 10f
         canvas.drawLine(MARGE, y, LARGEUR - MARGE, y, paintTrait)
-        y += 18f
+        y += 14f
 
         for (section in sections) {
-            espace(44f)
-            canvas.drawText(section.titre, MARGE, y + 13f, paintSection)
-            y += 18f
-            canvas.drawLine(MARGE, y, MARGE + 140f, y, paintTrait)
-            y += 14f
+            espace(36f)
+            canvas.drawText(section.titre, MARGE, y + 11f, paintSection)
+            y += 15f
+            canvas.drawLine(MARGE, y, MARGE + 110f, y, paintTrait)
+            y += 11f
             for (ligne in section.lignes) {
                 val texte = "${ligne.libelle} : ${ligne.valeur}"
                 val span = SpannableString(texte).apply {
@@ -105,20 +120,20 @@ object FicheEntreprisePdf {
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
                 }
-                val largeurDispo = (LARGEUR - MARGE * 2 - 14f).toInt()
+                val largeurDispo = (LARGEUR - MARGE * 2 - 12f).toInt()
                 val bloc = StaticLayout.Builder
                     .obtain(span, 0, span.length, paintLigne, largeurDispo)
                     .build()
-                val hauteurBloc = bloc.height + 6f
-                espace(hauteurBloc + 8f)
-                canvas.drawCircle(MARGE + 3f, y + 6f, 2.4f, paintPuce)
+                val hauteurBloc = bloc.height + 4f
+                espace(hauteurBloc + 6f)
+                canvas.drawCircle(MARGE + 2.5f, y + 5f, 2f, paintPuce)
                 canvas.save()
-                canvas.translate(MARGE + 14f, y)
+                canvas.translate(MARGE + 12f, y)
                 bloc.draw(canvas)
                 canvas.restore()
                 y += hauteurBloc
             }
-            y += 10f
+            y += 8f
         }
 
         document.finishPage(page)

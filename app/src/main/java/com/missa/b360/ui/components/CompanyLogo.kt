@@ -100,3 +100,26 @@ private fun rememberCompanyLogoBitmap(logoUri: String?): ImageBitmap? {
 }
 
 private const val LOGO_PREVIEW_MAX_SIDE = 640
+
+/**
+ * Décode le logo choisi par l'utilisateur en dehors de Compose (dessin dans
+ * le PDF d'aperçu d'impression). Retourne null si aucun logo ou lecture
+ * impossible — le document est alors généré sans logo, jamais avec un autre.
+ */
+fun chargerLogoBitmap(context: android.content.Context, logoUri: String?): android.graphics.Bitmap? =
+    logoUri?.let { uriText ->
+        runCatching {
+            val uri = Uri.parse(uriText)
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, bounds)
+            }
+            val largestSide = maxOf(bounds.outWidth, bounds.outHeight).coerceAtLeast(1)
+            var sampleSize = 1
+            while (largestSide / sampleSize > LOGO_PREVIEW_MAX_SIDE) sampleSize *= 2
+            val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, options)
+            }
+        }.getOrNull()
+    }

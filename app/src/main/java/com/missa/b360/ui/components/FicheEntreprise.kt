@@ -231,6 +231,8 @@ fun FicheEntrepriseDialog(
             titreDoc = res(R.string.fiche_entreprise_titre),
             dateTexte = dateTexte,
             sections = sectionsPdf,
+            // Aperçu d'impression avec le logo choisi par l'utilisateur.
+            logo = entreprise?.logoUri?.let { chargerLogoBitmap(context, it) },
         )
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", fichier)
         val intent = Intent(Intent.ACTION_SEND)
