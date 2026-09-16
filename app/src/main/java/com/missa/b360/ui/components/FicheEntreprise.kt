@@ -138,11 +138,6 @@ fun FicheEntrepriseDialog(
     val dateTexte = "${context.getString(R.string.fiche_edite_le)} " +
         android.text.format.DateFormat.getDateFormat(context).format(java.util.Date())
 
-    val copier: (String) -> Unit = { texte ->
-        clipboard.setText(AnnotatedString(texte))
-        Toast.makeText(context, context.getString(R.string.fiche_copie), Toast.LENGTH_SHORT).show()
-    }
-
     val langueAffichee = entreprise?.langue?.let { code ->
         langueLibelleRes(code)?.let { context.getString(it) } ?: code
     }
@@ -188,30 +183,36 @@ fun FicheEntrepriseDialog(
         ),
     )
 
-    val partager: () -> Unit = {
-        val res: (Int) -> String = { context.getString(it) }
-        val texte = buildString {
-            appendLine(nom)
-            appendLine()
-            sections.forEach { section ->
-                appendLine(res(section.titreRes))
-                section.lignes.forEach { ligne ->
-                    val valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() }
-                    appendLine("  • ${res(ligne.libelleRes)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
-                }
-                appendLine()
+    val res: (Int) -> String = { context.getString(it) }
+    val texteFiche = buildString {
+        appendLine(nom)
+        appendLine()
+        sections.forEach { section ->
+            appendLine(res(section.titreRes))
+            section.lignes.forEach { ligne ->
+                val valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() }
+                appendLine("  • ${res(ligne.libelleRes)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
             }
-        }.trimEnd()
+            appendLine()
+        }
+    }.trimEnd()
+
+    val partager: () -> Unit = {
         val intent = Intent(Intent.ACTION_SEND)
             .setType("text/plain")
             .putExtra(Intent.EXTRA_SUBJECT, nom)
-            .putExtra(Intent.EXTRA_TEXT, texte)
+            .putExtra(Intent.EXTRA_TEXT, texteFiche)
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.fiche_partager)))
+    }
+
+    // Copie la fiche complète d'un seul coup dans le presse-papiers.
+    val copierTout: () -> Unit = {
+        clipboard.setText(AnnotatedString(texteFiche))
+        Toast.makeText(context, context.getString(R.string.fiche_copie), Toast.LENGTH_SHORT).show()
     }
 
     // Partage PDF : même contenu que le document affiché, généré hors-ligne
     // puis exposé via FileProvider (application/pdf).
-    val res: (Int) -> String = { context.getString(it) }
     val partagerPdf: () -> Unit = {
         val sectionsPdf = sections.map { section ->
             FicheEntreprisePdf.Section(
@@ -304,22 +305,40 @@ fun FicheEntrepriseDialog(
                     modifier = Modifier
                         .weight(1f, fill = false)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 16.dp),
                 ) {
                     sections.forEach { section ->
                         SectionFiche(
                             section = section,
                             nonRenseigne = nonRenseigne,
-                            onCopier = copier,
                         )
                     }
                 }
-                // Pied : modifier (destination existante) / partager la fiche complète.
+                // Pied : copier tout · partager · partager en PDF.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
                 ) {
+                    OutlinedButton(
+                        onClick = copierTout,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(14.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.ContentCopy,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = stringResource(R.string.fiche_copier),
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
                     OutlinedButton(
                         onClick = partager,
                         modifier = Modifier.weight(1f),
@@ -330,10 +349,15 @@ fun FicheEntrepriseDialog(
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
-                        Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.fiche_partager), fontSize = 12.sp)
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = stringResource(R.string.fiche_partager),
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        )
                     }
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(8.dp))
                     Button(
                         onClick = partagerPdf,
                         modifier = Modifier.weight(1f),
@@ -345,8 +369,13 @@ fun FicheEntrepriseDialog(
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
-                        Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.fiche_partager_pdf), fontSize = 12.sp)
+                        Spacer(Modifier.width(5.dp))
+                        Text(
+                            text = stringResource(R.string.fiche_partager_pdf),
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        )
                     }
                 }
             }
@@ -363,7 +392,6 @@ fun FicheEntrepriseDialog(
 private fun SectionFiche(
     section: SectionFicheData,
     nonRenseigne: String,
-    onCopier: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
         Text(
@@ -388,20 +416,18 @@ private fun SectionFiche(
                 libelle = stringResource(ligne.libelleRes),
                 valeur = ligne.valeur,
                 nonRenseigne = nonRenseigne,
-                onCopier = onCopier,
             )
         }
         Spacer(Modifier.height(6.dp))
     }
 }
 
-/** Paragraphe à puce bleue : « Libellé : valeur », bouton copie si valeur renseignée. */
+/** Paragraphe à puce bleue : « Libellé : valeur ». */
 @Composable
 private fun LigneFiche(
     libelle: String,
     valeur: String?,
     nonRenseigne: String,
-    onCopier: (String) -> Unit,
 ) {
     val vide = valeur.isNullOrBlank()
     Row(
@@ -431,18 +457,5 @@ private fun LigneFiche(
             lineHeight = 14.sp,
             modifier = Modifier.weight(1f),
         )
-        if (!vide) {
-            IconButton(
-                onClick = { onCopier(valeur) },
-                modifier = Modifier.size(28.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ContentCopy,
-                    contentDescription = stringResource(R.string.fiche_copier),
-                    tint = MissaMuted,
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
     }
 }
