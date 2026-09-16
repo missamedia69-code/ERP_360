@@ -5,10 +5,8 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
-  <!-- Badge pointé sur la branche publiée la plus récente : arena/01a0a9d0-erp-360 n'est pas
-       encore poussée sur origin, son badge resterait « no status ». Dernière exécution verte
-       vérifiée : 35079663745 (arena/01a0a160-erp-360, commit 390d9eb). -->
-  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a160-erp-360">
+  <!-- Dernière exécution verte vérifiée sur cette branche : 35089341325 (commit 056f11e). -->
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a9d0-erp-360">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
@@ -189,8 +187,7 @@ sur `ProductType` via `ProduitRules`) :
 Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
 
 ```bash
-# Branche publiée la plus récente — arena/01a0a9d0-erp-360 s'y substituera dès sa poussée sur origin
-git clone -b arena/01a0a160-erp-360 https://github.com/missamedia69-code/ERP_360.git
+git clone -b arena/01a0a9d0-erp-360 https://github.com/missamedia69-code/ERP_360.git
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 python3 .github/scripts/verifier_traductions.py
