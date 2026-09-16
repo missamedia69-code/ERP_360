@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Missa Business 360</string>
     <string name="app_slogan">شركتك، أولويتنا</string>
+    <string name="fiche_entreprise_titre">ملف الشركة</string>
+    <string name="fiche_partager">مشاركة</string>
+    <string name="fiche_copier">نسخ</string>
+    <string name="fiche_copie">تم النسخ إلى الحافظة</string>
 
     <string name="more_modules">المزيد من الوحدات</string>
     <string name="notifications">الإشعارات</string>

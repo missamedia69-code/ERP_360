@@ -128,6 +128,9 @@ private fun MainNavHost() {
     val routeCourante = navController.currentBackStackEntryAsState().value?.destination?.route
     var plusDeModules by remember { mutableStateOf(false) }
     var assistance by remember { mutableStateOf(false) }
+    var ficheEntreprise by remember { mutableStateOf(false) }
+    val ficheViewModel: com.missa.b360.ui.components.FicheEntrepriseViewModel = hiltViewModel()
+    val ficheEtat by ficheViewModel.etat.collectAsState()
     val etatTiroir = rememberDrawerState(DrawerValue.Closed)
     val portee = rememberCoroutineScope()
     val etatAccueil by accueilViewModel.uiState.collectAsState()
@@ -203,7 +206,7 @@ private fun MainNavHost() {
                     onMenuClick = { portee.launch { etatTiroir.open() } },
                     onBackClick = { navController.popBackStack() },
                     onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                    onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
+                    onProfileClick = { ficheEntreprise = true },
                 )
             }
         },
@@ -556,6 +559,19 @@ private fun MainNavHost() {
         HomeSupportDialogue(
             entrepriseNom = etatAccueil.entrepriseNom,
             onFermer = { assistance = false },
+        )
+    }
+
+    if (ficheEntreprise) {
+        com.missa.b360.ui.components.FicheEntrepriseDialog(
+            etat = ficheEtat,
+            onDismiss = { ficheEntreprise = false },
+            // Le bouton rond du header ouvrait Réglages : la fiche reprend ce
+            // parcours via « Modifier » pour ne perdre aucune fonctionnalité.
+            onModifier = {
+                ficheEntreprise = false
+                navController.navigate(Routes.ADMIN_REGLAGES)
+            },
         )
     }
 

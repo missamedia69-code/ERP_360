@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Missa Business 360</string>
     <string name="app_slogan">Votre entreprise, notre priorité</string>
+    <string name="fiche_entreprise_titre">Fiche entreprise</string>
+    <string name="fiche_partager">Partager</string>
+    <string name="fiche_copier">Copier</string>
+    <string name="fiche_copie">Copié dans le presse-papiers</string>
 
     <!-- Accueil --><string name="more_modules">Plus de modules</string>
     <string name="notifications">Notifications</string>
