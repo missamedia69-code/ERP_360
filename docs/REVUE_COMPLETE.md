@@ -1,6 +1,6 @@
-# Revue complète ERP 360 — 2026-09-16 (v6 header compact + limites scroll)
+# Revue complète ERP 360 — 2026-09-16 (v7 barre accueil limites bien marquées)
 
-CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert → 35073598241 header compact 2m58s vert (Traductions 8s + Compilation)
+CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert → 35073598241 header compact 2m58s → 35075691738 barre bas limites 4m43s vert (Traductions 6s + Compilation)
 
 ## Fix v6 — Header trop descendu + logos + limites scrollable
 
@@ -9,10 +9,22 @@ CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert �
     - Fix v6 : `matchParentSize` pour tous fonds (watermark + halos radialGradient) pour ne pas agrandir layout, watermark `CompanyLogo` `matchParentSize` `alpha 0.09f` avec `ContentScale.Crop` remplit complètement head space et rogne parties invisibles, halos `matchParentSize` radialGradient centrés offset 900/100, hauteur Row réduite `height(52.dp)` vs padding 8+10, icones 36→34dp, logo MISSA 36→32dp, logo entreprise 40→38dp, `WindowInsets.statusBars` vs `safeDrawing` pour éviter espace descendu, `LazyColumn` contentPadding top 8→4dp + `background(HomeBackground)` pour contraste
     - Résultat : header compact 52dp + statusBars (~76dp total) vs 160dp avant, logos remplissent arrière-plan avec Crop ✅
 
-19. **Limites zone scrollable non marquées**
-    - Chemin : `HomeScreen.kt` header + `MissaBarreModules.kt` bottom bar
-    - Fix v6 : header `Surface shadowElevation 0→4.dp` + colonne basse 1dp `HomeBorder` + 2dp dégradé horizontal `HomeBlue 0.22f / TendrePositive 0.22f`, bottom bar `MissaBarreModules.kt` ajout colonne haute 1dp `MissaBorder` + 2dp dégradé `BrandBlue 0.12f / Green90` + shadowElevation 8dp existante, padding vertical 7→6dp, LazyColumn background `MissaCanvas` vs White header/bar pour contraste net
-    - Résultat : séparation nette header ↔ scrollable ↔ bottom bar ✅
+19. **Limites zone scrollable non marquées (header)**
+    - Chemin : `HomeScreen.kt` header
+    - Fix v6 : header `Surface shadowElevation 0→4.dp` + colonne basse 1dp `HomeBorder` + 2dp dégradé horizontal `HomeBlue 0.22f / TendrePositive 0.22f`
+    - Fix v7 : symétrie avec bottom bar : shadow 4→8dp + tonal 1dp, bordure 1→1.5dp, dégradé 2→3dp, ajout 6dp ombre douce verticale Black 0.06→transparent vers contenu scrollable
+    - Résultat : séparation nette header ↔ scrollable ✅
+
+## Fix v7 — Barre d'accueil du bas limites bien marquées
+
+20. **Barre d'accueil du bas limites faibles**
+    - Chemin : `MissaBarreModules.kt` `Surface shadow 8dp` + 1dp border + 2dp gradient 0.12f
+    - Fix v7 : 
+      - `Surface shadowElevation 8→12.dp` + `tonalElevation 1.dp` + `shape RoundedCornerShape(topStart=18.dp, topEnd=18.dp)` pour effet feuille détachée, limite très visible
+      - Limite haute en 3 couches : 1) `Box 1.5dp MissaBorder` solide bien visible, 2) `Box 3dp horizontalGradient BrandBlue 0.22 / TendrePositive 0.22` marqué (vs 0.12 avant), 3) `Box 6dp verticalGradient Black 0.06→transparent` pour profondeur entre scrollable et barre
+      - Row `background White` + `windowInsetsPadding(navigationBars)` + `padding vertical 6→5dp` compact
+      - Symétrie avec header : même épaisseur bordure/dégradé/ombre pour cohérence haut/bas
+    - Résultat : barre du bas clairement détachée de la zone scrollable MissaCanvas vs White, 3 niveaux de séparation (bordure + dégradé couleur marque + ombre douce), coins arrondis haut 18dp marquent limite, CI 35075691738 vert ✅
 
 ## Résumé exécutif
 Application Clean Architecture (data/domain/ui), Hilt, Room 12 migrations, DataStore, Compose, 5 langues (fr/en/es/ar/zh). 193 fichiers Kotlin. Header redesigné MISSA gauche / entreprise droite sans dropdown, fond basé sur logo utilisateur (watermark 7% + halos radialGradient + ligne dégradée). Illustrations 3D WebP 512px 80% (33MB → 176KB) avec `ContentScale.Crop` plein cadre. Dette i18n nettoyée : 1750 → 866 clés (-884), 0 inutilisée. Sécurité `!!` 0, `Color(0x)` 0 hors `Color.kt`, `runBlocking/GlobalScope` 0, DAO directs dans ViewModels 0 après v5. Build vert 4m46s.
