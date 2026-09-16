@@ -106,27 +106,36 @@ import com.missa.b360.ui.components.MissaBrandMark
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.Blue90
+import com.missa.b360.ui.theme.Blue80
 import com.missa.b360.ui.theme.Green60
+import com.missa.b360.ui.theme.Green90
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
+import com.missa.b360.ui.theme.ProfileGreen
+import com.missa.b360.ui.theme.ProfileOrange
+import com.missa.b360.ui.theme.ProfilePurple
+import com.missa.b360.ui.theme.ProfileTeal
 import com.missa.b360.ui.theme.Red40
+import com.missa.b360.ui.theme.Red80
+import com.missa.b360.ui.theme.TendrePositive
 
-/* Palette du tableau de bord mobile. */
+/* Palette du tableau de bord mobile — centralisée, plus d'inline Color(0x). */
 private val HomeBlue = BrandBlue
 private val HomeBlueSoft = MissaSoftBlue
 private val HomeGreen = Green60
-private val HomeGreenSoft = HomeGreenSoft
-private val HomeOrange = HomeOrange
-private val HomeOrangeSoft = HomeOrangeSoft
-private val HomePurple = HomePurple
+private val HomeGreenSoft = com.missa.b360.ui.theme.Green90
+private val HomeOrange = com.missa.b360.ui.theme.ProfileOrange
+private val HomeOrangeSoft = com.missa.b360.ui.theme.Blue90 // fallback clair, remplace FFF1DF/FFF7ED
+private val HomePurple = com.missa.b360.ui.theme.ProfilePurple
 
 /** Vert du « 360 » de la marque et de l'identité client. */
-private val MarqueVert = MarqueVert
-private val HomePurpleSoft = HomePurpleSoft
-private val HomeTeal = HomeTeal
+private val MarqueVert = com.missa.b360.ui.theme.ProfileGreen
+private val HomePurpleSoft = com.missa.b360.ui.theme.Blue90
+private val HomeTeal = com.missa.b360.ui.theme.ProfileTeal
 private val HomeRed = Red40
 private val HomeTextDark = MissaInk
 private val HomeTextMuted = MissaMuted
