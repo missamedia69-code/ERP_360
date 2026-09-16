@@ -71,7 +71,7 @@ fun MissaBarreModules(
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 12.dp),
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 10.dp),
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -84,7 +84,7 @@ fun MissaBarreModules(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 6.dp, vertical = 8.dp),
+                    .padding(horizontal = 6.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BarreOnglet(
@@ -137,8 +137,8 @@ private fun BarreOnglet(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
             .clickable(onClick = onClick)
-            .sizeIn(minWidth = 48.dp, minHeight = 56.dp)
-            .padding(vertical = 4.dp),
+            .sizeIn(minWidth = 48.dp, minHeight = 50.dp)
+            .padding(vertical = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -148,12 +148,12 @@ private fun BarreOnglet(
                     color = if (actif) BrandBlue.copy(alpha = 0.10f) else Color.Transparent,
                     shape = RoundedCornerShape(16.dp),
                 )
-                .padding(horizontal = 14.dp, vertical = 6.dp),
+                .padding(horizontal = 14.dp, vertical = 4.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(24.dp))
-                Spacer(Modifier.height(3.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = stringResource(libelleRes),
                     color = teinte,
@@ -164,7 +164,7 @@ private fun BarreOnglet(
                 )
             }
         }
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(3.dp))
         Box(
             modifier = Modifier
                 .height(3.dp)
