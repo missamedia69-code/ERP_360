@@ -365,7 +365,7 @@ private fun SectionFiche(
     nonRenseigne: String,
     onCopier: (String) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
         Text(
             text = stringResource(section.titreRes),
             color = BrandBlue,
@@ -382,7 +382,7 @@ private fun SectionFiche(
                     RoundedCornerShape(0.5.dp),
                 ),
         )
-        Spacer(Modifier.height(3.dp))
+        Spacer(Modifier.height(2.dp))
         section.lignes.forEach { ligne ->
             LigneFiche(
                 libelle = stringResource(ligne.libelleRes),
@@ -391,6 +391,7 @@ private fun SectionFiche(
                 onCopier = onCopier,
             )
         }
+        Spacer(Modifier.height(6.dp))
     }
 }
 
@@ -404,14 +405,12 @@ private fun LigneFiche(
 ) {
     val vide = valeur.isNullOrBlank()
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 1.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
     ) {
         Box(
             modifier = Modifier
-                .padding(top = 5.dp)
+                .padding(top = 4.dp)
                 .size(5.dp)
                 .background(BrandBlue, CircleShape),
         )
@@ -429,13 +428,13 @@ private fun LigneFiche(
                 }
             },
             fontSize = 12.sp,
-            lineHeight = 15.sp,
+            lineHeight = 14.sp,
             modifier = Modifier.weight(1f),
         )
         if (!vide) {
             IconButton(
                 onClick = { onCopier(valeur) },
-                modifier = Modifier.size(30.dp),
+                modifier = Modifier.size(28.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ContentCopy,
