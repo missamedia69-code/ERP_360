@@ -17,10 +17,10 @@ import java.io.File
 /**
  * Aperçu d'impression de la fiche entreprise au **format A5 portrait**, avec le
  * logo de l'entreprise en en-tête (jamais celui de MISSA) et un document bien
- * structuré : lettre à en-tête (logo + nom + titre + date), trait de
- * séparation, sections titrées au trait bleu, éléments en puces bleues
- * « Libellé : valeur » avec retour à la ligne propre et pagination automatique.
- * Généré 100 % hors-ligne via `android.graphics.pdf`, aucune dépendance tierce.
+ * structuré : en-tête papier à lettres (logo + nom + titre + date), sections
+ * titrées en bandeau bleu clair, éléments en puces bleues « Libellé : valeur »
+ * avec retour à la ligne propre, pied de page (note + pagination) et pagination
+ * automatique. Généré 100 % hors-ligne via `android.graphics.pdf`.
  */
 object FicheEntreprisePdf {
 
@@ -30,11 +30,13 @@ object FicheEntreprisePdf {
     /** A5 portrait en points (72 dpi) : 148 × 210 mm. */
     private const val LARGEUR = 420f
     private const val HAUTEUR = 595f
-    private const val MARGE = 36f
+    private const val MARGE = 32f
 
     private const val ENCRE = 0xFF101C43.toInt()
     private const val BLEU = 0xFF1554E8.toInt()
     private const val GRIS = 0xFF65718F.toInt()
+    private const val BLEU_CLAIR = 0xFFEFF4FF.toInt()
+    private const val TRAIT_LEGER = 0xFFE1E8F5.toInt()
 
     fun generer(
         context: Context,
@@ -43,6 +45,7 @@ object FicheEntreprisePdf {
         dateTexte: String,
         sections: List<Section>,
         logo: Bitmap? = null,
+        piedNote: String? = null,
     ): File {
         val document = PdfDocument()
         var numero = 1
@@ -50,7 +53,18 @@ object FicheEntreprisePdf {
         var canvas = page.canvas
         var y = MARGE
 
+        val paintPied = Paint().apply { color = GRIS; textSize = 7.5f; isAntiAlias = true }
+        val paintTraitPied = Paint().apply { color = TRAIT_LEGER; strokeWidth = 0.8f; isAntiAlias = true }
+
+        fun piedDePage(c: android.graphics.Canvas, num: Int) {
+            c.drawLine(MARGE, HAUTEUR - 26f, LARGEUR - MARGE, HAUTEUR - 26f, paintTraitPied)
+            piedNote?.let { c.drawText(it, MARGE, HAUTEUR - 14f, paintPied) }
+            val pageTexte = "Page $num"
+            c.drawText(pageTexte, LARGEUR - MARGE - paintPied.measureText(pageTexte), HAUTEUR - 14f, paintPied)
+        }
+
         fun nouvellePage() {
+            piedDePage(canvas, numero)
             document.finishPage(page)
             numero += 1
             page = demarrerPage(document, numero)
@@ -59,57 +73,63 @@ object FicheEntreprisePdf {
         }
 
         fun espace(besoin: Float) {
-            if (y + besoin > HAUTEUR - MARGE) nouvellePage()
+            if (y + besoin > HAUTEUR - 44f) nouvellePage()
         }
 
         val paintTitre = Paint().apply {
             color = ENCRE
-            textSize = 16f
+            textSize = 18f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
         val paintSousTitre = Paint().apply {
             color = BLEU
-            textSize = 9.5f
+            textSize = 10.5f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
-        val paintDate = Paint().apply { color = GRIS; textSize = 8.5f; isAntiAlias = true }
+        val paintDate = Paint().apply { color = GRIS; textSize = 9f; isAntiAlias = true }
         val paintSection = Paint().apply {
             color = BLEU
-            textSize = 11f
+            textSize = 11.5f
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
-        val paintLigne = TextPaint().apply { color = ENCRE; textSize = 9.5f; isAntiAlias = true }
-        val paintTrait = Paint().apply { color = BLEU; strokeWidth = 1f; isAntiAlias = true }
+        val paintFondSection = Paint().apply {
+            color = BLEU_CLAIR
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+        val paintLigne = TextPaint().apply { color = ENCRE; textSize = 10.5f; isAntiAlias = true }
+        val paintTrait = Paint().apply { color = BLEU; strokeWidth = 1.2f; isAntiAlias = true }
         val paintPuce = Paint().apply { color = BLEU; style = Paint.Style.FILL; isAntiAlias = true }
 
-        // En-tête façon papier à lettres : logo de l'entreprise à gauche,
+        // En-tête papier à lettres : logo de l'entreprise à gauche,
         // nom + titre + date à droite, trait de séparation dessous.
-        val coteLogo = 40f
-        val xTexte = if (logo != null) MARGE + coteLogo + 10f else MARGE
+        val coteLogo = 48f
+        val xTexte = if (logo != null) MARGE + coteLogo + 12f else MARGE
         if (logo != null) {
             val dst = RectF(MARGE, y, MARGE + coteLogo, y + coteLogo)
-            val arrondi = Path().apply { addRoundRect(dst, 9f, 9f, Path.Direction.CCW) }
+            val arrondi = Path().apply { addRoundRect(dst, 11f, 11f, Path.Direction.CCW) }
             canvas.save()
             canvas.clipPath(arrondi)
             canvas.drawBitmap(logo, null, dst, null)
             canvas.restore()
         }
-        canvas.drawText(nomEntreprise, xTexte, y + 15f, paintTitre)
-        canvas.drawText(titreDoc, xTexte, y + 27f, paintSousTitre)
-        canvas.drawText(dateTexte, xTexte, y + 38f, paintDate)
-        y += coteLogo + 10f
+        canvas.drawText(nomEntreprise, xTexte, y + 17f, paintTitre)
+        canvas.drawText(titreDoc, xTexte, y + 31f, paintSousTitre)
+        canvas.drawText(dateTexte, xTexte, y + 44f, paintDate)
+        y += coteLogo + 12f
         canvas.drawLine(MARGE, y, LARGEUR - MARGE, y, paintTrait)
-        y += 14f
+        y += 16f
 
         for (section in sections) {
-            espace(36f)
-            canvas.drawText(section.titre, MARGE, y + 11f, paintSection)
-            y += 15f
-            canvas.drawLine(MARGE, y, MARGE + 110f, y, paintTrait)
-            y += 11f
+            espace(44f)
+            // Titre de section en bandeau bleu clair pleine largeur.
+            val bandeau = RectF(MARGE, y, LARGEUR - MARGE, y + 18f)
+            canvas.drawRoundRect(bandeau, 4f, 4f, paintFondSection)
+            canvas.drawText(section.titre, MARGE + 7f, y + 13f, paintSection)
+            y += 24f
             for (ligne in section.lignes) {
                 val texte = "${ligne.libelle} : ${ligne.valeur}"
                 val span = SpannableString(texte).apply {
@@ -120,22 +140,23 @@ object FicheEntreprisePdf {
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                     )
                 }
-                val largeurDispo = (LARGEUR - MARGE * 2 - 12f).toInt()
+                val largeurDispo = (LARGEUR - MARGE * 2 - 14f).toInt()
                 val bloc = StaticLayout.Builder
                     .obtain(span, 0, span.length, paintLigne, largeurDispo)
                     .build()
-                val hauteurBloc = bloc.height + 4f
+                val hauteurBloc = bloc.height + 6f
                 espace(hauteurBloc + 6f)
-                canvas.drawCircle(MARGE + 2.5f, y + 5f, 2f, paintPuce)
+                canvas.drawCircle(MARGE + 3f, y + 5.5f, 2.2f, paintPuce)
                 canvas.save()
-                canvas.translate(MARGE + 12f, y)
+                canvas.translate(MARGE + 14f, y)
                 bloc.draw(canvas)
                 canvas.restore()
                 y += hauteurBloc
             }
-            y += 8f
+            y += 10f
         }
 
+        piedDePage(canvas, numero)
         document.finishPage(page)
 
         val dossier = File(context.cacheDir, "fiches_pdf").apply { mkdirs() }

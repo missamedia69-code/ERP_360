@@ -52,7 +52,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.EnterpriseEntity
+import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
+import com.missa.b360.core.domain.usecase.SiteAdminUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green90
@@ -79,27 +81,34 @@ data class FicheEntrepriseState(
     val entreprise: EnterpriseEntity? = null,
     val proprietaireNom: String? = null,
     val proprietaireEmail: String? = null,
+    val proprietaireRole: String? = null,
+    val sites: List<SiteEntity> = emptyList(),
 )
 
 @HiltViewModel
 class FicheEntrepriseViewModel @Inject constructor(
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
+    sites: SiteAdminUseCases,
 ) : ViewModel() {
 
-    /** Entreprise + utilisateur portant le rôle SYSTEM « Propriétaire » (à défaut, le premier). */
+    /** Entreprise + sites + utilisateur portant le rôle SYSTEM « Propriétaire » (à défaut, le premier). */
     val etat: StateFlow<FicheEntrepriseState> = combine(
         getEnterprise.observer(),
         users.observerUtilisateurs(),
         users.observerRoles(),
-    ) { entreprise, utilisateurs, roles ->
+        sites.observerSites(),
+    ) { entreprise, utilisateurs, roles, sitesEnregistres ->
         val roleIdProprietaire = roles.firstOrNull { it.nom.equals("Propriétaire", ignoreCase = true) }?.id
         val proprietaire = utilisateurs.firstOrNull { it.roleId != null && it.roleId == roleIdProprietaire }
             ?: utilisateurs.firstOrNull()
+        val proprietaireRole = proprietaire?.roleId?.let { rid -> roles.firstOrNull { it.id == rid }?.nom }
         FicheEntrepriseState(
             entreprise = entreprise,
             proprietaireNom = proprietaire?.nom,
             proprietaireEmail = proprietaire?.emailSecours,
+            proprietaireRole = proprietaireRole,
+            sites = sitesEnregistres,
         )
     }.stateIn(
         viewModelScope,
@@ -108,7 +117,12 @@ class FicheEntrepriseViewModel @Inject constructor(
     )
 }
 
-private data class LigneFicheData(val libelleRes: Int, val valeur: String?)
+/** Libellé de ligne : ressource traduite ou texte direct (ex. nom d'un site). */
+private data class LigneFicheData(
+    val libelleRes: Int? = null,
+    val valeur: String?,
+    val libelleTexte: String? = null,
+)
 
 private data class SectionFicheData(
     val titreRes: Int,
@@ -178,12 +192,35 @@ fun FicheEntrepriseDialog(
             R.string.obn_recap_proprietaire,
             listOf(
                 LigneFicheData(R.string.clients_nom, etat.proprietaireNom),
+                LigneFicheData(R.string.clients_flow_role, etat.proprietaireRole),
                 LigneFicheData(R.string.ob_email, etat.proprietaireEmail),
             ),
         ),
-    )
+    ) + if (etat.sites.isEmpty()) {
+        emptyList()
+    } else {
+        // Section Sites : nom du site en libellé, type · adresse · principal en valeur.
+        listOf(
+            SectionFicheData(
+                R.string.fiche_section_sites,
+                etat.sites.map { site ->
+                    LigneFicheData(
+                        libelleTexte = site.nom,
+                        valeur = listOfNotNull(
+                            site.type.takeIf { t -> t.isNotBlank() },
+                            site.adresse?.takeIf { a -> a.isNotBlank() },
+                            if (site.principal) context.getString(R.string.clients_flow_primary) else null,
+                        ).joinToString(" · ").takeIf { v -> v.isNotBlank() },
+                    )
+                },
+            ),
+        )
+    }
 
     val res: (Int) -> String = { context.getString(it) }
+    val libelle: (LigneFicheData) -> String = { ligne ->
+        ligne.libelleRes?.let { context.getString(it) } ?: ligne.libelleTexte.orEmpty()
+    }
     val texteFiche = buildString {
         appendLine(nom)
         appendLine()
@@ -191,7 +228,7 @@ fun FicheEntrepriseDialog(
             appendLine(res(section.titreRes))
             section.lignes.forEach { ligne ->
                 val valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() }
-                appendLine("  • ${res(ligne.libelleRes)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
+                appendLine("  • ${libelle(ligne)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
             }
             appendLine()
         }
@@ -219,11 +256,14 @@ fun FicheEntrepriseDialog(
                 titre = res(section.titreRes),
                 lignes = section.lignes.map { ligne ->
                     FicheEntreprisePdf.Ligne(
-                        libelle = res(ligne.libelleRes),
+                        libelle = libelle(ligne),
                         valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() } ?: nonRenseigne,
                     )
                 },
             )
+        }
+        val nbInfos = sectionsPdf.sumOf { section ->
+            section.lignes.count { ligne -> ligne.valeur != nonRenseigne }
         }
         val fichier = FicheEntreprisePdf.generer(
             context = context,
@@ -233,6 +273,7 @@ fun FicheEntrepriseDialog(
             sections = sectionsPdf,
             // Aperçu d'impression avec le logo choisi par l'utilisateur.
             logo = entreprise?.logoUri?.let { chargerLogoBitmap(context, it) },
+            piedNote = String.format(res(R.string.fiche_nb_infos), nbInfos),
         )
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", fichier)
         val intent = Intent(Intent.ACTION_SEND)
@@ -415,7 +456,7 @@ private fun SectionFiche(
         Spacer(Modifier.height(2.dp))
         section.lignes.forEach { ligne ->
             LigneFiche(
-                libelle = stringResource(ligne.libelleRes),
+                libelle = libelle(ligne),
                 valeur = ligne.valeur,
                 nonRenseigne = nonRenseigne,
             )
