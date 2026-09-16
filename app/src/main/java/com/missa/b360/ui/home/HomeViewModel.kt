@@ -2,15 +2,9 @@ package com.missa.b360.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.dao.CompteTresorerieDao
-import com.missa.b360.core.data.dao.MouvementTresorerieDao
-import com.missa.b360.core.data.dao.NonConformiteDao
-import com.missa.b360.core.data.dao.ProductDao
-import com.missa.b360.core.data.dao.ProductStockDao
-import com.missa.b360.core.data.dao.StockMovementDao
-import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.entity.StatutNc
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.repository.HomeRepository
 import com.missa.b360.core.data.repository.ProfilActivationRepository
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.CockpitRules
@@ -18,7 +12,6 @@ import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.PointPerformance
 import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.domain.model.RappelsRules
-import com.missa.b360.core.domain.model.StockHubRules
 import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
@@ -33,10 +26,12 @@ import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.notifications.AppNotifier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -102,13 +97,7 @@ class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
     private val settingsStore: SettingsStore,
     private val activationRepository: ProfilActivationRepository,
-    compteTresorerieDao: CompteTresorerieDao,
-    mouvementTresorerieDao: MouvementTresorerieDao,
-    productDao: ProductDao,
-    productStockDao: ProductStockDao,
-    stockMovementDao: StockMovementDao,
-    nonConformiteDao: NonConformiteDao,
-    taskDao: TaskDao,
+    private val homeRepository: HomeRepository,
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
@@ -195,17 +184,14 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private val taches = taskDao.observeAll()
+    private val taches = homeRepository.observeTaches()
 
-    private val soldeTresorerie = combine(
-        compteTresorerieDao.observeAll(),
-        mouvementTresorerieDao.observeAll(),
-    ) { comptes, mouvements -> TresorerieRules.soldeGlobal(comptes, mouvements) }
+    private val soldeTresorerie = homeRepository.observeSoldeTresorerie()
 
-    private val stockQuantites = productStockDao.observeToutes()
-    private val stockMouvements = stockMovementDao.observeRecent(500)
-    private val produits = productDao.observeAll()
-    private val nonConformites = nonConformiteDao.observeAll()
+    private val stockQuantites = homeRepository.observeStockQuantites()
+    private val stockMouvements = homeRepository.observeStockMouvements()
+    private val produits = homeRepository.observeProduits()
+    private val nonConformites = homeRepository.observeNonConformites()
 
     val uiState: StateFlow<HomeUiState> = combine(
         baseState,
@@ -353,7 +339,7 @@ class HomeViewModel @Inject constructor(
             nonConformitesOuvertes = ncOuvertes,
             interventionsMaintenance = 0,
         )
-    }.stateIn(
+    }.flowOn(Dispatchers.Default).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeUiState(),
