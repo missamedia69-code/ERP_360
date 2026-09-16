@@ -354,6 +354,7 @@ fun FicheEntrepriseDialog(
                         SectionFiche(
                             section = section,
                             nonRenseigne = nonRenseigne,
+                            libelle = libelle,
                         )
                     }
                 }
@@ -435,6 +436,7 @@ fun FicheEntrepriseDialog(
 private fun SectionFiche(
     section: SectionFicheData,
     nonRenseigne: String,
+    libelle: (LigneFicheData) -> String,
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(top = 5.dp)) {
         Text(
