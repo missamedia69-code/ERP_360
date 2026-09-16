@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -40,20 +40,22 @@ import com.missa.b360.R
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaMuted
-import com.missa.b360.ui.theme.TendrePositive
 
 val LocalBarreNavigation = compositionLocalOf { mutableStateOf(true) }
 
 /**
- * Barre de navigation principale — Spec UI MISSA BUSINESS 360
+ * Barre de navigation principale — carte blanche flottante.
  *
- * - Hauteur applicative 80dp + navigationBars bottom inset dynamique
- * - 5 destinations: Accueil, Vente, Achats, Stock, Plus
- * - Chaque item: icon 24dp + label 11-12sp, zone tactile 48x48 minimum
- * - Responsive: weight(1f) par item, fillMaxWidth, pas de px fixes
- * - Limites bien marquées: bordure 1.5dp + dégradé 3dp + ombre douce 6dp + shadow 12dp
- * - Edge-to-edge: background peut aller sous zones système, content respecte Insets
+ * - 5 destinations : Accueil + 3 modules du pack ([AppModule.barreBas]) + Plus.
+ * - Flotte au-dessus du contenu : coins 26dp, ombre légère, bordure fine, aucun fond bleu massif.
+ * - Respecte la zone de navigation / geste Android ([WindowInsets.navigationBars]).
+ * - Onglet actif : icône + libellé bleu MISSA sur pastille bleu extrêmement pâle,
+ *   petit indicateur bleu sous l'élément ; inactif : gris/bleu gris.
+ * - Zones tactiles ≥ 48dp, icônes 24dp, libellés 11sp, `weight(1f)` par onglet.
+ *
+ * La navigation elle-même est inchangée : mêmes callbacks, mêmes routes.
  */
 @Composable
 fun MissaBarreModules(
@@ -64,95 +66,63 @@ fun MissaBarreModules(
     onPlus: () -> Unit,
 ) {
     val racine = routeCourante?.substringBefore('?')
-    Surface(
-        color = Color.White,
-        shadowElevation = 12.dp,
-        tonalElevation = 1.dp,
-        shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(start = 12.dp, end = 12.dp, top = 6.dp, bottom = 12.dp),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White),
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(26.dp),
+            color = Color.White,
+            shadowElevation = 6.dp,
+            tonalElevation = 0.dp,
+            border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.3f)),
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Limite haute — 3 couches pour séparation nette avec zone scrollable
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.5.dp)
-                        .background(com.missa.b360.ui.theme.MissaBorder),
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 6.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                BarreOnglet(
+                    modifier = Modifier.weight(1f),
+                    icone = Icons.Outlined.Home,
+                    libelleRes = R.string.nav_accueil,
+                    actif = racine == Routes.HOME,
+                    onClick = onAccueil,
                 )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(
-                            androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                colors = listOf(
-                                    BrandBlue.copy(alpha = 0.22f),
-                                    TendrePositive.copy(alpha = 0.22f),
-                                ),
-                            ),
-                        ),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp)
-                        .background(
-                            androidx.compose.ui.graphics.Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Black.copy(alpha = 0.06f),
-                                    Color.Transparent,
-                                ),
-                            ),
-                        ),
-                )
-                // Contenu 80dp + bottom inset
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .height(80.dp)
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    BarreOnglet(
-                        modifier = Modifier.weight(1f),
-                        icone = Icons.Outlined.Home,
-                        libelleRes = R.string.nav_accueil,
-                        actif = racine == Routes.HOME,
-                        onClick = onAccueil,
-                    )
-                    modules.take(AppModule.MAX_ONGLETS).forEach { module ->
-                        val libelleRes = when (module) {
-                            AppModule.TRESORERIE -> R.string.module_finances
-                            else -> module.titleRes
-                        }
-                        BarreOnglet(
-                            modifier = Modifier.weight(1f),
-                            icone = module.icon,
-                            libelleRes = libelleRes,
-                            actif = racine == module.route,
-                            onClick = { onModule(module) },
-                        )
+                modules.take(AppModule.MAX_ONGLETS).forEach { module ->
+                    val libelleRes = when (module) {
+                        AppModule.TRESORERIE -> R.string.module_finances
+                        else -> module.titleRes
                     }
                     BarreOnglet(
                         modifier = Modifier.weight(1f),
-                        icone = Icons.Outlined.MoreHoriz,
-                        libelleRes = R.string.home_more_short,
-                        actif = false,
-                        onClick = onPlus,
+                        icone = module.icon,
+                        libelleRes = libelleRes,
+                        actif = racine == module.route,
+                        onClick = { onModule(module) },
                     )
                 }
+                BarreOnglet(
+                    modifier = Modifier.weight(1f),
+                    icone = Icons.Outlined.MoreHoriz,
+                    libelleRes = R.string.home_more_short,
+                    actif = false,
+                    onClick = onPlus,
+                )
             }
         }
     }
 }
 
+/**
+ * Onglet de la barre : pastille bleu pâle + indicateur bleu sous l'élément actif,
+ * gris/bleu gris sinon. La hauteur de l'indicateur est toujours réservée pour
+ * que les onglets actifs et inactifs restent alignés.
+ */
 @Composable
 private fun BarreOnglet(
     modifier: Modifier = Modifier,
@@ -164,29 +134,41 @@ private fun BarreOnglet(
     val teinte = if (actif) BrandBlue else MissaMuted
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(18.dp))
             .clickable(onClick = onClick)
-            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
-            .padding(horizontal = 4.dp, vertical = 6.dp),
+            .sizeIn(minWidth = 48.dp, minHeight = 56.dp)
+            .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Spacer(
+        Box(
+            modifier = Modifier
+                .background(
+                    color = if (actif) BrandBlue.copy(alpha = 0.10f) else Color.Transparent,
+                    shape = RoundedCornerShape(16.dp),
+                )
+                .padding(horizontal = 14.dp, vertical = 6.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(24.dp))
+                Spacer(Modifier.height(3.dp))
+                Text(
+                    text = stringResource(libelleRes),
+                    color = teinte,
+                    fontSize = 11.sp,
+                    fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Box(
             modifier = Modifier
                 .height(3.dp)
-                .width(if (actif) 24.dp else 0.dp)
+                .width(if (actif) 20.dp else 0.dp)
                 .background(BrandBlue, RoundedCornerShape(1.5.dp)),
-        )
-        Spacer(Modifier.height(4.dp))
-        Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(24.dp))
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(libelleRes),
-            color = teinte,
-            fontSize = 11.sp,
-            fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
     }
 }
