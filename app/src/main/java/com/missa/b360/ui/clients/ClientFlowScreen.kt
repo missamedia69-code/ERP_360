@@ -259,8 +259,9 @@ fun ClientsScreen(
                 profile = profile,
             )
         } else {
+            val editId = wizardClientId ?: return
             viewModel.modifier(
-                id = wizardClientId!!,
+                id = editId,
                 nom = draft.name,
                 telephone = telephone,
                 type = draft.type,

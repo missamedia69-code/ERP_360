@@ -315,8 +315,9 @@ class ReturnSaleUseCase @Inject constructor(
             if (retourStock) {
                 for ((produitId, quantite) in returnedLines
                     .filter { it.productId != null && it.quantity > 0.0 }
-                    .groupBy { it.productId!! }
-                    .mapValues { (_, group) -> group.sumOf { it.quantity } }
+                    .groupBy { it.productId }
+                    .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
+                    .toMap()
                 ) {
                     val produit = productDao.getById(produitId) ?: continue
                     val siteId = produit.siteId

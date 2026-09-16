@@ -195,7 +195,7 @@ class CreateProductUseCase @Inject constructor(
                 ),
             )
             if (stock > 0.0) {
-                val siteId = input.siteId!!
+                val siteId = input.siteId ?: return@withTransaction 0L // déjà vérifié plus haut, garde-fou
                 stockDao.ensureRow(produitId, siteId)
                 stockDao.remplacer(ProductStockEntity(produitId, siteId, stock))
                 movementDao.insert(

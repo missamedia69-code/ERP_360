@@ -63,8 +63,9 @@ object PurchaseStockEffects {
     fun besoinsParProduit(lines: List<PurchaseLine>): Map<Long, Double> =
         lines
             .filter { it.productId != null && it.quantity > 0.0 }
-            .groupBy { it.productId!! }
-            .mapValues { (_, group) -> group.sumOf { it.quantity } }
+            .groupBy { it.productId }
+            .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
+            .toMap()
 }
 
 /**
