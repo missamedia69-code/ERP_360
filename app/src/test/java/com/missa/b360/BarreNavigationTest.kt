@@ -92,11 +92,14 @@ class BarreNavigationTest {
     }
 
     @Test
-    fun `un module dont l ecran masque la barre n est jamais epinglable`() {
+    fun `tous les modules liste y compris achats et finances sont epinglables`() {
+        // Depuis le fix nav, Achats et Finances sont des listes comme les autres :
+        // la barre du bas doit rester visible, seul le formulaire plein écran la masque via LocalBarreNavigation.
         val actifs = ModuleCode.entries.toList()
-        assertTrue(AppModule.FINANCES !in AppModule.epinglables(actifs))
-        assertTrue(AppModule.ACHATS !in AppModule.epinglables(actifs))
-        assertTrue(AppModule.FINANCES !in AppModule.barreBas(actifs, listOf(AppModule.FINANCES.name)))
+        assertTrue(AppModule.FINANCES in AppModule.epinglables(actifs))
+        assertTrue(AppModule.ACHATS in AppModule.epinglables(actifs))
+        assertTrue(AppModule.FINANCES in AppModule.barreBas(actifs, listOf(AppModule.FINANCES.name)))
+        assertTrue(AppModule.ACHATS in AppModule.barreBas(actifs, listOf(AppModule.ACHATS.name)))
     }
 
     @Test
@@ -107,9 +110,10 @@ class BarreNavigationTest {
     }
 
     @Test
-    fun `un formulaire en surimpression n affiche pas la barre`() {
-        assertFalse(AppModule.barreVisibleSur(AppModule.FINANCES.route))
-        assertFalse(AppModule.barreVisibleSur(AppModule.ACHATS.route))
+    fun `les listes achats et finances affichent la barre`() {
+        // Anciennement masquée car formulaire en surimpression, désormais visible
+        assertTrue(AppModule.barreVisibleSur(AppModule.FINANCES.route))
+        assertTrue(AppModule.barreVisibleSur(AppModule.ACHATS.route))
     }
 
     @Test
