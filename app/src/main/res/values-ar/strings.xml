@@ -5,6 +5,12 @@
     <string name="fiche_partager">مشاركة</string>
     <string name="fiche_copier">نسخ</string>
     <string name="fiche_copie">تم النسخ إلى الحافظة</string>
+    <string name="fiche_section_identite">الهوية</string>
+    <string name="fiche_section_coordonnees">بيانات الاتصال</string>
+    <string name="fiche_section_legal">معلومات قانونية</string>
+    <string name="fiche_section_activite">النشاط</string>
+    <string name="fiche_langue">اللغة</string>
+    <string name="fiche_non_renseigne">غير محدد</string>
 
     <string name="more_modules">المزيد من الوحدات</string>
     <string name="notifications">الإشعارات</string>

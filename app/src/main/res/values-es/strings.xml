@@ -5,6 +5,12 @@
     <string name="fiche_partager">Compartir</string>
     <string name="fiche_copier">Copiar</string>
     <string name="fiche_copie">Copiado al portapapeles</string>
+    <string name="fiche_section_identite">Identidad</string>
+    <string name="fiche_section_coordonnees">Datos de contacto</string>
+    <string name="fiche_section_legal">Información legal</string>
+    <string name="fiche_section_activite">Actividad</string>
+    <string name="fiche_langue">Idioma</string>
+    <string name="fiche_non_renseigne">Sin especificar</string>
 
     <string name="more_modules">Más módulos</string>
     <string name="notifications">Notificaciones</string>
