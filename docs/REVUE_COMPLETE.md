@@ -1,6 +1,31 @@
-# Revue complète ERP 360 — 2026-09-16 (v7 barre accueil limites bien marquées)
+# Revue complète ERP 360 — 2026-09-16 (v8 spec UI responsive globale)
 
-CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert → 35073598241 header compact 2m58s → 35075691738 barre bas limites 4m43s vert (Traductions 6s + Compilation)
+CI référence : 35058751285 theming vert → 35059079180 HomeRepository vert → 35059915704 qualité/i18n 4m27s → 35060275666 docs v4 4m38s → 35071184064 archi v5 4m46s vert → 35073598241 header compact 2m58s → 35075691738 barre bas limites 4m43s → 35079168559 spec responsive 4m52s vert (Traductions 5s + Compilation)
+
+## Fix v8 — Spécification UI responsive MISSA BUSINESS 360
+
+21. **Implémentation spec structure écran complète (cahier des charges 26 points)**
+    - Chemin : `MissaAppScaffold.kt` nouveau, `MissaAppHeader.kt` dans `MissaAppScaffold.kt`, `MissaBarreModules.kt`, `MissaDesign.kt`, `HomeScreen.kt`, `AppNavHost.kt`, `MainActivity.kt`
+    - Spec architecture globale:
+      ```
+      SYSTEM STATUS BAR (inset top)
+      APP HEADER (64dp + statusBars)
+      APP CONTENT (scrollable seul)
+      BOTTOM NAVIGATION (80dp + navigationBars)
+      SYSTEM NAVIGATION / GESTURE INSET (bottom)
+      ```
+    - WindowInsets: `WindowInsets.statusBars` pour header, `WindowInsets.navigationBars` pour bottom, `WindowInsets(0,0,0,0)` pour Scaffold contentWindowInsets + gestion manuelle, background edge-to-edge (White) peut aller sous zones système, content respecte Insets
+    - Header: 64dp contenu (vs 52dp), padding horizontal 16dp minimum (vs 4dp), zones tactiles 48x48 (vs 36/34), icônes 24dp (vs 20), logo 40x40 dp (vs 32), titre 15-16sp (vs 11.5sp), avatar 40x40 dp (vs 38), notification 48x48 24dp, watermark logo entreprise `matchParentSize` `Crop` alpha 0.09 remplit head space, halos radialGradient matchParentSize
+    - BottomNav: 80dp contenu (vs ~48dp) + navigationBars inset dynamique, 5 destinations Accueil/Vente/Achats/Stock/Plus, chaque item icon 24dp + label 11sp (vs 21dp/9.5sp), zone tactile 48x48 min via `sizeIn`, `weight(1f)` responsive, `fillMaxWidth`, `SpaceBetween`, padding horizontal 8dp, limites 1.5dp border + 3dp gradient 0.22 + 6dp ombre douce + shadow 12dp + shape top 18dp
+    - Contenu: entre Header 64dp et BottomNav 80dp, scrollable seul, marges 16dp (vs 12dp), grille verticale 4/8/12/16/20/24/32 dp (spacedBy 16dp/12dp vs 14/10), cartes 2 colonnes `weight(1f)` + `SpaceBetween` 12dp (vs 10dp), quick actions 4 colonnes chunked avec 12dp
+    - MissaTopAppBar: 64dp + statusBars, logo 40dp (vs 25dp), touch 48dp (vs 42dp), icône 24dp (vs 21dp), titre 15sp (vs titleMedium), windowInsets statusBars
+    - MissaLayout: screenHorizontal 16dp spec, itemGap 10→12dp grille, sectionGap 18→16dp, actionHeight 46→48dp zone tactile min
+    - MissaAppScaffold: conteneur global réutilisable `Scaffold { TopBar, Content, BottomBar }` avec `contentWindowInsets=0`, padding géré via Scaffold padding + WindowInsets
+    - AppNavHost: topBar global `MissaAppHeader` pour HOME (hamburger + logo 40dp + titre 15sp + notif 48dp 24dp + avatar 40dp), bottomBar `MissaBarreModules` 80dp, NavHost `fillMaxSize().padding(padding)`, `ModalNavigationDrawer` avec drawer 320dp, `enableEdgeToEdge()` déjà dans MainActivity
+    - HomeScreen: suppression Scaffold topBar double, Box fillMaxSize background HomeBackground + HomeDashboard seul, respecte spec header fixe + content scrollable
+    - Responsive: pas de px, dp/sp + weight/fillMaxWidth/wrapContent/constraints/padding/margin/WindowInsets, fonctionne 360x800, 360x780, 390x844, 412x915, 720x1280, 1080x1920, petits écrans 360dp largeur avec espacements réduits mais zones tactiles conservées 48dp
+    - Couleurs: vert principal #24B315 = TendrePositive/ProfileGreen, centralisées dans theme, pas de gradients verts inutiles
+    - Résultat: même hiérarchie visuelle et proportions sur différentes tailles, header/bottom fixes, content scrollable, limites bien marquées, CI 35079168559 vert ✅
 
 ## Fix v6 — Header trop descendu + logos + limites scrollable
 
