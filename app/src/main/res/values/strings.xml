@@ -1849,5 +1849,8 @@
     <string name="activation_enregistre">Activation mise à jour.</string>
     <string name="activation_changer_profil">Changer de profil</string>
     <string name="activation_confirmer_changement">Changer de profil va recalculer les modules actifs. Les modules personnalisés hors nouveau profil seront conservés si compatibles. Continuer ?</string>
+    <string name="home_no_recent_activity">Aucune activité récente — vos opérations apparaîtront ici</string>
+    <string name="home_no_alerts">Aucune alerte — tout est à jour</string>
+    <string name="home_no_tasks">Aucune tâche pour le moment</string>
 </resources>
 <!-- Temp insert will be replaced -->

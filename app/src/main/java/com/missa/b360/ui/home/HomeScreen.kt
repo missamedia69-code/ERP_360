@@ -491,8 +491,6 @@ private fun HomeDashboard(
     val currency = state.devise
     val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
         ?: stringResource(R.string.home_greeting_anonymous)
-    // For demo values when no data: use same as maquette to show design, but real data when present
-    val hasData = state.ventes > 0 || state.achats > 0 || state.nombreClients > 0
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
@@ -590,16 +588,16 @@ private fun HomeDashboard(
                 }
             }
         }
-        // KPI 4 cartes – charte 3D isométrique intégrée (fond léger)
+        // KPI 4 cartes – 100% réel, charte 3D plein cadre avec crop
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_ventes_du_jour),
-                        valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
-                        sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
-                        tendance = state.tendanceVentes ?: 12.0,
+                        valeur = formatMontantSansDecimales(state.ventes, currency),
+                        sousTitre = "${state.ventesCount} ventes",
+                        tendance = state.tendanceVentes,
                         icon = Icons.Outlined.ShoppingCart,
                         iconBg = Color(0xFFEFF6FF),
                         iconTint = Color(0xFF2563EB),
@@ -609,9 +607,9 @@ private fun HomeDashboard(
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_achats_du_jour),
-                        valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
-                        sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
-                        tendance = state.tendanceAchats ?: 8.0,
+                        valeur = formatMontantSansDecimales(state.achats, currency),
+                        sousTitre = "${state.achatsCount} achats",
+                        tendance = state.tendanceAchats,
                         icon = Icons.Outlined.Inventory2,
                         iconBg = Color(0xFFECFDF5),
                         iconTint = Color(0xFF16A34A),
@@ -623,9 +621,9 @@ private fun HomeDashboard(
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_tresorerie_card),
-                        valeur = if (hasData) formatMontantSansDecimales(state.tresorerie, currency) else "2 450 000 XAF",
+                        valeur = formatMontantSansDecimales(state.tresorerie, currency),
                         sousTitre = stringResource(R.string.home_solde_disponible),
-                        tendance = state.tendanceTresorerie ?: 5.0,
+                        tendance = state.tendanceTresorerie,
                         icon = Icons.Outlined.Payments,
                         iconBg = Color(0xFFFFF7ED),
                         iconTint = Color(0xFFF59E0B),
@@ -635,9 +633,9 @@ private fun HomeDashboard(
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_clients_card),
-                        valeur = if (hasData) state.nombreClients.toString() else "356",
+                        valeur = state.nombreClients.toString(),
                         sousTitre = stringResource(R.string.home_total_label),
-                        tendance = state.tendanceClients ?: 4.0,
+                        tendance = state.tendanceClients,
                         icon = Icons.Outlined.People,
                         iconBg = Color(0xFFF5F3FF),
                         iconTint = Color(0xFF7C3AED),
@@ -868,7 +866,6 @@ private fun AccueilActionCard(
 @Composable
 private fun AccueilResumeCard(state: HomeUiState, currency: String) {
     val margePct = if (state.ventes > 0) state.marge / state.ventes * 100.0 else 0.0
-    val hasData = state.ventes > 0 || state.achats > 0
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -896,9 +893,9 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = Color(0xFF2563EB),
                     iconBg = Color(0xFFEFF6FF),
                     titre = stringResource(R.string.home_ventes_label),
-                    valeur = if (hasData) formatMontantSansDecimales(state.ventes, currency) else "1 250 000 XAF",
-                    sousTitre = if (hasData) "${state.ventesCount} ventes" else "24 ventes",
-                    tendance = state.tendanceVentes ?: 12.0,
+                    valeur = formatMontantSansDecimales(state.ventes, currency),
+                    sousTitre = "${state.ventesCount} ventes",
+                    tendance = state.tendanceVentes,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
                 AccueilResumeCell(
@@ -907,9 +904,9 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = Color(0xFF16A34A),
                     iconBg = Color(0xFFECFDF5),
                     titre = stringResource(R.string.home_achats_label),
-                    valeur = if (hasData) formatMontantSansDecimales(state.achats, currency) else "780 000 XAF",
-                    sousTitre = if (hasData) "${state.achatsCount} achats" else "8 achats",
-                    tendance = state.tendanceAchats ?: 8.0,
+                    valeur = formatMontantSansDecimales(state.achats, currency),
+                    sousTitre = "${state.achatsCount} achats",
+                    tendance = state.tendanceAchats,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
                 AccueilResumeCell(
@@ -918,9 +915,9 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = Color(0xFFF59E0B),
                     iconBg = Color(0xFFFFF7ED),
                     titre = stringResource(R.string.home_mouvements_stock_label),
-                    valeur = if (hasData) state.mouvementsStockCount.toString() else "42",
-                    sousTitre = stringResource(R.string.home_operations_label),
-                    tendance = 5.0,
+                    valeur = state.mouvementsStockCount.toString(),
+                    sousTitre = if (state.rupturesStock > 0) "${state.rupturesStock} ruptures" else stringResource(R.string.home_operations_label),
+                    tendance = null,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(Color(0xFFE2E8F0)))
                 AccueilResumeCell(
@@ -929,10 +926,40 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = Color(0xFF7C3AED),
                     iconBg = Color(0xFFF5F3FF),
                     titre = stringResource(R.string.home_marge_brute_label),
-                    valeur = if (hasData) formatMontantSansDecimales(state.marge, currency) else "470 000 XAF",
-                    sousTitre = if (hasData) String.format(java.util.Locale.ROOT, "%.1f%%", margePct) else "37.6%",
-                    tendance = state.tendanceMarge ?: 10.0,
+                    valeur = formatMontantSansDecimales(state.marge, currency),
+                    sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
+                    tendance = state.tendanceMarge,
                 )
+            }
+            // Ligne additionnelle réelle : stock, projets, qualité
+            if (state.nombreProduits > 0 || state.projetsActifs > 0 || state.nonConformitesOuvertes > 0) {
+                Spacer(Modifier.height(10.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (state.nombreProduits > 0) {
+                        Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFF8FAFC), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
+                            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "${state.nombreProduits} produits", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = formatMontantSansDecimales(state.valeurStock, currency), color = Color(0xFF64748B), fontSize = 10.sp)
+                            }
+                        }
+                    }
+                    if (state.projetsActifs > 0) {
+                        Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFF5F3FF), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
+                            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "${state.projetsActifs} projets actifs", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = if (state.projetsEnRetard > 0) "${state.projetsEnRetard} en retard" else "à jour", color = Color(0xFF64748B), fontSize = 10.sp)
+                            }
+                        }
+                    }
+                    if (state.nonConformitesOuvertes > 0) {
+                        Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFFEF2F2), border = BorderStroke(1.dp, Color(0xFFFECACA))) {
+                            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "${state.nonConformitesOuvertes} NC ouvertes", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = "Qualité", color = Color(0xFF64748B), fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -947,7 +974,7 @@ private fun AccueilResumeCell(
     titre: String,
     valeur: String,
     sousTitre: String,
-    tendance: Double,
+    tendance: Double?,
 ) {
     Column(modifier = modifier.padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(modifier = Modifier.size(28.dp), shape = CircleShape, color = iconBg) {
@@ -963,7 +990,11 @@ private fun AccueilResumeCell(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(text = stringResource(R.string.home_vs_hier), color = Color(0xFF94A3B8), fontSize = 9.sp)
             Spacer(Modifier.width(4.dp))
-            Text(text = "+" + String.format(java.util.Locale.ROOT, "%.0f%%", tendance), color = Color(0xFF16A34A), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+            if (tendance != null) {
+                Text(text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance), color = if (tendance >= 0) Color(0xFF16A34A) else Color(0xFFEF4444), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+            } else {
+                Text(text = "—", color = Color(0xFF94A3B8), fontSize = 9.sp)
+            }
         }
     }
 }
@@ -990,29 +1021,12 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
             }
             Spacer(Modifier.height(10.dp))
             if (records.isEmpty()) {
-                // Données de maquette quand vide
-                AccueilActiviteRow(
-                    icon = Icons.Outlined.ShoppingCart, iconBg = Color(0xFFEFF6FF), iconTint = Color(0xFF2563EB),
-                    titre = "Vente #V-0025", sousTitre = "Client ABC", montant = "125 000 XAF", badge = stringResource(R.string.home_payee), heure = "10:42",
-                    onClick = { onNavigate(AppModule.VENTE.route) },
-                )
-                Spacer(Modifier.height(8.dp))
-                AccueilActiviteRow(
-                    icon = Icons.Outlined.Inventory2, iconBg = Color(0xFFECFDF5), iconTint = Color(0xFF16A34A),
-                    titre = "Achat #A-0012", sousTitre = "Fournisseur AgroMax", montant = "230 000 XAF", badge = stringResource(R.string.home_recu), heure = "09:15",
-                    onClick = { onNavigate(AppModule.ACHATS.route) },
-                )
-                Spacer(Modifier.height(8.dp))
-                AccueilActiviteRow(
-                    icon = Icons.Outlined.People, iconBg = Color(0xFFF5F3FF), iconTint = Color(0xFF7C3AED),
-                    titre = "Nouveau client", sousTitre = "ETS Prestige", montant = null, badge = null, heure = "Hier, 16:30",
-                    onClick = { onNavigate(AppModule.CLIENTS.route) },
-                )
-                Spacer(Modifier.height(8.dp))
-                AccueilActiviteRow(
-                    icon = Icons.Outlined.LocalShipping, iconBg = Color(0xFFFFF7ED), iconTint = Color(0xFFF59E0B),
-                    titre = stringResource(R.string.home_transfert_de_stock), sousTitre = "Dépôt principal → Boutique Akwa", montant = null, badge = null, heure = "Hier, 14:20",
-                    onClick = { onNavigate(AppModule.STOCK.route) },
+                // 100% réel : vide = message, pas de maquette
+                Text(
+                    text = stringResource(R.string.home_no_recent_activity),
+                    color = Color(0xFF94A3B8),
+                    fontSize = 11.sp,
+                    modifier = Modifier.padding(vertical = 12.dp),
                 )
             } else {
                 records.forEachIndexed { idx, rec ->
@@ -1020,6 +1034,8 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                         OperationModule.VENTE.name -> Triple(Icons.Outlined.ShoppingCart, Color(0xFFEFF6FF), Color(0xFF2563EB))
                         OperationModule.ACHATS.name -> Triple(Icons.Outlined.Inventory2, Color(0xFFECFDF5), Color(0xFF16A34A))
                         OperationModule.STOCK.name -> Triple(Icons.Outlined.LocalShipping, Color(0xFFFFF7ED), Color(0xFFF59E0B))
+                        OperationModule.PROJETS.name -> Triple(Icons.Outlined.BarChart, Color(0xFFF5F3FF), Color(0xFF7C3AED))
+                        OperationModule.FINANCES.name -> Triple(Icons.Outlined.Payments, Color(0xFFFFF7ED), Color(0xFFF59E0B))
                         else -> Triple(Icons.Outlined.People, Color(0xFFF5F3FF), Color(0xFF7C3AED))
                     }
                     AccueilActiviteRow(
@@ -1028,7 +1044,8 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                         sousTitre = rec.counterpart ?: rec.reference,
                         montant = rec.amount?.let { formatMontantSansDecimales(it, currency) },
                         badge = when (rec.status) {
-                            OperationStatus.VALIDATED.name -> "Payée"
+                            OperationStatus.VALIDATED.name -> stringResource(R.string.home_payee)
+                            OperationStatus.DRAFT.name -> "Brouillon"
                             else -> null
                         },
                         heure = DateUtils.formatDateHeure(rec.createdAt),
@@ -1081,31 +1098,57 @@ private fun AccueilActiviteRow(
 private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit) {
     val factures = state.rappels.facturesEnRetard
     val commandes = state.commandesFournisseurAttente
-    val hasAlert = factures > 0 || commandes > 0
+    val nc = state.nonConformitesOuvertes
+    val ruptures = state.rupturesStock
+    val hasAlert = factures > 0 || commandes > 0 || nc > 0 || ruptures > 0
     Surface(
         modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFFFFBEB),
-        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
+        color = if (hasAlert) Color(0xFFFFFBEB) else Color.White,
+        border = BorderStroke(1.dp, if (hasAlert) Color(0xFFFDE68A) else Color(0xFFE2E8F0)),
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = Color(0xFFFEF3C7)) {
-                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(18.dp)) }
+            Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = if (hasAlert) Color(0xFFFEF3C7) else Color(0xFFF1F5F9)) {
+                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null, tint = if (hasAlert) Color(0xFFF59E0B) else Color(0xFF64748B), modifier = Modifier.size(18.dp)) }
             }
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = stringResource(R.string.home_rappels_importants), color = Color(0xFF0F172A), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
-                    Spacer(Modifier.width(6.dp))
-                    Text(text = if (hasAlert) "$factures factures clients en retard" else "2 factures clients en retard", color = Color(0xFF334155), fontSize = 11.sp)
-                }
-                Spacer(Modifier.height(2.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
-                    Spacer(Modifier.width(6.dp))
-                    Text(text = if (hasAlert) "$commandes commande fournisseur attendue" else "1 commande fournisseur attendue", color = Color(0xFF334155), fontSize = 11.sp)
+                if (!hasAlert) {
+                    Text(text = stringResource(R.string.home_no_alerts), color = Color(0xFF64748B), fontSize = 11.sp)
+                } else {
+                    if (factures > 0) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
+                            Spacer(Modifier.width(6.dp))
+                            Text(text = "$factures factures clients en retard", color = Color(0xFF334155), fontSize = 11.sp)
+                        }
+                        Spacer(Modifier.height(2.dp))
+                    }
+                    if (commandes > 0) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
+                            Spacer(Modifier.width(6.dp))
+                            Text(text = "$commandes commande fournisseur attendue", color = Color(0xFF334155), fontSize = 11.sp)
+                        }
+                        Spacer(Modifier.height(2.dp))
+                    }
+                    if (ruptures > 0) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFEF4444)))
+                            Spacer(Modifier.width(6.dp))
+                            Text(text = "$ruptures produits en rupture", color = Color(0xFF334155), fontSize = 11.sp)
+                        }
+                        Spacer(Modifier.height(2.dp))
+                    }
+                    if (nc > 0) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFEF4444)))
+                            Spacer(Modifier.width(6.dp))
+                            Text(text = "$nc non-conformités ouvertes", color = Color(0xFF334155), fontSize = 11.sp)
+                        }
+                    }
                 }
             }
             Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = Color(0xFF94A3B8), modifier = Modifier.size(18.dp))
@@ -1132,11 +1175,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
             }
             Spacer(Modifier.height(10.dp))
             if (taches.isEmpty()) {
-                AccueilTacheRow(titre = stringResource(R.string.home_relancer_clients))
-                Spacer(Modifier.height(8.dp))
-                AccueilTacheRow(titre = stringResource(R.string.home_verifier_stock))
-                Spacer(Modifier.height(8.dp))
-                AccueilTacheRow(titre = stringResource(R.string.home_saisir_depenses))
+                Text(text = stringResource(R.string.home_no_tasks), color = Color(0xFF94A3B8), fontSize = 11.sp, modifier = Modifier.padding(vertical = 8.dp))
             } else {
                 taches.forEachIndexed { idx, t ->
                     AccueilTacheRow(titre = t.titre)
