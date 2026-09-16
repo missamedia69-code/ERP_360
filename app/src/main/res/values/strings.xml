@@ -1852,5 +1852,14 @@
     <string name="home_no_recent_activity">Aucune activité récente — vos opérations apparaîtront ici</string>
     <string name="home_no_alerts">Aucune alerte — tout est à jour</string>
     <string name="home_no_tasks">Aucune tâche pour le moment</string>
+    <string name="home_produits_count">%1$d produits</string>
+    <string name="home_projets_actifs">%1$d projets actifs</string>
+    <string name="home_nc_ouvertes">%1$d NC ouvertes</string>
+    <string name="home_qualite_label">Qualité</string>
+    <string name="home_a_jour">à jour</string>
+    <string name="home_en_retard">%1$d en retard</string>
+    <string name="home_produits_rupture">%1$d produits en rupture</string>
+    <string name="home_nc_ouvertes_detail">%1$d non-conformités ouvertes</string>
+    <string name="home_commande_fournisseur_attente">%1$d commande fournisseur attendue</string>
 </resources>
 <!-- Temp insert will be replaced -->

@@ -9,8 +9,9 @@ import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.ui.navigation.AppNavHost
 import com.missa.b360.ui.theme.Erp360Theme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
@@ -23,25 +24,21 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        applyStoredLocale()
-        applyStoredFormats()
+        // Ne plus bloquer le thread principal : charge en arrière-plan
+        lifecycleScope.launch {
+            applyStoredLocaleAsync()
+            applyStoredFormatsAsync()
+        }
         setContent {
             Erp360Theme {
-                // L'introduction est décidée par le graphe de navigation, qui
-                // sait si l'installation est déjà configurée. La jouer ici la
-                // relançait à chaque recréation d'activité.
                 AppNavHost()
             }
         }
     }
 
-
-    /** Applique au démarrage la langue déjà enregistrée lorsqu'elle diffère réellement. */
-    private fun applyStoredLocale() {
-        val stored = runBlocking {
-            withTimeoutOrNull(2_000) {
-                settingsStore.observe(SettingsStore.Keys.LANGUE).first()
-            }
+    private suspend fun applyStoredLocaleAsync() {
+        val stored = withTimeoutOrNull(2_000) {
+            settingsStore.observe(SettingsStore.Keys.LANGUE).first()
         } ?: return
         val current = androidx.appcompat.app.AppCompatDelegate
             .getApplicationLocales().toLanguageTags()
@@ -52,16 +49,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Charge les préférences d'affichage (fuseau, format date, nombres) pour toute l'app. */
-    private fun applyStoredFormats() {
-        val result = runBlocking {
-            withTimeoutOrNull(2_000) {
-                listOf(
-                    settingsStore.observe(SettingsStore.Keys.FUSEAU_HORAIRE).first(),
-                    settingsStore.observe(SettingsStore.Keys.FORMAT_DATE).first(),
-                    settingsStore.observe(SettingsStore.Keys.FORMAT_NOMBRES).first(),
-                )
-            }
+    private suspend fun applyStoredFormatsAsync() {
+        val result = withTimeoutOrNull(2_000) {
+            listOf(
+                settingsStore.observe(SettingsStore.Keys.FUSEAU_HORAIRE).first(),
+                settingsStore.observe(SettingsStore.Keys.FORMAT_DATE).first(),
+                settingsStore.observe(SettingsStore.Keys.FORMAT_NOMBRES).first(),
+            )
         } ?: return
         FormatPrefs.appliquer(result[0], result[1], result[2])
     }

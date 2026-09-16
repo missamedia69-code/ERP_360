@@ -1784,4 +1784,13 @@
 <string name="module_inactif_titre">%1$s 未激活</string><string name="module_inactif_message">模块 %1$s 在配置文件 %2$s 中未激活。</string><string name="module_inactif_explication">在设置中启用或选择包含它的配置文件。</string><string name="module_inactif_retour">返回首页</string><string name="module_inactif_activer">启用此模块</string><string name="activation_titre">模块激活</string><string name="activation_sous_titre">在整个应用中管理活动配置文件和活动模块。</string><string name="activation_profil_actuel">当前配置文件</string><string name="activation_modules_actifs">活动模块 (%1$d)</string><string name="activation_elements_actifs">活动元素</string><string name="activation_module_actif">活动</string><string name="activation_module_inactif">未激活</string><string name="activation_element_actif">活动</string><string name="activation_element_inactif">未激活</string><string name="activation_ajouter_module">添加</string><string name="activation_retirer_module">移除</string><string name="activation_vente_sans_stock">无库存销售</string><string name="activation_vente_sans_stock_desc">允许无实物库存销售。</string><string name="activation_palier">公司规模</string><string name="activation_recommande">推荐</string><string name="activation_verrouille">配置文件锁定</string><string name="activation_personnalise">自定义</string><string name="activation_elements_titre">模块 %1$s 的元素</string><string name="activation_elements_sous">勾选此模块的活动功能。</string><string name="activation_enregistre">激活已更新。</string><string name="activation_changer_profil">更改配置文件</string><string name="activation_confirmer_changement">更改配置文件将重新计算活动模块。是否继续？</string><string name="palier_p1_desc">单人 - 基础模块</string><string name="palier_p2_desc">微型 - 简单管理</string><string name="palier_p3_desc">小型 - 解锁HR和CRM</string><string name="palier_p4_desc">中型 - 推荐HR和CRM</string><string name="palier_p5_desc">大型 - 完整结构</string><string name="palier_p6_desc">集团 - 所有支持模块</string><string name="palier_effectif_badge">人数</string><string name="palier_choisir_titre">公司规模</string><string name="palier_choisir_sous">人数影响推荐模块</string>    <string name="home_no_recent_activity">暂无最近活动 — 您的操作将显示在这里</string>
     <string name="home_no_alerts">暂无提醒 — 一切正常</string>
     <string name="home_no_tasks">暂无任务</string>
+    <string name="home_produits_count">%1$d 个产品</string>
+    <string name="home_projets_actifs">%1$d 个进行中项目</string>
+    <string name="home_nc_ouvertes">%1$d 个未关闭不符合项</string>
+    <string name="home_qualite_label">质量</string>
+    <string name="home_a_jour">最新</string>
+    <string name="home_en_retard">%1$d 个逾期</string>
+    <string name="home_produits_rupture">%1$d 个产品缺货</string>
+    <string name="home_nc_ouvertes_detail">%1$d 个未关闭不符合项</string>
+    <string name="home_commande_fournisseur_attente">%1$d 个供应商订单待处理</string>
 </resources>

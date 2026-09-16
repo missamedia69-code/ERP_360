@@ -133,6 +133,11 @@ private fun MainNavHost() {
     val etatAccueil by accueilViewModel.uiState.collectAsState()
 
     val barreDemandee = remember { mutableStateOf(true) }
+    // Reset la demande de masquage à chaque changement de route : si un écran a masqué
+    // la barre via LocalBarreNavigation, elle doit réapparaître en sortant.
+    androidx.compose.runtime.LaunchedEffect(routeCourante) {
+        barreDemandee.value = true
+    }
     // Barre visible partout sauf sur les formulaires plein écran.
     // Important pour que le changement de profil dans Réglages se répercute
     // directement sur la barre du bas et le menu Plus sans retour arrière.

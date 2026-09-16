@@ -313,9 +313,16 @@ class HomeViewModel @Inject constructor(
         }
 
         // Projets réels depuis operation_records PROJETS
-        val projetsActifsCount = validated.count { it.module == OperationModule.PROJETS.name }
-        // Pour retard, on ne peut pas décoder ici sans codec, on met 0 et sera calculé dans ProjetsViewModel, mais on compte brouillons comme retard potentiel
-        val projetsEnRetardCount = 0
+        val projetsRecords = validated.filter { it.module == OperationModule.PROJETS.name }
+        val projetsActifsCount = projetsRecords.size
+        val projetsEnRetardCount = projetsRecords.count { rec ->
+            val payload = com.missa.b360.core.domain.model.ProjetCodec.decode(rec.payload)
+            if (payload == null) false else {
+                val etat = com.missa.b360.core.domain.model.ProjetRules.etat(payload.etat)
+                if (etat == com.missa.b360.core.domain.model.EtatProjet.LIVRE) false
+                else payload.echeance?.let { it < maintenant } == true
+            }
+        }
 
         val ncOuvertes = listeNc.count { it.statut == StatutNc.OUVERTE.name || it.statut == StatutNc.EN_COURS.name }
 

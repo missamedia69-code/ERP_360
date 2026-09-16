@@ -491,7 +491,7 @@ private fun HomeHeader(
                     }
                 }
                 Spacer(Modifier.width(8.dp))
-                // Logo entreprise à droite, sans onglet déroulant
+                // Logo entreprise à droite, sans onglet déroulant – 100% réel, plus de GREEN FARM hardcodé
                 Surface(
                     modifier = Modifier
                         .size(40.dp)
@@ -504,7 +504,7 @@ private fun HomeHeader(
                     if (companyLogoUri != null) {
                         CompanyLogo(
                             logoUri = companyLogoUri,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.home_company_active),
                             fallbackIcon = Icons.Outlined.Store,
                             modifier = Modifier.fillMaxSize(),
                             size = 40.dp,
@@ -512,18 +512,11 @@ private fun HomeHeader(
                             fallbackTint = Color(0xFF16A34A),
                             fallbackBackground = Color(0xFFE6F8EC),
                         )
-                    } else if (companyName.contains("GREEN FARM")) {
-                        Image(
-                            painter = painterResource(R.drawable.logo_green_farm),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize().clip(CircleShape),
-                        )
                     } else {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Color(0xFFE6F8EC))) {
                             Icon(
                                 imageVector = Icons.Outlined.Store,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.home_company_active),
                                 tint = Color(0xFF16A34A),
                                 modifier = Modifier.size(20.dp),
                             )
@@ -1007,14 +1000,14 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     tendance = state.tendanceMarge,
                 )
             }
-            // Ligne additionnelle réelle : stock, projets, qualité
+            // Ligne additionnelle réelle : stock, projets, qualité – 100% i18n
             if (state.nombreProduits > 0 || state.projetsActifs > 0 || state.nonConformitesOuvertes > 0) {
                 Spacer(Modifier.height(10.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (state.nombreProduits > 0) {
                         Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFF8FAFC), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
                             Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "${state.nombreProduits} produits", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = stringResource(R.string.home_produits_count, state.nombreProduits), color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 Text(text = formatMontantSansDecimales(state.valeurStock, currency), color = Color(0xFF64748B), fontSize = 10.sp)
                             }
                         }
@@ -1022,16 +1015,20 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     if (state.projetsActifs > 0) {
                         Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFF5F3FF), border = BorderStroke(1.dp, Color(0xFFE2E8F0))) {
                             Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "${state.projetsActifs} projets actifs", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text(text = if (state.projetsEnRetard > 0) "${state.projetsEnRetard} en retard" else "à jour", color = Color(0xFF64748B), fontSize = 10.sp)
+                                Text(text = stringResource(R.string.home_projets_actifs, state.projetsActifs), color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    text = if (state.projetsEnRetard > 0) stringResource(R.string.home_en_retard, state.projetsEnRetard) else stringResource(R.string.home_a_jour),
+                                    color = Color(0xFF64748B),
+                                    fontSize = 10.sp,
+                                )
                             }
                         }
                     }
                     if (state.nonConformitesOuvertes > 0) {
                         Surface(modifier = Modifier.weight(1f), shape = RoundedCornerShape(10.dp), color = Color(0xFFFEF2F2), border = BorderStroke(1.dp, Color(0xFFFECACA))) {
                             Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "${state.nonConformitesOuvertes} NC ouvertes", color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text(text = "Qualité", color = Color(0xFF64748B), fontSize = 10.sp)
+                                Text(text = stringResource(R.string.home_nc_ouvertes, state.nonConformitesOuvertes), color = Color(0xFF0F172A), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text(text = stringResource(R.string.home_qualite_label), color = Color(0xFF64748B), fontSize = 10.sp)
                             }
                         }
                     }
@@ -1198,7 +1195,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
                             Spacer(Modifier.width(6.dp))
-                            Text(text = "$factures factures clients en retard", color = Color(0xFF334155), fontSize = 11.sp)
+                            Text(text = stringResource(R.string.home_overdue_invoices, factures), color = Color(0xFF334155), fontSize = 11.sp)
                         }
                         Spacer(Modifier.height(2.dp))
                     }
@@ -1206,7 +1203,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFF59E0B)))
                             Spacer(Modifier.width(6.dp))
-                            Text(text = "$commandes commande fournisseur attendue", color = Color(0xFF334155), fontSize = 11.sp)
+                            Text(text = stringResource(R.string.home_commande_fournisseur_attente, commandes), color = Color(0xFF334155), fontSize = 11.sp)
                         }
                         Spacer(Modifier.height(2.dp))
                     }
@@ -1214,7 +1211,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFEF4444)))
                             Spacer(Modifier.width(6.dp))
-                            Text(text = "$ruptures produits en rupture", color = Color(0xFF334155), fontSize = 11.sp)
+                            Text(text = stringResource(R.string.home_produits_rupture, ruptures), color = Color(0xFF334155), fontSize = 11.sp)
                         }
                         Spacer(Modifier.height(2.dp))
                     }
@@ -1222,7 +1219,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Color(0xFFEF4444)))
                             Spacer(Modifier.width(6.dp))
-                            Text(text = "$nc non-conformités ouvertes", color = Color(0xFF334155), fontSize = 11.sp)
+                            Text(text = stringResource(R.string.home_nc_ouvertes_detail, nc), color = Color(0xFF334155), fontSize = 11.sp)
                         }
                     }
                 }
