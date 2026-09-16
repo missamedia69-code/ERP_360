@@ -186,6 +186,10 @@ private fun MainNavHost() {
                     portee.launch { etatTiroir.close() }
                     navController.navigate(route)
                 },
+                onCompanyFiche = {
+                    portee.launch { etatTiroir.close() }
+                    ficheEntreprise = true
+                },
                 onSupport = {
                     portee.launch { etatTiroir.close() }
                     assistance = true

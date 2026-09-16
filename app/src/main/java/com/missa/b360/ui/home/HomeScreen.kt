@@ -43,7 +43,6 @@ import androidx.compose.material.icons.outlined.CloudDone
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.LocalShipping
 import androidx.compose.material.icons.outlined.MailOutline
@@ -1292,6 +1291,7 @@ internal fun MissaBusinessDrawer(
     currentRoute: String?,
     onClose: () -> Unit,
     onNavigate: (String) -> Unit,
+    onCompanyFiche: () -> Unit,
     onSupport: () -> Unit,
 ) {
     Surface(
@@ -1355,7 +1355,7 @@ internal fun MissaBusinessDrawer(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onNavigate(Routes.ADMIN_REGLAGES) },
+                    .clickable { onCompanyFiche() },
                 shape = RoundedCornerShape(16.dp),
                 color = Blue90,
                 border = BorderStroke(1.dp, HomeBorder),
@@ -1406,17 +1406,11 @@ internal fun MissaBusinessDrawer(
             DrawerMenuItem(Icons.Outlined.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {
                 onNavigate(Routes.ADMIN_REGLAGES)
             }
-            DrawerMenuItem(Icons.Outlined.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {
-                onNavigate(Routes.ADMIN_LICENCE)
-            }
             DrawerMenuItem(Icons.Outlined.People, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
                 onNavigate(Routes.ADMIN_UTILISATEURS)
             }
-            DrawerMenuItem(Icons.Outlined.Store, stringResource(R.string.home_sites_sales), currentRoute == Routes.ADMIN_MULTISITE) {
-                onNavigate(Routes.ADMIN_MULTISITE)
-            }
-            DrawerMenuItem(Icons.Outlined.Payments, stringResource(R.string.refer_title), currentRoute == Routes.ADMIN_REFERENTIELS) {
-                onNavigate(Routes.ADMIN_REFERENTIELS)
+            DrawerMenuItem(Icons.Outlined.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {
+                onNavigate(Routes.ADMIN_LICENCE)
             }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_tools))
@@ -1426,19 +1420,10 @@ internal fun MissaBusinessDrawer(
             DrawerMenuItem(Icons.Outlined.History, stringResource(R.string.admin_journal), currentRoute == Routes.ADMIN_JOURNAL) {
                 onNavigate(Routes.ADMIN_JOURNAL)
             }
-            DrawerMenuItem(Icons.Outlined.Notifications, stringResource(R.string.notifications), currentRoute == Routes.NOTIFICATIONS) {
-                onNavigate(Routes.NOTIFICATIONS)
-            }
-            DrawerMenuItem(Icons.Outlined.Checklist, stringResource(R.string.tasks_title), currentRoute == Routes.TASKS) {
-                onNavigate(Routes.TASKS)
-            }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_support))
             DrawerMenuItem(Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.home_help_assistance)) {
                 onSupport()
-            }
-            DrawerMenuItem(Icons.Outlined.Info, stringResource(R.string.admin_a_propos), currentRoute == Routes.ADMIN_A_PROPOS) {
-                onNavigate(Routes.ADMIN_A_PROPOS)
             }
 
             Spacer(Modifier.height(20.dp))
