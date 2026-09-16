@@ -54,7 +54,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
-import com.missa.b360.core.domain.usecase.SiteAdminUseCases
+import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green90
@@ -89,7 +89,7 @@ data class FicheEntrepriseState(
 class FicheEntrepriseViewModel @Inject constructor(
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
-    sites: SiteAdminUseCases,
+    sites: SiteUseCases,
 ) : ViewModel() {
 
     /** Entreprise + sites + utilisateur portant le rôle SYSTEM « Propriétaire » (à défaut, le premier). */
