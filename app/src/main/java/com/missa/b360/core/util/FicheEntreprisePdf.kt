@@ -126,7 +126,12 @@ object FicheEntreprisePdf {
 
         val dossier = File(context.cacheDir, "fiches_pdf").apply { mkdirs() }
         val fichier = File(dossier, "fiche-${System.currentTimeMillis()}.pdf")
-        fichier.outputStream().use { flux -> document.write(flux) }
+        val flux = java.io.FileOutputStream(fichier)
+        try {
+            document.write(flux)
+        } finally {
+            flux.close()
+        }
         document.close()
         return fichier
     }
