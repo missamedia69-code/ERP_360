@@ -205,16 +205,12 @@ enum class AppModule(
         const val MAX_ONGLETS = 3
 
         /**
-         * Modules dont la route ouvre un **formulaire de saisie** et non une
-         * liste : la barre de navigation n'y aurait pas sa place.
-         *
-         * Achats et Finances ouvrent leur formulaire **en surimpression** de la
-         * liste, avec sa propre barre « Annuler / Valider » : la barre de
-         * navigation apparaîtrait dessous, deux barres empilées. Ils sont donc
-         * exclus, et ne figurent pas non plus dans la disposition d'usine — un
-         * onglet dont l'écran masque la barre est une contradiction.
+         * Historiquement Achats et Finances masquaient la barre car leur
+         * formulaire était en surimpression. Désormais chaque module est une
+         * vraie liste : la barre du bas doit rester visible partout, seul le
+         * formulaire plein écran la masque via LocalBarreNavigation.
          */
-        private val SANS_BARRE = setOf(ACHATS, FINANCES)
+        private val SANS_BARRE: Set<AppModule> = emptySet()
 
         /**
          * Vrai si la barre de navigation doit rester visible sur cette route.
