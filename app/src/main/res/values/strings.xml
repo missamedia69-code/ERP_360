@@ -15,6 +15,7 @@
     <string name="fiche_edite_le">Édité le</string>
     <string name="fiche_section_sites">Sites</string>
     <string name="fiche_nb_infos">%d information(s) renseignée(s) sur cette fiche</string>
+    <string name="fiche_modules_actifs">Modules activés</string>
 
     <!-- Accueil --><string name="more_modules">Plus de modules</string>
     <string name="notifications">Notifications</string>

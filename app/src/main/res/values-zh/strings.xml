@@ -15,6 +15,7 @@
     <string name="fiche_edite_le">生成于</string>
     <string name="fiche_section_sites">站点</string>
     <string name="fiche_nb_infos">此档案已填写 %d 项信息</string>
+    <string name="fiche_modules_actifs">已启用模块</string>
 
     <string name="more_modules">更多模块</string>
     <string name="notifications">通知</string>

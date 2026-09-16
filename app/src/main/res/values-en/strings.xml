@@ -15,6 +15,7 @@
     <string name="fiche_edite_le">Issued on</string>
     <string name="fiche_section_sites">Sites</string>
     <string name="fiche_nb_infos">%d field(s) completed on this record</string>
+    <string name="fiche_modules_actifs">Active modules</string>
 
     <string name="more_modules">More modules</string>
     <string name="notifications">Notifications</string>

@@ -15,6 +15,7 @@
     <string name="fiche_edite_le">حرر في</string>
     <string name="fiche_section_sites">المواقع</string>
     <string name="fiche_nb_infos">تمت تعبئة %d معلومة في هذه البطاقة</string>
+    <string name="fiche_modules_actifs">الوحدات المفعّلة</string>
 
     <string name="more_modules">المزيد من الوحدات</string>
     <string name="notifications">الإشعارات</string>

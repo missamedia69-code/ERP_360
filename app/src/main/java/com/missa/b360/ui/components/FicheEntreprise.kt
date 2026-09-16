@@ -53,6 +53,10 @@ import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.PalierTaille
+import com.missa.b360.core.domain.model.ProfilActivite
+import com.missa.b360.core.domain.model.ProfilConfiguration
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
@@ -156,6 +160,21 @@ fun FicheEntrepriseDialog(
         langueLibelleRes(code)?.let { context.getString(it) } ?: code
     }
 
+    // Codes métier résolus en libellés explicites : P4 → « Moyenne (50–249) »,
+    // ASV → « Achat - Stock - Vente » + liste des modules activés.
+    val profil = entreprise?.profilActivite?.let { code ->
+        runCatching { ProfilActivite.valueOf(code) }.getOrNull()
+    }
+    val profilLibelle = profil?.let { context.getString(it.labelRes) } ?: entreprise?.profilActivite
+    val palier = PalierTaille.fromName(entreprise?.palierTaille)
+    val palierLibelle = palier?.let { context.getString(it.labelRes) } ?: entreprise?.palierTaille
+    val modulesProfil = profil?.let { p ->
+        ProfilConfiguration.modulesPourProfil(p)
+            .map { context.getString(ModulesPersonnalises.libelleRes(it)) }
+            .joinToString(", ")
+            .takeIf { m -> m.isNotBlank() }
+    }
+
     val sections = listOf(
         SectionFicheData(
             R.string.fiche_section_identite,
@@ -184,8 +203,9 @@ fun FicheEntrepriseDialog(
         SectionFicheData(
             R.string.fiche_section_activite,
             listOf(
-                LigneFicheData(R.string.obn_recap_profil, entreprise?.profilActivite),
-                LigneFicheData(R.string.obn_recap_taille, entreprise?.palierTaille),
+                LigneFicheData(R.string.obn_recap_profil, profilLibelle),
+                LigneFicheData(R.string.fiche_modules_actifs, modulesProfil),
+                LigneFicheData(R.string.obn_recap_taille, palierLibelle),
             ),
         ),
         SectionFicheData(
