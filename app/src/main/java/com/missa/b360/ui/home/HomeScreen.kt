@@ -337,11 +337,12 @@ private fun HomeHeader(
     onProfileClick: () -> Unit,
 ) {
     // Header compact : hauteur réduite, fond logo entreprise remplit complètement le head space avec Crop,
-    // limites bien marquées avec ombre + bordure.
+    // limites bien marquées avec ombre + bordure + dégradé + ombre douce.
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Color.White,
-        shadowElevation = 4.dp,
+        shadowElevation = 8.dp,
+        tonalElevation = 1.dp,
     ) {
         Box(
             modifier = Modifier
@@ -509,7 +510,7 @@ private fun HomeHeader(
                 }
             }
 
-            // Limite basse bien marquée : bordure 1dp + dégradé 2dp
+            // Limite basse bien marquée : 1.5dp border + 3dp dégradé + 6dp ombre douce vers contenu scrollable
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -518,18 +519,31 @@ private fun HomeHeader(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp)
+                        .height(1.5.dp)
                         .background(HomeBorder),
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(2.dp)
+                        .height(3.dp)
                         .background(
                             androidx.compose.ui.graphics.Brush.horizontalGradient(
                                 colors = listOf(
                                     HomeBlue.copy(alpha = 0.22f),
                                     TendrePositive.copy(alpha = 0.22f),
+                                ),
+                            ),
+                        ),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.06f),
+                                    Color.Transparent,
                                 ),
                             ),
                         ),

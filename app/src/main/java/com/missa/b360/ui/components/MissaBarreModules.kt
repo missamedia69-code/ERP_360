@@ -39,6 +39,7 @@ import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.TendrePositive
 
 /**
  * Permet à un écran de masquer temporairement la barre de navigation.
@@ -69,24 +70,47 @@ fun MissaBarreModules(
     // La route enregistrée porte ses arguments (« module_vente?create={create} ») :
     // comparer les chaînes entières ne désignerait jamais l'onglet courant.
     val racine = routeCourante?.substringBefore('?')
-    Surface(color = Color.White, shadowElevation = 8.dp) {
-        androidx.compose.foundation.layout.Column {
-            // Limite haute bien marquée avec zone scrollable
+    // Limites bien marquées : ombre forte + bordure + dégradé + coins arrondis haut pour séparation nette avec zone scrollable
+    Surface(
+        color = Color.White,
+        shadowElevation = 12.dp,
+        tonalElevation = 1.dp,
+        shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
+    ) {
+        androidx.compose.foundation.layout.Column(
+            modifier = Modifier.background(Color.White),
+        ) {
+            // 1 - Bordure solide 1.5dp bien visible
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(1.dp)
+                    .height(1.5.dp)
                     .background(com.missa.b360.ui.theme.MissaBorder),
             )
+            // 2 - Dégradé horizontal 3dp bleu->vert marqué (même intensité que header)
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(2.dp)
+                    .height(3.dp)
                     .background(
                         androidx.compose.ui.graphics.Brush.horizontalGradient(
                             colors = listOf(
-                                BrandBlue.copy(alpha = 0.12f),
-                                com.missa.b360.ui.theme.Green90,
+                                BrandBlue.copy(alpha = 0.22f),
+                                com.missa.b360.ui.theme.TendrePositive.copy(alpha = 0.22f),
+                            ),
+                        ),
+                    ),
+            )
+            // 3 - Ombre douce interne 6dp pour profondeur entre scrollable et barre
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.06f),
+                                Color.Transparent,
                             ),
                         ),
                     ),
@@ -94,8 +118,9 @@ fun MissaBarreModules(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color.White)
                     .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(vertical = 6.dp),
+                    .padding(vertical = 5.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
             ) {
             BarreOnglet(
