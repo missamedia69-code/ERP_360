@@ -8,6 +8,7 @@ import android.graphics.pdf.PdfDocument
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.StaticLayout
+import android.text.TextPaint
 import android.text.style.StyleSpan
 import java.io.File
 
@@ -75,7 +76,7 @@ object FicheEntreprisePdf {
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             isAntiAlias = true
         }
-        val paintLigne = Paint().apply { color = ENCRE; textSize = 10.5f; isAntiAlias = true }
+        val paintLigne = TextPaint().apply { color = ENCRE; textSize = 10.5f; isAntiAlias = true }
         val paintTrait = Paint().apply { color = BLEU; strokeWidth = 1.2f; isAntiAlias = true }
         val paintPuce = Paint().apply { color = BLEU; style = Paint.Style.FILL; isAntiAlias = true }
 
@@ -125,7 +126,7 @@ object FicheEntreprisePdf {
 
         val dossier = File(context.cacheDir, "fiches_pdf").apply { mkdirs() }
         val fichier = File(dossier, "fiche-${System.currentTimeMillis()}.pdf")
-        fichier.outputStream().use { document.write(it) }
+        fichier.outputStream().use { flux -> document.write(flux) }
         document.close()
         return fichier
     }
