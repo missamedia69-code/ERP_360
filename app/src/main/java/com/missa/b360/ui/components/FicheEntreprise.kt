@@ -3,11 +3,11 @@ package com.missa.b360.ui.components
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -15,19 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Gavel
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Store
-import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -39,12 +35,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -56,11 +54,10 @@ import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green90
+import androidx.compose.ui.graphics.Brush
 import com.missa.b360.ui.theme.MissaBorder
-import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
-import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.TendrePositive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -70,11 +67,11 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 /**
- * Carte d'identité détaillée de l'entreprise : toutes les informations
- * enregistrées (identité, coordonnées, légal, activité) plus celles du
- * Propriétaire, structurées en sections comme les popups explicatives des
- * packs de l'onboarding (puce d'icône bleu pâle + titre + panneau).
- * Copie champ par champ et partage de la fiche complète. Lecture seule.
+ * Carte d'identité détaillée de l'entreprise, présentée comme un petit
+ * document : sections titrées (trait bleu) puis chaque élément en paragraphe
+ * à puce bleue « Libellé : valeur ». Toutes les informations enregistrées
+ * (identité, coordonnées, légal, activité) + celles du Propriétaire.
+ * Copie champ par champ, partage de la fiche complète. Lecture seule.
  */
 data class FicheEntrepriseState(
     val entreprise: EnterpriseEntity? = null,
@@ -113,7 +110,6 @@ private data class LigneFicheData(val libelleRes: Int, val valeur: String?)
 
 private data class SectionFicheData(
     val titreRes: Int,
-    val icone: ImageVector,
     val lignes: List<LigneFicheData>,
 )
 
@@ -151,7 +147,6 @@ fun FicheEntrepriseDialog(
     val sections = listOf(
         SectionFicheData(
             R.string.fiche_section_identite,
-            Icons.Outlined.Business,
             listOf(
                 LigneFicheData(R.string.obn_secteur, entreprise?.secteur),
                 LigneFicheData(R.string.fiche_langue, langueAffichee),
@@ -161,7 +156,6 @@ fun FicheEntrepriseDialog(
         ),
         SectionFicheData(
             R.string.fiche_section_coordonnees,
-            Icons.Outlined.Place,
             listOf(
                 LigneFicheData(R.string.obn_adresse, entreprise?.adresse),
                 LigneFicheData(R.string.obn_telephone, entreprise?.telephone),
@@ -170,7 +164,6 @@ fun FicheEntrepriseDialog(
         ),
         SectionFicheData(
             R.string.fiche_section_legal,
-            Icons.Outlined.Gavel,
             listOf(
                 LigneFicheData(R.string.fisc_id_fiscal, entreprise?.numeroFiscal),
                 LigneFicheData(R.string.fisc_id_registre, entreprise?.registreCommerce),
@@ -178,7 +171,6 @@ fun FicheEntrepriseDialog(
         ),
         SectionFicheData(
             R.string.fiche_section_activite,
-            Icons.Outlined.Work,
             listOf(
                 LigneFicheData(R.string.obn_recap_profil, entreprise?.profilActivite),
                 LigneFicheData(R.string.obn_recap_taille, entreprise?.palierTaille),
@@ -186,7 +178,6 @@ fun FicheEntrepriseDialog(
         ),
         SectionFicheData(
             R.string.obn_recap_proprietaire,
-            Icons.Outlined.Person,
             listOf(
                 LigneFicheData(R.string.clients_nom, etat.proprietaireNom),
                 LigneFicheData(R.string.ob_email, etat.proprietaireEmail),
@@ -203,7 +194,7 @@ fun FicheEntrepriseDialog(
                 appendLine(res(section.titreRes))
                 section.lignes.forEach { ligne ->
                     val valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() }
-                    appendLine("  ${res(ligne.libelleRes)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
+                    appendLine("  • ${res(ligne.libelleRes)} : ${valeur ?: res(R.string.fiche_non_renseigne)}")
                 }
                 appendLine()
             }
@@ -233,7 +224,7 @@ fun FicheEntrepriseDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 10.dp),
+                        .padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     CompanyLogo(
@@ -270,12 +261,12 @@ fun FicheEntrepriseDialog(
                         )
                     }
                 }
-                // Corps défilable : sections façon popups de packs.
+                // Corps défilable : petit document à puces bleues.
                 Column(
                     modifier = Modifier
                         .weight(1f, fill = false)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 20.dp),
                 ) {
                     sections.forEach { section ->
                         SectionFiche(
@@ -326,9 +317,9 @@ fun FicheEntrepriseDialog(
 }
 
 /**
- * Section de la carte : puce d'icône bleu pâle + titre gras (comme les popups
- * de packs), puis panneau gris clair listant les champs. Un champ vide est
- * affiché « Non renseigné » ; la copie n'est proposée que si la valeur existe.
+ * Section du document : titre souligné d'un trait bleu, puis chaque élément en
+ * paragraphe introduit par une puce bleue : « Libellé : valeur ». Un champ vide
+ * affiche « Non renseigné » ; la copie n'est proposée que si la valeur existe.
  */
 @Composable
 private fun SectionFiche(
@@ -336,59 +327,36 @@ private fun SectionFiche(
     nonRenseigne: String,
     onCopier: (String) -> Unit,
 ) {
-    Row(
-        modifier = Modifier.padding(top = 4.dp, bottom = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Surface(
-            modifier = Modifier.size(32.dp),
-            shape = RoundedCornerShape(9.dp),
-            color = MissaSoftBlue,
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Icon(
-                    imageVector = section.icone,
-                    contentDescription = null,
-                    tint = BrandBlue,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        }
-        Spacer(Modifier.width(8.dp))
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
         Text(
             text = stringResource(section.titreRes),
-            color = MissaInk,
+            color = BrandBlue,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
         )
-    }
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        color = MissaCanvas,
-    ) {
-        Column(
+        Spacer(Modifier.height(3.dp))
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-        ) {
-            section.lignes.forEach { ligne ->
-                LigneFiche(
-                    libelle = stringResource(ligne.libelleRes),
-                    valeur = ligne.valeur,
-                    nonRenseigne = nonRenseigne,
-                    onCopier = onCopier,
-                )
-            }
+                .height(2.dp)
+                .background(
+                    Brush.horizontalGradient(listOf(BrandBlue.copy(alpha = 0.55f), BrandBlue.copy(alpha = 0.08f))),
+                    RoundedCornerShape(1.dp),
+                ),
+        )
+        Spacer(Modifier.height(6.dp))
+        section.lignes.forEach { ligne ->
+            LigneFiche(
+                libelle = stringResource(ligne.libelleRes),
+                valeur = ligne.valeur,
+                nonRenseigne = nonRenseigne,
+                onCopier = onCopier,
+            )
         }
     }
-    Spacer(Modifier.height(12.dp))
 }
 
-/** Ligne libellé gris + valeur encre (ou « Non renseigné »), bouton copie si valeur. */
+/** Paragraphe à puce bleue : « Libellé : valeur », bouton copie si valeur renseignée. */
 @Composable
 private fun LigneFiche(
     libelle: String,
@@ -400,28 +368,42 @@ private fun LigneFiche(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(vertical = 3.dp),
+        verticalAlignment = Alignment.Top,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(text = libelle, color = MissaMuted, fontSize = 11.sp)
-            Text(
-                text = if (vide) nonRenseigne else valeur,
-                color = if (vide) MissaMuted.copy(alpha = 0.7f) else MissaInk,
-                fontSize = 14.sp,
-                fontWeight = if (vide) FontWeight.Normal else FontWeight.Medium,
-            )
-        }
+        Box(
+            modifier = Modifier
+                .padding(top = 6.dp)
+                .size(6.dp)
+                .background(BrandBlue, CircleShape),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = MissaInk)) {
+                    append(libelle)
+                    append(" : ")
+                }
+                if (vide) {
+                    withStyle(SpanStyle(color = MissaMuted.copy(alpha = 0.7f))) { append(nonRenseigne) }
+                } else {
+                    withStyle(SpanStyle(color = MissaInk)) { append(valeur) }
+                }
+            },
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            modifier = Modifier.weight(1f),
+        )
         if (!vide) {
             IconButton(
                 onClick = { onCopier(valeur) },
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(36.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.ContentCopy,
                     contentDescription = stringResource(R.string.fiche_copier),
                     tint = MissaMuted,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
