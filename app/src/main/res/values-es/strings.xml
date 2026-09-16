@@ -895,4 +895,7 @@
     <string name="home_produits_rupture">%1$d productos en ruptura</string>
     <string name="home_nc_ouvertes_detail">%1$d no conformidades abiertas</string>
     <string name="home_commande_fournisseur_attente">%1$d pedido proveedor pendiente</string>
+    <string name="activation_entreprise_info">Informations entreprise</string>
+    <string name="activation_entreprise_nom">Nom : %1$s</string>
+    <string name="activation_entreprise_devise">Devise : %1$s (verrouillée)</string>
 </resources>

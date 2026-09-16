@@ -942,5 +942,8 @@
     <string name="home_produits_rupture">%1$d produits en rupture</string>
     <string name="home_nc_ouvertes_detail">%1$d non-conformités ouvertes</string>
     <string name="home_commande_fournisseur_attente">%1$d commande fournisseur attendue</string>
+    <string name="activation_entreprise_info">Informations entreprise</string>
+    <string name="activation_entreprise_nom">Nom : %1$s</string>
+    <string name="activation_entreprise_devise">Devise : %1$s (verrouillée)</string>
 </resources>
 <!-- Temp insert will be replaced -->

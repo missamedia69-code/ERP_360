@@ -226,10 +226,9 @@ fun AdminReglagesScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Informations entreprise", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                    // Secteur, adresse, etc. simplifiés pour l'exemple
-                    Text("Nom: ${entreprise.nom}", fontSize = 12.sp, color = MissaInk)
-                    Text("Devise: ${entreprise.devise} (verrouillée)", fontSize = 11.sp, color = MissaMuted)
+                    Text(stringResource(R.string.activation_entreprise_info), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    Text(stringResource(R.string.activation_entreprise_nom, entreprise.nom), fontSize = 12.sp, color = MissaInk)
+                    Text(stringResource(R.string.activation_entreprise_devise, entreprise.devise), fontSize = 11.sp, color = MissaMuted)
                 }
             }
         }

@@ -895,4 +895,7 @@
     <string name="home_produits_rupture">%1$d منتجات نفدت</string>
     <string name="home_nc_ouvertes_detail">%1$d عدم مطابقة مفتوحة</string>
     <string name="home_commande_fournisseur_attente">%1$d طلب مورد معلق</string>
+    <string name="activation_entreprise_info">Informations entreprise</string>
+    <string name="activation_entreprise_nom">Nom : %1$s</string>
+    <string name="activation_entreprise_devise">Devise : %1$s (verrouillée)</string>
 </resources>
