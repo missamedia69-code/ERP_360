@@ -351,12 +351,12 @@ private fun ActivationModuleLigne(
                         }
                     }
                 } else if (isRecommande) {
-                    Surface(shape = RoundedCornerShape(5.dp), color = Color(0xFFEFF6FF)) {
+                    Surface(shape = RoundedCornerShape(5.dp), color = com.missa.b360.ui.theme.Blue90) {
                         Text(stringResource(R.string.activation_recommande), fontSize = 9.sp, color = BrandBlue, modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp))
                     }
                 } else if (isActif) {
-                    Surface(shape = RoundedCornerShape(5.dp), color = Color(0xFFECFDF5)) {
-                        Text(stringResource(R.string.activation_personnalise), fontSize = 9.sp, color = Color(0xFF16A34A), modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp))
+                    Surface(shape = RoundedCornerShape(5.dp), color = com.missa.b360.ui.theme.Green90) {
+                        Text(stringResource(R.string.activation_personnalise), fontSize = 9.sp, color = com.missa.b360.ui.theme.TendrePositive, modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp))
                     }
                 }
             }
