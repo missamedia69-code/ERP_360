@@ -13,7 +13,6 @@
     <string name="fiche_non_renseigne">Non renseigné</string>
     <string name="fiche_partager_pdf">Partager en PDF</string>
     <string name="fiche_edite_le">Édité le</string>
-    <string name="fiche_section_sites">Sites</string>
     <string name="fiche_nb_infos">%d information(s) renseignée(s) sur cette fiche</string>
     <string name="fiche_modules_actifs">Modules activés</string>
 

@@ -52,13 +52,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.EnterpriseEntity
-import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ProfilConfiguration
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
-import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.UserAdminUseCases
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green90
@@ -86,23 +84,20 @@ data class FicheEntrepriseState(
     val proprietaireNom: String? = null,
     val proprietaireEmail: String? = null,
     val proprietaireRole: String? = null,
-    val sites: List<SiteEntity> = emptyList(),
 )
 
 @HiltViewModel
 class FicheEntrepriseViewModel @Inject constructor(
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
-    sites: SiteUseCases,
 ) : ViewModel() {
 
-    /** Entreprise + sites + utilisateur portant le rôle SYSTEM « Propriétaire » (à défaut, le premier). */
+    /** Entreprise + utilisateur portant le rôle SYSTEM « Propriétaire » (à défaut, le premier). */
     val etat: StateFlow<FicheEntrepriseState> = combine(
         getEnterprise.observer(),
         users.observerUtilisateurs(),
         users.observerRoles(),
-        sites.observerSites(),
-    ) { entreprise, utilisateurs, roles, sitesEnregistres ->
+    ) { entreprise, utilisateurs, roles ->
         val roleIdProprietaire = roles.firstOrNull { it.nom.equals("Propriétaire", ignoreCase = true) }?.id
         val proprietaire = utilisateurs.firstOrNull { it.roleId != null && it.roleId == roleIdProprietaire }
             ?: utilisateurs.firstOrNull()
@@ -112,7 +107,6 @@ class FicheEntrepriseViewModel @Inject constructor(
             proprietaireNom = proprietaire?.nom,
             proprietaireEmail = proprietaire?.emailSecours,
             proprietaireRole = proprietaireRole,
-            sites = sitesEnregistres,
         )
     }.stateIn(
         viewModelScope,
@@ -216,26 +210,7 @@ fun FicheEntrepriseDialog(
                 LigneFicheData(R.string.ob_email, etat.proprietaireEmail),
             ),
         ),
-    ) + if (etat.sites.isEmpty()) {
-        emptyList()
-    } else {
-        // Section Sites : nom du site en libellé, type · adresse · principal en valeur.
-        listOf(
-            SectionFicheData(
-                R.string.fiche_section_sites,
-                etat.sites.map { site ->
-                    LigneFicheData(
-                        libelleTexte = site.nom,
-                        valeur = listOfNotNull(
-                            site.type.takeIf { t -> t.isNotBlank() },
-                            site.adresse?.takeIf { a -> a.isNotBlank() },
-                            if (site.principal) context.getString(R.string.clients_flow_primary) else null,
-                        ).joinToString(" · ").takeIf { v -> v.isNotBlank() },
-                    )
-                },
-            ),
-        )
-    }
+    )
 
     val res: (Int) -> String = { context.getString(it) }
     val libelle: (LigneFicheData) -> String = { ligne ->

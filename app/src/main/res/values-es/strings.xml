@@ -13,7 +13,6 @@
     <string name="fiche_non_renseigne">Sin especificar</string>
     <string name="fiche_partager_pdf">Compartir en PDF</string>
     <string name="fiche_edite_le">Emitido el</string>
-    <string name="fiche_section_sites">Sitios</string>
     <string name="fiche_nb_infos">%d dato(s) registrado(s) en esta ficha</string>
     <string name="fiche_modules_actifs">Módulos activados</string>
 
