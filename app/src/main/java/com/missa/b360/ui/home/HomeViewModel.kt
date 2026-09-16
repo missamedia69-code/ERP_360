@@ -316,7 +316,7 @@ class HomeViewModel @Inject constructor(
         val projetsRecords = validated.filter { it.module == OperationModule.PROJETS.name }
         val projetsActifsCount = projetsRecords.size
         val projetsEnRetardCount = projetsRecords.count { rec ->
-            val payload = com.missa.b360.core.domain.model.ProjetCodec.decode(rec.payload)
+            val payload = com.missa.b360.core.domain.model.ProjetCodec.decode(rec.notes)
             if (payload == null) false else {
                 val etat = com.missa.b360.core.domain.model.ProjetRules.etat(payload.etat)
                 if (etat == com.missa.b360.core.domain.model.EtatProjet.LIVRE) false
