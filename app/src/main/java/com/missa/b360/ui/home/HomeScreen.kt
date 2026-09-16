@@ -326,84 +326,189 @@ private fun HomeHeader(
     onNotificationClick: () -> Unit,
     onProfileClick: () -> Unit,
 ) {
+    // Header redesigné : MISSA à gauche, entreprise à droite, sans onglet déroulant.
+    // Fond basé sur le logo de l'utilisateur : watermark + dégradé + halos.
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Color.White,
         shadowElevation = 0.dp,
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.safeDrawing)
-                .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .background(Color.White),
         ) {
-            IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = stringResource(R.string.drawer_admin),
-                    tint = HomeTextDark,
-                    modifier = Modifier.size(24.dp),
+            // --- Fond basé sur le logo entreprise ---
+            // Halo vert très léger derrière le logo entreprise (droite)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(160.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(Color(0xFFDCFCE7).copy(alpha = 0.85f), Color.Transparent),
+                            radius = 200f,
+                        ),
+                    ),
+            )
+            // Halo bleu très léger derrière MISSA (gauche)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .size(140.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(Color(0xFFDBEAFE).copy(alpha = 0.9f), Color.Transparent),
+                            radius = 180f,
+                        ),
+                    ),
+            )
+            // Watermark du logo entreprise en fond, très faible, basé sur le logo réel
+            if (companyLogoUri != null) {
+                CompanyLogoWatermark(
+                    logoUri = companyLogoUri,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxWidth(0.62f)
+                        .height(64.dp)
+                        .alpha(0.07f),
+                )
+            } else {
+                // Fallback pattern quand pas de logo : damier subtil
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFFF8FAFC),
+                                    Color(0xFFF0F9FF),
+                                    Color(0xFFF0FDF4),
+                                ),
+                            ),
+                        ),
                 )
             }
-            // Marque Missa - logo image rond + texte
-            Image(
-                painter = painterResource(R.drawable.logo_missa),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
+            // Ligne de séparation basse subtile + mini dégradé marque -> entreprise
+            Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp)),
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color(0xFFE2E8F0)),
             )
-            Spacer(Modifier.width(6.dp))
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "MISSA",
-                        color = Color(0xFF0F172A),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 12.sp,
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    Text(
-                        text = "BUSINESS",
-                        color = Color(0xFF0F172A),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 12.sp,
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFF2563EB).copy(alpha = 0.18f),
+                                Color(0xFF16A34A).copy(alpha = 0.18f),
+                            ),
+                        ),
+                    ),
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 4.dp, end = 10.dp, top = 8.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onMenuClick, modifier = Modifier.size(40.dp)) {
+                    Icon(
+                        imageVector = Icons.Outlined.Menu,
+                        contentDescription = stringResource(R.string.drawer_admin),
+                        tint = HomeTextDark,
+                        modifier = Modifier.size(22.dp),
                     )
                 }
-                Text(
-                    text = "360",
-                    color = Color(0xFF16A34A),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    lineHeight = 12.sp,
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            // Puce entité - GREEN FARM SARL style
-            Surface(
-                modifier = Modifier.clickable(onClick = onProfileClick),
-                shape = RoundedCornerShape(12.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
-                shadowElevation = 0.dp,
-            ) {
+                // MISSA BUSINESS à gauche
                 Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { /* logo MISSA = accueil */ },
                 ) {
-                    // Petit logo feuille verte - utilise le logo genere pour GREEN FARM
+                    Image(
+                        painter = painterResource(R.drawable.logo_missa),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(9.dp)),
+                    )
+                    Spacer(Modifier.width(7.dp))
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "MISSA",
+                                color = Color(0xFF0F172A),
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 12.sp,
+                                letterSpacing = 0.3.sp,
+                            )
+                            Spacer(Modifier.width(2.dp))
+                            Text(
+                                text = "BUSINESS",
+                                color = Color(0xFF0F172A),
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 12.sp,
+                                letterSpacing = 0.3.sp,
+                            )
+                        }
+                        Text(
+                            text = "360",
+                            color = Color(0xFF16A34A),
+                            fontSize = 12.5.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            lineHeight = 12.sp,
+                        )
+                    }
+                }
+                Spacer(Modifier.weight(1f))
+                // Notifications
+                IconButton(onClick = onNotificationClick, modifier = Modifier.size(38.dp)) {
+                    BadgedBox(
+                        badge = {
+                            if (notificationCount > 0) {
+                                NotificationBadge(containerColor = Color(0xFFEF4444), contentColor = Color.White) {
+                                    Text(notificationCount.coerceAtMost(99).toString(), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Notifications,
+                            contentDescription = stringResource(R.string.notifications),
+                            tint = HomeTextDark,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                // Logo entreprise à droite, sans onglet déroulant
+                Surface(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable(onClick = onProfileClick),
+                    shape = CircleShape,
+                    color = Color.White,
+                    border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                    shadowElevation = 2.dp,
+                ) {
                     if (companyLogoUri != null) {
                         CompanyLogo(
                             logoUri = companyLogoUri,
                             contentDescription = null,
                             fallbackIcon = Icons.Outlined.Store,
-                            modifier = Modifier.size(28.dp),
-                            size = 28.dp,
-                            shape = RoundedCornerShape(7.dp),
+                            modifier = Modifier.fillMaxSize(),
+                            size = 40.dp,
+                            shape = CircleShape,
                             fallbackTint = Color(0xFF16A34A),
                             fallbackBackground = Color(0xFFE6F8EC),
                         )
@@ -412,69 +517,40 @@ private fun HomeHeader(
                             painter = painterResource(R.drawable.logo_green_farm),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(28.dp).clip(RoundedCornerShape(7.dp)),
+                            modifier = Modifier.fillMaxSize().clip(CircleShape),
                         )
                     } else {
-                        Surface(
-                            modifier = Modifier.size(28.dp),
-                            shape = RoundedCornerShape(7.dp),
-                            color = Color(0xFFE6F8EC),
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Store,
-                                    contentDescription = null,
-                                    tint = Color(0xFF16A34A),
-                                    modifier = Modifier.size(16.dp),
-                                )
-                            }
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Color(0xFFE6F8EC))) {
+                            Icon(
+                                imageVector = Icons.Outlined.Store,
+                                contentDescription = null,
+                                tint = Color(0xFF16A34A),
+                                modifier = Modifier.size(20.dp),
+                            )
                         }
                     }
-                    Spacer(Modifier.width(7.dp))
-                    Column {
-                        Text(
-                            text = companyName.ifBlank { "GREEN FARM SARL" },
-                            color = Color(0xFF0F172A),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                        )
-                        Text(
-                            text = secteur.ifBlank { "Distributeur Agroalimentaire" },
-                            color = Color(0xFF64748B),
-                            fontSize = 9.sp,
-                            maxLines = 1,
-                        )
-                    }
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Outlined.ArrowDropDown,
-                        contentDescription = null,
-                        tint = Color(0xFF64748B),
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-            }
-            Spacer(Modifier.width(6.dp))
-            IconButton(onClick = onNotificationClick, modifier = Modifier.size(40.dp)) {
-                BadgedBox(
-                    badge = {
-                        if (notificationCount > 0) {
-                            NotificationBadge(containerColor = Color(0xFFEF4444), contentColor = Color.White) {
-                                Text(notificationCount.coerceAtMost(99).toString(), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Notifications,
-                        contentDescription = stringResource(R.string.notifications),
-                        tint = HomeTextDark,
-                        modifier = Modifier.size(24.dp),
-                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CompanyLogoWatermark(
+    logoUri: String?,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.clip(RoundedCornerShape(12.dp))) {
+        CompanyLogo(
+            logoUri = logoUri,
+            contentDescription = null,
+            fallbackIcon = Icons.Outlined.Store,
+            modifier = Modifier.fillMaxSize(),
+            size = 120.dp,
+            shape = RoundedCornerShape(12.dp),
+            fallbackTint = Color(0xFF16A34A).copy(alpha = 0.12f),
+            fallbackBackground = Color.Transparent,
+        )
     }
 }
 
