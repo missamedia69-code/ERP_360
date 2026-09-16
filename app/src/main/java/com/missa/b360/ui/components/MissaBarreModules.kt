@@ -3,6 +3,7 @@ package com.missa.b360.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,23 +43,17 @@ import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.TendrePositive
 
-/**
- * Permet à un écran de masquer temporairement la barre de navigation.
- *
- * Certains parcours occupent tout l'écran et posent leur propre bouton d'action
- * en bas — la saisie d'une vente, par exemple. La barre y apparaîtrait
- * juste en dessous, deux barres l'une sur l'autre. Plutôt que de dresser une
- * liste d'exceptions par route, l'écran concerné annonce lui-même qu'il prend
- * le bas de l'écran.
- */
 val LocalBarreNavigation = compositionLocalOf { mutableStateOf(true) }
 
 /**
- * Barre de navigation principale, partagée par tous les écrans-liste.
+ * Barre de navigation principale — Spec UI MISSA BUSINESS 360
  *
- * Le dessin reprend celui qui existait dans le module Vente : une simple ligne
- * d'icônes surmontant un libellé, plus fine que la `NavigationBar` de Material
- * et sans pastille de sélection — la couleur suffit à désigner l'onglet actif.
+ * - Hauteur applicative 80dp + navigationBars bottom inset dynamique
+ * - 5 destinations: Accueil, Vente, Achats, Stock, Plus
+ * - Chaque item: icon 24dp + label 11-12sp, zone tactile 48x48 minimum
+ * - Responsive: weight(1f) par item, fillMaxWidth, pas de px fixes
+ * - Limites bien marquées: bordure 1.5dp + dégradé 3dp + ombre douce 6dp + shadow 12dp
+ * - Edge-to-edge: background peut aller sous zones système, content respecte Insets
  */
 @Composable
 fun MissaBarreModules(
@@ -67,90 +63,91 @@ fun MissaBarreModules(
     onModule: (AppModule) -> Unit,
     onPlus: () -> Unit,
 ) {
-    // La route enregistrée porte ses arguments (« module_vente?create={create} ») :
-    // comparer les chaînes entières ne désignerait jamais l'onglet courant.
     val racine = routeCourante?.substringBefore('?')
-    // Limites bien marquées : ombre forte + bordure + dégradé + coins arrondis haut pour séparation nette avec zone scrollable
     Surface(
         color = Color.White,
         shadowElevation = 12.dp,
         tonalElevation = 1.dp,
         shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp),
     ) {
-        androidx.compose.foundation.layout.Column(
-            modifier = Modifier.background(Color.White),
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White),
         ) {
-            // 1 - Bordure solide 1.5dp bien visible
-            androidx.compose.foundation.layout.Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.5.dp)
-                    .background(com.missa.b360.ui.theme.MissaBorder),
-            )
-            // 2 - Dégradé horizontal 3dp bleu->vert marqué (même intensité que header)
-            androidx.compose.foundation.layout.Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(3.dp)
-                    .background(
-                        androidx.compose.ui.graphics.Brush.horizontalGradient(
-                            colors = listOf(
-                                BrandBlue.copy(alpha = 0.22f),
-                                com.missa.b360.ui.theme.TendrePositive.copy(alpha = 0.22f),
-                            ),
-                        ),
-                    ),
-            )
-            // 3 - Ombre douce interne 6dp pour profondeur entre scrollable et barre
-            androidx.compose.foundation.layout.Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .background(
-                        androidx.compose.ui.graphics.Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.06f),
-                                Color.Transparent,
-                            ),
-                        ),
-                    ),
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(vertical = 5.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-            ) {
-            BarreOnglet(
-                icone = Icons.Outlined.Home,
-                libelleRes = R.string.nav_accueil,
-                actif = racine == Routes.HOME,
-                onClick = onAccueil,
-            )
-            modules.take(AppModule.MAX_ONGLETS).forEach { module ->
-                // La maquette d'accueil affiche « Finances » pour le module
-                // Trésorerie : le libellé technique « Trésorerie » y prêterait
-                // à confusion. On conserve le module mais on affiche le terme
-                // de la capture.
-                val libelleRes = when (module) {
-                    AppModule.TRESORERIE -> R.string.module_finances
-                    else -> module.titleRes
-                }
-                BarreOnglet(
-                    icone = module.icon,
-                    libelleRes = libelleRes,
-                    actif = racine == module.route,
-                    onClick = { onModule(module) },
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Limite haute — 3 couches pour séparation nette avec zone scrollable
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.5.dp)
+                        .background(com.missa.b360.ui.theme.MissaBorder),
                 )
-            }
-            BarreOnglet(
-                icone = Icons.Outlined.MoreHoriz,
-                libelleRes = R.string.home_more_short,
-                actif = false,
-                onClick = onPlus,
-            )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                colors = listOf(
+                                    BrandBlue.copy(alpha = 0.22f),
+                                    TendrePositive.copy(alpha = 0.22f),
+                                ),
+                            ),
+                        ),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.06f),
+                                    Color.Transparent,
+                                ),
+                            ),
+                        ),
+                )
+                // Contenu 80dp + bottom inset
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .height(80.dp)
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    BarreOnglet(
+                        modifier = Modifier.weight(1f),
+                        icone = Icons.Outlined.Home,
+                        libelleRes = R.string.nav_accueil,
+                        actif = racine == Routes.HOME,
+                        onClick = onAccueil,
+                    )
+                    modules.take(AppModule.MAX_ONGLETS).forEach { module ->
+                        val libelleRes = when (module) {
+                            AppModule.TRESORERIE -> R.string.module_finances
+                            else -> module.titleRes
+                        }
+                        BarreOnglet(
+                            modifier = Modifier.weight(1f),
+                            icone = module.icon,
+                            libelleRes = libelleRes,
+                            actif = racine == module.route,
+                            onClick = { onModule(module) },
+                        )
+                    }
+                    BarreOnglet(
+                        modifier = Modifier.weight(1f),
+                        icone = Icons.Outlined.MoreHoriz,
+                        libelleRes = R.string.home_more_short,
+                        actif = false,
+                        onClick = onPlus,
+                    )
+                }
             }
         }
     }
@@ -158,6 +155,7 @@ fun MissaBarreModules(
 
 @Composable
 private fun BarreOnglet(
+    modifier: Modifier = Modifier,
     icone: ImageVector,
     libelleRes: Int,
     actif: Boolean,
@@ -165,27 +163,27 @@ private fun BarreOnglet(
 ) {
     val teinte = if (actif) BrandBlue else MissaMuted
     Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(10.dp))
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 9.dp, vertical = 2.dp),
+            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+            .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        // Un trait fin marque l'onglet actif : plus discret que la pastille de
-        // Material, il tient dans une barre de cette hauteur.
         Spacer(
             modifier = Modifier
-                .height(2.dp)
-                .width(if (actif) 20.dp else 0.dp)
-                .background(BrandBlue, RoundedCornerShape(1.dp)),
+                .height(3.dp)
+                .width(if (actif) 24.dp else 0.dp)
+                .background(BrandBlue, RoundedCornerShape(1.5.dp)),
         )
-        Spacer(Modifier.height(3.dp))
-        Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(21.dp))
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(4.dp))
+        Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(24.dp))
+        Spacer(Modifier.height(4.dp))
         Text(
             text = stringResource(libelleRes),
             color = teinte,
-            fontSize = 9.5.sp,
+            fontSize = 11.sp,
             fontWeight = if (actif) FontWeight.SemiBold else FontWeight.Normal,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

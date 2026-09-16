@@ -57,12 +57,12 @@ import com.missa.b360.ui.theme.MissaSoftBlue
  * vers une interprétation différente de cette direction artistique.
  */
 object MissaLayout {
-    val screenHorizontal = 16.dp
+    val screenHorizontal = 16.dp // Spec: 16dp marges
     val screenVertical = 12.dp
-    val itemGap = 10.dp
-    val sectionGap = 18.dp
+    val itemGap = 12.dp // Spec grille 4/8/12/16/20/24/32
+    val sectionGap = 16.dp
     val fieldHeight = 52.dp
-    val actionHeight = 46.dp
+    val actionHeight = 48.dp // Spec: zone tactile 48dp minimum
     val cardRadius = 14.dp
 }
 
@@ -86,7 +86,13 @@ fun MissaBrandMark(
     }
 }
 
-/** Barre haute compacte, blanche et constante pour les écrans de gestion. */
+/**
+ * Barre haute — Spec UI MISSA BUSINESS 360
+ * - Hauteur contenu 64dp + statusBar inset séparé
+ * - Padding horizontal 16dp minimum
+ * - Zones tactiles 48x48, icônes 24dp, logo 40dp, titre 15-16sp
+ * - Responsive: dp/sp, WindowInsets, pas de px
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MissaTopAppBar(
@@ -99,12 +105,12 @@ fun MissaTopAppBar(
         modifier = modifier,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MissaBrandMark(size = 25.dp)
+                MissaBrandMark(size = 40.dp)
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = title,
                     color = MissaInk,
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -113,12 +119,12 @@ fun MissaTopAppBar(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(42.dp)) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = null,
                         tint = MissaInk,
-                        modifier = Modifier.size(21.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -130,6 +136,7 @@ fun MissaTopAppBar(
             navigationIconContentColor = MissaInk,
             actionIconContentColor = MissaInk,
         ),
+        windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
     )
 }
 

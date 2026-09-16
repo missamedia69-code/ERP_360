@@ -276,36 +276,19 @@ fun HomeScreen(
         stringResource(R.string.home_greeting, it)
     } ?: stringResource(R.string.home_greeting_anonymous)
 
-    // Le tiroir et la barre du bas appartiennent au graphe de navigation : les
-    // redéclarer ici en donnait deux exemplaires, dont l'un se superposait à
-    // l'autre sur certains écrans.
-    Scaffold(
-        containerColor = HomeBackground,
-        topBar = {
-            HomeHeader(
-                companyName = companyName,
-                companyLogoUri = uiState.entrepriseLogoUri,
-                secteur = uiState.secteur,
-                profileLabel = profileLabel,
-                sizeLabel = sizeLabel,
-                greeting = greeting,
-                notificationCount = nonLues,
-                onMenuClick = onOuvrirMenu,
-                onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                // Le bloc porte le logo et le nom de l'entreprise : il ouvre
-                // sa fiche. Le compte utilisateur a son entrée au tiroir.
-                onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
-            )
-        },
-    ) { padding ->
+    // Spec: Header global fixe 64dp + statusBars dans AppNavHost, contenu scrollable seul
+    // HomeScreen ne déclare plus son propre topBar — évite double header et respecte architecture globale
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(HomeBackground),
+    ) {
         HomeDashboard(
             state = uiState,
             modulesActifs = modulesActifs,
             actionsRapidesSelection = actionsEpingles,
             onPersonnaliser = { showPersonnaliser = true },
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize(),
             onNavigate = { navController.navigate(it) },
         )
     }
@@ -336,8 +319,9 @@ private fun HomeHeader(
     onNotificationClick: () -> Unit,
     onProfileClick: () -> Unit,
 ) {
-    // Header compact : hauteur réduite, fond logo entreprise remplit complètement le head space avec Crop,
-    // limites bien marquées avec ombre + bordure + dégradé + ombre douce.
+    // Spec UI MISSA BUSINESS 360 — Header fixe 64dp + statusBar inset séparé
+    // Structure: SYSTEM STATUS BAR (inset) + 64dp content, padding horizontal 16dp,
+    // zones tactiles 48x48, icones 24dp, logo 40dp, titre 15-16sp, avatar 40dp
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Color.White,
@@ -347,12 +331,9 @@ private fun HomeHeader(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.statusBars)
                 .background(Color.White),
         ) {
-            // --- Fond basé sur le logo entreprise : doit remplir complètement le head space ---
-            // Tous les éléments de fond utilisent matchParentSize pour ne pas agrandir le header
-            // Watermark logo entreprise : remplit tout le header avec Crop, rogne hors-cadre, alpha 0.07
+            // Fond basé sur logo entreprise : remplit complètement le head space avec Crop (spec: background peut aller sous zones système)
             if (companyLogoUri != null) {
                 Box(
                     modifier = Modifier
@@ -371,7 +352,7 @@ private fun HomeHeader(
                     )
                 }
             }
-            // Halo vert derrière logo entreprise (droite) - matchParentSize pour ne pas pousser la hauteur
+            // Halos décoratifs — matchParentSize pour ne pas agrandir layout
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -383,7 +364,6 @@ private fun HomeHeader(
                         ),
                     ),
             )
-            // Halo bleu derrière MISSA (gauche)
             Box(
                 modifier = Modifier
                     .matchParentSize()
@@ -396,126 +376,124 @@ private fun HomeHeader(
                     ),
             )
 
-            // Contenu header compact : 52dp de hauteur totale (hors safeDrawing)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-                    .padding(start = 4.dp, end = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(onClick = onMenuClick, modifier = Modifier.size(36.dp)) {
-                    Icon(
-                        imageVector = Icons.Outlined.Menu,
-                        contentDescription = stringResource(R.string.drawer_admin),
-                        tint = HomeTextDark,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-                // MISSA BUSINESS à gauche - logo Crop remplit son cadre 32dp
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Zone système + header content — respecte WindowInsets
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { /* logo MISSA = accueil */ },
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_missa),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "MISSA",
-                                color = HomeTextDark,
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 11.sp,
-                                letterSpacing = 0.2.sp,
-                            )
-                            Spacer(Modifier.width(2.dp))
-                            Text(
-                                text = "BUSINESS",
-                                color = HomeTextDark,
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                lineHeight = 11.sp,
-                                letterSpacing = 0.2.sp,
-                            )
-                        }
-                        Text(
-                            text = "360",
-                            color = TendrePositive,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 11.sp,
-                        )
-                    }
-                }
-                Spacer(Modifier.weight(1f))
-                // Notifications
-                IconButton(onClick = onNotificationClick, modifier = Modifier.size(34.dp)) {
-                    BadgedBox(
-                        badge = {
-                            if (notificationCount > 0) {
-                                NotificationBadge(containerColor = Red40, contentColor = Color.White) {
-                                    Text(notificationCount.coerceAtMost(99).toString(), fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                                }
-                            }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = stringResource(R.string.notifications),
-                            tint = HomeTextDark,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                }
-                Spacer(Modifier.width(6.dp))
-                // Logo entreprise à droite - Crop remplit complètement le cercle 38dp
-                Surface(
                     modifier = Modifier
-                        .size(38.dp)
-                        .clickable(onClick = onProfileClick),
-                    shape = CircleShape,
-                    color = Color.White,
-                    border = BorderStroke(1.2.dp, HomeBorder),
-                    shadowElevation = 2.dp,
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.statusBars)
+                        .height(64.dp) // Spec: Header content height 64dp
+                        .padding(horizontal = 16.dp), // Spec: padding horizontal 16dp minimum
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (companyLogoUri != null) {
-                        CompanyLogo(
-                            logoUri = companyLogoUri,
-                            contentDescription = stringResource(R.string.home_company_active),
-                            fallbackIcon = Icons.Outlined.Store,
-                            modifier = Modifier.fillMaxSize(),
-                            size = 38.dp,
-                            shape = CircleShape,
-                            fallbackTint = TendrePositive,
-                            fallbackBackground = Green90,
+                    // Hamburger — zone tactile 48x48, icône 24dp
+                    IconButton(onClick = onMenuClick, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = stringResource(R.string.drawer_admin),
+                            tint = HomeTextDark,
+                            modifier = Modifier.size(24.dp),
                         )
-                    } else {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Green90)) {
-                            Icon(
-                                imageVector = Icons.Outlined.Store,
-                                contentDescription = stringResource(R.string.home_company_active),
-                                tint = TendrePositive,
-                                modifier = Modifier.size(18.dp),
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    // Logo MISSA — 40x40 dp, Crop remplit cadre
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { /* logo = accueil */ },
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.logo_missa),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "MISSA",
+                                    color = HomeTextDark,
+                                    fontSize = 15.sp, // Spec: 15-16sp
+                                    fontWeight = FontWeight.ExtraBold,
+                                    lineHeight = 15.sp,
+                                    letterSpacing = 0.2.sp,
+                                )
+                                Spacer(Modifier.width(2.dp))
+                                Text(
+                                    text = "BUSINESS",
+                                    color = HomeTextDark,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    lineHeight = 15.sp,
+                                    letterSpacing = 0.2.sp,
+                                )
+                            }
+                            Text(
+                                text = "360",
+                                color = TendrePositive,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 15.sp,
                             )
                         }
                     }
+                    Spacer(Modifier.weight(1f))
+                    // Notification — zone tactile 48x48, icône 24dp
+                    IconButton(onClick = onNotificationClick, modifier = Modifier.size(48.dp)) {
+                        BadgedBox(
+                            badge = {
+                                if (notificationCount > 0) {
+                                    NotificationBadge(containerColor = Red40, contentColor = Color.White) {
+                                        Text(notificationCount.coerceAtMost(99).toString(), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Notifications,
+                                contentDescription = stringResource(R.string.notifications),
+                                tint = HomeTextDark,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                    // Avatar entreprise — 40x40 dp, zone tactile 48dp via Surface + clickable
+                    Surface(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clickable(onClick = onProfileClick),
+                        shape = CircleShape,
+                        color = Color.White,
+                        border = BorderStroke(1.2.dp, HomeBorder),
+                        shadowElevation = 2.dp,
+                    ) {
+                        if (companyLogoUri != null) {
+                            CompanyLogo(
+                                logoUri = companyLogoUri,
+                                contentDescription = stringResource(R.string.home_company_active),
+                                fallbackIcon = Icons.Outlined.Store,
+                                modifier = Modifier.fillMaxSize(),
+                                size = 40.dp,
+                                shape = CircleShape,
+                                fallbackTint = TendrePositive,
+                                fallbackBackground = Green90,
+                            )
+                        } else {
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Green90)) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Store,
+                                    contentDescription = stringResource(R.string.home_company_active),
+                                    tint = TendrePositive,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        }
+                    }
                 }
-            }
 
-            // Limite basse bien marquée : 1.5dp border + 3dp dégradé + 6dp ombre douce vers contenu scrollable
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-            ) {
+                // Limite basse bien marquée — bordure + dégradé + ombre douce vers contenu scrollable
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -566,10 +544,11 @@ private fun HomeDashboard(
     val currency = state.devise
     val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
         ?: stringResource(R.string.home_greeting_anonymous)
+    // Spec: contenu entre Header 64dp et BottomNav 80dp, scrollable seul, marges 16dp, grille 4/8/12/16/20/24/32
     LazyColumn(
         modifier = modifier.background(HomeBackground),
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             // Salutation
@@ -663,10 +642,10 @@ private fun HomeDashboard(
                 }
             }
         }
-        // KPI 4 cartes – 100% réel, charte 3D plein cadre avec crop
+        // KPI 4 cartes – 100% réel, charte 3D plein cadre avec crop, responsive weight + 12dp spec
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_ventes_du_jour),
@@ -692,7 +671,7 @@ private fun HomeDashboard(
                         onClick = { onNavigate(AppModule.ACHATS.route) },
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
                         titre = stringResource(R.string.home_tresorerie_card),
@@ -866,7 +845,7 @@ private fun AccueilActionsGrid(
         .filter { modulesActifs.isEmpty() || it.module in modulesActifs }
         .filter { actionsSelection.isEmpty() || it.key in actionsSelection }
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (visibles.isEmpty()) {
             Text(
                 text = stringResource(R.string.home_personalize_actions_aide),
@@ -875,7 +854,7 @@ private fun AccueilActionsGrid(
             )
         } else {
             visibles.chunked(4).forEach { row ->
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     row.forEach { a ->
                         AccueilActionCard(
                             modifier = Modifier.weight(1f),

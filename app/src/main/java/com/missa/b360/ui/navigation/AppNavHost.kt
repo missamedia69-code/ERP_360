@@ -166,6 +166,9 @@ private fun MainNavHost() {
         stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(it))
     } ?: stringResource(R.string.home_backup_never)
 
+    val nonLues by accueilViewModel.notificationsNonLues.collectAsState(initial = 0)
+    val isHome = routeCourante == Routes.HOME || routeCourante?.startsWith(Routes.HOME) == true
+
     CompositionLocalProvider(LocalBarreNavigation provides barreDemandee) {
     ModalNavigationDrawer(
         drawerState = etatTiroir,
@@ -188,6 +191,22 @@ private fun MainNavHost() {
         },
     ) {
     Scaffold(
+        containerColor = com.missa.b360.ui.theme.MissaCanvas,
+        topBar = {
+            // Spec: Header fixe 64dp + statusBars — global pour Home, autres écrans ont leur propre MissaTopAppBar 64dp
+            // Pour éviter double header, on affiche MissaAppHeader seulement sur HOME
+            if (isHome && !estFormulairePleinEcran) {
+                com.missa.b360.ui.components.MissaAppHeader(
+                    companyLogoUri = etatAccueil.entrepriseLogoUri,
+                    notificationCount = nonLues,
+                    isHome = true,
+                    onMenuClick = { portee.launch { etatTiroir.open() } },
+                    onBackClick = { navController.popBackStack() },
+                    onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
+                    onProfileClick = { navController.navigate(Routes.ADMIN_REGLAGES) },
+                )
+            }
+        },
         bottomBar = {
             if (afficherBarre) {
                 MissaBarreModules(
@@ -199,11 +218,15 @@ private fun MainNavHost() {
                 )
             }
         },
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { padding ->
+    // Spec: Content entre Header 64dp et BottomNav 80dp, scrollable seul, respecte WindowInsets
     NavHost(
         navController = navController,
         startDestination = Routes.HOME,
-        modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding),
     ) {
         composable(Routes.HOME) {
             HomeScreen(
