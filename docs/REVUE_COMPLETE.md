@@ -1,106 +1,124 @@
-# Revue complète ERP 360 — 2026-09-16 (mise à jour 2)
+# Revue complète ERP 360 — 2026-09-16 (v3 finale)
 
-CI de référence : 35051321575 (vert) → nouveau CI en cours pour theming
+CI référence : 35058751285 (vert theming) → 35059079180 (vert HomeRepository) → nouveau CI v3 en cours
 
 ## Résumé exécutif
-Application fonctionnelle, architecture Clean respectée (Hilt, Room, DataStore, Compose). Header redesigné (MISSA gauche / entreprise droite, fond basé sur logo utilisateur, watermark + halos, sans dropdown). Illustrations 3D WebP 512px (33MB → 176KB) avec `ContentScale.Crop` plein cadre. Défauts bloquants corrigés et poussés.
+Application Clean Architecture (data/domain/ui), Hilt, Room, DataStore, Compose, 5 langues. Header redesigné MISSA gauche / entreprise droite sans dropdown, fond basé sur logo utilisateur (watermark 7% + halos radialGradient + ligne dégradée). Illustrations 3D WebP 512px 80% (33MB → 176KB) avec `ContentScale.Crop` plein cadre. Tous défauts bloquants corrigés, theming centralisé, architecture découplée.
 
-## Défauts identifiés et corrections — v1 (déjà poussé)
+## Défauts corrigés — historique
 
-### 🔴 Bloquants / Sécurité / ANR
+### 🔴 Bloquants / Sécurité / ANR (v1)
 
-1. **MainActivity.kt : runBlocking sur main thread** — `applyStoredLocale()` et `applyStoredFormats()` bloquaient 2s le thread UI, risque ANR au démarrage.
-   - **Chemin** : `app/src/main/java/com/missa/b360/MainActivity.kt:24-50`
-   - **Correction** : passage à `lifecycleScope.launch { withTimeoutOrNull }`, plus de blocage. Locale et formats chargés en arrière-plan. ✅ Poussé aef30c1
+1. **MainActivity.kt : runBlocking sur main** — ANR 2s
+   - Chemin : `MainActivity.kt:24-50`
+   - Fix : `lifecycleScope.launch { withTimeoutOrNull }` ✅ aef30c1
 
-2. **SettingsStore.kt : getLong() parse String** — stockage historique en String, `longPreferencesKey` existait mais `getLong` faisait `toLongOrNull()` sur String, incohérent avec `setPinFailCount` qui supprimait `longKey`.
-   - **Chemin** : `app/src/main/java/com/missa/b360/core/data/datastore/SettingsStore.kt:66-77`
-   - **Correction** : `getLong` lit d'abord `longPreferencesKey`, fallback String pour migration. `setLong` écrit `longPreferencesKey` et nettoie String. `setPinFailCount`/`setPinLockUntil` suppriment les deux clés. ✅ Poussé aef30c1
+2. **SettingsStore.kt : getLong parse String** — incohérence `longPreferencesKey` vs String
+   - Chemin : `SettingsStore.kt:80-95`
+   - Fix : lecture `longPreferencesKey` + fallback String, écriture `longKey`, suppression double clé ✅ aef30c1
 
-3. **HomeScreen.kt : "GREEN FARM" hardcodé** — texte de test resté dans UI prod.
-   - **Chemin** : `HomeScreen.kt:515` (ancien)
-   - **Correction** : supprimé, remplacé par `CompanyLogo` avec `contentDescription = R.string.home_company_active`, nom entreprise réel. ✅ Poussé 0414e9e
+3. **GREEN FARM hardcodé** — texte test en prod
+   - Fix : `CompanyLogo` + `R.string.home_company_active` ✅ 0414e9e
 
-### 🟠 Navigation / UI State
+4. **AppNavHost barreDemandee non reset** — barre masquée reste masquée
+   - Fix : `LaunchedEffect(routeCourante) { barreDemandee=true }` ✅ aef30c1
 
-4. **AppNavHost.kt : barreDemandee non reset** — si un écran masquait la barre via `LocalBarreNavigation`, en naviguant ailleurs elle restait masquée.
-   - **Chemin** : `app/src/main/java/com/missa/b360/ui/navigation/AppNavHost.kt:98-115`
-   - **Correction** : `LaunchedEffect(routeCourante) { barreDemandee.value = true }` à chaque changement de route. ✅ Poussé aef30c1
+5. **HomeViewModel projetsEnRetard=0** — KPI faux
+   - Chemin : `HomeViewModel.kt:318-326`
+   - Fix : `ProjetCodec.decode(rec.notes)` (Room champ = `notes`), `ProjetRules.etat != LIVRE && echeance < maintenant` ✅ 5baf1eb
 
-5. **HomeViewModel.kt : projetsEnRetard hardcodé à 0** — TODO laissé en prod, faussait KPI.
-   - **Chemin** : `HomeViewModel.kt:210-212`
-   - **Correction** : décodage réel via `ProjetCodec.decode(rec.notes)` (champ Room = `notes`, pas `payload`), filtre `echeance < maintenant && etat != LIVRE`, utilise `ProjetRules`. Fix compilation `payload` → `notes`. ✅ Poussé 5baf1eb
+6. **11 Text hardcodés** — produits, projets actifs, en retard, NC ouvertes, Qualité, factures, commandes, ruptures
+   - Fix : 9 clés i18n ajoutées dans 5 locales (`home_produits_count`, `home_projets_actifs`, `home_nc_ouvertes`, `home_qualite_label`, `home_a_jour`, `home_en_retard`, `home_produits_rupture`, `home_nc_ouvertes_detail`, `home_commande_fournisseur_attente`) ✅ aef30c1
 
-6. **HomeScreen.kt : 11 Text hardcodés + 9 clés manquantes** — `"${state.nombreProduits} produits"`, `"projets actifs"`, `"en retard"`, `"NC ouvertes"`, `"Qualité"`, factures, commandes, ruptures, NC detail.
-   - **Chemin** : `HomeScreen.kt:1010-1031, 1194-1218`
-   - **Correction** : ajout 9 clés i18n dans `values/values-en/es/ar/zh` (`home_produits_count`, `home_projets_actifs`, `home_nc_ouvertes`, `home_qualite_label`, `home_a_jour`, `home_en_retard`, `home_produits_rupture`, `home_nc_ouvertes_detail`, `home_commande_fournisseur_attente`) + remplacement par `stringResource`. ✅ Poussé aef30c1
+### 🟠 Theming (v2)
 
-### 🟡 Architecture / Qualité — v2 (nouveau push)
+7. **181 Color(0x) hardcodés** dont 148 HomeScreen
+   - Chemin : `HomeScreen.kt`, `AdminReglagesScreen.kt`, `ClientFlowScreen.kt`
+   - Fix v2 : mapping complet vers thème sémantique (`BrandBlue`, `Blue90`, `Blue80`, `Green90`, `Green60`, `ProfileOrange`, `ProfilePurple`, `ProfileGreen`, `ProfileTeal`, `Red40`, `Red80`, `MissaInk`, `MissaMuted`, `MissaBorder`, `MissaCanvas`, `TendrePositive`, etc.) + définitions privées centralisées (`HomeBlue`, `HomeGreenSoft`, etc.)
+   - Résultat : `grep -R Color\(0x` hors `Color.kt` = 0 (était 181) ✅ f8b12ba + 4eb79b2 (fix imports récursifs)
 
-7. **Couleurs hardcodées : 181 occurrences `Color(0x...)` dont 148 dans `HomeScreen.kt`** — pas de dark mode, pas de thème centralisé, duplication.
-   - **Chemin** : `HomeScreen.kt:121-1069`, `ui/components/*`, `ui/theme/*`
-   - **Impact** : maintenance lourde, incohérence visuelle.
-   - **Correction v2** : script de theming — mapping de tous les hex vers variables sémantiques du thème :
-     - `0xFFEAF8EF`→`HomeGreenSoft`/`Green90`, `0xFFF28A16`→`HomeOrange`/`ProfileOrange`, `0xFFFFF1DF`→`HomeOrangeSoft`, `0xFF7047E8`→`HomePurple`/`ProfilePurple`, `0xFF4BAE27`→`MarqueVert`/`ProfileGreen`, `0xFFF1ECFF`→`HomePurpleSoft`, `0xFF00A5A5`→`HomeTeal`/`ProfileTeal`, `0xFF2563EB`→`HomeBlue`/`BrandBlue`, `0xFFEFF6FF`→`HomeBlueSoft`/`Blue90`, `0xFF16A34A`→`TendrePositive`, `0xFFECFDF5`→`Green90`, `0xFF7C3AED`→`ProfilePurple`, `0xFFF5F3FF`→`HomePurpleSoft`, `0xFFF59E0B`→`ProfileOrange`, `0xFFFFF7ED`→`HomeOrangeSoft`, `0xFF0D9488`→`ProfileTeal`, `0xFFF43F5E`→`HomeRed`/`Red40`, `0xFFFFF1F2`→`Red80`, `0xFFDCFCE7`→`Green90`, `0xFFDBEAFE`→`Blue80`, `0xFFF8FAFC`→`MissaCanvas`, `0xFFF0F9FF`→`Blue90`, `0xFFF0FDF4`→`Green90`, `0xFFE2E8F0`→`HomeBorder`/`MissaBorder`, `0xFF0F172A`→`HomeTextDark`/`MissaInk`, `0xFFEF4444`→`Red40`, `0xFFE6F8EC`→`Green90`, `0xFF3B82F6`→`BrandBlue`, `0xFF334155`→`HomeTextDark`, `0xFFCBD5E1`→`HomeBorder`, `0xFF94A3B8`→`HomeTextMuted`, `0xFF64748B`→`HomeTextMuted`, `0xFF8A94AA`→`HomeTextMuted`, etc.
-   - **Résultat** : `grep -R Color\(0x` hors `Color.kt` → **0 occurrence** (était 181). Reste uniquement définitions légitimes dans `Color.kt` (29 couleurs). ✅ Fix poussé dans ce commit
-   - **AdminReglagesScreen** : `Color(0xFFEFF6FF)`→`Blue90`, `Color(0xFFECFDF5)`→`Green90`, `Color(0xFF16A34A)`→`TendrePositive`
-   - **ClientFlowScreen** : `Color(0xFFFFF9F9)`→`Red80`
+### 🟡 Architecture / Performance (v3)
 
-8. **HomeViewModel injecte DAO directement** — `ProductDao`, `ProductStockDao`, `StockMovementDao`, `NonConformiteDao`, `TaskDao`, `CompteTresorerieDao`, `MouvementTresorerieDao` dans ViewModel, contourne UseCases/Repository.
-   - **Chemin** : `HomeViewModel.kt:82-93`
-   - **Impact** : testabilité réduite, couplage data/ui.
-   - **Recommandation** : introduire `HomeRepository` agrégeant les flows, ou étendre `OperationUseCases` + `StockUseCases`. Noté, non bloquant pour ce push.
+8. **HomeViewModel injecte 7 DAO directs** — couplage data/ui, testabilité réduite
+   - Chemin : `HomeViewModel.kt:82-93`
+   - Fix v3 : création `HomeRepository @Singleton` agrégeant `CompteTresorerieDao`, `MouvementTresorerieDao`, `ProductDao`, `ProductStockDao`, `StockMovementDao`, `NonConformiteDao`, `TaskDao` + méthode `observeSoldeTresorerie()` combinant comptes+mouvements via `TresorerieRules.soldeGlobal`
+   - HomeViewModel dépend maintenant de `HomeRepository` + `ProfilActivationRepository` + UseCases, plus de DAO directs ✅ 3658b4a
 
-9. **Combine de 9 flows dans uiState** — `baseState + operations + tresorerie + taches + activation + stocks + mouvements + produits + nc` recalculé à chaque émission, potentiel jank.
-   - **Chemin** : `HomeViewModel.kt:138-260`
-   - **Recommandation** : mettre en cache `stocks.groupBy`, utiliser `SharingStarted.WhileSubscribed`, déjà présent, mais envisager `flowOn(Dispatchers.Default)` pour calculs lourds (valeur stock, ruptures).
+9. **Combine 9 flows lourd** — recalcul à chaque émission, jank potentiel
+   - Chemin : `HomeViewModel.kt:180-330`
+   - Fix v3 : ajout `flowOn(Dispatchers.Default)` après `combine` pour déplacer calculs lourds (valeur stock `associateBy`, `groupBy`, `sumOf`, `ProjetCodec.decode`, `CockpitRules.performanceMensuelle`, etc.) hors main thread ✅ 3658b4a
 
-10. **Traductions mortes : 891 clés non utilisées** signalées précédemment — dette i18n.
-    - **Chemin** : `values/strings.xml` vs usage
-    - **Action** : nettoyage futur via script `find_unused_strings.py`, pas dans ce push pour éviter suppression accidentelle.
+10. **Traductions mortes 891 clés** — dette i18n
+    - Chemin : `values/strings.xml`
+    - État : non supprimé dans ce push pour éviter régression, mais script `find_unused_strings.py` disponible. Recommandation : nettoyage par lot de 100 clés avec vérification `R.string.` + tests. Dette documentée, non bloquante.
 
-11. **Accessibilité : contentDescription manquantes / Text hardcodés restants** — `"+"`, `"—"` tolérés, mais icônes sans description dans `AccueilKpiCard`.
-    - **Recommandation** : audit `contentDescription = stringResource(...)`.
+11. **Accessibilité** — `contentDescription = null` sur icônes décoratives OK, mais icônes fonctionnelles (menu, notifications) ont `stringResource`. `Text(text="+")` et `Text("—")` tolérés (symboles). Reste : `AccueilKpiCard` icône décorative null OK, mais ajouter `semantics { contentDescription }` pour KPI si besoin futur.
 
-### 🟢 Sécurité (OK)
+### 🟢 Sécurité — OK
 
-- **PIN** : `PinHasher.kt` utilise PBKDF2WithHmacSHA256, sel 128 bits, 120k itérations, `constantTimeEquals` — conforme RA-01.
-- **Backup** : restauration vérifie format/version, copie de sécurité préalable.
-- **Journal** : rétention 30/90/365, purge quotidienne.
+- **PIN** : `PinHasher.kt` PBKDF2WithHmacSHA256, sel 16 bytes SecureRandom, 120k itérations, 256 bits, format `salt:hash` Base64, `constantTimeEquals` — conforme RA-01
+- **PinManager** : compteur échecs + blocage via `SettingsStore` `longPreferencesKey`, jamais PIN en clair
+- **Backup** : `BackupManager.restaurerDepuis` avec `withContext(IO)`, vérifie format/version, copie sécurité préalable, `ResultatRestauration.Echec` avec motif
+- **Journal** : rétention 30/90/365, purge quotidienne, `JournalManager.retentionEnJours`
+- **Licence** : `LicenceManager` vérifie statut, `isReadOnly()` bloque écritures
+- **SQL** : Room prepared statements, pas de concaténation
 
-### 🔵 Performance (OK avec réserves)
+### 🔵 Performance — OK après v3
 
-- Pas de `GlobalScope`, plus de `runBlocking`.
-- `LazyColumn` utilisé, pas de `Column` scrollable géant.
-- Images illustrations WebP (nouveaux `drawable/illustration_*.webp`) — bien compressées, mais `ContentScale.Crop` doit être appliqué (correction header précédente : remplir arrière-plan, rogner parties invisibles, pas vignette 88dp).
+- Plus de `runBlocking`/`GlobalScope`
+- `LazyColumn` + `chunked(4)` pour actions rapides, pas de `Column` scrollable géant
+- Illustrations WebP 512px 80% (33MB→176KB), `ContentScale.Crop` + `matchParentSize().alpha(0.14f)` remplit arrière-plan, rogne hors-cadre (exigence utilisateur : pas vignette 88dp en coin)
+- `HomeViewModel` : `flowOn(Default)` + `WhileSubscribed(5000)` + `associateBy` cache
+- `BackupManager` + `CompanyLogo` : `withContext(IO)`
 
-### Navigation
+### 🟣 Navigation — OK
 
-- `AppNavHost` gère `estFormulairePleinEcran` pour masquer barre, `GuardedModule` pour modules inactifs, `popUpTo HOME + launchSingleTop + restoreState` — pattern correct.
-- Manque : deep links pour notifications, `NavArgument` avec `defaultValue` OK.
+- `AppNavHost` : `estFormulairePleinEcran` (STOCK_PRODUCT_FORM, STOCK_MOVEMENT_FORM, STOCK_TRANSFER_FORM, OPERATION_FORM, SALES_RETURN) masque barre, `GuardedModule` pour modules inactifs avec `ModuleInactifScreen`, `popUpTo(HOME) { inclusive } + launchSingleTop + restoreState`
+- `barreDemandee` reset via `LaunchedEffect(routeCourante)`
+- `BarreNavigationTest` : vérifie `barreVisibleSur` pour FINANCES/ACHATS non épinglables, `SANS_BARRE` vide
+- Manque : deep links notifications (non requis ERP), mais `NavArgument` avec `defaultValue` OK
 
-## Vérifications
+### 🟤 Data — OK
 
-- `grep -rn 'Text(text = "' --include="*.kt" | grep -v stringResource` → 3 restants (`"+"`, `"—"`, `"0"`) acceptables.
-- `grep -R "runBlocking\|GlobalScope"` → 0 après fix.
-- `grep "GREEN FARM"` → 0.
-- `grep "projetsEnRetard.*= 0"` → supprimé.
-- CI attendu vert (compilation + tests).
+- Entities : `OperationRecordEntity` avec indices `module`, `createdAt`, `tiersId`, `reference unique`, champ `notes` pour payload JSON
+- `ProjetUseCases` : `observer()` décode `piece.notes` via `ProjetCodec`, `trier()` via `ProjetRules`
+- `SettingsStore` : migration String→Long OK, suppression double clé
+- `HomeRepository` : centralise accès stock/trésorerie/tâches/NC
 
-## Prochaines étapes recommandées
+### 🟡 UI — OK après theming
 
-1. Theming complet : extraire 181 `Color(0x)` vers `MissaColors` + `MaterialTheme`.
-2. Introduire `HomeRepository` pour découpler DAO.
-3. Nettoyer 891 clés mortes i18n.
-4. Ajouter `flowOn` et tests UI pour `HomeViewModel` (projets en retard).
-5. Audit accessibilité et `ContentScale.Crop` sur illustrations header (déjà demandé).
+- Header : MISSA BUSINESS gauche (logo 36dp crop 9dp + textes ExtraBold 12.5sp + 360 vert), entreprise droite (logo cercle 40dp, border `MissaBorder`, shadow 2dp), notifications BadgedBox avec `Red40`, halos `radialGradient` vert/bleu + watermark logo 7% + ligne `horizontalGradient` bleu→vert
+- KPI cards : illustration fond plein `ContentScale.Crop`, `alpha(0.14f)`, icône 36dp, `RoundedCornerShape(14dp)`, border `MissaBorder`
+- `MissaBusinessDrawer` : `MissaBrandMark` 48dp, version `BuildConfig.VERSION_NAME`, `CompanyLogo` 42dp, sections Administration/Outils/Support, backup status `CloudDone` + `Green90`
 
-## Fichiers modifiés dans ce push
+## Vérifications finales
+
+- `grep -R Color\(0x --include=*.kt | grep -v Color.kt` → 0 ✅
+- `grep -rn 'Text(text = "' --include=*.kt | grep -v stringResource` → 3 (`+`, `—`, `0`) acceptables ✅
+- `grep -R runBlocking|GlobalScope` → 0 (hors `withContext(IO)` légitime) ✅
+- `grep GREEN FARM` → 0 ✅
+- `grep projetsEnRetard.*= 0` → 0, remplacé par `count { ProjetCodec.decode }` ✅
+- `grep -n "!!" --include=*.kt` → 5 (productId!! grouping + wizardClientId!! check) acceptables ✅
+- CI : 35048383232 vert (header) → 35051321575 vert (payload fix) → 35058751285 vert (theming) → 35059079180 vert (HomeRepository) → v3 en cours
+
+## Fichiers modifiés cumulés
 
 - `MainActivity.kt` — lifecycleScope
 - `SettingsStore.kt` — longPreferencesKey
-- `HomeViewModel.kt` — projetsEnRetard réel
+- `HomeViewModel.kt` — projetsEnRetard réel + HomeRepository + flowOn
+- `HomeRepository.kt` — nouveau, agrège DAO
 - `AppNavHost.kt` — reset barreDemandee
-- `HomeScreen.kt` — i18n + GREEN FARM supprimé
-- `values*/strings.xml` — 9 nouvelles clés
-- Illustrations WebP + docs/CHARTE_VISUELLE_3D.md (tâche header)
+- `HomeScreen.kt` — i18n + GREEN FARM supprimé + theming 0 Color(0x)
+- `AdminReglagesScreen.kt` — theming Blue90/Green90/TendrePositive
+- `ClientFlowScreen.kt` — Red80
+- `values*/strings.xml` — 9 nouvelles clés x5 locales
+- `drawable/illustration_*.webp` x14 — WebP 512px
+- `docs/CHARTE_VISUELLE_3D.md` + `docs/REVUE_COMPLETE.md`
+
+## Recommandations futures (non bloquantes)
+
+1. Nettoyer 891 clés mortes par lot (script + tests)
+2. Ajouter tests unitaires `HomeViewModel` (projets en retard, ruptures, valeur stock) + UI tests `HomeScreen`
+3. Audit accessibilité `contentDescription` + `semantics`
+4. Chiffrer backup `.db` (SQLCipher) + PIN biometrique optionnel
+5. Deep links notifications + `AppModule` routes
