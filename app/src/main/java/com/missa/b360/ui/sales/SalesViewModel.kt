@@ -2,8 +2,6 @@ package com.missa.b360.ui.sales
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.dao.PaymentMethodDao
-import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
@@ -16,8 +14,10 @@ import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.usecase.CheckSaleStockUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
+import com.missa.b360.core.domain.usecase.ObservePaymentMethodsUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
+import com.missa.b360.core.domain.usecase.ObserveTaxesUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationStatus
@@ -79,8 +79,8 @@ data class SaleReceipt(
 class SalesViewModel @Inject constructor(
     operations: OperationUseCases,
     observeClients: ObserveClientsUseCase,
-    taxDao: TaxDao,
-    paymentMethodDao: PaymentMethodDao,
+    observeTaxes: ObserveTaxesUseCase,
+    observePaymentMethods: ObservePaymentMethodsUseCase,
     getEnterprise: GetEnterpriseUseCase,
     observeProducts: ObserveProductsUseCase,
     observeStock: ObserveProductStockUseCase,
@@ -105,10 +105,10 @@ class SalesViewModel @Inject constructor(
     val uiState: StateFlow<SalesUiState> = _uiState
 
     val clients: Flow<List<ClientEntity>> = observeClients()
-    val taxRate: StateFlow<Double> = taxDao.observeAll()
+    val taxRate: StateFlow<Double> = observeTaxes()
         .map { taxes -> taxes.firstOrNull { it.parDefaut }?.taux ?: taxes.firstOrNull()?.taux ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
-    val paymentMethods: StateFlow<List<String>> = paymentMethodDao.observeAll()
+    val paymentMethods: StateFlow<List<String>> = observePaymentMethods()
         .map { methods -> methods.filter { it.actif }.map { it.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val devise: StateFlow<String> = getEnterprise.observer()

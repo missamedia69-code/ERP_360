@@ -906,7 +906,7 @@ private fun ClientTypeChoice(selected: ClientType, onSelect: (ClientType) -> Uni
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(stringResource(R.string.clients_type), color = ClientMuted, fontSize = 10.sp)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            items(ClientType.entries) { type -> FilterChip(selected = type == selected, onClick = { onSelect(type) }, label = { Text(stringResource(type.labelRes()), fontSize = 10.sp) }) }
+            items(ClientType.entries, key = { it.name }) { type -> FilterChip(selected = type == selected, onClick = { onSelect(type) }, label = { Text(stringResource(type.labelRes()), fontSize = 10.sp) }) }
         }
     }
 }

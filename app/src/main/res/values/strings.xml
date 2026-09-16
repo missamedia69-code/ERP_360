@@ -945,5 +945,8 @@
     <string name="activation_entreprise_info">Informations entreprise</string>
     <string name="activation_entreprise_nom">Nom : %1$s</string>
     <string name="activation_entreprise_devise">Devise : %1$s (verrouillée)</string>
+    <string name="activation_modules_repartition">%1$d métier · %2$d support</string>
+    <string name="activation_modules_compteur">%1$d/%2$d</string>
+    <string name="activation_elements_compteur">%1$s : %2$d/%3$d</string>
 </resources>
 <!-- Temp insert will be replaced -->

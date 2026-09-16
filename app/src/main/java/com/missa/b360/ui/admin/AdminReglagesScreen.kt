@@ -184,7 +184,11 @@ fun AdminReglagesScreen(
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "${activation.modulesMetierEffectifs.size} métier · ${activation.modulesSupportEffectifs.size} support",
+                    text = stringResource(
+                        R.string.activation_modules_repartition,
+                        activation.modulesMetierEffectifs.size,
+                        activation.modulesSupportEffectifs.size,
+                    ),
                     fontSize = 11.sp,
                     color = MissaMuted,
                 )
@@ -279,7 +283,15 @@ private fun ActivationSectionModules(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(titre, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk, modifier = Modifier.weight(1f))
-                Text("${modules.count { activation.isModuleActif(it) }}/${modules.size}", fontSize = 11.sp, color = MissaMuted)
+                Text(
+                    stringResource(
+                        R.string.activation_modules_compteur,
+                        modules.count { activation.isModuleActif(it) },
+                        modules.size,
+                    ),
+                    fontSize = 11.sp,
+                    color = MissaMuted,
+                )
                 Spacer(Modifier.width(6.dp))
                 Icon(
                     imageVector = if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
@@ -368,7 +380,12 @@ private fun ActivationModuleLigne(
             if (isActif) {
                 val elems = activation.elementsActifsPour(module)
                 Text(
-                    text = stringResource(R.string.activation_elements_actifs) + " : ${elems.size}/${ModuleSousElements.pourModule(module).size}",
+                    text = stringResource(
+                        R.string.activation_elements_compteur,
+                        stringResource(R.string.activation_elements_actifs),
+                        elems.size,
+                        ModuleSousElements.pourModule(module).size,
+                    ),
                     fontSize = 10.sp,
                     color = MissaMuted,
                 )

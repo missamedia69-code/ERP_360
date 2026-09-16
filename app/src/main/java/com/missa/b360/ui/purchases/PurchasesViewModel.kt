@@ -2,9 +2,6 @@ package com.missa.b360.ui.purchases
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.dao.FournisseurDao
-import com.missa.b360.core.data.dao.PaymentMethodDao
-import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.PurchaseLine
@@ -13,8 +10,11 @@ import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
+import com.missa.b360.core.domain.usecase.ObserveFournisseursUseCase
+import com.missa.b360.core.domain.usecase.ObservePaymentMethodsUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
+import com.missa.b360.core.domain.usecase.ObserveTaxesUseCase
 import com.missa.b360.core.domain.usecase.OperationUseCases
 import com.missa.b360.core.domain.usecase.SavePurchaseUseCase
 import com.missa.b360.ui.stock.ProductStocks
@@ -49,9 +49,9 @@ class PurchasesViewModel @Inject constructor(
     operations: OperationUseCases,
     observeProducts: ObserveProductsUseCase,
     observeStock: ObserveProductStockUseCase,
-    private val fournisseurDao: FournisseurDao,
-    taxDao: TaxDao,
-    paymentMethodDao: PaymentMethodDao,
+    observeFournisseurs: ObserveFournisseursUseCase,
+    observeTaxes: ObserveTaxesUseCase,
+    observePaymentMethods: ObservePaymentMethodsUseCase,
     getEnterprise: GetEnterpriseUseCase,
     private val savePurchase: SavePurchaseUseCase,
 ) : ViewModel() {
@@ -81,14 +81,14 @@ class PurchasesViewModel @Inject constructor(
     ) { produits, stocks -> ProductStocks.combine(ProduitRules.achetables(produits), stocks) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val suppliers: StateFlow<List<FournisseurEntity>> = fournisseurDao.observeAll()
+    val suppliers: StateFlow<List<FournisseurEntity>> = observeFournisseurs()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val taxRate: StateFlow<Double> = taxDao.observeAll()
+    val taxRate: StateFlow<Double> = observeTaxes()
         .map { taxes -> taxes.firstOrNull { it.parDefaut }?.taux ?: taxes.firstOrNull()?.taux ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
 
-    val paymentMethods: StateFlow<List<String>> = paymentMethodDao.observeAll()
+    val paymentMethods: StateFlow<List<String>> = observePaymentMethods()
         .map { methods -> methods.filter { it.actif }.map { it.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
