@@ -11,6 +11,8 @@
     <string name="fiche_section_activite">Activité</string>
     <string name="fiche_langue">Langue</string>
     <string name="fiche_non_renseigne">Non renseigné</string>
+    <string name="fiche_partager_pdf">Partager en PDF</string>
+    <string name="fiche_edite_le">Édité le</string>
 
     <!-- Accueil --><string name="more_modules">Plus de modules</string>
     <string name="notifications">Notifications</string>

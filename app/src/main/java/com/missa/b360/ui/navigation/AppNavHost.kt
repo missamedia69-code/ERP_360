@@ -566,12 +566,6 @@ private fun MainNavHost() {
         com.missa.b360.ui.components.FicheEntrepriseDialog(
             etat = ficheEtat,
             onDismiss = { ficheEntreprise = false },
-            // Le bouton rond du header ouvrait Réglages : la fiche reprend ce
-            // parcours via « Modifier » pour ne perdre aucune fonctionnalité.
-            onModifier = {
-                ficheEntreprise = false
-                navController.navigate(Routes.ADMIN_REGLAGES)
-            },
         )
     }
 

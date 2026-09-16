@@ -11,6 +11,8 @@
     <string name="fiche_section_activite">النشاط</string>
     <string name="fiche_langue">اللغة</string>
     <string name="fiche_non_renseigne">غير محدد</string>
+    <string name="fiche_partager_pdf">مشاركة بصيغة PDF</string>
+    <string name="fiche_edite_le">حرر في</string>
 
     <string name="more_modules">المزيد من الوحدات</string>
     <string name="notifications">الإشعارات</string>

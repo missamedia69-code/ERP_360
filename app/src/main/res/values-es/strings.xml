@@ -11,6 +11,8 @@
     <string name="fiche_section_activite">Actividad</string>
     <string name="fiche_langue">Idioma</string>
     <string name="fiche_non_renseigne">Sin especificar</string>
+    <string name="fiche_partager_pdf">Compartir en PDF</string>
+    <string name="fiche_edite_le">Emitido el</string>
 
     <string name="more_modules">Más módulos</string>
     <string name="notifications">Notificaciones</string>

@@ -21,9 +21,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Store
+import androidx.core.content.FileProvider
+import com.missa.b360.core.util.FicheEntreprisePdf
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -127,13 +129,14 @@ private fun langueLibelleRes(code: String?): Int? = when (code?.lowercase()) {
 fun FicheEntrepriseDialog(
     etat: FicheEntrepriseState,
     onDismiss: () -> Unit,
-    onModifier: () -> Unit,
 ) {
     val entreprise = etat.entreprise
     val nom = entreprise?.nom.orEmpty().ifBlank { stringResource(R.string.home_company_placeholder) }
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val nonRenseigne = stringResource(R.string.fiche_non_renseigne)
+    val dateTexte = "${context.getString(R.string.fiche_edite_le)} " +
+        android.text.format.DateFormat.getDateFormat(context).format(java.util.Date())
 
     val copier: (String) -> Unit = { texte ->
         clipboard.setText(AnnotatedString(texte))
@@ -206,6 +209,36 @@ fun FicheEntrepriseDialog(
         context.startActivity(Intent.createChooser(intent, context.getString(R.string.fiche_partager)))
     }
 
+    // Partage PDF : même contenu que le document affiché, généré hors-ligne
+    // puis exposé via FileProvider (application/pdf).
+    val res: (Int) -> String = { context.getString(it) }
+    val partagerPdf: () -> Unit = {
+        val sectionsPdf = sections.map { section ->
+            FicheEntreprisePdf.Section(
+                titre = res(section.titreRes),
+                lignes = section.lignes.map { ligne ->
+                    FicheEntreprisePdf.Ligne(
+                        libelle = res(ligne.libelleRes),
+                        valeur = ligne.valeur?.takeIf { v -> v.isNotBlank() } ?: nonRenseigne,
+                    )
+                },
+            )
+        }
+        val fichier = FicheEntreprisePdf.generer(
+            context = context,
+            nomEntreprise = nom,
+            titreDoc = res(R.string.fiche_entreprise_titre),
+            dateTexte = dateTexte,
+            sections = sectionsPdf,
+        )
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", fichier)
+        val intent = Intent(Intent.ACTION_SEND)
+            .setType("application/pdf")
+            .putExtra(Intent.EXTRA_STREAM, uri)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        context.startActivity(Intent.createChooser(intent, res(R.string.fiche_partager_pdf)))
+    }
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -251,6 +284,11 @@ fun FicheEntrepriseDialog(
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 2,
                         )
+                        Text(
+                            text = dateTexte,
+                            color = MissaMuted,
+                            fontSize = 11.sp,
+                        )
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
                         Icon(
@@ -283,24 +321,9 @@ fun FicheEntrepriseDialog(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                 ) {
                     OutlinedButton(
-                        onClick = onModifier,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.clients_flow_edit), fontSize = 13.sp)
-                    }
-                    Spacer(Modifier.width(10.dp))
-                    Button(
                         onClick = partager,
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Share,
@@ -309,6 +332,21 @@ fun FicheEntrepriseDialog(
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.fiche_partager), fontSize = 13.sp)
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Button(
+                        onClick = partagerPdf,
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.PictureAsPdf,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(text = stringResource(R.string.fiche_partager_pdf), fontSize = 13.sp)
                     }
                 }
             }
