@@ -41,6 +41,8 @@ import com.missa.b360.ui.theme.Blue90
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
 import com.missa.b360.ui.theme.Green90
+import com.missa.b360.ui.theme.Red40
+import com.missa.b360.ui.theme.Red80
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.ProfileOrange

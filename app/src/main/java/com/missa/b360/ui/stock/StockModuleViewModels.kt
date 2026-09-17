@@ -11,6 +11,8 @@ import com.missa.b360.core.data.entity.ProductStatus
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.StockMovementInput
 import com.missa.b360.core.domain.usecase.RecordStockMovementUseCase
+import com.missa.b360.core.data.dao.ProductStockDao
+import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.StockMovementView
 import com.missa.b360.core.data.entity.FournisseurEntity
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlin.math.abs
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -379,9 +382,7 @@ class InventaireViewModel @Inject constructor(
     private val productDao: ProductDao,
     private val stockDao: ProductStockDao,
     private val siteDao: SiteDao,
-    private val getEnterprise: GetEnterpriseUseCase,
     private val recordStockMovement: RecordStockMovementUseCase,
-    @IoDispatcher private val io: CoroutineDispatcher,
 ) : ViewModel() {
 
     data class LigneInventaire(
@@ -412,12 +413,11 @@ class InventaireViewModel @Inject constructor(
                 combine(
                     inventaireDao.observeLignes(session.id),
                     productDao.observeAll(),
-                    productStockDao.observeBySite(session.siteId),
-                    siteDao.observeById(session.siteId),
-                ) { lignesRaw, produits, stocks, site ->
+                    siteDao.observeAll(),
+                ) { lignesRaw, produits, sites ->
                     Etat(
                         session = session,
-                        siteNom = site?.nom,
+                        siteNom = sites.firstOrNull { it.id == session.siteId }?.nom,
                         lignes = lignesRaw.mapNotNull { l ->
                             produits.firstOrNull { it.id == l.produitId }?.let { p ->
                                 LigneInventaire(
@@ -437,18 +437,18 @@ class InventaireViewModel @Inject constructor(
 
     /** Ouvre une session sur le site principal : attendu = stock actuel de chaque produit actif. */
     fun demarrer() {
-        viewModelScope.launch(io) {
+        viewModelScope.launch {
             if (inventaireDao.observeEnCours().first() != null) return@launch
-            val site = siteDao.observeAll().first().firstOrNull { it.isMain }
-                ?: siteDao.observeAll().first().firstOrNull()
+            val siteId = siteDao.idPrincipal()
+                ?: siteDao.observeAll().first().firstOrNull()?.id
                 ?: return@launch
             val id = inventaireDao.insert(
-                InventaireEntity(siteId = site.id, debut = System.currentTimeMillis()),
+                InventaireEntity(siteId = siteId, debut = System.currentTimeMillis()),
             )
             productDao.observeAll().first()
-                .filter { it.statut == ProductStatus.ACTIF.name }
+                .filter { it.active }
                 .forEach { p ->
-                    val stock = stockDao.getById(p.id, site.id)?.quantite ?: 0.0
+                    val stock = stockDao.quantite(p.id, siteId) ?: 0.0
                     inventaireDao.upsertLigne(
                         InventaireLigneEntity(inventaireId = id, produitId = p.id, attendu = stock),
                     )
@@ -458,7 +458,7 @@ class InventaireViewModel @Inject constructor(
 
     fun enregistrerCompte(produitId: Long, texte: String, attendu: Double) {
         val session = etat.value.session ?: return
-        viewModelScope.launch(io) {
+        viewModelScope.launch {
             inventaireDao.upsertLigne(
                 InventaireLigneEntity(
                     inventaireId = session.id,
@@ -470,30 +470,20 @@ class InventaireViewModel @Inject constructor(
         }
     }
 
-    /** Clôture : applique chaque écart en AJUSTEMENT, puis ferme la session. */
+    /** Clôture : applique chaque écart signé en AJUSTEMENT, puis ferme la session. */
     fun cloturer(onDone: () -> Unit) {
-        val etatActuel = etat.value
-        val session = etatActuel.session ?: return
-        viewModelScope.launch(io) {
-            val ent = getEnterprise().firstOrNull()
+        val session = etat.value.session ?: return
+        viewModelScope.launch {
             val lignes = inventaireDao.observeLignes(session.id).first()
             lignes.forEach { l ->
                 val compte = l.compte ?: return@forEach
                 val ecart = compte - l.attendu
-                if (ecart != 0.0) {
+                if (abs(ecart) >= 0.0001) {
                     recordStockMovement(
-                        StockMovementInput(
-                            productId = l.produitId,
-                            siteId = session.siteId,
-                            type = StockMovementType.AJUSTEMENT,
-                            quantite = kotlin.math.abs(ecart),
-                            motif = "Inventaire #${session.id} — ajustement",
-                            date = System.currentTimeMillis(),
-                            userId = 0L,
-                            enterpriseId = ent?.id ?: 0L,
-                            stockInitial = l.attendu,
-                            stockFinal = compte,
-                        ),
+                        produitId = l.produitId,
+                        type = StockMovementType.AJUSTEMENT,
+                        quantite = ecart,
+                        motif = "Inventaire #${session.id} — ajustement",
                     )
                 }
             }

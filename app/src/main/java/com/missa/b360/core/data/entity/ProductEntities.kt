@@ -198,6 +198,4 @@ data class InventaireLigneEntity(
     val produitId: Long,
     val attendu: Double,
     val compte: Double? = null,
-) {
-    val ecart: Double? get() = compte?.let { it - attendu }
-}
+)
