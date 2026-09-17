@@ -3,6 +3,7 @@ package com.missa.b360.ui.stock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
