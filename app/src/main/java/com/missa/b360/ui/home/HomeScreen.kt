@@ -53,7 +53,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -134,7 +133,7 @@ object AccueilActionKeys {
 private data class AccueilActionDef(
     val key: String,
     @StringRes val labelRes: Int,
-    val icon: ImageVector,
+    val icon: Int,
     val tint: Color,
     val bg: Color,
     val route: String,
@@ -361,7 +360,7 @@ private fun HomeHeader(
                     // Hamburger — zone tactile 48x48, icône 24dp
                     IconButton(onClick = onMenuClick, modifier = Modifier.size(48.dp)) {
                         Icon(
-                            imageVector = Iv.Menu,
+                            painter = painterResource(Iv.Menu,
                             contentDescription = stringResource(R.string.drawer_admin),
                             tint = HomeTextDark,
                             modifier = Modifier.size(24.dp),
@@ -424,7 +423,7 @@ private fun HomeHeader(
                             },
                         ) {
                             Icon(
-                                imageVector = Iv.Notifications,
+                                painter = painterResource(Iv.Notifications,
                                 contentDescription = stringResource(R.string.notifications),
                                 tint = HomeTextDark,
                                 modifier = Modifier.size(24.dp),
@@ -455,7 +454,7 @@ private fun HomeHeader(
                         } else {
                             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Green90)) {
                                 Icon(
-                                    imageVector = Iv.Store,
+                                    painter = painterResource(Iv.Store,
                                     contentDescription = stringResource(R.string.home_company_active),
                                     tint = TendrePositive,
                                     modifier = Modifier.size(20.dp),
@@ -552,7 +551,7 @@ private fun HomeDashboard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = Iv.Business,
+                        painter = painterResource(Iv.Business,
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -580,7 +579,7 @@ private fun HomeDashboard(
                     Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(HomeBorder))
                     Spacer(Modifier.width(10.dp))
                     Icon(
-                        imageVector = Iv.Groups,
+                        painter = painterResource(Iv.Groups,
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -606,7 +605,7 @@ private fun HomeDashboard(
                         modifier = Modifier.weight(1f),
                     )
                     Icon(
-                        imageVector = Iv.ChevronRight,
+                        painter = painterResource(Iv.ChevronRight,
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -697,7 +696,7 @@ private fun HomeDashboard(
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
-                            imageVector = Iv.Settings,
+                            painter = painterResource(Iv.Settings,
                             contentDescription = null,
                             tint = HomeBlue,
                             modifier = Modifier.size(16.dp),
@@ -742,7 +741,7 @@ private fun AccueilKpiCard(
     valeur: String,
     sousTitre: String,
     tendance: Double?,
-    icon: ImageVector,
+    icon: Int,
     iconBg: Color,
     iconTint: Color,
     illustrationRes: Int? = null,
@@ -775,7 +774,7 @@ private fun AccueilKpiCard(
                     color = iconBg,
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.height(10.dp))
@@ -848,7 +847,7 @@ private fun AccueilActionsGrid(
 private fun AccueilActionCard(
     modifier: Modifier,
     label: String,
-    icon: ImageVector,
+    icon: Int,
     tint: Color,
     bg: Color,
     onClick: () -> Unit,
@@ -867,7 +866,7 @@ private fun AccueilActionCard(
             Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(9.dp), color = bg) {
                 Box(contentAlignment = Alignment.Center) {
                     // Superpose un petit + pour les 4 premiers
-                    Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
+                    Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
                     if (label.startsWith("+")) {
                         Box(modifier = Modifier.align(Alignment.BottomEnd).size(12.dp).clip(CircleShape).background(tint), contentAlignment = Alignment.Center) {
                             Text(text = "+", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp)
@@ -903,11 +902,11 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Iv.History, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
+                        Icon(painter = painterResource(Iv.History, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
-                        Icon(imageVector = Iv.ArrowDropDown, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
+                        Icon(painter = painterResource(Iv.ArrowDropDown, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -998,7 +997,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
 @Composable
 private fun AccueilResumeCell(
     modifier: Modifier,
-    icon: ImageVector,
+    icon: Int,
     iconTint: Color,
     iconBg: Color,
     titre: String,
@@ -1008,7 +1007,7 @@ private fun AccueilResumeCell(
 ) {
     Column(modifier = modifier.padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(modifier = Modifier.size(28.dp), shape = CircleShape, color = iconBg) {
-            Box(contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
+            Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
         }
         Spacer(Modifier.height(6.dp))
         Text(text = titre, color = HomeTextMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
@@ -1090,7 +1089,7 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
 
 @Composable
 private fun AccueilActiviteRow(
-    icon: ImageVector,
+    icon: Int,
     iconBg: Color,
     iconTint: Color,
     titre: String,
@@ -1102,7 +1101,7 @@ private fun AccueilActiviteRow(
 ) {
     Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
         Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = iconBg) {
-            Box(contentAlignment = Alignment.Center) { Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
+            Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
         }
         Spacer(Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -1139,7 +1138,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = if (hasAlert) HomeBackground else HomeBackground) {
-                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Iv.Notifications, contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
+                Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Notifications, contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
             }
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -1181,7 +1180,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                     }
                 }
             }
-            Icon(imageVector = Iv.ChevronRight, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
+            Icon(painter = painterResource(Iv.ChevronRight, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -1198,7 +1197,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(26.dp), shape = RoundedCornerShape(7.dp), color = HomeBlueSoft) {
-                    Box(contentAlignment = Alignment.Center) { Icon(imageVector = Iv.Checklist, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
+                    Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Checklist, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(text = stringResource(R.string.home_taches_du_jour), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -1218,7 +1217,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = stringResource(R.string.home_voir_toutes_taches), color = HomeBlue, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                Icon(imageVector = Iv.ChevronRight, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
+                Icon(painter = painterResource(Iv.ChevronRight, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -1317,7 +1316,7 @@ internal fun MissaBusinessDrawer(
                 }
                 IconButton(onClick = onClose, modifier = Modifier.size(38.dp)) {
                     Icon(
-                        imageVector = Iv.Close,
+                        painter = painterResource(Iv.Close,
                         contentDescription = stringResource(R.string.home_close),
                         tint = HomeTextMuted,
                     )
@@ -1366,7 +1365,7 @@ internal fun MissaBusinessDrawer(
                         )
                     }
                     Icon(
-                        imageVector = Iv.ChevronRight,
+                        painter = painterResource(Iv.ChevronRight,
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -1413,7 +1412,7 @@ internal fun MissaBusinessDrawer(
                             color = HomeGreenSoft,
                         ) {
                             Icon(
-                                imageVector = Iv.CloudDone,
+                                painter = painterResource(Iv.CloudDone,
                                 contentDescription = null,
                                 tint = TendrePositive,
                                 modifier = Modifier.padding(7.dp),
@@ -1454,7 +1453,7 @@ private fun DrawerSectionTitle(title: String) {
 
 @Composable
 private fun DrawerMenuItem(
-    icon: ImageVector,
+    icon: Int,
     title: String,
     selected: Boolean = false,
     onClick: () -> Unit,
@@ -1476,7 +1475,7 @@ private fun DrawerMenuItem(
                 color = if (selected) Color.White else Color.Transparent,
             ) {
                 Icon(
-                    imageVector = icon,
+                    painter = painterResource(icon),
                     contentDescription = null,
                     tint = if (selected) HomeBlue else HomeTextMuted,
                     modifier = Modifier.padding(7.dp),
@@ -1593,7 +1592,7 @@ internal fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
 @Composable
 private fun HomeSupportBouton(
     texteRes: Int,
-    icone: ImageVector,
+    icone: Int,
     onClick: () -> Unit,
 ) {
     OutlinedButton(
@@ -1602,7 +1601,7 @@ private fun HomeSupportBouton(
         shape = RoundedCornerShape(11.dp),
         border = BorderStroke(1.dp, HomeBlue),
     ) {
-        Icon(icone, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(17.dp))
+        Icon(painterResource(icone), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(17.dp))
         Spacer(Modifier.width(8.dp))
         Text(stringResource(texteRes), fontSize = 13.sp, color = HomeBlue)
     }
@@ -1662,7 +1661,7 @@ private fun HomePersonnaliserDialogue(
                         Spacer(Modifier.width(4.dp))
                         Surface(modifier = Modifier.size(28.dp), shape = RoundedCornerShape(7.dp), color = def.bg) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(def.icon, contentDescription = null, tint = def.tint, modifier = Modifier.size(16.dp))
+                                Icon(painterResource(def.icon), contentDescription = null, tint = def.tint, modifier = Modifier.size(16.dp))
                             }
                         }
                         Spacer(Modifier.width(10.dp))

@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -87,7 +88,7 @@ fun AdminReglagesScreen(
         ) {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Iv.Settings, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                    Icon(painterResource(Iv.Settings, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.activation_titre), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 }
@@ -288,7 +289,7 @@ private fun ActivationSectionModules(
                 )
                 Spacer(Modifier.width(6.dp))
                 Icon(
-                    imageVector = if (expanded) Iv.ExpandLess else Iv.ExpandMore,
+                    painter = painterResource(if (expanded) Iv.ExpandLess else Iv.ExpandMore),
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(18.dp),
@@ -350,7 +351,7 @@ private fun ActivationModuleLigne(
                 if (isVerrouille) {
                     Surface(shape = RoundedCornerShape(5.dp), color = MissaSoftBlue, border = BorderStroke(0.5.dp, BrandBlue.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
+                            Icon(painterResource(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
                             Spacer(Modifier.width(3.dp))
                             Text(stringResource(R.string.activation_verrouille), fontSize = 9.sp, color = BrandBlue)
                         }
@@ -387,7 +388,7 @@ private fun ActivationModuleLigne(
         }
         if (isActif) {
             Icon(
-                imageVector = Iv.Info,
+                painter = painterResource(Iv.Info,
                 contentDescription = stringResource(R.string.activation_elements_actifs),
                 tint = BrandBlue,
                 modifier = Modifier
@@ -428,7 +429,7 @@ private fun ActivationChangerProfilDialogue(
                                 Text(profil.description, fontSize = 10.5.sp, color = MissaMuted)
                             }
                             if (selected) {
-                                Icon(Iv.CheckCircle, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(18.dp))
+                                Icon(painterResource(Iv.CheckCircle, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -492,7 +493,7 @@ private fun ActivationElementsDialogue(
                                 Text(elem, fontSize = 11.sp, color = MissaInk)
                                 if (isDefaut) {
                                     Spacer(Modifier.width(4.dp))
-                                    Icon(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
+                                    Icon(painterResource(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
                                 }
                             }
                         }

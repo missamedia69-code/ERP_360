@@ -34,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -127,7 +127,7 @@ fun MissaSelecteurLigne(
             }
         }
         Icon(
-            imageVector = Iv.ArrowDropDown,
+            painter = painterResource(Iv.ArrowDropDown,
             contentDescription = null,
             tint = MissaMuted,
             modifier = Modifier.size(18.dp),
@@ -162,7 +162,7 @@ fun MissaSelecteurBleu(
     selectionCle: String?,
     onSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
-    icone: ImageVector? = null,
+    icone: Int? = null,
     enabled: Boolean = true,
     placeholder: String = "",
     titreDialogue: String = label,
@@ -184,7 +184,7 @@ fun MissaSelecteurBleu(
         ) {
             if (icone != null) {
                 Icon(
-                    imageVector = icone,
+                    painter = painterResource(icone),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
@@ -232,7 +232,7 @@ fun MissaSelecteurBleu(
                 }
             }
             Icon(
-                imageVector = Iv.ArrowDropDown,
+                painter = painterResource(Iv.ArrowDropDown,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(22.dp),
@@ -392,7 +392,7 @@ private fun MissaOptionLigne(
         }
         if (actif) {
             Icon(
-                imageVector = Iv.Check,
+                painter = painterResource(Iv.Check,
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(18.dp),

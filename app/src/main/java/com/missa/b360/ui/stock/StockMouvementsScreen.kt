@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -141,7 +142,7 @@ internal fun LigneMouvement(mv: StockMovementView) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = fond) {
                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                    Icon(icone, null, tint = teinte, modifier = Modifier.size(16.dp))
+                    Icon(painterResource(icone), null, tint = teinte, modifier = Modifier.size(16.dp))
                 }
             }
             Spacer(Modifier.width(10.dp))

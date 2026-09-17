@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -108,7 +109,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Iv.CheckCircle,
+                painter = painterResource(Iv.CheckCircle,
                 contentDescription = null,
                 tint = ProfileGreen,
                 modifier = Modifier.size(16.dp),
@@ -123,7 +124,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
             Icon(
-                imageVector = Iv.ArrowForwardIos,
+                painter = painterResource(Iv.ArrowForwardIos,
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.size(12.dp),

@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -255,7 +256,7 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Iv.Restore,
+                    painter = painterResource(Iv.Restore,
                     contentDescription = null,
                     tint = BrandBlue,
                     modifier = Modifier.size(18.dp),

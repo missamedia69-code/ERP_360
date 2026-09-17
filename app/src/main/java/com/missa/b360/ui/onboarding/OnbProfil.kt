@@ -37,7 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,7 +64,7 @@ private data class OnbProfilCarteInfo(
     val profil: ProfilActivite,
     val titreRes: Int,
     val sousTitreRes: Int,
-    val icone: ImageVector,
+    val icone: Int,
 )
 
 /**
@@ -335,7 +335,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            imageVector = Iv.Info,
+                            painter = painterResource(Iv.Info,
                             contentDescription = null,
                             tint = BrandBlue,
                             modifier = Modifier.size(15.dp),
@@ -413,7 +413,7 @@ private fun OnbModulePastille(module: ModuleCode) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Iv.Lock,
+                painter = painterResource(Iv.Lock,
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(11.dp),
@@ -469,7 +469,7 @@ private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: ()
 internal fun OnbProfilCarte(
     titreRes: Int,
     sousTitreRes: Int,
-    icone: ImageVector,
+    icone: Int,
     selected: Boolean,
     onClick: () -> Unit,
     ouvert: Boolean = false,
@@ -501,7 +501,7 @@ internal fun OnbProfilCarte(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = icone,
+                        painter = painterResource(icone),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(22.dp),
@@ -524,11 +524,7 @@ internal fun OnbProfilCarte(
             }
             if (selected) {
                 Icon(
-                    imageVector = if (ouvert) {
-                        Iv.ExpandLess
-                    } else {
-                        Iv.ExpandMore
-                    },
+                    painter = painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
                     contentDescription = stringResource(
                         if (ouvert) R.string.obn_socle_replier else R.string.obn_socle_deplier,
                     ),
@@ -548,7 +544,7 @@ internal fun OnbProfilCarte(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = Iv.Info,
+                            painter = painterResource(Iv.Info,
                             contentDescription = stringResource(R.string.obn_profil_info),
                             tint = if (selected) Color.White else BrandBlue,
                             modifier = Modifier.size(16.dp),

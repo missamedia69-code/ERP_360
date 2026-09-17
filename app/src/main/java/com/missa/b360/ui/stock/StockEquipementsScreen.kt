@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -142,7 +143,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                                    Icon(ligne.product.type.icone(), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                                    Icon(painterResource(ligne.product.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                                 }
                             }
                             ProduitImage(photoPath = ligne.product.photoPath)

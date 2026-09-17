@@ -40,9 +40,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -429,7 +429,7 @@ private fun OnbChampTexte(
     valeur: String,
     onValeur: (String) -> Unit,
     label: String,
-    icone: ImageVector,
+    icone: Int,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     clavier: KeyboardType = KeyboardType.Text,
@@ -445,7 +445,7 @@ private fun OnbChampTexte(
         label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         leadingIcon = {
             Icon(
-                imageVector = icone,
+                painter = painterResource(icone),
                 contentDescription = null,
                 tint = if (erreur) Red40 else BrandBlue,
                 modifier = Modifier.size(18.dp),
@@ -514,7 +514,7 @@ private fun OnbPackPays(
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Iv.Public,
+                    painter = painterResource(Iv.Public,
                     contentDescription = null,
                     tint = BrandBlue,
                     modifier = Modifier.size(16.dp),
@@ -672,7 +672,7 @@ private fun OnbPackLien(texteRes: Int, ouvert: Boolean, onClic: () -> Unit) {
         ),
     ) {
         Icon(
-            imageVector = if (ouvert) Iv.ExpandLess else Iv.ExpandMore,
+            painter = painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
             contentDescription = null,
             modifier = Modifier.size(15.dp),
         )
@@ -801,7 +801,7 @@ private fun OnbLogoSection(
                     color = BrandBlue.copy(alpha = 0.025f),
                 ) {
                     Icon(
-                        imageVector = Iv.Backup,
+                        painter = painterResource(Iv.Backup,
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.padding(16.dp),
@@ -858,7 +858,7 @@ private fun OnbLogoSection(
             if (logoUri != null) {
                 IconButton(onClick = onLogoCleared, enabled = enabled) {
                     Icon(
-                        imageVector = Iv.DeleteOutline,
+                        painter = painterResource(Iv.DeleteOutline,
                         contentDescription = stringResource(R.string.ob_logo_supprimer),
                         tint = Red40,
                         modifier = Modifier.size(19.dp),

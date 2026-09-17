@@ -35,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -122,7 +121,7 @@ fun MissaTopAppBar(
             if (onBack != null) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(
-                        imageVector = Iv.ArrowBack,
+                        painter = painterResource(Iv.ArrowBack,
                         contentDescription = null,
                         tint = MissaInk,
                         modifier = Modifier.size(24.dp),
@@ -203,7 +202,7 @@ fun MissaSectionTitle(
 /** État vide cohérent : pictogramme doux, titre, explication et action éventuelle. */
 @Composable
 fun MissaEmptyState(
-    icon: ImageVector,
+    icon: Int,
     title: String,
     description: String? = null,
     modifier: Modifier = Modifier,
@@ -221,7 +220,7 @@ fun MissaEmptyState(
                 color = MissaSoftBlue,
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
                 }
             }
             Text(

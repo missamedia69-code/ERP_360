@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -95,7 +96,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Iv.Check,
+                        painter = painterResource(Iv.Check,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(30.dp),
@@ -139,7 +140,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                 )
                 Spacer(Modifier.size(8.dp))
                 Icon(
-                    imageVector = Iv.ArrowForward,
+                    painter = painterResource(Iv.ArrowForward,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(17.dp),
@@ -273,11 +274,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (viewModel.licenceDejaActive) {
-                        Iv.WorkspacePremium
-                    } else {
-                        Iv.Schedule
-                    },
+                    painter = painterResource(if (viewModel.licenceDejaActive) Iv.WorkspacePremium else Iv.Schedule),
                     contentDescription = null,
                     tint = if (viewModel.licenceDejaActive) ProfileGreen else BrandBlue,
                     modifier = Modifier.size(17.dp),
@@ -338,7 +335,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                 if (coordonneesManquantes) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Iv.Warning,
+                            painter = painterResource(Iv.Warning,
                             contentDescription = null,
                             tint = Red40,
                             modifier = Modifier.size(13.dp),
@@ -395,7 +392,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
 @Composable
 private fun OnbContactBouton(
     texteRes: Int,
-    icone: androidx.compose.ui.graphics.vector.ImageVector,
+    icone: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -408,7 +405,7 @@ private fun OnbContactBouton(
         contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
     ) {
         Icon(
-            imageVector = icone,
+            painter = painterResource(icone),
             contentDescription = null,
             tint = BrandBlue,
             modifier = Modifier.size(15.dp),

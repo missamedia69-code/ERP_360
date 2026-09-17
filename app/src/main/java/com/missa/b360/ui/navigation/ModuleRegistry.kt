@@ -1,7 +1,6 @@
 package com.missa.b360.ui.navigation
 
 import com.missa.b360.ui.icons.Iv
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
@@ -20,7 +19,7 @@ import com.missa.b360.core.domain.model.ModuleCode
 enum class AppModule(
     val route: String,
     val titleRes: Int,
-    val icon: ImageVector,
+    val icon: Int,
     val moduleCode: ModuleCode,
     /**
      * Rang de candidature à la barre du bas : 1 = le plus prioritaire, 0 = ne

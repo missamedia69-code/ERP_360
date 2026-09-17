@@ -28,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -122,7 +122,7 @@ fun MissaBarreModules(
 @Composable
 private fun BarreOnglet(
     modifier: Modifier = Modifier,
-    icone: ImageVector,
+    icone: Int,
     libelleRes: Int,
     actif: Boolean,
     onClick: () -> Unit,
@@ -147,7 +147,7 @@ private fun BarreOnglet(
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(22.dp))
+                Icon(painterResource(icone), contentDescription = null, tint = teinte, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = stringResource(libelleRes),

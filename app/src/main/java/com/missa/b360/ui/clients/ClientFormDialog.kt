@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -175,7 +176,7 @@ fun ClientFormDialog(
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
                                 Icon(
-                                    imageVector = Iv.ArrowBack,
+                                    painter = painterResource(Iv.ArrowBack,
                                     contentDescription = stringResource(R.string.ob_retour),
                                 )
                             }

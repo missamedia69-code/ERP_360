@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -36,7 +35,7 @@ import kotlinx.coroutines.withContext
 fun CompanyLogo(
     logoUri: String?,
     contentDescription: String?,
-    fallbackIcon: ImageVector,
+    fallbackIcon: Int,
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
     shape: androidx.compose.ui.graphics.Shape,
@@ -61,7 +60,7 @@ fun CompanyLogo(
                 )
             } else {
                 Icon(
-                    imageVector = fallbackIcon,
+                    painter = painterResource(fallbackIcon),
                     contentDescription = contentDescription,
                     tint = fallbackTint,
                     modifier = Modifier.size(size / 2),

@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -134,7 +135,7 @@ fun StockScreen(
             containerColor = Green60,
             contentColor = Color.White,
         ) {
-            Icon(StockIv.Add, contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
+            Icon(painterResource(StockIv.Add, contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -145,7 +146,7 @@ private fun CarteArticle(ligne: ProductWithStock, devise: String, onClick: () ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(ligne.product.type.icone(), null, tint = BrandBlue, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(ligne.product.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(21.dp))
                 }
             }
             ProduitImage(photoPath = ligne.product.photoPath)
@@ -192,7 +193,7 @@ fun BadgeNiveau(ligne: ProductWithStock) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (texteRes == R.string.st_stock_faible) {
-                Icon(StockIv.Star, null, tint = teinte, modifier = Modifier.size(10.dp))
+                Icon(painterResource(StockIv.Star, null, tint = teinte, modifier = Modifier.size(10.dp))
                 Spacer(Modifier.width(3.dp))
             }
             Text(stringResource(texteRes), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = teinte)

@@ -123,7 +123,7 @@ fun MissaAppHeader(
                         .background(PuceHeader),
                 ) {
                     Icon(
-                        imageVector = if (isHome) Iv.Menu else Iv.ArrowBack,
+                        painter = painterResource(if (isHome) Iv.Menu else Iv.ArrowBack),
                         contentDescription = if (isHome) stringResource(R.string.drawer_admin) else "Retour",
                         tint = MissaInk,
                         modifier = Modifier.size(24.dp),
@@ -176,7 +176,7 @@ fun MissaAppHeader(
                 ) {
                     Box {
                         Icon(
-                            imageVector = Iv.Notifications,
+                            painter = painterResource(Iv.Notifications,
                             contentDescription = stringResource(R.string.notifications),
                             tint = MissaInk,
                             modifier = Modifier.size(24.dp),
@@ -215,7 +215,7 @@ fun MissaAppHeader(
                         )
                     } else {
                         Icon(
-                            imageVector = Iv.Store,
+                            painter = painterResource(Iv.Store,
                             contentDescription = stringResource(R.string.home_company_active),
                             tint = TendrePositive,
                             modifier = Modifier.size(24.dp),

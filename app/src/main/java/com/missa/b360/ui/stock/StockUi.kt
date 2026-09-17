@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -91,7 +91,7 @@ fun ProductType.libelleTypeRes(): Int = when (this) {
     ProductType.AUTRE_BIEN -> R.string.st_type_autre
 }
 
-fun ProductType.icone(): ImageVector = when (this) {
+fun ProductType.icone(): Int = when (this) {
     ProductType.ACHATE_REVENDU -> StockIv.ShoppingCart
     ProductType.MATIERE_PREMIERE -> StockIv.Eco
     ProductType.CONNOMMABLE -> StockIv.Inventory2
@@ -168,7 +168,7 @@ fun StockSectionTitle(titre: String, action: String? = null, onAction: (() -> Un
 /** Tuile statistique 2×2 de l'accueil (valeur + libellé + icône teintée). */
 @Composable
 fun StatTile(
-    icone: ImageVector,
+    icone: Int,
     teinte: Color,
     fond: Color,
     valeur: String,
@@ -188,7 +188,7 @@ fun StatTile(
         ) {
             Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = fond) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(icone, contentDescription = null, tint = teinte, modifier = Modifier.size(18.dp))
+                    Icon(painterResource(icone), contentDescription = null, tint = teinte, modifier = Modifier.size(18.dp))
                 }
             }
             Spacer(Modifier.width(10.dp))
@@ -227,7 +227,7 @@ fun StockSearchField(valeur: String, onValeur: (String) -> Unit, placeholderRes:
         onValueChange = onValeur,
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(stringResource(placeholderRes), fontSize = 12.sp, color = MissaMuted) },
-        leadingIcon = { Icon(StockIv.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
+        leadingIcon = { Icon(painterResource(StockIv.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
     )
@@ -322,7 +322,7 @@ fun DropdownChamp(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
-                Icon(StockIv.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(painterResource(StockIv.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             },
         )
         Box(

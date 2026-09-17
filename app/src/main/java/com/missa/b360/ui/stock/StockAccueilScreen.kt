@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,7 +70,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -98,7 +99,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         }
                     }
                 }
-                Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+                Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(18.dp))
             }
         }
 
@@ -156,7 +157,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = Blue90) {
                         androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                            Icon(cat.type.icone(), null, tint = BrandBlue, modifier = Modifier.size(17.dp))
+                            Icon(painterResource(cat.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(17.dp))
                         }
                     }
                     Spacer(Modifier.width(10.dp))
@@ -166,7 +167,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     }
                     Text(fmtValeur(cat.valeur, etat.devise), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MissaMuted)
                     Spacer(Modifier.width(4.dp))
-                    Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(16.dp))
+                    Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(16.dp))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -177,7 +178,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(StockIv.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))
@@ -185,7 +186,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
                 }
-                Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             }
         }
 
@@ -204,7 +205,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
 
 @Composable
 private fun MouvementMini(
-    icone: androidx.compose.ui.graphics.vector.ImageVector,
+    icone: Int,
     teinte: Color,
     libelle: String,
     nombre: Int,
@@ -216,7 +217,7 @@ private fun MouvementMini(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icone, null, tint = teinte, modifier = Modifier.size(14.dp))
+                Icon(painterResource(icone), null, tint = teinte, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(5.dp))
                 Text(libelle, fontSize = 10.5.sp, color = MissaMuted)
             }

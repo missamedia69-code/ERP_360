@@ -136,7 +136,7 @@ internal fun OnbScaffold(
             if (onRetour != null) {
                 IconButton(onClick = onRetour, enabled = !viewModel.enregistrementEnCours, modifier = Modifier.size(40.dp)) {
                     Icon(
-                        imageVector = Iv.ArrowBack,
+                        painter = painterResource(Iv.ArrowBack,
                         contentDescription = stringResource(R.string.ob_retour),
                         tint = MissaMuted,
                         modifier = Modifier.size(22.dp),
@@ -251,7 +251,7 @@ internal fun OnbScaffold(
                     )
                     Spacer(Modifier.width(8.dp))
                     Icon(
-                        imageVector = Iv.ArrowForward,
+                        painter = painterResource(Iv.ArrowForward,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(17.dp),
@@ -341,7 +341,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
                 )
                 Spacer(Modifier.width(10.dp))
                 Icon(
-                    imageVector = Iv.ArrowForward,
+                    painter = painterResource(Iv.ArrowForward,
                     contentDescription = null,
                     tint = OnboardingHeroBlue,
                     modifier = Modifier.size(18.dp),

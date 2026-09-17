@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -738,7 +739,7 @@ private fun PlusDeModulesFeuille(
                             color = MissaSoftBlue,
                         ) {
                             Icon(
-                                imageVector = module.icon,
+                                painter = painterResource(module.icon),
                                 contentDescription = null,
                                 tint = BrandBlue,
                                 modifier = Modifier.padding(10.dp),
