@@ -363,7 +363,10 @@ private fun MainNavHost() {
         }
         composable(Routes.STOCK_MOUVEMENTS) {
             GuardedModule(AppModule.STOCK, activation, navController) {
-                StockMouvementsScreen(onBack = { navController.popBackStack() })
+                StockMouvementsScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
             }
         }
         composable(Routes.STOCK_ALERTES) {

@@ -33,6 +33,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.text.style.TextAlign
+import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.ui.theme.Blue90
+import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.R
 import com.missa.b360.core.data.dao.StockMovementView
 import com.missa.b360.ui.components.MissaTopAppBar
@@ -49,13 +53,48 @@ import java.util.Locale
 
 /** Maquette 7 — historique des mouvements groupés par jour, filtré par sens. */
 @Composable
-fun StockMouvementsScreen(onBack: () -> Unit) {
+fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
     val vm: StockMouvementsViewModel = hiltViewModel()
     val groupes by vm.etat.collectAsStateWithLifecycle()
     val filtre by vm.filtre.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_mouvements_titre), onBack = onBack)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Surface(
+                onClick = { onNavigate(Routes.STOCK_MOVEMENT_FORM) },
+                shape = RoundedCornerShape(10.dp),
+                color = BrandBlue,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = stringResource(R.string.st_nouveau_mouvement),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 9.dp),
+                )
+            }
+            Surface(
+                onClick = { onNavigate(Routes.STOCK_TRANSFER_FORM) },
+                shape = RoundedCornerShape(10.dp),
+                color = Blue90,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = stringResource(R.string.st_transferts_stock),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrandBlue,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 9.dp),
+                )
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
