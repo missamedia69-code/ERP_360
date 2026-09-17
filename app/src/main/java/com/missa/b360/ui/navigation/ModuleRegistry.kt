@@ -42,10 +42,6 @@ enum class AppModule(
      */
     val couleur: Color,
 ) {
-
-    /** Fond doux dérivé de [couleur] pour les pastilles et vignettes. */
-    val couleurDouce: Color
-        get() = couleur.copy(alpha = 0.12f)
     VENTE("module_vente", R.string.module_vente, Iv.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1, couleur = Color(0xFF1554E8)), 
     STOCK("module_stock", R.string.module_stock, Iv.Inventory2, ModuleCode.STK, prioriteBarre = 2, couleur = Color(0xFF0E9AA7)), 
     CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7, couleur = Color(0xFF7047E8)), 
@@ -65,6 +61,10 @@ enum class AppModule(
     LOGISTIQUE("module_logistique", R.string.module_logistique, Iv.Warehouse, ModuleCode.LOG, couleur = Color(0xFF65A30D)), 
     REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP, couleur = Color(0xFF0E7490)), 
     ;
+
+    /** Fond doux dérivé de [couleur] pour les pastilles et vignettes. */
+    val couleurDouce: Color
+        get() = couleur.copy(alpha = 0.12f)
 
     companion object {
 
