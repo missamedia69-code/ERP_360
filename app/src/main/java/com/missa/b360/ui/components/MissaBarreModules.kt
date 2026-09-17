@@ -99,6 +99,7 @@ fun MissaBarreModules(
                         icone = module.icon,
                         libelleRes = libelleRes,
                         actif = racine == module.route,
+                        couleurActive = module.couleur,
                         onClick = { onModule(module) },
                     )
                 }
@@ -125,9 +126,10 @@ private fun BarreOnglet(
     icone: Int,
     libelleRes: Int,
     actif: Boolean,
+    couleurActive: Color = BrandBlue,
     onClick: () -> Unit,
 ) {
-    val teinte = if (actif) BrandBlue else MissaMuted
+    val teinte = if (actif) couleurActive else MissaMuted
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
@@ -140,7 +142,7 @@ private fun BarreOnglet(
         Box(
             modifier = Modifier
                 .background(
-                    color = if (actif) BrandBlue.copy(alpha = 0.10f) else Color.Transparent,
+                    color = if (actif) couleurActive.copy(alpha = 0.10f) else Color.Transparent,
                     shape = RoundedCornerShape(16.dp),
                 )
                 .padding(horizontal = 14.dp, vertical = 3.dp),

@@ -736,12 +736,12 @@ private fun PlusDeModulesFeuille(
                         Surface(
                             modifier = Modifier.size(42.dp),
                             shape = RoundedCornerShape(12.dp),
-                            color = MissaSoftBlue,
+                            color = module.couleurDouce,
                         ) {
                             Icon(
                                 painter = painterResource(module.icon),
                                 contentDescription = null,
-                                tint = BrandBlue,
+                                tint = module.couleur,
                                 modifier = Modifier.padding(10.dp),
                             )
                         }
