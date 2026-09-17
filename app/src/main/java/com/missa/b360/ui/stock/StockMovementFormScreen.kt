@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import com.missa.b360.ui.theme.MissaInk
 
 import android.widget.Toast
