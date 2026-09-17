@@ -113,6 +113,7 @@ class StockViewModel @Inject constructor(
  */
 @HiltViewModel
 class ProductFormViewModel @Inject constructor(
+    private val productDao: ProductDao,
     private val getProduct: GetProductUseCase,
     private val createProduct: CreateProductUseCase,
     private val updateProduct: UpdateProductUseCase,

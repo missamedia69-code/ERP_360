@@ -108,8 +108,9 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     val edit by vm.product.collectAsStateWithLifecycle()
     LaunchedEffect(imageUri, edit?.photoPath, supprimerImage) {
         apercu = imageUri?.let { com.missa.b360.core.util.ImageProduit.decoderUri(contexte, android.net.Uri.parse(it)) }
-        if (apercu == null && edit?.photoPath != null && !supprimerImage) {
-            apercu = com.missa.b360.core.util.ImageProduit.charger(contexte, edit.id)
+        val enEdition = edit
+        if (apercu == null && enEdition?.photoPath != null && !supprimerImage) {
+            apercu = com.missa.b360.core.util.ImageProduit.charger(contexte, enEdition.id)
         }
     }
     LaunchedEffect(edit) {
