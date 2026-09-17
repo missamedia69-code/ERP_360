@@ -54,6 +54,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
     var observation by remember { mutableStateOf("") }
 
     val texteChampsRequis = stringResource(R.string.st_champs_requis)
+    val texteTransfertMotif = stringResource(R.string.st_mv_transfert)
     val texteTransfertOk = stringResource(R.string.st_transfert_ok)
     val texteTransfertKo = stringResource(R.string.st_transfert_ko)
     val texteMouvementOk = stringResource(R.string.st_mouvement_ok)
@@ -139,7 +140,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
                                 siteSourceId = sourceId!!,
                                 siteDestId = destId!!,
                                 quantite = q,
-                                motif = stringResource(R.string.st_mv_transfert),
+                                motif = texteTransfertMotif,
                                 commentaire = observation,
                             )
                         }

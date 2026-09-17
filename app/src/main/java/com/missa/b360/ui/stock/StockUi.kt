@@ -28,6 +28,9 @@ import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -310,49 +313,50 @@ fun StockOnglets(onglets: List<String>, selection: Int, onSelection: (Int) -> Un
 
 /** Champ avec menu déroulant (article, site, catégorie…). */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
+/** Sélecteur simple (champ + menu) pour les formulaires stock. */
 @Composable
 fun DropdownChamp(
-    libelle: String,
-    options: List<Pair<Long, String>>,
-    selection: Long?,
-    onSelection: (Long) -> Unit,
-    placeholder: String = "",
+    label: String,
+    valeur: String,
+    options: List<String>,
+    onOption: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val texte = options.firstOrNull { it.first == selection }?.second ?: placeholder
-    androidx.compose.material3.ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-    ) {
+    var ouvert by remember { mutableStateOf(false) }
+    Box(modifier) {
         OutlinedTextField(
-            value = texte,
+            value = valeur,
             onValueChange = {},
             readOnly = true,
-            label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-            singleLine = true,
+            enabled = false,
+            colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
+                disabledTextColor = MissaInk,
+                disabledBorderColor = MissaBorder,
+                disabledPlaceholderColor = MissaMuted,
+            ),
+            label = { Text(label, fontSize = 11.sp, color = MissaMuted) },
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                Icon(Icons.Outlined.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+            },
         )
-        ExposedDropdownMenuSimple(expanded, { expanded = false }, options, onSelection)
-    }
-}
-
-@Composable
-private fun androidx.compose.material3.ExposedDropdownMenuBoxScope.ExposedDropdownMenuSimple(
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    options: List<Pair<Long, String>>,
-    onSelection: (Long) -> Unit,
-) {
-    androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
-        options.forEach { (id, nom) ->
-            androidx.compose.material3.DropdownMenuItem(
-                text = { Text(nom, fontSize = 12.sp) },
-                onClick = { onSelection(id); onDismiss() },
-            )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable { ouvert = true },
+        )
+        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option, fontSize = 12.sp, color = MissaInk) },
+                    onClick = {
+                        ouvert = false
+                        onOption(option)
+                    },
+                )
+            }
         }
     }
 }

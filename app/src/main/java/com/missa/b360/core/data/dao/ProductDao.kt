@@ -6,6 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.missa.b360.core.data.entity.ProductCategoryEntity
+import com.missa.b360.core.data.entity.InventaireEntity
+import com.missa.b360.core.data.entity.InventaireLigneEntity
 import com.missa.b360.core.data.entity.ProductEquipementEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
@@ -161,4 +163,26 @@ interface ProductEquipementDao {
 
     @Query("UPDATE product_equipements SET statut = :statut WHERE produitId = :id")
     suspend fun setStatut(id: Long, statut: String)
+}
+
+/** Inventaires physiques (maquette 8). */
+@Dao
+interface InventaireDao {
+    @Query("SELECT * FROM inventaires WHERE statut = 'EN_COURS' ORDER BY debut DESC LIMIT 1")
+    fun observeEnCours(): Flow<InventaireEntity?>
+
+    @Query("SELECT * FROM inventaires ORDER BY debut DESC LIMIT 20")
+    fun observeRecents(): Flow<List<InventaireEntity>>
+
+    @Insert
+    suspend fun insert(inventaire: InventaireEntity): Long
+
+    @Query("UPDATE inventaires SET statut = 'CLOTURE', fin = :fin WHERE id = :id")
+    suspend fun cloturer(id: Long, fin: Long)
+
+    @Query("SELECT * FROM inventaire_lignes WHERE inventaireId = :id")
+    fun observeLignes(id: Long): Flow<List<InventaireLigneEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertLigne(ligne: InventaireLigneEntity)
 }

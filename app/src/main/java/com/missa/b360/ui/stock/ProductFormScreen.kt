@@ -56,6 +56,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     val sites by vm.sites.collectAsStateWithLifecycle()
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
     val contexte = LocalContext.current
+    val texteChampsRequis = stringResource(R.string.st_champs_requis)
 
     var type by remember { mutableStateOf(ProductType.ACHATE_REVENDU) }
     var nom by remember { mutableStateOf("") }
@@ -111,7 +112,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                 onBack()
             }
             else -> {
-                Toast.makeText(contexte, stringResource(R.string.st_champs_requis), Toast.LENGTH_SHORT).show()
+                Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
                 vm.clearSaveResult()
             }
         }
@@ -164,7 +165,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                 Button(
                     onClick = {
                         if (nom.isBlank()) {
-                            Toast.makeText(contexte, stringResource(R.string.st_champs_requis), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
                         } else {
                             etape = 1
                         }

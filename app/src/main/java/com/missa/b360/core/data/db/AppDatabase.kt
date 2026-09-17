@@ -62,6 +62,9 @@ import com.missa.b360.core.data.entity.PaymentMethodEntity
 import com.missa.b360.core.data.entity.ProductCategoryEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
+import com.missa.b360.core.data.entity.InventaireEntity
+import com.missa.b360.core.data.entity.InventaireLigneEntity
+import com.missa.b360.core.data.dao.InventaireDao
 import com.missa.b360.core.data.entity.ProductEquipementEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
@@ -118,11 +121,13 @@ import com.missa.b360.core.data.entity.UserEntity
         ProductStockEntity::class,
         StockMovementEntity::class,
         ProductEquipementEntity::class,
+        InventaireEntity::class,
+        InventaireLigneEntity::class,
         EmployeeEntity::class,
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 13,
+    version = 14,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -145,6 +150,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun productStockDao(): ProductStockDao
     abstract fun stockMovementDao(): StockMovementDao
     abstract fun productEquipementDao(): ProductEquipementDao
+    abstract fun inventaireDao(): InventaireDao
     abstract fun employeeDao(): EmployeeDao
     abstract fun absenceDao(): AbsenceDao
     abstract fun taskDao(): TaskDao
@@ -369,6 +375,24 @@ abstract class AppDatabase : RoomDatabase() {
          * vigueur. Les articles reçoivent un rattachement facultatif, ce qui
          * laisse fonctionner les fiches déjà saisies.
          */
+        /** v13 → v14 : inventaires physiques (sessions + lignes). */
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `inventaires` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`siteId` INTEGER NOT NULL, `debut` INTEGER NOT NULL, " +
+                        "`fin` INTEGER, `statut` TEXT NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `inventaire_lignes` (" +
+                        "`inventaireId` INTEGER NOT NULL, `produitId` INTEGER NOT NULL, " +
+                        "`attendu` REAL NOT NULL, `compte` REAL, " +
+                        "PRIMARY KEY(`inventaireId`, `produitId`))",
+                )
+            }
+        }
+
         /** v12 → v13 : extension immobilisation des produits (équipements). */
         val MIGRATION_12_13 = object : Migration(12, 13) {
             override fun migrate(db: SupportSQLiteDatabase) {

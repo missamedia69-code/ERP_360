@@ -5,6 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.entity.InventaireEntity
+import com.missa.b360.core.data.entity.InventaireLigneEntity
+import com.missa.b360.core.data.entity.ProductStatus
+import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.domain.model.StockMovementInput
+import com.missa.b360.core.domain.usecase.RecordStockMovementUseCase
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.StockMovementView
 import com.missa.b360.core.data.entity.FournisseurEntity
@@ -22,6 +28,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
@@ -360,4 +370,135 @@ class StockEquipementsViewModel @Inject constructor(
             horsService = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Etat())
+}
+
+/** Inventaire physique (maquette 8) : session, comptage, écarts, clôture. */
+@HiltViewModel
+class InventaireViewModel @Inject constructor(
+    private val inventaireDao: com.missa.b360.core.data.dao.InventaireDao,
+    private val productDao: ProductDao,
+    private val stockDao: ProductStockDao,
+    private val siteDao: SiteDao,
+    private val getEnterprise: GetEnterpriseUseCase,
+    private val recordStockMovement: RecordStockMovementUseCase,
+    @IoDispatcher private val io: CoroutineDispatcher,
+) : ViewModel() {
+
+    data class LigneInventaire(
+        val produitId: Long,
+        val nom: String,
+        val reference: String,
+        val attendu: Double,
+        val compte: Double?,
+    ) {
+        val ecart: Double? get() = compte?.let { it - attendu }
+    }
+
+    data class Etat(
+        val session: InventaireEntity? = null,
+        val lignes: List<LigneInventaire> = emptyList(),
+        val siteNom: String? = null,
+    ) {
+        val total get() = lignes.size
+        val comptes get() = lignes.count { it.compte != null }
+        val ecarts get() = lignes.filter { it.ecart != null && it.ecart != 0.0 }
+    }
+
+    val etat: StateFlow<Etat> = inventaireDao.observeEnCours()
+        .flatMapLatest { session ->
+            if (session == null) {
+                flowOf(Etat())
+            } else {
+                combine(
+                    inventaireDao.observeLignes(session.id),
+                    productDao.observeAll(),
+                    productStockDao.observeBySite(session.siteId),
+                    siteDao.observeById(session.siteId),
+                ) { lignesRaw, produits, stocks, site ->
+                    Etat(
+                        session = session,
+                        siteNom = site?.nom,
+                        lignes = lignesRaw.mapNotNull { l ->
+                            produits.firstOrNull { it.id == l.produitId }?.let { p ->
+                                LigneInventaire(
+                                    produitId = p.id,
+                                    nom = p.nom,
+                                    reference = p.reference?.takeIf { it.isNotBlank() } ?: p.code,
+                                    attendu = l.attendu,
+                                    compte = l.compte,
+                                )
+                            }
+                        }.sortedBy { it.nom },
+                    )
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Etat())
+
+    /** Ouvre une session sur le site principal : attendu = stock actuel de chaque produit actif. */
+    fun demarrer() {
+        viewModelScope.launch(io) {
+            if (inventaireDao.observeEnCours().first() != null) return@launch
+            val site = siteDao.observeAll().first().firstOrNull { it.isMain }
+                ?: siteDao.observeAll().first().firstOrNull()
+                ?: return@launch
+            val id = inventaireDao.insert(
+                InventaireEntity(siteId = site.id, debut = System.currentTimeMillis()),
+            )
+            productDao.observeAll().first()
+                .filter { it.statut == ProductStatus.ACTIF.name }
+                .forEach { p ->
+                    val stock = stockDao.getById(p.id, site.id)?.quantite ?: 0.0
+                    inventaireDao.upsertLigne(
+                        InventaireLigneEntity(inventaireId = id, produitId = p.id, attendu = stock),
+                    )
+                }
+        }
+    }
+
+    fun enregistrerCompte(produitId: Long, texte: String, attendu: Double) {
+        val session = etat.value.session ?: return
+        viewModelScope.launch(io) {
+            inventaireDao.upsertLigne(
+                InventaireLigneEntity(
+                    inventaireId = session.id,
+                    produitId = produitId,
+                    attendu = attendu,
+                    compte = texte.toDoubleOrNull(),
+                ),
+            )
+        }
+    }
+
+    /** Clôture : applique chaque écart en AJUSTEMENT, puis ferme la session. */
+    fun cloturer(onDone: () -> Unit) {
+        val etatActuel = etat.value
+        val session = etatActuel.session ?: return
+        viewModelScope.launch(io) {
+            val ent = getEnterprise().firstOrNull()
+            val lignes = inventaireDao.observeLignes(session.id).first()
+            lignes.forEach { l ->
+                val compte = l.compte ?: return@forEach
+                val ecart = compte - l.attendu
+                if (ecart != 0.0) {
+                    recordStockMovement(
+                        StockMovementInput(
+                            productId = l.produitId,
+                            siteId = session.siteId,
+                            type = StockMovementType.AJUSTEMENT,
+                            quantite = kotlin.math.abs(ecart),
+                            motif = "Inventaire #${session.id} — ajustement",
+                            date = System.currentTimeMillis(),
+                            userId = 0L,
+                            enterpriseId = ent?.id ?: 0L,
+                            stockInitial = l.attendu,
+                            stockFinal = compte,
+                        ),
+                    )
+                }
+            }
+            inventaireDao.cloturer(session.id, System.currentTimeMillis())
+            onDone()
+        }
+    }
 }

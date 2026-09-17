@@ -177,6 +177,23 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Spacer(Modifier.height(8.dp))
         }
 
+        // Accès inventaire physique.
+        CarteStock(onClick = { onNaviguer(Routes.STOCK_INVENTORY) }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Outlined.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                    }
+                }
+                Spacer(Modifier.width(11.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
+                }
+                Icon(Icons.Outlined.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+            }
+        }
+
         // Mouvements du jour.
         StockSectionTitle(titre = stringResource(R.string.st_mouvements_jour))
         CarteStock(onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) }) {

@@ -179,3 +179,25 @@ data class StockMovementEntity(
     val commentaire: String? = null,
     val horodatage: Long,
 )
+
+/** Session d'inventaire physique (maquette 8) — clôture appliquée en ajustements. */
+@Entity(tableName = "inventaires")
+data class InventaireEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val siteId: Long,
+    val debut: Long,
+    val fin: Long? = null,
+    /** EN_COURS / CLOTURE. */
+    val statut: String = "EN_COURS",
+)
+
+/** Ligne d'inventaire : attendu (stock théorique) vs compté. */
+@Entity(tableName = "inventaire_lignes", primaryKeys = ["inventaireId", "produitId"])
+data class InventaireLigneEntity(
+    val inventaireId: Long,
+    val produitId: Long,
+    val attendu: Double,
+    val compte: Double? = null,
+) {
+    val ecart: Double? get() = compte?.let { it - attendu }
+}
