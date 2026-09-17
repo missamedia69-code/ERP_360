@@ -77,6 +77,8 @@ object DatabaseModule {
     @Provides fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
     @Provides fun provideProductStockDao(db: AppDatabase): ProductStockDao = db.productStockDao()
     @Provides fun provideStockMovementDao(db: AppDatabase): StockMovementDao = db.stockMovementDao()
+    @Provides fun provideProductEquipementDao(db: AppDatabase): com.missa.b360.core.data.dao.ProductEquipementDao = db.productEquipementDao()
+    @Provides fun provideInventaireDao(db: AppDatabase): com.missa.b360.core.data.dao.InventaireDao = db.inventaireDao()
     @Provides fun provideEmployeeDao(db: AppDatabase): EmployeeDao = db.employeeDao()
     @Provides fun provideAbsenceDao(db: AppDatabase): AbsenceDao = db.absenceDao()
     @Provides fun provideTaskDao(db: AppDatabase): TaskDao = db.taskDao()
