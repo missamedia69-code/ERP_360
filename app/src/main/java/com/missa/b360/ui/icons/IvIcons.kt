@@ -41,6 +41,7 @@ object Iv {
     val ExpandMore = R.drawable.ph_caret_down
     val Gavel = R.drawable.ph_gavel
     val Group = R.drawable.ph_users_three
+    val Groups = R.drawable.ph_users_three
     val Handshake = R.drawable.ph_handshake
     val History = R.drawable.ph_clock_counter_clockwise
     val Home = R.drawable.ph_house_simple

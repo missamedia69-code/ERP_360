@@ -1,5 +1,7 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.ui.res.painterResource
+
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.Image

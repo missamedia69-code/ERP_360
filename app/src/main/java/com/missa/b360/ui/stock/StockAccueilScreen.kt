@@ -85,7 +85,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     etat.tendance?.let { t ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                if (t >= 0) StockIv.TrendingUp else StockIv.TrendingDown,
+                                painterResource(if (t >= 0) StockIv.TrendingUp else StockIv.TrendingDown),
                                 null,
                                 tint = if (t >= 0) Green60 else Red40,
                                 modifier = Modifier.size(13.dp),
