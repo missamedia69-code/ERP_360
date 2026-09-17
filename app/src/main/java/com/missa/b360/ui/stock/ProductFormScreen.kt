@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -201,7 +203,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            Icon(painterResource(type.icone()), null, tint = BrandBlue, modifier = Modifier.size(28.dp))
+                            Icon(painterResource(type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(28.dp))
                         }
                     }
                     Spacer(Modifier.width(12.dp))
@@ -399,7 +401,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
         modifier = modifier.then(Modifier.padding(0.dp)),
         shape = RoundedCornerShape(12.dp),
         color = if (actif) Blue90 else MissaSurface,
-        border = BorderStroke(1.5.dp, if (actif) BrandBlue else MissaBorder.copy(alpha = 0.6f)),
+        border = BorderStroke(1.5.dp, if (actif) AppModule.STOCK.couleur else MissaBorder.copy(alpha = 0.6f)),
         onClick = onClick,
     ) {
         Column(
@@ -409,7 +411,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
             Icon(
                 painterResource(type.icone()),
                 null,
-                tint = if (actif) BrandBlue else MissaMuted,
+                tint = if (actif) AppModule.STOCK.couleur else MissaMuted,
                 modifier = Modifier.size(20.dp),
             )
             Spacer(Modifier.height(4.dp))
@@ -417,7 +419,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
                 text = stringResource(type.libelleTypeRes()),
                 fontSize = 9.5.sp,
                 fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
-                color = if (actif) BrandBlue else MissaMuted,
+                color = if (actif) AppModule.STOCK.couleur else MissaMuted,
                 textAlign = TextAlign.Center,
             )
         }

@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -128,9 +130,9 @@ internal fun LigneMouvement(mv: StockMovementView) {
     val estEntree = mv.type == "ENTREE" || mv.type == "TRANSFERT_ENTREE"
     val estTransfert = mv.type == "TRANSFERT_SORTIE" || mv.type == "TRANSFERT_ENTREE"
     val (icone, teinte, fond) = when {
-        estTransfert -> Triple(StockIv.Sync, ProfilePurple, Color(0xFFF3EFFF))
-        estEntree -> Triple(StockIv.TrendingUp, Green60, Green90)
-        else -> Triple(StockIv.TrendingDown, Red40, Red80)
+        estTransfert -> Triple(StockIv.Sync, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
+        estEntree -> Triple(StockIv.TrendingUp, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
+        else -> Triple(StockIv.TrendingDown, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
     }
     val titreType = when {
         estTransfert -> stringResource(R.string.st_mv_transfert)

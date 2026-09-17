@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -81,7 +83,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                                     modifier = Modifier.fillMaxSize(),
                                 )
                             } else {
-                                Icon(painterResource(produit.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(26.dp))
+                                Icon(painterResource(produit.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(26.dp))
                             }
                         }
                     }

@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -146,7 +148,7 @@ private fun CarteArticle(ligne: ProductWithStock, devise: String, onClick: () ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(painterResource(ligne.product.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(ligne.product.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(21.dp))
                 }
             }
             ProduitImage(photoPath = ligne.product.photoPath)

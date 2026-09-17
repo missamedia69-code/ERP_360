@@ -1,5 +1,7 @@
 package com.missa.b360.ui.clients
 
+import com.missa.b360.ui.navigation.AppModule
+
 import com.missa.b360.ui.icons.Iv
 import android.content.Context
 import android.graphics.Paint
@@ -111,8 +113,8 @@ import java.util.Locale
 private enum class ClientView { LIST, DETAIL, FORM_INFO, FORM_CONTACTS, FORM_ADDRESSES, EDIT, HISTORY, ACCOUNT, SEARCH, DEACTIVATE }
 private enum class ClientDetailTab { INFO, CONTACTS, ADDRESSES, NOTES }
 
-private val ClientBlue = BrandBlue
-private val ClientBlueSoft = MissaSoftBlue
+private val ClientBlue = AppModule.CLIENTS.couleur
+private val ClientBlueSoft = AppModule.CLIENTS.couleurDouce
 private val ClientInk = MissaInk
 private val ClientMuted = MissaMuted
 private val ClientBorder = MissaBorder
@@ -517,8 +519,8 @@ private fun ClientListScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_list_title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = ClientInk) } },
-                actions = { IconButton(onClick = onSearch) { Icon(painterResource(Iv.Search), stringResource(R.string.clients_flow_search), tint = ClientInk) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
+                actions = { IconButton(onClick = onSearch) { Icon(painterResource(Iv.Search), stringResource(R.string.clients_flow_search), tint = MissaMuted) } },
             )
         },
     ) { padding ->
@@ -675,10 +677,10 @@ private fun ClientDetailScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = ClientInk) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
                 actions = {
                     TextButton(onClick = onEdit) { Text(stringResource(R.string.clients_flow_edit), fontSize = 11.sp) }
-                    IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = ClientInk) }
+                    IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = MissaMuted) }
                 },
             )
         },
@@ -1121,7 +1123,7 @@ private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, pri
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = ClientInk) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
             )
         },
         bottomBar = {

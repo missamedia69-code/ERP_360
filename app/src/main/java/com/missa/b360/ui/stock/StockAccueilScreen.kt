@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -70,7 +72,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Coins), null, tint = Green60, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Coins), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -107,7 +109,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
                 icone = StockIv.Inventory2,
-                teinte = BrandBlue,
+                teinte = AppModule.STOCK.couleur,
                 fond = Blue90,
                 valeur = groupe(etat.nbArticles.toLong()),
                 libelle = stringResource(R.string.st_articles),
@@ -116,7 +118,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
             StatTile(
                 icone = StockIv.Category,
-                teinte = Green60,
+                teinte = AppModule.STOCK.couleur,
                 fond = Green90,
                 valeur = etat.nbCategories.toString(),
                 libelle = stringResource(R.string.st_categories),
@@ -128,7 +130,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
                 icone = StockIv.Warning,
-                teinte = ProfileOrange,
+                teinte = AppModule.STOCK.couleur,
                 fond = Color(0xFFFFF4E5),
                 valeur = etat.critiques.toString(),
                 libelle = stringResource(R.string.st_stock_critique),
@@ -137,7 +139,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
             StatTile(
                 icone = StockIv.Error,
-                teinte = Red40,
+                teinte = AppModule.STOCK.couleur,
                 fond = Red80,
                 valeur = etat.ruptures.toString(),
                 libelle = stringResource(R.string.st_ruptures),
@@ -157,7 +159,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = Blue90) {
                         androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(cat.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(17.dp))
+                            Icon(painterResource(cat.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(17.dp))
                         }
                     }
                     Spacer(Modifier.width(10.dp))
@@ -178,7 +180,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.ClipboardText), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.ClipboardText), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))

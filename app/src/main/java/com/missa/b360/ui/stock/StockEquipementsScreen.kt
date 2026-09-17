@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -107,7 +109,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatTile(
                     icone = StockIv.CheckCircle,
-                    teinte = Green60,
+                    teinte = AppModule.STOCK.couleur,
                     fond = Green90,
                     valeur = etat.enService.toString(),
                     libelle = stringResource(R.string.st_en_service),
@@ -115,7 +117,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 )
                 StatTile(
                     icone = StockIv.Build,
-                    teinte = ProfileOrange,
+                    teinte = AppModule.STOCK.couleur,
                     fond = Color(0xFFFFF4E5),
                     valeur = etat.maintenance.toString(),
                     libelle = stringResource(R.string.st_maintenance),
@@ -123,7 +125,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 )
                 StatTile(
                     icone = StockIv.Error,
-                    teinte = Red40,
+                    teinte = AppModule.STOCK.couleur,
                     fond = Red80,
                     valeur = etat.horsService.toString(),
                     libelle = stringResource(R.string.st_hors_service),
@@ -143,7 +145,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                                    Icon(painterResource(ligne.product.type.icone()), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                                    Icon(painterResource(ligne.product.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
                                 }
                             }
                             ProduitImage(photoPath = ligne.product.photoPath)

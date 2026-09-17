@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.navigation.AppModule
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -52,7 +54,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                                Icon(painterResource(type.icone()), null, tint = BrandBlue, modifier = Modifier.size(19.dp))
+                                Icon(painterResource(type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(19.dp))
                             }
                         }
                         Spacer(Modifier.width(11.dp))

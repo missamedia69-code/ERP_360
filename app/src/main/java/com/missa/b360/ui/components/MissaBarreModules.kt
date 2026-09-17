@@ -99,7 +99,7 @@ fun MissaBarreModules(
                         icone = module.icon,
                         libelleRes = libelleRes,
                         actif = racine == module.route,
-                        couleurActive = module.couleur,
+                        couleurModule = module.couleur,
                         onClick = { onModule(module) },
                     )
                 }
@@ -126,10 +126,12 @@ private fun BarreOnglet(
     icone: Int,
     libelleRes: Int,
     actif: Boolean,
-    couleurActive: Color = BrandBlue,
+    couleurModule: Color? = null,
     onClick: () -> Unit,
 ) {
-    val teinte = if (actif) couleurActive else MissaMuted
+    // Règle charte : une icône de module porte toujours la couleur du module ;
+    // les onglets génériques (Accueil, Plus) restent bleu actif / gris inactif.
+    val teinte = couleurModule ?: if (actif) BrandBlue else MissaMuted
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
@@ -142,7 +144,7 @@ private fun BarreOnglet(
         Box(
             modifier = Modifier
                 .background(
-                    color = if (actif) couleurActive.copy(alpha = 0.10f) else Color.Transparent,
+                    color = if (actif) (couleurModule ?: BrandBlue).copy(alpha = 0.10f) else Color.Transparent,
                     shape = RoundedCornerShape(16.dp),
                 )
                 .padding(horizontal = 14.dp, vertical = 3.dp),
