@@ -1,5 +1,7 @@
 package com.missa.b360.ui.navigation
 
+import com.missa.b360.ui.theme.MissaInk
+
 import androidx.compose.runtime.CompositionLocalProvider
 import com.missa.b360.ui.components.LocalBarreNavigation
 import androidx.compose.material3.DrawerValue
@@ -741,7 +743,7 @@ private fun PlusDeModulesFeuille(
                             Icon(
                                 painter = painterResource(module.icon),
                                 contentDescription = null,
-                                tint = module.couleur,
+                                tint = MissaInk,
                                 modifier = Modifier.padding(10.dp),
                             )
                         }

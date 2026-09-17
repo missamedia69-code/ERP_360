@@ -1,5 +1,7 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.theme.MissaInk
+
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,6 +65,13 @@ fun MissaBarreModules(
     onPlus: () -> Unit,
 ) {
     val racine = routeCourante?.substringBefore('?')
+    // Module correspondant à l'écran affiché : la barre prend sa teinte pâle.
+    val moduleCourant = when {
+        racine == null -> null
+        racine == AppModule.STOCK.route || racine.startsWith("stock") -> AppModule.STOCK
+        racine == AppModule.CLIENTS.route || racine.startsWith("clients") -> AppModule.CLIENTS
+        else -> AppModule.entries.firstOrNull { it.route == racine }
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,7 +81,7 @@ fun MissaBarreModules(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(26.dp),
-            color = Color.White,
+            color = moduleCourant?.couleurPale ?: Color.White,
             shadowElevation = 8.dp,
             tonalElevation = 0.dp,
         ) {
@@ -99,7 +108,6 @@ fun MissaBarreModules(
                         icone = module.icon,
                         libelleRes = libelleRes,
                         actif = racine == module.route,
-                        couleurModule = module.couleur,
                         onClick = { onModule(module) },
                     )
                 }
@@ -126,12 +134,10 @@ private fun BarreOnglet(
     icone: Int,
     libelleRes: Int,
     actif: Boolean,
-    couleurModule: Color? = null,
     onClick: () -> Unit,
 ) {
-    // Règle charte : une icône de module porte toujours la couleur du module ;
-    // les onglets génériques (Accueil, Plus) restent bleu actif / gris inactif.
-    val teinte = couleurModule ?: if (actif) BrandBlue else MissaMuted
+    // Charte : toutes les icônes en noir ; l'état actif passe par le gras et la pastille.
+    val teinte = if (actif) MissaInk else MissaMuted
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
@@ -144,7 +150,7 @@ private fun BarreOnglet(
         Box(
             modifier = Modifier
                 .background(
-                    color = if (actif) (couleurModule ?: BrandBlue).copy(alpha = 0.10f) else Color.Transparent,
+                    color = if (actif) MissaInk.copy(alpha = 0.07f) else Color.Transparent,
                     shape = RoundedCornerShape(16.dp),
                 )
                 .padding(horizontal = 14.dp, vertical = 3.dp),

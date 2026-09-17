@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.theme.MissaInk
+
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +76,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
     ) {
-        MissaTopAppBar(title = stringResource(R.string.st_transferts_stock), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_transferts_stock), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             Row {

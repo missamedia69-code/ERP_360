@@ -57,7 +57,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
     val produit = etat.product
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_detail_article), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_detail_article), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         if (produit == null) {
             Box(Modifier.fillMaxSize())
             return
@@ -83,7 +83,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                                     modifier = Modifier.fillMaxSize(),
                                 )
                             } else {
-                                Icon(painterResource(produit.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(26.dp))
+                                Icon(painterResource(produit.type.icone()), null, tint = MissaInk, modifier = Modifier.size(26.dp))
                             }
                         }
                     }

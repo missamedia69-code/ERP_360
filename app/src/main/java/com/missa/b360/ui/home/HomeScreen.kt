@@ -146,7 +146,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.VENTE,
         labelRes = R.string.home_plus_vente,
         icon = Iv.ShoppingCart,
-        tint = HomeBlue,
+        tint = MissaInk,
         bg = HomeBlueSoft,
         route = AppModule.VENTE.createRoute(),
         module = ModuleCode.VEN,
@@ -155,7 +155,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.ACHAT,
         labelRes = R.string.home_plus_achat,
         icon = Iv.CartArrowDown,
-        tint = AppModule.ACHATS.couleur,
+        tint = MissaInk,
         bg = AppModule.ACHATS.couleurDouce,
         route = AppModule.ACHATS.createRoute(),
         module = ModuleCode.ACH,
@@ -164,7 +164,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.CLIENT,
         labelRes = R.string.home_plus_client,
         icon = Iv.PersonAdd,
-        tint = AppModule.CLIENTS.couleur,
+        tint = MissaInk,
         bg = AppModule.CLIENTS.couleurDouce,
         route = AppModule.CLIENTS.createRoute(),
         module = ModuleCode.VEN,
@@ -173,7 +173,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.FOURNISSEUR,
         labelRes = R.string.home_plus_fournisseur,
         icon = Iv.Handshake,
-        tint = AppModule.FOURNISSEURS.couleur,
+        tint = MissaInk,
         bg = AppModule.FOURNISSEURS.couleurDouce,
         route = AppModule.FOURNISSEURS.createRoute(),
         module = ModuleCode.ACH,
@@ -182,7 +182,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.ENTREE_STOCK,
         labelRes = R.string.home_entree_en_stock,
         icon = Iv.Inventory2,
-        tint = AppModule.STOCK.couleur,
+        tint = MissaInk,
         bg = AppModule.STOCK.couleurDouce,
         route = AppModule.STOCK.createRoute(),
         module = ModuleCode.STK,
@@ -191,7 +191,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.TRANSFERT_STOCK,
         labelRes = R.string.home_transfert_de_stock,
         icon = Iv.LocalShipping,
-        tint = AppModule.STOCK.couleur,
+        tint = MissaInk,
         bg = AppModule.STOCK.couleurDouce,
         route = Routes.STOCK_TRANSFER_FORM,
         module = ModuleCode.STK,
@@ -200,7 +200,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.PAIEMENT_RECU,
         labelRes = R.string.home_paiement_recu_label,
         icon = Iv.Payments,
-        tint = AppModule.TRESORERIE.couleur,
+        tint = MissaInk,
         bg = AppModule.TRESORERIE.couleurDouce,
         route = AppModule.TRESORERIE.route,
         module = ModuleCode.TRE,
@@ -209,8 +209,8 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.DEPENSE,
         labelRes = R.string.home_depense_label,
         icon = Iv.Description,
-        tint = AppModule.FINANCES.couleur,
-        bg = AppModule.FINANCES.couleurDouce,
+        tint = MissaInk,
+        bg = Red80,
         route = AppModule.FINANCES.route,
         module = ModuleCode.CPT,
     ),
@@ -362,7 +362,7 @@ private fun HomeHeader(
                         Icon(
                             painter = painterResource(Iv.Menu),
                             contentDescription = stringResource(R.string.drawer_admin),
-                            tint = HomeTextDark,
+                            tint = MissaInk,
                             modifier = Modifier.size(24.dp),
                         )
                     }
@@ -425,7 +425,7 @@ private fun HomeHeader(
                             Icon(
                                 painter = painterResource(Iv.Notifications),
                                 contentDescription = stringResource(R.string.notifications),
-                                tint = HomeTextDark,
+                                tint = MissaInk,
                                 modifier = Modifier.size(24.dp),
                             )
                         }
@@ -456,7 +456,7 @@ private fun HomeHeader(
                                 Icon(
                                     painter = painterResource(Iv.Store),
                                     contentDescription = stringResource(R.string.home_company_active),
-                                    tint = TendrePositive,
+                                    tint = MissaInk,
                                     modifier = Modifier.size(20.dp),
                                 )
                             }
@@ -553,7 +553,7 @@ private fun HomeDashboard(
                     Icon(
                         painter = painterResource(Iv.Business),
                         contentDescription = null,
-                        tint = BrandBlue,
+                        tint = MissaInk,
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(6.dp))
@@ -581,7 +581,7 @@ private fun HomeDashboard(
                     Icon(
                         painter = painterResource(Iv.Groups),
                         contentDescription = null,
-                        tint = BrandBlue,
+                        tint = MissaInk,
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(6.dp))
@@ -607,7 +607,7 @@ private fun HomeDashboard(
                     Icon(
                         painter = painterResource(Iv.ChevronRight),
                         contentDescription = null,
-                        tint = HomeTextMuted,
+                        tint = MissaInk,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -625,7 +625,7 @@ private fun HomeDashboard(
                         tendance = state.tendanceVentes,
                         icon = Iv.ShoppingCart,
                         iconBg = HomeBlueSoft,
-                        iconTint = HomeBlue,
+                        iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_ventes,
                         onClick = { onNavigate(AppModule.VENTE.route) },
                     )
@@ -637,7 +637,7 @@ private fun HomeDashboard(
                         tendance = state.tendanceAchats,
                         icon = Iv.CartArrowDown,
                         iconBg = AppModule.ACHATS.couleurDouce,
-                        iconTint = AppModule.ACHATS.couleur,
+                        iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_stock,
                         onClick = { onNavigate(AppModule.ACHATS.route) },
                     )
@@ -651,7 +651,7 @@ private fun HomeDashboard(
                         tendance = state.tendanceTresorerie,
                         icon = Iv.Bank,
                         iconBg = AppModule.TRESORERIE.couleurDouce,
-                        iconTint = AppModule.TRESORERIE.couleur,
+                        iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_tresorerie,
                         onClick = { onNavigate(AppModule.TRESORERIE.route) },
                     )
@@ -663,7 +663,7 @@ private fun HomeDashboard(
                         tendance = state.tendanceClients,
                         icon = Iv.People,
                         iconBg = AppModule.CLIENTS.couleurDouce,
-                        iconTint = AppModule.CLIENTS.couleur,
+                        iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_clients,
                         onClick = { onNavigate(AppModule.CLIENTS.route) },
                     )
@@ -902,11 +902,11 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(Iv.Calendar), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
+                        Icon(painter = painterResource(Iv.Calendar), contentDescription = null, tint = MissaInk, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
-                        Icon(painter = painterResource(Iv.ArrowDropDown), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
+                        Icon(painter = painterResource(Iv.ArrowDropDown), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -915,7 +915,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
                     icon = Iv.BarChart,
-                    iconTint = HomeBlue,
+                    iconTint = MissaInk,
                     iconBg = HomeBlueSoft,
                     titre = stringResource(R.string.home_ventes_label),
                     valeur = formatMontantSansDecimales(state.ventes, currency),
@@ -926,7 +926,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
                     icon = Iv.CartArrowDown,
-                    iconTint = AppModule.ACHATS.couleur,
+                    iconTint = MissaInk,
                     iconBg = AppModule.ACHATS.couleurDouce,
                     titre = stringResource(R.string.home_achats_label),
                     valeur = formatMontantSansDecimales(state.achats, currency),
@@ -937,7 +937,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
                     icon = Iv.SwapHoriz,
-                    iconTint = AppModule.STOCK.couleur,
+                    iconTint = MissaInk,
                     iconBg = AppModule.STOCK.couleurDouce,
                     titre = stringResource(R.string.home_mouvements_stock_label),
                     valeur = state.mouvementsStockCount.toString(),
@@ -948,7 +948,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
                     icon = Iv.Percent,
-                    iconTint = AppModule.FINANCES.couleur,
+                    iconTint = MissaInk,
                     iconBg = AppModule.FINANCES.couleurDouce,
                     titre = stringResource(R.string.home_marge_brute_label),
                     valeur = formatMontantSansDecimales(state.marge, currency),
@@ -1180,7 +1180,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                     }
                 }
             }
-            Icon(painter = painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
+            Icon(painter = painterResource(Iv.ChevronRight), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -1318,7 +1318,7 @@ internal fun MissaBusinessDrawer(
                     Icon(
                         painter = painterResource(Iv.Close),
                         contentDescription = stringResource(R.string.home_close),
-                        tint = HomeTextMuted,
+                        tint = MissaInk,
                     )
                 }
             }
@@ -1367,7 +1367,7 @@ internal fun MissaBusinessDrawer(
                     Icon(
                         painter = painterResource(Iv.ChevronRight),
                         contentDescription = null,
-                        tint = HomeTextMuted,
+                        tint = MissaInk,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -1414,7 +1414,7 @@ internal fun MissaBusinessDrawer(
                             Icon(
                                 painter = painterResource(Iv.CloudDone),
                                 contentDescription = null,
-                                tint = TendrePositive,
+                                tint = MissaInk,
                                 modifier = Modifier.padding(7.dp),
                             )
                         }
@@ -1477,7 +1477,7 @@ private fun DrawerMenuItem(
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint = if (selected) HomeBlue else HomeTextMuted,
+                    tint = if (selected) MissaInk else MissaMuted,
                     modifier = Modifier.padding(7.dp),
                 )
             }

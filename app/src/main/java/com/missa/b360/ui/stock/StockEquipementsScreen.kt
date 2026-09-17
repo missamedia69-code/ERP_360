@@ -76,7 +76,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
     val filtreStatut by vm.filtreStatut.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_equipements), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_equipements), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             androidx.compose.material3.OutlinedTextField(
@@ -88,7 +88,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                     Icon(
                         painterResource(StockIv.Search),
                         null,
-                        tint = MissaMuted,
+                        tint = MissaInk,
                         modifier = Modifier.size(18.dp),
                     )
                 },
@@ -109,7 +109,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatTile(
                     icone = StockIv.CheckCircle,
-                    teinte = AppModule.STOCK.couleur,
+                    teinte = MissaInk,
                     fond = Green90,
                     valeur = etat.enService.toString(),
                     libelle = stringResource(R.string.st_en_service),
@@ -117,7 +117,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 )
                 StatTile(
                     icone = StockIv.Build,
-                    teinte = AppModule.STOCK.couleur,
+                    teinte = MissaInk,
                     fond = Color(0xFFFFF4E5),
                     valeur = etat.maintenance.toString(),
                     libelle = stringResource(R.string.st_maintenance),
@@ -125,7 +125,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 )
                 StatTile(
                     icone = StockIv.Error,
-                    teinte = AppModule.STOCK.couleur,
+                    teinte = MissaInk,
                     fond = Red80,
                     valeur = etat.horsService.toString(),
                     libelle = stringResource(R.string.st_hors_service),
@@ -145,7 +145,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                                    Icon(painterResource(ligne.product.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
+                                    Icon(painterResource(ligne.product.type.icone()), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                                 }
                             }
                             ProduitImage(photoPath = ligne.product.photoPath)

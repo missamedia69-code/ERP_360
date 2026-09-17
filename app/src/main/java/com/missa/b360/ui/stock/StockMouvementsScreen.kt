@@ -58,7 +58,7 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
     val filtre by vm.filtre.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_mouvements_titre), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_mouvements_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -130,9 +130,9 @@ internal fun LigneMouvement(mv: StockMovementView) {
     val estEntree = mv.type == "ENTREE" || mv.type == "TRANSFERT_ENTREE"
     val estTransfert = mv.type == "TRANSFERT_SORTIE" || mv.type == "TRANSFERT_ENTREE"
     val (icone, teinte, fond) = when {
-        estTransfert -> Triple(StockIv.Sync, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
-        estEntree -> Triple(StockIv.TrendingUp, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
-        else -> Triple(StockIv.TrendingDown, AppModule.STOCK.couleur, AppModule.STOCK.couleurDouce)
+        estTransfert -> Triple(StockIv.Sync, MissaInk, AppModule.STOCK.couleurDouce)
+        estEntree -> Triple(StockIv.TrendingUp, MissaInk, AppModule.STOCK.couleurDouce)
+        else -> Triple(StockIv.TrendingDown, MissaInk, AppModule.STOCK.couleurDouce)
     }
     val titreType = when {
         estTransfert -> stringResource(R.string.st_mv_transfert)

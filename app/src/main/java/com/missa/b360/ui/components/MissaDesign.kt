@@ -99,6 +99,7 @@ fun MissaTopAppBar(
     title: String,
     onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    couleurFond: Color = Color.White,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
@@ -131,7 +132,7 @@ fun MissaTopAppBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White,
+            containerColor = couleurFond,
             titleContentColor = MissaInk,
             navigationIconContentColor = MissaInk,
             actionIconContentColor = MissaInk,

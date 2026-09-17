@@ -5,6 +5,7 @@ import com.missa.b360.R
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 
 /**
  * ModuleRegistry (RA-22) — les 14 modules métier de Missa Business 360.
@@ -65,6 +66,10 @@ enum class AppModule(
     /** Fond doux dérivé de [couleur] pour les pastilles et vignettes. */
     val couleurDouce: Color
         get() = couleur.copy(alpha = 0.12f)
+
+    /** Fond pâle opaque (teinte du module fondue dans le blanc) : headers et barre du bas. */
+    val couleurPale: Color
+        get() = couleur.copy(alpha = 0.14f).compositeOver(Color.White)
 
     companion object {
 

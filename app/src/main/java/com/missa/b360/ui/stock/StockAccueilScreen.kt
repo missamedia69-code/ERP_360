@@ -63,8 +63,17 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        Text(text = stringResource(R.string.module_stock), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
-        Text(text = stringResource(R.string.st_sous_titre), fontSize = 11.5.sp, color = MissaMuted)
+        // Header du module : bandeau légèrement teinté de la couleur Stock.
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = AppModule.STOCK.couleurPale,
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                Text(text = stringResource(R.string.module_stock), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
+                Text(text = stringResource(R.string.st_sous_titre), fontSize = 11.5.sp, color = MissaMuted)
+            }
+        }
         Spacer(Modifier.height(12.dp))
 
         // Valeur totale du stock.
@@ -72,7 +81,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Coins), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Coins), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -89,7 +98,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                             Icon(
                                 painterResource(if (t >= 0) StockIv.TrendingUp else StockIv.TrendingDown),
                                 null,
-                                tint = if (t >= 0) Green60 else Red40,
+                                tint = MissaInk,
                                 modifier = Modifier.size(13.dp),
                             )
                             Spacer(Modifier.width(4.dp))
@@ -101,7 +110,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         }
                     }
                 }
-                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(18.dp))
             }
         }
 
@@ -109,7 +118,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
                 icone = StockIv.Inventory2,
-                teinte = AppModule.STOCK.couleur,
+                teinte = MissaInk,
                 fond = Blue90,
                 valeur = groupe(etat.nbArticles.toLong()),
                 libelle = stringResource(R.string.st_articles),
@@ -118,7 +127,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
             StatTile(
                 icone = StockIv.Category,
-                teinte = AppModule.STOCK.couleur,
+                teinte = MissaInk,
                 fond = Green90,
                 valeur = etat.nbCategories.toString(),
                 libelle = stringResource(R.string.st_categories),
@@ -130,7 +139,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
                 icone = StockIv.Warning,
-                teinte = AppModule.STOCK.couleur,
+                teinte = MissaInk,
                 fond = Color(0xFFFFF4E5),
                 valeur = etat.critiques.toString(),
                 libelle = stringResource(R.string.st_stock_critique),
@@ -139,7 +148,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
             StatTile(
                 icone = StockIv.Error,
-                teinte = AppModule.STOCK.couleur,
+                teinte = MissaInk,
                 fond = Red80,
                 valeur = etat.ruptures.toString(),
                 libelle = stringResource(R.string.st_ruptures),
@@ -159,7 +168,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = Blue90) {
                         androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(cat.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(17.dp))
+                            Icon(painterResource(cat.type.icone()), null, tint = MissaInk, modifier = Modifier.size(17.dp))
                         }
                     }
                     Spacer(Modifier.width(10.dp))
@@ -169,7 +178,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     }
                     Text(fmtValeur(cat.valeur, etat.devise), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MissaMuted)
                     Spacer(Modifier.width(4.dp))
-                    Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(16.dp))
+                    Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -180,7 +189,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.ClipboardText), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.ClipboardText), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))
@@ -188,7 +197,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
                 }
-                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(20.dp))
             }
         }
 

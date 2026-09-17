@@ -1,5 +1,7 @@
 package com.missa.b360.ui.clients
 
+import androidx.compose.material3.TopAppBarDefaults
+
 import com.missa.b360.ui.navigation.AppModule
 
 import com.missa.b360.ui.icons.Iv
@@ -517,10 +519,10 @@ private fun ClientListScreen(
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(
+            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_list_title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
-                actions = { IconButton(onClick = onSearch) { Icon(painterResource(Iv.Search), stringResource(R.string.clients_flow_search), tint = MissaMuted) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
+                actions = { IconButton(onClick = onSearch) { Icon(painterResource(Iv.Search), stringResource(R.string.clients_flow_search), tint = MissaInk) } },
             )
         },
     ) { padding ->
@@ -597,7 +599,7 @@ private fun ClientStatCard(label: String, value: String, modifier: Modifier = Mo
 private fun ClientEmptyList(onNew: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), shape = RoundedCornerShape(15.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder)) {
         Column(Modifier.padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Surface(modifier = Modifier.size(46.dp), shape = CircleShape, color = ClientBlueSoft) { Icon(painterResource(Iv.PersonOutline), null, tint = ClientBlue, modifier = Modifier.padding(11.dp)) }
+            Surface(modifier = Modifier.size(46.dp), shape = CircleShape, color = ClientBlueSoft) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(11.dp)) }
             Text(stringResource(R.string.clients_flow_empty_title), color = ClientInk, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.clients_flow_empty_description), color = ClientMuted, fontSize = 11.sp, textAlign = TextAlign.Center)
             TextButton(onClick = onNew) { Text(stringResource(R.string.clients_nouveau)) }
@@ -618,7 +620,7 @@ private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?,
             }
             if (outstanding > 0) {
                 IconButton(onClick = onRappel, modifier = Modifier.size(30.dp)) {
-                    Icon(painterResource(Iv.Notifications), contentDescription = stringResource(R.string.rappel_bell_cd), tint = ClientBlue, modifier = Modifier.size(18.dp))
+                    Icon(painterResource(Iv.Notifications), contentDescription = stringResource(R.string.rappel_bell_cd), tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
@@ -675,12 +677,12 @@ private fun ClientDetailScreen(
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(
+            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
                 actions = {
                     TextButton(onClick = onEdit) { Text(stringResource(R.string.clients_flow_edit), fontSize = 11.sp) }
-                    IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = MissaMuted) }
+                    IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = MissaInk) }
                 },
             )
         },
@@ -940,7 +942,7 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
             Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 22.dp)) {
                 Text(stringResource(R.string.clients_indicatif_pays), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_rechercher_indicatif)) }, singleLine = true)
-                LazyColumn(modifier = Modifier.height(330.dp)) { items(visible, key = { it.code }) { country -> Row(modifier = Modifier.fillMaxWidth().clickable { onCountryCode(country.code); pickerVisible = false }.padding(vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) { Text(country.indicatif, color = ClientBlue, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp)); Text("${country.nom} (${country.code})", color = ClientInk, fontSize = 12.sp); if (country.code == countryCode) { Spacer(Modifier.weight(1f)); Icon(painterResource(Iv.Check), null, tint = ClientGreen) } } } }
+                LazyColumn(modifier = Modifier.height(330.dp)) { items(visible, key = { it.code }) { country -> Row(modifier = Modifier.fillMaxWidth().clickable { onCountryCode(country.code); pickerVisible = false }.padding(vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) { Text(country.indicatif, color = ClientBlue, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp)); Text("${country.nom} (${country.code})", color = ClientInk, fontSize = 12.sp); if (country.code == countryCode) { Spacer(Modifier.weight(1f)); Icon(painterResource(Iv.Check), null, tint = MissaInk) } } } }
             }
         }
     }
@@ -970,7 +972,7 @@ private fun ClientContactsFormScreen(contacts: MutableList<ClientContactEntity>,
                 Surface(modifier = Modifier.fillMaxWidth().clickable { editing = contact }, shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
                     Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Row { Text(contact.nom, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 12.sp); if (contact.principal) { Spacer(Modifier.width(6.dp)); ClientPill(R.string.clients_flow_primary) } }; Text(listOfNotNull(contact.fonction, contact.telephone, contact.email).joinToString(" · "), color = ClientMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                        IconButton(onClick = { contacts.remove(contact) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = ClientRed, modifier = Modifier.size(17.dp)) }
+                        IconButton(onClick = { contacts.remove(contact) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
                     }
                 }
             }
@@ -1057,7 +1059,7 @@ private fun ClientAddressesFormScreen(
                 Surface(modifier = Modifier.fillMaxWidth().clickable { editing = address }, shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
                     Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Row { Text(address.libelle.ifBlank { stringResource(R.string.clients_adresse) }, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 12.sp); if (address.principale) { Spacer(Modifier.width(6.dp)); ClientPill(R.string.clients_flow_primary) } }; Text(address.displayAddress(), color = ClientMuted, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-                        IconButton(onClick = { addresses.remove(address) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = ClientRed, modifier = Modifier.size(17.dp)) }
+                        IconButton(onClick = { addresses.remove(address) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
                     }
                 }
             }
@@ -1121,9 +1123,9 @@ private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, pri
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(
+            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(title)) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaMuted) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
             )
         },
         bottomBar = {
@@ -1157,7 +1159,7 @@ private fun ClientProgress(current: Int) {
 private fun ClientHistoryScreen(client: ClientEntity, records: List<OperationRecordEntity>, devise: String, onBack: () -> Unit) {
     val total = records.filter { it.status == OperationStatus.VALIDATED.name }.sumOf { SaleRecordCodec.decode(it.notes)?.total ?: 0.0 }
     val due = records.filter { it.status == OperationStatus.VALIDATED.name }.sumOf { payloadOutstanding(it) }
-    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(title = { ClientPageTitle(stringResource(R.string.clients_flow_sales_history)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
+    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_sales_history)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             item { ClientHistoryHeader(client) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) { ClientStatCard(stringResource(R.string.clients_flow_sales_total), clientMoney(total, devise), Modifier.weight(1f)); ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(due, devise), Modifier.weight(1f)) } }
@@ -1193,7 +1195,7 @@ private fun ClientAccountScreen(client: ClientEntity, records: List<OperationRec
         containerColor = ClientBackground,
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = { CenterAlignedTopAppBar(title = { ClientPageTitle(stringResource(R.string.clients_flow_account_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) },
+        topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_account_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) },
         bottomBar = { OutlinedButton(onClick = onDownload, modifier = Modifier.fillMaxWidth().padding(15.dp).height(47.dp)) { Icon(painterResource(Iv.Download), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_flow_download_pdf)) } },
     ) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -1259,7 +1261,7 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
             (since.parseClientDate()?.let { dates >= it } ?: true) &&
             (until.parseClientDate()?.let { dates <= it + 86_399_999 } ?: true)
     }
-    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(title = { ClientPageTitle(stringResource(R.string.clients_flow_search_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
+    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_search_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
             item { OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(), leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_recherche)) }, singleLine = true) }
             item { Text(stringResource(R.string.clients_flow_filters), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
@@ -1296,9 +1298,9 @@ private fun ClientStringPicker(label: Int, choices: List<Pair<String, String>>, 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientDeactivateScreen(client: ClientEntity, outstanding: Double, devise: String, onBack: () -> Unit, onConfirm: () -> Unit) {
-    Scaffold(containerColor = com.missa.b360.ui.theme.Red80, topBar = { CenterAlignedTopAppBar(title = { ClientPageTitle(stringResource(R.string.clients_flow_deactivate_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }, bottomBar = { Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth().padding(15.dp).height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientRed)) { Icon(painterResource(Iv.Cancel), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_desactiver)) } }) { padding ->
+    Scaffold(containerColor = com.missa.b360.ui.theme.Red80, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_deactivate_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }, bottomBar = { Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth().padding(15.dp).height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientRed)) { Icon(painterResource(Iv.Cancel), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_desactiver)) } }) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Surface(modifier = Modifier.size(76.dp), shape = CircleShape, color = ClientRed.copy(alpha = .12f)) { Icon(painterResource(Iv.PersonOutline), null, tint = ClientRed, modifier = Modifier.padding(18.dp)) }
+            Surface(modifier = Modifier.size(76.dp), shape = CircleShape, color = ClientRed.copy(alpha = .12f)) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(18.dp)) }
             Spacer(Modifier.height(16.dp)); Text(stringResource(R.string.clients_flow_deactivate_question), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 16.sp); Spacer(Modifier.height(7.dp)); Text(stringResource(R.string.clients_flow_deactivate_description, client.nom), color = ClientMuted, fontSize = 11.sp, textAlign = TextAlign.Center)
             if (outstanding > 0) { Spacer(Modifier.height(12.dp)); Surface(shape = RoundedCornerShape(8.dp), color = ClientRed.copy(alpha = .08f), border = BorderStroke(1.dp, ClientRed.copy(alpha = .4f))) { Text(stringResource(R.string.clients_flow_deactivate_due, clientMoney(outstanding, devise)), color = ClientRed, fontSize = 10.sp, modifier = Modifier.padding(11.dp), textAlign = TextAlign.Center) } }
             Spacer(Modifier.height(16.dp)); Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) { Text(stringResource(R.string.clients_flow_consequences), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 11.sp); Text(stringResource(R.string.clients_flow_consequence_1), color = ClientMuted, fontSize = 10.sp); Text(stringResource(R.string.clients_flow_consequence_2), color = ClientMuted, fontSize = 10.sp) } }

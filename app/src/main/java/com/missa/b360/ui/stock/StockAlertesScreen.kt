@@ -48,7 +48,7 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
     val filtre by vm.filtre.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_alertes_titre), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_alertes_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),

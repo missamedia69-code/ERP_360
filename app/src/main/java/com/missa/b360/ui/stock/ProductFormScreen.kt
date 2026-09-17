@@ -176,6 +176,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
         MissaTopAppBar(
             title = stringResource(if (productId == null) R.string.st_nouvel_article else R.string.st_modifier),
             onBack = onBack,
+            couleurFond = AppModule.STOCK.couleurPale,
         )
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
@@ -203,7 +204,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            Icon(painterResource(type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(28.dp))
+                            Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(28.dp))
                         }
                     }
                     Spacer(Modifier.width(12.dp))
@@ -411,7 +412,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
             Icon(
                 painterResource(type.icone()),
                 null,
-                tint = if (actif) AppModule.STOCK.couleur else MissaMuted,
+                tint = if (actif) MissaInk else MissaMuted,
                 modifier = Modifier.size(20.dp),
             )
             Spacer(Modifier.height(4.dp))
@@ -419,7 +420,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
                 text = stringResource(type.libelleTypeRes()),
                 fontSize = 9.5.sp,
                 fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
-                color = if (actif) AppModule.STOCK.couleur else MissaMuted,
+                color = if (actif) MissaInk else MissaMuted,
                 textAlign = TextAlign.Center,
             )
         }

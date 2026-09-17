@@ -64,6 +64,7 @@ fun StockScreen(
             MissaTopAppBar(
                 title = stringResource(etat.type?.libelleCatRes() ?: R.string.module_stock),
                 onBack = onBack,
+                couleurFond = AppModule.STOCK.couleurPale,
             )
             Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                 Spacer(Modifier.height(8.dp))
@@ -148,7 +149,7 @@ private fun CarteArticle(ligne: ProductWithStock, devise: String, onClick: () ->
         Row(verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(painterResource(ligne.product.type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(ligne.product.type.icone()), null, tint = MissaInk, modifier = Modifier.size(21.dp))
                 }
             }
             ProduitImage(photoPath = ligne.product.photoPath)

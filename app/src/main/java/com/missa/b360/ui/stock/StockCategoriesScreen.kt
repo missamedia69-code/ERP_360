@@ -43,7 +43,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
     val etat by vm.etat.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_categories_titre), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_categories_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
         ) {
@@ -54,7 +54,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                                Icon(painterResource(type.icone()), null, tint = AppModule.STOCK.couleur, modifier = Modifier.size(19.dp))
+                                Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(19.dp))
                             }
                         }
                         Spacer(Modifier.width(11.dp))
@@ -81,7 +81,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                         Icon(
                             painterResource(StockIv.ChevronRight),
                             null,
-                            tint = MissaMuted,
+                            tint = MissaInk,
                             modifier = Modifier.size(16.dp),
                         )
                     }
