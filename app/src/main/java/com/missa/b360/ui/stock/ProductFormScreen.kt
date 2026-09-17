@@ -75,7 +75,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     var supprimerImage by remember { mutableStateOf(false) }
     var aUneImage by remember { mutableStateOf(false) }
     var apercu by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
-    val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let {
             imageUri = it.toString()
             supprimerImage = false
@@ -117,7 +117,12 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
             )
             imageTemp = temp
             if (temp == null) {
-                Toast.makeText(contexte, texteImageEchec, Toast.LENGTH_SHORT).show()
+                val cause = com.missa.b360.core.util.ImageProduit.derniereErreur
+                Toast.makeText(
+                    contexte,
+                    if (cause == null) texteImageEchec else "$texteImageEchec ($cause)",
+                    Toast.LENGTH_LONG,
+                ).show()
             } else {
                 apercu = android.graphics.BitmapFactory.decodeFile(temp)
             }
@@ -202,7 +207,13 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Button(
-                            onClick = { pickImage.launch("image/*") },
+                            onClick = {
+                                pickImage.launch(
+                                    androidx.activity.result.PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly,
+                                    ),
+                                )
+                            },
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),

@@ -23,6 +23,11 @@ object ImageProduit {
     private const val TAILLE_MAX = 512
     private const val QUALITE = 70
 
+    /** Dernière cause d'échec (pour diagnostic affiché à l'utilisateur). */
+    @Volatile
+    var derniereErreur: String? = null
+        private set
+
     fun fichier(context: Context, produitId: Long): File =
         File(context.filesDir, "produits/$produitId.jpg")
 
@@ -113,6 +118,9 @@ object ImageProduit {
             }
             bitmap.recycle()
             temp.absolutePath
+        }.onFailure { e ->
+            derniereErreur = e.javaClass.simpleName + ": " + e.message
+            android.util.Log.e("ImageProduit", "enregistrerTemp échoué pour $uri", e)
         }.getOrNull()
     }
 
@@ -132,16 +140,29 @@ object ImageProduit {
 
     private fun decoderBitmap(context: Context, uri: Uri): Bitmap? {
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        context.contentResolver.openInputStream(uri)?.use {
-            BitmapFactory.decodeStream(it, null, options)
-        } ?: return null
+        val fluxBounds = context.contentResolver.openInputStream(uri)
+        if (fluxBounds == null) {
+            derniereErreur = "openInputStream: null ($uri)"
+            return null
+        }
+        fluxBounds.use { BitmapFactory.decodeStream(it, null, options) }
         var echantillon = 1
         while (maxOf(options.outWidth, options.outHeight) / (echantillon * 2) >= TAILLE_MAX) {
             echantillon *= 2
         }
-        val source = context.contentResolver.openInputStream(uri)?.use {
+        var source = context.contentResolver.openInputStream(uri)?.use {
             BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = echantillon })
-        } ?: return null
+        }
+        if (source == null) {
+            // Repli : décodage direct, sans bornes ni échantillonnage.
+            source = context.contentResolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it, null, null)
+            }
+        }
+        if (source == null) {
+            derniereErreur = "decodeStream: null (${options.outWidth}x${options.outHeight}, uri=$uri)"
+            return null
+        }
         val plusGrand = maxOf(source.width, source.height)
         if (plusGrand <= TAILLE_MAX) return source
         val ratio = TAILLE_MAX.toFloat() / plusGrand
