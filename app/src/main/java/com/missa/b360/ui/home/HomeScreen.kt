@@ -172,7 +172,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.FOURNISSEUR,
         labelRes = R.string.home_plus_fournisseur,
-        icon = Iv.Business,
+        icon = Iv.Handshake,
         tint = ProfileOrange,
         bg = HomeOrangeSoft,
         route = AppModule.FOURNISSEURS.createRoute(),
@@ -649,7 +649,7 @@ private fun HomeDashboard(
                         valeur = formatMontantSansDecimales(state.tresorerie, currency),
                         sousTitre = stringResource(R.string.home_solde_disponible),
                         tendance = state.tendanceTresorerie,
-                        icon = Iv.Payments,
+                        icon = Iv.Bank,
                         iconBg = HomeOrangeSoft,
                         iconTint = ProfileOrange,
                         illustrationRes = R.drawable.illustration_tresorerie,
@@ -902,7 +902,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(Iv.History), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
+                        Icon(painter = painterResource(Iv.Calendar), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
@@ -947,7 +947,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Iv.Payments,
+                    icon = Iv.Percent,
                     iconTint = ProfilePurple,
                     iconBg = HomePurpleSoft,
                     titre = stringResource(R.string.home_marge_brute_label),
@@ -1378,7 +1378,7 @@ internal fun MissaBusinessDrawer(
             DrawerMenuItem(Iv.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {
                 onNavigate(Routes.ADMIN_REGLAGES)
             }
-            DrawerMenuItem(Iv.People, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
+            DrawerMenuItem(Iv.UserGear, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
                 onNavigate(Routes.ADMIN_UTILISATEURS)
             }
             DrawerMenuItem(Iv.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {

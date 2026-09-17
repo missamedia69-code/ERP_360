@@ -94,4 +94,7 @@ object Iv {
     val QualityBadge = R.drawable.ph_seal_check
     val HammerWrench = R.drawable.ph_hammer
     val Warehouse = R.drawable.ph_warehouse
+    val UserGear = R.drawable.ph_user_gear
+    val Calendar = R.drawable.ph_calendar_blank
+    val UploadSimple = R.drawable.ph_upload_simple
 }

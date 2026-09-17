@@ -533,7 +533,7 @@ private fun ClientListScreen(
                         Icon(painterResource(Iv.Add), null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.clients_nouveau), fontSize = 11.sp)
                     }
                     OutlinedButton(onClick = onImport, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(7.dp)) {
-                        Icon(painterResource(Iv.Download), null, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.clients_flow_import), fontSize = 11.sp)
+                        Icon(painterResource(Iv.UploadSimple), null, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.clients_flow_import), fontSize = 11.sp)
                     }
                 }
             }
