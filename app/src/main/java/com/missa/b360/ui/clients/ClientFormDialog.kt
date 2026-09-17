@@ -176,7 +176,7 @@ fun ClientFormDialog(
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
                                 Icon(
-                                    painter = painterResource(Iv.ArrowBack,
+                                    painter = painterResource(Iv.ArrowBack),
                                     contentDescription = stringResource(R.string.ob_retour),
                                 )
                             }

@@ -135,7 +135,7 @@ fun StockScreen(
             containerColor = Green60,
             contentColor = Color.White,
         ) {
-            Icon(painterResource(StockIv.Add, contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
+            Icon(painterResource(StockIv.Add), contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -193,7 +193,7 @@ fun BadgeNiveau(ligne: ProductWithStock) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (texteRes == R.string.st_stock_faible) {
-                Icon(painterResource(StockIv.Star, null, tint = teinte, modifier = Modifier.size(10.dp))
+                Icon(painterResource(StockIv.Star), null, tint = teinte, modifier = Modifier.size(10.dp))
                 Spacer(Modifier.width(3.dp))
             }
             Text(stringResource(texteRes), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = teinte)

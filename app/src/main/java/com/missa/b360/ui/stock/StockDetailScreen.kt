@@ -159,7 +159,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
-                        Icon(painterResource(StockIv.Edit, null, modifier = Modifier.size(15.dp))
+                        Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(stringResource(R.string.st_modifier), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
@@ -189,7 +189,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                 ) {
-                    Icon(painterResource(StockIv.Edit, null, modifier = Modifier.size(16.dp))
+                    Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(7.dp))
                     Text(stringResource(R.string.st_modifier), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }

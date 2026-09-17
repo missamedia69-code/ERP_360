@@ -335,7 +335,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            painter = painterResource(Iv.Info,
+                            painter = painterResource(Iv.Info),
                             contentDescription = null,
                             tint = BrandBlue,
                             modifier = Modifier.size(15.dp),
@@ -413,7 +413,7 @@ private fun OnbModulePastille(module: ModuleCode) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(Iv.Lock,
+                painter = painterResource(Iv.Lock),
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(11.dp),
@@ -544,7 +544,7 @@ internal fun OnbProfilCarte(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            painter = painterResource(Iv.Info,
+                            painter = painterResource(Iv.Info),
                             contentDescription = stringResource(R.string.obn_profil_info),
                             tint = if (selected) Color.White else BrandBlue,
                             modifier = Modifier.size(16.dp),

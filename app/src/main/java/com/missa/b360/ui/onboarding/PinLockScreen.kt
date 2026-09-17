@@ -238,7 +238,7 @@ private fun Keypad(
         }
         KeypadTouche(actif = interactionActive && saisie.isNotEmpty(), onClick = onErase) {
             Icon(
-                painter = painterResource(Iv.Backspace,
+                painter = painterResource(Iv.Backspace),
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.size(20.dp),

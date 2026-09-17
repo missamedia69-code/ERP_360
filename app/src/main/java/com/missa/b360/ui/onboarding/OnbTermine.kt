@@ -96,7 +96,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        painter = painterResource(Iv.Check,
+                        painter = painterResource(Iv.Check),
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(30.dp),
@@ -140,7 +140,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                 )
                 Spacer(Modifier.size(8.dp))
                 Icon(
-                    painter = painterResource(Iv.ArrowForward,
+                    painter = painterResource(Iv.ArrowForward),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(17.dp),
@@ -335,7 +335,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                 if (coordonneesManquantes) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            painter = painterResource(Iv.Warning,
+                            painter = painterResource(Iv.Warning),
                             contentDescription = null,
                             tint = Red40,
                             modifier = Modifier.size(13.dp),

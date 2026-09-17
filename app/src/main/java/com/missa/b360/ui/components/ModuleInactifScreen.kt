@@ -58,7 +58,7 @@ fun ModuleInactifScreen(
             color = MissaSoftBlue,
         ) {
             Icon(
-                painter = painterResource(Iv.Lock,
+                painter = painterResource(Iv.Lock),
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier

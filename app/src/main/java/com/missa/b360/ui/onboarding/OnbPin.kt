@@ -91,7 +91,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
             ) {
                 Icon(
-                    painter = painterResource(Iv.Lock,
+                    painter = painterResource(Iv.Lock),
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(14.dp),
@@ -130,7 +130,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                         enabled = !viewModel.enregistrementEnCours,
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(Iv.Person,
+                                painter = painterResource(Iv.Person),
                                 contentDescription = null,
                                 tint = BrandBlue,
                                 modifier = Modifier.size(18.dp),
@@ -150,7 +150,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(Iv.Email,
+                                painter = painterResource(Iv.Email),
                                 contentDescription = null,
                                 tint = if (emailInvalide) Red40 else BrandBlue,
                                 modifier = Modifier.size(18.dp),
@@ -237,7 +237,7 @@ private fun OnbPinPave(viewModel: OnboardingViewModel) {
             AnimatedVisibility(visible = !premiereSaisie) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(Iv.CheckCircle,
+                        painter = painterResource(Iv.CheckCircle),
                         contentDescription = null,
                         tint = ProfileGreen,
                         modifier = Modifier.size(13.dp),
@@ -255,7 +255,7 @@ private fun OnbPinPave(viewModel: OnboardingViewModel) {
                 Spacer(Modifier.height(4.dp))
                 TextButton(onClick = viewModel::reinitialiserPin) {
                     Icon(
-                        painter = painterResource(Iv.Restore,
+                        painter = painterResource(Iv.Restore),
                         contentDescription = null,
                         modifier = Modifier.size(15.dp),
                     )
@@ -319,7 +319,7 @@ private fun OnbPinTouches(
                     .semantics { contentDescription = effacerDescription },
             ) {
                 Icon(
-                    painter = painterResource(Iv.Backspace,
+                    painter = painterResource(Iv.Backspace),
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(19.dp),
@@ -361,7 +361,7 @@ private fun OnbPinBandeau(texteRes: Int, couleur: Color) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(Iv.CheckCircle,
+                painter = painterResource(Iv.CheckCircle),
                 contentDescription = null,
                 tint = couleur,
                 modifier = Modifier.size(20.dp),

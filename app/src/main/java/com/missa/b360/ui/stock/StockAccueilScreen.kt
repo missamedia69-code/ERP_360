@@ -70,7 +70,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Inventory2), null, tint = Green60, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -99,7 +99,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         }
                     }
                 }
-                Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(18.dp))
             }
         }
 
@@ -167,7 +167,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     }
                     Text(fmtValeur(cat.valeur, etat.devise), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MissaMuted)
                     Spacer(Modifier.width(4.dp))
-                    Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(16.dp))
+                    Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(16.dp))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -178,7 +178,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Inventory2), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))
@@ -186,7 +186,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
                 }
-                Icon(painterResource(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             }
         }
 

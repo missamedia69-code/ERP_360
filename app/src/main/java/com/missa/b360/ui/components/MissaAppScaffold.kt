@@ -176,7 +176,7 @@ fun MissaAppHeader(
                 ) {
                     Box {
                         Icon(
-                            painter = painterResource(Iv.Notifications,
+                            painter = painterResource(Iv.Notifications),
                             contentDescription = stringResource(R.string.notifications),
                             tint = MissaInk,
                             modifier = Modifier.size(24.dp),
@@ -215,7 +215,7 @@ fun MissaAppHeader(
                         )
                     } else {
                         Icon(
-                            painter = painterResource(Iv.Store,
+                            painter = painterResource(Iv.Store),
                             contentDescription = stringResource(R.string.home_company_active),
                             tint = TendrePositive,
                             modifier = Modifier.size(24.dp),

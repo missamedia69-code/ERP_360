@@ -69,7 +69,7 @@ fun InventoryScreen(onBack: () -> Unit) {
             ) {
                 Surface(shape = RoundedCornerShape(20.dp), color = Blue90, modifier = Modifier.size(64.dp)) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Unarchive, null, tint = BrandBlue, modifier = Modifier.size(30.dp))
+                        Icon(painterResource(StockIv.Unarchive), null, tint = BrandBlue, modifier = Modifier.size(30.dp))
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -92,7 +92,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(shape = RoundedCornerShape(12.dp), color = Green90, modifier = Modifier.size(42.dp)) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(painterResource(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
+                                Icon(painterResource(StockIv.Inventory2), null, tint = Green60, modifier = Modifier.size(20.dp))
                             }
                         }
                         Spacer(Modifier.width(11.dp))

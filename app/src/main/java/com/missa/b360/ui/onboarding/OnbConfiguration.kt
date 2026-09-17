@@ -256,7 +256,7 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painter = painterResource(Iv.Restore,
+                    painter = painterResource(Iv.Restore),
                     contentDescription = null,
                     tint = BrandBlue,
                     modifier = Modifier.size(18.dp),

@@ -360,7 +360,7 @@ private fun HomeHeader(
                     // Hamburger — zone tactile 48x48, icône 24dp
                     IconButton(onClick = onMenuClick, modifier = Modifier.size(48.dp)) {
                         Icon(
-                            painter = painterResource(Iv.Menu,
+                            painter = painterResource(Iv.Menu),
                             contentDescription = stringResource(R.string.drawer_admin),
                             tint = HomeTextDark,
                             modifier = Modifier.size(24.dp),
@@ -423,7 +423,7 @@ private fun HomeHeader(
                             },
                         ) {
                             Icon(
-                                painter = painterResource(Iv.Notifications,
+                                painter = painterResource(Iv.Notifications),
                                 contentDescription = stringResource(R.string.notifications),
                                 tint = HomeTextDark,
                                 modifier = Modifier.size(24.dp),
@@ -454,7 +454,7 @@ private fun HomeHeader(
                         } else {
                             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Green90)) {
                                 Icon(
-                                    painter = painterResource(Iv.Store,
+                                    painter = painterResource(Iv.Store),
                                     contentDescription = stringResource(R.string.home_company_active),
                                     tint = TendrePositive,
                                     modifier = Modifier.size(20.dp),
@@ -551,7 +551,7 @@ private fun HomeDashboard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(Iv.Business,
+                        painter = painterResource(Iv.Business),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -579,7 +579,7 @@ private fun HomeDashboard(
                     Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(HomeBorder))
                     Spacer(Modifier.width(10.dp))
                     Icon(
-                        painter = painterResource(Iv.Groups,
+                        painter = painterResource(Iv.Groups),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -605,7 +605,7 @@ private fun HomeDashboard(
                         modifier = Modifier.weight(1f),
                     )
                     Icon(
-                        painter = painterResource(Iv.ChevronRight,
+                        painter = painterResource(Iv.ChevronRight),
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -696,7 +696,7 @@ private fun HomeDashboard(
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
-                            painter = painterResource(Iv.Settings,
+                            painter = painterResource(Iv.Settings),
                             contentDescription = null,
                             tint = HomeBlue,
                             modifier = Modifier.size(16.dp),
@@ -902,11 +902,11 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(painter = painterResource(Iv.History, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
+                        Icon(painter = painterResource(Iv.History), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
-                        Icon(painter = painterResource(Iv.ArrowDropDown, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
+                        Icon(painter = painterResource(Iv.ArrowDropDown), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -1138,7 +1138,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = if (hasAlert) HomeBackground else HomeBackground) {
-                Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Notifications, contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
+                Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Notifications), contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
             }
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -1180,7 +1180,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                     }
                 }
             }
-            Icon(painter = painterResource(Iv.ChevronRight, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
+            Icon(painter = painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -1197,7 +1197,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(26.dp), shape = RoundedCornerShape(7.dp), color = HomeBlueSoft) {
-                    Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Checklist, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
+                    Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Checklist), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(text = stringResource(R.string.home_taches_du_jour), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -1217,7 +1217,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = stringResource(R.string.home_voir_toutes_taches), color = HomeBlue, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                Icon(painter = painterResource(Iv.ChevronRight, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
+                Icon(painter = painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -1316,7 +1316,7 @@ internal fun MissaBusinessDrawer(
                 }
                 IconButton(onClick = onClose, modifier = Modifier.size(38.dp)) {
                     Icon(
-                        painter = painterResource(Iv.Close,
+                        painter = painterResource(Iv.Close),
                         contentDescription = stringResource(R.string.home_close),
                         tint = HomeTextMuted,
                     )
@@ -1365,7 +1365,7 @@ internal fun MissaBusinessDrawer(
                         )
                     }
                     Icon(
-                        painter = painterResource(Iv.ChevronRight,
+                        painter = painterResource(Iv.ChevronRight),
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -1412,7 +1412,7 @@ internal fun MissaBusinessDrawer(
                             color = HomeGreenSoft,
                         ) {
                             Icon(
-                                painter = painterResource(Iv.CloudDone,
+                                painter = painterResource(Iv.CloudDone),
                                 contentDescription = null,
                                 tint = TendrePositive,
                                 modifier = Modifier.padding(7.dp),

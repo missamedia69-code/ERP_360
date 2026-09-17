@@ -514,7 +514,7 @@ private fun OnbPackPays(
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painter = painterResource(Iv.Public,
+                    painter = painterResource(Iv.Public),
                     contentDescription = null,
                     tint = BrandBlue,
                     modifier = Modifier.size(16.dp),
@@ -801,7 +801,7 @@ private fun OnbLogoSection(
                     color = BrandBlue.copy(alpha = 0.025f),
                 ) {
                     Icon(
-                        painter = painterResource(Iv.Backup,
+                        painter = painterResource(Iv.Backup),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.padding(16.dp),
@@ -858,7 +858,7 @@ private fun OnbLogoSection(
             if (logoUri != null) {
                 IconButton(onClick = onLogoCleared, enabled = enabled) {
                     Icon(
-                        painter = painterResource(Iv.DeleteOutline,
+                        painter = painterResource(Iv.DeleteOutline),
                         contentDescription = stringResource(R.string.ob_logo_supprimer),
                         tint = Red40,
                         modifier = Modifier.size(19.dp),

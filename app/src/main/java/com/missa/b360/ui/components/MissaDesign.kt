@@ -121,7 +121,7 @@ fun MissaTopAppBar(
             if (onBack != null) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(
-                        painter = painterResource(Iv.ArrowBack,
+                        painter = painterResource(Iv.ArrowBack),
                         contentDescription = null,
                         tint = MissaInk,
                         modifier = Modifier.size(24.dp),

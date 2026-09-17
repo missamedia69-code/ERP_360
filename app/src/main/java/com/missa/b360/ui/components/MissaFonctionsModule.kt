@@ -109,7 +109,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                painter = painterResource(Iv.CheckCircle,
+                painter = painterResource(Iv.CheckCircle),
                 contentDescription = null,
                 tint = ProfileGreen,
                 modifier = Modifier.size(16.dp),
@@ -124,7 +124,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
             Icon(
-                painter = painterResource(Iv.ArrowForwardIos,
+                painter = painterResource(Iv.ArrowForwardIos),
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.size(12.dp),

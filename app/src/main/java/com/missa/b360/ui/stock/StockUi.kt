@@ -227,7 +227,7 @@ fun StockSearchField(valeur: String, onValeur: (String) -> Unit, placeholderRes:
         onValueChange = onValeur,
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(stringResource(placeholderRes), fontSize = 12.sp, color = MissaMuted) },
-        leadingIcon = { Icon(painterResource(StockIv.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
+        leadingIcon = { Icon(painterResource(StockIv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
     )
@@ -322,7 +322,7 @@ fun DropdownChamp(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
-                Icon(painterResource(StockIv.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(painterResource(StockIv.ExpandMore), null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             },
         )
         Box(

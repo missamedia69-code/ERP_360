@@ -127,7 +127,7 @@ fun MissaSelecteurLigne(
             }
         }
         Icon(
-            painter = painterResource(Iv.ArrowDropDown,
+            painter = painterResource(Iv.ArrowDropDown),
             contentDescription = null,
             tint = MissaMuted,
             modifier = Modifier.size(18.dp),
@@ -232,7 +232,7 @@ fun MissaSelecteurBleu(
                 }
             }
             Icon(
-                painter = painterResource(Iv.ArrowDropDown,
+                painter = painterResource(Iv.ArrowDropDown),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(22.dp),
@@ -392,7 +392,7 @@ private fun MissaOptionLigne(
         }
         if (actif) {
             Icon(
-                painter = painterResource(Iv.Check,
+                painter = painterResource(Iv.Check),
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(18.dp),

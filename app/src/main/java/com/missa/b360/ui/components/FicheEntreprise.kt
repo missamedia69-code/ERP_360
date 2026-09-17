@@ -327,7 +327,7 @@ fun FicheEntrepriseDialog(
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
                         Icon(
-                            painter = painterResource(Iv.Close,
+                            painter = painterResource(Iv.Close),
                             contentDescription = null,
                             tint = MissaMuted,
                             modifier = Modifier.size(22.dp),
@@ -361,7 +361,7 @@ fun FicheEntrepriseDialog(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Icon(
-                            painter = painterResource(Iv.ContentCopy,
+                            painter = painterResource(Iv.ContentCopy),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
@@ -380,7 +380,7 @@ fun FicheEntrepriseDialog(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Icon(
-                            painter = painterResource(Iv.Share,
+                            painter = painterResource(Iv.Share),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
@@ -400,7 +400,7 @@ fun FicheEntrepriseDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Icon(
-                            painter = painterResource(Iv.PictureAsPdf,
+                            painter = painterResource(Iv.PictureAsPdf),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
