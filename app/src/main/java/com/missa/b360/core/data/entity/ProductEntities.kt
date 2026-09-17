@@ -16,6 +16,14 @@ enum class ProductType {
     COMPOSE,
     /** Consommable non revendable. */
     CONNOMMABLE,
+    /** Pièce détachée destinée à la maintenance. */
+    PIECE_MAINTENANCE,
+    /** Immobilisation suivie (n° série, garantie, statut de service). */
+    EQUIPEMENT,
+    /** Matériel / outillage de l'entreprise. */
+    MATERIEL,
+    /** Tout autre bien non couvert ci-dessus. */
+    AUTRE_BIEN,
 }
 
 /** Statut produit — « Désactivé » unique ; jamais de suppression physique (C7). */

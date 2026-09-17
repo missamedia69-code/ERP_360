@@ -94,6 +94,10 @@ import com.missa.b360.ui.stock.InventoryScreen
 import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockAccueilScreen
+import com.missa.b360.ui.stock.StockAlertesScreen
+import com.missa.b360.ui.stock.StockCategoriesScreen
+import com.missa.b360.ui.stock.StockDetailScreen
+import com.missa.b360.ui.stock.StockMouvementsScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
 import com.missa.b360.ui.screens.SplashVideoScreen
@@ -313,6 +317,51 @@ private fun MainNavHost() {
                     onBack = { navController.popBackStack() },
                     onNavigate = { route -> navController.navigate(route) },
                     initialMovement = null,
+                )
+            }
+        }
+
+        composable(Routes.STOCK_CATEGORIES) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockCategoriesScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.naviguerVers(route) },
+                )
+            }
+        }
+        composable(
+            route = "${Routes.STOCK_LISTE}?type={type}",
+            arguments = listOf(navArgument("type") { type = NavType.StringType; nullable = true; defaultValue = null }),
+        ) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                    initialMovement = null,
+                )
+            }
+        }
+        composable(
+            route = Routes.STOCK_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.LongType }),
+        ) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
+        }
+        composable(Routes.STOCK_MOUVEMENTS) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockMouvementsScreen(onBack = { navController.popBackStack() })
+            }
+        }
+        composable(Routes.STOCK_ALERTES) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockAlertesScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.naviguerVers(route) },
                 )
             }
         }

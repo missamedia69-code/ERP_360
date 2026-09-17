@@ -15,6 +15,14 @@ object Routes {
     const val STOCK_MOVEMENT_FORM = "stock_movement_form"
     const val STOCK_TRANSFER_FORM = "stock_transfer_form"
     const val STOCK_INVENTORY = "stock_inventory"
+    const val STOCK_CATEGORIES = "stock_categories"
+    const val STOCK_LISTE = "stock_liste"
+    const val STOCK_DETAIL = "stock_detail/{id}"
+    const val STOCK_MOUVEMENTS = "stock_mouvements"
+    const val STOCK_ALERTES = "stock_alertes"
+
+    fun stockListe(type: String?): String = STOCK_LISTE + (type?.let { "?type=$it" } ?: "")
+    fun stockDetail(id: Long): String = "stock_detail/$id"
     const val OPERATION_FORM = "operation_form"
 
     // Module Vente — retour de vente et avoir (spec §22)
