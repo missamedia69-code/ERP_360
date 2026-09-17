@@ -63,13 +63,13 @@ enum class AppModule(
     REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP, couleur = Color(0xFF0E7490)), 
     ;
 
-    /** Fond doux dérivé de [couleur] pour les pastilles et vignettes. */
+    /** Fond vif dérivé de [couleur] pour les pastilles et vignettes. */
     val couleurDouce: Color
-        get() = couleur.copy(alpha = 0.12f)
+        get() = couleur.copy(alpha = 0.26f)
 
-    /** Fond pâle opaque (teinte du module fondue dans le blanc) : headers et barre du bas. */
+    /** Fond vif opaque (teinte du module fondue dans le blanc) : headers et barre du bas. */
     val couleurPale: Color
-        get() = couleur.copy(alpha = 0.14f).compositeOver(Color.White)
+        get() = couleur.copy(alpha = 0.45f).compositeOver(Color.White)
 
     companion object {
 
