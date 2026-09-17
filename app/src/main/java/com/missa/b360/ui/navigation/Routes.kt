@@ -20,6 +20,7 @@ object Routes {
     const val STOCK_DETAIL = "stock_detail/{id}"
     const val STOCK_MOUVEMENTS = "stock_mouvements"
     const val STOCK_ALERTES = "stock_alertes"
+    const val STOCK_EQUIPEMENTS = "stock_equipements"
 
     fun stockListe(type: String?): String = STOCK_LISTE + (type?.let { "?type=$it" } ?: "")
     fun stockDetail(id: Long): String = "stock_detail/$id"

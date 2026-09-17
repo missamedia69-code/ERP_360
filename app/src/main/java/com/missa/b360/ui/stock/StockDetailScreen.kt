@@ -107,33 +107,91 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
             }
             Spacer(Modifier.height(12.dp))
             var onglet by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
-            StockOnglets(
-                onglets = listOf(
-                    stringResource(R.string.st_tab_general),
-                    stringResource(R.string.st_tab_stock),
-                    stringResource(R.string.st_tab_prix),
-                    stringResource(R.string.st_tab_fournisseur),
-                ),
-                selection = onglet,
-                onSelection = { onglet = it },
-            )
-            Spacer(Modifier.height(12.dp))
-            when (onglet) {
-                0 -> OngletGeneral(etat, produit, categorieNom)
-                1 -> OngletStock(etat, produit)
-                2 -> OngletPrix(etat, produit)
-                else -> OngletFournisseur(etat)
-            }
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
-                modifier = Modifier.fillMaxWidth().height(46.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-            ) {
-                Icon(Icons.Outlined.Edit, null, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(7.dp))
-                Text(stringResource(R.string.st_modifier), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            val equipement by vm.equipement.collectAsStateWithLifecycle()
+            val estEquipement = TYPES_EQUIPEMENTS.contains(produit.type)
+            if (estEquipement) {
+                StockOnglets(
+                    onglets = listOf(
+                        stringResource(R.string.st_tab_general),
+                        stringResource(R.string.st_maintenance),
+                        stringResource(R.string.st_tab_historique),
+                    ),
+                    selection = onglet,
+                    onSelection = { onglet = it },
+                )
+                Spacer(Modifier.height(12.dp))
+                when (onglet) {
+                    0 -> OngletGeneralEquipement(produit, equipement, categorieNom)
+                    1 -> OngletMaintenance(equipement, vm)
+                    else -> {
+                        if (etat.mouvements.isEmpty()) {
+                            Text(stringResource(R.string.st_aucun_resultat), fontSize = 11.5.sp, color = MissaMuted)
+                        } else {
+                            etat.mouvements.take(20).forEach { LigneMouvement(it) ; Spacer(Modifier.height(8.dp)) }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Row {
+                    val enMaint = equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE
+                    Button(
+                        onClick = {
+                            vm.setStatutEquipement(
+                                if (enMaint) com.missa.b360.core.data.entity.StatutEquipement.EN_SERVICE
+                                else com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE,
+                            )
+                        },
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    ) {
+                        Text(
+                            stringResource(if (enMaint) R.string.st_remettre_service else R.string.st_maintenancer),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    ) {
+                        Icon(Icons.Outlined.Edit, null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.st_modifier), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            } else {
+                StockOnglets(
+                    onglets = listOf(
+                        stringResource(R.string.st_tab_general),
+                        stringResource(R.string.st_tab_stock),
+                        stringResource(R.string.st_tab_prix),
+                        stringResource(R.string.st_tab_fournisseur),
+                    ),
+                    selection = onglet,
+                    onSelection = { onglet = it },
+                )
+                Spacer(Modifier.height(12.dp))
+                when (onglet) {
+                    0 -> OngletGeneral(etat, produit, categorieNom)
+                    1 -> OngletStock(etat, produit)
+                    2 -> OngletPrix(etat, produit)
+                    else -> OngletFournisseur(etat)
+                }
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
+                    modifier = Modifier.fillMaxWidth().height(46.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                ) {
+                    Icon(Icons.Outlined.Edit, null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(7.dp))
+                    Text(stringResource(R.string.st_modifier), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
             }
             Spacer(Modifier.height(20.dp))
         }
@@ -223,5 +281,78 @@ private fun OngletFournisseur(etat: StockDetailState) {
     CarteStock {
         LigneInfo(stringResource(R.string.st_fournisseur), f?.nom)
         LigneInfo(stringResource(R.string.st_reference), etat.product?.refFournisseur)
+    }
+}
+
+@Composable
+private fun OngletGeneralEquipement(
+    produit: com.missa.b360.core.data.entity.ProductEntity,
+    equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
+    categorieNom: String?,
+) {
+    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    CarteStock {
+        Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+        Spacer(Modifier.height(6.dp))
+        LigneInfo(stringResource(R.string.st_type), stringResource(produit.type.libelleTypeRes()))
+        LigneInfo(stringResource(R.string.st_marque), produit.marque)
+        LigneInfo(stringResource(R.string.st_modele), equipement?.modele)
+        LigneInfo(stringResource(R.string.st_num_serie), equipement?.numeroSerie)
+        LigneInfo(stringResource(R.string.st_date_acquisition), equipement?.dateAcquisition?.let { fmt.format(java.util.Date(it)) })
+        LigneInfo(stringResource(R.string.st_emplacement), produit.emplacement)
+        LigneInfo(stringResource(R.string.st_responsable), equipement?.responsable)
+        LigneInfo(stringResource(R.string.st_categorie), categorieNom)
+    }
+    Spacer(Modifier.height(10.dp))
+    CarteStock {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.st_garantie), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(4.dp))
+                LigneInfo(stringResource(R.string.st_debut), equipement?.garantieDebut?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_fin), equipement?.garantieFin?.let { fmt.format(java.util.Date(it)) })
+            }
+            val fin = equipement?.garantieFin
+            val valide = fin != null && fin > System.currentTimeMillis()
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (valide) Green90 else com.missa.b360.ui.theme.Red80,
+            ) {
+                Text(
+                    text = stringResource(if (valide) R.string.st_valide else R.string.st_expiree),
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (valide) Green60 else com.missa.b360.ui.theme.Red40,
+                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OngletMaintenance(
+    equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
+    vm: StockDetailViewModel,
+) {
+    CarteStock {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.st_maintenance), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(
+                        when (equipement?.statut) {
+                            com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE -> R.string.st_maintenance
+                            com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE -> R.string.st_hors_service
+                            else -> R.string.st_en_service
+                        },
+                    ),
+                    fontSize = 11.5.sp,
+                    color = MissaMuted,
+                )
+            }
+            BadgeStatutEquipement(equipement)
+        }
     }
 }

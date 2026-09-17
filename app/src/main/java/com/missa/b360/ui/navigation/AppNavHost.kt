@@ -97,6 +97,7 @@ import com.missa.b360.ui.stock.StockAccueilScreen
 import com.missa.b360.ui.stock.StockAlertesScreen
 import com.missa.b360.ui.stock.StockCategoriesScreen
 import com.missa.b360.ui.stock.StockDetailScreen
+import com.missa.b360.ui.stock.StockEquipementsScreen
 import com.missa.b360.ui.stock.StockMouvementsScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
@@ -347,6 +348,14 @@ private fun MainNavHost() {
         ) {
             GuardedModule(AppModule.STOCK, activation, navController) {
                 StockDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
+        }
+        composable(Routes.STOCK_EQUIPEMENTS) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockEquipementsScreen(
                     onBack = { navController.popBackStack() },
                     onNavigate = { route -> navController.navigate(route) },
                 )

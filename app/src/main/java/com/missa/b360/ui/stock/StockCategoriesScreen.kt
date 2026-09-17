@@ -48,7 +48,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
             item { Spacer(Modifier.height(8.dp)) }
             items(ProductType.entries.toList(), key = { it.name }) { type ->
                 val ligne = etat.categories.firstOrNull { it.type == type }
-                CarteStock(onClick = { onNaviguer(Routes.stockListe(type.name)) }) {
+                CarteStock(onClick = { onNaviguer(if (TYPES_EQUIPEMENTS.contains(type)) Routes.STOCK_EQUIPEMENTS else Routes.stockListe(type.name)) }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {

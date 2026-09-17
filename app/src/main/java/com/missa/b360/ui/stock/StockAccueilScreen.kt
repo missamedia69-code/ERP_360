@@ -157,7 +157,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             onAction = { onNaviguer(Routes.STOCK_CATEGORIES) },
         )
         etat.categories.filter { it.nombre > 0 }.take(6).forEach { cat ->
-            CarteStock(onClick = { onNaviguer(Routes.stockListe(cat.type.name)) }) {
+            CarteStock(onClick = { onNaviguer(if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS else Routes.stockListe(cat.type.name)) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = Blue90) {
                         androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {

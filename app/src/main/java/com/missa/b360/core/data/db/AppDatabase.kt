@@ -23,6 +23,7 @@ import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
+import com.missa.b360.core.data.dao.ProductEquipementDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.RoleDao
@@ -61,6 +62,7 @@ import com.missa.b360.core.data.entity.PaymentMethodEntity
 import com.missa.b360.core.data.entity.ProductCategoryEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
+import com.missa.b360.core.data.entity.ProductEquipementEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.RoleEntity
@@ -115,11 +117,12 @@ import com.missa.b360.core.data.entity.UserEntity
         ProductEntity::class,
         ProductStockEntity::class,
         StockMovementEntity::class,
+        ProductEquipementEntity::class,
         EmployeeEntity::class,
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -141,6 +144,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun productStockDao(): ProductStockDao
     abstract fun stockMovementDao(): StockMovementDao
+    abstract fun productEquipementDao(): ProductEquipementDao
     abstract fun employeeDao(): EmployeeDao
     abstract fun absenceDao(): AbsenceDao
     abstract fun taskDao(): TaskDao
@@ -365,6 +369,20 @@ abstract class AppDatabase : RoomDatabase() {
          * vigueur. Les articles reçoivent un rattachement facultatif, ce qui
          * laisse fonctionner les fiches déjà saisies.
          */
+        /** v12 → v13 : extension immobilisation des produits (équipements). */
+        val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_equipements` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, " +
+                        "`modele` TEXT, `numeroSerie` TEXT, `dateAcquisition` INTEGER, " +
+                        "`prixAquisition` REAL, `fournisseurNom` TEXT, `responsable` TEXT, " +
+                        "`garantieDebut` INTEGER, `garantieFin` INTEGER, " +
+                        "`statut` TEXT NOT NULL)",
+                )
+            }
+        }
+
         val MIGRATION_11_12 = object : Migration(11, 12) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(

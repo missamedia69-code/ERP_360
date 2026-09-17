@@ -182,6 +182,7 @@ class StockDetailViewModel @Inject constructor(
     observeMovements: ObserveStockMovementsUseCase,
     fournisseurDao: FournisseurDao,
     getEnterprise: GetEnterpriseUseCase,
+    equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -223,6 +224,18 @@ class StockDetailViewModel @Inject constructor(
     val categorieNom: StateFlow<String?> = productDao.observeById(id)
         .map { p -> p?.categorieId?.let { productDao.getCategorieById(it)?.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** Extension immobilisation (équipements) de l'article, si applicable. */
+    val equipement: StateFlow<com.missa.b360.core.data.entity.ProductEquipementEntity?> =
+        equipementDao.observeById(id)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    private val equipementDao2 = equipementDao
+
+    /** Change le statut de service d'un équipement (maquette 6). */
+    fun setStatutEquipement(statut: com.missa.b360.core.data.entity.StatutEquipement) {
+        viewModelScope.launch { equipementDao2.setStatut(id, statut.name) }
+    }
 }
 
 /** Groupe de mouvements d'une même journée (maquette 7). */
@@ -294,4 +307,57 @@ class StockAlertesViewModel @Inject constructor(
             else -> alertes
         }.sortedBy { it.stock }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+}
+
+/** Équipements (immobilisations) : produits de type équipement/matériel/pièce + statut. */
+@HiltViewModel
+class StockEquipementsViewModel @Inject constructor(
+    observeProducts: ObserveProductsUseCase,
+    equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+) : ViewModel() {
+
+    private val _requete = kotlinx.coroutines.flow.MutableStateFlow("")
+    private val _statut = kotlinx.coroutines.flow.MutableStateFlow(0)
+    val requete: StateFlow<String> = _requete
+    val filtreStatut: StateFlow<Int> = _statut
+    fun chercher(t: String) { _requete.value = t }
+    fun setStatut(s: Int) { _statut.value = s }
+
+    data class LigneEquipement(
+        val product: ProductEntity,
+        val equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
+    )
+
+    data class Etat(
+        val lignes: List<LigneEquipement> = emptyList(),
+        val enService: Int = 0,
+        val maintenance: Int = 0,
+        val horsService: Int = 0,
+    )
+
+    val etat: StateFlow<Etat> = combine(
+        combine(observeProducts(), equipementDao.observeAll()) { produits, eqs ->
+            produits.filter { TYPES_EQUIPEMENTS.contains(it.type) }
+                .map { p -> LigneEquipement(p, eqs.firstOrNull { it.produitId == p.id }) }
+        },
+        _requete,
+        _statut,
+    ) { lignes, requete, statut ->
+        val filtrees = lignes
+            .filter { requete.isBlank() || it.product.nom.contains(requete, ignoreCase = true) }
+            .filter {
+                when (statut) {
+                    1 -> it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.EN_SERVICE
+                    2 -> it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE
+                    3 -> it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE
+                    else -> true
+                }
+            }
+        Etat(
+            lignes = filtrees.sortedBy { it.product.nom },
+            enService = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.EN_SERVICE },
+            maintenance = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE },
+            horsService = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE },
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Etat())
 }

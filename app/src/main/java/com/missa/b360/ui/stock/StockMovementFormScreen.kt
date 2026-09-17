@@ -197,6 +197,12 @@ fun StockMovementFormScreen(
     var quantite by remember { mutableStateOf("") }
     var motif by remember { mutableStateOf("") }
 
+    val texteChampsRequis = stringResource(R.string.st_champs_requis)
+    val texteMouvementOk = stringResource(R.string.st_mouvement_ok)
+    val texteMouvementKo = stringResource(R.string.st_mouvement_ko)
+    val texteEntree = stringResource(R.string.st_mv_entree)
+    val texteSortie = stringResource(R.string.st_mv_sortie)
+
     outcome?.let { o ->
         val ok = when (o) {
             is StockOpsViewModel.MovementOutcome.Result -> o.result is com.missa.b360.core.domain.usecase.StockMovementResult.Succes

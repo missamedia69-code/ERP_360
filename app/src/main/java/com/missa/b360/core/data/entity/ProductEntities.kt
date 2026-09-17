@@ -29,6 +29,29 @@ enum class ProductType {
 /** Statut produit — « Désactivé » unique ; jamais de suppression physique (C7). */
 enum class ProductStatus { ACTIF, DESACTIVE }
 
+/** Statut de service d'une immobilisation (maquette Équipements). */
+enum class StatutEquipement { EN_SERVICE, MAINTENANCE, HORS_SERVICE }
+
+/**
+ * Extension « immobilisation » d'un produit de type équipement / matériel /
+ * pièce de maintenance : n° de série, garantie, statut de service (maquette 6).
+ * Table séparée : aucun produit existant ni migration de colonne nécessaire.
+ */
+@Entity(tableName = "product_equipements")
+data class ProductEquipementEntity(
+    @PrimaryKey val produitId: Long,
+    val modele: String? = null,
+    val numeroSerie: String? = null,
+    /** Epoch millis. */
+    val dateAcquisition: Long? = null,
+    val prixAquisition: Double? = null,
+    val fournisseurNom: String? = null,
+    val responsable: String? = null,
+    val garantieDebut: Long? = null,
+    val garantieFin: Long? = null,
+    val statut: StatutEquipement = StatutEquipement.EN_SERVICE,
+)
+
 /**
  * Catégorie de produit (spec §31) — suppression verrouillée si rattachée
  * à au moins un produit (même règle que les catégories clients).

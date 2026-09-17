@@ -71,6 +71,12 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     var stockSecurite by remember { mutableStateOf("") }
     var stockInitial by remember { mutableStateOf("") }
     var siteId by remember { mutableStateOf<Long?>(null) }
+    var modele by remember { mutableStateOf("") }
+    var numeroSerie by remember { mutableStateOf("") }
+    var dateAcquisition by remember { mutableStateOf("") }
+    var responsable by remember { mutableStateOf("") }
+    var garantieDebut by remember { mutableStateOf("") }
+    var garantieFin by remember { mutableStateOf("") }
     var etape by remember { mutableStateOf(0) }
     var preRempli by remember { mutableStateOf(false) }
 
@@ -140,6 +146,20 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                 Champ(stringResource(R.string.st_marque), marque) { marque = it }
                 Spacer(Modifier.height(10.dp))
                 Champ("${stringResource(R.string.st_unite)} *", unite) { unite = it }
+                if (TYPES_EQUIPEMENTS.contains(type)) {
+                    Spacer(Modifier.height(10.dp))
+                    Champ(stringResource(R.string.st_modele), modele) { modele = it }
+                    Spacer(Modifier.height(10.dp))
+                    Champ(stringResource(R.string.st_num_serie), numeroSerie) { numeroSerie = it }
+                    Spacer(Modifier.height(10.dp))
+                    Champ("${stringResource(R.string.st_date_acquisition)} (jj/mm/aaaa)", dateAcquisition) { dateAcquisition = it }
+                    Spacer(Modifier.height(10.dp))
+                    Champ(stringResource(R.string.st_responsable), responsable) { responsable = it }
+                    Spacer(Modifier.height(10.dp))
+                    Champ("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)} (jj/mm/aaaa)", garantieDebut) { garantieDebut = it }
+                    Spacer(Modifier.height(10.dp))
+                    Champ("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_fin)} (jj/mm/aaaa)", garantieFin) { garantieFin = it }
+                }
                 Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = {
@@ -183,6 +203,21 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                 }
                 Button(
                     onClick = {
+                        val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+                        val parse = { t: String -> runCatching { fmt.parse(t.trim())?.time }.getOrNull() }
+                        val equipement = if (TYPES_EQUIPEMENTS.contains(type)) {
+                            com.missa.b360.core.data.entity.ProductEquipementEntity(
+                                produitId = 0L,
+                                modele = modele.takeIf { it.isNotBlank() },
+                                numeroSerie = numeroSerie.takeIf { it.isNotBlank() },
+                                dateAcquisition = parse(dateAcquisition),
+                                responsable = responsable.takeIf { it.isNotBlank() },
+                                garantieDebut = parse(garantieDebut),
+                                garantieFin = parse(garantieFin),
+                            )
+                        } else {
+                            null
+                        }
                         vm.save(
                             ProductInput(
                                 nom = nom.trim(),
@@ -200,6 +235,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                                 siteId = siteId,
                             ),
                             initialStock = stockInitial.toDoubleOrNull(),
+                            equipement = equipement,
                         )
                     },
                     modifier = Modifier.fillMaxWidth().height(46.dp),

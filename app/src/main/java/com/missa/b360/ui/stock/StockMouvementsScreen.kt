@@ -88,7 +88,7 @@ fun StockMouvementsScreen(onBack: () -> Unit) {
 }
 
 @Composable
-private fun LigneMouvement(mv: StockMovementView) {
+internal fun LigneMouvement(mv: StockMovementView) {
     val estEntree = mv.type == "ENTREE" || mv.type == "TRANSFERT_ENTREE"
     val estTransfert = mv.type == "TRANSFERT_SORTIE" || mv.type == "TRANSFERT_ENTREE"
     val (icone, teinte, fond) = when {

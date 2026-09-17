@@ -121,10 +121,11 @@ class ProductFormViewModel @Inject constructor(
     sites: SiteUseCases,
     fournisseurDao: FournisseurDao,
     observeStock: ObserveProductStockUseCase,
+    private val equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
 ) : ViewModel() {
 
     sealed interface SaveResult {
-        data class Saved(val code: String, val isCreate: Boolean) : SaveResult
+        data class Saved(val code: String, val isCreate: Boolean, val id: Long = 0L) : SaveResult
         data object NomObligatoire : SaveResult
         data object DonneesInvalides : SaveResult
         data object BarcodeExistant : SaveResult
@@ -171,7 +172,11 @@ class ProductFormViewModel @Inject constructor(
         }
     }
 
-    fun save(input: ProductInput, initialStock: Double?) {
+    fun save(
+        input: ProductInput,
+        initialStock: Double?,
+        equipement: com.missa.b360.core.data.entity.ProductEquipementEntity? = null,
+    ) {
         if (_busy.value) return
         val id = _editingId.value
         viewModelScope.launch {
@@ -179,7 +184,10 @@ class ProductFormViewModel @Inject constructor(
             val result = try {
                 if (id == null) {
                     when (val r = createProduct(input, initialStock)) {
-                        is CreateProductUseCase.Result.Succes -> SaveResult.Saved(r.code, true)
+                        is CreateProductUseCase.Result.Succes -> {
+                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = r.productId)) }
+                            SaveResult.Saved(r.code, true, r.productId)
+                        }
                         CreateProductUseCase.Result.NomObligatoire -> SaveResult.NomObligatoire
                         CreateProductUseCase.Result.DonneesInvalides -> SaveResult.DonneesInvalides
                         CreateProductUseCase.Result.BarcodeExistant -> SaveResult.BarcodeExistant
@@ -189,7 +197,10 @@ class ProductFormViewModel @Inject constructor(
                 } else {
                     val success = updateProduct(id, input)
                     when {
-                        success -> SaveResult.Saved(_product.value?.code ?: "", false)
+                        success -> {
+                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = id)) }
+                            SaveResult.Saved(_product.value?.code ?: "", false, id)
+                        }
                         _product.value == null -> SaveResult.Introuvable
                         else -> SaveResult.Error
                     }

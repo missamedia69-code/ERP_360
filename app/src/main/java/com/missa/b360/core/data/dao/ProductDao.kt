@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.missa.b360.core.data.entity.ProductCategoryEntity
+import com.missa.b360.core.data.entity.ProductEquipementEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
@@ -145,3 +146,19 @@ data class StockMovementView(
     val commentaire: String?,
     val horodatage: Long,
 )
+
+/** Extension immobilisation d'un produit (maquette Équipements). */
+@Dao
+interface ProductEquipementDao {
+    @Query("SELECT * FROM product_equipements WHERE produitId = :id LIMIT 1")
+    fun observeById(id: Long): Flow<ProductEquipementEntity?>
+
+    @Query("SELECT * FROM product_equipements")
+    fun observeAll(): Flow<List<ProductEquipementEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(equipement: ProductEquipementEntity)
+
+    @Query("UPDATE product_equipements SET statut = :statut WHERE produitId = :id")
+    suspend fun setStatut(id: Long, statut: String)
+}
