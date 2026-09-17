@@ -154,7 +154,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.ACHAT,
         labelRes = R.string.home_plus_achat,
-        icon = Iv.ShoppingCart,
+        icon = Iv.CartArrowDown,
         tint = TendrePositive,
         bg = Green90,
         route = AppModule.ACHATS.createRoute(),
@@ -635,7 +635,7 @@ private fun HomeDashboard(
                         valeur = formatMontantSansDecimales(state.achats, currency),
                         sousTitre = "${state.achatsCount} achats",
                         tendance = state.tendanceAchats,
-                        icon = Iv.Inventory2,
+                        icon = Iv.CartArrowDown,
                         iconBg = Green90,
                         iconTint = TendrePositive,
                         illustrationRes = R.drawable.illustration_stock,
@@ -925,7 +925,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Iv.ShoppingCart,
+                    icon = Iv.CartArrowDown,
                     iconTint = TendrePositive,
                     iconBg = Green90,
                     titre = stringResource(R.string.home_achats_label),
