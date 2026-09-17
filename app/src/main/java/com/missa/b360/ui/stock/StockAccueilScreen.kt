@@ -70,7 +70,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Inventory2), null, tint = Green60, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.Coins), null, tint = Green60, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -178,7 +178,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Inventory2), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(StockIv.ClipboardText), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))

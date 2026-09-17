@@ -131,7 +131,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                         modifier = Modifier.weight(1f),
                     )
                     StatTile(
-                        icone = StockIv.Unarchive,
+                        icone = StockIv.Warning,
                         teinte = ProfileOrange,
                         fond = Color(0xFFFFF4E5),
                         valeur = etat.ecarts.size.toString(),

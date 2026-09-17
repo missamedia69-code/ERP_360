@@ -21,6 +21,8 @@ object StockIv {
     val ExpandMore = R.drawable.ph_caret_down
     val Factory = R.drawable.ph_factory
     val Inventory2 = R.drawable.ph_package
+    val Coins = R.drawable.ph_coins
+    val ClipboardText = R.drawable.ph_clipboard_text
     val Monitor = R.drawable.ph_monitor
     val Notifications = R.drawable.ph_bell
     val Search = R.drawable.ph_magnifying_glass
