@@ -179,7 +179,7 @@ class ProductFormViewModel @Inject constructor(
         input: ProductInput,
         initialStock: Double?,
         equipement: com.missa.b360.core.data.entity.ProductEquipementEntity? = null,
-        imageUri: String? = null,
+        imageTemp: String? = null,
         supprimerImage: Boolean = false,
     ) {
         if (_busy.value) return
@@ -191,7 +191,7 @@ class ProductFormViewModel @Inject constructor(
                     when (val r = createProduct(input, initialStock)) {
                         is CreateProductUseCase.Result.Succes -> {
                             equipement?.let { e -> equipementDao.upsert(e.copy(produitId = r.productId)) }
-                            appliquerImage(r.productId, imageUri, supprimerImage)
+                            appliquerImage(r.productId, imageTemp, supprimerImage)
                             SaveResult.Saved(r.code, true, r.productId)
                         }
                         CreateProductUseCase.Result.NomObligatoire -> SaveResult.NomObligatoire
@@ -205,7 +205,7 @@ class ProductFormViewModel @Inject constructor(
                     when {
                         success -> {
                             equipement?.let { e -> equipementDao.upsert(e.copy(produitId = id)) }
-                            appliquerImage(id, imageUri, supprimerImage)
+                            appliquerImage(id, imageTemp, supprimerImage)
                             SaveResult.Saved(_product.value?.code ?: "", false, id)
                         }
                         _product.value == null -> SaveResult.Introuvable
@@ -226,13 +226,9 @@ class ProductFormViewModel @Inject constructor(
      * Écrit le JPEG compact dans le stockage interne et persiste son chemin
      * dans `photoPath` (colonne existante, lue par les écrans de détail/liste).
      */
-    private suspend fun appliquerImage(produitId: Long, imageUri: String?, supprimerImage: Boolean) {
-        val chemin = if (imageUri != null) {
-            com.missa.b360.core.util.ImageProduit.enregistrer(
-                contexte,
-                produitId,
-                android.net.Uri.parse(imageUri),
-            )
+    private suspend fun appliquerImage(produitId: Long, imageTemp: String?, supprimerImage: Boolean) {
+        val chemin = if (imageTemp != null) {
+            com.missa.b360.core.util.ImageProduit.promouvoirTemp(contexte, produitId, imageTemp)
         } else if (supprimerImage) {
             com.missa.b360.core.util.ImageProduit.supprimer(contexte, produitId)
             null

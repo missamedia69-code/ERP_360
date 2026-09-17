@@ -1097,5 +1097,6 @@
     <string name="st_ajouter_image">Ajouter une image</string>
     <string name="st_modifier_image">Modifier l\'image</string>
     <string name="st_supprimer_image">Supprimer l\'image</string>
+    <string name="st_image_echec">Image illisible — réessayez avec une autre photo</string>
 </resources>
 <!-- Temp insert will be replaced -->

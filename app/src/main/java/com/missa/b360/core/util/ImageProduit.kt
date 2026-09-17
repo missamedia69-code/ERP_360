@@ -98,6 +98,63 @@ object ImageProduit {
         }.getOrNull()
     }
 
+    /**
+     * Compresse l'image sélectionnée dans un fichier temporaire (cache) —
+     * appelé dès la sélection, avant que l'identifiant produit existe.
+     * @return le chemin temporaire, ou null si l'image est illisible.
+     */
+    suspend fun enregistrerTemp(context: Context, uri: Uri): String? = withContext(Dispatchers.IO) {
+        runCatching {
+            val bitmap = decoderBitmap(context, uri) ?: return@runCatching null
+            val temp = File(context.cacheDir, "images/pending_${System.currentTimeMillis()}.jpg")
+            temp.parentFile?.mkdirs()
+            FileOutputStream(temp).use { sortie ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, QUALITE, sortie)
+            }
+            bitmap.recycle()
+            temp.absolutePath
+        }.getOrNull()
+    }
+
+    /** Déplace un fichier temporaire vers l'emplacement définitif du produit. */
+    suspend fun promouvoirTemp(context: Context, produitId: Long, tempPath: String): String? =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val temp = File(tempPath)
+                if (!temp.exists()) return@runCatching null
+                val destination = fichier(context, produitId)
+                destination.parentFile?.mkdirs()
+                temp.copyTo(destination, overwrite = true)
+                temp.delete()
+                destination.absolutePath
+            }.getOrNull()
+        }
+
+    private fun decoderBitmap(context: Context, uri: Uri): Bitmap? {
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        context.contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, options)
+        } ?: return null
+        var echantillon = 1
+        while (maxOf(options.outWidth, options.outHeight) / (echantillon * 2) >= TAILLE_MAX) {
+            echantillon *= 2
+        }
+        val source = context.contentResolver.openInputStream(uri)?.use {
+            BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = echantillon })
+        } ?: return null
+        val plusGrand = maxOf(source.width, source.height)
+        if (plusGrand <= TAILLE_MAX) return source
+        val ratio = TAILLE_MAX.toFloat() / plusGrand
+        val cible = Bitmap.createScaledBitmap(
+            source,
+            (source.width * ratio).toInt().coerceAtLeast(1),
+            (source.height * ratio).toInt().coerceAtLeast(1),
+            true,
+        )
+        source.recycle()
+        return cible
+    }
+
     suspend fun supprimer(context: Context, produitId: Long) = withContext(Dispatchers.IO) {
         runCatching { fichier(context, produitId).delete() }
     }

@@ -1054,4 +1054,5 @@
     <string name="st_ajouter_image">Add image</string>
     <string name="st_modifier_image">Change image</string>
     <string name="st_supprimer_image">Remove image</string>
+    <string name="st_image_echec">Unreadable image — try another photo</string>
 </resources>

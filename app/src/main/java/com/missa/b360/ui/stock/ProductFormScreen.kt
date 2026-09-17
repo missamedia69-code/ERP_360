@@ -68,7 +68,9 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
     val contexte = LocalContext.current
     val texteChampsRequis = stringResource(R.string.st_champs_requis)
+    val texteImageEchec = stringResource(R.string.st_image_echec)
     var imageUri by remember { mutableStateOf<String?>(null) }
+    var imageTemp by remember { mutableStateOf<String?>(null) }
     var supprimerImage by remember { mutableStateOf(false) }
     var aUneImage by remember { mutableStateOf(false) }
     var apercu by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
@@ -107,10 +109,25 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     }
     val edit by vm.product.collectAsStateWithLifecycle()
     LaunchedEffect(imageUri, edit?.photoPath, supprimerImage) {
-        apercu = imageUri?.let { com.missa.b360.core.util.ImageProduit.decoderUri(contexte, android.net.Uri.parse(it)) }
-        val enEdition = edit
-        if (apercu == null && enEdition?.photoPath != null && !supprimerImage) {
-            apercu = com.missa.b360.core.util.ImageProduit.charger(contexte, enEdition.id)
+        if (imageUri != null) {
+            val temp = com.missa.b360.core.util.ImageProduit.enregistrerTemp(
+                contexte,
+                android.net.Uri.parse(imageUri),
+            )
+            imageTemp = temp
+            if (temp == null) {
+                Toast.makeText(contexte, texteImageEchec, Toast.LENGTH_SHORT).show()
+            } else {
+                apercu = android.graphics.BitmapFactory.decodeFile(temp)
+            }
+        } else {
+            imageTemp = null
+            val enEdition = edit
+            apercu = if (enEdition?.photoPath != null && !supprimerImage) {
+                com.missa.b360.core.util.ImageProduit.charger(contexte, enEdition.id)
+            } else {
+                null
+            }
         }
     }
     LaunchedEffect(edit) {
@@ -321,7 +338,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                             ),
                             initialStock = stockInitial.toDoubleOrNull(),
                             equipement = equipement,
-                            imageUri = imageUri,
+                            imageTemp = imageTemp,
                             supprimerImage = supprimerImage,
                         )
                     },

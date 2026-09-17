@@ -2993,4 +2993,343 @@ object Iv {
             }
         }.build()
     }
+
+    /** cart-arrow-down — Material Design Icons (IconVaultKit). */
+    val CartArrowDown: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvCartArrowDown",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(10f, 0f)
+                lineTo(10f, 4f)
+                lineTo(8f, 4f)
+                lineTo(12f, 8f)
+                lineTo(16f, 4f)
+                lineTo(14f, 4f)
+                lineTo(14f, 0f)
+                lineTo(1f, 2f)
+                lineTo(1f, 4f)
+                lineTo(3f, 4f)
+                lineTo(6.6f, 11.6f)
+                lineTo(5.2f, 14f)
+                curveTo(5.1f, 14.3f, 5f, 14.6f, 5f, 15f)
+                curveTo(5f, 16.1f, 5.9f, 17f, 7f, 17f)
+                lineTo(19f, 17f)
+                lineTo(19f, 15f)
+                lineTo(7.4f, 15f)
+                curveTo(7.3f, 15f, 7.2f, 14.9f, 7.2f, 14.8f)
+                lineTo(7.2f, 14.7f)
+                lineTo(8.1f, 13f)
+                lineTo(15.5f, 13f)
+                curveTo(16.2f, 13f, 16.9f, 12.6f, 17.2f, 12f)
+                lineTo(21.1f, 5f)
+                lineTo(19.4f, 4f)
+                lineTo(15.5f, 11f)
+                lineTo(8.5f, 11f)
+                lineTo(4.3f, 2f)
+                lineTo(7f, 18f)
+                curveTo(5.9f, 18f, 5f, 18.9f, 5f, 20f)
+                curveTo(5f, 21.1f, 5.9f, 22f, 7f, 22f)
+                curveTo(8.1f, 22f, 9f, 21.1f, 9f, 20f)
+                curveTo(9f, 18.9f, 8.1f, 18f, 7f, 18f)
+                lineTo(17f, 18f)
+                curveTo(15.9f, 18f, 15f, 18.9f, 15f, 20f)
+                curveTo(15f, 21.1f, 15.9f, 22f, 17f, 22f)
+                curveTo(18.1f, 22f, 19f, 21.1f, 19f, 20f)
+                curveTo(19f, 18.9f, 18.1f, 18f, 17f, 18f)
+            }
+        }.build()
+    }
+
+    /** calculator-variant-outline — Material Design Icons (IconVaultKit). */
+    val Calculator: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvCalculator",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(19f, 3f)
+                lineTo(5f, 3f)
+                curveTo(3.9f, 3f, 3f, 3.9f, 3f, 5f)
+                lineTo(3f, 19f)
+                curveTo(3f, 20.1f, 3.9f, 21f, 5f, 21f)
+                lineTo(19f, 21f)
+                curveTo(20.1f, 21f, 21f, 20.1f, 21f, 19f)
+                lineTo(21f, 5f)
+                curveTo(21f, 3.9f, 20.1f, 3f, 19f, 3f)
+                lineTo(19f, 19f)
+                lineTo(5f, 19f)
+                lineTo(5f, 5f)
+                lineTo(19f, 5f)
+                close()
+                lineTo(6.2f, 7.7f)
+                lineTo(11.2f, 7.7f)
+                lineTo(11.2f, 9.2f)
+                lineTo(6.2f, 9.2f)
+                close()
+                lineTo(13f, 15.8f)
+                lineTo(18f, 15.8f)
+                lineTo(18f, 17.3f)
+                lineTo(13f, 17.3f)
+                close()
+                lineTo(13f, 13.2f)
+                lineTo(18f, 13.2f)
+                lineTo(18f, 14.7f)
+                lineTo(13f, 14.7f)
+                close()
+                lineTo(8f, 18f)
+                lineTo(9.5f, 18f)
+                lineTo(9.5f, 16f)
+                lineTo(11.5f, 16f)
+                lineTo(11.5f, 14.5f)
+                lineTo(9.5f, 14.5f)
+                lineTo(9.5f, 12.5f)
+                lineTo(8f, 12.5f)
+                lineTo(8f, 14.5f)
+                lineTo(6f, 14.5f)
+                lineTo(6f, 16f)
+                lineTo(8f, 16f)
+                close()
+                lineTo(14.1f, 10.9f)
+                lineTo(15.5f, 9.5f)
+                lineTo(16.9f, 10.9f)
+                lineTo(18f, 9.9f)
+                lineTo(16.6f, 8.5f)
+                lineTo(18f, 7.1f)
+                lineTo(16.9f, 6f)
+                lineTo(15.5f, 7.4f)
+                lineTo(14.1f, 6f)
+                lineTo(13f, 7.1f)
+                lineTo(14.4f, 8.5f)
+                lineTo(13f, 9.9f)
+                close()
+            }
+        }.build()
+    }
+
+    /** bank-outline — Material Design Icons (IconVaultKit). */
+    val Bank: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvBank",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(6.5f, 10f)
+                lineTo(4.5f, 10f)
+                lineTo(4.5f, 17f)
+                lineTo(6.5f, 17f)
+                close()
+                lineTo(12.5f, 10f)
+                lineTo(10.5f, 10f)
+                lineTo(10.5f, 17f)
+                lineTo(12.5f, 17f)
+                close()
+                lineTo(21f, 19f)
+                lineTo(2f, 19f)
+                lineTo(2f, 21f)
+                lineTo(21f, 21f)
+                close()
+                lineTo(18.5f, 10f)
+                lineTo(16.5f, 10f)
+                lineTo(16.5f, 17f)
+                lineTo(18.5f, 17f)
+                close()
+                lineTo(11.5f, 3.26f)
+                lineTo(16.71f, 6f)
+                lineTo(6.29f, 6f)
+                close()
+                lineTo(11.5f, 1f)
+                lineTo(2f, 6f)
+                lineTo(2f, 8f)
+                lineTo(21f, 8f)
+                lineTo(21f, 6f)
+                close()
+            }
+        }.build()
+    }
+
+    /** check-decagram-outline — Material Design Icons (IconVaultKit). */
+    val QualityBadge: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvQualityBadge",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(23f, 12f)
+                lineTo(20.6f, 9.2f)
+                lineTo(20.9f, 5.5f)
+                lineTo(17.3f, 4.7f)
+                lineTo(15.4f, 1.5f)
+                lineTo(12f, 3f)
+                lineTo(8.6f, 1.5f)
+                lineTo(6.7f, 4.7f)
+                lineTo(3.1f, 5.5f)
+                lineTo(3.4f, 9.2f)
+                lineTo(1f, 12f)
+                lineTo(3.4f, 14.8f)
+                lineTo(3.1f, 18.5f)
+                lineTo(6.7f, 19.3f)
+                lineTo(8.6f, 22.5f)
+                lineTo(12f, 21f)
+                lineTo(15.4f, 22.5f)
+                lineTo(17.3f, 19.3f)
+                lineTo(20.9f, 18.5f)
+                lineTo(20.6f, 14.8f)
+                close()
+                lineTo(18.7f, 16.9f)
+                lineTo(16f, 17.5f)
+                lineTo(14.6f, 19.9f)
+                lineTo(12f, 18.8f)
+                lineTo(9.4f, 19.9f)
+                lineTo(8f, 17.5f)
+                lineTo(5.3f, 16.9f)
+                lineTo(5.5f, 14.1f)
+                lineTo(3.7f, 12f)
+                lineTo(5.5f, 9.9f)
+                lineTo(5.3f, 7.1f)
+                lineTo(8f, 6.5f)
+                lineTo(9.4f, 4.1f)
+                lineTo(12f, 5.2f)
+                lineTo(14.6f, 4.1f)
+                lineTo(16f, 6.5f)
+                lineTo(18.7f, 7.1f)
+                lineTo(18.5f, 9.9f)
+                lineTo(20.3f, 12f)
+                lineTo(18.5f, 14.1f)
+                close()
+                lineTo(16.6f, 7.6f)
+                lineTo(18f, 9f)
+                lineTo(10f, 17f)
+                lineTo(6f, 13f)
+                lineTo(7.4f, 11.6f)
+                lineTo(10f, 14.2f)
+                close()
+            }
+        }.build()
+    }
+
+    /** hammer-wrench — Material Design Icons (IconVaultKit). */
+    val HammerWrench: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvHammerWrench",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(13.78f, 15.3f)
+                lineTo(19.78f, 21.3f)
+                lineTo(21.89f, 19.14f)
+                lineTo(15.89f, 13.14f)
+                close()
+                lineTo(17.5f, 10.1f)
+                curveTo(17.11f, 10.1f, 16.69f, 10.05f, 16.36f, 9.91f)
+                lineTo(4.97f, 21.25f)
+                lineTo(2.86f, 19.14f)
+                lineTo(10.27f, 11.74f)
+                lineTo(8.5f, 9.96f)
+                lineTo(7.78f, 10.66f)
+                lineTo(6.33f, 9.25f)
+                lineTo(6.33f, 12.11f)
+                lineTo(5.63f, 12.81f)
+                lineTo(2.11f, 9.25f)
+                lineTo(2.81f, 8.55f)
+                lineTo(5.62f, 8.55f)
+                lineTo(4.22f, 7.14f)
+                lineTo(7.78f, 3.58f)
+                arcTo(2.976f, 2.976f, 0f, false, true, 12f, 3.58f)
+                lineTo(9.89f, 5.74f)
+                lineTo(11.3f, 7.14f)
+                lineTo(10.59f, 7.85f)
+                lineTo(12.38f, 9.63f)
+                lineTo(14.2f, 7.75f)
+                curveTo(14.06f, 7.42f, 14f, 7f, 14f, 6.63f)
+                arcTo(3.49f, 3.49f, 0f, false, true, 17.5f, 3.11f)
+                curveTo(18.09f, 3.11f, 18.61f, 3.25f, 19.08f, 3.53f)
+                lineTo(16.41f, 6.2f)
+                lineTo(17.91f, 7.7f)
+                lineTo(20.58f, 5.03f)
+                curveTo(20.86f, 5.5f, 21f, 6f, 21f, 6.63f)
+                curveTo(21f, 8.55f, 19.45f, 10.1f, 17.5f, 10.1f)
+            }
+        }.build()
+    }
+
+    /** warehouse — Material Design Icons (IconVaultKit). */
+    val Warehouse: ImageVector by lazy {
+        ImageVector.Builder(
+            name = "IvWarehouse",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f,
+        ).apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(6f, 19f)
+                lineTo(8f, 19f)
+                lineTo(8f, 21f)
+                lineTo(6f, 21f)
+                close()
+                lineTo(12f, 3f)
+                lineTo(2f, 8f)
+                lineTo(2f, 21f)
+                lineTo(4f, 21f)
+                lineTo(4f, 13f)
+                lineTo(20f, 13f)
+                lineTo(20f, 21f)
+                lineTo(22f, 21f)
+                lineTo(22f, 8f)
+                close()
+                lineTo(8f, 11f)
+                lineTo(4f, 11f)
+                lineTo(4f, 9f)
+                lineTo(8f, 9f)
+                close()
+                lineTo(14f, 11f)
+                lineTo(10f, 11f)
+                lineTo(10f, 9f)
+                lineTo(14f, 9f)
+                close()
+                lineTo(20f, 11f)
+                lineTo(16f, 11f)
+                lineTo(16f, 9f)
+                lineTo(20f, 9f)
+                close()
+                lineTo(6f, 15f)
+                lineTo(8f, 15f)
+                lineTo(8f, 17f)
+                lineTo(6f, 17f)
+                close()
+                lineTo(10f, 15f)
+                lineTo(12f, 15f)
+                lineTo(12f, 17f)
+                lineTo(10f, 17f)
+                close()
+                lineTo(10f, 19f)
+                lineTo(12f, 19f)
+                lineTo(12f, 21f)
+                lineTo(10f, 21f)
+                close()
+                lineTo(14f, 19f)
+                lineTo(16f, 19f)
+                lineTo(16f, 21f)
+                lineTo(14f, 21f)
+                close()
+            }
+        }.build()
+    }
 }
