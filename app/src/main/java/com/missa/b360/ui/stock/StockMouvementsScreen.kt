@@ -15,10 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Sync
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -131,9 +127,9 @@ internal fun LigneMouvement(mv: StockMovementView) {
     val estEntree = mv.type == "ENTREE" || mv.type == "TRANSFERT_ENTREE"
     val estTransfert = mv.type == "TRANSFERT_SORTIE" || mv.type == "TRANSFERT_ENTREE"
     val (icone, teinte, fond) = when {
-        estTransfert -> Triple(Icons.Outlined.Sync, ProfilePurple, Color(0xFFF3EFFF))
-        estEntree -> Triple(Icons.Outlined.TrendingUp, Green60, Green90)
-        else -> Triple(Icons.Outlined.TrendingDown, Red40, Red80)
+        estTransfert -> Triple(StockIv.Sync, ProfilePurple, Color(0xFFF3EFFF))
+        estEntree -> Triple(StockIv.TrendingUp, Green60, Green90)
+        else -> Triple(StockIv.TrendingDown, Red40, Red80)
     }
     val titreType = when {
         estTransfert -> stringResource(R.string.st_mv_transfert)

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -77,7 +76,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
-                            androidx.compose.material.icons.Icons.Outlined.ChevronRight,
+                            StockIv.ChevronRight,
                             null,
                             tint = MissaMuted,
                             modifier = Modifier.size(16.dp),

@@ -14,16 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Sync
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -75,7 +66,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(40.dp), shape = RoundedCornerShape(12.dp), color = Green90) {
                     androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Outlined.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
+                        Icon(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(12.dp))
@@ -90,7 +81,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     etat.tendance?.let { t ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                if (t >= 0) Icons.Outlined.TrendingUp else Icons.Outlined.TrendingDown,
+                                if (t >= 0) StockIv.TrendingUp else StockIv.TrendingDown,
                                 null,
                                 tint = if (t >= 0) Green60 else Red40,
                                 modifier = Modifier.size(13.dp),
@@ -104,14 +95,14 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         }
                     }
                 }
-                Icon(Icons.Outlined.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+                Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(18.dp))
             }
         }
 
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
-                icone = Icons.Outlined.Inventory2,
+                icone = StockIv.Inventory2,
                 teinte = BrandBlue,
                 fond = Blue90,
                 valeur = groupe(etat.nbArticles.toLong()),
@@ -120,7 +111,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 onClick = { onNaviguer(Routes.stockListe(null)) },
             )
             StatTile(
-                icone = Icons.Outlined.Category,
+                icone = StockIv.Category,
                 teinte = Green60,
                 fond = Green90,
                 valeur = etat.nbCategories.toString(),
@@ -132,7 +123,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             StatTile(
-                icone = Icons.Outlined.Warning,
+                icone = StockIv.Warning,
                 teinte = ProfileOrange,
                 fond = Color(0xFFFFF4E5),
                 valeur = etat.critiques.toString(),
@@ -141,7 +132,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 onClick = { onNaviguer(Routes.STOCK_ALERTES) },
             )
             StatTile(
-                icone = Icons.Outlined.Error,
+                icone = StockIv.Error,
                 teinte = Red40,
                 fond = Red80,
                 valeur = etat.ruptures.toString(),
@@ -172,7 +163,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     }
                     Text(fmtValeur(cat.valeur, etat.devise), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MissaMuted)
                     Spacer(Modifier.width(4.dp))
-                    Icon(Icons.Outlined.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(16.dp))
+                    Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(16.dp))
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -183,7 +174,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Outlined.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                        Icon(StockIv.Inventory2, null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     }
                 }
                 Spacer(Modifier.width(11.dp))
@@ -191,7 +182,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
                 }
-                Icon(Icons.Outlined.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(StockIv.ChevronRight, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             }
         }
 
@@ -199,9 +190,9 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         StockSectionTitle(titre = stringResource(R.string.st_mouvements_jour))
         CarteStock(onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) }) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MouvementMini(Icons.Outlined.TrendingUp, Green60, stringResource(R.string.st_entrees), etat.entreesJour, Modifier.weight(1f))
-                MouvementMini(Icons.Outlined.TrendingDown, Red40, stringResource(R.string.st_sorties), etat.sortiesJour, Modifier.weight(1f))
-                MouvementMini(Icons.Outlined.Sync, ProfilePurple, stringResource(R.string.st_transferts), etat.transfertsJour, Modifier.weight(1f))
+                MouvementMini(StockIv.TrendingUp, Green60, stringResource(R.string.st_entrees), etat.entreesJour, Modifier.weight(1f))
+                MouvementMini(StockIv.TrendingDown, Red40, stringResource(R.string.st_sorties), etat.sortiesJour, Modifier.weight(1f))
+                MouvementMini(StockIv.Sync, ProfilePurple, stringResource(R.string.st_transferts), etat.transfertsJour, Modifier.weight(1f))
             }
         }
         Spacer(Modifier.height(16.dp))

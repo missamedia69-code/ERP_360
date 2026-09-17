@@ -14,10 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Unarchive
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -72,7 +68,7 @@ fun InventoryScreen(onBack: () -> Unit) {
             ) {
                 Surface(shape = RoundedCornerShape(20.dp), color = Blue90, modifier = Modifier.size(64.dp)) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Outlined.Unarchive, null, tint = BrandBlue, modifier = Modifier.size(30.dp))
+                        Icon(StockIv.Unarchive, null, tint = BrandBlue, modifier = Modifier.size(30.dp))
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -95,7 +91,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(shape = RoundedCornerShape(12.dp), color = Green90, modifier = Modifier.size(42.dp)) {
                             Box(contentAlignment = Alignment.Center) {
-                                Icon(Icons.Outlined.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
+                                Icon(StockIv.Inventory2, null, tint = Green60, modifier = Modifier.size(20.dp))
                             }
                         }
                         Spacer(Modifier.width(11.dp))
@@ -126,7 +122,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     StatTile(
-                        icone = Icons.Outlined.CheckCircle,
+                        icone = StockIv.CheckCircle,
                         teinte = Green60,
                         fond = Green90,
                         valeur = etat.comptes.toString(),
@@ -134,7 +130,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                         modifier = Modifier.weight(1f),
                     )
                     StatTile(
-                        icone = Icons.Outlined.Unarchive,
+                        icone = StockIv.Unarchive,
                         teinte = ProfileOrange,
                         fond = Color(0xFFFFF4E5),
                         valeur = etat.ecarts.size.toString(),

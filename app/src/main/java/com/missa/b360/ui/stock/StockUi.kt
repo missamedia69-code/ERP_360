@@ -14,21 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.BuildCircle
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.Eco
-import androidx.compose.material.icons.outlined.Factory
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Monitor
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -104,15 +92,15 @@ fun ProductType.libelleTypeRes(): Int = when (this) {
 }
 
 fun ProductType.icone(): ImageVector = when (this) {
-    ProductType.ACHATE_REVENDU -> Icons.Outlined.ShoppingCart
-    ProductType.MATIERE_PREMIERE -> Icons.Outlined.Eco
-    ProductType.CONNOMMABLE -> Icons.Outlined.Inventory2
-    ProductType.PIECE_MAINTENANCE -> Icons.Outlined.Build
-    ProductType.EQUIPEMENT -> Icons.Outlined.Settings
-    ProductType.MATERIEL -> Icons.Outlined.Monitor
-    ProductType.FABRIQUE -> Icons.Outlined.Factory
-    ProductType.COMPOSE -> Icons.Outlined.BuildCircle
-    ProductType.AUTRE_BIEN -> Icons.Outlined.Category
+    ProductType.ACHATE_REVENDU -> StockIv.ShoppingCart
+    ProductType.MATIERE_PREMIERE -> StockIv.Eco
+    ProductType.CONNOMMABLE -> StockIv.Inventory2
+    ProductType.PIECE_MAINTENANCE -> StockIv.Build
+    ProductType.EQUIPEMENT -> StockIv.Settings
+    ProductType.MATERIEL -> StockIv.Monitor
+    ProductType.FABRIQUE -> StockIv.Factory
+    ProductType.COMPOSE -> StockIv.BuildCircle
+    ProductType.AUTRE_BIEN -> StockIv.Category
 }
 
 /** Types proposés dans le formulaire « Nouvel article » (maquette 11). */
@@ -239,7 +227,7 @@ fun StockSearchField(valeur: String, onValeur: (String) -> Unit, placeholderRes:
         onValueChange = onValeur,
         modifier = Modifier.fillMaxWidth(),
         placeholder = { Text(stringResource(placeholderRes), fontSize = 12.sp, color = MissaMuted) },
-        leadingIcon = { Icon(Icons.Outlined.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
+        leadingIcon = { Icon(StockIv.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
     )
@@ -334,7 +322,7 @@ fun DropdownChamp(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
-                Icon(Icons.Outlined.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+                Icon(StockIv.ExpandMore, null, tint = MissaMuted, modifier = Modifier.size(20.dp))
             },
         )
         Box(

@@ -17,9 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -112,7 +109,7 @@ fun StockScreen(
                 Spacer(Modifier.height(8.dp))
                 if (etat.articles.isEmpty()) {
                     MissaEmptyState(
-                        icon = Icons.Outlined.Add,
+                        icon = StockIv.Add,
                         title = stringResource(R.string.st_aucun_resultat),
                         description = stringResource(R.string.module_placeholder),
                         modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
@@ -137,7 +134,7 @@ fun StockScreen(
             containerColor = Green60,
             contentColor = Color.White,
         ) {
-            Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
+            Icon(StockIv.Add, contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -194,7 +191,7 @@ fun BadgeNiveau(ligne: ProductWithStock) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (texteRes == R.string.st_stock_faible) {
-                Icon(Icons.Outlined.Star, null, tint = teinte, modifier = Modifier.size(10.dp))
+                Icon(StockIv.Star, null, tint = teinte, modifier = Modifier.size(10.dp))
                 Spacer(Modifier.width(3.dp))
             }
             Text(stringResource(texteRes), fontSize = 9.5.sp, fontWeight = FontWeight.Bold, color = teinte)

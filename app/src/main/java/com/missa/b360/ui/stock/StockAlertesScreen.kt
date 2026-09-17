@@ -15,8 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,7 +58,7 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         }
         if (alertes.isEmpty()) {
             MissaEmptyState(
-                icon = Icons.Outlined.Notifications,
+                icon = StockIv.Notifications,
                 title = stringResource(R.string.st_ok),
                 description = stringResource(R.string.st_aucun_resultat),
                 modifier = Modifier.fillMaxWidth().padding(24.dp),

@@ -15,11 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Error
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -88,7 +83,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 placeholder = { Text(stringResource(R.string.st_rechercher_equipement), fontSize = 12.sp, color = MissaMuted) },
                 leadingIcon = {
                     Icon(
-                        Icons.Outlined.Search,
+                        StockIv.Search,
                         null,
                         tint = MissaMuted,
                         modifier = Modifier.size(18.dp),
@@ -110,7 +105,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatTile(
-                    icone = Icons.Outlined.CheckCircle,
+                    icone = StockIv.CheckCircle,
                     teinte = Green60,
                     fond = Green90,
                     valeur = etat.enService.toString(),
@@ -118,7 +113,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                     modifier = Modifier.weight(1f),
                 )
                 StatTile(
-                    icone = Icons.Outlined.Build,
+                    icone = StockIv.Build,
                     teinte = ProfileOrange,
                     fond = Color(0xFFFFF4E5),
                     valeur = etat.maintenance.toString(),
@@ -126,7 +121,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                     modifier = Modifier.weight(1f),
                 )
                 StatTile(
-                    icone = Icons.Outlined.Error,
+                    icone = StockIv.Error,
                     teinte = Red40,
                     fond = Red80,
                     valeur = etat.horsService.toString(),
