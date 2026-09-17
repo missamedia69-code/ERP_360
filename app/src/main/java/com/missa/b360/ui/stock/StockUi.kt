@@ -360,3 +360,22 @@ fun DropdownChamp(
         }
     }
 }
+
+/** Variante avec identifiants : options = id → libellé affiché. */
+@Composable
+fun DropdownChamp(
+    libelle: String,
+    options: List<Pair<Long, String>>,
+    selection: Long?,
+    onSelection: (Long?) -> Unit = {},
+    placeholder: String = libelle,
+    modifier: Modifier = Modifier,
+) {
+    DropdownChamp(
+        label = libelle,
+        valeur = options.firstOrNull { it.first == selection }?.second ?: "",
+        options = options.map { it.second },
+        onOption = { texte -> onSelection(options.firstOrNull { it.second == texte }?.first) },
+        modifier = modifier,
+    )
+}
