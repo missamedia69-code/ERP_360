@@ -84,7 +84,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 placeholder = { Text(stringResource(R.string.st_rechercher_equipement), fontSize = 12.sp, color = MissaMuted) },
                 leadingIcon = {
                     Icon(
-                        StockIv.Search,
+                        painterResource(StockIv.Search),
                         null,
                         tint = MissaMuted,
                         modifier = Modifier.size(18.dp),

@@ -76,7 +76,7 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                             ) {
                                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                                     Icon(
-                                        ligne.product.type.icone(),
+                                        painterResource(ligne.product.type.icone()),
                                         null,
                                         tint = if (ligne.stock <= 0) Red40 else ProfileOrange,
                                         modifier = Modifier.size(16.dp),

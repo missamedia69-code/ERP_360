@@ -77,7 +77,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
-                            StockIv.ChevronRight,
+                            painterResource(StockIv.ChevronRight),
                             null,
                             tint = MissaMuted,
                             modifier = Modifier.size(16.dp),

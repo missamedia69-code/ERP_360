@@ -396,7 +396,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(
-                type.icone(),
+                painterResource(type.icone()),
                 null,
                 tint = if (actif) BrandBlue else MissaMuted,
                 modifier = Modifier.size(20.dp),
