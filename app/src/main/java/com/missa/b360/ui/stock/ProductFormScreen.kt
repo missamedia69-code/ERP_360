@@ -37,6 +37,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import com.missa.b360.ui.theme.Red40
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ProductType
 import com.missa.b360.core.domain.usecase.ProductInput
@@ -57,6 +68,16 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
     val contexte = LocalContext.current
     val texteChampsRequis = stringResource(R.string.st_champs_requis)
+    var imageUri by remember { mutableStateOf<String?>(null) }
+    var supprimerImage by remember { mutableStateOf(false) }
+    var aUneImage by remember { mutableStateOf(false) }
+    var apercu by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+    val pickImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            imageUri = it.toString()
+            supprimerImage = false
+        }
+    }
 
     var type by remember { mutableStateOf(ProductType.ACHATE_REVENDU) }
     var nom by remember { mutableStateOf("") }
@@ -85,6 +106,12 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
         productId?.let { vm.load(it) }
     }
     val edit by vm.product.collectAsStateWithLifecycle()
+    LaunchedEffect(imageUri, edit?.photoPath, supprimerImage) {
+        apercu = imageUri?.let { com.missa.b360.core.util.ImageProduit.decoderUri(contexte, android.net.Uri.parse(it)) }
+        if (apercu == null && edit?.photoPath != null && !supprimerImage) {
+            apercu = com.missa.b360.core.util.ImageProduit.charger(contexte, edit.id)
+        }
+    }
     LaunchedEffect(edit) {
         val p = edit ?: return@LaunchedEffect
         if (preRempli) return@LaunchedEffect
@@ -102,6 +129,7 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
         stockMax = p.stockMax?.toString().orEmpty()
         stockSecurite = if (p.stockSecurite > 0) p.stockSecurite.toString() else ""
         siteId = p.siteId
+        aUneImage = p.photoPath != null
     }
 
     saveResult?.let { r ->
@@ -129,6 +157,61 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                 Text(stringResource(R.string.st_type_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(8.dp))
                 GrilleTypes(type) { type = it }
+                Spacer(Modifier.height(14.dp))
+                Text(stringResource(R.string.st_image_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Blue90),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        val image = apercu
+                        if (image != null && !supprimerImage) {
+                            Image(
+                                bitmap = image.asImageBitmap(),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        } else {
+                            Icon(type.icone(), null, tint = BrandBlue, modifier = Modifier.size(28.dp))
+                        }
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column {
+                        Button(
+                            onClick = { pickImage.launch("image/*") },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    if (apercu != null || aUneImage) R.string.st_modifier_image else R.string.st_ajouter_image,
+                                ),
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                        if ((apercu != null || aUneImage) && !supprimerImage) {
+                            Spacer(Modifier.height(6.dp))
+                            Text(
+                                text = stringResource(R.string.st_supprimer_image),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Red40,
+                                modifier = Modifier.clickable {
+                                    supprimerImage = true
+                                    imageUri = null
+                                    apercu = null
+                                },
+                            )
+                        }
+                    }
+                }
                 Spacer(Modifier.height(14.dp))
                 Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(8.dp))
@@ -237,6 +320,8 @@ fun ProductFormScreen(onBack: () -> Unit, productId: Long? = null) {
                             ),
                             initialStock = stockInitial.toDoubleOrNull(),
                             equipement = equipement,
+                            imageUri = imageUri,
+                            supprimerImage = supprimerImage,
                         )
                     },
                     modifier = Modifier.fillMaxWidth().height(46.dp),

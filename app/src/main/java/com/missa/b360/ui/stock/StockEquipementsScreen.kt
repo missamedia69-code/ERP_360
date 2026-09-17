@@ -145,6 +145,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                                     Icon(ligne.product.type.icone(), null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                                 }
                             }
+                            ProduitImage(photoPath = ligne.product.photoPath)
                             Spacer(Modifier.width(11.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(ligne.product.nom, fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 1)

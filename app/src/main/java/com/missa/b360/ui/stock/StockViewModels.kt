@@ -122,6 +122,7 @@ class ProductFormViewModel @Inject constructor(
     fournisseurDao: FournisseurDao,
     observeStock: ObserveProductStockUseCase,
     private val equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val contexte: android.content.Context,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -176,6 +177,8 @@ class ProductFormViewModel @Inject constructor(
         input: ProductInput,
         initialStock: Double?,
         equipement: com.missa.b360.core.data.entity.ProductEquipementEntity? = null,
+        imageUri: String? = null,
+        supprimerImage: Boolean = false,
     ) {
         if (_busy.value) return
         val id = _editingId.value
@@ -186,6 +189,7 @@ class ProductFormViewModel @Inject constructor(
                     when (val r = createProduct(input, initialStock)) {
                         is CreateProductUseCase.Result.Succes -> {
                             equipement?.let { e -> equipementDao.upsert(e.copy(produitId = r.productId)) }
+                            appliquerImage(r.productId, imageUri, supprimerImage)
                             SaveResult.Saved(r.code, true, r.productId)
                         }
                         CreateProductUseCase.Result.NomObligatoire -> SaveResult.NomObligatoire
@@ -199,6 +203,7 @@ class ProductFormViewModel @Inject constructor(
                     when {
                         success -> {
                             equipement?.let { e -> equipementDao.upsert(e.copy(produitId = id)) }
+                            appliquerImage(id, imageUri, supprimerImage)
                             SaveResult.Saved(_product.value?.code ?: "", false, id)
                         }
                         _product.value == null -> SaveResult.Introuvable
@@ -214,6 +219,32 @@ class ProductFormViewModel @Inject constructor(
             _saveResult.value = result
         }
     }
+
+    /**
+     * Écrit le JPEG compact dans le stockage interne et persiste son chemin
+     * dans `photoPath` (colonne existante, lue par les écrans de détail/liste).
+     */
+    private suspend fun appliquerImage(produitId: Long, imageUri: String?, supprimerImage: Boolean) {
+        val chemin = if (imageUri != null) {
+            com.missa.b360.core.util.ImageProduit.enregistrer(
+                contexte,
+                produitId,
+                android.net.Uri.parse(imageUri),
+            )
+        } else if (supprimerImage) {
+            com.missa.b360.core.util.ImageProduit.supprimer(contexte, produitId)
+            null
+        } else {
+            return
+        }
+        productDao.getById(produitId)?.let { p ->
+            productDao.update(p.copy(photoPath = chemin))
+        }
+    }
+
+    /** True si l'article en cours d'édition a déjà une image sur le disque. */
+    fun imageExiste(produitId: Long): Boolean =
+        com.missa.b360.core.util.ImageProduit.existe(contexte, produitId)
 
     fun clearSaveResult() {
         _saveResult.value = null
