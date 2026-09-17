@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,9 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -138,7 +136,7 @@ internal fun OnbScaffold(
             if (onRetour != null) {
                 IconButton(onClick = onRetour, enabled = !viewModel.enregistrementEnCours, modifier = Modifier.size(40.dp)) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        imageVector = Iv.ArrowBack,
                         contentDescription = stringResource(R.string.ob_retour),
                         tint = MissaMuted,
                         modifier = Modifier.size(22.dp),
@@ -253,7 +251,7 @@ internal fun OnbScaffold(
                     )
                     Spacer(Modifier.width(8.dp))
                     Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                        imageVector = Iv.ArrowForward,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(17.dp),
@@ -343,7 +341,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
                 )
                 Spacer(Modifier.width(10.dp))
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                    imageVector = Iv.ArrowForward,
                     contentDescription = null,
                     tint = OnboardingHeroBlue,
                     modifier = Modifier.size(18.dp),

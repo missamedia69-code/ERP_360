@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -176,7 +175,7 @@ fun ClientFormDialog(
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                    imageVector = Iv.ArrowBack,
                                     contentDescription = stringResource(R.string.ob_retour),
                                 )
                             }

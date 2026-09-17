@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,11 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Store
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -127,7 +123,7 @@ fun MissaAppHeader(
                         .background(PuceHeader),
                 ) {
                     Icon(
-                        imageVector = if (isHome) Icons.Outlined.Menu else Icons.AutoMirrored.Outlined.ArrowBack,
+                        imageVector = if (isHome) Iv.Menu else Iv.ArrowBack,
                         contentDescription = if (isHome) stringResource(R.string.drawer_admin) else "Retour",
                         tint = MissaInk,
                         modifier = Modifier.size(24.dp),
@@ -180,7 +176,7 @@ fun MissaAppHeader(
                 ) {
                     Box {
                         Icon(
-                            imageVector = Icons.Outlined.Notifications,
+                            imageVector = Iv.Notifications,
                             contentDescription = stringResource(R.string.notifications),
                             tint = MissaInk,
                             modifier = Modifier.size(24.dp),
@@ -210,7 +206,7 @@ fun MissaAppHeader(
                         CompanyLogo(
                             logoUri = companyLogoUri,
                             contentDescription = stringResource(R.string.home_company_active),
-                            fallbackIcon = Icons.Outlined.Store,
+                            fallbackIcon = Iv.Store,
                             modifier = Modifier.fillMaxSize(),
                             size = 48.dp,
                             shape = CircleShape,
@@ -219,7 +215,7 @@ fun MissaAppHeader(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Outlined.Store,
+                            imageVector = Iv.Store,
                             contentDescription = stringResource(R.string.home_company_active),
                             tint = TendrePositive,
                             modifier = Modifier.size(24.dp),

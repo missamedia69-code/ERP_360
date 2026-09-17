@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -58,7 +57,7 @@ fun ModuleInactifScreen(
             color = MissaSoftBlue,
         ) {
             Icon(
-                imageVector = Icons.Outlined.Lock,
+                imageVector = Iv.Lock,
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.home
 
+import com.missa.b360.ui.icons.Iv
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -28,34 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Chat
-import androidx.compose.material.icons.automirrored.outlined.HelpOutline
-import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.Backup
-import androidx.compose.material.icons.outlined.BarChart
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Checklist
-import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.CloudDone
-import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.LocalShipping
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.icons.outlined.People
-import androidx.compose.material.icons.outlined.PersonAdd
-import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.Store
-import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge as NotificationBadge
 import androidx.compose.material3.BadgedBox
@@ -173,7 +146,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.VENTE,
         labelRes = R.string.home_plus_vente,
-        icon = Icons.Outlined.ShoppingCart,
+        icon = Iv.ShoppingCart,
         tint = HomeBlue,
         bg = HomeBlueSoft,
         route = AppModule.VENTE.createRoute(),
@@ -182,7 +155,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.ACHAT,
         labelRes = R.string.home_plus_achat,
-        icon = Icons.Outlined.ShoppingCart,
+        icon = Iv.ShoppingCart,
         tint = TendrePositive,
         bg = Green90,
         route = AppModule.ACHATS.createRoute(),
@@ -191,7 +164,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.CLIENT,
         labelRes = R.string.home_plus_client,
-        icon = Icons.Outlined.PersonAdd,
+        icon = Iv.PersonAdd,
         tint = ProfilePurple,
         bg = HomePurpleSoft,
         route = AppModule.CLIENTS.createRoute(),
@@ -200,7 +173,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.FOURNISSEUR,
         labelRes = R.string.home_plus_fournisseur,
-        icon = Icons.Outlined.Business,
+        icon = Iv.Business,
         tint = ProfileOrange,
         bg = HomeOrangeSoft,
         route = AppModule.FOURNISSEURS.createRoute(),
@@ -209,7 +182,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.ENTREE_STOCK,
         labelRes = R.string.home_entree_en_stock,
-        icon = Icons.Outlined.Inventory2,
+        icon = Iv.Inventory2,
         tint = ProfileTeal,
         bg = Green90,
         route = AppModule.STOCK.createRoute(),
@@ -218,7 +191,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.TRANSFERT_STOCK,
         labelRes = R.string.home_transfert_de_stock,
-        icon = Icons.Outlined.LocalShipping,
+        icon = Iv.LocalShipping,
         tint = HomeBlue,
         bg = HomeBlueSoft,
         route = Routes.STOCK_TRANSFER_FORM,
@@ -227,7 +200,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.PAIEMENT_RECU,
         labelRes = R.string.home_paiement_recu_label,
-        icon = Icons.Outlined.Payments,
+        icon = Iv.Payments,
         tint = TendrePositive,
         bg = Green90,
         route = AppModule.TRESORERIE.route,
@@ -236,7 +209,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
     AccueilActionDef(
         key = AccueilActionKeys.DEPENSE,
         labelRes = R.string.home_depense_label,
-        icon = Icons.Outlined.Description,
+        icon = Iv.Description,
         tint = HomeRed,
         bg = Red80,
         route = AppModule.FINANCES.route,
@@ -342,7 +315,7 @@ private fun HomeHeader(
                     CompanyLogo(
                         logoUri = companyLogoUri,
                         contentDescription = null,
-                        fallbackIcon = Icons.Outlined.Store,
+                        fallbackIcon = Iv.Store,
                         modifier = Modifier.matchParentSize(),
                         size = 200.dp,
                         shape = RoundedCornerShape(0.dp),
@@ -388,7 +361,7 @@ private fun HomeHeader(
                     // Hamburger — zone tactile 48x48, icône 24dp
                     IconButton(onClick = onMenuClick, modifier = Modifier.size(48.dp)) {
                         Icon(
-                            imageVector = Icons.Outlined.Menu,
+                            imageVector = Iv.Menu,
                             contentDescription = stringResource(R.string.drawer_admin),
                             tint = HomeTextDark,
                             modifier = Modifier.size(24.dp),
@@ -451,7 +424,7 @@ private fun HomeHeader(
                             },
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.Notifications,
+                                imageVector = Iv.Notifications,
                                 contentDescription = stringResource(R.string.notifications),
                                 tint = HomeTextDark,
                                 modifier = Modifier.size(24.dp),
@@ -472,7 +445,7 @@ private fun HomeHeader(
                             CompanyLogo(
                                 logoUri = companyLogoUri,
                                 contentDescription = stringResource(R.string.home_company_active),
-                                fallbackIcon = Icons.Outlined.Store,
+                                fallbackIcon = Iv.Store,
                                 modifier = Modifier.fillMaxSize(),
                                 size = 40.dp,
                                 shape = CircleShape,
@@ -482,7 +455,7 @@ private fun HomeHeader(
                         } else {
                             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize().background(Green90)) {
                                 Icon(
-                                    imageVector = Icons.Outlined.Store,
+                                    imageVector = Iv.Store,
                                     contentDescription = stringResource(R.string.home_company_active),
                                     tint = TendrePositive,
                                     modifier = Modifier.size(20.dp),
@@ -579,7 +552,7 @@ private fun HomeDashboard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Business,
+                        imageVector = Iv.Business,
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -607,7 +580,7 @@ private fun HomeDashboard(
                     Box(modifier = Modifier.size(3.dp).clip(CircleShape).background(HomeBorder))
                     Spacer(Modifier.width(10.dp))
                     Icon(
-                        imageVector = Icons.Outlined.Groups,
+                        imageVector = Iv.Groups,
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(16.dp),
@@ -633,7 +606,7 @@ private fun HomeDashboard(
                         modifier = Modifier.weight(1f),
                     )
                     Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
+                        imageVector = Iv.ChevronRight,
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -651,7 +624,7 @@ private fun HomeDashboard(
                         valeur = formatMontantSansDecimales(state.ventes, currency),
                         sousTitre = "${state.ventesCount} ventes",
                         tendance = state.tendanceVentes,
-                        icon = Icons.Outlined.ShoppingCart,
+                        icon = Iv.ShoppingCart,
                         iconBg = HomeBlueSoft,
                         iconTint = HomeBlue,
                         illustrationRes = R.drawable.illustration_ventes,
@@ -663,7 +636,7 @@ private fun HomeDashboard(
                         valeur = formatMontantSansDecimales(state.achats, currency),
                         sousTitre = "${state.achatsCount} achats",
                         tendance = state.tendanceAchats,
-                        icon = Icons.Outlined.Inventory2,
+                        icon = Iv.Inventory2,
                         iconBg = Green90,
                         iconTint = TendrePositive,
                         illustrationRes = R.drawable.illustration_stock,
@@ -677,7 +650,7 @@ private fun HomeDashboard(
                         valeur = formatMontantSansDecimales(state.tresorerie, currency),
                         sousTitre = stringResource(R.string.home_solde_disponible),
                         tendance = state.tendanceTresorerie,
-                        icon = Icons.Outlined.Payments,
+                        icon = Iv.Payments,
                         iconBg = HomeOrangeSoft,
                         iconTint = ProfileOrange,
                         illustrationRes = R.drawable.illustration_tresorerie,
@@ -689,7 +662,7 @@ private fun HomeDashboard(
                         valeur = state.nombreClients.toString(),
                         sousTitre = stringResource(R.string.home_total_label),
                         tendance = state.tendanceClients,
-                        icon = Icons.Outlined.People,
+                        icon = Iv.People,
                         iconBg = HomePurpleSoft,
                         iconTint = ProfilePurple,
                         illustrationRes = R.drawable.illustration_clients,
@@ -724,7 +697,7 @@ private fun HomeDashboard(
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
-                            imageVector = Icons.Outlined.Settings,
+                            imageVector = Iv.Settings,
                             contentDescription = null,
                             tint = HomeBlue,
                             modifier = Modifier.size(16.dp),
@@ -930,11 +903,11 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Outlined.History, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
+                        Icon(imageVector = Iv.History, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
-                        Icon(imageVector = Icons.Outlined.ArrowDropDown, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
+                        Icon(imageVector = Iv.ArrowDropDown, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
                     }
                 }
             }
@@ -942,7 +915,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.BarChart,
+                    icon = Iv.BarChart,
                     iconTint = HomeBlue,
                     iconBg = HomeBlueSoft,
                     titre = stringResource(R.string.home_ventes_label),
@@ -953,7 +926,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.ShoppingCart,
+                    icon = Iv.ShoppingCart,
                     iconTint = TendrePositive,
                     iconBg = Green90,
                     titre = stringResource(R.string.home_achats_label),
@@ -964,7 +937,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.SwapHoriz,
+                    icon = Iv.SwapHoriz,
                     iconTint = ProfileOrange,
                     iconBg = HomeOrangeSoft,
                     titre = stringResource(R.string.home_mouvements_stock_label),
@@ -975,7 +948,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
                     modifier = Modifier.weight(1f),
-                    icon = Icons.Outlined.Payments,
+                    icon = Iv.Payments,
                     iconTint = ProfilePurple,
                     iconBg = HomePurpleSoft,
                     titre = stringResource(R.string.home_marge_brute_label),
@@ -1088,12 +1061,12 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
             } else {
                 records.forEachIndexed { idx, rec ->
                     val (icon, bg, tint) = when (rec.module) {
-                        OperationModule.VENTE.name -> Triple(Icons.Outlined.ShoppingCart, HomeBlueSoft, HomeBlue)
-                        OperationModule.ACHATS.name -> Triple(Icons.Outlined.Inventory2, Green90, TendrePositive)
-                        OperationModule.STOCK.name -> Triple(Icons.Outlined.LocalShipping, HomeOrangeSoft, ProfileOrange)
-                        OperationModule.PROJETS.name -> Triple(Icons.Outlined.BarChart, HomePurpleSoft, ProfilePurple)
-                        OperationModule.FINANCES.name -> Triple(Icons.Outlined.Payments, HomeOrangeSoft, ProfileOrange)
-                        else -> Triple(Icons.Outlined.People, HomePurpleSoft, ProfilePurple)
+                        OperationModule.VENTE.name -> Triple(Iv.ShoppingCart, HomeBlueSoft, HomeBlue)
+                        OperationModule.ACHATS.name -> Triple(Iv.Inventory2, Green90, TendrePositive)
+                        OperationModule.STOCK.name -> Triple(Iv.LocalShipping, HomeOrangeSoft, ProfileOrange)
+                        OperationModule.PROJETS.name -> Triple(Iv.BarChart, HomePurpleSoft, ProfilePurple)
+                        OperationModule.FINANCES.name -> Triple(Iv.Payments, HomeOrangeSoft, ProfileOrange)
+                        else -> Triple(Iv.People, HomePurpleSoft, ProfilePurple)
                     }
                     AccueilActiviteRow(
                         icon = icon, iconBg = bg, iconTint = tint,
@@ -1166,7 +1139,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = if (hasAlert) HomeBackground else HomeBackground) {
-                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
+                Box(contentAlignment = Alignment.Center) { Icon(imageVector = Iv.Notifications, contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
             }
             Spacer(Modifier.width(10.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -1208,7 +1181,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
                     }
                 }
             }
-            Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
+            Icon(imageVector = Iv.ChevronRight, contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(18.dp))
         }
     }
 }
@@ -1225,7 +1198,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(modifier = Modifier.size(26.dp), shape = RoundedCornerShape(7.dp), color = HomeBlueSoft) {
-                    Box(contentAlignment = Alignment.Center) { Icon(imageVector = Icons.Outlined.Checklist, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
+                    Box(contentAlignment = Alignment.Center) { Icon(imageVector = Iv.Checklist, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(14.dp)) }
                 }
                 Spacer(Modifier.width(8.dp))
                 Text(text = stringResource(R.string.home_taches_du_jour), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
@@ -1245,7 +1218,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = stringResource(R.string.home_voir_toutes_taches), color = HomeBlue, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                Icon(imageVector = Icons.Outlined.ChevronRight, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
+                Icon(imageVector = Iv.ChevronRight, contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -1344,7 +1317,7 @@ internal fun MissaBusinessDrawer(
                 }
                 IconButton(onClick = onClose, modifier = Modifier.size(38.dp)) {
                     Icon(
-                        imageVector = Icons.Outlined.Close,
+                        imageVector = Iv.Close,
                         contentDescription = stringResource(R.string.home_close),
                         tint = HomeTextMuted,
                     )
@@ -1369,7 +1342,7 @@ internal fun MissaBusinessDrawer(
                     CompanyLogo(
                         logoUri = logoUri,
                         contentDescription = null,
-                        fallbackIcon = Icons.Outlined.Store,
+                        fallbackIcon = Iv.Store,
                         modifier = Modifier.size(42.dp),
                         size = 42.dp,
                         shape = CircleShape,
@@ -1393,7 +1366,7 @@ internal fun MissaBusinessDrawer(
                         )
                     }
                     Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
+                        imageVector = Iv.ChevronRight,
                         contentDescription = null,
                         tint = HomeTextMuted,
                         modifier = Modifier.size(18.dp),
@@ -1403,26 +1376,26 @@ internal fun MissaBusinessDrawer(
 
 
             DrawerSectionTitle(stringResource(R.string.drawer_section_administration))
-            DrawerMenuItem(Icons.Outlined.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {
+            DrawerMenuItem(Iv.Settings, stringResource(R.string.home_settings), currentRoute == Routes.ADMIN_REGLAGES) {
                 onNavigate(Routes.ADMIN_REGLAGES)
             }
-            DrawerMenuItem(Icons.Outlined.People, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
+            DrawerMenuItem(Iv.People, stringResource(R.string.admin_utilisateurs), currentRoute == Routes.ADMIN_UTILISATEURS) {
                 onNavigate(Routes.ADMIN_UTILISATEURS)
             }
-            DrawerMenuItem(Icons.Outlined.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {
+            DrawerMenuItem(Iv.Security, stringResource(R.string.home_licence_activation), currentRoute == Routes.ADMIN_LICENCE) {
                 onNavigate(Routes.ADMIN_LICENCE)
             }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_tools))
-            DrawerMenuItem(Icons.Outlined.Backup, stringResource(R.string.admin_sauvegarde), currentRoute == Routes.ADMIN_SAUVEGARDE) {
+            DrawerMenuItem(Iv.Backup, stringResource(R.string.admin_sauvegarde), currentRoute == Routes.ADMIN_SAUVEGARDE) {
                 onNavigate(Routes.ADMIN_SAUVEGARDE)
             }
-            DrawerMenuItem(Icons.Outlined.History, stringResource(R.string.admin_journal), currentRoute == Routes.ADMIN_JOURNAL) {
+            DrawerMenuItem(Iv.History, stringResource(R.string.admin_journal), currentRoute == Routes.ADMIN_JOURNAL) {
                 onNavigate(Routes.ADMIN_JOURNAL)
             }
 
             DrawerSectionTitle(stringResource(R.string.home_drawer_support))
-            DrawerMenuItem(Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.home_help_assistance)) {
+            DrawerMenuItem(Iv.HelpOutline, stringResource(R.string.home_help_assistance)) {
                 onSupport()
             }
 
@@ -1440,7 +1413,7 @@ internal fun MissaBusinessDrawer(
                             color = HomeGreenSoft,
                         ) {
                             Icon(
-                                imageVector = Icons.Outlined.CloudDone,
+                                imageVector = Iv.CloudDone,
                                 contentDescription = null,
                                 tint = TendrePositive,
                                 modifier = Modifier.padding(7.dp),
@@ -1583,7 +1556,7 @@ internal fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
                     color = HomeTextMuted,
                 )
                 if (whatsappOk) {
-                    HomeSupportBouton(R.string.obn_code_whatsapp, Icons.AutoMirrored.Outlined.Chat) {
+                    HomeSupportBouton(R.string.obn_code_whatsapp, Iv.Chat) {
                         if (!ContactCommercial.ouvrirWhatsApp(contexte, numero, message)) {
                             Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                         }
@@ -1593,7 +1566,7 @@ internal fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
                 if (telegramOk) {
                     HomeSupportBouton(
                         R.string.obn_code_telegram,
-                        Icons.AutoMirrored.Outlined.Send,
+                        Iv.Send,
                     ) {
                         if (!ContactCommercial.ouvrirTelegram(contexte, telegram, message)) {
                             Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
@@ -1602,7 +1575,7 @@ internal fun HomeSupportDialogue(entrepriseNom: String, onFermer: () -> Unit) {
                     }
                 }
                 if (emailOk) {
-                    HomeSupportBouton(R.string.obn_code_email, Icons.Outlined.MailOutline) {
+                    HomeSupportBouton(R.string.obn_code_email, Iv.MailOutline) {
                         if (!ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)) {
                             Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                         }

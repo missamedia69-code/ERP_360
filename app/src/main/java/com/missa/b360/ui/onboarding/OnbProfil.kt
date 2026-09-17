@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -16,18 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Construction
-import androidx.compose.material.icons.outlined.ExpandLess
-import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.Handshake
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -94,37 +83,37 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             ProfilActivite.ASV,
             R.string.obn_profil_asv,
             R.string.obn_profil_asv_sous,
-            Icons.Outlined.Inventory2,
+            Iv.Inventory2,
         ),
         OnbProfilCarteInfo(
             ProfilActivite.APSV,
             R.string.obn_profil_apsv,
             R.string.obn_profil_apsv_sous,
-            Icons.Outlined.Construction,
+            Iv.Construction,
         ),
         OnbProfilCarteInfo(
             ProfilActivite.AV,
             R.string.obn_profil_av,
             R.string.obn_profil_av_sous,
-            Icons.Outlined.ShoppingCart,
+            Iv.ShoppingCart,
         ),
         OnbProfilCarteInfo(
             ProfilActivite.SER,
             R.string.obn_profil_ser,
             R.string.obn_profil_ser_sous,
-            Icons.Outlined.Handshake,
+            Iv.Handshake,
         ),
         OnbProfilCarteInfo(
             ProfilActivite.PRJ,
             R.string.obn_profil_prj,
             R.string.obn_profil_prj_sous,
-            Icons.Outlined.Workspaces,
+            Iv.Workspaces,
         ),
         OnbProfilCarteInfo(
             ProfilActivite.FULL,
             R.string.obn_profil_full,
             R.string.obn_profil_full_sous,
-            Icons.Outlined.Business,
+            Iv.Business,
         ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
@@ -182,7 +171,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                     runCatching { PalierTaille.valueOf(cle) }.getOrNull()
                         ?.let(viewModel::choisirPalier)
                 },
-                icone = Icons.Outlined.Groups,
+                icone = Iv.Groups,
                 enabled = !viewModel.enregistrementEnCours,
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
                 titreDialogue = stringResource(R.string.palier_choisir_titre),
@@ -346,7 +335,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Info,
+                            imageVector = Iv.Info,
                             contentDescription = null,
                             tint = BrandBlue,
                             modifier = Modifier.size(15.dp),
@@ -424,7 +413,7 @@ private fun OnbModulePastille(module: ModuleCode) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.Lock,
+                imageVector = Iv.Lock,
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(11.dp),
@@ -536,9 +525,9 @@ internal fun OnbProfilCarte(
             if (selected) {
                 Icon(
                     imageVector = if (ouvert) {
-                        Icons.Outlined.ExpandLess
+                        Iv.ExpandLess
                     } else {
-                        Icons.Outlined.ExpandMore
+                        Iv.ExpandMore
                     },
                     contentDescription = stringResource(
                         if (ouvert) R.string.obn_socle_replier else R.string.obn_socle_deplier,
@@ -559,7 +548,7 @@ internal fun OnbProfilCarte(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = Icons.Outlined.Info,
+                            imageVector = Iv.Info,
                             contentDescription = stringResource(R.string.obn_profil_info),
                             tint = if (selected) Color.White else BrandBlue,
                             modifier = Modifier.size(16.dp),

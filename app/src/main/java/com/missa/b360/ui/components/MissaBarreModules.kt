@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,9 +18,6 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -86,7 +84,7 @@ fun MissaBarreModules(
             ) {
                 BarreOnglet(
                     modifier = Modifier.weight(1f),
-                    icone = Icons.Outlined.Home,
+                    icone = Iv.Home,
                     libelleRes = R.string.nav_accueil,
                     actif = racine == Routes.HOME,
                     onClick = onAccueil,
@@ -106,7 +104,7 @@ fun MissaBarreModules(
                 }
                 BarreOnglet(
                     modifier = Modifier.weight(1f),
-                    icone = Icons.Outlined.MoreHoriz,
+                    icone = Iv.MoreHoriz,
                     libelleRes = R.string.home_more_short,
                     actif = false,
                     onClick = onPlus,

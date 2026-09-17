@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -18,12 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.PictureAsPdf
-import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Store
 import androidx.core.content.FileProvider
 import com.missa.b360.core.util.FicheEntreprisePdf
 import androidx.compose.material3.Button
@@ -302,7 +297,7 @@ fun FicheEntrepriseDialog(
                     CompanyLogo(
                         logoUri = entreprise?.logoUri,
                         contentDescription = null,
-                        fallbackIcon = Icons.Outlined.Store,
+                        fallbackIcon = Iv.Store,
                         modifier = Modifier.size(48.dp),
                         size = 48.dp,
                         shape = RoundedCornerShape(14.dp),
@@ -331,7 +326,7 @@ fun FicheEntrepriseDialog(
                     }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
                         Icon(
-                            imageVector = Icons.Outlined.Close,
+                            imageVector = Iv.Close,
                             contentDescription = null,
                             tint = MissaMuted,
                             modifier = Modifier.size(22.dp),
@@ -365,7 +360,7 @@ fun FicheEntrepriseDialog(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.ContentCopy,
+                            imageVector = Iv.ContentCopy,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
@@ -384,7 +379,7 @@ fun FicheEntrepriseDialog(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Share,
+                            imageVector = Iv.Share,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )
@@ -404,7 +399,7 @@ fun FicheEntrepriseDialog(
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.PictureAsPdf,
+                            imageVector = Iv.PictureAsPdf,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                         )

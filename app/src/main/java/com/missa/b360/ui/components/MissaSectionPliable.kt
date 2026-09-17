@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -13,9 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ExpandLess
-import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -131,7 +129,7 @@ fun MissaSectionPliable(
                 }
             }
             Icon(
-                imageVector = if (ouvert) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                imageVector = if (ouvert) Iv.ExpandLess else Iv.ExpandMore,
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.padding(start = 4.dp).size(20.dp),

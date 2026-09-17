@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Arrangement
@@ -7,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,7 +35,7 @@ fun PlaceholderScreen(titleRes: Int, subtitleRes: Int = R.string.module_placehol
             verticalArrangement = Arrangement.Center,
         ) {
             MissaEmptyState(
-                icon = Icons.Outlined.Construction,
+                icon = Iv.Construction,
                 title = stringResource(titleRes),
                 description = stringResource(subtitleRes),
                 modifier = Modifier.fillMaxWidth(),

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,9 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -110,7 +108,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.CheckCircle,
+                imageVector = Iv.CheckCircle,
                 contentDescription = null,
                 tint = ProfileGreen,
                 modifier = Modifier.size(16.dp),
@@ -125,7 +123,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                imageVector = Iv.ArrowForwardIos,
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.size(12.dp),

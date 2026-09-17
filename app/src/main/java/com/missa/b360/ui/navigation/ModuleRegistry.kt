@@ -1,22 +1,6 @@
 package com.missa.b360.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Campaign
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Handshake
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.LineWeight
-import androidx.compose.material.icons.outlined.LocalShipping
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PointOfSale
-import androidx.compose.material.icons.outlined.RequestQuote
-import androidx.compose.material.icons.outlined.Savings
-import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.Workspaces
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.ActivationProfil
@@ -51,24 +35,24 @@ enum class AppModule(
      */
     val prioriteBarre: Int = 0,
 ) {
-    VENTE("module_vente", R.string.module_vente, Icons.Outlined.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1),
-    STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, prioriteBarre = 2),
-    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, prioriteBarre = 7),
-    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
-    ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
-    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
-    LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG, prioriteBarre = 8),
-    PRODUCTION("module_production", R.string.module_production, Icons.Outlined.LineWeight, ModuleCode.PRO, prioriteBarre = 6),
-    SERVICES("module_services", R.string.module_services, Icons.Outlined.RequestQuote, ModuleCode.SER, prioriteBarre = 4),
-    RH("module_rh", R.string.module_rh, Icons.Outlined.Person, ModuleCode.RH, prioriteBarre = 9),
-    PROJETS("module_projets", R.string.module_projets, Icons.Outlined.Workspaces, ModuleCode.PRJ, prioriteBarre = 5),
-    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Icons.Outlined.Savings, ModuleCode.CPT),
-    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE, prioriteBarre = 3),
-    CRM("module_crm", R.string.module_crm, Icons.Outlined.Campaign, ModuleCode.CRM),
-    QUALITE("module_qualite", R.string.module_qualite, Icons.Outlined.Build, ModuleCode.QUA),
-    MAINTENANCE("module_maintenance", R.string.module_maintenance, Icons.Outlined.Build, ModuleCode.MAI),
-    LOGISTIQUE("module_logistique", R.string.module_logistique, Icons.Outlined.LocalShipping, ModuleCode.LOG),
-    REPORTING("module_reporting", R.string.module_reporting, Icons.Outlined.Analytics, ModuleCode.REP),
+    VENTE("module_vente", R.string.module_vente, Iv.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1),
+    STOCK("module_stock", R.string.module_stock, Iv.Inventory2, ModuleCode.STK, prioriteBarre = 2),
+    CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7),
+    FINANCES("module_finances", R.string.module_finances, Iv.TrendingUp, ModuleCode.CPT),
+    ACHATS("module_achats", R.string.module_achats, Iv.ShoppingCart, ModuleCode.ACH),
+    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH),
+    LIVRAISON("module_livraison", R.string.module_livraison, Iv.LocalShipping, ModuleCode.LOG, prioriteBarre = 8),
+    PRODUCTION("module_production", R.string.module_production, Iv.LineWeight, ModuleCode.PRO, prioriteBarre = 6),
+    SERVICES("module_services", R.string.module_services, Iv.RequestQuote, ModuleCode.SER, prioriteBarre = 4),
+    RH("module_rh", R.string.module_rh, Iv.Person, ModuleCode.RH, prioriteBarre = 9),
+    PROJETS("module_projets", R.string.module_projets, Iv.Workspaces, ModuleCode.PRJ, prioriteBarre = 5),
+    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Iv.Savings, ModuleCode.CPT),
+    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Iv.Savings, ModuleCode.TRE, prioriteBarre = 3),
+    CRM("module_crm", R.string.module_crm, Iv.Campaign, ModuleCode.CRM),
+    QUALITE("module_qualite", R.string.module_qualite, Iv.Build, ModuleCode.QUA),
+    MAINTENANCE("module_maintenance", R.string.module_maintenance, Iv.Build, ModuleCode.MAI),
+    LOGISTIQUE("module_logistique", R.string.module_logistique, Iv.LocalShipping, ModuleCode.LOG),
+    REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP),
     ;
 
     companion object {

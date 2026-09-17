@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -17,13 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Backspace
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -96,7 +90,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Lock,
+                    imageVector = Iv.Lock,
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(14.dp),
@@ -112,7 +106,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
             // --- Contact de récupération : obligatoire, donc ouvert ---
             MissaSectionPliable(
                 titre = stringResource(R.string.obn_pin_recup_titre),
-                icone = Icons.Outlined.Person,
+                icone = Iv.Person,
                 resume = listOf(viewModel.votreNom, viewModel.emailSecours)
                     .filter { it.isNotBlank() }
                     .joinToString(" · ")
@@ -135,7 +129,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                         enabled = !viewModel.enregistrementEnCours,
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Outlined.Person,
+                                imageVector = Iv.Person,
                                 contentDescription = null,
                                 tint = BrandBlue,
                                 modifier = Modifier.size(18.dp),
@@ -155,7 +149,7 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         leadingIcon = {
                             Icon(
-                                imageVector = Icons.Outlined.Email,
+                                imageVector = Iv.Email,
                                 contentDescription = null,
                                 tint = if (emailInvalide) Red40 else BrandBlue,
                                 modifier = Modifier.size(18.dp),
@@ -242,7 +236,7 @@ private fun OnbPinPave(viewModel: OnboardingViewModel) {
             AnimatedVisibility(visible = !premiereSaisie) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Outlined.CheckCircle,
+                        imageVector = Iv.CheckCircle,
                         contentDescription = null,
                         tint = ProfileGreen,
                         modifier = Modifier.size(13.dp),
@@ -260,7 +254,7 @@ private fun OnbPinPave(viewModel: OnboardingViewModel) {
                 Spacer(Modifier.height(4.dp))
                 TextButton(onClick = viewModel::reinitialiserPin) {
                     Icon(
-                        imageVector = Icons.Outlined.Restore,
+                        imageVector = Iv.Restore,
                         contentDescription = null,
                         modifier = Modifier.size(15.dp),
                     )
@@ -324,7 +318,7 @@ private fun OnbPinTouches(
                     .semantics { contentDescription = effacerDescription },
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.Backspace,
+                    imageVector = Iv.Backspace,
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(19.dp),
@@ -366,7 +360,7 @@ private fun OnbPinBandeau(texteRes: Int, couleur: Color) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.CheckCircle,
+                imageVector = Iv.CheckCircle,
                 contentDescription = null,
                 tint = couleur,
                 modifier = Modifier.size(20.dp),

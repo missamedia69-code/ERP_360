@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -17,9 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -129,7 +127,7 @@ fun MissaSelecteurLigne(
             }
         }
         Icon(
-            imageVector = Icons.Outlined.ArrowDropDown,
+            imageVector = Iv.ArrowDropDown,
             contentDescription = null,
             tint = MissaMuted,
             modifier = Modifier.size(18.dp),
@@ -234,7 +232,7 @@ fun MissaSelecteurBleu(
                 }
             }
             Icon(
-                imageVector = Icons.Outlined.ArrowDropDown,
+                imageVector = Iv.ArrowDropDown,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(22.dp),
@@ -394,7 +392,7 @@ private fun MissaOptionLigne(
         }
         if (actif) {
             Icon(
-                imageVector = Icons.Outlined.Check,
+                imageVector = Iv.Check,
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(18.dp),

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.admin
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,13 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.ExpandLess
-import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -93,7 +87,7 @@ fun AdminReglagesScreen(
         ) {
             Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Settings, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                    Icon(Iv.Settings, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(stringResource(R.string.activation_titre), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 }
@@ -294,7 +288,7 @@ private fun ActivationSectionModules(
                 )
                 Spacer(Modifier.width(6.dp))
                 Icon(
-                    imageVector = if (expanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                    imageVector = if (expanded) Iv.ExpandLess else Iv.ExpandMore,
                     contentDescription = null,
                     tint = MissaMuted,
                     modifier = Modifier.size(18.dp),
@@ -356,7 +350,7 @@ private fun ActivationModuleLigne(
                 if (isVerrouille) {
                     Surface(shape = RoundedCornerShape(5.dp), color = MissaSoftBlue, border = BorderStroke(0.5.dp, BrandBlue.copy(alpha = 0.3f))) {
                         Row(Modifier.padding(horizontal = 5.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
+                            Icon(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
                             Spacer(Modifier.width(3.dp))
                             Text(stringResource(R.string.activation_verrouille), fontSize = 9.sp, color = BrandBlue)
                         }
@@ -393,7 +387,7 @@ private fun ActivationModuleLigne(
         }
         if (isActif) {
             Icon(
-                imageVector = Icons.Outlined.Info,
+                imageVector = Iv.Info,
                 contentDescription = stringResource(R.string.activation_elements_actifs),
                 tint = BrandBlue,
                 modifier = Modifier
@@ -434,7 +428,7 @@ private fun ActivationChangerProfilDialogue(
                                 Text(profil.description, fontSize = 10.5.sp, color = MissaMuted)
                             }
                             if (selected) {
-                                Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(18.dp))
+                                Icon(Iv.CheckCircle, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -498,7 +492,7 @@ private fun ActivationElementsDialogue(
                                 Text(elem, fontSize = 11.sp, color = MissaInk)
                                 if (isDefaut) {
                                     Spacer(Modifier.width(4.dp))
-                                    Icon(Icons.Outlined.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
+                                    Icon(Iv.Lock, contentDescription = null, tint = BrandBlue, modifier = Modifier.size(10.dp))
                                 }
                             }
                         }

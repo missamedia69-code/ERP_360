@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -18,15 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.automirrored.outlined.Chat
-import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -103,7 +95,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Outlined.Check,
+                        imageVector = Iv.Check,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(30.dp),
@@ -147,7 +139,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                 )
                 Spacer(Modifier.size(8.dp))
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                    imageVector = Iv.ArrowForward,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(17.dp),
@@ -282,9 +274,9 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = if (viewModel.licenceDejaActive) {
-                        Icons.Outlined.WorkspacePremium
+                        Iv.WorkspacePremium
                     } else {
-                        Icons.Outlined.Schedule
+                        Iv.Schedule
                     },
                     contentDescription = null,
                     tint = if (viewModel.licenceDejaActive) ProfileGreen else BrandBlue,
@@ -346,7 +338,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                 if (coordonneesManquantes) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Outlined.Warning,
+                            imageVector = Iv.Warning,
                             contentDescription = null,
                             tint = Red40,
                             modifier = Modifier.size(13.dp),
@@ -366,7 +358,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                         if (whatsappOk) {
                             OnbContactBouton(
                                 R.string.obn_code_whatsapp,
-                                Icons.AutoMirrored.Outlined.Chat,
+                                Iv.Chat,
                                 Modifier.weight(1f),
                             ) {
                                 val ouvert = ContactCommercial.ouvrirWhatsApp(contexte, numero, message)
@@ -376,7 +368,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                         if (telegramOk) {
                             OnbContactBouton(
                                 R.string.obn_code_telegram,
-                                Icons.AutoMirrored.Outlined.Send,
+                                Iv.Send,
                                 Modifier.weight(1f),
                             ) {
                                 val ouvert = ContactCommercial.ouvrirTelegram(contexte, telegram, message)
@@ -387,7 +379,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                     if (emailOk) {
                         OnbContactBouton(
                             R.string.obn_code_email,
-                            Icons.Outlined.MailOutline,
+                            Iv.MailOutline,
                             Modifier.fillMaxWidth(),
                         ) {
                             val ouvert = ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)
