@@ -22,7 +22,9 @@ object ProduitRules {
      */
     fun estVendable(type: ProductType): Boolean = when (type) {
         ProductType.ACHATE_REVENDU, ProductType.FABRIQUE, ProductType.COMPOSE -> true
-        ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE -> false
+        ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN -> false
     }
 
     /**
@@ -33,14 +35,18 @@ object ProduitRules {
      * s'assemble à partir de ses composants.
      */
     fun estAchetable(type: ProductType): Boolean = when (type) {
-        ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE -> true
+        ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT, ProductType.MATERIEL,
+        ProductType.AUTRE_BIEN -> true
         ProductType.FABRIQUE, ProductType.COMPOSE -> false
     }
 
     /** Articles utilisables comme composant d'un ordre de fabrication. */
     fun estComposant(type: ProductType): Boolean = when (type) {
         ProductType.MATIERE_PREMIERE, ProductType.ACHATE_REVENDU, ProductType.COMPOSE -> true
-        ProductType.FABRIQUE, ProductType.CONNOMMABLE -> false
+        ProductType.FABRIQUE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN -> false
     }
 
     /** Articles qu'un ordre de fabrication peut produire. */

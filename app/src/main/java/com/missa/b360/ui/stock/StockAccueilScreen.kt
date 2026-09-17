@@ -62,7 +62,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .backgroundCanvas()
+            .background(MissaCanvas)
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(text = stringResource(R.string.module_stock), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
@@ -214,5 +214,3 @@ private fun MouvementMini(
     }
 }
 
-private fun Modifier.backgroundCanvas(): Modifier =
-    this.then(androidx.compose.foundation.background(MissaCanvas))

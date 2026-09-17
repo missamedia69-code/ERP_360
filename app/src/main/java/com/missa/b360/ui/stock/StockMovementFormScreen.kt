@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -52,12 +53,20 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
     var destId by remember { mutableStateOf<Long?>(null) }
     var observation by remember { mutableStateOf("") }
 
+    val texteChampsRequis = stringResource(R.string.st_champs_requis)
+    val texteTransfertOk = stringResource(R.string.st_transfert_ok)
+    val texteTransfertKo = stringResource(R.string.st_transfert_ko)
+    val texteMouvementOk = stringResource(R.string.st_mouvement_ok)
+    val texteMouvementKo = stringResource(R.string.st_mouvement_ko)
+    val texteEntree = stringResource(R.string.st_mv_entree)
+    val texteSortie = stringResource(R.string.st_mv_sortie)
+
     outcome?.let { o ->
         val ok = when (o) {
-            is StockOpsViewModel.MovementOutcome.Transfer -> o.result == com.missa.b360.core.domain.usecase.TransferStockUseCase.Result.Succes
+            is StockOpsViewModel.MovementOutcome.Transfer -> o.result is com.missa.b360.core.domain.usecase.TransferStockUseCase.Result.Succes
             else -> false
         }
-        Toast.makeText(contexte, if (ok) stringResource(R.string.st_transfert_ok) else stringResource(R.string.st_transfert_ko), Toast.LENGTH_SHORT).show()
+        Toast.makeText(contexte, if (ok) texteTransfertOk else texteTransfertKo, Toast.LENGTH_SHORT).show()
         vm.clearOutcome()
     }
 
@@ -69,7 +78,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(8.dp))
             Row {
                 StockChip(stringResource(R.string.st_nouveau_transfert), actif = !modeHistorique) { modeHistorique = false }
-                Spacer(Modifier.padding(start = 6.dp))
+                Spacer(Modifier.width(6.dp))
                 StockChip(stringResource(R.string.st_historique), actif = modeHistorique) { modeHistorique = true }
             }
             Spacer(Modifier.height(12.dp))
@@ -123,7 +132,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
                     onClick = {
                         val q = quantite.toDoubleOrNull()
                         if (produitId == null || q == null || q <= 0 || sourceId == null || destId == null || sourceId == destId) {
-                            Toast.makeText(contexte, stringResource(R.string.st_champs_requis), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
                         } else {
                             vm.transfer(
                                 produitId = produitId!!,
@@ -190,10 +199,10 @@ fun StockMovementFormScreen(
 
     outcome?.let { o ->
         val ok = when (o) {
-            is StockOpsViewModel.MovementOutcome.Result -> o.result == com.missa.b360.core.domain.usecase.StockMovementResult.Succes
+            is StockOpsViewModel.MovementOutcome.Result -> o.result is com.missa.b360.core.domain.usecase.StockMovementResult.Succes
             else -> false
         }
-        Toast.makeText(contexte, if (ok) stringResource(R.string.st_mouvement_ok) else stringResource(R.string.st_mouvement_ko), Toast.LENGTH_SHORT).show()
+        Toast.makeText(contexte, if (ok) texteMouvementOk else texteMouvementKo, Toast.LENGTH_SHORT).show()
         vm.clearOutcome()
     }
 
@@ -203,9 +212,9 @@ fun StockMovementFormScreen(
             Spacer(Modifier.height(8.dp))
             Row {
                 StockChip(stringResource(R.string.st_mv_entree), actif = type == StockMovementType.ENTREE) { type = StockMovementType.ENTREE }
-                Spacer(Modifier.padding(start = 6.dp))
+                Spacer(Modifier.width(6.dp))
                 StockChip(stringResource(R.string.st_mv_sortie), actif = type == StockMovementType.SORTIE) { type = StockMovementType.SORTIE }
-                Spacer(Modifier.padding(start = 6.dp))
+                Spacer(Modifier.width(6.dp))
                 StockChip(stringResource(R.string.st_mv_transfert), actif = false, onClick = onOpenTransfer)
             }
             Spacer(Modifier.height(12.dp))
@@ -238,13 +247,13 @@ fun StockMovementFormScreen(
                 onClick = {
                     val q = quantite.toDoubleOrNull()
                     if (produitId == null || q == null || q <= 0) {
-                        Toast.makeText(contexte, stringResource(R.string.st_champs_requis), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
                     } else {
                         vm.record(
                             produitId = produitId!!,
                             type = type,
                             quantite = q,
-                            motif = motif.ifBlank { if (type == StockMovementType.ENTREE) "Entrée" else "Sortie" },
+                            motif = motif.ifBlank { if (type == StockMovementType.ENTREE) texteEntree else texteSortie },
                             reference = "",
                             commentaire = "",
                         )
