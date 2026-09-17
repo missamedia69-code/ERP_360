@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -521,6 +522,8 @@ private fun ClientListScreen(
     val dueTotal = metrics.values.sumOf { it.outstanding }
     Scaffold(
         containerColor = ClientBackground,
+        // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_list_title)) },
@@ -677,6 +680,8 @@ private fun ClientDetailScreen(
 ) {
     Scaffold(
         containerColor = ClientBackground,
+        // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
@@ -1121,6 +1126,8 @@ private fun ClientAddressDialog(address: ClientAddressEntity, onDismiss: () -> U
 private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, primaryLabel: Int, enabled: Boolean, onPrimary: () -> Unit, content: @Composable () -> Unit) {
     Scaffold(
         containerColor = ClientBackground,
+        // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { ClientPageTitle(stringResource(title)) },
@@ -1192,6 +1199,8 @@ private fun ClientAccountScreen(client: ClientEntity, records: List<OperationRec
     val creditLimit = client.limiteCredit
     Scaffold(
         containerColor = ClientBackground,
+        // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = { CenterAlignedTopAppBar(title = { ClientPageTitle(stringResource(R.string.clients_flow_account_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.clients_flow_back)) } }) },
         bottomBar = { OutlinedButton(onClick = onDownload, modifier = Modifier.fillMaxWidth().padding(15.dp).height(47.dp)) { Icon(Icons.Outlined.Download, null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_flow_download_pdf)) } },
     ) { padding ->

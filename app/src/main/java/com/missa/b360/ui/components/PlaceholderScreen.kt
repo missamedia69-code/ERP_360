@@ -1,6 +1,7 @@
 package com.missa.b360.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,8 @@ fun PlaceholderScreen(titleRes: Int, subtitleRes: Int = R.string.module_placehol
     Scaffold(
         topBar = { MissaTopAppBar(title = stringResource(titleRes), onBack = onBack) },
         containerColor = MissaCanvas,
+        // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { padding ->
         Column(
             modifier = Modifier
