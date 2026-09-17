@@ -330,11 +330,6 @@ fun DropdownChamp(
             onValueChange = {},
             readOnly = true,
             enabled = false,
-            colors = androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors(
-                disabledTextColor = MissaInk,
-                disabledBorderColor = MissaBorder,
-                disabledPlaceholderColor = MissaMuted,
-            ),
             label = { Text(label, fontSize = 11.sp, color = MissaMuted) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),

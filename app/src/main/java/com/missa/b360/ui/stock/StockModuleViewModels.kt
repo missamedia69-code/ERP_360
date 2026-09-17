@@ -9,7 +9,6 @@ import com.missa.b360.core.data.entity.InventaireEntity
 import com.missa.b360.core.data.entity.InventaireLigneEntity
 import com.missa.b360.core.data.entity.ProductStatus
 import com.missa.b360.core.data.entity.StockMovementType
-import com.missa.b360.core.domain.model.StockMovementInput
 import com.missa.b360.core.domain.usecase.RecordStockMovementUseCase
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.SiteDao
