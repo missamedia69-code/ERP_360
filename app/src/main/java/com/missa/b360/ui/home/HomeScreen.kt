@@ -950,7 +950,8 @@ private fun AccueilActionCard(
 private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJour: (Long) -> Unit = {}) {
     val margePct = if (state.resumeVentes > 0) state.resumeMarge / state.resumeVentes * 100.0 else 0.0
     var choixDate by remember { mutableStateOf(false) }
-    val labelJour = if (state.resumeJour == CockpitRules.debutJour(System.currentTimeMillis())) {
+    val estAujourdhui = state.resumeJour == CockpitRules.debutJour(System.currentTimeMillis())
+    val labelJour = if (estAujourdhui) {
         stringResource(R.string.home_aujourdhui)
     } else {
         remember(state.resumeJour) {
@@ -964,7 +965,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
             onDismissRequest = { choixDate = false },
             confirmButton = {
                 TextButton(onClick = {
-                    etatDate.selectedDateMillis?.let { onSelectionJour(it + 3_600_000L) }
+                    etatDate.selectedDateMillis?.let { onSelectionJour(it + 43_200_000L) }
                     choixDate = false
                 }) { Text(stringResource(android.R.string.ok)) }
             },
@@ -1011,7 +1012,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                     titre = stringResource(R.string.home_ventes_label),
                     valeur = formatMontantSansDecimales(state.resumeVentes, currency),
                     sousTitre = "${state.resumeVentesCount} ventes",
-                    tendance = state.tendanceVentes,
+                    tendance = if (estAujourdhui) state.tendanceVentes else null,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
@@ -1022,7 +1023,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                     titre = stringResource(R.string.home_achats_label),
                     valeur = formatMontantSansDecimales(state.resumeAchats, currency),
                     sousTitre = "${state.resumeAchatsCount} achats",
-                    tendance = state.tendanceAchats,
+                    tendance = if (estAujourdhui) state.tendanceAchats else null,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
                 AccueilResumeCell(
@@ -1044,7 +1045,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                     titre = stringResource(R.string.home_marge_brute_label),
                     valeur = formatMontantSansDecimales(state.resumeMarge, currency),
                     sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
-                    tendance = state.tendanceMarge,
+                    tendance = if (estAujourdhui) state.tendanceMarge else null,
                 )
             }
             // Ligne additionnelle réelle : stock, projets, qualité – 100% i18n

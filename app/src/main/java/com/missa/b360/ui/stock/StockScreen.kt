@@ -117,19 +117,30 @@ fun StockScreen(
                 Spacer(Modifier.height(8.dp))
                 if (etat.articles.isEmpty()) {
                     MissaEmptyState(
-                        icon = StockIv.Add,
+                        icon = if (etat.requete.isBlank()) StockIv.Add else StockIv.Search,
                         title = stringResource(R.string.st_aucun_resultat),
-                        description = stringResource(R.string.st_ajouter_premier),
+                        description = if (etat.requete.isBlank()) stringResource(R.string.st_ajouter_premier) else null,
                         modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                        action = {
-                            Button(
-                                onClick = { onNavigate(Routes.STOCK_PRODUCT_FORM) },
-                                colors = ButtonDefaults.buttonColors(containerColor = Green60),
-                            ) {
-                                Icon(painterResource(StockIv.Add), null, modifier = Modifier.size(16.dp))
-                                Spacer(Modifier.width(6.dp))
-                                Text(stringResource(R.string.st_ajouter_article))
+                        action = if (etat.requete.isBlank()) {
+                            {
+                                Button(
+                                    onClick = {
+                                        onNavigate(
+                                            Routes.stockProductForm(
+                                                categorieId = etat.categorieId,
+                                                type = etat.type?.name,
+                                            ),
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Green60),
+                                ) {
+                                    Icon(painterResource(StockIv.Add), null, modifier = Modifier.size(16.dp))
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(stringResource(R.string.st_ajouter_article))
+                                }
                             }
+                        } else {
+                            null
                         },
                     )
                 } else {

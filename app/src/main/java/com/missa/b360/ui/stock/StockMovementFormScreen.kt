@@ -73,6 +73,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
         }
         Toast.makeText(contexte, if (ok) texteTransfertOk else texteTransfertKo, Toast.LENGTH_SHORT).show()
         vm.clearOutcome()
+        if (ok) onBack()
     }
 
     Column(
@@ -215,10 +216,13 @@ fun StockMovementFormScreen(
         }
         Toast.makeText(contexte, if (ok) texteMouvementOk else texteMouvementKo, Toast.LENGTH_SHORT).show()
         vm.clearOutcome()
+        // Un mouvement enregistré = opération terminée : on revient en arrière
+        // (rester sur le formulaire rempli exposerait au double enregistrement).
+        if (ok) onBack()
     }
 
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        MissaTopAppBar(title = stringResource(R.string.st_nouveau_mouvement), onBack = onBack)
+        MissaTopAppBar(title = stringResource(R.string.st_nouveau_mouvement), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             Row {

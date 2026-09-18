@@ -107,7 +107,7 @@ fun MissaBarreModules(
                         modifier = Modifier.weight(1f),
                         icone = module.icon,
                         libelleRes = libelleRes,
-                        actif = racine == module.route,
+                        actif = moduleCourant == module,
                         onClick = { onModule(module) },
                     )
                 }

@@ -82,7 +82,7 @@ data class HomeUiState(
     val serieTresorerie: List<PointJour> = emptyList(),
     val serieClients: List<PointJour> = emptyList(),
     /** Jour suivi par le résumé d'activité (modifiable via le calendrier). */
-    val resumeJour: Long = 0L,
+    val resumeJour: Long = CockpitRules.debutJour(System.currentTimeMillis()),
     val resumeVentes: Double = 0.0,
     val resumeAchats: Double = 0.0,
     val resumeMarge: Double = 0.0,
