@@ -310,7 +310,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.STOCK, activation, navController) {
                 StockAccueilScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -328,7 +328,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.STOCK, activation, navController) {
                 StockCategoriesScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -378,7 +378,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.STOCK, activation, navController) {
                 StockAlertesScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -507,7 +507,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.LIVRAISON, activation, navController) {
                 LivraisonScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                 )
             }
@@ -519,7 +519,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.SERVICES, activation, navController) {
                 ServicesScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                 )
             }
@@ -531,7 +531,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.PROJETS, activation, navController) {
                 ProjetsScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                 )
             }
@@ -540,7 +540,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.COMPTABILITE, activation, navController) {
                 ComptabiliteScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -548,7 +548,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.TRESORERIE, activation, navController) {
                 TresorerieScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -556,7 +556,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.CRM, activation, navController) {
                 CrmScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -564,7 +564,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.QUALITE, activation, navController) {
                 QualiteScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -572,7 +572,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.MAINTENANCE, activation, navController) {
                 MaintenanceScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
@@ -580,7 +580,7 @@ private fun MainNavHost() {
             GuardedModule(AppModule.LOGISTIQUE, activation, navController) {
                 LogistiqueScreen(
                     onBack = { navController.popBackStack() },
-                    onNaviguer = { route -> navController.naviguerVers(route) },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
                 )
             }
         }
