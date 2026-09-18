@@ -1,5 +1,9 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.ui.text.style.TextOverflow
+
+import androidx.compose.foundation.layout.widthIn
+
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -83,11 +87,10 @@ private val PuceHeader = MissaInk.copy(alpha = 0.05f)
 @Composable
 fun MissaAppHeader(
     companyLogoUri: String?,
-    notificationCount: Int,
+    companyName: String,
     isHome: Boolean,
     onMenuClick: () -> Unit,
     onBackClick: () -> Unit,
-    onNotificationClick: () -> Unit,
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -166,33 +169,17 @@ fun MissaAppHeader(
                     )
                 }
                 Spacer(Modifier.weight(1f))
-                // Cloche + pastille rouge si notifications non lues.
-                IconButton(
-                    onClick = onNotificationClick,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(PuceHeader),
-                ) {
-                    Box {
-                        Icon(
-                            painter = painterResource(Iv.Notifications),
-                            contentDescription = stringResource(R.string.notifications),
-                            tint = MissaInk,
-                            modifier = Modifier.size(24.dp),
-                        )
-                        if (notificationCount > 0) {
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(top = 1.dp)
-                                    .size(9.dp)
-                                    .border(1.5.dp, Color.White, CircleShape)
-                                    .background(Red40, CircleShape),
-                            )
-                        }
-                    }
-                }
+                // Nom de l'entreprise à côté de son logo — la cloche vit désormais
+                // au niveau du « Bonjour » de l'accueil.
+                Text(
+                    text = companyName,
+                    color = MissaInk,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.widthIn(max = 130.dp),
+                )
                 Spacer(Modifier.width(6.dp))
                 // Bouton entreprise — parfaitement rond, fond très légèrement teinté de vert.
                 IconButton(

@@ -1098,5 +1098,12 @@
     <string name="st_modifier_image">Modifier l\'image</string>
     <string name="st_supprimer_image">Supprimer l\'image</string>
     <string name="st_image_echec">Image illisible — réessayez avec une autre photo</string>
+
+    <!-- Popups des cartes KPI : courbes d'évolution -->
+    <string name="kpi_popup_fermer">Fermer</string>
+    <string name="kpi_ventes_explication">Évolution des ventes validées sur les 14 derniers jours. Chaque point représente le total encaissé du jour.</string>
+    <string name="kpi_achats_explication">Évolution des achats validés sur les 14 derniers jours. Chaque point représente le total dépensé du jour.</string>
+    <string name="kpi_tresorerie_explication">Évolution du solde de trésorerie (entrées moins sorties, cumulé) sur les 14 derniers jours.</string>
+    <string name="kpi_clients_explication">Évolution du nombre total de clients enregistrés, jour après jour, sur les 14 derniers jours.</string>
 </resources>
 <!-- Temp insert will be replaced -->

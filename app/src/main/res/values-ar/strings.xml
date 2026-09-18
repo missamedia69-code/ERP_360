@@ -1051,4 +1051,11 @@
     <string name="st_modifier_image">تغيير الصورة</string>
     <string name="st_supprimer_image">إزالة الصورة</string>
     <string name="st_image_echec">صورة غير قابلة للقراءة — جرّب صورة أخرى</string>
+
+    <!-- Popups des cartes KPI : courbes d'évolution -->
+    <string name="kpi_popup_fermer">إغلاق</string>
+    <string name="kpi_ventes_explication">تطور المبيعات المعتمدة خلال آخر 14 يوماً. كل نقطة تمثل إجمالي المقبوضات في ذلك اليوم.</string>
+    <string name="kpi_achats_explication">تطور المشتريات المعتمدة خلال آخر 14 يوماً. كل نقطة تمثل إجمالي المصروفات في ذلك اليوم.</string>
+    <string name="kpi_tresorerie_explication">تطور رصيد الخزينة (الإيرادات ناقص المصروفات، تراكمياً) خلال آخر 14 يوماً.</string>
+    <string name="kpi_clients_explication">تطور العدد الإجمالي للعملاء المسجلين، يوماً بيوم، خلال آخر 14 يوماً.</string>
 </resources>

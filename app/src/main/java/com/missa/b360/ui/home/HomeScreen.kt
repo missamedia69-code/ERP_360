@@ -1,5 +1,25 @@
 package com.missa.b360.ui.home
 
+import com.missa.b360.core.domain.model.PointJour
+
+import com.missa.b360.core.domain.model.CockpitRules
+
+import androidx.compose.foundation.border
+
+import androidx.compose.material3.rememberDatePickerState
+
+import androidx.compose.material3.DatePickerDialog
+
+import androidx.compose.material3.DatePicker
+
+import androidx.compose.ui.geometry.Offset
+
+import androidx.compose.ui.graphics.drawscope.Stroke
+
+import androidx.compose.ui.graphics.Path
+
+import androidx.compose.foundation.Canvas
+
 import com.missa.b360.ui.icons.Iv
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -166,7 +186,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.PersonAdd,
         tint = MissaInk,
         bg = AppModule.CLIENTS.couleurDouce,
-        route = AppModule.CLIENTS.createRoute(),
+        route = AppModule.CLIENTS.route + "?create=true",
         module = ModuleCode.VEN,
     ),
     AccueilActionDef(
@@ -184,7 +204,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.Inventory2,
         tint = MissaInk,
         bg = AppModule.STOCK.couleurDouce,
-        route = AppModule.STOCK.createRoute(),
+        route = Routes.STOCK_MOVEMENT_FORM + "?type=ENTREE",
         module = ModuleCode.STK,
     ),
     AccueilActionDef(
@@ -200,8 +220,8 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.PAIEMENT_RECU,
         labelRes = R.string.home_paiement_recu_label,
         icon = Iv.Payments,
-        tint = MissaInk,
-        bg = AppModule.TRESORERIE.couleurDouce,
+        tint = TendrePositive,
+        bg = Green90,
         route = AppModule.TRESORERIE.route,
         module = ModuleCode.TRE,
     ),
@@ -209,7 +229,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         key = AccueilActionKeys.DEPENSE,
         labelRes = R.string.home_depense_label,
         icon = Iv.Description,
-        tint = MissaInk,
+        tint = HomeRed,
         bg = Red80,
         route = AppModule.FINANCES.route,
         module = ModuleCode.CPT,
@@ -261,6 +281,9 @@ fun HomeScreen(
             onPersonnaliser = { showPersonnaliser = true },
             modifier = Modifier.fillMaxSize(),
             onNavigate = { navController.navigate(it) },
+            notificationCount = nonLues,
+            onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
+            onSelectionJour = viewModel::selectionnerJour,
         )
     }
 
@@ -511,10 +534,22 @@ private fun HomeDashboard(
     onPersonnaliser: () -> Unit,
     modifier: Modifier,
     onNavigate: (String) -> Unit,
+    notificationCount: Int = 0,
+    onNotificationClick: () -> Unit = {},
+    onSelectionJour: (Long) -> Unit = {},
 ) {
+    // Carte KPI consultée en popup (0 ventes · 1 achats · 2 trésorerie · 3 clients).
+    var kpiEnVue by remember { mutableStateOf(-1) }
     val currency = state.devise
     val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
         ?: stringResource(R.string.home_greeting_anonymous)
+    // Dashboard : chaque carte KPI ouvre un popup avec la courbe d'évolution.
+    when (kpiEnVue) {
+        0 -> KpiPopup(stringResource(R.string.home_ventes_du_jour), state.serieVentes, AppModule.VENTE.couleur, stringResource(R.string.kpi_ventes_explication)) { kpiEnVue = -1 }
+        1 -> KpiPopup(stringResource(R.string.home_achats_du_jour), state.serieAchats, AppModule.ACHATS.couleur, stringResource(R.string.kpi_achats_explication)) { kpiEnVue = -1 }
+        2 -> KpiPopup(stringResource(R.string.home_tresorerie_card), state.serieTresorerie, AppModule.TRESORERIE.couleur, stringResource(R.string.kpi_tresorerie_explication)) { kpiEnVue = -1 }
+        3 -> KpiPopup(stringResource(R.string.home_clients_card), state.serieClients, AppModule.CLIENTS.couleur, stringResource(R.string.kpi_clients_explication)) { kpiEnVue = -1 }
+    }
     // Spec: contenu entre Header 64dp et BottomNav 80dp, scrollable seul, marges 16dp, grille 4/8/12/16/20/24/32
     LazyColumn(
         modifier = modifier.background(HomeBackground),
@@ -522,20 +557,42 @@ private fun HomeDashboard(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            // Salutation
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = greeting,
-                    color = HomeTextDark,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(Modifier.height(3.dp))
-                Text(
-                    text = stringResource(R.string.home_overview),
-                    color = HomeTextMuted,
-                    fontSize = 13.sp,
-                )
+            // Salutation + cloche des notifications (descendue du header).
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = greeting,
+                        color = HomeTextDark,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(3.dp))
+                    Text(
+                        text = stringResource(R.string.home_overview),
+                        color = HomeTextMuted,
+                        fontSize = 13.sp,
+                    )
+                }
+                Box {
+                    IconButton(onClick = onNotificationClick, modifier = Modifier.size(44.dp)) {
+                        Icon(
+                            painter = painterResource(Iv.Notifications),
+                            contentDescription = stringResource(R.string.notifications),
+                            tint = MissaInk,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                    if (notificationCount > 0) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 6.dp, end = 6.dp)
+                                .size(9.dp)
+                                .border(1.5.dp, HomeBackground, CircleShape)
+                                .background(HomeRed, CircleShape),
+                        )
+                    }
+                }
             }
         }
         item {
@@ -627,7 +684,7 @@ private fun HomeDashboard(
                         iconBg = HomeBlueSoft,
                         iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_ventes,
-                        onClick = { onNavigate(AppModule.VENTE.route) },
+                        onClick = { kpiEnVue = 0 },
                     )
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
@@ -639,7 +696,7 @@ private fun HomeDashboard(
                         iconBg = AppModule.ACHATS.couleurDouce,
                         iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_stock,
-                        onClick = { onNavigate(AppModule.ACHATS.route) },
+                        onClick = { kpiEnVue = 1 },
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -653,7 +710,7 @@ private fun HomeDashboard(
                         iconBg = AppModule.TRESORERIE.couleurDouce,
                         iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_tresorerie,
-                        onClick = { onNavigate(AppModule.TRESORERIE.route) },
+                        onClick = { kpiEnVue = 2 },
                     )
                     AccueilKpiCard(
                         modifier = Modifier.weight(1f),
@@ -665,7 +722,7 @@ private fun HomeDashboard(
                         iconBg = AppModule.CLIENTS.couleurDouce,
                         iconTint = MissaInk,
                         illustrationRes = R.drawable.illustration_clients,
-                        onClick = { onNavigate(AppModule.CLIENTS.route) },
+                        onClick = { kpiEnVue = 3 },
                     )
                 }
             }
@@ -713,7 +770,7 @@ private fun HomeDashboard(
         }
         item {
             // Résumé de l'activité
-            AccueilResumeCard(state = state, currency = currency)
+            AccueilResumeCard(state = state, currency = currency, onSelectionJour = onSelectionJour)
         }
         item {
             // Activités récentes + Rappels + Tâches
@@ -865,9 +922,9 @@ private fun AccueilActionCard(
         ) {
             Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(9.dp), color = bg) {
                 Box(contentAlignment = Alignment.Center) {
-                    // Superpose un petit + pour les 4 premiers
+                    // Chaque action rapide mène à un formulaire : petit + en indice partout.
                     Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(18.dp))
-                    if (label.startsWith("+")) {
+                    run {
                         Box(modifier = Modifier.align(Alignment.BottomEnd).size(12.dp).clip(CircleShape).background(tint), contentAlignment = Alignment.Center) {
                             Text(text = "+", color = Color.White, fontSize = 8.sp, fontWeight = FontWeight.Bold, lineHeight = 8.sp)
                         }
@@ -888,9 +945,38 @@ private fun AccueilActionCard(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AccueilResumeCard(state: HomeUiState, currency: String) {
-    val margePct = if (state.ventes > 0) state.marge / state.ventes * 100.0 else 0.0
+private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJour: (Long) -> Unit = {}) {
+    val margePct = if (state.resumeVentes > 0) state.resumeMarge / state.resumeVentes * 100.0 else 0.0
+    var choixDate by remember { mutableStateOf(false) }
+    val labelJour = if (state.resumeJour == CockpitRules.debutJour(System.currentTimeMillis())) {
+        stringResource(R.string.home_aujourdhui)
+    } else {
+        remember(state.resumeJour) {
+            java.text.SimpleDateFormat("d/M/yyyy", java.util.Locale.getDefault())
+                .format(java.util.Date(state.resumeJour))
+        }
+    }
+    if (choixDate) {
+        val etatDate = rememberDatePickerState(initialSelectedDateMillis = state.resumeJour)
+        DatePickerDialog(
+            onDismissRequest = { choixDate = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    etatDate.selectedDateMillis?.let { onSelectionJour(it + 3_600_000L) }
+                    choixDate = false
+                }) { Text(stringResource(android.R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { choixDate = false }) {
+                    Text(stringResource(R.string.kpi_popup_fermer))
+                }
+            },
+        ) {
+            DatePicker(state = etatDate)
+        }
+    }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -900,11 +986,16 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.home_resume_activite), color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Surface(shape = RoundedCornerShape(20.dp), color = HomeBackground, border = BorderStroke(1.dp, HomeBorder)) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = HomeBackground,
+                    border = BorderStroke(1.dp, HomeBorder),
+                    modifier = Modifier.clickable { choixDate = true },
+                ) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(painter = painterResource(Iv.Calendar), contentDescription = null, tint = MissaInk, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text(text = stringResource(R.string.home_aujourdhui), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                        Text(text = labelJour, color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         Spacer(Modifier.width(4.dp))
                         Icon(painter = painterResource(Iv.ArrowDropDown), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
                     }
@@ -918,8 +1009,8 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = MissaInk,
                     iconBg = HomeBlueSoft,
                     titre = stringResource(R.string.home_ventes_label),
-                    valeur = formatMontantSansDecimales(state.ventes, currency),
-                    sousTitre = "${state.ventesCount} ventes",
+                    valeur = formatMontantSansDecimales(state.resumeVentes, currency),
+                    sousTitre = "${state.resumeVentesCount} ventes",
                     tendance = state.tendanceVentes,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
@@ -929,8 +1020,8 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = MissaInk,
                     iconBg = AppModule.ACHATS.couleurDouce,
                     titre = stringResource(R.string.home_achats_label),
-                    valeur = formatMontantSansDecimales(state.achats, currency),
-                    sousTitre = "${state.achatsCount} achats",
+                    valeur = formatMontantSansDecimales(state.resumeAchats, currency),
+                    sousTitre = "${state.resumeAchatsCount} achats",
                     tendance = state.tendanceAchats,
                 )
                 Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
@@ -940,7 +1031,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = MissaInk,
                     iconBg = AppModule.STOCK.couleurDouce,
                     titre = stringResource(R.string.home_mouvements_stock_label),
-                    valeur = state.mouvementsStockCount.toString(),
+                    valeur = state.resumeMouvements.toString(),
                     sousTitre = if (state.rupturesStock > 0) "${state.rupturesStock} ruptures" else stringResource(R.string.home_operations_label),
                     tendance = null,
                 )
@@ -951,7 +1042,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String) {
                     iconTint = MissaInk,
                     iconBg = AppModule.FINANCES.couleurDouce,
                     titre = stringResource(R.string.home_marge_brute_label),
-                    valeur = formatMontantSansDecimales(state.marge, currency),
+                    valeur = formatMontantSansDecimales(state.resumeMarge, currency),
                     sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
                     tendance = state.tendanceMarge,
                 )
@@ -1689,4 +1780,68 @@ private fun HomePersonnaliserDialogue(
             }
         },
     )
+}
+
+@Composable
+private fun KpiPopup(
+    titre: String,
+    points: List<PointJour>,
+    couleur: Color,
+    explication: String,
+    onFermer: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onFermer,
+        confirmButton = {
+            TextButton(onClick = onFermer) { Text(stringResource(R.string.kpi_popup_fermer)) }
+        },
+        title = { Text(titre, fontWeight = FontWeight.Bold, fontSize = 16.sp) },
+        text = {
+            Column {
+                if (points.size >= 2) {
+                    CourbeEvolution(points, couleur, modifier = Modifier.fillMaxWidth().height(140.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(points.first().label, fontSize = 10.sp, color = HomeTextMuted)
+                        Text(points.last().label, fontSize = 10.sp, color = HomeTextMuted)
+                    }
+                }
+                Spacer(Modifier.height(10.dp))
+                Text(explication, fontSize = 12.sp, color = HomeTextMuted)
+            }
+        },
+    )
+}
+
+/** Courbe d'évolution simple tracée à la main (Canvas) — aucune dépendance externe. */
+@Composable
+private fun CourbeEvolution(
+    points: List<PointJour>,
+    couleur: Color,
+    modifier: Modifier = Modifier,
+) {
+    val maxV = points.maxOf { it.valeur }
+    val minV = minOf(0.0, points.minOf { it.valeur })
+    Canvas(modifier = modifier) {
+        val pad = 12f
+        val w = size.width - pad * 2
+        val h = size.height - pad * 2
+        val n = points.size
+        val amplitude = (maxV - minV).takeIf { it > 0.0 } ?: 1.0
+        fun pt(i: Int): Offset {
+            val x = pad + w * i.toFloat() / (n - 1).coerceAtLeast(1)
+            val y = pad + h * (1f - ((points[i].valeur - minV) / amplitude).toFloat())
+            return Offset(x, y)
+        }
+        val chemin = Path().apply {
+            for (i in points.indices) {
+                val p = pt(i)
+                if (i == 0) moveTo(p.x, p.y) else lineTo(p.x, p.y)
+            }
+        }
+        drawPath(chemin, couleur, style = Stroke(width = 3.5f))
+        for (i in points.indices) drawCircle(couleur, radius = 4.5f, center = pt(i))
+    }
 }

@@ -9,6 +9,7 @@ import com.missa.b360.core.data.repository.ProfilActivationRepository
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.CockpitRules
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.PointJour
 import com.missa.b360.core.domain.model.PointPerformance
 import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.domain.model.RappelsRules
@@ -75,6 +76,19 @@ data class HomeUiState(
     val tendanceClients: Double? = null,
     /** Encaissements des six derniers mois civils, pour le graphique. */
     val performanceMensuelle: List<PointPerformance> = emptyList(),
+    /** Courbes des 14 derniers jours pour les popups des cartes KPI. */
+    val serieVentes: List<PointJour> = emptyList(),
+    val serieAchats: List<PointJour> = emptyList(),
+    val serieTresorerie: List<PointJour> = emptyList(),
+    val serieClients: List<PointJour> = emptyList(),
+    /** Jour suivi par le résumé d'activité (modifiable via le calendrier). */
+    val resumeJour: Long = 0L,
+    val resumeVentes: Double = 0.0,
+    val resumeAchats: Double = 0.0,
+    val resumeMarge: Double = 0.0,
+    val resumeVentesCount: Int = 0,
+    val resumeAchatsCount: Int = 0,
+    val resumeMouvements: Int = 0,
     val recentOperations: List<OperationRecordEntity> = emptyList(),
     /** Ce que l'accueil doit signaler : tâches ouvertes et impayés échus. */
     val rappels: RappelsAccueil = RappelsAccueil(),
@@ -184,6 +198,16 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    /** Jour sélectionné dans le résumé d'activité (défaut : aujourd'hui). */
+    private val jourResume = kotlinx.coroutines.flow.MutableStateFlow(
+        CockpitRules.debutJour(System.currentTimeMillis()),
+    )
+
+    /** Change le jour suivi par le résumé d'activité. */
+    fun selectionnerJour(jour: Long) {
+        jourResume.value = CockpitRules.debutJour(jour)
+    }
+
     private val taches = homeRepository.observeTaches()
 
     private val soldeTresorerie = homeRepository.observeSoldeTresorerie()
@@ -203,6 +227,8 @@ class HomeViewModel @Inject constructor(
         stockMouvements,
         produits,
         nonConformites,
+        observeClients(),
+        jourResume,
     ) { args ->
         val base = args[0] as HomeUiState
         @Suppress("UNCHECKED_CAST")
@@ -213,6 +239,9 @@ class HomeViewModel @Inject constructor(
         val act = args[4] as ActivationProfil
         @Suppress("UNCHECKED_CAST")
         val stocks = args[5] as List<com.missa.b360.core.data.entity.ProductStockEntity>
+        @Suppress("UNCHECKED_CAST")
+        val clientsListe = args[9] as List<com.missa.b360.core.data.entity.ClientEntity>
+        val jourSel = args[10] as Long
         @Suppress("UNCHECKED_CAST")
         val mouvementsStock = args[6] as List<com.missa.b360.core.data.entity.StockMovementEntity>
         @Suppress("UNCHECKED_CAST")
@@ -331,6 +360,20 @@ class HomeViewModel @Inject constructor(
             else (marge / ventes - margeHier / ventesHier) * 100.0,
             tendanceTresorerie = CockpitRules.variationPct(fluxJour, fluxHier),
             performanceMensuelle = CockpitRules.performanceMensuelle(validated, maintenant),
+            serieVentes = CockpitRules.serieVentes(validated, maintenant),
+            serieAchats = CockpitRules.serieAchats(validated, maintenant),
+            serieTresorerie = CockpitRules.serieTresorerie(validated, maintenant),
+            serieClients = CockpitRules.serieClients(clientsListe.map { it.createdAt }, maintenant),
+            resumeJour = jourSel,
+            resumeVentes = CockpitRules.encaissements(records, jourSel),
+            resumeAchats = CockpitRules.achatsJour(records, jourSel),
+            resumeMarge = CockpitRules.margeJour(
+                CockpitRules.encaissements(records, jourSel),
+                CockpitRules.achatsJour(records, jourSel),
+            ),
+            resumeVentesCount = CockpitRules.piecesJour(records, jourSel, OperationModule.VENTE),
+            resumeAchatsCount = CockpitRules.piecesJour(records, jourSel, OperationModule.ACHATS),
+            resumeMouvements = CockpitRules.mouvementsJour(records, jourSel),
             recentOperations = recordsFiltres.sortedByDescending { it.createdAt }.take(4),
             rappels = RappelsRules.rappels(listeTaches, recordsFiltres, maintenant),
             taches = listeTaches,

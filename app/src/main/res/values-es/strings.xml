@@ -1051,4 +1051,11 @@
     <string name="st_modifier_image">Cambiar imagen</string>
     <string name="st_supprimer_image">Eliminar imagen</string>
     <string name="st_image_echec">Imagen ilegible — prueba con otra foto</string>
+
+    <!-- Popups des cartes KPI : courbes d'évolution -->
+    <string name="kpi_popup_fermer">Cerrar</string>
+    <string name="kpi_ventes_explication">Evolución de las ventas validadas en los últimos 14 días. Cada punto es el total cobrado del día.</string>
+    <string name="kpi_achats_explication">Evolución de las compras validadas en los últimos 14 días. Cada punto es el total gastado del día.</string>
+    <string name="kpi_tresorerie_explication">Evolución del saldo de tesorería (entradas menos salidas, acumulado) en los últimos 14 días.</string>
+    <string name="kpi_clients_explication">Evolución del número total de clientes registrados, día a día, en los últimos 14 días.</string>
 </resources>

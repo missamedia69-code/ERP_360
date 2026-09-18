@@ -213,11 +213,10 @@ private fun MainNavHost() {
             if (isHome && !estFormulairePleinEcran) {
                 com.missa.b360.ui.components.MissaAppHeader(
                     companyLogoUri = etatAccueil.entrepriseLogoUri,
-                    notificationCount = nonLues,
+                    companyName = etatAccueil.entrepriseNom,
                     isHome = true,
                     onMenuClick = { portee.launch { etatTiroir.open() } },
                     onBackClick = { navController.popBackStack() },
-                    onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
                     onProfileClick = { ficheEntreprise = true },
                 )
             }
