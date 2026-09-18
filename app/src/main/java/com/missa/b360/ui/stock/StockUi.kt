@@ -311,13 +311,15 @@ fun DropdownChamp(
     onOption: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Un sélecteur sans options ne s'affiche pas : cliquer sans rien voir arriver
+    // est l'incohérence même.
+    if (options.isEmpty()) return
     var ouvert by remember { mutableStateOf(false) }
     Box(modifier) {
         OutlinedTextField(
             value = valeur,
             onValueChange = {},
             readOnly = true,
-            enabled = false,
             label = { Text(label, fontSize = 11.sp, color = MissaMuted) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),

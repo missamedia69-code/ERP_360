@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,10 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -92,6 +97,7 @@ fun ProductFormScreen(
     var type by remember { mutableStateOf(initialType ?: ProductType.ACHATE_REVENDU) }
     var nom by remember { mutableStateOf("") }
     var reference by remember { mutableStateOf("") }
+    var barcode by remember { mutableStateOf("") }
     var categorieId by remember { mutableStateOf(initialCategorieId) }
     var marque by remember { mutableStateOf("") }
     var unite by remember { mutableStateOf("") }
@@ -150,6 +156,7 @@ fun ProductFormScreen(
         type = p.type
         nom = p.nom
         reference = p.reference.orEmpty()
+        barcode = p.barcode.orEmpty()
         categorieId = p.categorieId
         marque = p.marque.orEmpty()
         unite = p.unite.orEmpty()
@@ -264,15 +271,19 @@ fun ProductFormScreen(
                 Spacer(Modifier.height(10.dp))
                 Champ(stringResource(R.string.st_reference), reference) { reference = it }
                 Spacer(Modifier.height(10.dp))
-                if (productId == null && initialCategorieId != null) {
+                Champ(stringResource(R.string.st_code_barres), barcode) { barcode = it }
+                Spacer(Modifier.height(10.dp))
+                when {
                     // Création déjà dans une catégorie utilisateur : pas de sélecteur.
-                    BadgeVerrouille(
-                        StockIv.Category,
-                        categories.firstOrNull { it.id == initialCategorieId }?.nom
-                            ?: stringResource(R.string.st_categorie),
-                    )
-                } else {
-                    DropdownChamp(
+                    productId == null && initialCategorieId != null ->
+                        BadgeVerrouille(
+                            StockIv.Category,
+                            categories.firstOrNull { it.id == initialCategorieId }?.nom
+                                ?: stringResource(R.string.st_categorie),
+                        )
+                    // Aucune catégorie utilisateur : pas de sélecteur vide qui s'ouvre sur rien.
+                    categories.isEmpty() -> Unit
+                    else -> DropdownChamp(
                         libelle = stringResource(R.string.st_categorie),
                         options = categories.map { it.id to it.nom },
                         selection = categorieId,
@@ -290,18 +301,18 @@ fun ProductFormScreen(
                     Spacer(Modifier.height(10.dp))
                     Champ(stringResource(R.string.st_num_serie), numeroSerie) { numeroSerie = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ("${stringResource(R.string.st_date_acquisition)} (jj/mm/aaaa)", dateAcquisition) { dateAcquisition = it }
+                    ChampDate(stringResource(R.string.st_date_acquisition), dateAcquisition) { dateAcquisition = it }
                     Spacer(Modifier.height(10.dp))
                     Champ(stringResource(R.string.st_responsable), responsable) { responsable = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)} (jj/mm/aaaa)", garantieDebut) { garantieDebut = it }
+                    ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)}", garantieDebut) { garantieDebut = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_fin)} (jj/mm/aaaa)", garantieFin) { garantieFin = it }
+                    ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_fin)}", garantieFin) { garantieFin = it }
                 }
                 Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        if (nom.isBlank()) {
+                        if (nom.isBlank() || unite.isBlank()) {
                             Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
                         } else {
                             etape = 1
@@ -370,6 +381,7 @@ fun ProductFormScreen(
                                 nom = nom.trim(),
                                 type = type,
                                 reference = reference.takeIf { it.isNotBlank() },
+                                barcode = barcode.takeIf { it.isNotBlank() },
                                 categorieId = categorieId,
                                 marque = marque.takeIf { it.isNotBlank() },
                                 unite = unite.takeIf { it.isNotBlank() },
@@ -396,6 +408,49 @@ fun ProductFormScreen(
                 }
             }
             Spacer(Modifier.height(20.dp))
+        }
+    }
+}
+
+/** Champ de date en lecture seule ouvrant un petit calendrier (DatePicker). */
+@Composable
+private fun ChampDate(libelle: String, valeur: String, onValeur: (String) -> Unit) {
+    var ouvert by remember { mutableStateOf(false) }
+    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = valeur,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            trailingIcon = {
+                Icon(painterResource(StockIv.Calendar), null, tint = MissaInk, modifier = Modifier.size(18.dp))
+            },
+        )
+        Box(modifier = Modifier.matchParentSize().clickable { ouvert = true })
+    }
+    if (ouvert) {
+        // +12 h : midi UTC = même jour civil dans tous les fuseaux (aller/retour).
+        val initial = runCatching { fmt.parse(valeur.trim())?.time }.getOrNull()
+        val etatDate = rememberDatePickerState(initialSelectedDateMillis = initial?.plus(43_200_000L))
+        DatePickerDialog(
+            onDismissRequest = { ouvert = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    etatDate.selectedDateMillis?.let { millis ->
+                        onValeur(fmt.format(java.util.Date(millis + 43_200_000L)))
+                    }
+                    ouvert = false
+                }) { Text(stringResource(R.string.st_ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { ouvert = false }) { Text(stringResource(R.string.st_annuler)) }
+            },
+        ) {
+            DatePicker(state = etatDate)
         }
     }
 }

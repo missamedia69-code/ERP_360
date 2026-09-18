@@ -11,6 +11,7 @@ object StockIv {
 
     val Add = R.drawable.ph_plus
     val Bank = R.drawable.ph_bank
+    val Calendar = R.drawable.ph_calendar_blank
     val Build = R.drawable.ph_wrench
     val BuildCircle = R.drawable.ph_wrench
     val Category = R.drawable.ph_squares_four
