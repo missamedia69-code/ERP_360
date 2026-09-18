@@ -1062,4 +1062,12 @@
     <!-- Stock : état vide avec action Ajouter -->
     <string name="st_ajouter_premier">Esta lista está vacía. Pulse Añadir para crear un artículo.</string>
     <string name="st_ajouter_article">Añadir un artículo</string>
+
+    <!-- Stock : catégories utilisateur -->
+    <string name="st_nouvelle_categorie">Nueva categoría</string>
+    <string name="st_nom_categorie">Nombre de la categoría</string>
+    <string name="st_creer">Crear</string>
+    <string name="st_annuler">Cancelar</string>
+    <string name="st_categories_perso">Categorías personalizadas</string>
+    <string name="st_nouvel_equipement">Nuevo equipo</string>
 </resources>

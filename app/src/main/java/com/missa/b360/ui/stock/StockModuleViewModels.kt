@@ -1,5 +1,7 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.core.domain.usecase.CategorieProduitUseCases
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -56,9 +58,18 @@ data class StockAccueilState(
     val critiques: Int = 0,
     val ruptures: Int = 0,
     val categories: List<CatStockRow> = emptyList(),
+    /** Catégories librement créées par l'utilisateur (table product_categories). */
+    val categoriesLibres: List<CatLibreRow> = emptyList(),
     val entreesJour: Int = 0,
     val sortiesJour: Int = 0,
     val transfertsJour: Int = 0,
+)
+
+/** Ligne d'une catégorie utilisateur dans la matrice : id, nom et nombre d'articles. */
+data class CatLibreRow(
+    val id: Long,
+    val nom: String,
+    val nombre: Int,
 )
 
 /** Accueil du module Stock : valorisation, compteurs, catégories et mouvements du jour. */
@@ -68,7 +79,13 @@ class StockAccueilViewModel @Inject constructor(
     observeStock: ObserveProductStockUseCase,
     observeMovements: ObserveStockMovementsUseCase,
     getEnterprise: GetEnterpriseUseCase,
+    private val categoriesUseCases: CategorieProduitUseCases,
 ) : ViewModel() {
+
+    /** Crée une catégorie utilisateur depuis la matrice (matrice rafraîchie par le flux). */
+    fun creerCategorie(nom: String) {
+        viewModelScope.launch { categoriesUseCases.creer(nom) }
+    }
 
     val etat: StateFlow<StockAccueilState> = combine(
         combine(observeProducts(), observeStock()) { produits, stocks ->
@@ -76,7 +93,8 @@ class StockAccueilViewModel @Inject constructor(
         },
         observeMovements(),
         getEnterprise.observer(),
-    ) { lignes, mouvements, entreprise ->
+        categoriesUseCases.observer(),
+    ) { lignes, mouvements, entreprise, catsLibres ->
         val devise = entreprise?.devise.orEmpty()
         // Valorisation au coût de revient, à défaut au prix d'achat (même règle que StockHubRules).
         val valeur = lignes.sumOf { l ->
@@ -111,6 +129,13 @@ class StockAccueilViewModel @Inject constructor(
             critiques = lignes.count { it.level == StockLevel.CRITIQUE || it.level == StockLevel.BAS },
             ruptures = lignes.count { it.stock <= 0.0 },
             categories = parType,
+            categoriesLibres = catsLibres.filter { it.actif }.map { c ->
+                CatLibreRow(
+                    id = c.id,
+                    nom = c.nom,
+                    nombre = lignes.count { it.product.categorieId == c.id },
+                )
+            },
             entreesJour = entrees,
             sortiesJour = sorties,
             transfertsJour = transferts,
@@ -143,8 +168,12 @@ class StockListeViewModel @Inject constructor(
             runCatching { ProductType.valueOf(nom) }.getOrNull()
         }
 
+    /** Catégorie utilisateur demandée par la route (tuile de la matrice). */
+    private val categorieInitiale: Long? =
+        savedStateHandle.get<String>("cat")?.toLongOrNull()
+
     private val _requete = kotlinx.coroutines.flow.MutableStateFlow("")
-    private val _categorieId = kotlinx.coroutines.flow.MutableStateFlow<Long?>(null)
+    private val _categorieId = kotlinx.coroutines.flow.MutableStateFlow(categorieInitiale)
 
     fun chercher(texte: String) { _requete.value = texte }
     fun filtrerCategorie(id: Long?) { _categorieId.value = id }

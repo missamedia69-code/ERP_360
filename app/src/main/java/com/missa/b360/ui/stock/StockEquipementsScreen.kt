@@ -1,5 +1,9 @@
 package com.missa.b360.ui.stock
 
+import androidx.compose.material3.ButtonDefaults
+
+import androidx.compose.material3.Button
+
 import com.missa.b360.ui.navigation.AppModule
 
 import androidx.compose.foundation.horizontalScroll
@@ -139,6 +143,16 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 color = MissaMuted,
                 modifier = Modifier.padding(vertical = 6.dp),
             )
+            Button(
+                onClick = { onNavigate(Routes.stockProductForm(type = "EQUIPEMENT")) },
+                colors = ButtonDefaults.buttonColors(containerColor = Green60),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(painterResource(StockIv.Add), null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.st_nouvel_equipement))
+            }
+            Spacer(Modifier.height(10.dp))
             LazyColumn {
                 items(etat.lignes, key = { it.product.id }) { ligne ->
                     CarteStock(onClick = { onNavigate(Routes.stockDetail(ligne.product.id)) }) {

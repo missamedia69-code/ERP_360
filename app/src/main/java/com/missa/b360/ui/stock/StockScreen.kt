@@ -146,7 +146,14 @@ fun StockScreen(
             }
         }
         FloatingActionButton(
-            onClick = { onNavigate(Routes.STOCK_PRODUCT_FORM) },
+            onClick = {
+                onNavigate(
+                    Routes.stockProductForm(
+                        categorieId = etat.categorieId,
+                        type = etat.type?.name,
+                    ),
+                )
+            },
             modifier = Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp),
             shape = RoundedCornerShape(16.dp),
             containerColor = Green60,

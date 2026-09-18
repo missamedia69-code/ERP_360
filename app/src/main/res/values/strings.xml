@@ -1109,5 +1109,13 @@
     <!-- Stock : état vide avec action Ajouter -->
     <string name="st_ajouter_premier">Cette liste est vide. Cliquez sur Ajouter pour créer un article.</string>
     <string name="st_ajouter_article">Ajouter un article</string>
+
+    <!-- Stock : catégories utilisateur -->
+    <string name="st_nouvelle_categorie">Nouvelle catégorie</string>
+    <string name="st_nom_categorie">Nom de la catégorie</string>
+    <string name="st_creer">Créer</string>
+    <string name="st_annuler">Annuler</string>
+    <string name="st_categories_perso">Catégories personnalisées</string>
+    <string name="st_nouvel_equipement">Nouvel équipement</string>
 </resources>
 <!-- Temp insert will be replaced -->

@@ -1,5 +1,17 @@
 package com.missa.b360.ui.stock
 
+import androidx.compose.runtime.setValue
+
+import androidx.compose.runtime.remember
+
+import androidx.compose.runtime.mutableStateOf
+
+import androidx.compose.material3.OutlinedTextField
+
+import androidx.compose.material3.TextButton
+
+import androidx.compose.material3.AlertDialog
+
 import androidx.compose.ui.text.style.TextAlign
 
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,6 +74,36 @@ import com.missa.b360.ui.theme.Red80
 fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
     val vm: StockAccueilViewModel = hiltViewModel()
     val etat by vm.etat.collectAsStateWithLifecycle()
+    var dialogueCategorie by remember { mutableStateOf(false) }
+
+    if (dialogueCategorie) {
+        var nomCategorie by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { dialogueCategorie = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (nomCategorie.isNotBlank()) {
+                        vm.creerCategorie(nomCategorie)
+                        dialogueCategorie = false
+                    }
+                }) { Text(stringResource(R.string.st_creer)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { dialogueCategorie = false }) {
+                    Text(stringResource(R.string.st_annuler))
+                }
+            },
+            title = { Text(stringResource(R.string.st_nouvelle_categorie)) },
+            text = {
+                OutlinedTextField(
+                    value = nomCategorie,
+                    onValueChange = { nomCategorie = it },
+                    label = { Text(stringResource(R.string.st_nom_categorie)) },
+                    singleLine = true,
+                )
+            },
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -90,22 +132,51 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             action = stringResource(R.string.st_voir_tout),
             onAction = { onNaviguer(Routes.STOCK_CATEGORIES) },
         )
-        etat.categories.chunked(4).forEach { ligneCats ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ligneCats.forEach { cat ->
-                    TuileCategorieMatrice(
+        // Matrice unifiée : types d'articles + catégories utilisateur + création.
+        val tuiles = buildList {
+            etat.categories.forEach { cat ->
+                add(
+                    TuileCatSpec(
                         icone = cat.type.icone(),
                         nom = stringResource(cat.nomRes),
-                        nombre = stringResource(R.string.st_articles_count, cat.nombre),
-                        modifier = Modifier.weight(1f),
+                        sous = stringResource(R.string.st_articles_count, cat.nombre),
                     ) {
                         onNaviguer(
                             if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS
                             else Routes.stockListe(cat.type.name),
                         )
-                    }
+                    },
+                )
+            }
+            etat.categoriesLibres.forEach { cat ->
+                add(
+                    TuileCatSpec(
+                        icone = StockIv.Category,
+                        nom = cat.nom,
+                        sous = stringResource(R.string.st_articles_count, cat.nombre),
+                    ) { onNaviguer(Routes.stockListe(null, cat.id)) },
+                )
+            }
+            add(
+                TuileCatSpec(
+                    icone = StockIv.Add,
+                    nom = stringResource(R.string.st_nouvelle_categorie),
+                    sous = stringResource(R.string.st_creer),
+                ) { dialogueCategorie = true },
+            )
+        }
+        tuiles.chunked(4).forEach { ligneTuiles ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ligneTuiles.forEach { tuile ->
+                    TuileCategorieMatrice(
+                        icone = tuile.icone,
+                        nom = tuile.nom,
+                        nombre = tuile.sous,
+                        modifier = Modifier.weight(1f),
+                        onClick = tuile.clic,
+                    )
                 }
-                repeat(4 - ligneCats.size) { Spacer(Modifier.weight(1f)) }
+                repeat(4 - ligneTuiles.size) { Spacer(Modifier.weight(1f)) }
             }
             Spacer(Modifier.height(8.dp))
         }
@@ -291,3 +362,11 @@ private fun TuileCategorieMatrice(
         }
     }
 }
+
+/** Spécification d'une tuile de la matrice des catégories. */
+private class TuileCatSpec(
+    val icone: Int,
+    val nom: String,
+    val sous: String,
+    val clic: () -> Unit,
+)

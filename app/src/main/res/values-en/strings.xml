@@ -1066,4 +1066,12 @@
     <!-- Stock : état vide avec action Ajouter -->
     <string name="st_ajouter_premier">This list is empty. Tap Add to create a product.</string>
     <string name="st_ajouter_article">Add a product</string>
+
+    <!-- Stock : catégories utilisateur -->
+    <string name="st_nouvelle_categorie">New category</string>
+    <string name="st_nom_categorie">Category name</string>
+    <string name="st_creer">Create</string>
+    <string name="st_annuler">Cancel</string>
+    <string name="st_categories_perso">Custom categories</string>
+    <string name="st_nouvel_equipement">New equipment</string>
 </resources>

@@ -22,7 +22,21 @@ object Routes {
     const val STOCK_ALERTES = "stock_alertes"
     const val STOCK_EQUIPEMENTS = "stock_equipements"
 
-    fun stockListe(type: String?): String = STOCK_LISTE + (type?.let { "?type=$it" } ?: "")
+    fun stockListe(type: String?, categorieId: Long? = null): String = STOCK_LISTE +
+        (type?.let { "?type=$it" } ?: "") +
+        (categorieId?.let { (if (type != null) "&" else "?") + "cat=$it" } ?: "")
+
+    /** Formulaire article avec pré-remplissage optionnel (catégorie, type). */
+    fun stockProductForm(categorieId: Long? = null, type: String? = null): String =
+        STOCK_PRODUCT_FORM + buildString {
+            val params = mutableListOf<String>()
+            categorieId?.let { params.add("cat=$it") }
+            type?.let { params.add("type=$it") }
+            if (params.isNotEmpty()) {
+                append("?")
+                append(params.joinToString("&"))
+            }
+        }
     fun stockDetail(id: Long): String = "stock_detail/$id"
     const val OPERATION_FORM = "operation_form"
 

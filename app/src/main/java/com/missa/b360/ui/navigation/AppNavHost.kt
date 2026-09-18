@@ -333,8 +333,11 @@ private fun MainNavHost() {
             }
         }
         composable(
-            route = "${Routes.STOCK_LISTE}?type={type}",
-            arguments = listOf(navArgument("type") { type = NavType.StringType; nullable = true; defaultValue = null }),
+            route = "${Routes.STOCK_LISTE}?type={type}&cat={cat}",
+            arguments = listOf(
+                navArgument("type") { type = NavType.StringType; nullable = true; defaultValue = null },
+                navArgument("cat") { type = NavType.StringType; nullable = true; defaultValue = null },
+            ),
         ) {
             GuardedModule(AppModule.STOCK, activation, navController) {
                 StockScreen(
@@ -380,13 +383,21 @@ private fun MainNavHost() {
             }
         }
         composable(
-            route = "${Routes.STOCK_PRODUCT_FORM}?productId={productId}",
-            arguments = listOf(navArgument("productId") { type = NavType.LongType; defaultValue = 0L }),
+            route = "${Routes.STOCK_PRODUCT_FORM}?productId={productId}&cat={cat}&type={type}",
+            arguments = listOf(
+                navArgument("productId") { type = NavType.LongType; defaultValue = 0L },
+                navArgument("cat") { type = NavType.StringType; defaultValue = "" },
+                navArgument("type") { type = NavType.StringType; defaultValue = "" },
+            ),
         ) { entry ->
             GuardedModule(AppModule.STOCK, activation, navController) {
                 ProductFormScreen(
                     onBack = { navController.popBackStack() },
                     productId = entry.arguments?.getLong("productId")?.takeIf { it > 0L },
+                    initialCategorieId = entry.arguments?.getString("cat")?.toLongOrNull(),
+                    initialType = entry.arguments?.getString("type")
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { runCatching { com.missa.b360.core.data.entity.ProductType.valueOf(it) }.getOrNull() },
                 )
             }
         }

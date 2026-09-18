@@ -1062,4 +1062,12 @@
     <!-- Stock : état vide avec action Ajouter -->
     <string name="st_ajouter_premier">هذه القائمة فارغة. اضغط على إضافة لإنشاء مادة.</string>
     <string name="st_ajouter_article">إضافة مادة</string>
+
+    <!-- Stock : catégories utilisateur -->
+    <string name="st_nouvelle_categorie">فئة جديدة</string>
+    <string name="st_nom_categorie">اسم الفئة</string>
+    <string name="st_creer">إنشاء</string>
+    <string name="st_annuler">إلغاء</string>
+    <string name="st_categories_perso">فئات مخصصة</string>
+    <string name="st_nouvel_equipement">معدة جديدة</string>
 </resources>

@@ -1062,4 +1062,12 @@
     <!-- Stock : état vide avec action Ajouter -->
     <string name="st_ajouter_premier">此列表为空。点击“添加”创建商品。</string>
     <string name="st_ajouter_article">添加商品</string>
+
+    <!-- Stock : catégories utilisateur -->
+    <string name="st_nouvelle_categorie">新类别</string>
+    <string name="st_nom_categorie">类别名称</string>
+    <string name="st_creer">创建</string>
+    <string name="st_annuler">取消</string>
+    <string name="st_categories_perso">自定义类别</string>
+    <string name="st_nouvel_equipement">新设备</string>
 </resources>
