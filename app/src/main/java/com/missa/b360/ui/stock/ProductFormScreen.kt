@@ -413,6 +413,7 @@ fun ProductFormScreen(
 }
 
 /** Champ de date en lecture seule ouvrant un petit calendrier (DatePicker). */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun ChampDate(libelle: String, valeur: String, onValeur: (String) -> Unit) {
     var ouvert by remember { mutableStateOf(false) }
