@@ -18,13 +18,10 @@
     <string name="st_sous_titre">Tout votre inventaire en un seul endroit</string>
     <string name="st_valeur_totale">Valeur totale du stock</string>
     <string name="st_tendance">%1$s vs hier</string>
-    <string name="st_articles">Articles</string>
-    <string name="st_categories">Catégories</string>
     <string name="st_stock_critique">Stock critique</string>
     <string name="st_ruptures">Ruptures</string>
     <string name="st_categories_titre">Catégories de stock</string>
     <string name="st_voir_tout">Voir tout</string>
-    <string name="st_mouvements_jour">Mouvements du jour</string>
     <string name="st_entrees">Entrées</string>
     <string name="st_sorties">Sorties</string>
     <string name="st_transferts">Transferts</string>
@@ -1116,6 +1113,14 @@
     <string name="st_creer">Créer</string>
     <string name="st_annuler">Annuler</string>
     <string name="st_categories_perso">Catégories personnalisées</string>
+    <string name="st_tableau_bord">Tableau de bord</string>
+    <string name="st_resume_hero">%1$d articles · %2$d catégories</string>
+    <string name="st_mouvement">Mouvement</string>
+    <string name="st_30_jours">30 jours</string>
+    <string name="st_valeur_par_categorie">Valeur par catégorie</string>
+    <string name="st_resume_cat">%1$d art. · %2$d %% du stock</string>
+    <string name="st_activite_mois">Activité · 6 derniers mois</string>
+    <string name="st_resume_jour">Aujourd\'hui : %1$d entrées · %2$d sorties · %3$d transferts</string>
     <string name="st_nouvel_equipement">Nouvel équipement</string>
 </resources>
 <!-- Temp insert will be replaced -->

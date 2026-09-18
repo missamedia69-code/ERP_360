@@ -63,7 +63,17 @@ data class StockAccueilState(
     val entreesJour: Int = 0,
     val sortiesJour: Int = 0,
     val transfertsJour: Int = 0,
+    /** Quantités entrées / sorties sur 30 jours glissants (tableau de bord). */
+    val entrees30j: Double = 0.0,
+    val sorties30j: Double = 0.0,
+    /** Trois catégories les plus valorisées (tableau de bord). */
+    val topCategories: List<CatStockRow> = emptyList(),
+    /** Activité mensuelle entrées/sorties, 6 derniers mois (tableau de bord). */
+    val activite: List<MoisActivite> = emptyList(),
 )
+
+/** Barre mensuelle du graphique d'activité du tableau de bord. */
+data class MoisActivite(val label: String, val entrees: Double, val sorties: Double)
 
 /** Ligne d'une catégorie utilisateur dans la matrice : id, nom et nombre d'articles. */
 data class CatLibreRow(
@@ -91,7 +101,7 @@ class StockAccueilViewModel @Inject constructor(
         combine(observeProducts(), observeStock()) { produits, stocks ->
             ProductStocks.combine(produits, stocks)
         },
-        observeMovements(),
+        observeMovements(1_500),
         getEnterprise.observer(),
         categoriesUseCases.observer(),
     ) { lignes, mouvements, entreprise, catsLibres ->
@@ -120,6 +130,26 @@ class StockAccueilViewModel @Inject constructor(
         val transferts = duJour.count { it.type == "TRANSFERT_SORTIE" }
         val totalJour = duJour.size
         val totalHier = dHier.size
+        val cutoff30 = System.currentTimeMillis() - 30L * 86_400_000L
+        val entrees30j = mouvements.filter { it.type == "ENTREE" && it.horodatage >= cutoff30 }.sumOf { abs(it.quantite) }
+        val sorties30j = mouvements.filter { it.type == "SORTIE" && it.horodatage >= cutoff30 }.sumOf { abs(it.quantite) }
+        val activite = (5 downTo 0).map { back ->
+            val debut = Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 1); set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+                add(Calendar.MONTH, -back)
+            }.timeInMillis
+            val fin = Calendar.getInstance().apply {
+                timeInMillis = debut
+                add(Calendar.MONTH, 1)
+            }.timeInMillis
+            val duMois = mouvements.filter { it.horodatage in debut until fin }
+            MoisActivite(
+                label = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(java.util.Date(debut)),
+                entrees = duMois.filter { it.type == "ENTREE" }.sumOf { abs(it.quantite) },
+                sorties = duMois.filter { it.type == "SORTIE" }.sumOf { abs(it.quantite) },
+            )
+        }
         StockAccueilState(
             devise = devise,
             valeur = valeur,
@@ -139,6 +169,10 @@ class StockAccueilViewModel @Inject constructor(
             entreesJour = entrees,
             sortiesJour = sorties,
             transfertsJour = transferts,
+            entrees30j = entrees30j,
+            sorties30j = sorties30j,
+            topCategories = parType.filter { it.nombre > 0 }.sortedByDescending { it.valeur }.take(3),
+            activite = activite,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockAccueilState())
 }

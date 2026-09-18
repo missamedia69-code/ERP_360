@@ -18,13 +18,10 @@
     <string name="st_sous_titre">All your inventory in one place</string>
     <string name="st_valeur_totale">Total stock value</string>
     <string name="st_tendance">%1$s vs yesterday</string>
-    <string name="st_articles">Items</string>
-    <string name="st_categories">Categories</string>
     <string name="st_stock_critique">Critical stock</string>
     <string name="st_ruptures">Out of stock</string>
     <string name="st_categories_titre">Stock categories</string>
     <string name="st_voir_tout">See all</string>
-    <string name="st_mouvements_jour">Today\'s movements</string>
     <string name="st_entrees">In</string>
     <string name="st_sorties">Out</string>
     <string name="st_transferts">Transfers</string>
@@ -1073,5 +1070,13 @@
     <string name="st_creer">Create</string>
     <string name="st_annuler">Cancel</string>
     <string name="st_categories_perso">Custom categories</string>
+    <string name="st_tableau_bord">Dashboard</string>
+    <string name="st_resume_hero">%1$d items · %2$d categories</string>
+    <string name="st_mouvement">Movement</string>
+    <string name="st_30_jours">30 days</string>
+    <string name="st_valeur_par_categorie">Value by category</string>
+    <string name="st_resume_cat">%1$d items · %2$d%% of stock</string>
+    <string name="st_activite_mois">Activity · last 6 months</string>
+    <string name="st_resume_jour">Today: %1$d in · %2$d out · %3$d transfers</string>
     <string name="st_nouvel_equipement">New equipment</string>
 </resources>

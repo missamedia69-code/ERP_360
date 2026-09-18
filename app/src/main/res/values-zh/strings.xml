@@ -18,13 +18,10 @@
     <string name="st_sous_titre">所有库存一目了然</string>
     <string name="st_valeur_totale">库存总价值</string>
     <string name="st_tendance">%1$s 较昨日</string>
-    <string name="st_articles">商品</string>
-    <string name="st_categories">类别</string>
     <string name="st_stock_critique">库存危急</string>
     <string name="st_ruptures">缺货</string>
     <string name="st_categories_titre">库存类别</string>
     <string name="st_voir_tout">查看全部</string>
-    <string name="st_mouvements_jour">今日变动</string>
     <string name="st_entrees">入库</string>
     <string name="st_sorties">出库</string>
     <string name="st_transferts">调拨</string>
@@ -1069,5 +1066,13 @@
     <string name="st_creer">创建</string>
     <string name="st_annuler">取消</string>
     <string name="st_categories_perso">自定义类别</string>
+    <string name="st_tableau_bord">仪表板</string>
+    <string name="st_resume_hero">%1$d 件商品 · %2$d 个类别</string>
+    <string name="st_mouvement">移动</string>
+    <string name="st_30_jours">30天</string>
+    <string name="st_valeur_par_categorie">按类别价值</string>
+    <string name="st_resume_cat">%1$d 件 · 占库存 %2$d%%</string>
+    <string name="st_activite_mois">活动 · 最近6个月</string>
+    <string name="st_resume_jour">今天：%1$d 入库 · %2$d 出库 · %3$d 调拨</string>
     <string name="st_nouvel_equipement">新设备</string>
 </resources>

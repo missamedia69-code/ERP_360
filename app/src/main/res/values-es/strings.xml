@@ -18,13 +18,10 @@
     <string name="st_sous_titre">Todo tu inventario en un solo lugar</string>
     <string name="st_valeur_totale">Valor total del stock</string>
     <string name="st_tendance">%1$s vs ayer</string>
-    <string name="st_articles">Artículos</string>
-    <string name="st_categories">Categorías</string>
     <string name="st_stock_critique">Stock crítico</string>
     <string name="st_ruptures">Rupturas</string>
     <string name="st_categories_titre">Categorías de stock</string>
     <string name="st_voir_tout">Ver todo</string>
-    <string name="st_mouvements_jour">Movimientos del día</string>
     <string name="st_entrees">Entradas</string>
     <string name="st_sorties">Salidas</string>
     <string name="st_transferts">Transferencias</string>
@@ -1069,5 +1066,13 @@
     <string name="st_creer">Crear</string>
     <string name="st_annuler">Cancelar</string>
     <string name="st_categories_perso">Categorías personalizadas</string>
+    <string name="st_tableau_bord">Panel de control</string>
+    <string name="st_resume_hero">%1$d artículos · %2$d categorías</string>
+    <string name="st_mouvement">Movimiento</string>
+    <string name="st_30_jours">30 días</string>
+    <string name="st_valeur_par_categorie">Valor por categoría</string>
+    <string name="st_resume_cat">%1$d art. · %2$d %% del stock</string>
+    <string name="st_activite_mois">Actividad · últimos 6 meses</string>
+    <string name="st_resume_jour">Hoy: %1$d entradas · %2$d salidas · %3$d transferencias</string>
     <string name="st_nouvel_equipement">Nuevo equipo</string>
 </resources>

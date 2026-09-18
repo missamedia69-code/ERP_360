@@ -18,13 +18,10 @@
     <string name="st_sous_titre">كل مخزونك في مكان واحد</string>
     <string name="st_valeur_totale">القيمة الإجمالية للمخزون</string>
     <string name="st_tendance">%1$s مقارنة بالأمس</string>
-    <string name="st_articles">الأصناف</string>
-    <string name="st_categories">الفئات</string>
     <string name="st_stock_critique">مخزون حرج</string>
     <string name="st_ruptures">نفاد</string>
     <string name="st_categories_titre">فئات المخزون</string>
     <string name="st_voir_tout">عرض الكل</string>
-    <string name="st_mouvements_jour">حركات اليوم</string>
     <string name="st_entrees">دخل</string>
     <string name="st_sorties">خرج</string>
     <string name="st_transferts">تحويلات</string>
@@ -1069,5 +1066,13 @@
     <string name="st_creer">إنشاء</string>
     <string name="st_annuler">إلغاء</string>
     <string name="st_categories_perso">فئات مخصصة</string>
+    <string name="st_tableau_bord">لوحة التحكم</string>
+    <string name="st_resume_hero">%1$d منتجًا · %2$d فئات</string>
+    <string name="st_mouvement">حركة</string>
+    <string name="st_30_jours">30 يومًا</string>
+    <string name="st_valeur_par_categorie">القيمة حسب الفئة</string>
+    <string name="st_resume_cat">%1$d منتج · %2$d%% من المخزون</string>
+    <string name="st_activite_mois">النشاط · آخر 6 أشهر</string>
+    <string name="st_resume_jour">اليوم: %1$d دخول · %2$d خروج · %3$d تحويلات</string>
     <string name="st_nouvel_equipement">معدة جديدة</string>
 </resources>
