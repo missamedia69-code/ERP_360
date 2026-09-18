@@ -17,6 +17,7 @@ import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -252,4 +253,29 @@ class ObserveStockMovementsUseCase @Inject constructor(
     private val movementDao: StockMovementDao,
 ) {
     operator fun invoke(limit: Int = 200): Flow<List<StockMovementView>> = movementDao.observeJoints(limit)
+}
+
+/**
+ * Suppression d'un article = désactivation douce : l'article disparaît des listes
+ * (requêtes filtrées sur active = 1) mais l'historique des mouvements et les
+ * références restent intacts. Bloquée tant que le stock n'est pas nul.
+ */
+class SupprimerProduitUseCase @Inject constructor(
+    private val productDao: ProductDao,
+    private val observeStock: ObserveProductStockUseCase,
+    private val licenceManager: LicenceManager,
+) {
+    sealed class Result {
+        data object Supprime : Result()
+        data class StockNonNul(val quantite: Double) : Result()
+        data object LectureSeule : Result()
+    }
+
+    suspend operator fun invoke(produitId: Long): Result {
+        if (licenceManager.isReadOnly()) return Result.LectureSeule
+        val stock = observeStock().first().filter { it.produitId == produitId }.sumOf { it.quantite }
+        if (abs(stock) >= QUANTITE_EPSILON) return Result.StockNonNul(stock)
+        productDao.desactiver(produitId)
+        return Result.Supprime
+    }
 }

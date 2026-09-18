@@ -1074,5 +1074,12 @@
     <string name="st_resume_cat">%1$d منتج · %2$d%% من المخزون</string>
     <string name="st_activite_mois">النشاط · آخر 6 أشهر</string>
     <string name="st_resume_jour">اليوم: %1$d دخول · %2$d خروج · %3$d تحويلات</string>
+    <string name="st_retour">رجوع</string>
+    <string name="st_supprimer">حذف</string>
+    <string name="st_supprimer_article">حذف المنتج</string>
+    <string name="st_supprimer_article_msg">حذف هذا المنتج؟ سيختفي من القوائم ويُحتفظ بسجل الحركات.</string>
+    <string name="st_suppression_stock_non_nul">لا يمكن الحذف: المخزون غير صفري (%1$s). سجّل خروجًا أولاً.</string>
+    <string name="st_categorie_utilisee">الفئة مستخدمة في منتجات: لا يمكن الحذف.</string>
+    <string name="st_reprendre_inventaire">استئناف الجرد</string>
     <string name="st_nouvel_equipement">معدة جديدة</string>
 </resources>

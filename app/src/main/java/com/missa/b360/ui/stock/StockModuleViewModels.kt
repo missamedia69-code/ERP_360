@@ -27,6 +27,7 @@ import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.domain.usecase.ObserveStockMovementsUseCase
 import com.missa.b360.core.domain.usecase.SiteUseCases
+import com.missa.b360.core.domain.usecase.SupprimerProduitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +71,8 @@ data class StockAccueilState(
     val topCategories: List<CatStockRow> = emptyList(),
     /** Activité mensuelle entrées/sorties, 6 derniers mois (tableau de bord). */
     val activite: List<MoisActivite> = emptyList(),
+    /** Une session d'inventaire physique est en cours. */
+    val inventaireEnCours: Boolean = false,
 )
 
 /** Barre mensuelle du graphique d'activité du tableau de bord. */
@@ -90,11 +93,24 @@ class StockAccueilViewModel @Inject constructor(
     observeMovements: ObserveStockMovementsUseCase,
     getEnterprise: GetEnterpriseUseCase,
     private val categoriesUseCases: CategorieProduitUseCases,
+    inventaireDao: com.missa.b360.core.data.dao.InventaireDao,
 ) : ViewModel() {
 
     /** Crée une catégorie utilisateur depuis la matrice (matrice rafraîchie par le flux). */
     fun creerCategorie(nom: String) {
         viewModelScope.launch { categoriesUseCases.creer(nom) }
+    }
+
+    private val _suppressionCategorie = kotlinx.coroutines.flow.MutableStateFlow<CategorieProduitUseCases.SuppressionResult?>(null)
+    val suppressionCategorie: StateFlow<CategorieProduitUseCases.SuppressionResult?> = _suppressionCategorie
+
+    /** Supprime une catégorie utilisateur (refusée si des articles y sont rattachés). */
+    fun supprimerCategorie(id: Long) {
+        viewModelScope.launch { _suppressionCategorie.value = categoriesUseCases.supprimer(id) }
+    }
+
+    fun clearSuppressionCategorie() {
+        _suppressionCategorie.value = null
     }
 
     val etat: StateFlow<StockAccueilState> = combine(
@@ -104,7 +120,8 @@ class StockAccueilViewModel @Inject constructor(
         observeMovements(1_500),
         getEnterprise.observer(),
         categoriesUseCases.observer(),
-    ) { lignes, mouvements, entreprise, catsLibres ->
+        inventaireDao.observeEnCours(),
+    ) { lignes, mouvements, entreprise, catsLibres, sessionInventaire ->
         val devise = entreprise?.devise.orEmpty()
         // Valorisation au coût de revient, à défaut au prix d'achat (même règle que StockHubRules).
         val valeur = lignes.sumOf { l ->
@@ -155,7 +172,7 @@ class StockAccueilViewModel @Inject constructor(
             valeur = valeur,
             tendance = if (totalHier > 0) (totalJour - totalHier).toDouble() / totalHier else null,
             nbArticles = lignes.size,
-            nbCategories = parType.count { it.nombre > 0 },
+            nbCategories = parType.count { it.nombre > 0 } + catsLibres.count { it.actif },
             critiques = lignes.count { it.level == StockLevel.CRITIQUE || it.level == StockLevel.BAS },
             ruptures = lignes.count { it.stock <= 0.0 },
             categories = parType,
@@ -173,6 +190,7 @@ class StockAccueilViewModel @Inject constructor(
             sorties30j = sorties30j,
             topCategories = parType.filter { it.nombre > 0 }.sortedByDescending { it.valeur }.take(3),
             activite = activite,
+            inventaireEnCours = sessionInventaire != null,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockAccueilState())
 }
@@ -259,9 +277,22 @@ class StockDetailViewModel @Inject constructor(
     getEnterprise: GetEnterpriseUseCase,
     equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
     savedStateHandle: SavedStateHandle,
+    private val supprimerProduit: SupprimerProduitUseCase,
 ) : ViewModel() {
 
     private val id: Long = savedStateHandle.get<Long>("id") ?: 0L
+
+    private val _suppressionResult = kotlinx.coroutines.flow.MutableStateFlow<SupprimerProduitUseCase.Result?>(null)
+    val suppressionResult: StateFlow<SupprimerProduitUseCase.Result?> = _suppressionResult
+
+    /** Demande la suppression (désactivation) de l'article affiché. */
+    fun supprimer() {
+        viewModelScope.launch { _suppressionResult.value = supprimerProduit(id) }
+    }
+
+    fun clearSuppressionResult() {
+        _suppressionResult.value = null
+    }
 
     val etat: StateFlow<StockDetailState> = combine(
         combine(

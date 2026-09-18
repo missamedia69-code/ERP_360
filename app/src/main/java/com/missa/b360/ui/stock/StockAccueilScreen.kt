@@ -415,7 +415,13 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Spacer(Modifier.width(11.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                    Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 10.5.sp, color = MissaMuted)
+                    Text(
+                        text = stringResource(
+                            if (etat.inventaireEnCours) R.string.st_reprendre_inventaire else R.string.st_demarrer_inventaire,
+                        ),
+                        fontSize = 10.5.sp,
+                        color = MissaMuted,
+                    )
                 }
                 Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(20.dp))
             }

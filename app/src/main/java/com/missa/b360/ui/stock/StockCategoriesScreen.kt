@@ -25,7 +25,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import android.widget.Toast
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ProductType
+import com.missa.b360.core.domain.usecase.CategorieProduitUseCases
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.navigation.Routes
 import com.missa.b360.ui.theme.Blue90
@@ -54,6 +57,19 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
     val vm: StockAccueilViewModel = hiltViewModel()
     val etat by vm.etat.collectAsStateWithLifecycle()
     var dialogueCategorie by remember { mutableStateOf(false) }
+    val contexte = androidx.compose.ui.platform.LocalContext.current
+    val suppCat by vm.suppressionCategorie.collectAsStateWithLifecycle()
+
+    suppCat?.let { r ->
+        when (r) {
+            is CategorieProduitUseCases.SuppressionResult.CategorieUtilisee ->
+                Toast.makeText(contexte, stringResource(R.string.st_categorie_utilisee), Toast.LENGTH_LONG).show()
+            is CategorieProduitUseCases.SuppressionResult.LectureSeule ->
+                Toast.makeText(contexte, stringResource(R.string.clients_lecture_seule), Toast.LENGTH_LONG).show()
+            else -> Unit
+        }
+        vm.clearSuppressionCategorie()
+    }
 
     if (dialogueCategorie) {
         var nomCategorie by remember { mutableStateOf("") }
@@ -146,6 +162,9 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = cat.nom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                             Text(text = stringResource(R.string.st_articles_count, cat.nombre), fontSize = 10.5.sp, color = MissaMuted)
+                        }
+                        IconButton(onClick = { vm.supprimerCategorie(cat.id) }, modifier = Modifier.size(40.dp)) {
+                            Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                         }
                         Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                     }

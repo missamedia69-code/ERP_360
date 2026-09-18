@@ -33,5 +33,6 @@ object StockIv {
     val TrendingDown = R.drawable.ph_trend_down
     val TrendingUp = R.drawable.ph_trend_up
     val Unarchive = R.drawable.ph_archive
+    val Trash = R.drawable.ph_trash
     val Warning = R.drawable.ph_warning
 }

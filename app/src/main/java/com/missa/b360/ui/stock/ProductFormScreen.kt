@@ -188,11 +188,13 @@ fun ProductFormScreen(
             if (etape == 0) {
                 Text(stringResource(R.string.st_type_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(8.dp))
-                if (productId == null && initialType != null) {
-                    // Le contexte (liste d'un type, « Nouvel équipement ») impose le type : pas de choix libre.
-                    BadgeVerrouille(type.icone(), stringResource(type.libelleTypeRes()))
-                } else {
-                    GrilleTypes(type) { type = it }
+                when {
+                    // Édition : le type est l'identité de l'article (sections, extension
+                    // équipement, listes) — il ne se change pas.
+                    productId != null && edit == null -> Unit // chargement en cours
+                    productId != null || initialType != null ->
+                        BadgeVerrouille(type.icone(), stringResource(type.libelleTypeRes()))
+                    else -> GrilleTypes(type) { type = it }
                 }
                 Spacer(Modifier.height(14.dp))
                 Text(stringResource(R.string.st_image_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
@@ -337,8 +339,17 @@ fun ProductFormScreen(
                     )
                     Spacer(Modifier.height(16.dp))
                 }
-                Button(
-                    onClick = {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(
+                        onClick = { etape = 0 },
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MissaSurface, contentColor = MissaInk),
+                    ) {
+                        Text("← ${stringResource(R.string.st_retour)}", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = {
                         val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
                         val parse = { t: String -> runCatching { fmt.parse(t.trim())?.time }.getOrNull() }
                         val equipement = if (TYPES_EQUIPEMENTS.contains(type)) {
@@ -376,11 +387,12 @@ fun ProductFormScreen(
                             supprimerImage = supprimerImage,
                         )
                     },
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
+                    modifier = Modifier.weight(1f).height(46.dp),
                     shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                 ) {
                     Text(stringResource(R.string.st_enregistrer), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
                 }
             }
             Spacer(Modifier.height(20.dp))

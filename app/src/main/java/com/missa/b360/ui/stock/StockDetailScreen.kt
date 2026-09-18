@@ -2,6 +2,7 @@ package com.missa.b360.ui.stock
 
 import com.missa.b360.ui.navigation.AppModule
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -55,9 +59,59 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
     val etat by vm.etat.collectAsStateWithLifecycle()
     val categorieNom by vm.categorieNom.collectAsStateWithLifecycle()
     val produit = etat.product
+    val contexte = androidx.compose.ui.platform.LocalContext.current
+    var dialogueSuppression by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val suppression by vm.suppressionResult.collectAsStateWithLifecycle()
+
+    suppression?.let { r ->
+        when (r) {
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.Supprime -> {
+                vm.clearSuppressionResult()
+                onBack()
+            }
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.StockNonNul -> {
+                Toast.makeText(
+                    contexte,
+                    stringResource(R.string.st_suppression_stock_non_nul, fmtQuantite(r.quantite)),
+                    Toast.LENGTH_LONG,
+                ).show()
+                vm.clearSuppressionResult()
+            }
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.LectureSeule -> {
+                Toast.makeText(contexte, stringResource(R.string.clients_lecture_seule), Toast.LENGTH_LONG).show()
+                vm.clearSuppressionResult()
+            }
+        }
+    }
+
+    if (dialogueSuppression) {
+        AlertDialog(
+            onDismissRequest = { dialogueSuppression = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    dialogueSuppression = false
+                    vm.supprimer()
+                }) { Text(stringResource(R.string.st_supprimer), color = Red40) }
+            },
+            dismissButton = {
+                TextButton(onClick = { dialogueSuppression = false }) { Text(stringResource(R.string.st_annuler)) }
+            },
+            title = { Text(stringResource(R.string.st_supprimer_article)) },
+            text = { Text(stringResource(R.string.st_supprimer_article_msg)) },
+        )
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_detail_article), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
+        MissaTopAppBar(
+            title = stringResource(R.string.st_detail_article),
+            onBack = onBack,
+            couleurFond = AppModule.STOCK.couleurPale,
+            actions = {
+                IconButton(onClick = { dialogueSuppression = true }, modifier = Modifier.size(48.dp)) {
+                    Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                }
+            },
+        )
         if (produit == null) {
             Box(Modifier.fillMaxSize())
             return
@@ -124,7 +178,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                 )
                 Spacer(Modifier.height(12.dp))
                 when (onglet) {
-                    0 -> OngletGeneralEquipement(produit, equipement, categorieNom)
+                    0 -> OngletGeneralEquipement(produit, equipement, categorieNom, etat.devise)
                     1 -> OngletMaintenance(equipement, vm)
                     else -> {
                         if (etat.mouvements.isEmpty()) {
@@ -223,7 +277,8 @@ private fun OngletStock(
     etat: StockDetailState,
     produit: com.missa.b360.core.data.entity.ProductEntity,
 ) {
-    val total = etat.stocks.sumOf { it.quantite }.coerceAtLeast(0.0)
+    // Stock réel, négatif compris : masquer un stock négatif cacherait une anomalie.
+    val total = etat.stocks.sumOf { it.quantite }
     CarteStock {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TuileStock(stringResource(R.string.st_disponible), fmtQuantite(total), MissaInk, Modifier.weight(1f))
@@ -241,6 +296,16 @@ private fun OngletStock(
                     libelle = etat.sites.firstOrNull { it.id == ligne.siteId }?.nom ?: stringResource(R.string.st_site),
                     valeur = fmtQuantite(ligne.quantite),
                 )
+            }
+        }
+        // Historique des mouvements, aussi pour les articles non équipement.
+        if (etat.mouvements.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            Text(stringResource(R.string.st_historique), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            Spacer(Modifier.height(6.dp))
+            etat.mouvements.take(10).forEach { mv ->
+                LigneMouvement(mv)
+                Spacer(Modifier.height(8.dp))
             }
         }
     }
@@ -292,12 +357,14 @@ private fun OngletGeneralEquipement(
     produit: com.missa.b360.core.data.entity.ProductEntity,
     equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
     categorieNom: String?,
+    devise: String,
 ) {
     val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
     CarteStock {
         Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
         Spacer(Modifier.height(6.dp))
         LigneInfo(stringResource(R.string.st_type), stringResource(produit.type.libelleTypeRes()))
+        LigneInfo(stringResource(R.string.st_prix_achat), produit.prixAchat?.let { fmtValeur(it, devise) })
         LigneInfo(stringResource(R.string.st_marque), produit.marque)
         LigneInfo(stringResource(R.string.st_modele), equipement?.modele)
         LigneInfo(stringResource(R.string.st_num_serie), equipement?.numeroSerie)

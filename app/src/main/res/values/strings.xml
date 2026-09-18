@@ -1121,6 +1121,13 @@
     <string name="st_resume_cat">%1$d art. · %2$d %% du stock</string>
     <string name="st_activite_mois">Activité · 6 derniers mois</string>
     <string name="st_resume_jour">Aujourd\'hui : %1$d entrées · %2$d sorties · %3$d transferts</string>
+    <string name="st_retour">Retour</string>
+    <string name="st_supprimer">Supprimer</string>
+    <string name="st_supprimer_article">Supprimer l\'article</string>
+    <string name="st_supprimer_article_msg">Supprimer cet article ? Il disparaîtra des listes ; l\'historique des mouvements est conservé.</string>
+    <string name="st_suppression_stock_non_nul">Suppression impossible : stock non nul (%1$s). Faites d\'abord une sortie.</string>
+    <string name="st_categorie_utilisee">Catégorie utilisée par des articles : suppression impossible.</string>
+    <string name="st_reprendre_inventaire">Reprendre l\'inventaire</string>
     <string name="st_nouvel_equipement">Nouvel équipement</string>
 </resources>
 <!-- Temp insert will be replaced -->

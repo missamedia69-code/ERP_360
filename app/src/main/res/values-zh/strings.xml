@@ -1074,5 +1074,12 @@
     <string name="st_resume_cat">%1$d 件 · 占库存 %2$d%%</string>
     <string name="st_activite_mois">活动 · 最近6个月</string>
     <string name="st_resume_jour">今天：%1$d 入库 · %2$d 出库 · %3$d 调拨</string>
+    <string name="st_retour">返回</string>
+    <string name="st_supprimer">删除</string>
+    <string name="st_supprimer_article">删除商品</string>
+    <string name="st_supprimer_article_msg">删除该商品？它将从列表中消失；移动历史将保留。</string>
+    <string name="st_suppression_stock_non_nul">无法删除：库存不为零（%1$s）。请先做出库。</string>
+    <string name="st_categorie_utilisee">该类别下有商品：无法删除。</string>
+    <string name="st_reprendre_inventaire">继续盘点</string>
     <string name="st_nouvel_equipement">新设备</string>
 </resources>
