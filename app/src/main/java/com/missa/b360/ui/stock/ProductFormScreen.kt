@@ -64,9 +64,12 @@ import com.missa.b360.ui.theme.MissaSurface
 
 /** Maquette 11 — nouvel article : grille de types puis infos générales, prix & seuils. */
 @Composable
-fun ProductFormScreen(onBack: (
+fun ProductFormScreen(
+    onBack: () -> Unit,
+    productId: Long? = null,
     initialCategorieId: Long? = null,
-    initialType: ProductType? = null,) -> Unit, productId: Long? = null) {
+    initialType: ProductType? = null,
+) {
     val vm: ProductFormViewModel = hiltViewModel()
     val categories by vm.categories.collectAsStateWithLifecycle()
     val sites by vm.sites.collectAsStateWithLifecycle()
