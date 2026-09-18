@@ -52,7 +52,6 @@
     <string name="st_maximum">最高</string>
     <string name="st_securite">安全</string>
     <string name="st_modifier">修改</string>
-    <string name="st_equipements">设备</string>
     <string name="st_rechercher_equipement">搜索设备…</string>
     <string name="st_en_service">在用</string>
     <string name="st_maintenance">维护</string>

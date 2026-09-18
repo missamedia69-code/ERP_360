@@ -52,7 +52,6 @@
     <string name="st_maximum">Maximum</string>
     <string name="st_securite">Sécurité</string>
     <string name="st_modifier">Modifier</string>
-    <string name="st_equipements">Équipements</string>
     <string name="st_rechercher_equipement">Rechercher un équipement…</string>
     <string name="st_en_service">En service</string>
     <string name="st_maintenance">Maintenance</string>
