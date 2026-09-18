@@ -365,6 +365,8 @@ private fun OngletGeneralEquipement(
         Spacer(Modifier.height(6.dp))
         LigneInfo(stringResource(R.string.st_type), stringResource(produit.type.libelleTypeRes()))
         LigneInfo(stringResource(R.string.st_prix_achat), produit.prixAchat?.let { fmtValeur(it, devise) })
+        // Immobilisations vendables : le prix de vente est visible comme pour les autres articles.
+        LigneInfo(stringResource(R.string.st_prix_vente), produit.prixVente?.let { fmtValeur(it, devise) })
         LigneInfo(stringResource(R.string.st_marque), produit.marque)
         LigneInfo(stringResource(R.string.st_modele), equipement?.modele)
         LigneInfo(stringResource(R.string.st_num_serie), equipement?.numeroSerie)

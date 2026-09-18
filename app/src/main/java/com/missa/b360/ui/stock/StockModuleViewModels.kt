@@ -73,6 +73,9 @@ data class StockAccueilState(
     val activite: List<MoisActivite> = emptyList(),
     /** Une session d'inventaire physique est en cours. */
     val inventaireEnCours: Boolean = false,
+    /** Valorisation et nombre des immobilisations (équipements, matériel, pièces). */
+    val valeurImmo: Double = 0.0,
+    val nbImmo: Int = 0,
 )
 
 /** Barre mensuelle du graphique d'activité du tableau de bord. */
@@ -191,6 +194,8 @@ class StockAccueilViewModel @Inject constructor(
             topCategories = parType.filter { it.nombre > 0 }.sortedByDescending { it.valeur }.take(3),
             activite = activite,
             inventaireEnCours = sessionInventaire != null,
+            valeurImmo = parType.filter { TYPES_EQUIPEMENTS.contains(it.type) }.sumOf { it.valeur },
+            nbImmo = parType.filter { TYPES_EQUIPEMENTS.contains(it.type) }.sumOf { it.nombre },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockAccueilState())
 }
@@ -420,6 +425,7 @@ class StockAlertesViewModel @Inject constructor(
 class StockEquipementsViewModel @Inject constructor(
     observeProducts: ObserveProductsUseCase,
     equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+    getEnterprise: GetEnterpriseUseCase,
 ) : ViewModel() {
 
     private val _requete = kotlinx.coroutines.flow.MutableStateFlow("")
@@ -439,6 +445,8 @@ class StockEquipementsViewModel @Inject constructor(
         val enService: Int = 0,
         val maintenance: Int = 0,
         val horsService: Int = 0,
+        val devise: String = "",
+        val valeur: Double = 0.0,
     )
 
     val etat: StateFlow<Etat> = combine(
@@ -448,7 +456,8 @@ class StockEquipementsViewModel @Inject constructor(
         },
         _requete,
         _statut,
-    ) { lignes, requete, statut ->
+        getEnterprise.observer(),
+    ) { lignes, requete, statut, entreprise ->
         val filtrees = lignes
             .filter { requete.isBlank() || it.product.nom.contains(requete, ignoreCase = true) }
             .filter {
@@ -464,6 +473,8 @@ class StockEquipementsViewModel @Inject constructor(
             enService = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.EN_SERVICE },
             maintenance = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE },
             horsService = lignes.count { it.equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE },
+            devise = entreprise?.devise.orEmpty(),
+            valeur = lignes.sumOf { it.product.prixRevient ?: it.product.prixAchat ?: 0.0 },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Etat())
 }

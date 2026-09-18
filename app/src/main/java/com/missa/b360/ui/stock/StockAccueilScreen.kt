@@ -139,12 +139,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         icone = cat.type.icone(),
                         nom = stringResource(cat.nomRes),
                         sous = stringResource(R.string.st_articles_count, cat.nombre),
-                    ) {
-                        onNaviguer(
-                            if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS
-                            else Routes.stockListe(cat.type.name),
-                        )
-                    },
+                    ) { onNaviguer(Routes.stockListe(cat.type.name)) },
                 )
             }
             etat.categoriesLibres.forEach { cat ->
@@ -299,12 +294,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 etat.topCategories.forEach { cat ->
                     val pct = if (etat.valeur > 0) round(cat.valeur / etat.valeur * 100).toInt() else 0
                     Surface(
-                        onClick = {
-                            onNaviguer(
-                                if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS
-                                else Routes.stockListe(cat.type.name),
-                            )
-                        },
+                        onClick = { onNaviguer(Routes.stockListe(cat.type.name)) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         color = Color.White,
@@ -400,6 +390,27 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     fontSize = 10.sp,
                     color = MissaMuted,
                 )
+            }
+        }
+
+        // Immobilisations : vue transverse équipements / matériel / pièces.
+        CarteStock(onClick = { onNaviguer(Routes.STOCK_EQUIPEMENTS) }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(painterResource(StockIv.Bank), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                    }
+                }
+                Spacer(Modifier.width(11.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.st_immobilisations), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    Text(
+                        text = stringResource(R.string.st_resume_immo, etat.nbImmo, fmtValeur(etat.valeurImmo, etat.devise)),
+                        fontSize = 10.5.sp,
+                        color = MissaMuted,
+                    )
+                }
+                Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(20.dp))
             }
         }
 

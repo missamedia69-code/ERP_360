@@ -1085,5 +1085,7 @@
     <string name="st_suppression_stock_non_nul">Cannot delete: stock is not zero (%1$s). Record an issue first.</string>
     <string name="st_categorie_utilisee">Category used by items: cannot delete.</string>
     <string name="st_reprendre_inventaire">Resume inventory</string>
+    <string name="st_immobilisations">Fixed assets</string>
+    <string name="st_resume_immo">%1$d assets · %2$s</string>
     <string name="st_nouvel_equipement">New equipment</string>
 </resources>

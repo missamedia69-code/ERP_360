@@ -10,6 +10,7 @@ import com.missa.b360.R
 object StockIv {
 
     val Add = R.drawable.ph_plus
+    val Bank = R.drawable.ph_bank
     val Build = R.drawable.ph_wrench
     val BuildCircle = R.drawable.ph_wrench
     val Category = R.drawable.ph_squares_four

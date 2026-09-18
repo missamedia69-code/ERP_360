@@ -80,7 +80,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
     val filtreStatut by vm.filtreStatut.collectAsStateWithLifecycle()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MissaTopAppBar(title = stringResource(R.string.st_equipements), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
+        MissaTopAppBar(title = stringResource(R.string.st_immobilisations), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             androidx.compose.material3.OutlinedTextField(
@@ -134,6 +134,21 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                     valeur = etat.horsService.toString(),
                     libelle = stringResource(R.string.st_hors_service),
                     modifier = Modifier.weight(1f),
+                )
+            }
+            Spacer(Modifier.height(6.dp))
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.st_valeur_totale),
+                    fontSize = 11.sp,
+                    color = MissaMuted,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = fmtValeur(etat.valeur, etat.devise),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MissaInk,
                 )
             }
             Spacer(Modifier.height(6.dp))

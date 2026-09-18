@@ -1081,5 +1081,7 @@
     <string name="st_suppression_stock_non_nul">No se puede eliminar: stock no nulo (%1$s). Registre primero una salida.</string>
     <string name="st_categorie_utilisee">Categoría usada por artículos: no se puede eliminar.</string>
     <string name="st_reprendre_inventaire">Reanudar inventario</string>
+    <string name="st_immobilisations">Inmovilizado</string>
+    <string name="st_resume_immo">%1$d bienes · %2$s</string>
     <string name="st_nouvel_equipement">Nuevo equipo</string>
 </resources>

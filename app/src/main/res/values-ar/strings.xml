@@ -1081,5 +1081,7 @@
     <string name="st_suppression_stock_non_nul">لا يمكن الحذف: المخزون غير صفري (%1$s). سجّل خروجًا أولاً.</string>
     <string name="st_categorie_utilisee">الفئة مستخدمة في منتجات: لا يمكن الحذف.</string>
     <string name="st_reprendre_inventaire">استئناف الجرد</string>
+    <string name="st_immobilisations">الأصول الثابتة</string>
+    <string name="st_resume_immo">%1$d أصول · %2$s</string>
     <string name="st_nouvel_equipement">معدة جديدة</string>
 </resources>

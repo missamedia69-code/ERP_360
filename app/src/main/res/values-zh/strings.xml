@@ -1081,5 +1081,7 @@
     <string name="st_suppression_stock_non_nul">无法删除：库存不为零（%1$s）。请先做出库。</string>
     <string name="st_categorie_utilisee">该类别下有商品：无法删除。</string>
     <string name="st_reprendre_inventaire">继续盘点</string>
+    <string name="st_immobilisations">固定资产</string>
+    <string name="st_resume_immo">%1$d 项资产 · %2$s</string>
     <string name="st_nouvel_equipement">新设备</string>
 </resources>
