@@ -1105,5 +1105,9 @@
     <string name="kpi_achats_explication">Évolution des achats validés sur les 14 derniers jours. Chaque point représente le total dépensé du jour.</string>
     <string name="kpi_tresorerie_explication">Évolution du solde de trésorerie (entrées moins sorties, cumulé) sur les 14 derniers jours.</string>
     <string name="kpi_clients_explication">Évolution du nombre total de clients enregistrés, jour après jour, sur les 14 derniers jours.</string>
+
+    <!-- Stock : état vide avec action Ajouter -->
+    <string name="st_ajouter_premier">Cette liste est vide. Cliquez sur Ajouter pour créer un article.</string>
+    <string name="st_ajouter_article">Ajouter un article</string>
 </resources>
 <!-- Temp insert will be replaced -->

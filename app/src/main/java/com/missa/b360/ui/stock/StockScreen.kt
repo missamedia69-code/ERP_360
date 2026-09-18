@@ -1,5 +1,9 @@
 package com.missa.b360.ui.stock
 
+import androidx.compose.material3.ButtonDefaults
+
+import androidx.compose.material3.Button
+
 import com.missa.b360.ui.navigation.AppModule
 
 import androidx.compose.foundation.background
@@ -115,8 +119,18 @@ fun StockScreen(
                     MissaEmptyState(
                         icon = StockIv.Add,
                         title = stringResource(R.string.st_aucun_resultat),
-                        description = stringResource(R.string.module_placeholder),
+                        description = stringResource(R.string.st_ajouter_premier),
                         modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                        action = {
+                            Button(
+                                onClick = { onNavigate(Routes.STOCK_PRODUCT_FORM) },
+                                colors = ButtonDefaults.buttonColors(containerColor = Green60),
+                            ) {
+                                Icon(painterResource(StockIv.Add), null, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(R.string.st_ajouter_article))
+                            }
+                        },
                     )
                 } else {
                     LazyColumn {

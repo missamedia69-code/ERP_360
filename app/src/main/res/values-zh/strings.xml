@@ -1058,4 +1058,8 @@
     <string name="kpi_achats_explication">过去 14 天已确认采购的走势。每个点代表当天的支出总额。</string>
     <string name="kpi_tresorerie_explication">过去 14 天资金余额的走势（收入减支出，累计）。</string>
     <string name="kpi_clients_explication">过去 14 天注册客户总数的逐日走势。</string>
+
+    <!-- Stock : état vide avec action Ajouter -->
+    <string name="st_ajouter_premier">此列表为空。点击“添加”创建商品。</string>
+    <string name="st_ajouter_article">添加商品</string>
 </resources>

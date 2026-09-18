@@ -1062,4 +1062,8 @@
     <string name="kpi_achats_explication">Evolution of validated purchases over the last 14 days. Each point is the total spent that day.</string>
     <string name="kpi_tresorerie_explication">Evolution of the cash balance (income minus expenses, cumulative) over the last 14 days.</string>
     <string name="kpi_clients_explication">Evolution of the total number of registered clients, day by day, over the last 14 days.</string>
+
+    <!-- Stock : état vide avec action Ajouter -->
+    <string name="st_ajouter_premier">This list is empty. Tap Add to create a product.</string>
+    <string name="st_ajouter_article">Add a product</string>
 </resources>

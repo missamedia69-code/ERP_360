@@ -1,5 +1,13 @@
 package com.missa.b360.ui.stock
 
+import androidx.compose.ui.text.style.TextAlign
+
+import androidx.compose.ui.text.style.TextOverflow
+
+import com.missa.b360.ui.theme.MissaBorder
+
+import androidx.compose.foundation.BorderStroke
+
 import com.missa.b360.ui.navigation.AppModule
 
 import androidx.compose.foundation.layout.Arrangement
@@ -75,6 +83,33 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             }
         }
         Spacer(Modifier.height(12.dp))
+
+        // Catégories en petits onglets matriciels : accès direct aux listes.
+        StockSectionTitle(
+            titre = stringResource(R.string.st_categories_titre),
+            action = stringResource(R.string.st_voir_tout),
+            onAction = { onNaviguer(Routes.STOCK_CATEGORIES) },
+        )
+        etat.categories.chunked(4).forEach { ligneCats ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ligneCats.forEach { cat ->
+                    TuileCategorieMatrice(
+                        icone = cat.type.icone(),
+                        nom = stringResource(cat.nomRes),
+                        nombre = stringResource(R.string.st_articles_count, cat.nombre),
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        onNaviguer(
+                            if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS
+                            else Routes.stockListe(cat.type.name),
+                        )
+                    }
+                }
+                repeat(4 - ligneCats.size) { Spacer(Modifier.weight(1f)) }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+        Spacer(Modifier.height(4.dp))
 
         // Valeur totale du stock.
         CarteStock(onClick = { onNaviguer(Routes.stockListe(null)) }) {
@@ -157,32 +192,6 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
         }
 
-        // Catégories de stock (types d'articles).
-        StockSectionTitle(
-            titre = stringResource(R.string.st_categories_titre),
-            action = stringResource(R.string.st_voir_tout),
-            onAction = { onNaviguer(Routes.STOCK_CATEGORIES) },
-        )
-        etat.categories.filter { it.nombre > 0 }.take(6).forEach { cat ->
-            CarteStock(onClick = { onNaviguer(if (TYPES_EQUIPEMENTS.contains(cat.type)) Routes.STOCK_EQUIPEMENTS else Routes.stockListe(cat.type.name)) }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = Blue90) {
-                        androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(cat.type.icone()), null, tint = MissaInk, modifier = Modifier.size(17.dp))
-                        }
-                    }
-                    Spacer(Modifier.width(10.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(cat.nomRes), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                        Text(stringResource(R.string.st_articles_count, cat.nombre), fontSize = 10.5.sp, color = MissaMuted)
-                    }
-                    Text(fmtValeur(cat.valeur, etat.devise), fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = MissaMuted)
-                    Spacer(Modifier.width(4.dp))
-                    Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-        }
 
         // Accès inventaire physique.
         CarteStock(onClick = { onNaviguer(Routes.STOCK_INVENTORY) }) {
@@ -238,3 +247,47 @@ private fun MouvementMini(
     }
 }
 
+
+/** Petit onglet matriciel d'une catégorie : icône, nom et nombre d'articles. */
+@Composable
+private fun TuileCategorieMatrice(
+    icone: Int,
+    nom: String,
+    nombre: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, MissaBorder),
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 9.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Surface(
+                modifier = Modifier.size(30.dp),
+                shape = RoundedCornerShape(9.dp),
+                color = AppModule.STOCK.couleurDouce,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                }
+            }
+            Spacer(Modifier.height(5.dp))
+            Text(
+                text = nom,
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+            )
+            Text(text = nombre, fontSize = 9.sp, color = MissaMuted, maxLines = 1)
+        }
+    }
+}

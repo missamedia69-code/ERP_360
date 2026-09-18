@@ -1058,4 +1058,8 @@
     <string name="kpi_achats_explication">تطور المشتريات المعتمدة خلال آخر 14 يوماً. كل نقطة تمثل إجمالي المصروفات في ذلك اليوم.</string>
     <string name="kpi_tresorerie_explication">تطور رصيد الخزينة (الإيرادات ناقص المصروفات، تراكمياً) خلال آخر 14 يوماً.</string>
     <string name="kpi_clients_explication">تطور العدد الإجمالي للعملاء المسجلين، يوماً بيوم، خلال آخر 14 يوماً.</string>
+
+    <!-- Stock : état vide avec action Ajouter -->
+    <string name="st_ajouter_premier">هذه القائمة فارغة. اضغط على إضافة لإنشاء مادة.</string>
+    <string name="st_ajouter_article">إضافة مادة</string>
 </resources>
