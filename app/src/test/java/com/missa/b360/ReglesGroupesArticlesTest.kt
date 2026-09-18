@@ -87,14 +87,14 @@ class ReglesGroupesArticlesTest {
 
     @Test
     fun `le filtrage par module suit le tableau spec 5 2`() {
-        // ACH ne retient que les familles achetables.
+        // ACH ne retient que les familles achetables (emballages inclus).
         assertEquals(
-            setOf("MARCH", "MP", "CONSO", "PM", "EQUIP", "MAT", "AB"),
+            setOf("MARCH", "MP", "CONSO", "PM", "EQUIP", "MAT", "AB", "EMBAL"),
             ReglesGroupesArticles.utilisablesPour(ModuleCode.ACH, groupes()).map { it.groupe.code }.toSet(),
         )
-        // VEN ne retient que les familles vendables.
+        // VEN ne retient que les familles vendables (semi-finis, déchets valorisables et kits inclus).
         assertEquals(
-            setOf("MARCH", "PF", "SE", "SERV"),
+            setOf("MARCH", "PF", "SE", "SERV", "SF", "DV", "KIT"),
             ReglesGroupesArticles.utilisablesPour(ModuleCode.VEN, groupes()).map { it.groupe.code }.toSet(),
         )
         // MAI ne retient que les équipements et le matériel maintenable.
@@ -102,9 +102,9 @@ class ReglesGroupesArticlesTest {
             setOf("EQUIP", "MAT"),
             ReglesGroupesArticles.utilisablesPour(ModuleCode.MAI, groupes()).map { it.groupe.code }.toSet(),
         )
-        // PRO retient les produisibles et les familles achetées (matières).
+        // PRO retient les produisibles et les familles achetées (matières, emballages).
         assertEquals(
-            setOf("MARCH", "MP", "PF", "SE", "CONSO", "PM", "EQUIP", "MAT", "AB"),
+            setOf("MARCH", "MP", "PF", "SE", "CONSO", "PM", "EQUIP", "MAT", "AB", "EMBAL", "SF", "KIT"),
             ReglesGroupesArticles.utilisablesPour(ModuleCode.PRO, groupes()).map { it.groupe.code }.toSet(),
         )
         // SER ne retient que les prestations.
