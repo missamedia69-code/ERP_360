@@ -156,21 +156,25 @@ fun StockScreen(
                 }
             }
         }
-        FloatingActionButton(
-            onClick = {
-                onNavigate(
-                    Routes.stockProductForm(
-                        categorieId = etat.categorieId,
-                        type = etat.type?.name,
-                    ),
-                )
-            },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp),
-            shape = RoundedCornerShape(16.dp),
-            containerColor = Green60,
-            contentColor = Color.White,
-        ) {
-            Icon(painterResource(StockIv.Add), contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
+        // Un seul élément d'ajout à la fois : liste vide sans recherche = bouton
+        // « Ajouter » de l'état vide ; sinon le bouton flottant.
+        if (etat.articles.isNotEmpty() || etat.requete.isNotBlank()) {
+            FloatingActionButton(
+                onClick = {
+                    onNavigate(
+                        Routes.stockProductForm(
+                            categorieId = etat.categorieId,
+                            type = etat.type?.name,
+                        ),
+                    )
+                },
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp),
+                shape = RoundedCornerShape(16.dp),
+                containerColor = Green60,
+                contentColor = Color.White,
+            ) {
+                Icon(painterResource(StockIv.Add), contentDescription = stringResource(R.string.st_nouvel_article), modifier = Modifier.size(22.dp))
+            }
         }
     }
 }

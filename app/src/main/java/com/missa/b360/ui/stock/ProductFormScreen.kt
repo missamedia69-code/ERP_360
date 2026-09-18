@@ -188,7 +188,12 @@ fun ProductFormScreen(
             if (etape == 0) {
                 Text(stringResource(R.string.st_type_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(8.dp))
-                GrilleTypes(type) { type = it }
+                if (productId == null && initialType != null) {
+                    // Le contexte (liste d'un type, « Nouvel équipement ») impose le type : pas de choix libre.
+                    BadgeVerrouille(type.icone(), stringResource(type.libelleTypeRes()))
+                } else {
+                    GrilleTypes(type) { type = it }
+                }
                 Spacer(Modifier.height(14.dp))
                 Text(stringResource(R.string.st_image_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(8.dp))
@@ -257,13 +262,22 @@ fun ProductFormScreen(
                 Spacer(Modifier.height(10.dp))
                 Champ(stringResource(R.string.st_reference), reference) { reference = it }
                 Spacer(Modifier.height(10.dp))
-                DropdownChamp(
-                    libelle = stringResource(R.string.st_categorie),
-                    options = categories.map { it.id to it.nom },
-                    selection = categorieId,
-                    onSelection = { categorieId = it },
-                    placeholder = stringResource(R.string.st_categorie),
-                )
+                if (productId == null && initialCategorieId != null) {
+                    // Création déjà dans une catégorie utilisateur : pas de sélecteur.
+                    BadgeVerrouille(
+                        StockIv.Category,
+                        categories.firstOrNull { it.id == initialCategorieId }?.nom
+                            ?: stringResource(R.string.st_categorie),
+                    )
+                } else {
+                    DropdownChamp(
+                        libelle = stringResource(R.string.st_categorie),
+                        options = categories.map { it.id to it.nom },
+                        selection = categorieId,
+                        onSelection = { categorieId = it },
+                        placeholder = stringResource(R.string.st_categorie),
+                    )
+                }
                 Spacer(Modifier.height(10.dp))
                 Champ(stringResource(R.string.st_marque), marque) { marque = it }
                 Spacer(Modifier.height(10.dp))
@@ -384,6 +398,26 @@ private fun Champ(libelle: String, valeur: String, onValeur: (String) -> Unit) {
         singleLine = true,
         shape = RoundedCornerShape(12.dp),
     )
+}
+
+/** Choix verrouillé par le contexte (type ou catégorie imposé) : badge lecture seule. */
+@Composable
+private fun BadgeVerrouille(icone: Int, texte: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = MissaSurface,
+        border = BorderStroke(1.dp, MissaBorder),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(texte, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+        }
+    }
 }
 
 @Composable
