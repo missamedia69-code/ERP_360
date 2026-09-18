@@ -9,6 +9,11 @@ import com.missa.b360.core.data.entity.ProductCategoryEntity
 import com.missa.b360.core.data.entity.InventaireEntity
 import com.missa.b360.core.data.entity.InventaireLigneEntity
 import com.missa.b360.core.data.entity.ProductEquipementEntity
+import com.missa.b360.core.data.entity.ProductConsignationEntity
+import com.missa.b360.core.data.entity.ProductDechetEntity
+import com.missa.b360.core.data.entity.ProductEmballageEntity
+import com.missa.b360.core.data.entity.ProductKitEntity
+import com.missa.b360.core.data.entity.KitComposantEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
@@ -185,4 +190,41 @@ interface InventaireDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertLigne(ligne: InventaireLigneEntity)
+}
+
+/** DAO des extensions par famille d'article (déchets, emballages, consignations, kits). */
+@Dao
+interface ProductExtrasDao {
+    @Query("SELECT * FROM product_dechets WHERE produitId = :id LIMIT 1")
+    fun observeDechet(id: Long): Flow<ProductDechetEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertDechet(entity: ProductDechetEntity)
+
+    @Query("SELECT * FROM product_emballages WHERE produitId = :id LIMIT 1")
+    fun observeEmballage(id: Long): Flow<ProductEmballageEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertEmballage(entity: ProductEmballageEntity)
+
+    @Query("SELECT * FROM product_consignations WHERE produitId = :id LIMIT 1")
+    fun observeConsignation(id: Long): Flow<ProductConsignationEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertConsignation(entity: ProductConsignationEntity)
+
+    @Query("SELECT * FROM product_kits WHERE produitId = :id LIMIT 1")
+    fun observeKit(id: Long): Flow<ProductKitEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertKit(entity: ProductKitEntity)
+
+    @Query("SELECT * FROM kit_composants WHERE kitId = :id ORDER BY composantId")
+    fun observeComposants(id: Long): Flow<List<KitComposantEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertComposant(entity: KitComposantEntity)
+
+    @Query("DELETE FROM kit_composants WHERE kitId = :kitId AND composantId = :composantId")
+    suspend fun retirerComposant(kitId: Long, composantId: Long)
 }

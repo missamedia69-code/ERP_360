@@ -21,10 +21,14 @@ object ProduitRules {
      * fonctionnement de l'entreprise, pas à son chiffre d'affaires.
      */
     fun estVendable(type: ProductType): Boolean = when (type) {
-        ProductType.ACHATE_REVENDU, ProductType.FABRIQUE, ProductType.COMPOSE -> true
+        ProductType.ACHATE_REVENDU, ProductType.FABRIQUE, ProductType.COMPOSE,
+        ProductType.PRESTATION, ProductType.SEMI_FINI, ProductType.DECHET_VALORISABLE,
+        ProductType.KIT -> true
         ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
         ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
-        ProductType.MATERIEL, ProductType.AUTRE_BIEN -> false
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN,
+        ProductType.EMBALLAGE, ProductType.DECHET_NON_VALORISABLE,
+        ProductType.CONSIGNATION -> false
     }
 
     /**
@@ -37,22 +41,41 @@ object ProduitRules {
     fun estAchetable(type: ProductType): Boolean = when (type) {
         ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
         ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT, ProductType.MATERIEL,
-        ProductType.AUTRE_BIEN -> true
-        ProductType.FABRIQUE, ProductType.COMPOSE -> false
+        ProductType.AUTRE_BIEN, ProductType.EMBALLAGE -> true
+        ProductType.FABRIQUE, ProductType.COMPOSE, ProductType.PRESTATION,
+        ProductType.SEMI_FINI, ProductType.DECHET_VALORISABLE,
+        ProductType.DECHET_NON_VALORISABLE, ProductType.KIT,
+        ProductType.CONSIGNATION -> false
     }
 
     /** Articles utilisables comme composant d'un ordre de fabrication. */
     fun estComposant(type: ProductType): Boolean = when (type) {
-        ProductType.MATIERE_PREMIERE, ProductType.ACHATE_REVENDU, ProductType.COMPOSE -> true
+        ProductType.MATIERE_PREMIERE, ProductType.ACHATE_REVENDU, ProductType.COMPOSE,
+        ProductType.SEMI_FINI, ProductType.EMBALLAGE -> true
         ProductType.FABRIQUE, ProductType.CONNOMMABLE,
         ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
-        ProductType.MATERIEL, ProductType.AUTRE_BIEN -> false
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN, ProductType.PRESTATION,
+        ProductType.DECHET_VALORISABLE, ProductType.DECHET_NON_VALORISABLE,
+        ProductType.KIT, ProductType.CONSIGNATION -> false
     }
 
     /** Articles qu'un ordre de fabrication peut produire. */
     fun estFabricable(type: ProductType): Boolean = when (type) {
-        ProductType.FABRIQUE, ProductType.COMPOSE -> true
+        ProductType.FABRIQUE, ProductType.COMPOSE, ProductType.SEMI_FINI,
+        ProductType.KIT -> true
         else -> false
+    }
+
+    /**
+     * Articles suivis physiquement en stock.
+     *
+     * Une prestation ne se stocke pas ; un déchet non valorisable reste suivi
+     * physiquement (quantité à éliminer) sans valeur commerciale ; équipements
+     * et matériel sont des immobilisations, pas des stocks.
+     */
+    fun estStockable(type: ProductType): Boolean = when (type) {
+        ProductType.PRESTATION, ProductType.EQUIPEMENT, ProductType.MATERIEL -> false
+        else -> true
     }
 
     /** Filtre d'un catalogue pour la vente : actifs et vendables. */

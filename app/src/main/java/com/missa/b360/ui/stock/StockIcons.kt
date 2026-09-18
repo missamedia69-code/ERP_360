@@ -12,6 +12,10 @@ object StockIv {
     val Add = R.drawable.ph_plus
     val Bank = R.drawable.ph_bank
     val Calendar = R.drawable.ph_calendar_blank
+    val Handshake = R.drawable.ph_handshake
+    val Hammer = R.drawable.ph_hammer
+    val Kanban = R.drawable.ph_kanban
+    val Warehouse = R.drawable.ph_warehouse
     val Build = R.drawable.ph_wrench
     val BuildCircle = R.drawable.ph_wrench
     val Category = R.drawable.ph_squares_four

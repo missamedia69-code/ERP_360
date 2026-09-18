@@ -24,6 +24,20 @@ enum class ProductType {
     MATERIEL,
     /** Tout autre bien non couvert ci-dessus. */
     AUTRE_BIEN,
+    /** Service ou prestation facturée, sans stock. */
+    PRESTATION,
+    /** Produit semi-fini, intermédiaire de fabrication. */
+    SEMI_FINI,
+    /** Emballage : carton, palette, bouteille, consigne… */
+    EMBALLAGE,
+    /** Déchet revendu ou remis à un recycleur. */
+    DECHET_VALORISABLE,
+    /** Déchet à éliminer : suivi physique, aucune valeur commerciale. */
+    DECHET_NON_VALORISABLE,
+    /** Kit ou ensemble vendu/assemblé à partir de composants. */
+    KIT,
+    /** Article en consignation : propriété d'un tiers. */
+    CONSIGNATION,
 }
 
 /** Statut produit — « Désactivé » unique ; jamais de suppression physique (C7). */
@@ -50,6 +64,64 @@ data class ProductEquipementEntity(
     val garantieDebut: Long? = null,
     val garantieFin: Long? = null,
     val statut: StatutEquipement = StatutEquipement.EN_SERVICE,
+)
+
+/** Extension « déchet » d'un produit : traçabilité réglementaire et élimination. */
+@Entity(tableName = "product_dechets")
+data class ProductDechetEntity(
+    @PrimaryKey val produitId: Long,
+    val typeDechet: String? = null,
+    val codeReglementaire: String? = null,
+    val dangereux: Boolean = false,
+    val valorisable: Boolean = true,
+    val origine: String? = null,
+    val modeElimination: String? = null,
+    val prestataire: String? = null,
+    val coutElimination: Double? = null,
+    val filiereRecyclage: String? = null,
+    val zoneStockage: String? = null,
+)
+
+/** Extension « emballage » d'un produit : contenant, consigne, réutilisation. */
+@Entity(tableName = "product_emballages")
+data class ProductEmballageEntity(
+    @PrimaryKey val produitId: Long,
+    val typeEmballage: String? = null,
+    val matiere: String? = null,
+    val dimensions: String? = null,
+    val poidsKg: Double? = null,
+    val capacite: Double? = null,
+    val reutilisable: Boolean = false,
+    val consigne: Boolean = false,
+    val reutilisationsMax: Int? = null,
+)
+
+/** Extension « consignation » : le bien appartient à un tiers. */
+@Entity(tableName = "product_consignations")
+data class ProductConsignationEntity(
+    @PrimaryKey val produitId: Long,
+    val proprietaire: String? = null,
+    val referenceContrat: String? = null,
+    /** Epoch millis. */
+    val dateDebut: Long? = null,
+    val dateFin: Long? = null,
+    val conditionsRetour: String? = null,
+)
+
+/** Extension « kit » : méthode de gestion du stock. */
+@Entity(tableName = "product_kits")
+data class ProductKitEntity(
+    @PrimaryKey val produitId: Long,
+    /** VIRTUEL (déstockage à la vente) ou ASSEMBLE (entrée en stock). */
+    val methode: String = "VIRTUEL",
+)
+
+/** Composition d'un kit : composant et quantité (nomenclature légère). */
+@Entity(tableName = "kit_composants", primaryKeys = ["kitId", "composantId"])
+data class KitComposantEntity(
+    val kitId: Long,
+    val composantId: Long,
+    val quantite: Double = 1.0,
 )
 
 /**
@@ -92,6 +164,10 @@ data class ProductEntity(
      * fonctionner sur leur seul [type], qui reste la valeur de repli.
      */
     val itemGroupId: Long? = null,
+    /** Règles héritées du groupe, surchargeables par article (spec §14). */
+    val vendable: Boolean = true,
+    val achetable: Boolean = true,
+    val stockable: Boolean = true,
     val reference: String? = null,
     /** Code-barres saisi ou scanné. */
     val barcode: String? = null,

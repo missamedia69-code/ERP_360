@@ -140,6 +140,20 @@
     <string name="st_cat_fabriques">Productos fabricados</string>
     <string name="st_cat_composes">Productos compuestos</string>
     <string name="st_cat_autres">Otros bienes</string>
+    <string name="st_type_prestation">Prestación</string>
+    <string name="st_type_semi_fini">Producto semiterminado</string>
+    <string name="st_type_emballage">Embalaje</string>
+    <string name="st_type_dechet_val">Residuo valorizable</string>
+    <string name="st_type_dechet_nval">Residuo no valorizable</string>
+    <string name="st_type_kit">Kit</string>
+    <string name="st_type_consignation">Consignación</string>
+    <string name="st_cat_prestations">Prestaciones</string>
+    <string name="st_cat_semi_finis">Productos semiterminados</string>
+    <string name="st_cat_emballages">Embalajes</string>
+    <string name="st_cat_dechets_val">Residuos valorizables</string>
+    <string name="st_cat_dechets_nval">Residuos no valorizables</string>
+    <string name="st_cat_kits">Kits</string>
+    <string name="st_cat_consignations">Consignaciones</string>
     <string name="st_equipements_count">%1$d equipos</string>
     
     <string name="more_modules">Más módulos</string>

@@ -76,6 +76,13 @@ fun ProductType.libelleCatRes(): Int = when (this) {
     ProductType.FABRIQUE -> R.string.st_cat_fabriques
     ProductType.COMPOSE -> R.string.st_cat_composes
     ProductType.AUTRE_BIEN -> R.string.st_cat_autres
+    ProductType.PRESTATION -> R.string.st_cat_prestations
+    ProductType.SEMI_FINI -> R.string.st_cat_semi_finis
+    ProductType.EMBALLAGE -> R.string.st_cat_emballages
+    ProductType.DECHET_VALORISABLE -> R.string.st_cat_dechets_val
+    ProductType.DECHET_NON_VALORISABLE -> R.string.st_cat_dechets_nval
+    ProductType.KIT -> R.string.st_cat_kits
+    ProductType.CONSIGNATION -> R.string.st_cat_consignations
 }
 
 /** Libellé singulier d'un type d'article (grille « Type d'article »). */
@@ -89,6 +96,13 @@ fun ProductType.libelleTypeRes(): Int = when (this) {
     ProductType.FABRIQUE -> R.string.st_type_fabrique
     ProductType.COMPOSE -> R.string.st_type_compose
     ProductType.AUTRE_BIEN -> R.string.st_type_autre
+    ProductType.PRESTATION -> R.string.st_type_prestation
+    ProductType.SEMI_FINI -> R.string.st_type_semi_fini
+    ProductType.EMBALLAGE -> R.string.st_type_emballage
+    ProductType.DECHET_VALORISABLE -> R.string.st_type_dechet_val
+    ProductType.DECHET_NON_VALORISABLE -> R.string.st_type_dechet_nval
+    ProductType.KIT -> R.string.st_type_kit
+    ProductType.CONSIGNATION -> R.string.st_type_consignation
 }
 
 fun ProductType.icone(): Int = when (this) {
@@ -101,16 +115,32 @@ fun ProductType.icone(): Int = when (this) {
     ProductType.FABRIQUE -> StockIv.Factory
     ProductType.COMPOSE -> StockIv.BuildCircle
     ProductType.AUTRE_BIEN -> StockIv.Category
+    ProductType.PRESTATION -> StockIv.Handshake
+    ProductType.SEMI_FINI -> StockIv.Hammer
+    ProductType.EMBALLAGE -> StockIv.Inventory2
+    ProductType.DECHET_VALORISABLE -> StockIv.Trash
+    ProductType.DECHET_NON_VALORISABLE -> StockIv.Warning
+    ProductType.KIT -> StockIv.Kanban
+    ProductType.CONSIGNATION -> StockIv.Warehouse
 }
 
 /** Types proposés dans le formulaire « Nouvel article » (maquette 11). */
 val TYPES_NOUVEL_ARTICLE = listOf(
     ProductType.ACHATE_REVENDU,
     ProductType.MATIERE_PREMIERE,
+    ProductType.FABRIQUE,
+    ProductType.SEMI_FINI,
+    ProductType.COMPOSE,
+    ProductType.KIT,
     ProductType.CONNOMMABLE,
+    ProductType.EMBALLAGE,
     ProductType.PIECE_MAINTENANCE,
     ProductType.EQUIPEMENT,
     ProductType.MATERIEL,
+    ProductType.PRESTATION,
+    ProductType.DECHET_VALORISABLE,
+    ProductType.DECHET_NON_VALORISABLE,
+    ProductType.CONSIGNATION,
 )
 
 /** Types « immobilisations » listés dans Équipements (maquettes 5-6). */

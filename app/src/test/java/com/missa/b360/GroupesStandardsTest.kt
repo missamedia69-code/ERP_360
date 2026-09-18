@@ -23,7 +23,10 @@ class GroupesStandardsTest {
     fun `les dix familles courantes sont livrees`() {
         val codes = modeles("SYSCOHADA").map { it.groupe.code }
         assertEquals(
-            listOf("MARCH", "MP", "PF", "SE", "CONSO", "SERV", "PM", "EQUIP", "MAT", "AB"),
+            listOf(
+                "MARCH", "MP", "PF", "SE", "CONSO", "SERV", "PM", "EQUIP", "MAT", "AB",
+                "SF", "EMBAL", "DV", "DNV", "KIT", "CONS",
+            ),
             codes,
         )
     }

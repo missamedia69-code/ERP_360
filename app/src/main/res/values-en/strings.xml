@@ -140,6 +140,20 @@
     <string name="st_cat_fabriques">Manufactured products</string>
     <string name="st_cat_composes">Assembled products</string>
     <string name="st_cat_autres">Other assets</string>
+    <string name="st_type_prestation">Service</string>
+    <string name="st_type_semi_fini">Semi-finished product</string>
+    <string name="st_type_emballage">Packaging</string>
+    <string name="st_type_dechet_val">Recoverable waste</string>
+    <string name="st_type_dechet_nval">Non-recoverable waste</string>
+    <string name="st_type_kit">Kit</string>
+    <string name="st_type_consignation">Consignment</string>
+    <string name="st_cat_prestations">Services</string>
+    <string name="st_cat_semi_finis">Semi-finished products</string>
+    <string name="st_cat_emballages">Packaging</string>
+    <string name="st_cat_dechets_val">Recoverable waste</string>
+    <string name="st_cat_dechets_nval">Non-recoverable waste</string>
+    <string name="st_cat_kits">Kits</string>
+    <string name="st_cat_consignations">Consignments</string>
     <string name="st_equipements_count">%1$d equipment items</string>
     
     <string name="more_modules">More modules</string>

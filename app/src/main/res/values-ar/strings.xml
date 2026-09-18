@@ -140,6 +140,20 @@
     <string name="st_cat_fabriques">منتجات مصنوعة</string>
     <string name="st_cat_composes">منتجات مركبة</string>
     <string name="st_cat_autres">أصول أخرى</string>
+    <string name="st_type_prestation">خدمة</string>
+    <string name="st_type_semi_fini">منتج نصف مصنع</string>
+    <string name="st_type_emballage">تغليف</string>
+    <string name="st_type_dechet_val">نفايات قابلة للتثمين</string>
+    <string name="st_type_dechet_nval">نفايات غير قابلة للتثمين</string>
+    <string name="st_type_kit">طقم</string>
+    <string name="st_type_consignation">إيداع</string>
+    <string name="st_cat_prestations">خدمات</string>
+    <string name="st_cat_semi_finis">منتجات نصف مصنعة</string>
+    <string name="st_cat_emballages">تغليفات</string>
+    <string name="st_cat_dechets_val">نفايات قابلة للتثمين</string>
+    <string name="st_cat_dechets_nval">نفايات غير قابلة للتثمين</string>
+    <string name="st_cat_kits">أطقم</string>
+    <string name="st_cat_consignations">إيداعات</string>
     <string name="st_equipements_count">%1$d معدة</string>
     
     <string name="more_modules">المزيد من الوحدات</string>

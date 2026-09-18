@@ -22,6 +22,7 @@ import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.ProductDao
+import com.missa.b360.core.data.dao.ProductExtrasDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.ProductEquipementDao
 import com.missa.b360.core.data.dao.StockMovementDao
@@ -40,6 +41,11 @@ import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
+import com.missa.b360.core.data.entity.KitComposantEntity
+import com.missa.b360.core.data.entity.ProductConsignationEntity
+import com.missa.b360.core.data.entity.ProductDechetEntity
+import com.missa.b360.core.data.entity.ProductEmballageEntity
+import com.missa.b360.core.data.entity.ProductKitEntity
 import com.missa.b360.core.data.entity.EmployeeEntity
 import com.missa.b360.core.data.entity.EquipementEntity
 import com.missa.b360.core.data.entity.GroupeAchatEntity
@@ -121,13 +127,18 @@ import com.missa.b360.core.data.entity.UserEntity
         ProductStockEntity::class,
         StockMovementEntity::class,
         ProductEquipementEntity::class,
+        ProductDechetEntity::class,
+        ProductEmballageEntity::class,
+        ProductConsignationEntity::class,
+        ProductKitEntity::class,
+        KitComposantEntity::class,
         InventaireEntity::class,
         InventaireLigneEntity::class,
         EmployeeEntity::class,
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 14,
+    version = 15,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -147,6 +158,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun fournisseurDao(): FournisseurDao
     abstract fun operationRecordDao(): OperationRecordDao
     abstract fun productDao(): ProductDao
+    abstract fun productExtrasDao(): ProductExtrasDao
     abstract fun productStockDao(): ProductStockDao
     abstract fun stockMovementDao(): StockMovementDao
     abstract fun productEquipementDao(): ProductEquipementDao
@@ -375,6 +387,54 @@ abstract class AppDatabase : RoomDatabase() {
          * vigueur. Les articles reçoivent un rattachement facultatif, ce qui
          * laisse fonctionner les fiches déjà saisies.
          */
+        /**
+         * v14 → v15 : drapeaux article (vendable/achetable/stockable, spec §14)
+         * et extensions par famille (déchets, emballages, consignations, kits).
+         */
+        val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE products ADD COLUMN vendable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE products ADD COLUMN achetable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE products ADD COLUMN stockable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL(
+                    "UPDATE products SET vendable = 0 WHERE type IN " +
+                        "('MATIERE_PREMIERE','CONNOMMABLE','PIECE_MAINTENANCE','EQUIPEMENT','MATERIEL','AUTRE_BIEN')",
+                )
+                db.execSQL("UPDATE products SET achetable = 0 WHERE type IN ('FABRIQUE','COMPOSE')")
+                db.execSQL("UPDATE products SET stockable = 0 WHERE type IN ('EQUIPEMENT','MATERIEL')")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_dechets` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `typeDechet` TEXT, " +
+                        "`codeReglementaire` TEXT, `dangereux` INTEGER NOT NULL, " +
+                        "`valorisable` INTEGER NOT NULL, `origine` TEXT, `modeElimination` TEXT, " +
+                        "`prestataire` TEXT, `coutElimination` REAL, `filiereRecyclage` TEXT, " +
+                        "`zoneStockage` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_emballages` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `typeEmballage` TEXT, " +
+                        "`matiere` TEXT, `dimensions` TEXT, `poidsKg` REAL, `capacite` REAL, " +
+                        "`reutilisable` INTEGER NOT NULL, `consigne` INTEGER NOT NULL, " +
+                        "`reutilisationsMax` INTEGER)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_consignations` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `proprietaire` TEXT, " +
+                        "`referenceContrat` TEXT, `dateDebut` INTEGER, `dateFin` INTEGER, " +
+                        "`conditionsRetour` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_kits` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `methode` TEXT NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `kit_composants` (" +
+                        "`kitId` INTEGER NOT NULL, `composantId` INTEGER NOT NULL, " +
+                        "`quantite` REAL NOT NULL, PRIMARY KEY(`kitId`, `composantId`))",
+                )
+            }
+        }
+
         /** v13 → v14 : inventaires physiques (sessions + lignes). */
         val MIGRATION_13_14 = object : Migration(13, 14) {
             override fun migrate(db: SupportSQLiteDatabase) {

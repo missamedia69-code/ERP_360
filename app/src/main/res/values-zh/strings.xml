@@ -140,6 +140,20 @@
     <string name="st_cat_fabriques">制成品</string>
     <string name="st_cat_composes">组装品</string>
     <string name="st_cat_autres">其他资产</string>
+    <string name="st_type_prestation">服务</string>
+    <string name="st_type_semi_fini">半成品</string>
+    <string name="st_type_emballage">包装</string>
+    <string name="st_type_dechet_val">可回收废物</string>
+    <string name="st_type_dechet_nval">不可回收废物</string>
+    <string name="st_type_kit">套件</string>
+    <string name="st_type_consignation">寄售</string>
+    <string name="st_cat_prestations">服务</string>
+    <string name="st_cat_semi_finis">半成品</string>
+    <string name="st_cat_emballages">包装</string>
+    <string name="st_cat_dechets_val">可回收废物</string>
+    <string name="st_cat_dechets_nval">不可回收废物</string>
+    <string name="st_cat_kits">套件</string>
+    <string name="st_cat_consignations">寄售</string>
     <string name="st_equipements_count">%1$d 台设备</string>
     
     <string name="more_modules">更多模块</string>
