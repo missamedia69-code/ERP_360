@@ -281,6 +281,7 @@ class StockDetailViewModel @Inject constructor(
     fournisseurDao: FournisseurDao,
     getEnterprise: GetEnterpriseUseCase,
     equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+    extrasDao: com.missa.b360.core.data.dao.ProductExtrasDao,
     savedStateHandle: SavedStateHandle,
     private val supprimerProduit: SupprimerProduitUseCase,
 ) : ViewModel() {
@@ -340,6 +341,17 @@ class StockDetailViewModel @Inject constructor(
     val equipement: StateFlow<com.missa.b360.core.data.entity.ProductEquipementEntity?> =
         equipementDao.observeById(id)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val dechet: StateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?> =
+        extrasDao.observeDechet(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val emballage: StateFlow<com.missa.b360.core.data.entity.ProductEmballageEntity?> =
+        extrasDao.observeEmballage(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val consignation: StateFlow<com.missa.b360.core.data.entity.ProductConsignationEntity?> =
+        extrasDao.observeConsignation(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val kit: StateFlow<com.missa.b360.core.data.entity.ProductKitEntity?> =
+        extrasDao.observeKit(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val composantsKit: StateFlow<List<com.missa.b360.core.data.entity.KitComposantEntity>> =
+        extrasDao.observeComposants(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val equipementDao2 = equipementDao
 

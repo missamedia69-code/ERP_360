@@ -238,6 +238,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                     2 -> OngletPrix(etat, produit)
                     else -> OngletFournisseur(etat)
                 }
+                SectionExtension(produit.type, vm)
                 Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
@@ -252,6 +253,75 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
             }
             Spacer(Modifier.height(20.dp))
         }
+    }
+}
+
+/** Sections lecture seule des extensions par famille (déchets, emballage, consignation, kit). */
+@Composable
+private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, vm: StockDetailViewModel) {
+    val dechet by vm.dechet.collectAsStateWithLifecycle()
+    val emballage by vm.emballage.collectAsStateWithLifecycle()
+    val consignation by vm.consignation.collectAsStateWithLifecycle()
+    val kit by vm.kit.collectAsStateWithLifecycle()
+    val composants by vm.composantsKit.collectAsStateWithLifecycle()
+    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    when (type) {
+        com.missa.b360.core.data.entity.ProductType.DECHET_VALORISABLE,
+        com.missa.b360.core.data.entity.ProductType.DECHET_NON_VALORISABLE -> dechet?.let { d ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_dechet), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_type_dechet), d.typeDechet)
+                LigneInfo(stringResource(R.string.st_code_dechet), d.codeReglementaire)
+                LigneInfo(stringResource(R.string.st_dangereux), stringResource(if (d.dangereux) R.string.st_oui else R.string.st_non))
+                LigneInfo(stringResource(R.string.st_origine_dechet), d.origine)
+                LigneInfo(stringResource(R.string.st_zone_stockage), d.zoneStockage)
+                LigneInfo(stringResource(R.string.st_mode_elimination), d.modeElimination)
+                LigneInfo(stringResource(R.string.st_prestataire), d.prestataire)
+                LigneInfo(stringResource(R.string.st_cout_elimination), d.coutElimination?.let { fmtValeur(it, "") })
+                LigneInfo(stringResource(R.string.st_filiere_recyclage), d.filiereRecyclage)
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.EMBALLAGE -> emballage?.let { e ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_emballage), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_type_emballage), e.typeEmballage)
+                LigneInfo(stringResource(R.string.st_matiere), e.matiere)
+                LigneInfo(stringResource(R.string.st_dimensions), e.dimensions)
+                LigneInfo(stringResource(R.string.st_reutilisable), stringResource(if (e.reutilisable) R.string.st_oui else R.string.st_non))
+                LigneInfo(stringResource(R.string.st_consigne), stringResource(if (e.consigne) R.string.st_oui else R.string.st_non))
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.CONSIGNATION -> consignation?.let { c ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_consignation), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_proprietaire), c.proprietaire)
+                LigneInfo(stringResource(R.string.st_ref_contrat), c.referenceContrat)
+                LigneInfo(stringResource(R.string.st_debut), c.dateDebut?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_fin), c.dateFin?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_conditions_retour), c.conditionsRetour)
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.KIT -> kit?.let { k ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_kit), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(
+                    stringResource(R.string.st_methode_stock),
+                    stringResource(if (k.methode == "ASSEMBLE") R.string.st_kit_assemble else R.string.st_kit_virtuel),
+                )
+                composants.forEach { c ->
+                    LigneInfo("#${c.composantId}", fmtQuantite(c.quantite))
+                }
+            }
+        }
+        else -> Unit
     }
 }
 
