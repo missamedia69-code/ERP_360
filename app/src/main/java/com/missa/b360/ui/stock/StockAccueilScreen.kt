@@ -40,6 +40,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -64,7 +65,6 @@ import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.Red40
-import com.missa.b360.ui.theme.Red80
 import kotlin.math.max
 import kotlin.math.round
 
@@ -219,6 +219,40 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     )
                 }
                 Spacer(Modifier.height(10.dp))
+                Row {
+                    TexteMetrique(
+                        icone = StockIv.TrendingUp,
+                        valeur = groupe(round(etat.entrees30j).toLong()),
+                        libelle = stringResource(R.string.st_entrees) + " · " + stringResource(R.string.st_30_jours),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) },
+                    )
+                    TexteMetrique(
+                        icone = StockIv.TrendingDown,
+                        valeur = groupe(round(etat.sorties30j).toLong()),
+                        libelle = stringResource(R.string.st_sorties) + " · " + stringResource(R.string.st_30_jours),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) },
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
+                Row {
+                    TexteMetrique(
+                        icone = StockIv.Warning,
+                        valeur = etat.critiques.toString(),
+                        libelle = stringResource(R.string.st_stock_critique),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNaviguer(Routes.STOCK_ALERTES) },
+                    )
+                    TexteMetrique(
+                        icone = StockIv.Error,
+                        valeur = etat.ruptures.toString(),
+                        libelle = stringResource(R.string.st_ruptures),
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNaviguer(Routes.STOCK_ALERTES) },
+                    )
+                }
+                Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Surface(
                         onClick = { onNaviguer(Routes.stockProductForm()) },
@@ -255,50 +289,6 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                     }
                 }
             }
-        }
-
-        // Grille 2×2 : flux 30 jours et alertes.
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            KpiDash(
-                icone = StockIv.TrendingUp,
-                libelle = stringResource(R.string.st_entrees),
-                valeur = groupe(round(etat.entrees30j).toLong()),
-                sous = stringResource(R.string.st_30_jours),
-                fond = AppModule.STOCK.couleurPale,
-                modifier = Modifier.weight(1f),
-                onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) },
-            )
-            KpiDash(
-                icone = StockIv.TrendingDown,
-                libelle = stringResource(R.string.st_sorties),
-                valeur = groupe(round(etat.sorties30j).toLong()),
-                sous = stringResource(R.string.st_30_jours),
-                fond = Color.White,
-                modifier = Modifier.weight(1f),
-                onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) },
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            KpiDash(
-                icone = StockIv.Warning,
-                libelle = stringResource(R.string.st_stock_critique),
-                valeur = etat.critiques.toString(),
-                sous = null,
-                fond = Color(0xFFFFF4E5),
-                modifier = Modifier.weight(1f),
-                onClick = { onNaviguer(Routes.STOCK_ALERTES) },
-            )
-            KpiDash(
-                icone = StockIv.Error,
-                libelle = stringResource(R.string.st_ruptures),
-                valeur = etat.ruptures.toString(),
-                sous = null,
-                fond = Red80,
-                modifier = Modifier.weight(1f),
-                onClick = { onNaviguer(Routes.STOCK_ALERTES) },
-            )
         }
 
         // Valeur par catégorie : les trois catégories les plus valorisées.
@@ -444,39 +434,24 @@ private fun LegendePoint(couleur: Color, libelle: String) {
     }
 }
 
-/** Tuile KPI du tableau de bord : libellé, valeur, sous-titre et icône. */
+/** Métrique compacte en texte de la carte héro : icône, valeur, libellé, cliquable. */
 @Composable
-private fun KpiDash(
+private fun TexteMetrique(
     icone: Int,
-    libelle: String,
     valeur: String,
-    sous: String?,
-    fond: Color,
+    libelle: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
-        color = fond,
-        border = BorderStroke(1.dp, MissaBorder),
+    Row(
+        modifier = modifier.clickable(onClick = onClick).padding(vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(libelle, fontSize = 11.sp, color = MissaMuted, modifier = Modifier.weight(1f))
-                Surface(modifier = Modifier.size(22.dp), shape = RoundedCornerShape(8.dp), color = MissaCanvas) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(12.dp))
-                    }
-                }
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(valeur, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
-            if (sous != null) {
-                Text(sous, fontSize = 9.5.sp, color = MissaMuted)
-            }
-        }
+        Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(12.dp))
+        Spacer(Modifier.width(5.dp))
+        Text(valeur, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
+        Spacer(Modifier.width(4.dp))
+        Text(libelle, fontSize = 10.sp, color = MissaMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
