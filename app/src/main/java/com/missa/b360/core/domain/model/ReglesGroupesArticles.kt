@@ -100,6 +100,14 @@ object ReglesGroupesArticles {
     fun estMaintenable(article: ProductEntity, groupes: List<GroupeArticleComplet>): Boolean =
         pourArticle(article, groupes)?.estMaintenable ?: false
 
+    /** L'article génère-t-il des mouvements de stock ? (groupe, sinon type historique) */
+    fun estStocke(article: ProductEntity, groupes: List<GroupeArticleComplet>): Boolean =
+        pourArticle(article, groupes)?.estStocke ?: ProduitRules.estStockable(article.type)
+
+    /** L'article porte-t-il une valeur de stock (CUMP) ? (groupe, sinon type historique) */
+    fun estValorise(article: ProductEntity, groupes: List<GroupeArticleComplet>): Boolean =
+        pourArticle(article, groupes)?.estValorise ?: ProduitRules.estValorise(article.type)
+
     /** Compte par défaut d'un article pour un module (null sans groupe ni règle dédiée). */
     fun compteParDefaut(
         article: ProductEntity,

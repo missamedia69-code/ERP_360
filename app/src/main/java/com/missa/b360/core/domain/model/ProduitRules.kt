@@ -41,8 +41,11 @@ object ProduitRules {
     fun estAchetable(type: ProductType): Boolean = when (type) {
         ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
         ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT, ProductType.MATERIEL,
-        ProductType.AUTRE_BIEN, ProductType.EMBALLAGE -> true
-        ProductType.FABRIQUE, ProductType.COMPOSE, ProductType.PRESTATION,
+        ProductType.AUTRE_BIEN, ProductType.EMBALLAGE,
+        // Une prestation s'achète auprès d'un fournisseur (sous-traitance, honoraires) :
+        // non stockable, elle s'impute directement en charge à la validation.
+        ProductType.PRESTATION -> true
+        ProductType.FABRIQUE, ProductType.COMPOSE,
         ProductType.SEMI_FINI, ProductType.DECHET_VALORISABLE,
         ProductType.DECHET_NON_VALORISABLE, ProductType.KIT,
         ProductType.CONSIGNATION -> false
@@ -75,6 +78,18 @@ object ProduitRules {
      */
     fun estStockable(type: ProductType): Boolean = when (type) {
         ProductType.PRESTATION, ProductType.EQUIPEMENT, ProductType.MATERIEL -> false
+        else -> true
+    }
+
+    /**
+     * Un article valorisé porte une valeur de stock (CUMP). Les familles non
+     * stockées ne sont jamais valorisées, et déchets non valorisables comme
+     * consignations sont stockés sans valeur (le stock n'appartient pas à
+     * l'entreprise ou n'a pas de coût d'acquisition).
+     */
+    fun estValorise(type: ProductType): Boolean = when (type) {
+        ProductType.PRESTATION, ProductType.EQUIPEMENT, ProductType.MATERIEL,
+        ProductType.DECHET_NON_VALORISABLE, ProductType.CONSIGNATION -> false
         else -> true
     }
 

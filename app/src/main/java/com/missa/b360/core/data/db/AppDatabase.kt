@@ -138,7 +138,7 @@ import com.missa.b360.core.data.entity.UserEntity
         AbsenceEntity::class,
         TaskEntity::class,
     ],
-    version = 15,
+    version = 16,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -391,6 +391,15 @@ abstract class AppDatabase : RoomDatabase() {
          * v14 → v15 : drapeaux article (vendable/achetable/stockable, spec §14)
          * et extensions par famille (déchets, emballages, consignations, kits).
          */
+        val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE product_stock ADD COLUMN valeur REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN lot TEXT")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN numeroSerie TEXT")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN datePeremption INTEGER")
+            }
+        }
+
         val MIGRATION_14_15 = object : Migration(14, 15) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE products ADD COLUMN vendable INTEGER NOT NULL DEFAULT 1")

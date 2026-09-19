@@ -214,6 +214,11 @@ data class ProductStockEntity(
     val produitId: Long,
     val siteId: Long,
     val quantite: Double = 0.0,
+    /**
+     * Valeur du stock (CUMP × quantité) pour les familles valorisées — alimentée
+     * par les réceptions d'achat ; le CUMP se déduit : `valeur ÷ quantite`.
+     */
+    val valeur: Double = 0.0,
 )
 
 /**
@@ -253,6 +258,10 @@ data class StockMovementEntity(
     /** Référence du document d'origine (vente, achat, transfert TRF…). */
     val reference: String? = null,
     val commentaire: String? = null,
+    /** Traçabilité réception : lot, numéro de série, date de péremption. */
+    val lot: String? = null,
+    val numeroSerie: String? = null,
+    val datePeremption: Long? = null,
     val horodatage: Long,
 )
 

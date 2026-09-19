@@ -186,6 +186,19 @@ class PurchasesViewModel @Inject constructor(
         }
     }
 
+    /** Traçabilité réception d'une ligne : lot, numéro de série, péremption. */
+    fun updateLineTrace(lineId: Long, lot: String, numeroSerie: String, datePeremption: Long?) {
+        updateKeepingFullPayment { current ->
+            current.copy(
+                lines = current.lines.map {
+                    if (it.id == lineId) {
+                        it.copy(lot = lot, numeroSerie = numeroSerie, datePeremption = datePeremption)
+                    } else it
+                },
+            )
+        }
+    }
+
     fun updatePaid(value: String) {
         _uiState.value = _uiState.value.copy(paidInput = value.filterMoneyInput())
     }
@@ -217,6 +230,7 @@ class PurchasesViewModel @Inject constructor(
      */
     fun save(paymentMethod: String, draft: Boolean) {
         if (_busy.value) return
+        _saveResult.value = null
         val state = _uiState.value
         val supplier = state.supplier ?: run {
             _saveResult.value = SaveResult.MissingSupplier

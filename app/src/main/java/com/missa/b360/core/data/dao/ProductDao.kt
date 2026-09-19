@@ -94,12 +94,24 @@ interface ProductStockDao {
     fun observeToutes(): Flow<List<ProductStockEntity>>
 
     /** Crée la ligne à 0 si elle n'existe pas (no-op sinon). */
-    @Query("INSERT OR IGNORE INTO product_stock (produitId, siteId, quantite) VALUES (:produitId, :siteId, 0)")
+    @Query("INSERT OR IGNORE INTO product_stock (produitId, siteId, quantite, valeur) VALUES (:produitId, :siteId, 0, 0)")
     suspend fun ensureRow(produitId: Long, siteId: Long)
 
-    /** Écrase la ligne — à appeler uniquement dans une transaction après relecture. */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun remplacer(ligne: ProductStockEntity)
+    /**
+     * Met à jour la quantité **sans toucher à la valeur** — à appeler uniquement
+     * dans une transaction après relecture. (Un INSERT REPLACE remettrait la
+     * valeur valorisée à zéro à chaque vente ou ajustement.)
+     */
+    @Query("UPDATE product_stock SET quantite = :quantite WHERE produitId = :produitId AND siteId = :siteId")
+    suspend fun remplacer(produitId: Long, siteId: Long, quantite: Double)
+
+    /** Ajoute (ou retire) de la valeur au stock — réceptions d'achat (CUMP). */
+    @Query("UPDATE product_stock SET valeur = valeur + :delta WHERE produitId = :produitId AND siteId = :siteId")
+    suspend fun ajouterValeur(produitId: Long, siteId: Long, delta: Double)
+
+    /** Valeur actuelle du stock d'un produit dans un site (0 si aucune ligne). */
+    @Query("SELECT COALESCE(valeur, 0) FROM product_stock WHERE produitId = :produitId AND siteId = :siteId LIMIT 1")
+    suspend fun valeur(produitId: Long, siteId: Long): Double
 
     /** Site ayant la plus grande quantité positive (sortie sans site principal). */
     @Query(

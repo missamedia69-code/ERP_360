@@ -204,7 +204,7 @@ class SaveSaleUseCase @Inject constructor(
                 val avant = stockDao.quantite(produitId, siteId) ?: 0.0
                 val apres = (avant - demande).coerceAtLeast(0.0)
                 stockDao.ensureRow(produitId, siteId)
-                stockDao.remplacer(ProductStockEntity(produitId, siteId, apres))
+                stockDao.remplacer(produitId, siteId, apres)
                 movementDao.insert(
                     StockMovementEntity(
                         produitId = produitId,
@@ -305,7 +305,7 @@ class ReverseSaleStockUseCase @Inject constructor(
                         ?: continue
                     val avant = stockDao.quantite(produitId, siteId) ?: 0.0
                     stockDao.ensureRow(produitId, siteId)
-                    stockDao.remplacer(ProductStockEntity(produitId, siteId, avant + quantite))
+                    stockDao.remplacer(produitId, siteId, avant + quantite)
                     movementDao.insert(
                         StockMovementEntity(
                             produitId = produitId,

@@ -16,6 +16,10 @@ data class PurchaseLine(
     val quantity: Double,
     /** Produit du catalogue rattaché — null pour une ligne libre. */
     val productId: Long? = null,
+    /** Traçabilité réception — enregistrée sur le mouvement de stock. */
+    val lot: String? = null,
+    val numeroSerie: String? = null,
+    val datePeremption: Long? = null,
 ) {
     val total: Double get() = unitPrice * quantity
 }
@@ -66,6 +70,53 @@ object PurchaseStockEffects {
             .groupBy { it.productId }
             .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
             .toMap()
+
+    /** Coût d'achat (HT) par produit rattaché — alimente la valorisation CUMP. */
+    fun coutParProduit(lines: List<PurchaseLine>): Map<Long, Double> =
+        lines
+            .filter { it.productId != null && it.quantity > 0.0 }
+            .groupBy { it.productId }
+            .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.total } } }
+            .toMap()
+
+    /** Lignes portant une traçabilité (lot, série ou péremption) — un mouvement chacune. */
+    fun lignesTracees(lines: List<PurchaseLine>): List<PurchaseLine> =
+        lines.filter {
+            it.productId != null && it.quantity > 0.0 &&
+                (!it.lot.isNullOrBlank() || !it.numeroSerie.isNullOrBlank() || it.datePeremption != null)
+        }
+
+    /** Identifiants des lignes tracées — le reste est agrégé par produit. */
+    fun idsTracees(lines: List<PurchaseLine>): Set<Long> = lignesTracees(lines).map { it.id }.toSet()
+
+    /** Besoins agrégés hors lignes tracées (celles-ci ont déjà leur mouvement propre). */
+    fun besoinsParProduitSansTracees(lines: List<PurchaseLine>): Map<Long, Double> {
+        val tracees = idsTracees(lines)
+        return besoinsParProduit(lines.filterNot { it.id in tracees })
+    }
+
+    /** Coût agrégé hors lignes tracées. */
+    fun coutParProduitSansTracees(lines: List<PurchaseLine>): Map<Long, Double> {
+        val tracees = idsTracees(lines)
+        return coutParProduit(lines.filterNot { it.id in tracees })
+    }
+}
+
+/**
+ * Valorisation CUMP (spec §43) — règles pures.
+ *
+ * Le coût unitaire moyen pondéré se recalcule à chaque réception :
+ * `nouvelle valeur = ancienne valeur + coût de la réception`, et
+ * `CUMP = valeur ÷ quantité`. Les sorties (ventes, consommation) viendront
+ * décrémenter la valeur au CUMP dans une passe dédiée.
+ */
+object ValorisationRules {
+    fun nouvelleValeur(valeurAvant: Double, coutEntree: Double): Double =
+        (valeurAvant + coutEntree).coerceAtLeast(0.0)
+
+    /** CUMP après réception — 0 si la quantité est nulle (aucune division par zéro). */
+    fun cump(quantite: Double, valeur: Double): Double =
+        if (quantite > 0.0) valeur / quantite else 0.0
 }
 
 /**

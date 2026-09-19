@@ -165,7 +165,7 @@ class SaveProductionOrderUseCase @Inject constructor(
                     return@withTransaction Result.StockInsuffisant(composant.nom, disponible, besoin)
                 }
                 stockDao.ensureRow(composantId, compSite)
-                stockDao.remplacer(ProductStockEntity(composantId, compSite, disponible - besoin))
+                stockDao.remplacer(composantId, compSite, disponible - besoin)
                 movementDao.insert(
                     StockMovementEntity(
                         produitId = composantId,
@@ -182,7 +182,7 @@ class SaveProductionOrderUseCase @Inject constructor(
             // Entrée du produit fini.
             val avant = stockDao.quantite(payload.produitId, siteId) ?: 0.0
             stockDao.ensureRow(payload.produitId, siteId)
-            stockDao.remplacer(ProductStockEntity(payload.produitId, siteId, avant + payload.quantite))
+            stockDao.remplacer(payload.produitId, siteId, avant + payload.quantite)
             movementDao.insert(
                 StockMovementEntity(
                     produitId = payload.produitId,

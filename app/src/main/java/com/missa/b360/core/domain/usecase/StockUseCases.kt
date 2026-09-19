@@ -122,7 +122,7 @@ class RecordStockMovementUseCase @Inject constructor(
             }
             val apres = (avant + delta).coerceAtLeast(0.0)
             stockDao.ensureRow(produitId, siteId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteId, apres))
+            stockDao.remplacer(produitId, siteId, apres)
             movementDao.insert(
                 StockMovementEntity(
                     produitId = produitId,
@@ -210,9 +210,9 @@ class TransferStockUseCase @Inject constructor(
             val avantDest = stockDao.quantite(produitId, siteDestId) ?: 0.0
             val apresDest = avantDest + quantite
             stockDao.ensureRow(produitId, siteSourceId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteSourceId, apresSource))
+            stockDao.remplacer(produitId, siteSourceId, apresSource)
             stockDao.ensureRow(produitId, siteDestId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteDestId, apresDest))
+            stockDao.remplacer(produitId, siteDestId, apresDest)
             val reference = sequenceManager.next(DocType.TRANSFERT)
             movementDao.insert(
                 StockMovementEntity(
