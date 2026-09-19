@@ -66,7 +66,8 @@ class PurchasesViewModel @Inject constructor(
         data object Error : SaveResult
     }
 
-    val purchases: Flow<List<OperationRecordEntity>> = operations.observe(OperationModule.ACHATS)
+    val purchases: StateFlow<List<OperationRecordEntity>> = operations.observe(OperationModule.ACHATS)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Catalogue produits avec stock courant — les prix affichés sont les prix d'achat. */
     /**

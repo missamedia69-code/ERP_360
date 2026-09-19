@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -118,16 +119,16 @@ private fun ListeAchats(
     onNouveau: () -> Unit,
     onFormulaire: () -> Unit,
 ) {
-    val pieces by vm.purchases.collectAsStateWithLifecycle(initial = emptyList())
+    val pieces by vm.purchases.collectAsStateWithLifecycle()
     val devise by vm.devise.collectAsStateWithLifecycle()
     var pieceOuverte by remember { mutableStateOf<Long?>(null) }
     val fournisseurs by vm.suppliers.collectAsStateWithLifecycle()
 
     val validees = pieces.filter { it.status == OperationStatus.VALIDATED.name }
-    val depenses = validees.sumOf { it.amount }
+    val depenses = validees.sumOf { it.amount ?: 0.0 }
     val passif = validees.sumOf { piece ->
         val payload = PurchaseRecordCodec.decode(piece.notes)
-        (piece.amount - (payload?.paidAmount ?: 0.0)).coerceAtLeast(0.0)
+        ((piece.amount ?: 0.0) - (payload?.paidAmount ?: 0.0)).coerceAtLeast(0.0)
     }
     val brouillons = pieces.count { it.status == OperationStatus.DRAFT.name }
 
@@ -178,7 +179,7 @@ private fun ListeAchats(
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = JauneAchats, contentColor = MissaInk),
                     ) {
-                        Icon(Iv.Add, null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                        Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(stringResource(R.string.ach_nouvelle), color = MissaInk)
                     }
@@ -234,9 +235,9 @@ private fun CartePiece(
                 }
                 BadgeStatut(piece.status)
                 Spacer(Modifier.width(6.dp))
-                Text(fmtValeur(piece.amount, devise), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Text(fmtValeur(piece.amount ?: 0.0, devise), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Icon(
-                    if (ouvert) Iv.ExpandLess else Iv.ExpandMore,
+                    if (ouvert) painterResource(Iv.ExpandLess) else painterResource(Iv.ExpandMore),
                     null,
                     tint = MissaInk,
                     modifier = Modifier.size(20.dp),
@@ -377,7 +378,7 @@ private fun FormulaireAchat(
                     value = recherche,
                     onValueChange = { recherche = it },
                     label = { Text(stringResource(R.string.ach_rechercher), fontSize = 11.sp, color = MissaMuted) },
-                    leadingIcon = { Icon(Iv.Search, null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
+                    leadingIcon = { Icon(painterResource(Iv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -413,7 +414,7 @@ private fun FormulaireAchat(
                             }
                             Spacer(Modifier.width(6.dp))
                         }
-                        Icon(Iv.Add, null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -539,11 +540,11 @@ private fun LignePanier(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
                 IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
-                    Icon(Iv.DeleteOutline, null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                    Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
                 IconButton(onClick = onToggle, modifier = Modifier.size(32.dp)) {
                     Icon(
-                        if (ouvert) Iv.ExpandLess else Iv.ExpandMore,
+                        if (ouvert) painterResource(Iv.ExpandLess) else painterResource(Iv.ExpandMore),
                         null,
                         tint = MissaInk,
                         modifier = Modifier.size(20.dp),
@@ -629,7 +630,7 @@ private fun Selecteur(
             onValueChange = {},
             readOnly = true,
             label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(Iv.ArrowDropDown, null, tint = MissaInk) },
+            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
@@ -665,7 +666,7 @@ private fun ChampDateAchat(libelle: String, valeur: Long?, onDate: (Long?) -> Un
             onValueChange = {},
             readOnly = true,
             label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(Iv.Calendar, null, tint = MissaInk, modifier = Modifier.size(18.dp)) },
+            trailingIcon = { Icon(painterResource(Iv.Calendar), null, tint = MissaInk, modifier = Modifier.size(18.dp)) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
