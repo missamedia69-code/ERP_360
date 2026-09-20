@@ -46,9 +46,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -150,6 +150,7 @@ data class FournisseurFormState(
  * formulaire en 7 étapes, workflow de statuts, comptes bancaires, documents
  * et liaisons articles — tout passe par les use cases (licence, audit).
  */
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FournisseursViewModel @Inject constructor(
     private val fournisseurDao: FournisseurDao,
@@ -178,6 +179,8 @@ class FournisseursViewModel @Inject constructor(
 ) : ViewModel() {
 
     val modesPaiement: StateFlow<List<String>> = observePaymentMethods()
+        .map { methods -> methods.filter { it.actif }.map { it.nom } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Catalogue pour la liaison fournisseur ↔ article (spec §6.4). */
     val produits: StateFlow<List<ProductEntity>> = observeProducts()
@@ -302,10 +305,10 @@ class FournisseursViewModel @Inject constructor(
         }
 
     /**
-     * Flux combiné des enfants du fournisseur courant. `switchMap` garde un seul
-     * abonnement actif ; les noms de produits sont résolus à chaque emission.
+     * Flux combiné des enfants du fournisseur courant. `flatMapLatest` garde un
+     * seul abonnement actif ; les noms de produits sont résolus à chaque emission.
      */
-    private fun enfantsFlow() = _ficheId.switchMap { id ->
+    private fun enfantsFlow(): kotlinx.coroutines.flow.Flow<Quintuple> = _ficheId.flatMapLatest { id ->
         if (id == null) {
             kotlinx.coroutines.flow.flowOf(
                 Quintuple(emptyList(), emptyList(), emptyList(), emptyList() to emptyMap(), emptyList()),
