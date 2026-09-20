@@ -152,14 +152,19 @@ class FournisseurRulesTest {
     @Test
     fun `les motifs de doublon sont explicites`() {
         val candidat = base(nom = "Société Alpha", telephone = "+237600000000", identifiant = "M0123456789")
-        val homonyme = base(nom = "société alpha ", telephone = "+237699999999", identifiant = "X1")
-        val memeTel = base(nom = "Bêta SARL", telephone = "+237600000000", identifiant = "X2")
+        val homonyme = base(nom = "société alpha ", telephone = "+237699999999", identifiant = "X1").copy(id = 1)
+        val memeTel = base(nom = "Bêta SARL", telephone = "+237600000000", identifiant = "X2").copy(id = 2)
         val motifs = FournisseurRules.motifsDoublon(candidat, listOf(homonyme, memeTel))
         assertEquals(2, motifs.size)
-        assertTrue(motifs.values.flatten().contains("raison_sociale"))
-        assertTrue(motifs.values.flatten().contains("pays_raison_sociale"))
-        assertTrue(motifs.values.flatten().contains("telephone"))
-        assertTrue(FournisseurRules.motifsDoublon(candidat, listOf(base(nom = "Gamma", telephone = "+999", identifiant = "X3"))).isEmpty())
+        assertTrue(motifs[1L].orEmpty().contains("raison_sociale"))
+        assertTrue(motifs[1L].orEmpty().contains("pays_raison_sociale"))
+        assertTrue(motifs[2L].orEmpty().contains("telephone"))
+        assertTrue(
+            FournisseurRules.motifsDoublon(
+                candidat,
+                listOf(base(nom = "Gamma", telephone = "+999", identifiant = "X3").copy(id = 3)),
+            ).isEmpty(),
+        )
     }
 
     @Test
