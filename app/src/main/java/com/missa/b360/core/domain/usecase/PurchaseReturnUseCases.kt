@@ -138,18 +138,29 @@ class SavePurchaseUseCase @Inject constructor(
             // la facture porte seule la charge (imputation directe).
             val receptions = mutableListOf<Triple<Long, Long, Double>>() // produit, site, quantité
             var imputationsDirectes = 0
-            for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(payload.lines)) {
-                val produit = productDao.getById(produitId)
-                if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
-                if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
-                    imputationsDirectes++
-                    continue
+            if (payload.receptionRecordId != null) {
+                // Facture rattachée à un bon de réception : le stock a déjà été
+                // réceptionné et valorisé — aucun nouvel effet stock.
+                val reception = operationDao.getById(payload.receptionRecordId)
+                if (reception == null || reception.module != OperationModule.ACHATS.name ||
+                    reception.status != OperationStatus.VALIDATED.name
+                ) {
+                    return@withTransaction Result.DonneesInvalides
                 }
-                val siteId = produit.siteId
-                    ?: stockDao.siteAvecPlusDeStock(produitId)
-                    ?: siteDao.idPrincipal()
-                    ?: return@withTransaction Result.FournisseurIntrouvable
-                receptions += Triple(produitId, siteId, quantite)
+            } else {
+                for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(payload.lines)) {
+                    val produit = productDao.getById(produitId)
+                    if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
+                    if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
+                        imputationsDirectes++
+                        continue
+                    }
+                    val siteId = produit.siteId
+                        ?: stockDao.siteAvecPlusDeStock(produitId)
+                        ?: siteDao.idPrincipal()
+                        ?: return@withTransaction Result.FournisseurIntrouvable
+                    receptions += Triple(produitId, siteId, quantite)
+                }
             }
 
             val (recordIdFinal, reference) = when (val id = recordId) {
@@ -287,6 +298,12 @@ class SavePurchaseUseCase @Inject constructor(
             }
 
             val passif = (payload.total - payload.paidAmount).coerceAtLeast(0.0)
+            appNotifier.notifier(
+                type = "ACHATS",
+                titre = "Facture enregistrée",
+                message = "$reference — ${payload.supplierName} : ${payload.total}",
+                date = now,
+            )
             journalManager.log(
                 "ACHATS",
                 "ACHAT_VALIDATE",

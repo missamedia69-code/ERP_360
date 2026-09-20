@@ -43,6 +43,14 @@ data class PurchaseRecordPayload(
     /** Montant réglé à la validation — le reste est un passif fournisseur (spec §6). */
     val paidAmount: Double,
     val note: String? = null,
+    /**
+     * Chaîne commande → réception → facture : une facture rattachée à une
+     * réception ne regénère **aucun** stock (déjà réceptionné et valorisé).
+     */
+    val receptionRecordId: Long? = null,
+    val commandeRecordId: Long? = null,
+    /** Chemins internes des pièces jointes (photos compressées, PDF). */
+    val attachments: List<String> = emptyList(),
 )
 
 object PurchaseRecordCodec {
