@@ -311,7 +311,13 @@ class FournisseursViewModel @Inject constructor(
     private fun enfantsFlow(): kotlinx.coroutines.flow.Flow<Quintuple> = _ficheId.flatMapLatest { id ->
         if (id == null) {
             kotlinx.coroutines.flow.flowOf(
-                Quintuple(emptyList(), emptyList(), emptyList(), emptyList() to emptyMap(), emptyList()),
+                Quintuple(
+                    first = emptyList(),
+                    second = emptyList(),
+                    third = emptyList(),
+                    fourth = emptyList<FournisseurItemEntity>() to emptyMap<Long, String>(),
+                    fifth = emptyList(),
+                ),
             )
         } else {
             combine(
