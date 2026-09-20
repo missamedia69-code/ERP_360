@@ -1509,7 +1509,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
         AchatReportRules.topFournisseurs(
             factures
                 .filter { (piece, _) -> piece.createdAt in debutCourant until finCourant }
-                .map { (piece, _) -> piece.counterpart to (piece.amount ?: 0.0) },
+                .map { (piece, _) -> piece.counterpart.orEmpty().ifBlank { "—" } to (piece.amount ?: 0.0) },
         )
     }
     val mois = remember(factures) { AchatReportRules.parMois(montantsDates, fenetres) }

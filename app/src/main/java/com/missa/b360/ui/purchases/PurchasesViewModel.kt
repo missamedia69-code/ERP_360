@@ -506,10 +506,11 @@ class PurchasesViewModel @Inject constructor(
             commandeReference = record.reference,
             supplier = supplier,
             lignes = payload.lines
-                .filter { it.productId != null && it.quantity > 0.0 }
-                .map { ligne ->
+                .filter { it.quantity > 0.0 }
+                .mapNotNull { ligne ->
+                    val produitId = ligne.productId ?: return@mapNotNull null
                     ReceptionLigne(
-                        productId = ligne.productId,
+                        productId = produitId,
                         name = ligne.name,
                         quantiteCommandee = ligne.quantity,
                         quantiteRecue = ligne.quantity,
