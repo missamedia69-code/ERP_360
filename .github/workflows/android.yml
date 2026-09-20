@@ -30,6 +30,9 @@ jobs:
       - name: Parité des fichiers strings.xml
         run: python3 .github/scripts/verifier_traductions.py
 
+      - name: Clés R.string référencées mais manquantes
+        run: python3 .github/scripts/verifier_cles_manquantes.py
+
   build:
     name: Compilation et tests
     runs-on: ubuntu-latest
