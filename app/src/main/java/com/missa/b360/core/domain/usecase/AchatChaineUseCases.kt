@@ -23,6 +23,7 @@ import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.CommandeAchatPayload
+import com.missa.b360.core.domain.model.FournisseurRules
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseStockEffects
 import com.missa.b360.core.domain.model.ReceptionCodec
@@ -61,6 +62,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object DonneesInvalides : Result()
         data object FournisseurIntrouvable : Result()
+        data object FournisseurNonActif : Result()
         data object BrouillonIntrouvable : Result()
     }
 
@@ -74,7 +76,13 @@ class SaveCommandeAchatUseCase @Inject constructor(
         if (payload.lines.isEmpty() || payload.lines.none { it.quantity > 0.0 }) {
             return Result.DonneesInvalides
         }
-        if (fournisseurDao.getById(payload.supplierId) == null) return Result.FournisseurIntrouvable
+        val fournisseur = fournisseurDao.getById(payload.supplierId)
+            ?: return Result.FournisseurIntrouvable
+        // Règle d'accès (spec Fournisseurs) : une commande ne peut être VALIDÉE
+        // que si son fournisseur est ACTIF ; le brouillon reste libre.
+        if (!draft && !FournisseurRules.peutCommander(fournisseur.statut)) {
+            return Result.FournisseurNonActif
+        }
 
         val statut = if (draft) OperationStatus.DRAFT.name else OperationStatus.VALIDATED.name
         val total = payload.lines.sumOf { it.total }.coerceAtLeast(0.0)
@@ -326,6 +334,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
  */
 class ReglerAchatUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
+    private val fournisseurDao: FournisseurDao,
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val appNotifier: AppNotifier,
@@ -340,6 +349,7 @@ class ReglerAchatUseCase @Inject constructor(
         data object MontantInvalide : Result()
         data object CompteIntrouvable : Result()
         data object DejaEnregistre : Result()
+        data object PaiementBloque : Result()
     }
 
     suspend operator fun invoke(
@@ -358,6 +368,12 @@ class ReglerAchatUseCase @Inject constructor(
         val payload = PurchaseRecordCodec.decode(facture.notes) ?: return Result.Introuvable
         if (!AchatCommandeRules.reglementEstValide(payload.total, payload.paidAmount, montant)) {
             return Result.MontantInvalide
+        }
+        // Spec Fournisseurs §3.1 : paiement possible uniquement pour ACTIF, SUSPENDU
+        // ou BLOQUE (obligations déjà validées) ; jamais brouillon/archivé.
+        val fournisseur = fournisseurDao.getById(payload.supplierId)
+        if (fournisseur != null && !FournisseurRules.peutEtrePaye(fournisseur.statut)) {
+            return Result.PaiementBloque
         }
         val compte = TresorerieRules.compteCible(modePaiement, comptesTresorerieDao.getAll())
             ?: return Result.CompteIntrouvable

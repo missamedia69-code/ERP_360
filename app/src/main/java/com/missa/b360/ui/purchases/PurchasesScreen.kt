@@ -383,6 +383,8 @@ private fun messageAction(resultat: PurchasesViewModel.ActionAchatResult): Strin
     PurchasesViewModel.ActionAchatResult.FactureLiee -> stringResource(R.string.ach_erreur_facture_liee)
     PurchasesViewModel.ActionAchatResult.ReceptionLiee -> stringResource(R.string.ach_erreur_reception_liee)
     PurchasesViewModel.ActionAchatResult.CompteIntrouvable -> stringResource(R.string.ach_erreur_compte)
+    PurchasesViewModel.ActionAchatResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+    PurchasesViewModel.ActionAchatResult.PaiementBloque -> stringResource(R.string.ach_erreur_paiement_bloque)
     PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
     PurchasesViewModel.ActionAchatResult.Erreur -> stringResource(R.string.ach_erreur)
 }
@@ -768,6 +770,7 @@ private fun FormulaireAchat(
     val devise by vm.devise.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val resultat by vm.saveResult.collectAsStateWithLifecycle()
+    val itemsFournisseur by vm.itemsFournisseur.collectAsStateWithLifecycle()
 
     var modePaiement by remember { mutableStateOf("") }
     var ligneOuverte by remember { mutableStateOf<Long?>(null) }
@@ -841,6 +844,8 @@ private fun FormulaireAchat(
             items(ui.lines, key = { "ligne-${it.id}" }) { ligne ->
                 LignePanier(
                     ligne = ligne,
+                    liaison = ligne.productId?.let { itemsFournisseur[it] },
+                    devise = devise,
                     ouvert = ligneOuverte == ligne.id,
                     onToggle = { ligneOuverte = if (ligneOuverte == ligne.id) null else ligne.id },
                     onQuantite = { delta -> vm.changeQuantity(ligne.id, delta) },
@@ -998,6 +1003,8 @@ private fun VignettePieceJointe(path: String, onSupprimer: () -> Unit) {
 @Composable
 private fun LignePanier(
     ligne: PurchaseLine,
+    liaison: com.missa.b360.core.data.entity.FournisseurItemEntity?,
+    devise: String,
     ouvert: Boolean,
     onToggle: () -> Unit,
     onQuantite: (Double) -> Unit,
@@ -1024,6 +1031,9 @@ private fun LignePanier(
                         modifier = Modifier.size(20.dp),
                     )
                 }
+            }
+            if (liaison != null) {
+                BadgeLiaisonFournisseur(liaison, ligne.unitPrice, devise)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(36.dp)) {
@@ -1061,6 +1071,31 @@ private fun LignePanier(
             }
         }
     }
+}
+
+/**
+ * Référence fournisseur (spec Fournisseurs §6.4) : dernier prix validé, délai,
+ * quantité minimum ; en rouge si le prix saisi diffère du prix fournisseur.
+ */
+@Composable
+private fun BadgeLiaisonFournisseur(
+    liaison: com.missa.b360.core.data.entity.FournisseurItemEntity,
+    prixActuel: Double,
+    devise: String,
+) {
+    val ecart = liaison.prixUnitaire > 0.0 && kotlin.math.abs(prixActuel - liaison.prixUnitaire) > 1.0
+    val labelEcart = if (ecart) stringResource(R.string.four_prix_differents) else ""
+    Text(
+        buildString {
+            liaison.reference?.takeIf { it.isNotBlank() }?.let { append(it).append(" · ") }
+            append(fmtValeur(liaison.prixUnitaire, devise))
+            if (liaison.delaiJours > 0) append(" · ").append(liaison.delaiJours).append(" j")
+            if (liaison.quantiteMin > 0.0) append(" · min ").append(fmtQuantite(liaison.quantiteMin))
+            if (ecart) append("  ⚠ ").append(labelEcart)
+        },
+        fontSize = 10.sp,
+        color = if (ecart) Color(0xFFB91C1C) else MissaMuted,
+    )
 }
 
 /** Lot / numéro de série / péremption — communs au panier facture et à la réception. */
@@ -1126,6 +1161,7 @@ private fun FormulaireCommande(
     val devise by vm.devise.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val actionResult by vm.actionResult.collectAsStateWithLifecycle()
+    val itemsFournisseur by vm.itemsFournisseur.collectAsStateWithLifecycle()
 
     LaunchedEffect(actionResult) {
         if (actionResult == PurchasesViewModel.ActionAchatResult.CommandeEnregistree) {
@@ -1164,6 +1200,8 @@ private fun FormulaireCommande(
             items(ui.lines, key = { "cmd-${it.id}" }) { ligne ->
                 LigneCommande(
                     ligne = ligne,
+                    liaison = ligne.productId?.let { itemsFournisseur[it] },
+                    devise = devise,
                     onQuantite = { delta -> vm.changeQuantityCommande(ligne.id, delta) },
                     onPrix = { prix -> vm.updateLineCommande(ligne.id, ligne.quantity, prix) },
                     onSupprimer = { vm.removeLineCommande(ligne.id) },
@@ -1212,6 +1250,8 @@ private fun FormulaireCommande(
 @Composable
 private fun LigneCommande(
     ligne: CommandeAchatLigne,
+    liaison: com.missa.b360.core.data.entity.FournisseurItemEntity?,
+    devise: String,
     onQuantite: (Double) -> Unit,
     onPrix: (Double) -> Unit,
     onSupprimer: () -> Unit,
@@ -1223,6 +1263,9 @@ private fun LigneCommande(
                 IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
                     Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
+            }
+            if (liaison != null) {
+                BadgeLiaisonFournisseur(liaison, ligne.unitPrice, devise)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(36.dp)) {

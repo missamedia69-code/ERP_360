@@ -95,6 +95,7 @@ class PurchasesViewModel @Inject constructor(
     private val saveReceptionAchat: SaveReceptionAchatUseCase,
     private val reglerAchat: ReglerAchatUseCase,
     private val annulerAchat: AnnulerAchatUseCase,
+    private val fournisseurItemDao: com.missa.b360.core.data.dao.FournisseurItemDao,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -152,8 +153,21 @@ class PurchasesViewModel @Inject constructor(
 
     private var nextLineId = 1L
 
+    /**
+     * Liaisons article ↔ fournisseur du fournisseur choisi (spec Fournisseurs §6.4) :
+     * référence, dernier prix validé, délai et quantité minimum affichés au panier.
+     */
+    private val _itemsFournisseur =
+        MutableStateFlow<Map<Long, com.missa.b360.core.data.entity.FournisseurItemEntity>>(emptyMap())
+    val itemsFournisseur: StateFlow<Map<Long, com.missa.b360.core.data.entity.FournisseurItemEntity>> =
+        _itemsFournisseur
+
     fun selectSupplier(supplier: FournisseurEntity) {
         _uiState.value = _uiState.value.copy(supplier = supplier)
+        viewModelScope.launch {
+            _itemsFournisseur.value =
+                fournisseurItemDao.listeParFournisseur(supplier.id).associateBy { it.productId }
+        }
     }
 
     /** Reprend un brouillon fournisseur sans créer de deuxième pièce. */
@@ -350,6 +364,8 @@ class PurchasesViewModel @Inject constructor(
         data object FactureLiee : ActionAchatResult
         data object ReceptionLiee : ActionAchatResult
         data object CompteIntrouvable : ActionAchatResult
+        data object FournisseurNonActif : ActionAchatResult
+        data object PaiementBloque : ActionAchatResult
         data object LectureSeule : ActionAchatResult
         data object Erreur : ActionAchatResult
     }
@@ -480,6 +496,7 @@ class PurchasesViewModel @Inject constructor(
                     SaveCommandeAchatUseCase.Result.LectureSeule -> _actionResult.value = ActionAchatResult.LectureSeule
                     SaveCommandeAchatUseCase.Result.DonneesInvalides -> _actionResult.value = ActionAchatResult.DonneesInvalides
                     SaveCommandeAchatUseCase.Result.FournisseurIntrouvable -> _actionResult.value = ActionAchatResult.FournisseurManquant
+                    SaveCommandeAchatUseCase.Result.FournisseurNonActif -> _actionResult.value = ActionAchatResult.FournisseurNonActif
                     SaveCommandeAchatUseCase.Result.BrouillonIntrouvable -> _actionResult.value = ActionAchatResult.Erreur
                 }
             } catch (exception: CancellationException) {
@@ -669,6 +686,7 @@ class PurchasesViewModel @Inject constructor(
                     ReglerAchatUseCase.Result.MontantInvalide -> _actionResult.value = ActionAchatResult.DonneesInvalides
                     ReglerAchatUseCase.Result.CompteIntrouvable -> _actionResult.value = ActionAchatResult.CompteIntrouvable
                     ReglerAchatUseCase.Result.DejaEnregistre -> _actionResult.value = ActionAchatResult.Erreur
+                    ReglerAchatUseCase.Result.PaiementBloque -> _actionResult.value = ActionAchatResult.PaiementBloque
                 }
             } catch (exception: CancellationException) {
                 throw exception

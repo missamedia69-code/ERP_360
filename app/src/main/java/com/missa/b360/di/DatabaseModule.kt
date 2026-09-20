@@ -12,7 +12,12 @@ import com.missa.b360.core.data.dao.InterventionDao
 import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EnterpriseDao
+import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
+import com.missa.b360.core.data.dao.FournisseurContactDao
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.dao.FournisseurDocumentDao
+import com.missa.b360.core.data.dao.FournisseurEvenementDao
+import com.missa.b360.core.data.dao.FournisseurItemDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -49,7 +54,7 @@ object DatabaseModule {
         Room.databaseBuilder(context, AppDatabase::class.java, "missa_b360.db")
             .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7,
-                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12, AppDatabase.MIGRATION_12_13, AppDatabase.MIGRATION_13_14, AppDatabase.MIGRATION_14_15, AppDatabase.MIGRATION_15_16)
+                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12, AppDatabase.MIGRATION_12_13, AppDatabase.MIGRATION_13_14, AppDatabase.MIGRATION_14_15, AppDatabase.MIGRATION_15_16, AppDatabase.MIGRATION_16_17)
             .build()
 
     @Provides fun provideGroupeArticleDao(db: AppDatabase): GroupeArticleDao = db.groupeArticleDao()
@@ -75,6 +80,16 @@ object DatabaseModule {
     @Provides fun provideNotificationDao(db: AppDatabase): NotificationDao = db.notificationDao()
     @Provides fun provideClientDao(db: AppDatabase): ClientDao = db.clientDao()
     @Provides fun provideFournisseurDao(db: AppDatabase): FournisseurDao = db.fournisseurDao()
+    @Provides fun provideFournisseurContactDao(db: AppDatabase): FournisseurContactDao =
+        db.fournisseurContactDao()
+    @Provides fun provideFournisseurCompteBancaireDao(db: AppDatabase): FournisseurCompteBancaireDao =
+        db.fournisseurCompteBancaireDao()
+    @Provides fun provideFournisseurDocumentDao(db: AppDatabase): FournisseurDocumentDao =
+        db.fournisseurDocumentDao()
+    @Provides fun provideFournisseurItemDao(db: AppDatabase): FournisseurItemDao =
+        db.fournisseurItemDao()
+    @Provides fun provideFournisseurEvenementDao(db: AppDatabase): FournisseurEvenementDao =
+        db.fournisseurEvenementDao()
     @Provides fun provideOperationRecordDao(db: AppDatabase): OperationRecordDao = db.operationRecordDao()
     @Provides fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
     @Provides fun provideProductStockDao(db: AppDatabase): ProductStockDao = db.productStockDao()
