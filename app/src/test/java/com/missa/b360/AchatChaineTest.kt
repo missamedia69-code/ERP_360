@@ -147,7 +147,8 @@ class AchatChaineTest {
             listOf("A" to 10.0, "B" to 90.0, "A" to 20.0, "C" to 5.0, "D" to 1.0, "E" to 2.0, "F" to 3.0),
             limite = 3,
         )
-        assertEquals(listOf("B", "A", "F"), top.map { it.nom })
+        // B (90) > A (10 + 20 = 30) > C (5) — F (3), E (2) et D (1) sont hors du top 3.
+        assertEquals(listOf("B", "A", "C"), top.map { it.nom })
         assertEquals(30.0, top[1].total, 1e-9)
         assertEquals(2, top[1].nombre)
     }
