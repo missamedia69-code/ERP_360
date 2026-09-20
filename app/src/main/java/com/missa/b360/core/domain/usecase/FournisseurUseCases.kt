@@ -173,7 +173,12 @@ class SoumettreFournisseurUseCase @Inject constructor(
         if (manquants.isNotEmpty()) return Result.ChampsManquants(manquants)
         fournisseurDao.update(fournisseur.copy(statut = FournisseurStatus.A_VALIDER, soumisLe = now, updatedAt = now))
         evenementDao.insert(
-            FournisseurEvenementEntity(id, now, FournisseurEvenementType.SOUMISSION, "Dossier soumis à validation"),
+            FournisseurEvenementEntity(
+                fournisseurId = id,
+                date = now,
+                type = FournisseurEvenementType.SOUMISSION,
+                details = "Dossier soumis à validation",
+            ),
         )
         notifier.notifier("FOURNISSEUR", "Fournisseur à valider", "${fournisseur.code} — ${fournisseur.nom}")
         return Result.Succes

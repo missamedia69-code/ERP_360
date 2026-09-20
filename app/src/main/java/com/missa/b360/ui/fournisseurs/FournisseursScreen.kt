@@ -816,7 +816,7 @@ private fun FicheFournisseurEcran(
                             onClick = { evaluationOuverte = true },
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Icon(painterResource(Iv.Star), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                            Icon(painterResource(Iv.QualityBadge), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text(stringResource(R.string.four_evaluer), fontSize = 12.sp, color = MissaInk)
                         }
@@ -1969,7 +1969,6 @@ private fun SelecteurSimple(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2079,7 +2078,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2204,7 +2202,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2289,7 +2286,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeAchats(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2365,7 +2361,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeAchats(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapePaiement(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2404,7 +2399,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapePaiement(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
@@ -2577,7 +2571,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
     }
 }
 
-@Composable
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeValidation(
     vm: FournisseursViewModel,
     form: FournisseurFormState,
