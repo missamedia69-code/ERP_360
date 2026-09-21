@@ -1447,4 +1447,20 @@
     <string name="pro_lancer_fabrication">确认并扣减库存</string>
     <string name="pro_choisir_matiere">选择原材料/组件</string>
     <string name="pro_quantite_requise">所需用量</string>
+    <string name="liv_titre_synthese">物流发货概况</string>
+    <string name="liv_en_cours">%1$d 笔派送中</string>
+    <string name="liv_taux_reussite">送达率：%1$s %%</string>
+    <string name="liv_delai_moyen">平均时效：%1$s 天</string>
+    <string name="liv_nouveau_bl">新建送货单</string>
+    <string name="liv_titre_registre">发货记录册</string>
+    <string name="liv_aucun_bl">暂无送货单</string>
+    <string name="liv_aucun_bl_desc">创建送货单以备货、发运并向客户确认包裹签收。</string>
+    <string name="liv_nb_colis">%1$d 件包裹</string>
+    <string name="liv_passer_etape">流转至：%1$s</string>
+    <string name="liv_champ_transporteur">承运商 / 司机</string>
+    <string name="liv_champ_nb_colis">包裹数量</string>
+    <string name="liv_msg_cree">送货单已创建：%1$s</string>
+    <string name="liv_msg_avance">节点已更新</string>
+    <string name="liv_msg_annule">送货单已取消</string>
+    <string name="liv_msg_finale">该送货单已签收完毕</string>
 </resources>

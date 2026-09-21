@@ -1451,4 +1451,20 @@
     <string name="pro_lancer_fabrication">Validate &amp; deduct stock</string>
     <string name="pro_choisir_matiere">Select component / material</string>
     <string name="pro_quantite_requise">Required quantity</string>
+    <string name="liv_titre_synthese">Dispatch &amp; Delivery activity</string>
+    <string name="liv_en_cours">%1$d deliveries in progress</string>
+    <string name="liv_taux_reussite">Delivery rate: %1$s %%</string>
+    <string name="liv_delai_moyen">Average time: %1$s days</string>
+    <string name="liv_nouveau_bl">New delivery note</string>
+    <string name="liv_titre_registre">Shipments log</string>
+    <string name="liv_aucun_bl">No delivery notes</string>
+    <string name="liv_aucun_bl_desc">Create a delivery note to pack, ship, and confirm parcel handovers to your clients.</string>
+    <string name="liv_nb_colis">%1$d parcels</string>
+    <string name="liv_passer_etape">Mark as: %1$s</string>
+    <string name="liv_champ_transporteur">Carrier / Driver</string>
+    <string name="liv_champ_nb_colis">Number of packages</string>
+    <string name="liv_msg_cree">Delivery note created: %1$s</string>
+    <string name="liv_msg_avance">Stage updated</string>
+    <string name="liv_msg_annule">Delivery note cancelled</string>
+    <string name="liv_msg_finale">This order is already delivered</string>
 </resources>

@@ -1447,4 +1447,20 @@
     <string name="pro_lancer_fabrication">اعتماد وخصم المخزون</string>
     <string name="pro_choisir_matiere">اختر المكون / المادة الخام</string>
     <string name="pro_quantite_requise">الكمية المطلوبة</string>
+    <string name="liv_titre_synthese">نشاط الشحن والتوصيل</string>
+    <string name="liv_en_cours">%1$d شحنات قيد التوصيل</string>
+    <string name="liv_taux_reussite">نسبة الإنجاز: %1$s %%</string>
+    <string name="liv_delai_moyen">متوسط الوقت: %1$s يوم</string>
+    <string name="liv_nouveau_bl">إذن تسليم جديد</string>
+    <string name="liv_titre_registre">سجل الشحنات</string>
+    <string name="liv_aucun_bl">لا توجد أذونات تسليم</string>
+    <string name="liv_aucun_bl_desc">أنشئ إذن تسليم لتجهيز الطرود وشحنها وتأكيد استلام العملاء لها.</string>
+    <string name="liv_nb_colis">%1$d طرد</string>
+    <string name="liv_passer_etape">تحويل إلى: %1$s</string>
+    <string name="liv_champ_transporteur">شركة الشحن / السائق</string>
+    <string name="liv_champ_nb_colis">عدد الطرود</string>
+    <string name="liv_msg_cree">تم إنشاء إذن التسليم: %1$s</string>
+    <string name="liv_msg_avance">تم تحديث المرحلة</string>
+    <string name="liv_msg_annule">تم إلغاء إذن التسليم</string>
+    <string name="liv_msg_finale">تم تسليم هذا الإذن مسبقاً</string>
 </resources>

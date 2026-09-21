@@ -1494,5 +1494,21 @@
     <string name="pro_lancer_fabrication">Valider et déstocker</string>
     <string name="pro_choisir_matiere">Choisir le composant / matière</string>
     <string name="pro_quantite_requise">Quantité nécessaire</string>
+    <string name="liv_titre_synthese">Activité des expéditions</string>
+    <string name="liv_en_cours">%1$d livraisons en cours</string>
+    <string name="liv_taux_reussite">Taux de livraison : %1$s %%</string>
+    <string name="liv_delai_moyen">Délai moyen : %1$s j</string>
+    <string name="liv_nouveau_bl">Nouveau bon de livraison</string>
+    <string name="liv_titre_registre">Registre des expéditions</string>
+    <string name="liv_aucun_bl">Aucun bon de livraison</string>
+    <string name="liv_aucun_bl_desc">Créez un bon de livraison pour préparer, expédier et attester la remise des colis à vos clients.</string>
+    <string name="liv_nb_colis">%1$d colis</string>
+    <string name="liv_passer_etape">Marquer : %1$s</string>
+    <string name="liv_champ_transporteur">Transporteur / Chauffeur</string>
+    <string name="liv_champ_nb_colis">Nombre de colis</string>
+    <string name="liv_msg_cree">Bon de livraison créé : %1$s</string>
+    <string name="liv_msg_avance">Étape mise à jour</string>
+    <string name="liv_msg_annule">Bon de livraison annulé</string>
+    <string name="liv_msg_finale">Ce bon a déjà été livré</string>
 </resources>
 <!-- Temp insert will be replaced -->

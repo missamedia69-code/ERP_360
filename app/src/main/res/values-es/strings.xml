@@ -1447,4 +1447,20 @@
     <string name="pro_lancer_fabrication">Validar y descontar stock</string>
     <string name="pro_choisir_matiere">Elegir componente / material</string>
     <string name="pro_quantite_requise">Cantidad requerida</string>
+    <string name="liv_titre_synthese">Actividad de envíos</string>
+    <string name="liv_en_cours">%1$d entregas en curso</string>
+    <string name="liv_taux_reussite">Tasa de entrega: %1$s %%</string>
+    <string name="liv_delai_moyen">Plazo medio: %1$s d</string>
+    <string name="liv_nouveau_bl">Nuevo albarán de entrega</string>
+    <string name="liv_titre_registre">Registro de expediciones</string>
+    <string name="liv_aucun_bl">Sin albaranes de entrega</string>
+    <string name="liv_aucun_bl_desc">Cree un albarán para preparar, despachar y certificar la entrega a sus clientes.</string>
+    <string name="liv_nb_colis">%1$d bultos</string>
+    <string name="liv_passer_etape">Marcar como: %1$s</string>
+    <string name="liv_champ_transporteur">Transportista / Conductor</string>
+    <string name="liv_champ_nb_colis">Número de bultos</string>
+    <string name="liv_msg_cree">Albarán creado: %1$s</string>
+    <string name="liv_msg_avance">Estado actualizado</string>
+    <string name="liv_msg_annule">Albarán cancelado</string>
+    <string name="liv_msg_finale">Este albarán ya fue entregado</string>
 </resources>
