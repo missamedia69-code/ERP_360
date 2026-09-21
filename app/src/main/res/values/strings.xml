@@ -1510,5 +1510,34 @@
     <string name="liv_msg_avance">Étape mise à jour</string>
     <string name="liv_msg_annule">Bon de livraison annulé</string>
     <string name="liv_msg_finale">Ce bon a déjà été livré</string>
+    <string name="qua_titre_synthese">Performance Qualité</string>
+    <string name="qua_ecarts_ouverts">%1$d écarts ouverts</string>
+    <string name="qua_critiques">%1$d critiques</string>
+    <string name="qua_cout_ecarts">Coût : %1$s</string>
+    <string name="qua_declarer_ecart">Déclarer une non-conformité</string>
+    <string name="qua_titre_file">Registre des non-conformités</string>
+    <string name="qua_aucun_ecart">Aucun écart qualité</string>
+    <string name="qua_aucun_ecart_desc">Consignez les réclamations et défauts constatés en production ou réception.</string>
+    <string name="qua_passer_en_cours">Prendre en charge</string>
+    <string name="qua_marquer_resolue">Clôturer l\'écart</string>
+    <string name="qua_champ_titre">Intitulé de l\'écart</string>
+    <string name="qua_champ_description">Description détaillée</string>
+    <string name="qua_champ_cout_estime">Coût estimé (perte / rebut)</string>
+    <string name="mai_titre_synthese">Disponibilité du parc machines</string>
+    <string name="mai_nb_equipements">%1$d équipements suivis</string>
+    <string name="mai_en_retard">%1$d en retard</string>
+    <string name="mai_cout_cumule">Coût : %1$s</string>
+    <string name="mai_ajouter_equipement">Ajouter un équipement</string>
+    <string name="mai_titre_parc">Parc matériel &amp; installations</string>
+    <string name="mai_aucun_equipement">Aucun équipement enregistré</string>
+    <string name="mai_aucun_equipement_desc">Référencez vos machines et véhicules pour planifier les entretiens.</string>
+    <string name="mai_retard_maintenance">Entretien en retard</string>
+    <string name="mai_a_jour">À jour</string>
+    <string name="mai_enregistrer_intervention">Enregistrer une intervention</string>
+    <string name="mai_champ_nom">Désignation de la machine / matériel</string>
+    <string name="mai_champ_periodicite_jours">Périodicité d\'entretien (jours)</string>
+    <string name="mai_intervention_sur">Intervention sur</string>
+    <string name="mai_champ_description_travaux">Travaux réalisés ou planifiés</string>
+    <string name="mai_champ_cout_pieces">Coût des pièces / main d\'œuvre</string>
 </resources>
 <!-- Temp insert will be replaced -->
