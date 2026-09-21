@@ -1442,5 +1442,19 @@
     <string name="tre_titre_mouvements">Derniers mouvements</string>
     <string name="tre_aucun_mouvement">Aucun mouvement</string>
     <string name="tre_aucun_mouvement_desc">Enregistrez vos encaissements et décaissements pour suivre votre solde en temps réel.</string>
+    <string name="cpt_periode_mois_courant">Ce mois</string>
+    <string name="cpt_periode_mois_precedent">Mois précédent</string>
+    <string name="cpt_periode_annee">Année</string>
+    <string name="cpt_resultat_net">Résultat net d\'exploitation</string>
+    <string name="cpt_total_produits">Total Produits (Ventes)</string>
+    <string name="cpt_total_charges">Total Charges (Achats &amp; Frais)</string>
+    <string name="cpt_position_tva">Position Fiscale TVA</string>
+    <string name="cpt_tva_collectee">TVA collectée</string>
+    <string name="cpt_tva_deductible">TVA déductible</string>
+    <string name="cpt_tva_due">TVA nette due</string>
+    <string name="cpt_tva_credit">Crédit de TVA</string>
+    <string name="cpt_journal_general">Grand Livre &amp; Journal des écritures</string>
+    <string name="cpt_aucun_journal">Aucune écriture comptable</string>
+    <string name="cpt_aucun_journal_desc">Les écritures se génèrent automatiquement à la validation des ventes, achats et opérations.</string>
 </resources>
 <!-- Temp insert will be replaced -->

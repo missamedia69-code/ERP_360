@@ -1399,4 +1399,18 @@
     <string name="tre_titre_mouvements">Recent transactions</string>
     <string name="tre_aucun_mouvement">No transactions</string>
     <string name="tre_aucun_mouvement_desc">Record cash entries and payments to track your real-time balance.</string>
+    <string name="cpt_periode_mois_courant">This month</string>
+    <string name="cpt_periode_mois_precedent">Previous month</string>
+    <string name="cpt_periode_annee">Year</string>
+    <string name="cpt_resultat_net">Net Operating Result</string>
+    <string name="cpt_total_produits">Total Income (Sales)</string>
+    <string name="cpt_total_charges">Total Expenses &amp; Costs</string>
+    <string name="cpt_position_tva">VAT Tax Position</string>
+    <string name="cpt_tva_collectee">Output VAT</string>
+    <string name="cpt_tva_deductible">Input VAT</string>
+    <string name="cpt_tva_due">Net VAT payable</string>
+    <string name="cpt_tva_credit">VAT tax credit</string>
+    <string name="cpt_journal_general">General Ledger &amp; Journal</string>
+    <string name="cpt_aucun_journal">No accounting entries</string>
+    <string name="cpt_aucun_journal_desc">Entries are generated automatically upon validation of sales, purchases, and cash flows.</string>
 </resources>

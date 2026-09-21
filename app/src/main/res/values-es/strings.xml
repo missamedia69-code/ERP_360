@@ -1395,4 +1395,18 @@
     <string name="tre_titre_mouvements">Últimos movimientos</string>
     <string name="tre_aucun_mouvement">Sin movimientos</string>
     <string name="tre_aucun_mouvement_desc">Registre cobros y pagos para seguir su saldo en tiempo real.</string>
+    <string name="cpt_periode_mois_courant">Este mes</string>
+    <string name="cpt_periode_mois_precedent">Mes anterior</string>
+    <string name="cpt_periode_annee">Año</string>
+    <string name="cpt_resultat_net">Resultado neto de explotación</string>
+    <string name="cpt_total_produits">Total Ingresos (Ventas)</string>
+    <string name="cpt_total_charges">Total Gastos y Costos</string>
+    <string name="cpt_position_tva">Posición Fiscal IVA</string>
+    <string name="cpt_tva_collectee">IVA repercutido</string>
+    <string name="cpt_tva_deductible">IVA soportado</string>
+    <string name="cpt_tva_due">IVA a ingresar</string>
+    <string name="cpt_tva_credit">Crédito de IVA</string>
+    <string name="cpt_journal_general">Libro Mayor y Diario</string>
+    <string name="cpt_aucun_journal">Sin asientos contables</string>
+    <string name="cpt_aucun_journal_desc">Los asientos se generan automáticamente al validar ventas, compras y tesorería.</string>
 </resources>

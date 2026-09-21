@@ -1395,4 +1395,18 @@
     <string name="tre_titre_mouvements">آخر الحركات</string>
     <string name="tre_aucun_mouvement">لا توجد حركات</string>
     <string name="tre_aucun_mouvement_desc">سجل مقبوضاتك ومدفوعاتك لمتابعة رصيدك في الوقت الفعلي.</string>
+    <string name="cpt_periode_mois_courant">هذا الشهر</string>
+    <string name="cpt_periode_mois_precedent">الشهر السابق</string>
+    <string name="cpt_periode_annee">السنة</string>
+    <string name="cpt_resultat_net">صافي نتيجة التشغيل</string>
+    <string name="cpt_total_produits">إجمالي الإيرادات (المبيعات)</string>
+    <string name="cpt_total_charges">إجمالي الأعباء (المشتريات والتكاليف)</string>
+    <string name="cpt_position_tva">الموقف الضريبي للقيمة المضافة</string>
+    <string name="cpt_tva_collectee">ضريبة المخرجات المحصلة</string>
+    <string name="cpt_tva_deductible">ضريبة المدخلات القابلة للخصم</string>
+    <string name="cpt_tva_due">صافي الضريبة المستحقة</string>
+    <string name="cpt_tva_credit">رصيد دائن للقيمة المضافة</string>
+    <string name="cpt_journal_general">دفتر الأستاذ العام ودفتر اليومية</string>
+    <string name="cpt_aucun_journal">لا توجد قيود محاسبية</string>
+    <string name="cpt_aucun_journal_desc">يتم إنشاء القيود تلقائياً عند اعتماد المبيعات والمشتريات وحركات الخزينة.</string>
 </resources>

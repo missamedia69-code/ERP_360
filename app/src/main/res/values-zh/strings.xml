@@ -1395,4 +1395,18 @@
     <string name="tre_titre_mouvements">最新收支</string>
     <string name="tre_aucun_mouvement">暂无收支记录</string>
     <string name="tre_aucun_mouvement_desc">记录收款和付款以实时跟踪您的资金余额。</string>
+    <string name="cpt_periode_mois_courant">本月</string>
+    <string name="cpt_periode_mois_precedent">上月</string>
+    <string name="cpt_periode_annee">本年度</string>
+    <string name="cpt_resultat_net">营业净利润</string>
+    <string name="cpt_total_produits">总收入（销售）</string>
+    <string name="cpt_total_charges">总支出（采购与费用）</string>
+    <string name="cpt_position_tva">增值税税务状况</string>
+    <string name="cpt_tva_collectee">销项税额</string>
+    <string name="cpt_tva_deductible">进项税额</string>
+    <string name="cpt_tva_due">应纳增值税额</string>
+    <string name="cpt_tva_credit">增值税留抵税额</string>
+    <string name="cpt_journal_general">总分类账与凭证日记账</string>
+    <string name="cpt_aucun_journal">暂无会计分录</string>
+    <string name="cpt_aucun_journal_desc">在销售、采购和资金流水确认后，会计分录将自动生成。</string>
 </resources>
