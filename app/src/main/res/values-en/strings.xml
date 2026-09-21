@@ -1383,4 +1383,12 @@
     <string name="st_immobilisations">Fixed assets</string>
     <string name="st_resume_immo">%1$d assets · %2$s</string>
     <string name="st_nouvel_equipement">New equipment</string>
+    <string name="clients_nouveau_client">New client</string>
+    <string name="sales_empty_desc">Record direct sales, manage payments and update inventory in real time.</string>
+    <string name="sales_new_sale">New sale</string>
+    <string name="sales_select_client">Select a client</string>
+    <string name="sales_subtotal">Subtotal</string>
+    <string name="sales_total_sales">Total sales</string>
+    <string name="sales_err_client_required">Please select a client</string>
+    <string name="sales_err_stock_insufficient">Insufficient stock for %1$s (available: %2$s)</string>
 </resources>

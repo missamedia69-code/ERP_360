@@ -1379,4 +1379,12 @@
     <string name="st_immobilisations">الأصول الثابتة</string>
     <string name="st_resume_immo">%1$d أصول · %2$s</string>
     <string name="st_nouvel_equipement">معدة جديدة</string>
+    <string name="clients_nouveau_client">عميل جديد</string>
+    <string name="sales_empty_desc">سجل مبيعاتك المباشرة، وأدر المقبوضات وحدث المخزون في الوقت الفعلي.</string>
+    <string name="sales_new_sale">بيع جديد</string>
+    <string name="sales_select_client">اختر عميلاً</string>
+    <string name="sales_subtotal">المجموع الفرعي</string>
+    <string name="sales_total_sales">إجمالي المبيعات</string>
+    <string name="sales_err_client_required">يرجى اختيار عميل</string>
+    <string name="sales_err_stock_insufficient">المخزون غير كافٍ لـ %1$s (المتوفر: %2$s)</string>
 </resources>

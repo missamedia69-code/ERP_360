@@ -1379,4 +1379,12 @@
     <string name="st_immobilisations">固定资产</string>
     <string name="st_resume_immo">%1$d 项资产 · %2$s</string>
     <string name="st_nouvel_equipement">新设备</string>
+    <string name="clients_nouveau_client">新客户</string>
+    <string name="sales_empty_desc">实时记录直销、管理收款并更新库存。</string>
+    <string name="sales_new_sale">新建销售</string>
+    <string name="sales_select_client">选择客户</string>
+    <string name="sales_subtotal">小计</string>
+    <string name="sales_total_sales">销售总额</string>
+    <string name="sales_err_client_required">请选择客户</string>
+    <string name="sales_err_stock_insufficient">%1$s 库存不足（可用：%2$s）</string>
 </resources>

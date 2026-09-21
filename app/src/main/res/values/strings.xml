@@ -1426,5 +1426,13 @@
     <string name="st_immobilisations">Immobilisations</string>
     <string name="st_resume_immo">%1$d biens · %2$s</string>
     <string name="st_nouvel_equipement">Nouvel équipement</string>
+    <string name="clients_nouveau_client">Nouveau client</string>
+    <string name="sales_empty_desc">Enregistrez vos ventes directes, gérez les encaissements et déstockez en temps réel.</string>
+    <string name="sales_new_sale">Nouvelle vente</string>
+    <string name="sales_select_client">Sélectionner un client</string>
+    <string name="sales_subtotal">Sous-total HT</string>
+    <string name="sales_total_sales">Total des ventes</string>
+    <string name="sales_err_client_required">Veuillez choisir un client</string>
+    <string name="sales_err_stock_insufficient">Stock insuffisant pour %1$s (disponible: %2$s)</string>
 </resources>
 <!-- Temp insert will be replaced -->
