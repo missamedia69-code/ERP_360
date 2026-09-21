@@ -1409,4 +1409,27 @@
     <string name="cpt_journal_general">دفتر الأستاذ العام ودفتر اليومية</string>
     <string name="cpt_aucun_journal">لا توجد قيود محاسبية</string>
     <string name="cpt_aucun_journal_desc">يتم إنشاء القيود تلقائياً عند اعتماد المبيعات والمشتريات وحركات الخزينة.</string>
+    <string name="rh_masse_salariale">كتلة الرواتب الشهرية</string>
+    <string name="rh_effectif_actif">%1$d موظف نشط</string>
+    <string name="rh_total_inscrits">الإجمالي: %1$d</string>
+    <string name="rh_nouvel_employe">موظف جديد</string>
+    <string name="rh_generer_paie">احتساب الرواتب</string>
+    <string name="rh_titre_personnel">سجل الموظفين</string>
+    <string name="rh_aucun_employe">لا يوجد موظفون مسجلون</string>
+    <string name="rh_aucun_employe_desc">أضف موظفيك لإدارة العقود والغيابات والسلف ومسيرات الرواتب.</string>
+    <string name="rh_statut_actif">نشط</string>
+    <string name="rh_statut_inactif">غير نشط</string>
+    <string name="rh_salaire_mensuel">الأساسي: %1$s / شهر</string>
+    <string name="rh_action_absence">غياب</string>
+    <string name="rh_action_avance">سلفة</string>
+    <string name="rh_nouveau_titre">ملف موظف جديد</string>
+    <string name="rh_champ_nom">الاسم الكامل</string>
+    <string name="rh_champ_tel">الهاتف</string>
+    <string name="rh_champ_poste">الوظيفة / المنصب</string>
+    <string name="rh_champ_salaire">الراتب الأساسي الشهري</string>
+    <string name="rh_declarer_absence">تسجيل غياب (%1$s)</string>
+    <string name="rh_champ_duree_jours">المدة بالأيام</string>
+    <string name="rh_champ_motif">السبب / التبرير</string>
+    <string name="rh_verser_avance">صرف سلفة (%1$s)</string>
+    <string name="rh_champ_montant_avance">مبلغ السلفة</string>
 </resources>

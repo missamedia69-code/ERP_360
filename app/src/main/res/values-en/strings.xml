@@ -1413,4 +1413,27 @@
     <string name="cpt_journal_general">General Ledger &amp; Journal</string>
     <string name="cpt_aucun_journal">No accounting entries</string>
     <string name="cpt_aucun_journal_desc">Entries are generated automatically upon validation of sales, purchases, and cash flows.</string>
+    <string name="rh_masse_salariale">Monthly payroll total</string>
+    <string name="rh_effectif_actif">%1$d active employees</string>
+    <string name="rh_total_inscrits">Total: %1$d</string>
+    <string name="rh_nouvel_employe">New employee</string>
+    <string name="rh_generer_paie">Process payroll</string>
+    <string name="rh_titre_personnel">Staff directory</string>
+    <string name="rh_aucun_employe">No employees recorded</string>
+    <string name="rh_aucun_employe_desc">Add your staff to manage contracts, leaves, salary advances, and payslips.</string>
+    <string name="rh_statut_actif">Active</string>
+    <string name="rh_statut_inactif">Inactive</string>
+    <string name="rh_salaire_mensuel">Base: %1$s / month</string>
+    <string name="rh_action_absence">Leave</string>
+    <string name="rh_action_avance">Advance</string>
+    <string name="rh_nouveau_titre">New employee record</string>
+    <string name="rh_champ_nom">Full name</string>
+    <string name="rh_champ_tel">Phone number</string>
+    <string name="rh_champ_poste">Job title / Position</string>
+    <string name="rh_champ_salaire">Monthly base salary</string>
+    <string name="rh_declarer_absence">Record absence (%1$s)</string>
+    <string name="rh_champ_duree_jours">Duration in days</string>
+    <string name="rh_champ_motif">Reason / Justification</string>
+    <string name="rh_verser_avance">Pay advance (%1$s)</string>
+    <string name="rh_champ_montant_avance">Advance amount</string>
 </resources>

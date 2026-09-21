@@ -1409,4 +1409,27 @@
     <string name="cpt_journal_general">总分类账与凭证日记账</string>
     <string name="cpt_aucun_journal">暂无会计分录</string>
     <string name="cpt_aucun_journal_desc">在销售、采购和资金流水确认后，会计分录将自动生成。</string>
+    <string name="rh_masse_salariale">每月工资总额</string>
+    <string name="rh_effectif_actif">%1$d 名在职员工</string>
+    <string name="rh_total_inscrits">总数：%1$d</string>
+    <string name="rh_nouvel_employe">新增员工</string>
+    <string name="rh_generer_paie">生成工资单</string>
+    <string name="rh_titre_personnel">员工名册</string>
+    <string name="rh_aucun_employe">暂无员工记录</string>
+    <string name="rh_aucun_employe_desc">添加员工以管理合同、考勤假、预支款及工资单。</string>
+    <string name="rh_statut_actif">在职</string>
+    <string name="rh_statut_inactif">离职</string>
+    <string name="rh_salaire_mensuel">基本工资：%1$s / 月</string>
+    <string name="rh_action_absence">请假</string>
+    <string name="rh_action_avance">支薪</string>
+    <string name="rh_nouveau_titre">新建员工档案</string>
+    <string name="rh_champ_nom">姓名</string>
+    <string name="rh_champ_tel">电话</string>
+    <string name="rh_champ_poste">职务 / 岗位</string>
+    <string name="rh_champ_salaire">月基本工资</string>
+    <string name="rh_declarer_absence">登记请假（%1$s）</string>
+    <string name="rh_champ_duree_jours">请假天数</string>
+    <string name="rh_champ_motif">事由 / 说明</string>
+    <string name="rh_verser_avance">发放预支款（%1$s）</string>
+    <string name="rh_champ_montant_avance">预支金额</string>
 </resources>

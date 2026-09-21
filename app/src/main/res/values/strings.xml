@@ -1456,5 +1456,28 @@
     <string name="cpt_journal_general">Grand Livre &amp; Journal des écritures</string>
     <string name="cpt_aucun_journal">Aucune écriture comptable</string>
     <string name="cpt_aucun_journal_desc">Les écritures se génèrent automatiquement à la validation des ventes, achats et opérations.</string>
+    <string name="rh_masse_salariale">Masse salariale mensuelle</string>
+    <string name="rh_effectif_actif">%1$d employés actifs</string>
+    <string name="rh_total_inscrits">Total : %1$d</string>
+    <string name="rh_nouvel_employe">Nouvel employé</string>
+    <string name="rh_generer_paie">Calculer la paie</string>
+    <string name="rh_titre_personnel">Registre du personnel</string>
+    <string name="rh_aucun_employe">Aucun employé enregistré</string>
+    <string name="rh_aucun_employe_desc">Ajoutez vos salariés pour gérer les contrats, absences, avances et bulletins de paie.</string>
+    <string name="rh_statut_actif">Actif</string>
+    <string name="rh_statut_inactif">Inactif</string>
+    <string name="rh_salaire_mensuel">Base : %1$s / mois</string>
+    <string name="rh_action_absence">Absence</string>
+    <string name="rh_action_avance">Avance</string>
+    <string name="rh_nouveau_titre">Fiche du nouvel employé</string>
+    <string name="rh_champ_nom">Nom complet</string>
+    <string name="rh_champ_tel">Téléphone</string>
+    <string name="rh_champ_poste">Poste / Fonction</string>
+    <string name="rh_champ_salaire">Salaire de base mensuel</string>
+    <string name="rh_declarer_absence">Déclarer une absence (%1$s)</string>
+    <string name="rh_champ_duree_jours">Durée en jours</string>
+    <string name="rh_champ_motif">Motif / Justification</string>
+    <string name="rh_verser_avance">Verser une avance (%1$s)</string>
+    <string name="rh_champ_montant_avance">Montant de l\'avance</string>
 </resources>
 <!-- Temp insert will be replaced -->

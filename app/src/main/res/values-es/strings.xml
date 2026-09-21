@@ -1409,4 +1409,27 @@
     <string name="cpt_journal_general">Libro Mayor y Diario</string>
     <string name="cpt_aucun_journal">Sin asientos contables</string>
     <string name="cpt_aucun_journal_desc">Los asientos se generan automáticamente al validar ventas, compras y tesorería.</string>
+    <string name="rh_masse_salariale">Masa salarial mensual</string>
+    <string name="rh_effectif_actif">%1$d empleados activos</string>
+    <string name="rh_total_inscrits">Total: %1$d</string>
+    <string name="rh_nouvel_employe">Nuevo empleado</string>
+    <string name="rh_generer_paie">Calcular nómina</string>
+    <string name="rh_titre_personnel">Registro del personal</string>
+    <string name="rh_aucun_employe">Sin empleados registrados</string>
+    <string name="rh_aucun_employe_desc">Añada empleados para gestionar contratos, ausencias, anticipos y nóminas.</string>
+    <string name="rh_statut_actif">Activo</string>
+    <string name="rh_statut_inactif">Inactivo</string>
+    <string name="rh_salaire_mensuel">Base: %1$s / mes</string>
+    <string name="rh_action_absence">Ausencia</string>
+    <string name="rh_action_avance">Anticipo</string>
+    <string name="rh_nouveau_titre">Nuevo empleado</string>
+    <string name="rh_champ_nom">Nombre completo</string>
+    <string name="rh_champ_tel">Teléfono</string>
+    <string name="rh_champ_poste">Puesto / Cargo</string>
+    <string name="rh_champ_salaire">Salario base mensual</string>
+    <string name="rh_declarer_absence">Declarar ausencia (%1$s)</string>
+    <string name="rh_champ_duree_jours">Duración en días</string>
+    <string name="rh_champ_motif">Motivo</string>
+    <string name="rh_verser_avance">Pagar anticipo (%1$s)</string>
+    <string name="rh_champ_montant_avance">Importe del anticipo</string>
 </resources>
