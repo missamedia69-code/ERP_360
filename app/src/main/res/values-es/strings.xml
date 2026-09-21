@@ -1387,4 +1387,12 @@
     <string name="sales_total_sales">Ventas totales</string>
     <string name="sales_err_client_required">Por favor seleccione un cliente</string>
     <string name="sales_err_stock_insufficient">Stock insuficiente para %1$s (disponible: %2$s)</string>
+    <string name="tre_solde_global">Disponibilidad total</string>
+    <string name="tre_flux_entrees">Ingresos del mes</string>
+    <string name="tre_flux_sorties">Salidas del mes</string>
+    <string name="tre_flux_net">Flujo neto</string>
+    <string name="tre_titre_comptes">Cuentas de tesorería</string>
+    <string name="tre_titre_mouvements">Últimos movimientos</string>
+    <string name="tre_aucun_mouvement">Sin movimientos</string>
+    <string name="tre_aucun_mouvement_desc">Registre cobros y pagos para seguir su saldo en tiempo real.</string>
 </resources>

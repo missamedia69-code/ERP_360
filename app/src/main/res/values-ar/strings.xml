@@ -1387,4 +1387,12 @@
     <string name="sales_total_sales">إجمالي المبيعات</string>
     <string name="sales_err_client_required">يرجى اختيار عميل</string>
     <string name="sales_err_stock_insufficient">المخزون غير كافٍ لـ %1$s (المتوفر: %2$s)</string>
+    <string name="tre_solde_global">إجمالي السيولة المتاحة</string>
+    <string name="tre_flux_entrees">مقبوضات الشهر</string>
+    <string name="tre_flux_sorties">مدفوعات الشهر</string>
+    <string name="tre_flux_net">صافي التدفق</string>
+    <string name="tre_titre_comptes">حسابات الخزينة</string>
+    <string name="tre_titre_mouvements">آخر الحركات</string>
+    <string name="tre_aucun_mouvement">لا توجد حركات</string>
+    <string name="tre_aucun_mouvement_desc">سجل مقبوضاتك ومدفوعاتك لمتابعة رصيدك في الوقت الفعلي.</string>
 </resources>

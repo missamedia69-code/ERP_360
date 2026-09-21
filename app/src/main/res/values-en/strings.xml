@@ -1391,4 +1391,12 @@
     <string name="sales_total_sales">Total sales</string>
     <string name="sales_err_client_required">Please select a client</string>
     <string name="sales_err_stock_insufficient">Insufficient stock for %1$s (available: %2$s)</string>
+    <string name="tre_solde_global">Total available cash</string>
+    <string name="tre_flux_entrees">Monthly inflows</string>
+    <string name="tre_flux_sorties">Monthly outflows</string>
+    <string name="tre_flux_net">Net cash flow</string>
+    <string name="tre_titre_comptes">Cash &amp; Bank accounts</string>
+    <string name="tre_titre_mouvements">Recent transactions</string>
+    <string name="tre_aucun_mouvement">No transactions</string>
+    <string name="tre_aucun_mouvement_desc">Record cash entries and payments to track your real-time balance.</string>
 </resources>

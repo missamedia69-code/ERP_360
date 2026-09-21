@@ -1434,5 +1434,13 @@
     <string name="sales_total_sales">Total des ventes</string>
     <string name="sales_err_client_required">Veuillez choisir un client</string>
     <string name="sales_err_stock_insufficient">Stock insuffisant pour %1$s (disponible: %2$s)</string>
+    <string name="tre_solde_global">Disponibilités globales</string>
+    <string name="tre_flux_entrees">Entrées du mois</string>
+    <string name="tre_flux_sorties">Sorties du mois</string>
+    <string name="tre_flux_net">Flux net</string>
+    <string name="tre_titre_comptes">Comptes de trésorerie</string>
+    <string name="tre_titre_mouvements">Derniers mouvements</string>
+    <string name="tre_aucun_mouvement">Aucun mouvement</string>
+    <string name="tre_aucun_mouvement_desc">Enregistrez vos encaissements et décaissements pour suivre votre solde en temps réel.</string>
 </resources>
 <!-- Temp insert will be replaced -->

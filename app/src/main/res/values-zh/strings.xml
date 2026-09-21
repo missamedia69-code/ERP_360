@@ -1387,4 +1387,12 @@
     <string name="sales_total_sales">销售总额</string>
     <string name="sales_err_client_required">请选择客户</string>
     <string name="sales_err_stock_insufficient">%1$s 库存不足（可用：%2$s）</string>
+    <string name="tre_solde_global">可用资金总额</string>
+    <string name="tre_flux_entrees">本月流入</string>
+    <string name="tre_flux_sorties">本月流出</string>
+    <string name="tre_flux_net">净现金流</string>
+    <string name="tre_titre_comptes">资金账户</string>
+    <string name="tre_titre_mouvements">最新收支</string>
+    <string name="tre_aucun_mouvement">暂无收支记录</string>
+    <string name="tre_aucun_mouvement_desc">记录收款和付款以实时跟踪您的资金余额。</string>
 </resources>
