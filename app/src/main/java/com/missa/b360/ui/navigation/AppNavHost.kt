@@ -70,7 +70,7 @@ import com.missa.b360.ui.admin.AdminSauvegardeScreen
 import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
 import com.missa.b360.ui.admin.ReferentielsScreen
-import com.missa.b360.ui.clients.ClientsPlaceholderScreen
+import com.missa.b360.ui.clients.ClientsScreen
 import com.missa.b360.ui.comptabilite.ComptabiliteScreen
 import com.missa.b360.ui.crm.CrmScreen
 import com.missa.b360.ui.fournisseurs.FournisseursScreen
@@ -281,7 +281,7 @@ private fun MainNavHost() {
             arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
             GuardedModule(AppModule.CLIENTS, activation, navController) {
-                ClientsPlaceholderScreen(
+                ClientsScreen(
                     onBack = { navController.popBackStack() },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                     onNavigate = { route -> navController.navigate(route) },
