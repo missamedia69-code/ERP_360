@@ -1432,4 +1432,19 @@
     <string name="rh_champ_motif">事由 / 说明</string>
     <string name="rh_verser_avance">发放预支款（%1$s）</string>
     <string name="rh_champ_montant_avance">预支金额</string>
+    <string name="pro_titre_synthese">生产概况</string>
+    <string name="pro_ordres_termines">%1$d 个已完成工单</string>
+    <string name="pro_total_ordres">工单总数：%1$d</string>
+    <string name="pro_nouvel_ordre">新建生产工单</string>
+    <string name="pro_titre_historique">生产工单历史</string>
+    <string name="pro_aucun_ordre">暂无生产工单</string>
+    <string name="pro_aucun_ordre_desc">创建生产工单以消耗原材料并将产成品入库。</string>
+    <string name="pro_produit_a_fabriquer">待生产产成品</string>
+    <string name="pro_quantite_a_fabriquer">生产数量</string>
+    <string name="pro_titre_nomenclature">物料清单（BOM）</string>
+    <string name="pro_ajouter_composant">添加原料</string>
+    <string name="pro_aucun_composant">配方中未添加任何物料。</string>
+    <string name="pro_lancer_fabrication">确认并扣减库存</string>
+    <string name="pro_choisir_matiere">选择原材料/组件</string>
+    <string name="pro_quantite_requise">所需用量</string>
 </resources>

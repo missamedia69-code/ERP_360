@@ -1436,4 +1436,19 @@
     <string name="rh_champ_motif">Reason / Justification</string>
     <string name="rh_verser_avance">Pay advance (%1$s)</string>
     <string name="rh_champ_montant_avance">Advance amount</string>
+    <string name="pro_titre_synthese">Production activity</string>
+    <string name="pro_ordres_termines">%1$d completed orders</string>
+    <string name="pro_total_ordres">Total orders: %1$d</string>
+    <string name="pro_nouvel_ordre">New manufacturing order</string>
+    <string name="pro_titre_historique">Manufacturing order history</string>
+    <string name="pro_aucun_ordre">No manufacturing orders</string>
+    <string name="pro_aucun_ordre_desc">Create a production order to consume raw materials and add finished goods to inventory.</string>
+    <string name="pro_produit_a_fabriquer">Finished product to produce</string>
+    <string name="pro_quantite_a_fabriquer">Quantity to manufacture</string>
+    <string name="pro_titre_nomenclature">Bill of Materials (BOM)</string>
+    <string name="pro_ajouter_composant">Add raw material</string>
+    <string name="pro_aucun_composant">No components added to this recipe.</string>
+    <string name="pro_lancer_fabrication">Validate &amp; deduct stock</string>
+    <string name="pro_choisir_matiere">Select component / material</string>
+    <string name="pro_quantite_requise">Required quantity</string>
 </resources>

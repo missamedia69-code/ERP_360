@@ -1432,4 +1432,19 @@
     <string name="rh_champ_motif">السبب / التبرير</string>
     <string name="rh_verser_avance">صرف سلفة (%1$s)</string>
     <string name="rh_champ_montant_avance">مبلغ السلفة</string>
+    <string name="pro_titre_synthese">نشاط الإنتاج</string>
+    <string name="pro_ordres_termines">%1$d أوامر إنتاج معتمدة</string>
+    <string name="pro_total_ordres">إجمالي الأوامر: %1$d</string>
+    <string name="pro_nouvel_ordre">أمر تصنيع جديد</string>
+    <string name="pro_titre_historique">سجل أوامر التصنيع</string>
+    <string name="pro_aucun_ordre">لا توجد أوامر تصنيع</string>
+    <string name="pro_aucun_ordre_desc">أنشئ أمر إنتاج لاستهلاك المواد الخام وإدخال المنتجات تامة الصنع إلى المخزون.</string>
+    <string name="pro_produit_a_fabriquer">المنتج النهائي للتصنيع</string>
+    <string name="pro_quantite_a_fabriquer">الكمية المراد تصنيعها</string>
+    <string name="pro_titre_nomenclature">قائمة المواد والمكونات (BOM)</string>
+    <string name="pro_ajouter_composant">إضافة مادة خام</string>
+    <string name="pro_aucun_composant">لم تتم إضافة أي مكونات لهذه الوصفة.</string>
+    <string name="pro_lancer_fabrication">اعتماد وخصم المخزون</string>
+    <string name="pro_choisir_matiere">اختر المكون / المادة الخام</string>
+    <string name="pro_quantite_requise">الكمية المطلوبة</string>
 </resources>

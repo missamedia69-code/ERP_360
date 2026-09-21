@@ -1432,4 +1432,19 @@
     <string name="rh_champ_motif">Motivo</string>
     <string name="rh_verser_avance">Pagar anticipo (%1$s)</string>
     <string name="rh_champ_montant_avance">Importe del anticipo</string>
+    <string name="pro_titre_synthese">Actividad de producción</string>
+    <string name="pro_ordres_termines">%1$d órdenes completadas</string>
+    <string name="pro_total_ordres">Total órdenes: %1$d</string>
+    <string name="pro_nouvel_ordre">Nueva orden de fabricación</string>
+    <string name="pro_titre_historique">Historial de fabricación</string>
+    <string name="pro_aucun_ordre">Sin órdenes de fabricación</string>
+    <string name="pro_aucun_ordre_desc">Lance una orden de producción para consumir materias primas e ingresar productos terminados al stock.</string>
+    <string name="pro_produit_a_fabriquer">Producto terminado a fabricar</string>
+    <string name="pro_quantite_a_fabriquer">Cantidad a fabricar</string>
+    <string name="pro_titre_nomenclature">Lista de materiales (BOM)</string>
+    <string name="pro_ajouter_composant">Añadir materia prima</string>
+    <string name="pro_aucun_composant">No se han añadido componentes a esta receta.</string>
+    <string name="pro_lancer_fabrication">Validar y descontar stock</string>
+    <string name="pro_choisir_matiere">Elegir componente / material</string>
+    <string name="pro_quantite_requise">Cantidad requerida</string>
 </resources>

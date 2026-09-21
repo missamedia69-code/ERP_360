@@ -1479,5 +1479,20 @@
     <string name="rh_champ_motif">Motif / Justification</string>
     <string name="rh_verser_avance">Verser une avance (%1$s)</string>
     <string name="rh_champ_montant_avance">Montant de l\'avance</string>
+    <string name="pro_titre_synthese">Activité de production</string>
+    <string name="pro_ordres_termines">%1$d ordres validés</string>
+    <string name="pro_total_ordres">Total des ordres : %1$d</string>
+    <string name="pro_nouvel_ordre">Nouvel ordre de fabrication</string>
+    <string name="pro_titre_historique">Historique des ordres de fabrication</string>
+    <string name="pro_aucun_ordre">Aucun ordre de fabrication</string>
+    <string name="pro_aucun_ordre_desc">Lancez un ordre de production pour consommer vos composants et faire entrer vos produits finis en stock.</string>
+    <string name="pro_produit_a_fabriquer">Produit fini à fabriquer</string>
+    <string name="pro_quantite_a_fabriquer">Quantité à fabriquer</string>
+    <string name="pro_titre_nomenclature">Nomenclature des matières (BOM)</string>
+    <string name="pro_ajouter_composant">Ajouter une matière</string>
+    <string name="pro_aucun_composant">Aucune matière première ajoutée à la recette.</string>
+    <string name="pro_lancer_fabrication">Valider et déstocker</string>
+    <string name="pro_choisir_matiere">Choisir le composant / matière</string>
+    <string name="pro_quantite_requise">Quantité nécessaire</string>
 </resources>
 <!-- Temp insert will be replaced -->
