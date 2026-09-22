@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -33,6 +34,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.FormatIndicateur
+import com.missa.b360.core.domain.model.IndicateurCode
+import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.SensIndicateur
+import com.missa.b360.core.domain.model.ValeurIndicateur
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.navigation.AppModule
@@ -61,7 +67,11 @@ fun ReportingScreen(
 ) {
     val tableau by vm.tableau.collectAsStateWithLifecycle()
     val devise by vm.devise.collectAsStateWithLifecycle()
-    var sectionSelectionnee by remember { mutableStateOf(0) } // 0: Tous, 1: Ventes, 2: Dépenses, 3: Trésorerie
+    var moduleSelectionne by remember { mutableStateOf<ModuleCode?>(null) }
+
+    val caValeur = tableau.indicateurs[IndicateurCode.CA_PERIODE]?.valeur ?: 0.0
+    val margeValeur = tableau.indicateurs[IndicateurCode.MARGE_BRUTE]?.valeur ?: 0.0
+    val tresoValeur = tableau.indicateurs[IndicateurCode.TRESORERIE_NETTE]?.valeur ?: 0.0
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -89,7 +99,7 @@ fun ReportingScreen(
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            fmtValeur(tableau.ventes.chiffreAffaires, devise),
+                            fmtValeur(caValeur, devise),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
@@ -97,13 +107,13 @@ fun ReportingScreen(
                         Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
-                                stringResource(R.string.rep_marge_brute, fmtValeur(tableau.ventes.margeBrute, devise)),
+                                stringResource(R.string.rep_marge_brute, fmtValeur(margeValeur, devise)),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = CyanReporting,
                             )
                             Text(
-                                stringResource(R.string.rep_tresorerie_nette, fmtValeur(tableau.tresorerie.disponible, devise)),
+                                stringResource(R.string.rep_tresorerie_nette, fmtValeur(tresoValeur, devise)),
                                 fontSize = 11.sp,
                                 color = MissaMuted,
                             )
@@ -127,30 +137,30 @@ fun ReportingScreen(
                     TuileMatriceSpec(
                         icone = Iv.Analytics,
                         titre = stringResource(R.string.rep_tuile_vue_globale),
-                        sousTitre = stringResource(R.string.rep_indicateurs_count, 6),
-                        estActif = sectionSelectionnee == 0,
-                        onClick = { sectionSelectionnee = 0 },
+                        sousTitre = stringResource(R.string.rep_indicateurs_count, tableau.indicateurs.size),
+                        estActif = moduleSelectionne == null,
+                        onClick = { moduleSelectionne = null },
                     ),
                     TuileMatriceSpec(
                         icone = Iv.ShoppingCart,
                         titre = stringResource(R.string.module_vente),
-                        sousTitre = fmtValeur(tableau.ventes.chiffreAffaires, devise),
-                        estActif = sectionSelectionnee == 1,
-                        onClick = { sectionSelectionnee = 1 },
+                        sousTitre = fmtValeur(caValeur, devise),
+                        estActif = moduleSelectionne == ModuleCode.VEN,
+                        onClick = { moduleSelectionne = ModuleCode.VEN },
                     ),
                     TuileMatriceSpec(
                         icone = Iv.CartArrowDown,
                         titre = stringResource(R.string.module_achats),
-                        sousTitre = fmtValeur(tableau.achats.totalEngage, devise),
-                        estActif = sectionSelectionnee == 2,
-                        onClick = { sectionSelectionnee = 2 },
+                        sousTitre = fmtValeur(tableau.indicateurs[IndicateurCode.ACHATS_PERIODE]?.valeur ?: 0.0, devise),
+                        estActif = moduleSelectionne == ModuleCode.ACH,
+                        onClick = { moduleSelectionne = ModuleCode.ACH },
                     ),
                     TuileMatriceSpec(
                         icone = Iv.Bank,
                         titre = stringResource(R.string.module_tresorerie),
-                        sousTitre = fmtValeur(tableau.tresorerie.disponible, devise),
-                        estActif = sectionSelectionnee == 3,
-                        onClick = { sectionSelectionnee = 3 },
+                        sousTitre = fmtValeur(tresoValeur, devise),
+                        estActif = moduleSelectionne == ModuleCode.TRE,
+                        onClick = { moduleSelectionne = ModuleCode.TRE },
                     ),
                 )
 
@@ -171,7 +181,7 @@ fun ReportingScreen(
                 }
             }
 
-            // --- Fiches Analytiques Détaillées ---
+            // --- Registre des Indicateurs Filtrés ---
             item {
                 Text(
                     stringResource(R.string.rep_titre_indicateurs),
@@ -181,40 +191,16 @@ fun ReportingScreen(
                 )
             }
 
-            if (sectionSelectionnee == 0 || sectionSelectionnee == 1) {
-                item {
-                    CarteIndicateurSection(
-                        titre = stringResource(R.string.module_vente),
-                        ligne1 = stringResource(R.string.rep_ca_realise) to fmtValeur(tableau.ventes.chiffreAffaires, devise),
-                        ligne2 = stringResource(R.string.rep_marge_estimee) to fmtValeur(tableau.ventes.margeBrute, devise),
-                        ligne3 = stringResource(R.string.rep_commandes_count) to "${tableau.ventes.nombreVentes}",
-                        couleur = Color(0xFF2563EB),
-                    )
-                }
-            }
+            val indicateursAffiches = tableau.indicateurs.entries
+                .filter { moduleSelectionne == null || it.key.module == moduleSelectionne }
+                .sortedBy { it.key.name }
 
-            if (sectionSelectionnee == 0 || sectionSelectionnee == 2) {
-                item {
-                    CarteIndicateurSection(
-                        titre = stringResource(R.string.module_achats),
-                        ligne1 = stringResource(R.string.rep_achats_engages) to fmtValeur(tableau.achats.totalEngage, devise),
-                        ligne2 = stringResource(R.string.rep_fournisseurs_actifs) to "${tableau.achats.fournisseursActifs}",
-                        ligne3 = stringResource(R.string.rep_factures_achats) to "${tableau.achats.nombreFactures}",
-                        couleur = Color(0xFFF59E0B),
-                    )
-                }
-            }
-
-            if (sectionSelectionnee == 0 || sectionSelectionnee == 3) {
-                item {
-                    CarteIndicateurSection(
-                        titre = stringResource(R.string.module_tresorerie),
-                        ligne1 = stringResource(R.string.rep_solde_tresorerie) to fmtValeur(tableau.tresorerie.disponible, devise),
-                        ligne2 = stringResource(R.string.rep_flux_entrants) to fmtValeur(tableau.tresorerie.encaissements, devise),
-                        ligne3 = stringResource(R.string.rep_flux_sortants) to fmtValeur(tableau.tresorerie.decaissements, devise),
-                        couleur = Color(0xFF16A34A),
-                    )
-                }
+            items(indicateursAffiches, key = { it.key.name }) { (code, kpi) ->
+                CarteKpiReporting(
+                    code = code,
+                    kpi = kpi,
+                    devise = devise,
+                )
             }
         }
     }
@@ -251,35 +237,52 @@ private fun TuileReporting(
 }
 
 @Composable
-private fun CarteIndicateurSection(
-    titre: String,
-    ligne1: Pair<String, String>,
-    ligne2: Pair<String, String>,
-    ligne3: Pair<String, String>,
-    couleur: Color,
+private fun CarteKpiReporting(
+    code: IndicateurCode,
+    kpi: ValeurIndicateur,
+    devise: String,
 ) {
+    val valeurFormatee = when (code.format) {
+        FormatIndicateur.MONNAIE -> fmtValeur(kpi.valeur, devise)
+        FormatIndicateur.POURCENT -> String.format(Locale.ROOT, "%.1f%%", kpi.valeur)
+        FormatIndicateur.JOURS -> String.format(Locale.ROOT, "%.0f j", kpi.valeur)
+        FormatIndicateur.ENTIER -> String.format(Locale.ROOT, "%.0f", kpi.valeur)
+        FormatIndicateur.DECIMAL -> String.format(Locale.ROOT, "%.1f", kpi.valeur)
+    }
+
+    val couleurSens = when (code.sens) {
+        SensIndicateur.HAUT_BON -> if (kpi.valeur > 0) Color(0xFF15803D) else Color(0xFFB91C1C)
+        SensIndicateur.BAS_BON -> if (kpi.valeur > 0) Color(0xFFB91C1C) else Color(0xFF15803D)
+        SensIndicateur.NEUTRE -> MissaInk
+    }
+
     Surface(
         shape = RoundedCornerShape(14.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp)) {
-            Text(titre, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = couleur)
-            Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(ligne1.first, fontSize = 12.sp, color = MissaMuted)
-                Text(ligne1.second, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(code.libelleRes),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = MissaInk,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    valeurFormatee,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = couleurSens,
+                )
             }
             Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(ligne2.first, fontSize = 12.sp, color = MissaMuted)
-                Text(ligne2.second, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            }
-            Spacer(Modifier.height(4.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(ligne3.first, fontSize = 12.sp, color = MissaMuted)
-                Text(ligne3.second, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            }
+            Text(
+                stringResource(code.formuleRes),
+                fontSize = 11.sp,
+                color = MissaMuted,
+            )
         }
     }
 }
