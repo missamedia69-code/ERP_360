@@ -95,6 +95,10 @@ object Iv {
     val CartArrowDown = R.drawable.ph_shopping_bag
     val Calculator = R.drawable.ph_calculator
     val Bank = R.drawable.ph_bank
+    val AccountBalance = R.drawable.ph_bank
+    val Smartphone = R.drawable.ph_phone
+    val CompareArrows = R.drawable.ph_arrows_left_right
+
     val QualityBadge = R.drawable.ph_seal_check
     val HammerWrench = R.drawable.ph_hammer
     val Warehouse = R.drawable.ph_warehouse
