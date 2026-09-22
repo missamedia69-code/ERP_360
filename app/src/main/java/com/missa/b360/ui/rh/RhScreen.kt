@@ -317,7 +317,7 @@ private fun CarteEmploye(
                         contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
                     ) { Text(stringResource(R.string.rh_action_avance), fontSize = 10.5.sp, color = MissaInk) }
                     IconButton(onClick = onDesactiver, modifier = Modifier.size(32.dp)) {
-                        Icon(painterResource(Iv.Block), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(16.dp))
+                        Icon(painterResource(Iv.Prohibit), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(16.dp))
                     }
                 }
             }

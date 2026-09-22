@@ -461,7 +461,7 @@ private fun BlocCatalogueVente(
                 Column(Modifier.weight(1f)) {
                     Text(produit.product.nom, fontSize = 13.sp, color = MissaInk)
                     Text(
-                        fmtValeur(produit.product.prixVente ?: 0.0, devise) + " · Stock: " + fmtQuantite(produit.stockActuel),
+                        fmtValeur(produit.product.prixVente ?: 0.0, devise) + " · Stock: " + fmtQuantite(produit.stock),
                         fontSize = 11.sp,
                         color = MissaMuted,
                     )

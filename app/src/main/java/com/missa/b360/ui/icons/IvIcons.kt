@@ -88,6 +88,10 @@ object Iv {
     val HelpOutline = R.drawable.ph_question
     val Send = R.drawable.ph_paper_plane_tilt
     val TrendingUp = R.drawable.ph_trend_up
+    val TrendingDown = R.drawable.ph_trend_down
+    val Prohibit = R.drawable.ph_x_circle
+    val Factory = R.drawable.ph_factory
+
     val CartArrowDown = R.drawable.ph_shopping_bag
     val Calculator = R.drawable.ph_calculator
     val Bank = R.drawable.ph_bank

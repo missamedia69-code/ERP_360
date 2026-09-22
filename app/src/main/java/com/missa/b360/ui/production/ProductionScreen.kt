@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -191,7 +192,7 @@ private fun ListeOrdres(
             if (ordres.isEmpty()) {
                 item {
                     MissaEmptyState(
-                        icon = Iv.PrecisionManufacturing,
+                        icon = Iv.Factory,
                         title = stringResource(R.string.pro_aucun_ordre),
                         description = stringResource(R.string.pro_aucun_ordre_desc),
                         modifier = Modifier.padding(16.dp),
@@ -459,7 +460,7 @@ private fun DialogueAjoutComposant(
                     DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
                         options.forEach { opt ->
                             DropdownMenuItem(
-                                text = { Text("${opt.nom} (Stock: ${fmtQuantite(opt.stockActuel)})", color = MissaInk) },
+                                text = { Text("${opt.nom} (Stock: ${fmtQuantite(opt.stock)})", color = MissaInk) },
                                 onClick = {
                                     selectionne = opt
                                     ouvert = false
