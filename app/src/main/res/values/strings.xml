@@ -1652,5 +1652,35 @@
     <string name="tasks_action_terminer">Terminer</string>
     <string name="tasks_champ_titre">Intitulé de la tâche</string>
     <string name="tasks_champ_notes">Détails / Instructions</string>
+    <string name="ops_delete">Supprimer</string>
+    <string name="sales_tab_history">Validées</string>
+    <string name="sites_titre_synthese">Infrastructure multi-sites</string>
+    <string name="sites_total_count">%1$d sites opérationnels</string>
+    <string name="sites_depots_count">%1$d dépôts / entrepôts</string>
+    <string name="sites_boutiques_count">%1$d boutiques / comptoirs</string>
+    <string name="sites_matrice_titre">Réseau physique &amp; Ajout</string>
+    <string name="sites_tuile_tous">Tous</string>
+    <string name="sites_tuile_boutiques">Boutiques</string>
+    <string name="sites_tuile_depots">Dépôts</string>
+    <string name="sites_nouveau_site">Nouveau site</string>
+    <string name="sites_titre_registre">Registre des implantations physiques</string>
+    <string name="sites_aucun">Aucun site enregistré</string>
+    <string name="sites_aucun_desc">Ajoutez vos entrepôts, usines ou boutiques pour la gestion logistique et commerciale.</string>
+    <string name="sites_badge_principal">Principal</string>
+    <string name="sites_champ_nom">Nom de l\'établissement / site</string>
+    <string name="sites_champ_type">Type (Boutique, Entrepôt, Magasin...)</string>
+    <string name="sites_champ_adresse">Adresse / Localisation</string>
+    <string name="sites_champ_principal">Définir comme site principal</string>
+    <string name="sites_confirmer_suppression">Confirmer la suppression du site %1$s ?</string>
+    <string name="ref_titre_synthese">Nomenclatures &amp; Données de base</string>
+    <string name="ref_norme_ohada">Normes OHADA &amp; CEMAC</string>
+    <string name="ref_familles_count">%1$d familles d\'articles</string>
+    <string name="ref_unites_count">%1$d unités de mesure</string>
+    <string name="ref_matrice_titre">Tables de référence</string>
+    <string name="ref_tuile_familles">Familles</string>
+    <string name="ref_tuile_unites">Unités</string>
+    <string name="ref_tuile_devises">Devises</string>
+    <string name="ref_tuile_taxes">Taxes / TVA</string>
+    <string name="ref_titre_registre">Données référentielles actives</string>
 </resources>
 <!-- Temp insert will be replaced -->

@@ -143,6 +143,7 @@ private fun ListeVentes(
     val validees = pieces.filter { it.status == OperationStatus.VALIDATED.name }
     val caTotal = validees.sumOf { it.amount ?: 0.0 }
     val brouillons = pieces.count { it.status == OperationStatus.DRAFT.name }
+    var filtreStatut by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -190,18 +191,48 @@ private fun ListeVentes(
                         }
                     }
                 }
+                // --- Structure Matricielle 4 Tuiles ---
                 item {
-                    Button(
-                        onClick = onNouvelleVente,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Icon(painterResource(Iv.Add), null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.sales_new_sale), color = Color.White)
+                        TuileVente(
+                            icone = Iv.ShoppingCart,
+                            titre = stringResource(R.string.crm_tuile_tous),
+                            sousTitre = pieces.size.toString(),
+                            estActif = filtreStatut == null,
+                            modifier = Modifier.weight(1f),
+                            onClick = { filtreStatut = null },
+                        )
+                        TuileVente(
+                            icone = Iv.CheckCircle,
+                            titre = stringResource(R.string.sales_tab_history),
+                            sousTitre = validees.size.toString(),
+                            estActif = filtreStatut == OperationStatus.VALIDATED.name,
+                            modifier = Modifier.weight(1f),
+                            onClick = { filtreStatut = OperationStatus.VALIDATED.name },
+                        )
+                        TuileVente(
+                            icone = Iv.Edit,
+                            titre = stringResource(R.string.ach_brouillons),
+                            sousTitre = brouillons.toString(),
+                            estActif = filtreStatut == OperationStatus.DRAFT.name,
+                            modifier = Modifier.weight(1f),
+                            onClick = { filtreStatut = OperationStatus.DRAFT.name },
+                        )
+                        TuileVente(
+                            icone = Iv.Add,
+                            titre = stringResource(R.string.sales_new_sale),
+                            sousTitre = stringResource(R.string.st_creer),
+                            estActif = false,
+                            modifier = Modifier.weight(1f),
+                            onClick = onNouvelleVente,
+                        )
                     }
                 }
-                items(pieces, key = { it.id }) { piece ->
+                val piecesAffichees = pieces.filter { filtreStatut == null || it.status == filtreStatut }
+                items(piecesAffichees, key = { it.id }) { piece ->
                     CartePieceVente(
                         piece = piece,
                         devise = devise,
@@ -580,4 +611,34 @@ internal fun saleMoney(amount: Double, devise: String): String {
     val pattern = if (fractionDigits == 0) "#,##0" else "#,##0.${"0".repeat(fractionDigits.coerceAtMost(2))}"
     val formatter = java.text.DecimalFormat(pattern, java.text.DecimalFormatSymbols(java.util.Locale.getDefault()))
     return "${formatter.format(amount)} $devise"
+}
+
+@Composable
+private fun TuileVente(
+    icone: Int,
+    titre: String,
+    sousTitre: String,
+    estActif: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = if (estActif) BleuVente.copy(alpha = 0.15f) else Color.White,
+        border = BorderStroke(1.dp, if (estActif) BleuVente else MissaBorder),
+        modifier = modifier
+            .height(82.dp)
+            .clickable(onClick = onClick),
+    ) {
+        Column(
+            Modifier.padding(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.height(4.dp))
+            Text(titre, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 1)
+            Text(sousTitre, fontSize = 9.sp, color = MissaMuted, maxLines = 1)
+        }
+    }
 }
