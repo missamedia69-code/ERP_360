@@ -38,7 +38,7 @@ import com.missa.b360.core.domain.model.FormatIndicateur
 import com.missa.b360.core.domain.model.IndicateurCode
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.SensIndicateur
-import com.missa.b360.core.domain.model.ValeurIndicateur
+import com.missa.b360.core.domain.usecase.ValeurIndicateur
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.navigation.AppModule
@@ -71,7 +71,7 @@ fun ReportingScreen(
 
     val caValeur = tableau.indicateurs[IndicateurCode.CA_PERIODE]?.valeur ?: 0.0
     val margeValeur = tableau.indicateurs[IndicateurCode.MARGE_BRUTE]?.valeur ?: 0.0
-    val tresoValeur = tableau.indicateurs[IndicateurCode.TRESORERIE_NETTE]?.valeur ?: 0.0
+    val tresoValeur = tableau.indicateurs[IndicateurCode.SOLDE_TRESORERIE]?.valeur ?: 0.0
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -245,8 +245,7 @@ private fun CarteKpiReporting(
     val valeurFormatee = when (code.format) {
         FormatIndicateur.MONNAIE -> fmtValeur(kpi.valeur, devise)
         FormatIndicateur.POURCENT -> String.format(Locale.ROOT, "%.1f%%", kpi.valeur)
-        FormatIndicateur.JOURS -> String.format(Locale.ROOT, "%.0f j", kpi.valeur)
-        FormatIndicateur.ENTIER -> String.format(Locale.ROOT, "%.0f", kpi.valeur)
+        FormatIndicateur.NOMBRE -> String.format(Locale.ROOT, "%.0f", kpi.valeur)
         FormatIndicateur.DECIMAL -> String.format(Locale.ROOT, "%.1f", kpi.valeur)
     }
 
