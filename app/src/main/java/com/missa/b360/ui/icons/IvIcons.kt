@@ -105,4 +105,7 @@ object Iv {
     val UserGear = R.drawable.ph_user_gear
     val Calendar = R.drawable.ph_calendar_blank
     val UploadSimple = R.drawable.ph_upload_simple
+    val Edit = R.drawable.ph_pencil_simple
+    val Folder = R.drawable.ph_squares_four
+    val Straighten = R.drawable.ph_squares_four
 }
