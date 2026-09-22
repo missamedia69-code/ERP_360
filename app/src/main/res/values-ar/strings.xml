@@ -1492,4 +1492,27 @@
     <string name="mai_intervention_sur">تدخل صيانة على</string>
     <string name="mai_champ_description_travaux">الأعمال المنجزة أو المخططة</string>
     <string name="mai_champ_cout_pieces">تكلفة قطع الغيار والعمالة</string>
+    <string name="srv_titre_synthese">نشاط الخدمات</string>
+    <string name="srv_en_cours">%1$d مهام جارية</string>
+    <string name="srv_carnet">الطلبات المعلقة: %1$s</string>
+    <string name="srv_matrice_titre">التصنيفات والوصول السريع</string>
+    <string name="srv_tuile_toutes">الكل</string>
+    <string name="srv_nb_count">%1$d</string>
+    <string name="srv_nouvelle_prestation">خدمة جديدة</string>
+    <string name="srv_titre_registre">سجل التدخلات والخدمات</string>
+    <string name="srv_aucune">لا توجد خدمات مسجلة</string>
+    <string name="srv_aucune_desc">جدول مهامك بمبلغ مقطوع أو بالساعة، وتابع الوقت الفعلي وأصدر فواتير لعملائك.</string>
+    <string name="srv_passer_etape">تحويل إلى: %1$s</string>
+    <string name="srv_action_heures">الساعات</string>
+    <string name="srv_champ_intitule">مسمى الخدمة</string>
+    <string name="srv_champ_forfait">المبلغ المقطوع المتفق عليه</string>
+    <string name="srv_champ_tarif_horaire">سعر الساعة المتفق عليه</string>
+    <string name="srv_champ_heures_prevues">الساعات المقدرة</string>
+    <string name="srv_champ_heures_passees">الساعات المستغرقة فعلياً</string>
+    <string name="srv_titre_ajuster_heures">تسجيل ساعات العمل</string>
+    <string name="srv_msg_creee">تم إنشاء الخدمة: %1$s</string>
+    <string name="srv_msg_avance">تم تحديث المرحلة</string>
+    <string name="srv_msg_annulee">تم إلغاء الخدمة</string>
+    <string name="srv_msg_heures">تم تحديث الساعات</string>
+    <string name="srv_msg_finale">هذه الخدمة مكتملة بالفعل</string>
 </resources>

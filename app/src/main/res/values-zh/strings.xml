@@ -1492,4 +1492,27 @@
     <string name="mai_intervention_sur">维保对象：</string>
     <string name="mai_champ_description_travaux">作业内容说明</string>
     <string name="mai_champ_cout_pieces">配件与人工费用</string>
+    <string name="srv_titre_synthese">服务业务概况</string>
+    <string name="srv_en_cours">%1$d 项进行中任务</string>
+    <string name="srv_carnet">待履行储备：%1$s</string>
+    <string name="srv_matrice_titre">分类与快速通道</string>
+    <string name="srv_tuile_toutes">全部</string>
+    <string name="srv_nb_count">%1$d</string>
+    <string name="srv_nouvelle_prestation">新建服务工单</string>
+    <string name="srv_titre_registre">服务与维保任务账册</string>
+    <string name="srv_aucune">暂无服务项目</string>
+    <string name="srv_aucune_desc">按固定总包或按工时排期服务，跟踪工时并向客户开票。</string>
+    <string name="srv_passer_etape">转入：%1$s</string>
+    <string name="srv_action_heures">工时</string>
+    <string name="srv_champ_intitule">服务项目名称</string>
+    <string name="srv_champ_forfait">约定总包金额</string>
+    <string name="srv_champ_tarif_horaire">约定每小时费率</string>
+    <string name="srv_champ_heures_prevues">预估工时</string>
+    <string name="srv_champ_heures_passees">实际耗费工时</string>
+    <string name="srv_titre_ajuster_heures">打卡记工时</string>
+    <string name="srv_msg_creee">服务已创建：%1$s</string>
+    <string name="srv_msg_avance">节点已推进</string>
+    <string name="srv_msg_annulee">服务已撤销</string>
+    <string name="srv_msg_heures">工时已更新</string>
+    <string name="srv_msg_finale">该服务已全部完成</string>
 </resources>

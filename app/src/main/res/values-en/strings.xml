@@ -1496,4 +1496,27 @@
     <string name="mai_intervention_sur">Service on</string>
     <string name="mai_champ_description_travaux">Work carried out or planned</string>
     <string name="mai_champ_cout_pieces">Parts &amp; labor cost</string>
+    <string name="srv_titre_synthese">Services performance</string>
+    <string name="srv_en_cours">%1$d ongoing missions</string>
+    <string name="srv_carnet">Backlog: %1$s</string>
+    <string name="srv_matrice_titre">Categories &amp; Quick access</string>
+    <string name="srv_tuile_toutes">All</string>
+    <string name="srv_nb_count">%1$d</string>
+    <string name="srv_nouvelle_prestation">New service job</string>
+    <string name="srv_titre_registre">Service &amp; mission log</string>
+    <string name="srv_aucune">No services recorded</string>
+    <string name="srv_aucune_desc">Schedule fixed-fee or hourly jobs, track time spent, and invoice your clients.</string>
+    <string name="srv_passer_etape">Move to: %1$s</string>
+    <string name="srv_action_heures">Hours</string>
+    <string name="srv_champ_intitule">Mission title</string>
+    <string name="srv_champ_forfait">Agreed flat fee</string>
+    <string name="srv_champ_tarif_horaire">Agreed hourly rate</string>
+    <string name="srv_champ_heures_prevues">Estimated hours</string>
+    <string name="srv_champ_heures_passees">Actual hours spent</string>
+    <string name="srv_titre_ajuster_heures">Track billable time</string>
+    <string name="srv_msg_creee">Service created: %1$s</string>
+    <string name="srv_msg_avance">Stage updated</string>
+    <string name="srv_msg_annulee">Service cancelled</string>
+    <string name="srv_msg_heures">Hours updated</string>
+    <string name="srv_msg_finale">This service is already completed</string>
 </resources>

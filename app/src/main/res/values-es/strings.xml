@@ -1492,4 +1492,27 @@
     <string name="mai_intervention_sur">Intervención en</string>
     <string name="mai_champ_description_travaux">Trabajos realizados</string>
     <string name="mai_champ_cout_pieces">Coste de piezas / mano de obra</string>
+    <string name="srv_titre_synthese">Actividad de servicios</string>
+    <string name="srv_en_cours">%1$d servicios en curso</string>
+    <string name="srv_carnet">Cartera: %1$s</string>
+    <string name="srv_matrice_titre">Categorías y Acceso rápido</string>
+    <string name="srv_tuile_toutes">Todas</string>
+    <string name="srv_nb_count">%1$d</string>
+    <string name="srv_nouvelle_prestation">Nuevo servicio</string>
+    <string name="srv_titre_registre">Registro de servicios y misiones</string>
+    <string name="srv_aucune">Sin servicios registrados</string>
+    <string name="srv_aucune_desc">Planifique trabajos a tanto alzado o por horas, controle el tiempo y facture.</string>
+    <string name="srv_passer_etape">Avanzar a: %1$s</string>
+    <string name="srv_action_heures">Horas</string>
+    <string name="srv_champ_intitule">Título del servicio</string>
+    <string name="srv_champ_forfait">Importe a tanto alzado</string>
+    <string name="srv_champ_tarif_horaire">Tarifa por hora</string>
+    <string name="srv_champ_heures_prevues">Horas estimadas</string>
+    <string name="srv_champ_heures_passees">Horas reales dedicadas</string>
+    <string name="srv_titre_ajuster_heures">Imputar horas de trabajo</string>
+    <string name="srv_msg_creee">Servicio creado: %1$s</string>
+    <string name="srv_msg_avance">Estado actualizado</string>
+    <string name="srv_msg_annulee">Servicio cancelado</string>
+    <string name="srv_msg_heures">Horas actualizadas</string>
+    <string name="srv_msg_finale">Este servicio ya está finalizado</string>
 </resources>
