@@ -223,10 +223,10 @@ fun LivraisonScreen(
                     )
                 }
             } else {
-                items(etat.bons, key = { it.id }) { bon ->
+                items(etat.bons, key = { it.record.id }) { bon ->
                     CarteBonLivraison(
                         bon = bon,
-                        onAvancer = { vm.avancer(bon.id) },
+                        onAvancer = { vm.avancer(bon.record.id) },
                         onAnnuler = { bonAAnnuler = bon },
                     )
                 }
@@ -249,9 +249,9 @@ fun LivraisonScreen(
         AlertDialog(
             onDismissRequest = { bonAAnnuler = null },
             title = { Text(stringResource(R.string.ach_annuler), color = MissaInk) },
-            text = { Text(stringResource(R.string.ach_confirmer_annulation, bon.reference), color = MissaInk) },
+            text = { Text(stringResource(R.string.ach_confirmer_annulation, bon.record.reference), color = MissaInk) },
             confirmButton = {
-                TextButton(onClick = { vm.annuler(bon.id) }) {
+                TextButton(onClick = { vm.annuler(bon.record.id) }) {
                     Text(stringResource(R.string.ach_annuler), color = Color(0xFFB91C1C))
                 }
             },
@@ -273,7 +273,7 @@ private fun CarteBonLivraison(
     val dateStr = remember(bon.record.createdAt) {
         SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(bon.record.createdAt))
     }
-    val etapeSuivante = bon.etapeSuivante
+    val etapeSuivante = com.missa.b360.core.domain.model.LivraisonRules.etapeSuivante(bon.etape)
 
     Surface(
         shape = RoundedCornerShape(14.dp),
@@ -282,7 +282,7 @@ private fun CarteBonLivraison(
     ) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(bon.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
+                Text(bon.record.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
                 Surface(
                     shape = RoundedCornerShape(6.dp),
@@ -308,13 +308,13 @@ private fun CarteBonLivraison(
                 }
             }
             Spacer(Modifier.height(4.dp))
-            Text(bon.clientNom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            bon.adresse?.let {
+            Text(bon.payload.clientName, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            bon.payload.adresseLivraison?.let {
                 Text(it, fontSize = 11.sp, color = MissaMuted)
             }
-            if (bon.nombreColis > 0) {
+            if (bon.payload.nombreColis > 0) {
                 Text(
-                    stringResource(R.string.liv_nb_colis, bon.nombreColis) + (bon.transporteur?.let { " · $it" } ?: ""),
+                    stringResource(R.string.liv_nb_colis, bon.payload.nombreColis) + (bon.payload.transporteur?.let { " · $it" } ?: ""),
                     fontSize = 11.sp,
                     color = BleuCielLivraison,
                 )

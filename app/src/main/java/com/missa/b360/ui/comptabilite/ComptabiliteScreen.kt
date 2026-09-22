@@ -266,7 +266,7 @@ private fun CarteEcriture(ecriture: EcritureComptable, devise: String) {
         ) {
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(ecriture.reference, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    Text(ecriture.reference ?: "—", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Spacer(Modifier.width(6.dp))
                     Surface(shape = RoundedCornerShape(6.dp), color = VertCompta.copy(alpha = 0.15f)) {
                         Text(
