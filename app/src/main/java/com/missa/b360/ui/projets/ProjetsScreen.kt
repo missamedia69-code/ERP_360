@@ -392,7 +392,7 @@ private fun CarteProjet(
             }
             Spacer(Modifier.height(4.dp))
             Text(projet.payload.nom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            projet.payload.clientNom?.let {
+            projet.payload.clientName?.let {
                 Text(it, fontSize = 11.5.sp, color = MissaMuted)
             }
             Spacer(Modifier.height(6.dp))
