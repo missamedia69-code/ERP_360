@@ -50,7 +50,7 @@ import com.missa.b360.ui.theme.MissaMuted
 
 private val BleuSites: Color get() = AppModule.LOGISTIQUE.couleur
 
-private data class TuileMatriceSpec(
+private data class TuileAdminSitesSpec(
     val icone: Int,
     val titre: String,
     val sousTitre: String,
@@ -134,28 +134,28 @@ fun AdminSitesScreen(
 
             item {
                 val tuiles = listOf(
-                    TuileMatriceSpec(
+                    TuileAdminSitesSpec(
                         icone = Iv.Warehouse,
                         titre = stringResource(R.string.sites_tuile_tous),
                         sousTitre = totalSites.size.toString(),
                         estActif = filtreType == null,
                         onClick = { vm.filtrer(null) },
                     ),
-                    TuileMatriceSpec(
+                    TuileAdminSitesSpec(
                         icone = Iv.Store,
                         titre = stringResource(R.string.sites_tuile_boutiques),
                         sousTitre = boutiquesCount.toString(),
                         estActif = filtreType == "Boutique",
                         onClick = { vm.filtrer("Boutique") },
                     ),
-                    TuileMatriceSpec(
+                    TuileAdminSitesSpec(
                         icone = Iv.LocalShipping,
                         titre = stringResource(R.string.sites_tuile_depots),
                         sousTitre = depotsCount.toString(),
                         estActif = filtreType == "Entrepôt",
                         onClick = { vm.filtrer("Entrepôt") },
                     ),
-                    TuileMatriceSpec(
+                    TuileAdminSitesSpec(
                         icone = Iv.Add,
                         titre = stringResource(R.string.sites_nouveau_site),
                         sousTitre = stringResource(R.string.st_creer),

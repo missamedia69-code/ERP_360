@@ -32,8 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.core.domain.model.GroupesStandards
-import com.missa.b360.core.domain.model.UniteStandard
+import com.missa.b360.core.data.entity.ProductType
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.MissaBorder
@@ -42,7 +41,7 @@ import com.missa.b360.ui.theme.MissaMuted
 
 private val GrisReferentiel: Color = Color(0xFF4B5563)
 
-private data class TuileMatriceSpec(
+private data class TuileReferentielSpec(
     val icone: Int,
     val titre: String,
     val sousTitre: String,
@@ -62,29 +61,51 @@ fun ReferentielsScreen(
 ) {
     var categorieChoisie by remember { mutableStateOf(0) } // 0: Familles, 1: Unités, 2: Devises, 3: Taxes
 
-    val itemsAffiches = remember(categorieChoisie) {
-        when (categorieChoisie) {
-            0 -> GroupesStandards.TOUS.map {
-                ItemReferentiel(it.code, it.nom, "Type: ${it.typeArticle.name}")
-            }
-            1 -> UniteStandard.entries.map {
-                ItemReferentiel(it.name, it.name, "Unité de mesure standard")
-            }
-            2 -> listOf(
-                ItemReferentiel("XAF", "Franc CFA (BEAC)", "Afrique Centrale - CEMAC"),
-                ItemReferentiel("XOF", "Franc CFA (BCEAO)", "Afrique de l'Ouest - UEMOA"),
-                ItemReferentiel("EUR", "Euro (€)", "Zone Euro"),
-                ItemReferentiel("USD", "Dollar US ($)", "États-Unis"),
-                ItemReferentiel("GNF", "Franc Guinéen", "Guinée"),
-                ItemReferentiel("CDF", "Franc Congolais", "RDC"),
-            )
-            else -> listOf(
-                ItemReferentiel("TVA 19.25%", "Taux Standard", "Cameroun / Zone CEMAC"),
-                ItemReferentiel("TVA 18%", "Taux Standard UEMOA", "Côte d'Ivoire, Sénégal"),
-                ItemReferentiel("TVA 0%", "Exonéré / Export", "Régime d'exportation"),
-                ItemReferentiel("AIR 2.2%", "Acompte IS", "Retenue à la source"),
-            )
+    val famillesTypes = remember {
+        ProductType.entries.map {
+            ItemReferentiel(it.name, it.name.replace('_', ' ').lowercase().replaceFirstChar { c -> c.uppercase() }, "Type standard OHADA")
         }
+    }
+
+    val unites = remember {
+        listOf(
+            ItemReferentiel("U", "Unité (pièce)", "Comptage unitaire"),
+            ItemReferentiel("KG", "Kilogramme", "Masse / Poids"),
+            ItemReferentiel("L", "Litre", "Volume liquide"),
+            ItemReferentiel("M", "Mètre", "Longueur"),
+            ItemReferentiel("M2", "Mètre carré", "Surface"),
+            ItemReferentiel("CRT", "Carton", "Conditionnement groupé"),
+            ItemReferentiel("PAL", "Palette", "Logistique lourde"),
+            ItemReferentiel("H", "Heure", "Prestation horaire"),
+            ItemReferentiel("J", "Jour", "Forfait journalier"),
+        )
+    }
+
+    val devises = remember {
+        listOf(
+            ItemReferentiel("XAF", "Franc CFA (BEAC)", "Afrique Centrale - CEMAC"),
+            ItemReferentiel("XOF", "Franc CFA (BCEAO)", "Afrique de l'Ouest - UEMOA"),
+            ItemReferentiel("EUR", "Euro (€)", "Zone Euro"),
+            ItemReferentiel("USD", "Dollar US ($)", "États-Unis"),
+            ItemReferentiel("GNF", "Franc Guinéen", "Guinée"),
+            ItemReferentiel("CDF", "Franc Congolais", "RDC"),
+        )
+    }
+
+    val taxes = remember {
+        listOf(
+            ItemReferentiel("TVA 19.25%", "Taux Standard", "Cameroun / Zone CEMAC"),
+            ItemReferentiel("TVA 18%", "Taux Standard UEMOA", "Côte d'Ivoire, Sénégal"),
+            ItemReferentiel("TVA 0%", "Exonéré / Export", "Régime d'exportation"),
+            ItemReferentiel("AIR 2.2%", "Acompte IS", "Retenue à la source"),
+        )
+    }
+
+    val itemsAffiches = when (categorieChoisie) {
+        0 -> famillesTypes
+        1 -> unites
+        2 -> devises
+        else -> taxes
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -121,13 +142,13 @@ fun ReferentielsScreen(
                         Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
-                                stringResource(R.string.ref_familles_count, GroupesStandards.TOUS.size),
+                                stringResource(R.string.ref_familles_count, famillesTypes.size),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = GrisReferentiel,
                             )
                             Text(
-                                stringResource(R.string.ref_unites_count, UniteStandard.entries.size),
+                                stringResource(R.string.ref_unites_count, unites.size),
                                 fontSize = 11.sp,
                                 color = MissaMuted,
                             )
@@ -148,31 +169,31 @@ fun ReferentielsScreen(
 
             item {
                 val tuiles = listOf(
-                    TuileMatriceSpec(
+                    TuileReferentielSpec(
                         icone = Iv.Folder,
                         titre = stringResource(R.string.ref_tuile_familles),
-                        sousTitre = GroupesStandards.TOUS.size.toString(),
+                        sousTitre = famillesTypes.size.toString(),
                         estActif = categorieChoisie == 0,
                         onClick = { categorieChoisie = 0 },
                     ),
-                    TuileMatriceSpec(
+                    TuileReferentielSpec(
                         icone = Iv.Straighten,
                         titre = stringResource(R.string.ref_tuile_unites),
-                        sousTitre = UniteStandard.entries.size.toString(),
+                        sousTitre = unites.size.toString(),
                         estActif = categorieChoisie == 1,
                         onClick = { categorieChoisie = 1 },
                     ),
-                    TuileMatriceSpec(
+                    TuileReferentielSpec(
                         icone = Iv.Bank,
                         titre = stringResource(R.string.ref_tuile_devises),
-                        sousTitre = "6",
+                        sousTitre = devises.size.toString(),
                         estActif = categorieChoisie == 2,
                         onClick = { categorieChoisie = 2 },
                     ),
-                    TuileMatriceSpec(
+                    TuileReferentielSpec(
                         icone = Iv.Percent,
                         titre = stringResource(R.string.ref_tuile_taxes),
-                        sousTitre = "4",
+                        sousTitre = taxes.size.toString(),
                         estActif = categorieChoisie == 3,
                         onClick = { categorieChoisie = 3 },
                     ),
@@ -205,7 +226,7 @@ fun ReferentielsScreen(
                 )
             }
 
-            items(itemsAffiches, key = { it.code }) { itemRef ->
+            items(itemsAffiches, key = { "${it.code}_${it.libelle}" }) { itemRef ->
                 CarteReferentiel(itemRef)
             }
         }
