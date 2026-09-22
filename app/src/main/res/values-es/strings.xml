@@ -1587,4 +1587,22 @@
     <string name="rep_solde_tresorerie">Saldo de tesorería disponible</string>
     <string name="rep_flux_entrants">Entradas de tesorería</string>
     <string name="rep_flux_sortants">Salidas de tesorería</string>
+    <string name="tasks_titre_synthese">Control de tareas y equipo</string>
+    <string name="tasks_en_attente_total">%1$d tareas pendientes</string>
+    <string name="tasks_urgentes_count">%1$d vencidas / urgentes</string>
+    <string name="tasks_terminees_count">%1$d completadas</string>
+    <string name="tasks_matrice_titre">Filtros y Creación</string>
+    <string name="tasks_tuile_toutes">Todas</string>
+    <string name="tasks_nb_count">%1$d</string>
+    <string name="tasks_statut_a_faire">Por hacer</string>
+    <string name="tasks_statut_en_cours">En curso</string>
+    <string name="tasks_statut_faite">Terminada</string>
+    <string name="tasks_nouvelle_tache">Nueva tarea</string>
+    <string name="tasks_titre_registre">Lista de acciones y recordatorios</string>
+    <string name="tasks_aucune">Sin tareas</string>
+    <string name="tasks_aucune_desc">Añada tareas y recordatorios para coordinar el trabajo del equipo.</string>
+    <string name="tasks_action_demarrer">Iniciar</string>
+    <string name="tasks_action_terminer">Completar</string>
+    <string name="tasks_champ_titre">Título de la tarea</string>
+    <string name="tasks_champ_notes">Detalles / Instrucciones</string>
 </resources>

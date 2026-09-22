@@ -1587,4 +1587,22 @@
     <string name="rep_solde_tresorerie">رصيد السيولة المتاح</string>
     <string name="rep_flux_entrants">التدفقات النقدية الداخلة</string>
     <string name="rep_flux_sortants">التدفقات النقدية الخارجة</string>
+    <string name="tasks_titre_synthese">متابعة المهام وقائمة العمل</string>
+    <string name="tasks_en_attente_total">%1$d مهام معلقة</string>
+    <string name="tasks_urgentes_count">%1$d مستعجلة / متأخرة</string>
+    <string name="tasks_terminees_count">%1$d منجزة</string>
+    <string name="tasks_matrice_titre">التصنيف والإنشاء</string>
+    <string name="tasks_tuile_toutes">الكل</string>
+    <string name="tasks_nb_count">%1$d</string>
+    <string name="tasks_statut_a_faire">للإنجاز</string>
+    <string name="tasks_statut_en_cours">قيد التنفيذ</string>
+    <string name="tasks_statut_faite">تمت</string>
+    <string name="tasks_nouvelle_tache">مهمة جديدة</string>
+    <string name="tasks_titre_registre">قائمة الإجراءات والتنبيهات</string>
+    <string name="tasks_aucune">لا توجد مهام</string>
+    <string name="tasks_aucune_desc">أضف المهام والتذكيرات لتنسيق أعمال الفريق بسلاسة.</string>
+    <string name="tasks_action_demarrer">بدء</string>
+    <string name="tasks_action_terminer">إنهاء</string>
+    <string name="tasks_champ_titre">عنوان المهمة</string>
+    <string name="tasks_champ_notes">تفاصيل / تعليمات</string>
 </resources>

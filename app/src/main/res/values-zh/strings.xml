@@ -1587,4 +1587,22 @@
     <string name="rep_solde_tresorerie">可用现金结余</string>
     <string name="rep_flux_entrants">资金流入总额</string>
     <string name="rep_flux_sortants">资金流出总额</string>
+    <string name="tasks_titre_synthese">待办任务与团队协同</string>
+    <string name="tasks_en_attente_total">%1$d 项待处理任务</string>
+    <string name="tasks_urgentes_count">%1$d 项到期/紧急</string>
+    <string name="tasks_terminees_count">%1$d 项已办结</string>
+    <string name="tasks_matrice_titre">筛选与创建</string>
+    <string name="tasks_tuile_toutes">全部</string>
+    <string name="tasks_nb_count">%1$d</string>
+    <string name="tasks_statut_a_faire">待办</string>
+    <string name="tasks_statut_en_cours">进行中</string>
+    <string name="tasks_statut_faite">已完成</string>
+    <string name="tasks_nouvelle_tache">新建任务</string>
+    <string name="tasks_titre_registre">待办事项与提醒列表</string>
+    <string name="tasks_aucune">暂无任务</string>
+    <string name="tasks_aucune_desc">录入日常任务与备忘，协助团队高效推进各项业务。</string>
+    <string name="tasks_action_demarrer">开工</string>
+    <string name="tasks_action_terminer">办结</string>
+    <string name="tasks_champ_titre">任务标题</string>
+    <string name="tasks_champ_notes">详细要求/备注</string>
 </resources>

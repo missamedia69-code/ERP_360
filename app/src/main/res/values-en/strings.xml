@@ -1591,4 +1591,22 @@
     <string name="rep_solde_tresorerie">Available cash balance</string>
     <string name="rep_flux_entrants">Cash inflows</string>
     <string name="rep_flux_sortants">Cash outflows</string>
+    <string name="tasks_titre_synthese">Tasks tracking &amp; team to-do</string>
+    <string name="tasks_en_attente_total">%1$d tasks pending</string>
+    <string name="tasks_urgentes_count">%1$d due / urgent</string>
+    <string name="tasks_terminees_count">%1$d completed</string>
+    <string name="tasks_matrice_titre">Filters &amp; Creation</string>
+    <string name="tasks_tuile_toutes">All</string>
+    <string name="tasks_nb_count">%1$d</string>
+    <string name="tasks_statut_a_faire">To do</string>
+    <string name="tasks_statut_en_cours">In progress</string>
+    <string name="tasks_statut_faite">Done</string>
+    <string name="tasks_nouvelle_tache">New task</string>
+    <string name="tasks_titre_registre">Action items &amp; reminders</string>
+    <string name="tasks_aucune">No tasks</string>
+    <string name="tasks_aucune_desc">Add tasks and reminders to coordinate your team\'s work.</string>
+    <string name="tasks_action_demarrer">Start</string>
+    <string name="tasks_action_terminer">Complete</string>
+    <string name="tasks_champ_titre">Task title</string>
+    <string name="tasks_champ_notes">Details / Instructions</string>
 </resources>
