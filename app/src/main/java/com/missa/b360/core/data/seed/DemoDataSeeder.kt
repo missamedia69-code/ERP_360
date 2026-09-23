@@ -46,7 +46,7 @@ import com.missa.b360.core.data.entity.TypeCompteTresorerie
 import com.missa.b360.core.data.entity.TypeFournisseur
 import com.missa.b360.core.data.entity.UserEntity
 import com.missa.b360.core.data.repository.ProfilActivationRepository
-import com.missa.b360.core.domain.model.AppModule
+import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.core.domain.model.CockpitRules
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
@@ -111,7 +111,7 @@ class DemoDataSeeder @Inject constructor(
 
         // 2. Profil d'activité & Réglages
         profilActivationRepository.mettreAJourProfil(
-            profil = ProfilActivite.COMMERCE_GENERAL,
+            profil = ProfilActivite.ASV,
             palier = PalierTaille.P3,
             venteSansStock = false,
         )
@@ -133,7 +133,7 @@ class DemoDataSeeder @Inject constructor(
             numeroFiscal = "M051800012345A",
             registreCommerce = "RC/DLA/2020/B/145",
             logoUri = null,
-            profilActivite = ProfilActivite.COMMERCE_GENERAL.name,
+            profilActivite = ProfilActivite.ASV.name,
             palierTaille = PalierTaille.P3.name,
             onboardingTermine = true,
         )
@@ -165,9 +165,9 @@ class DemoDataSeeder @Inject constructor(
             roleProprietaire = roleDao.getById(roleId)
             val permissions = buildList {
                 val actions = listOf("VIEW", "CREATE", "EDIT", "DELETE", "VALIDATE")
-                val modules = AppModule.entries.map { it.name } + "ADMIN"
-                modules.forEach { mod ->
-                    actions.forEach { act ->
+                val moduleNames: List<String> = AppModule.entries.map { it.name } + listOf("ADMIN")
+                for (mod in moduleNames) {
+                    for (act in actions) {
                         add(RolePermissionEntity(roleId, mod, act, granted = true))
                     }
                 }
