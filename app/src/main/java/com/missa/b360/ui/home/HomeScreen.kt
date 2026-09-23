@@ -299,6 +299,7 @@ private fun HomeDashboard(
     onPersonnaliser: () -> Unit,
     modifier: Modifier,
     onNavigate: (String) -> Unit,
+    onSupport: () -> Unit = {},
     notificationCount: Int = 0,
     onNotificationClick: () -> Unit = {},
     onSelectionJour: (Long) -> Unit = {},
