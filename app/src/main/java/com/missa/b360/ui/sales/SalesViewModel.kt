@@ -169,7 +169,6 @@ class SalesViewModel @Inject constructor(
                 adresse = adresse?.trim()?.ifBlank { null },
                 statut = ClientStatus.ACTIF,
                 createdAt = now,
-                updatedAt = now,
             )
             val id = clientDao.insert(nouveau)
             val cree = nouveau.copy(id = id)
