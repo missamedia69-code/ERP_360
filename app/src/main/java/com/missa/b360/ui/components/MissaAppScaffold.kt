@@ -2,7 +2,6 @@ package com.missa.b360.ui.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -123,24 +122,8 @@ fun MissaAppHeader(
         ),
         label = "menuPulseAlpha",
     )
-    val pulseBorderWidth by infiniteTransition.animateDp(
-        initialValue = 1.5.dp,
-        targetValue = 3.dp,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "menuPulseWidth",
-    )
-    val pulseHaloPadding by infiniteTransition.animateDp(
-        initialValue = 0.5.dp,
-        targetValue = 2.5.dp,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "menuHaloPadding",
-    )
+    val pulseBorderWidth = (1.2f + 1.8f * pulseAlpha).dp
+    val pulseHaloPadding = (0.5f + 2.0f * pulseAlpha).dp
 
     val logoShape = RoundedCornerShape(12.dp)
 
