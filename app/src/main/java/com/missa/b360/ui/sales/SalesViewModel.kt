@@ -3,6 +3,10 @@ package com.missa.b360.ui.sales
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.ClientStatus
+import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.numbering.DocType
+import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.SaleCalculator
@@ -87,6 +91,8 @@ class SalesViewModel @Inject constructor(
     private val saveSale: SaveSaleUseCase,
     private val reverseSaleStock: ReverseSaleStockUseCase,
     private val checkSaleStock: CheckSaleStockUseCase,
+    private val clientDao: ClientDao,
+    private val sequenceManager: SequenceManager,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -142,6 +148,34 @@ class SalesViewModel @Inject constructor(
 
     fun selectClient(client: ClientEntity) {
         _uiState.value = _uiState.value.copy(selectedClient = client)
+    }
+
+    /** Création rapide in-situ d'un client actif sans abandonner le panier en cours. */
+    fun creerClientRapide(
+        nom: String,
+        telephone: String,
+        email: String? = null,
+        adresse: String? = null,
+        onSuccess: (ClientEntity) -> Unit = {},
+    ) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val code = sequenceManager.next(DocType.CLIENT)
+            val nouveau = ClientEntity(
+                code = code,
+                nom = nom.trim(),
+                telephone = telephone.trim(),
+                email = email?.trim()?.ifBlank { null },
+                adresse = adresse?.trim()?.ifBlank { null },
+                statut = ClientStatus.ACTIF,
+                createdAt = now,
+                updatedAt = now,
+            )
+            val id = clientDao.insert(nouveau)
+            val cree = nouveau.copy(id = id)
+            selectClient(cree)
+            onSuccess(cree)
+        }
     }
 
     /** Reprend un brouillon persistant dans le panier sans créer de deuxième facture. */

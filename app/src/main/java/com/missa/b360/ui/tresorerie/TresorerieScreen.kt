@@ -320,6 +320,7 @@ fun TresorerieScreen(
             sensInitial = sens,
             enCours = enCours,
             onFermer = { dialogueMouvement = null },
+            onNouveauCompte = { dialogueNouveauCompte = true },
             onValider = { compteId, s, mt, lib, cat, tiers, mode, ref ->
                 vm.enregistrerMouvement(compteId, s, mt, lib, cat, tiers, mode, ref, System.currentTimeMillis())
             },

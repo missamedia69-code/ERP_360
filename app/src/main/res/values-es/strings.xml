@@ -1640,4 +1640,19 @@
     <string name="retour_err_lignes">Por favor seleccione al menos una línea válida para devolver</string>
     <string name="retour_err_lecture">Error al cargar la venta</string>
     <string name="retour_err_brouillon">No se puede procesar una devolución en una venta borrador</string>
+    <string name="ach_nouveau_fournisseur_rapide">Nuevo proveedor</string>
+    <string name="ach_aucun_fournisseur">Ningún proveedor registrado</string>
+    <string name="ach_creer_fournisseur_invite">Crear directamente un proveedor para continuar</string>
+    <string name="ach_email_optionnel">Correo electrónico (opcional)</string>
+    <string name="ach_adresse_optionnelle">Dirección / Ciudad (opcional)</string>
+    <string name="sales_nouveau_client_rapide">Nuevo cliente</string>
+    <string name="sales_aucun_client">Ningún cliente registrado</string>
+    <string name="sales_creer_client_invite">Crear directamente un cliente para continuar</string>
+    <string name="sales_email_optionnel">Correo electrónico (opcional)</string>
+    <string name="sales_adresse_optionnelle">Dirección / Ciudad (opcional)</string>
+    <string name="st_nouvelle_categorie_rapide">Nueva categoría</string>
+    <string name="st_nom_categorie_requis">Nombre de la categoría *</string>
+    <string name="st_creer_categorie_invite">Crear una categoría para clasificar este artículo</string>
+    <string name="tre_aucun_compte">Ninguna cuenta disponible</string>
+    <string name="tre_creer_compte_invite">Crear una cuenta para registrar la operación</string>
 </resources>

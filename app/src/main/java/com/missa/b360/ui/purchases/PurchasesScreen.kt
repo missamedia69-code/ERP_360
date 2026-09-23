@@ -674,13 +674,15 @@ private fun BlocCatalogue(
     }
 }
 
-/** Sélecteur déroulant simple — l'option vide n'est jamais proposée. */
+/** Sélecteur déroulant simple — avec option d'ajout direct in-situ si disponible. */
 @Composable
 private fun Selecteur(
     libelle: String,
     valeur: String?,
     options: List<String>,
     onChoix: (Int) -> Unit,
+    onNouveau: (() -> Unit)? = null,
+    nouveauLibelle: String? = null,
 ) {
     var ouvert by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth()) {
@@ -690,6 +692,9 @@ private fun Selecteur(
             readOnly = true,
             label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
             trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
+            placeholder = if (options.isEmpty() && onNouveau != null) {
+                { Text("+ ${nouveauLibelle ?: libelle}", fontSize = 12.sp, color = MissaMuted) }
+            } else null,
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
@@ -697,9 +702,31 @@ private fun Selecteur(
         Box(
             Modifier
                 .matchParentSize()
-                .clickable(enabled = options.isNotEmpty()) { ouvert = true },
+                .clickable {
+                    if (options.isEmpty() && onNouveau != null) {
+                        onNouveau()
+                    } else {
+                        ouvert = true
+                    }
+                },
         )
         DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+            if (onNouveau != null) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "+ ${nouveauLibelle ?: libelle}",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MissaInk,
+                        )
+                    },
+                    onClick = {
+                        ouvert = false
+                        onNouveau()
+                    },
+                )
+            }
             options.forEachIndexed { index, option ->
                 DropdownMenuItem(
                     text = { Text(option, fontSize = 13.sp, color = MissaInk) },
@@ -711,6 +738,91 @@ private fun Selecteur(
             }
         }
     }
+}
+
+/** Boîte de dialogue de création rapide d'un fournisseur sans quitter le flux d'achat. */
+@Composable
+private fun DialogueCreationFournisseurRapide(
+    onDismiss: () -> Unit,
+    onValider: (nom: String, telephone: String, email: String?, adresse: String?) -> Unit,
+) {
+    var nom by remember { mutableStateOf("") }
+    var telephone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var adresse by remember { mutableStateOf("") }
+
+    val nomValide = nom.trim().isNotBlank()
+    val telValide = telephone.trim().isNotBlank()
+    val valide = nomValide && telValide
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.ach_nouveau_fournisseur_rapide),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MissaInk,
+                )
+            }
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = nom,
+                    onValueChange = { nom = it.take(120) },
+                    label = { Text(stringResource(R.string.fournisseurs_nom) + " *", fontSize = 11.sp) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = telephone,
+                    onValueChange = { telephone = it.take(25) },
+                    label = { Text(stringResource(R.string.fournisseurs_telephone) + " *", fontSize = 11.sp) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it.take(100) },
+                    label = { Text(stringResource(R.string.ach_email_optionnel), fontSize = 11.sp) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = adresse,
+                    onValueChange = { adresse = it.take(150) },
+                    label = { Text(stringResource(R.string.ach_adresse_optionnelle), fontSize = 11.sp) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
+                enabled = valide,
+                colors = ButtonDefaults.buttonColors(containerColor = JauneAchats, contentColor = MissaInk),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.ops_cancel), color = MissaInk)
+            }
+        },
+    )
 }
 
 /** Champ de date en lecture seule ouvrant un petit calendrier (±12 h, aller/retour). */
@@ -774,6 +886,7 @@ private fun FormulaireAchat(
 
     var modePaiement by remember { mutableStateOf("") }
     var ligneOuverte by remember { mutableStateOf<Long?>(null) }
+    var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
 
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
     LaunchedEffect(resultat) {
@@ -831,7 +944,40 @@ private fun FormulaireAchat(
                     valeur = ui.supplier?.nom,
                     options = fournisseurs.map { it.nom },
                     onChoix = { index -> vm.selectSupplier(fournisseurs[index]) },
+                    onNouveau = { dialogueNouveauFournisseur = true },
+                    nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
                 )
+            }
+            if (fournisseurs.isEmpty()) {
+                item {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = JauneAchats.copy(alpha = 0.26f),
+                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.ach_aucun_fournisseur),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = MissaInk,
+                                )
+                                Text(
+                                    stringResource(R.string.ach_creer_fournisseur_invite),
+                                    fontSize = 10.sp,
+                                    color = MissaInk.copy(alpha = 0.8f),
+                                )
+                            }
+                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
             }
 
             item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProduct) }
@@ -959,6 +1105,16 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
                 else -> null
+            },
+        )
+    }
+
+    if (dialogueNouveauFournisseur) {
+        DialogueCreationFournisseurRapide(
+            onDismiss = { dialogueNouveauFournisseur = false },
+            onValider = { nom, telephone, email, adresse ->
+                vm.creerFournisseurRapide(nom, telephone, email, adresse)
+                dialogueNouveauFournisseur = false
             },
         )
     }
@@ -1162,6 +1318,7 @@ private fun FormulaireCommande(
     val busy by vm.busy.collectAsStateWithLifecycle()
     val actionResult by vm.actionResult.collectAsStateWithLifecycle()
     val itemsFournisseur by vm.itemsFournisseur.collectAsStateWithLifecycle()
+    var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
 
     LaunchedEffect(actionResult) {
         if (actionResult == PurchasesViewModel.ActionAchatResult.CommandeEnregistree) {
@@ -1189,7 +1346,40 @@ private fun FormulaireCommande(
                     valeur = ui.supplier?.nom,
                     options = fournisseurs.map { it.nom },
                     onChoix = { index -> vm.selectSupplierCommande(fournisseurs[index]) },
+                    onNouveau = { dialogueNouveauFournisseur = true },
+                    nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
                 )
+            }
+            if (fournisseurs.isEmpty()) {
+                item {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = JauneAchats.copy(alpha = 0.26f),
+                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.ach_aucun_fournisseur),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = MissaInk,
+                                )
+                                Text(
+                                    stringResource(R.string.ach_creer_fournisseur_invite),
+                                    fontSize = 10.sp,
+                                    color = MissaInk.copy(alpha = 0.8f),
+                                )
+                            }
+                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
             }
             item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProductCommande) }
             if (ui.lines.isNotEmpty()) {
@@ -1242,6 +1432,16 @@ private fun FormulaireCommande(
                 PurchasesViewModel.ActionAchatResult.Erreur,
                 -> stringResource(R.string.ach_erreur)
                 else -> null
+            },
+        )
+    }
+
+    if (dialogueNouveauFournisseur) {
+        DialogueCreationFournisseurRapide(
+            onDismiss = { dialogueNouveauFournisseur = false },
+            onValider = { nom, telephone, email, adresse ->
+                vm.creerFournisseurRapide(nom, telephone, email, adresse)
+                dialogueNouveauFournisseur = false
             },
         )
     }

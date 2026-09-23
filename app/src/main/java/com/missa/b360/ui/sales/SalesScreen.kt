@@ -322,6 +322,7 @@ private fun FormulaireVente(
     val taxRate by vm.taxRate.collectAsStateWithLifecycle()
     val saving by vm.saving.collectAsStateWithLifecycle()
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
+    var dialogueNouveauClient by remember { mutableStateOf(false) }
 
     var modePaiement by remember { mutableStateOf("") }
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
@@ -344,8 +345,39 @@ private fun FormulaireVente(
                     selectedClient = ui.selectedClient,
                     clients = clients,
                     onSelect = vm::selectClient,
-                    onOpenClientCreate = onOpenClientCreate,
+                    onOpenClientCreate = { dialogueNouveauClient = true },
                 )
+            }
+            if (clients.isEmpty()) {
+                item {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = BleuVente.copy(alpha = 0.26f),
+                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauClient = true },
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.sales_aucun_client),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = MissaInk,
+                                )
+                                Text(
+                                    stringResource(R.string.sales_creer_client_invite),
+                                    fontSize = 10.sp,
+                                    color = MissaInk.copy(alpha = 0.8f),
+                                )
+                            }
+                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
             }
             item {
                 BlocCatalogueVente(
@@ -417,6 +449,16 @@ private fun FormulaireVente(
             },
         )
     }
+
+    if (dialogueNouveauClient) {
+        DialogueCreationClientRapide(
+            onDismiss = { dialogueNouveauClient = false },
+            onValider = { nom, telephone, email, adresse ->
+                vm.creerClientRapide(nom, telephone, email, adresse)
+                dialogueNouveauClient = false
+            },
+        )
+    }
 }
 
 @Composable
@@ -434,10 +476,21 @@ private fun SelecteurClient(
             readOnly = true,
             label = { Text(stringResource(R.string.sales_select_client), fontSize = 11.sp, color = MissaMuted) },
             trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
+            placeholder = if (clients.isEmpty()) {
+                { Text("+ " + stringResource(R.string.sales_nouveau_client_rapide), fontSize = 12.sp, color = MissaMuted) }
+            } else null,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
         )
-        Box(Modifier.matchParentSize().clickable { ouvert = true })
+        Box(
+            Modifier.matchParentSize().clickable {
+                if (clients.isEmpty()) {
+                    onOpenClientCreate()
+                } else {
+                    ouvert = true
+                }
+            },
+        )
         DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             DropdownMenuItem(
                 text = { Text("+ " + stringResource(R.string.clients_nouveau_client), fontWeight = FontWeight.Bold, color = BleuVente) },
@@ -457,6 +510,91 @@ private fun SelecteurClient(
             }
         }
     }
+}
+
+/** Boîte de dialogue de création rapide d'un client in-situ sans abandonner le panier vente. */
+@Composable
+private fun DialogueCreationClientRapide(
+    onDismiss: () -> Unit,
+    onValider: (nom: String, telephone: String, email: String?, adresse: String?) -> Unit,
+) {
+    var nom by remember { mutableStateOf("") }
+    var telephone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var adresse by remember { mutableStateOf("") }
+
+    val nomValide = nom.trim().isNotBlank()
+    val telValide = telephone.trim().isNotBlank()
+    val valide = nomValide && telValide
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.sales_nouveau_client_rapide),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MissaInk,
+                )
+            }
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = nom,
+                    onValueChange = { nom = it.take(120) },
+                    label = { Text(stringResource(R.string.clients_nom) + " *", fontSize = 11.sp) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = telephone,
+                    onValueChange = { telephone = it.take(25) },
+                    label = { Text(stringResource(R.string.clients_telephone) + " *", fontSize = 11.sp) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it.take(100) },
+                    label = { Text(stringResource(R.string.sales_email_optionnel), fontSize = 11.sp) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = adresse,
+                    onValueChange = { adresse = it.take(150) },
+                    label = { Text(stringResource(R.string.sales_adresse_optionnelle), fontSize = 11.sp) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
+                enabled = valide,
+                colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.ops_cancel), color = MissaInk)
+            }
+        },
+    )
 }
 
 @Composable

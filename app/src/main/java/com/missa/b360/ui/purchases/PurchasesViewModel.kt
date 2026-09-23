@@ -3,6 +3,10 @@ package com.missa.b360.ui.purchases
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.FournisseurEntity
+import com.missa.b360.core.data.entity.FournisseurStatus
+import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.numbering.DocType
+import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.domain.model.CommandeAchatCodec
@@ -96,6 +100,8 @@ class PurchasesViewModel @Inject constructor(
     private val reglerAchat: ReglerAchatUseCase,
     private val annulerAchat: AnnulerAchatUseCase,
     private val fournisseurItemDao: com.missa.b360.core.data.dao.FournisseurItemDao,
+    private val fournisseurDao: FournisseurDao,
+    private val sequenceManager: SequenceManager,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -167,6 +173,35 @@ class PurchasesViewModel @Inject constructor(
         viewModelScope.launch {
             _itemsFournisseur.value =
                 fournisseurItemDao.listeParFournisseur(supplier.id).associateBy { it.productId }
+        }
+    }
+
+    /** Création rapide in-situ d'un fournisseur actif pour poursuivre le cycle d'achat sans interruption. */
+    fun creerFournisseurRapide(
+        nom: String,
+        telephone: String,
+        email: String? = null,
+        adresse: String? = null,
+        onSuccess: (FournisseurEntity) -> Unit = {},
+    ) {
+        viewModelScope.launch {
+            val now = System.currentTimeMillis()
+            val code = sequenceManager.next(DocType.FOURNISSEUR)
+            val nouveau = FournisseurEntity(
+                code = code,
+                nom = nom.trim(),
+                telephone = telephone.trim(),
+                email = email?.trim()?.ifBlank { null },
+                adresse = adresse?.trim()?.ifBlank { null },
+                statut = FournisseurStatus.ACTIF,
+                createdAt = now,
+                updatedAt = now,
+            )
+            val id = fournisseurDao.insert(nouveau)
+            val cree = nouveau.copy(id = id)
+            selectSupplier(cree)
+            _commandeState.value = _commandeState.value.copy(supplier = cree)
+            onSuccess(cree)
         }
     }
 

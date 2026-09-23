@@ -1644,4 +1644,19 @@
     <string name="retour_err_lignes">Please select at least one valid line to return</string>
     <string name="retour_err_lecture">Error loading sale</string>
     <string name="retour_err_brouillon">Cannot process a return on a draft sale</string>
+    <string name="ach_nouveau_fournisseur_rapide">New supplier</string>
+    <string name="ach_aucun_fournisseur">No supplier registered</string>
+    <string name="ach_creer_fournisseur_invite">Create a supplier directly to continue</string>
+    <string name="ach_email_optionnel">Email (optional)</string>
+    <string name="ach_adresse_optionnelle">Address / City (optional)</string>
+    <string name="sales_nouveau_client_rapide">New customer</string>
+    <string name="sales_aucun_client">No customer registered</string>
+    <string name="sales_creer_client_invite">Create a customer directly to continue</string>
+    <string name="sales_email_optionnel">Email (optional)</string>
+    <string name="sales_adresse_optionnelle">Address / City (optional)</string>
+    <string name="st_nouvelle_categorie_rapide">New category</string>
+    <string name="st_nom_categorie_requis">Category name *</string>
+    <string name="st_creer_categorie_invite">Create a category to classify this item</string>
+    <string name="tre_aucun_compte">No account available</string>
+    <string name="tre_creer_compte_invite">Create an account to record this transaction</string>
 </resources>

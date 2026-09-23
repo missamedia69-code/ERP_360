@@ -340,10 +340,11 @@ fun DropdownChamp(
     options: List<String>,
     onOption: (String) -> Unit,
     modifier: Modifier = Modifier,
+    onNouveau: (() -> Unit)? = null,
+    nouveauLibelle: String? = null,
 ) {
-    // Un sélecteur sans options ne s'affiche pas : cliquer sans rien voir arriver
-    // est l'incohérence même.
-    if (options.isEmpty()) return
+    // Un sélecteur sans options et sans action d'ajout ne s'affiche pas.
+    if (options.isEmpty() && onNouveau == null) return
     var ouvert by remember { mutableStateOf(false) }
     Box(modifier) {
         OutlinedTextField(
@@ -351,6 +352,9 @@ fun DropdownChamp(
             onValueChange = {},
             readOnly = true,
             label = { Text(label, fontSize = 11.sp, color = MissaMuted) },
+            placeholder = if (options.isEmpty() && onNouveau != null) {
+                { Text("+ ${nouveauLibelle ?: label}", fontSize = 12.sp, color = MissaMuted) }
+            } else null,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {
@@ -360,9 +364,31 @@ fun DropdownChamp(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .clickable { ouvert = true },
+                .clickable {
+                    if (options.isEmpty() && onNouveau != null) {
+                        onNouveau()
+                    } else {
+                        ouvert = true
+                    }
+                },
         )
         DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+            if (onNouveau != null) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "+ ${nouveauLibelle ?: label}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MissaInk,
+                        )
+                    },
+                    onClick = {
+                        ouvert = false
+                        onNouveau()
+                    },
+                )
+            }
             options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option, fontSize = 12.sp, color = MissaInk) },
@@ -385,6 +411,8 @@ fun DropdownChamp(
     onSelection: (Long?) -> Unit = {},
     placeholder: String = libelle,
     modifier: Modifier = Modifier,
+    onNouveau: (() -> Unit)? = null,
+    nouveauLibelle: String? = null,
 ) {
     DropdownChamp(
         label = libelle,
@@ -392,5 +420,7 @@ fun DropdownChamp(
         options = options.map { it.second },
         onOption = { texte -> onSelection(options.firstOrNull { it.second == texte }?.first) },
         modifier = modifier,
+        onNouveau = onNouveau,
+        nouveauLibelle = nouveauLibelle,
     )
 }

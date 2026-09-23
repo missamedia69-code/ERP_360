@@ -1640,4 +1640,19 @@
     <string name="retour_err_lignes">请至少选择一行有效商品进行退货</string>
     <string name="retour_err_lecture">读取销售单据错误</string>
     <string name="retour_err_brouillon">无法对草稿状态的销售单进行退货</string>
+    <string name="ach_nouveau_fournisseur_rapide">新建供应商</string>
+    <string name="ach_aucun_fournisseur">未登记供应商</string>
+    <string name="ach_creer_fournisseur_invite">直接创建供应商以继续</string>
+    <string name="ach_email_optionnel">电子邮箱（选填）</string>
+    <string name="ach_adresse_optionnelle">地址 / 城市（选填）</string>
+    <string name="sales_nouveau_client_rapide">新建客户</string>
+    <string name="sales_aucun_client">未登记客户</string>
+    <string name="sales_creer_client_invite">直接创建客户以继续</string>
+    <string name="sales_email_optionnel">电子邮箱（选填）</string>
+    <string name="sales_adresse_optionnelle">地址 / 城市（选填）</string>
+    <string name="st_nouvelle_categorie_rapide">新建分类</string>
+    <string name="st_nom_categorie_requis">分类名称 *</string>
+    <string name="st_creer_categorie_invite">创建分类以归类此商品</string>
+    <string name="tre_aucun_compte">暂无可用账户</string>
+    <string name="tre_creer_compte_invite">创建账户以记录此笔账目</string>
 </resources>

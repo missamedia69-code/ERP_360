@@ -128,6 +128,7 @@ internal fun TreMouvementDialogue(
     sensInitial: SensMouvement,
     enCours: Boolean,
     onFermer: () -> Unit,
+    onNouveauCompte: (() -> Unit)? = null,
     onValider: (
         Long,
         SensMouvement,
@@ -146,6 +147,12 @@ internal fun TreMouvementDialogue(
     var tiers by remember { mutableStateOf("") }
     var reference by remember { mutableStateOf("") }
     var categorie by remember { mutableStateOf(TresorerieRules.categoriesPour(sensInitial).first()) }
+
+    LaunchedEffect(comptes) {
+        if (compteId == 0L && comptes.isNotEmpty()) {
+            compteId = comptes.first().id
+        }
+    }
 
     val categories = TresorerieRules.categoriesPour(sens)
     // Changer de sens change la liste des postes : on retombe sur le premier
@@ -218,6 +225,31 @@ internal fun TreMouvementDialogue(
                     selectionCle = compteId.takeIf { it != 0L }?.toString(),
                     onSelection = { compteId = it.toLongOrNull() ?: 0L },
                 )
+                if (comptes.isEmpty() && onNouveauCompte != null) {
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = BrandBlue.copy(alpha = 0.12f),
+                        modifier = Modifier.fillMaxWidth().clickable { onNouveauCompte() },
+                    ) {
+                        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(R.string.tre_aucun_compte),
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MissaInk,
+                                )
+                                Text(
+                                    stringResource(R.string.tre_creer_compte_invite),
+                                    fontSize = 10.sp,
+                                    color = MissaInk.copy(alpha = 0.8f),
+                                )
+                            }
+                        }
+                    }
+                }
                 TreChamps(
                     valeur = montant,
                     onValeur = { montant = it },

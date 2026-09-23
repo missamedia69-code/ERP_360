@@ -100,6 +100,7 @@ fun ProductFormScreen(
     var reference by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf("") }
     var categorieId by remember { mutableStateOf(initialCategorieId) }
+    var dialogueNouvelleCategorie by remember { mutableStateOf(false) }
     var marque by remember { mutableStateOf("") }
     var unite by remember { mutableStateOf("") }
     var prixAchat by remember { mutableStateOf("") }
@@ -355,15 +356,34 @@ fun ProductFormScreen(
                             categories.firstOrNull { it.id == initialCategorieId }?.nom
                                 ?: stringResource(R.string.st_categorie),
                         )
-                    // Aucune catégorie utilisateur : pas de sélecteur vide qui s'ouvre sur rien.
-                    categories.isEmpty() -> Unit
                     else -> DropdownChamp(
                         libelle = stringResource(R.string.st_categorie),
                         options = categories.map { it.id to it.nom },
                         selection = categorieId,
                         onSelection = { categorieId = it },
                         placeholder = stringResource(R.string.st_categorie),
+                        onNouveau = { dialogueNouvelleCategorie = true },
+                        nouveauLibelle = stringResource(R.string.st_nouvelle_categorie_rapide),
                     )
+                }
+                if (productId == null && initialCategorieId == null && categories.isEmpty()) {
+                    Spacer(Modifier.height(6.dp))
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = MissaSurface,
+                        border = BorderStroke(1.dp, MissaBorder),
+                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouvelleCategorie = true },
+                    ) {
+                        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                stringResource(R.string.st_creer_categorie_invite),
+                                fontSize = 11.sp,
+                                color = MissaInk,
+                            )
+                        }
+                    }
                 }
                 Spacer(Modifier.height(14.dp))
                 Text(stringResource(R.string.st_regles), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
@@ -664,6 +684,67 @@ fun ProductFormScreen(
             Spacer(Modifier.height(20.dp))
         }
     }
+
+    if (dialogueNouvelleCategorie) {
+        DialogueCreationCategorieRapide(
+            onDismiss = { dialogueNouvelleCategorie = false },
+            onValider = { nomCat ->
+                vm.addCategoryAsync(nomCat) { newId ->
+                    if (newId != null) {
+                        categorieId = newId
+                    }
+                }
+                dialogueNouvelleCategorie = false
+            },
+        )
+    }
+}
+
+/** Boîte de dialogue de création rapide d'une catégorie d'article. */
+@Composable
+private fun DialogueCreationCategorieRapide(
+    onDismiss: () -> Unit,
+    onValider: (String) -> Unit,
+) {
+    var nom by remember { mutableStateOf("") }
+    val valide = nom.trim().isNotBlank()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                stringResource(R.string.st_nouvelle_categorie_rapide),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+            )
+        },
+        text = {
+            OutlinedTextField(
+                value = nom,
+                onValueChange = { nom = it.take(80) },
+                label = { Text(stringResource(R.string.st_nom_categorie_requis), fontSize = 11.sp) },
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = { onValider(nom.trim()) },
+                enabled = valide,
+                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue, contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.ops_cancel), color = MissaInk)
+            }
+        },
+    )
 }
 
 /** Interrupteur libellé + switch (règles vendable/achetable/stockable). */

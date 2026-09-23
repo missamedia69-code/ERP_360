@@ -1640,4 +1640,19 @@
     <string name="retour_err_lignes">يرجى تحديد بند صالح واحد على الأقل للإرجاع</string>
     <string name="retour_err_lecture">خطأ أثناء قراءة المبيعات</string>
     <string name="retour_err_brouillon">لا يمكن معالجة إرجاع على عملية بيع في حالة مسودة</string>
+    <string name="ach_nouveau_fournisseur_rapide">مورد جديد</string>
+    <string name="ach_aucun_fournisseur">لا يوجد مورد مسجل</string>
+    <string name="ach_creer_fournisseur_invite">إنشاء مورد مباشرة للمتابعة</string>
+    <string name="ach_email_optionnel">البريد الإلكتروني (اختياري)</string>
+    <string name="ach_adresse_optionnelle">العنوان / المدينة (اختياري)</string>
+    <string name="sales_nouveau_client_rapide">عميل جديد</string>
+    <string name="sales_aucun_client">لا يوجد عميل مسجل</string>
+    <string name="sales_creer_client_invite">إنشاء عميل مباشرة للمتابعة</string>
+    <string name="sales_email_optionnel">البريد الإلكتروني (اختياري)</string>
+    <string name="sales_adresse_optionnelle">العنوان / المدينة (اختياري)</string>
+    <string name="st_nouvelle_categorie_rapide">فئة جديدة</string>
+    <string name="st_nom_categorie_requis">اسم الفئة *</string>
+    <string name="st_creer_categorie_invite">إنشاء فئة لتصنيف هذا العنصر</string>
+    <string name="tre_aucun_compte">لا يوجد حساب متاح</string>
+    <string name="tre_creer_compte_invite">إنشاء حساب لتسجيل العملية</string>
 </resources>

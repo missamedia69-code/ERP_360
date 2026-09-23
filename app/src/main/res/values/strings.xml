@@ -1687,4 +1687,19 @@
     <string name="retour_err_lignes">Veuillez sélectionner au moins une ligne valide à retourner</string>
     <string name="retour_err_lecture">Erreur de lecture de la vente</string>
     <string name="retour_err_brouillon">Impossible d\'effectuer un retour sur une vente en brouillon</string>
+    <string name="ach_nouveau_fournisseur_rapide">Nouveau fournisseur</string>
+    <string name="ach_aucun_fournisseur">Aucun fournisseur enregistré</string>
+    <string name="ach_creer_fournisseur_invite">Créer directement un fournisseur pour continuer</string>
+    <string name="ach_email_optionnel">E-mail (optionnel)</string>
+    <string name="ach_adresse_optionnelle">Adresse / Ville (optionnel)</string>
+    <string name="sales_nouveau_client_rapide">Nouveau client</string>
+    <string name="sales_aucun_client">Aucun client enregistré</string>
+    <string name="sales_creer_client_invite">Créer directement un client pour continuer</string>
+    <string name="sales_email_optionnel">E-mail (optionnel)</string>
+    <string name="sales_adresse_optionnelle">Adresse / Ville (optionnel)</string>
+    <string name="st_nouvelle_categorie_rapide">Nouvelle catégorie</string>
+    <string name="st_nom_categorie_requis">Nom de la catégorie *</string>
+    <string name="st_creer_categorie_invite">Créer une catégorie pour classer cet article</string>
+    <string name="tre_aucun_compte">Aucun compte disponible</string>
+    <string name="tre_creer_compte_invite">Créer un compte pour enregistrer l\'opération</string>
 </resources>
