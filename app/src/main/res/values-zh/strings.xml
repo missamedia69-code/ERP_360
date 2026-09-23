@@ -1635,4 +1635,5 @@
     <string name="ref_tuile_devises">币种</string>
     <string name="ref_tuile_taxes">税率</string>
     <string name="ref_titre_registre">生效中基础主数据台账</string>
+    <string name="ach_fermer">关闭</string>
 </resources>

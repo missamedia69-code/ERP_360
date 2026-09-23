@@ -1682,5 +1682,6 @@
     <string name="ref_tuile_devises">Devises</string>
     <string name="ref_tuile_taxes">Taxes / TVA</string>
     <string name="ref_titre_registre">Données référentielles actives</string>
+    <string name="ach_fermer">Fermer</string>
 </resources>
 <!-- Temp insert will be replaced -->

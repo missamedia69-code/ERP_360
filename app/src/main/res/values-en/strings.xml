@@ -1639,4 +1639,5 @@
     <string name="ref_tuile_devises">Currencies</string>
     <string name="ref_tuile_taxes">Taxes / VAT</string>
     <string name="ref_titre_registre">Active reference master data</string>
+    <string name="ach_fermer">Close</string>
 </resources>
