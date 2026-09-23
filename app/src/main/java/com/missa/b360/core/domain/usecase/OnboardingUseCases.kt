@@ -15,6 +15,8 @@ import com.missa.b360.core.data.entity.RoleEntity
 import com.missa.b360.core.data.entity.RolePermissionEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.data.entity.TaxEntity
+import com.missa.b360.core.data.entity.CompteTresorerieEntity
+import com.missa.b360.core.data.entity.TypeCompteTresorerie
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.security.PinManager
@@ -97,6 +99,19 @@ class SetupEnterpriseUseCase @Inject constructor(
             ensureEnterprisePrerequisites(entreprise.devise, entreprise.pays)
             // Couvre aussi une interruption après Room mais avant l'écriture DataStore.
             settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
+            if (database.compteTresorerieDao().getAll().isEmpty()) {
+                val siteNom = siteDao.idPrincipal()?.let { siteDao.getById(it)?.nom } ?: "Principal"
+                database.compteTresorerieDao().insert(
+                    CompteTresorerieEntity(
+                        nom = "Caisse Principale",
+                        type = TypeCompteTresorerie.CAISSE.name,
+                        etablissement = siteNom,
+                        soldeInitial = 0.0,
+                        actif = true,
+                        createdAt = System.currentTimeMillis(),
+                    ),
+                )
+            }
             return true
         }
 
@@ -136,6 +151,18 @@ class SetupEnterpriseUseCase @Inject constructor(
                     PaymentMethodEntity(nom = "Carte bancaire"),
                 ),
             )
+            if (database.compteTresorerieDao().getAll().isEmpty()) {
+                database.compteTresorerieDao().insert(
+                    CompteTresorerieEntity(
+                        nom = "Caisse Principale",
+                        type = TypeCompteTresorerie.CAISSE.name,
+                        etablissement = params.nomSitePrincipal.trim(),
+                        soldeInitial = 0.0,
+                        actif = true,
+                        createdAt = System.currentTimeMillis(),
+                    ),
+                )
+            }
             seedSystemRoles()
         }
 
