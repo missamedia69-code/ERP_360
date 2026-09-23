@@ -27,3 +27,5 @@ local.properties
 
 # Logs
 *.log
+/build.log
+/tests.log

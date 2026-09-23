@@ -12,7 +12,12 @@ import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EquipementDao
 import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.EnterpriseDao
+import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
+import com.missa.b360.core.data.dao.FournisseurContactDao
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.dao.FournisseurDocumentDao
+import com.missa.b360.core.data.dao.FournisseurEvenementDao
+import com.missa.b360.core.data.dao.FournisseurItemDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -22,7 +27,9 @@ import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.PaymentMethodDao
 import com.missa.b360.core.data.dao.ProductDao
+import com.missa.b360.core.data.dao.ProductExtrasDao
 import com.missa.b360.core.data.dao.ProductStockDao
+import com.missa.b360.core.data.dao.ProductEquipementDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.RoleDao
@@ -39,6 +46,11 @@ import com.missa.b360.core.data.entity.ClientAddressEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
+import com.missa.b360.core.data.entity.KitComposantEntity
+import com.missa.b360.core.data.entity.ProductConsignationEntity
+import com.missa.b360.core.data.entity.ProductDechetEntity
+import com.missa.b360.core.data.entity.ProductEmballageEntity
+import com.missa.b360.core.data.entity.ProductKitEntity
 import com.missa.b360.core.data.entity.EmployeeEntity
 import com.missa.b360.core.data.entity.EquipementEntity
 import com.missa.b360.core.data.entity.GroupeAchatEntity
@@ -49,7 +61,12 @@ import com.missa.b360.core.data.entity.GroupeProductionEntity
 import com.missa.b360.core.data.entity.GroupeStockEntity
 import com.missa.b360.core.data.entity.GroupeVenteEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
+import com.missa.b360.core.data.entity.FournisseurCompteBancaireEntity
+import com.missa.b360.core.data.entity.FournisseurContactEntity
+import com.missa.b360.core.data.entity.FournisseurDocumentEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
+import com.missa.b360.core.data.entity.FournisseurEvenementEntity
+import com.missa.b360.core.data.entity.FournisseurItemEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
@@ -61,6 +78,10 @@ import com.missa.b360.core.data.entity.PaymentMethodEntity
 import com.missa.b360.core.data.entity.ProductCategoryEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
+import com.missa.b360.core.data.entity.InventaireEntity
+import com.missa.b360.core.data.entity.InventaireLigneEntity
+import com.missa.b360.core.data.dao.InventaireDao
+import com.missa.b360.core.data.entity.ProductEquipementEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.RoleEntity
@@ -115,11 +136,24 @@ import com.missa.b360.core.data.entity.UserEntity
         ProductEntity::class,
         ProductStockEntity::class,
         StockMovementEntity::class,
+        ProductEquipementEntity::class,
+        ProductDechetEntity::class,
+        ProductEmballageEntity::class,
+        ProductConsignationEntity::class,
+        ProductKitEntity::class,
+        KitComposantEntity::class,
+        InventaireEntity::class,
+        InventaireLigneEntity::class,
         EmployeeEntity::class,
         AbsenceEntity::class,
         TaskEntity::class,
+        FournisseurContactEntity::class,
+        FournisseurCompteBancaireEntity::class,
+        FournisseurDocumentEntity::class,
+        FournisseurItemEntity::class,
+        FournisseurEvenementEntity::class,
     ],
-    version = 12,
+    version = 17,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -137,10 +171,18 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun clientDao(): ClientDao
     abstract fun fournisseurDao(): FournisseurDao
+    abstract fun fournisseurContactDao(): FournisseurContactDao
+    abstract fun fournisseurCompteBancaireDao(): FournisseurCompteBancaireDao
+    abstract fun fournisseurDocumentDao(): FournisseurDocumentDao
+    abstract fun fournisseurItemDao(): FournisseurItemDao
+    abstract fun fournisseurEvenementDao(): FournisseurEvenementDao
     abstract fun operationRecordDao(): OperationRecordDao
     abstract fun productDao(): ProductDao
+    abstract fun productExtrasDao(): ProductExtrasDao
     abstract fun productStockDao(): ProductStockDao
     abstract fun stockMovementDao(): StockMovementDao
+    abstract fun productEquipementDao(): ProductEquipementDao
+    abstract fun inventaireDao(): InventaireDao
     abstract fun employeeDao(): EmployeeDao
     abstract fun absenceDao(): AbsenceDao
     abstract fun taskDao(): TaskDao
@@ -365,6 +407,204 @@ abstract class AppDatabase : RoomDatabase() {
          * vigueur. Les articles reçoivent un rattachement facultatif, ce qui
          * laisse fonctionner les fiches déjà saisies.
          */
+        /**
+         * v14 → v15 : drapeaux article (vendable/achetable/stockable, spec §14)
+         * et extensions par famille (déchets, emballages, consignations, kits).
+         */
+        val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Référentiel fournisseur étendu (spec module Fournisseurs) :
+                // identité, fiscalité, paiement, achats, évaluation.
+                val colonnes = listOf(
+                    "type TEXT NOT NULL DEFAULT 'ENTREPRISE'",
+                    "nomCommercial TEXT",
+                    "pays TEXT NOT NULL DEFAULT 'CM'",
+                    "devise TEXT NOT NULL DEFAULT 'XAF'",
+                    "langue TEXT",
+                    "siteWeb TEXT",
+                    "description TEXT",
+                    "motifBlocage TEXT",
+                    "soumisLe INTEGER",
+                    "approuveLe INTEGER",
+                    "typeIdentifiantFiscal TEXT",
+                    "identifiantFiscal TEXT",
+                    "rccm TEXT",
+                    "numTva TEXT",
+                    "assujettiTva INTEGER NOT NULL DEFAULT 1",
+                    "tauxRetenue REAL NOT NULL DEFAULT 0",
+                    "exonere INTEGER NOT NULL DEFAULT 0",
+                    "dateValidationFiscale INTEGER",
+                    "conditionsPaiement TEXT",
+                    "joursEcheance INTEGER NOT NULL DEFAULT 0",
+                    "modePaiementPrefere TEXT",
+                    "paiementBloque INTEGER NOT NULL DEFAULT 0",
+                    "plafondPaiement REAL NOT NULL DEFAULT 0",
+                    "approuve INTEGER NOT NULL DEFAULT 0",
+                    "delaiMoyenJours INTEGER NOT NULL DEFAULT 0",
+                    "quantiteMinCommande REAL NOT NULL DEFAULT 0",
+                    "montantMinCommande REAL NOT NULL DEFAULT 0",
+                    "categoriesFournies TEXT",
+                    "incoterm TEXT",
+                    "depotLivraisonId INTEGER",
+                    "noteEvaluation REAL",
+                    "commentaireEvaluation TEXT",
+                    "dateEvaluation INTEGER",
+                    "updatedAt INTEGER NOT NULL DEFAULT 0",
+                )
+                colonnes.forEach { db.execSQL("ALTER TABLE fournisseurs ADD COLUMN $it") }
+                // L'ancien statut « désactivé » devient un archivage (cycle de vie complet).
+                db.execSQL("UPDATE fournisseurs SET statut = 'ARCHIVE' WHERE statut = 'DESACTIVE'")
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `fournisseur_contacts` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`fournisseurId` INTEGER NOT NULL, `nom` TEXT NOT NULL, `prenom` TEXT, " +
+                        "`fonction` TEXT, `service` TEXT, `telephone` TEXT, `whatsapp` TEXT, " +
+                        "`email` TEXT, `principal` INTEGER NOT NULL, `roleAchats` INTEGER NOT NULL, " +
+                        "`roleCompta` INTEGER NOT NULL, `roleLivraison` INTEGER NOT NULL, " +
+                        "`roleUrgence` INTEGER NOT NULL, `actif` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_fournisseur_contacts_fournisseurId` " +
+                        "ON `fournisseur_contacts` (`fournisseurId`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `fournisseur_comptes_bancaires` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`fournisseurId` INTEGER NOT NULL, `titulaire` TEXT NOT NULL, `banque` TEXT, " +
+                        "`paysBanque` TEXT, `numeroCompte` TEXT, `iban` TEXT, `bicSwift` TEXT, " +
+                        "`operateurMobile` TEXT, `numeroMobile` TEXT, `principal` INTEGER NOT NULL, " +
+                        "`verification` TEXT NOT NULL, `verifieLe` INTEGER, `notes` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_fournisseur_comptes_bancaires_fournisseurId` " +
+                        "ON `fournisseur_comptes_bancaires` (`fournisseurId`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `fournisseur_documents` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`fournisseurId` INTEGER NOT NULL, `typeDocument` TEXT NOT NULL, " +
+                        "`reference` TEXT, `cheminFichier` TEXT, `dateEmission` INTEGER, " +
+                        "`dateExpiration` INTEGER, `verification` TEXT NOT NULL, `notes` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_fournisseur_documents_fournisseurId` " +
+                        "ON `fournisseur_documents` (`fournisseurId`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `fournisseur_items` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`fournisseurId` INTEGER NOT NULL, `productId` INTEGER NOT NULL, " +
+                        "`reference` TEXT, `prixUnitaire` REAL NOT NULL, `delaiJours` INTEGER NOT NULL, " +
+                        "`quantiteMin` REAL NOT NULL, `prefere` INTEGER NOT NULL, " +
+                        "`debutValidite` INTEGER, `finValidite` INTEGER, `actif` INTEGER NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS `index_fournisseur_items_fournisseurId_productId` " +
+                        "ON `fournisseur_items` (`fournisseurId`, `productId`)",
+                )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `fournisseur_evenements` (" +
+                        "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`fournisseurId` INTEGER NOT NULL, `date` INTEGER NOT NULL, " +
+                        "`type` TEXT NOT NULL, `details` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_fournisseur_evenements_fournisseurId` " +
+                        "ON `fournisseur_evenements` (`fournisseurId`)",
+                )
+            }
+        }
+
+        val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE product_stock ADD COLUMN valeur REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN lot TEXT")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN numeroSerie TEXT")
+                db.execSQL("ALTER TABLE stock_movements ADD COLUMN datePeremption INTEGER")
+            }
+        }
+
+        val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE products ADD COLUMN vendable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE products ADD COLUMN achetable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE products ADD COLUMN stockable INTEGER NOT NULL DEFAULT 1")
+                db.execSQL(
+                    "UPDATE products SET vendable = 0 WHERE type IN " +
+                        "('MATIERE_PREMIERE','CONNOMMABLE','PIECE_MAINTENANCE','EQUIPEMENT','MATERIEL','AUTRE_BIEN')",
+                )
+                db.execSQL("UPDATE products SET achetable = 0 WHERE type IN ('FABRIQUE','COMPOSE')")
+                db.execSQL("UPDATE products SET stockable = 0 WHERE type IN ('EQUIPEMENT','MATERIEL')")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_dechets` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `typeDechet` TEXT, " +
+                        "`codeReglementaire` TEXT, `dangereux` INTEGER NOT NULL, " +
+                        "`valorisable` INTEGER NOT NULL, `origine` TEXT, `modeElimination` TEXT, " +
+                        "`prestataire` TEXT, `coutElimination` REAL, `filiereRecyclage` TEXT, " +
+                        "`zoneStockage` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_emballages` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `typeEmballage` TEXT, " +
+                        "`matiere` TEXT, `dimensions` TEXT, `poidsKg` REAL, `capacite` REAL, " +
+                        "`reutilisable` INTEGER NOT NULL, `consigne` INTEGER NOT NULL, " +
+                        "`reutilisationsMax` INTEGER)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_consignations` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `proprietaire` TEXT, " +
+                        "`referenceContrat` TEXT, `dateDebut` INTEGER, `dateFin` INTEGER, " +
+                        "`conditionsRetour` TEXT)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_kits` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, `methode` TEXT NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `kit_composants` (" +
+                        "`kitId` INTEGER NOT NULL, `composantId` INTEGER NOT NULL, " +
+                        "`quantite` REAL NOT NULL, PRIMARY KEY(`kitId`, `composantId`))",
+                )
+            }
+        }
+
+        /** v13 → v14 : inventaires physiques (sessions + lignes). */
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `inventaires` (" +
+                        "`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        "`siteId` INTEGER NOT NULL, `debut` INTEGER NOT NULL, " +
+                        "`fin` INTEGER, `statut` TEXT NOT NULL)",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `inventaire_lignes` (" +
+                        "`inventaireId` INTEGER NOT NULL, `produitId` INTEGER NOT NULL, " +
+                        "`attendu` REAL NOT NULL, `compte` REAL, " +
+                        "PRIMARY KEY(`inventaireId`, `produitId`))",
+                )
+            }
+        }
+
+        /** v12 → v13 : extension immobilisation des produits (équipements). */
+        val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `product_equipements` (" +
+                        "`produitId` INTEGER NOT NULL PRIMARY KEY, " +
+                        "`modele` TEXT, `numeroSerie` TEXT, `dateAcquisition` INTEGER, " +
+                        "`prixAquisition` REAL, `fournisseurNom` TEXT, `responsable` TEXT, " +
+                        "`garantieDebut` INTEGER, `garantieFin` INTEGER, " +
+                        "`statut` TEXT NOT NULL)",
+                )
+            }
+        }
+
         val MIGRATION_11_12 = object : Migration(11, 12) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(

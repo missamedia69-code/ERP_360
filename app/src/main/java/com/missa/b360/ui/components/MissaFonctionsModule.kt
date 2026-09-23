@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,21 +14,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.ui.navigation.DestinationsFonctions
 import com.missa.b360.ui.navigation.FonctionModule
@@ -53,9 +53,18 @@ import com.missa.b360.ui.theme.ProfileGreen
 fun LazyListScope.sectionFonctionsModule(
     module: ModuleCode,
     onNaviguer: (String) -> Unit,
+    activation: ActivationProfil? = null,
 ) {
-    val disponibles = DestinationsFonctions.disponibles(module)
-    val aVenir = DestinationsFonctions.aVenir(module)
+    val disponibles = if (activation != null) {
+        DestinationsFonctions.disponibles(module, activation)
+    } else {
+        DestinationsFonctions.disponibles(module)
+    }
+    val aVenir = if (activation != null) {
+        DestinationsFonctions.aVenir(module, activation)
+    } else {
+        DestinationsFonctions.aVenir(module)
+    }
 
     if (disponibles.isNotEmpty()) {
         item { TitreSectionModule(stringResource(R.string.mod_fonctions_disponibles)) }
@@ -100,7 +109,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Outlined.CheckCircle,
+                painter = painterResource(Iv.CheckCircle),
                 contentDescription = null,
                 tint = ProfileGreen,
                 modifier = Modifier.size(16.dp),
@@ -115,7 +124,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
             Icon(
-                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                painter = painterResource(Iv.ArrowForwardIos),
                 contentDescription = null,
                 tint = MissaMuted,
                 modifier = Modifier.size(12.dp),

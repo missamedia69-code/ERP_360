@@ -2,9 +2,9 @@ package com.missa.b360.ui.operations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
-import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveTableauDeBordUseCase
 import com.missa.b360.core.domain.usecase.TableauDeBord
@@ -18,12 +18,12 @@ import com.missa.b360.core.util.Iso4217
 
 /**
  * Tableau de bord : croise les données de tous les modules et ne présente que
- * les indicateurs des modules réellement activés (clé `modules_actifs`).
+ * les indicateurs des modules réellement activés (activation effective du profil).
  */
 @HiltViewModel
 class ReportingViewModel @Inject constructor(
     observeTableauDeBord: ObserveTableauDeBordUseCase,
-    settingsStore: SettingsStore,
+    activationRepository: ProfilActivationRepository,
     getEnterprise: GetEnterpriseUseCase,
 ) : ViewModel() {
 
@@ -31,21 +31,23 @@ class ReportingViewModel @Inject constructor(
         .map { it?.devise ?: Iso4217.DEVISE_REPLI }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
+    val activation: StateFlow<ActivationProfil> =
+        activationRepository.observeActivation()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ActivationProfil.VIDE)
+
     /**
      * Modules actifs de l'installation. Une installation antérieure à la
      * sélection des modules n'a pas encore la clé : on considère alors que tout
      * est actif plutôt que d'afficher un écran vide.
      */
     val modulesActifs: StateFlow<List<ModuleCode>> =
-        settingsStore.observe(SettingsStore.Keys.MODULES_ACTIFS)
-            .map { valeur ->
-                ModulesPersonnalises.deserialiser(valeur).ifEmpty { ModuleCode.entries.toList() }
-            }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                ModuleCode.entries.toList(),
-            )
+        activation.map { act ->
+            if (act.modulesActifs.isEmpty()) ModuleCode.entries.toList() else act.modulesActifs.toList()
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            ModuleCode.entries.toList(),
+        )
 
     val tableau: StateFlow<TableauDeBord> = observeTableauDeBord()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TableauDeBord())

@@ -1,30 +1,38 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.dao.GroupeArticleDao
+import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.db.AppDatabase
+import com.missa.b360.core.data.entity.CategorieTresorerie
+import com.missa.b360.core.data.entity.MouvementTresorerieEntity
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
-import com.missa.b360.core.data.entity.ProductStockEntity
+import com.missa.b360.core.data.entity.SensMouvement
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.InventoryRules
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.domain.model.PurchaseStockEffects
+import com.missa.b360.core.domain.model.ReglesGroupesArticles
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
 import com.missa.b360.core.domain.model.ReturnRules
+import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
+import com.missa.b360.core.notifications.AppNotifier
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import javax.inject.Inject
@@ -49,6 +57,10 @@ class SavePurchaseUseCase @Inject constructor(
     private val stockDao: ProductStockDao,
     private val movementDao: StockMovementDao,
     private val siteDao: SiteDao,
+    private val groupeDao: GroupeArticleDao,
+    private val comptesTresorerieDao: CompteTresorerieDao,
+    private val mouvementsTresorerieDao: MouvementTresorerieDao,
+    private val appNotifier: AppNotifier,
     private val database: AppDatabase,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
@@ -119,17 +131,36 @@ class SavePurchaseUseCase @Inject constructor(
         }
 
         return database.withTransaction {
+            val groupes = groupeDao.listerComplets()
             // Résolution du site de réception : site principal produit, sinon le site
             // qui détient déjà ce produit, sinon le site principal de l'entreprise.
+            // Un article **non stockable** (prestation…) ne génère aucun mouvement :
+            // la facture porte seule la charge (imputation directe).
             val receptions = mutableListOf<Triple<Long, Long, Double>>() // produit, site, quantité
-            for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(payload.lines)) {
-                val produit = productDao.getById(produitId)
-                if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
-                val siteId = produit.siteId
-                    ?: stockDao.siteAvecPlusDeStock(produitId)
-                    ?: siteDao.idPrincipal()
-                    ?: return@withTransaction Result.FournisseurIntrouvable
-                receptions += Triple(produitId, siteId, quantite)
+            var imputationsDirectes = 0
+            if (payload.receptionRecordId != null) {
+                // Facture rattachée à un bon de réception : le stock a déjà été
+                // réceptionné et valorisé — aucun nouvel effet stock.
+                val reception = operationDao.getById(payload.receptionRecordId)
+                if (reception == null || reception.module != OperationModule.ACHATS.name ||
+                    reception.status != OperationStatus.VALIDATED.name
+                ) {
+                    return@withTransaction Result.DonneesInvalides
+                }
+            } else {
+                for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(payload.lines)) {
+                    val produit = productDao.getById(produitId)
+                    if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
+                    if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
+                        imputationsDirectes++
+                        continue
+                    }
+                    val siteId = produit.siteId
+                        ?: stockDao.siteAvecPlusDeStock(produitId)
+                        ?: siteDao.idPrincipal()
+                        ?: return@withTransaction Result.FournisseurIntrouvable
+                    receptions += Triple(produitId, siteId, quantite)
+                }
             }
 
             val (recordIdFinal, reference) = when (val id = recordId) {
@@ -170,11 +201,39 @@ class SavePurchaseUseCase @Inject constructor(
                 }
             }
 
+            // Sites résolus par produit — les lignes tracées (lot/série/péremption)
+            // réutilisent la même résolution.
+            val siteParProduit = receptions.associate { (produitId, siteId, _) -> produitId to siteId }
+
+            // 1. Quantités : une seule ligne de stock par produit × site.
             for ((produitId, siteId, quantite) in receptions) {
                 val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-                val apres = avant + quantite
                 stockDao.ensureRow(produitId, siteId)
-                stockDao.remplacer(ProductStockEntity(produitId, siteId, apres))
+                stockDao.remplacer(produitId, siteId, avant + quantite)
+            }
+
+            // 2. Mouvements : un par ligne tracée (traçabilité lot/série/péremption),
+            //    puis un agrégé par produit pour les lignes sans traçabilité.
+            for (line in PurchaseStockEffects.lignesTracees(payload.lines)) {
+                val siteId = line.productId?.let { siteParProduit[it] } ?: continue
+                movementDao.insert(
+                    StockMovementEntity(
+                        produitId = line.productId,
+                        siteId = siteId,
+                        type = StockMovementType.ENTREE,
+                        quantite = line.quantity,
+                        motif = "ACHAT",
+                        reference = reference,
+                        commentaire = line.name,
+                        lot = line.lot?.trim()?.ifBlank { null },
+                        numeroSerie = line.numeroSerie?.trim()?.ifBlank { null },
+                        datePeremption = line.datePeremption,
+                        horodatage = now,
+                    ),
+                )
+            }
+            for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduitSansTracees(payload.lines)) {
+                val siteId = siteParProduit[produitId] ?: continue
                 movementDao.insert(
                     StockMovementEntity(
                         produitId = produitId,
@@ -188,11 +247,69 @@ class SavePurchaseUseCase @Inject constructor(
                 )
             }
 
+            // 3. Valorisation CUMP : le coût d'achat entre dans la valeur du stock
+            //    pour les familles valorisées uniquement (le CUMP = valeur ÷ quantité).
+            val couts = PurchaseStockEffects.coutParProduit(payload.lines)
+            for ((produitId, siteId, _) in receptions) {
+                val produit = productDao.getById(produitId) ?: continue
+                if (!ReglesGroupesArticles.estValorise(produit, groupes)) continue
+                val cout = couts[produitId] ?: continue
+                if (cout > 0.0) stockDao.ajouterValeur(produitId, siteId, cout)
+            }
+
+            // 4. Le montant réglé sort de trésorerie — même garde-fou que la vente :
+            //    la référence de la facture empêche de décaisser deux fois.
+            val referenceDecaissement = TresorerieRules.referenceEncaissement(reference)
+            val compteDecaissement = TresorerieRules.compteCible(
+                payload.paymentMethod,
+                comptesTresorerieDao.getAll(),
+            )
+            val montantDecaisse = TresorerieRules.encaissementAEnregistrer(
+                montantPaye = payload.paidAmount,
+                dejaEnregistre = mouvementsTresorerieDao.compterParReference(referenceDecaissement) > 0,
+                compteDisponible = compteDecaissement != null,
+            )
+            if (montantDecaisse != null && compteDecaissement != null) {
+                mouvementsTresorerieDao.insert(
+                    MouvementTresorerieEntity(
+                        compteId = compteDecaissement.id,
+                        date = now,
+                        sens = SensMouvement.OUT.name,
+                        montant = montantDecaisse,
+                        categorie = CategorieTresorerie.ACHAT.name,
+                        libelle = payload.supplierName,
+                        tiers = payload.supplierName,
+                        modePaiement = payload.paymentMethod,
+                        reference = referenceDecaissement,
+                        createdAt = now,
+                    ),
+                )
+            }
+
+            // 5. Événement qualité : une réception physique est à contrôler.
+            if (receptions.isNotEmpty()) {
+                appNotifier.notifier(
+                    type = "QUA",
+                    titre = "Réception à contrôler",
+                    message = "$reference — ${payload.supplierName} : " +
+                        "${receptions.size} article(s) reçu(s)",
+                    date = now,
+                )
+            }
+
             val passif = (payload.total - payload.paidAmount).coerceAtLeast(0.0)
+            appNotifier.notifier(
+                type = "ACHATS",
+                titre = "Facture enregistrée",
+                message = "$reference — ${payload.supplierName} : ${payload.total}",
+                date = now,
+            )
             journalManager.log(
                 "ACHATS",
                 "ACHAT_VALIDATE",
-                "Achat $reference — ${payload.supplierName} (${payload.total} réglé ${payload.paidAmount}, passif $passif)",
+                "Achat $reference — ${payload.supplierName} (${payload.total} réglé " +
+                    "${payload.paidAmount}, passif $passif, réceptions ${receptions.size}, " +
+                    "imputations directes $imputationsDirectes)",
             )
             Result.Succes(recordIdFinal, reference)
         }
@@ -315,8 +432,9 @@ class ReturnSaleUseCase @Inject constructor(
             if (retourStock) {
                 for ((produitId, quantite) in returnedLines
                     .filter { it.productId != null && it.quantity > 0.0 }
-                    .groupBy { it.productId!! }
-                    .mapValues { (_, group) -> group.sumOf { it.quantity } }
+                    .groupBy { it.productId }
+                    .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
+                    .toMap()
                 ) {
                     val produit = productDao.getById(produitId) ?: continue
                     val siteId = produit.siteId
@@ -325,7 +443,7 @@ class ReturnSaleUseCase @Inject constructor(
                         ?: continue
                     val avant = stockDao.quantite(produitId, siteId) ?: 0.0
                     stockDao.ensureRow(produitId, siteId)
-                    stockDao.remplacer(ProductStockEntity(produitId, siteId, avant + quantite))
+                    stockDao.remplacer(produitId, siteId, avant + quantite)
                     movementDao.insert(
                         StockMovementEntity(
                             produitId = produitId,
@@ -401,7 +519,7 @@ class SaveInventoryUseCase @Inject constructor(
                 }
                 val apres = theorique + ecart
                 stockDao.ensureRow(lecture.produitId, siteId)
-                stockDao.remplacer(ProductStockEntity(lecture.produitId, siteId, apres))
+                stockDao.remplacer(lecture.produitId, siteId, apres)
                 movementDao.insert(
                     StockMovementEntity(
                         produitId = lecture.produitId,

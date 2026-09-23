@@ -15,6 +15,29 @@ object Routes {
     const val STOCK_MOVEMENT_FORM = "stock_movement_form"
     const val STOCK_TRANSFER_FORM = "stock_transfer_form"
     const val STOCK_INVENTORY = "stock_inventory"
+    const val STOCK_CATEGORIES = "stock_categories"
+    const val STOCK_LISTE = "stock_liste"
+    const val STOCK_DETAIL = "stock_detail/{id}"
+    const val STOCK_MOUVEMENTS = "stock_mouvements"
+    const val STOCK_ALERTES = "stock_alertes"
+    const val STOCK_EQUIPEMENTS = "stock_equipements"
+
+    fun stockListe(type: String?, categorieId: Long? = null): String = STOCK_LISTE +
+        (type?.let { "?type=$it" } ?: "") +
+        (categorieId?.let { (if (type != null) "&" else "?") + "cat=$it" } ?: "")
+
+    /** Formulaire article avec pré-remplissage optionnel (catégorie, type). */
+    fun stockProductForm(categorieId: Long? = null, type: String? = null): String =
+        STOCK_PRODUCT_FORM + buildString {
+            val params = mutableListOf<String>()
+            categorieId?.let { params.add("cat=$it") }
+            type?.let { params.add("type=$it") }
+            if (params.isNotEmpty()) {
+                append("?")
+                append(params.joinToString("&"))
+            }
+        }
+    fun stockDetail(id: Long): String = "stock_detail/$id"
     const val OPERATION_FORM = "operation_form"
 
     // Module Vente — retour de vente et avoir (spec §22)

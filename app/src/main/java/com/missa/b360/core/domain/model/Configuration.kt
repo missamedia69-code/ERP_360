@@ -200,6 +200,51 @@ enum class PalierTaille(val labelRes: Int) {
     P4(R.string.palier_p4), // 50–249
     P5(R.string.palier_p5), // 250–999
     P6(R.string.palier_p6), // 1000+
+    ;
+
+    /** Tranche d'effectif affichée en badge */
+    val tranche: String get() = when (this) {
+        P1 -> "1"
+        P2 -> "2–9"
+        P3 -> "10–49"
+        P4 -> "50–249"
+        P5 -> "250–999"
+        P6 -> "1000+"
+    }
+
+    /** Icône représentative */
+    val emoji: String get() = when (this) {
+        P1 -> "👤"
+        P2 -> "👥"
+        P3 -> "🏢"
+        P4 -> "🏭"
+        P5 -> "🏢🏢"
+        P6 -> "🌐"
+    }
+
+    /** Description courte de l'impact sur les modules */
+    val impactRes: Int get() = when (this) {
+        P1 -> R.string.palier_p1_desc
+        P2 -> R.string.palier_p2_desc
+        P3 -> R.string.palier_p3_desc
+        P4 -> R.string.palier_p4_desc
+        P5 -> R.string.palier_p5_desc
+        P6 -> R.string.palier_p6_desc
+    }
+
+    /** Modules support débloqués à ce palier */
+    val modulesDebloques: String get() = when (this) {
+        P1 -> "Base"
+        P2 -> "Base"
+        P3 -> "RH, CRM"
+        P4 -> "RH, CRM"
+        P5 -> "RH, CRM"
+        P6 -> "RH, CRM"
+    }
+
+    companion object {
+        fun fromName(name: String?): PalierTaille? = name?.let { runCatching { valueOf(it) }.getOrNull() }
+    }
 }
 
 /**
@@ -225,6 +270,16 @@ object ModulesPersonnalises {
         ModuleCode.MAI -> R.string.module_maintenance
         ModuleCode.LOG -> R.string.module_logistique
         ModuleCode.REP -> R.string.module_reporting
+    }
+
+    fun libelleRes(profil: ProfilActivite): Int = when (profil) {
+        ProfilActivite.AV -> R.string.profil_av
+        ProfilActivite.ASV -> R.string.profil_asv
+        ProfilActivite.APSV -> R.string.profil_apsv
+        ProfilActivite.SER -> R.string.profil_ser
+        ProfilActivite.PRJ -> R.string.profil_prj
+        ProfilActivite.FULL -> R.string.profil_full
+        ProfilActivite.CUSTOM -> R.string.profil_custom
     }
 
     fun serialiser(modules: Collection<ModuleCode>): String =

@@ -1,8 +1,9 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,19 +17,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material.icons.outlined.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,7 +68,8 @@ import com.missa.b360.ui.theme.Red40
  * d'être configuré, l'**annonce de l'essai de 7 jours** — qui a réellement
  * démarré en base à la création de l'entreprise (RA-04), d'où l'échéance lue
  * et non recalculée — et le moyen de **commander son code d'activation**.
- * Le contenu défile ; le bouton d'accès reste posé en bas.
+ * Tout tient sur un écran, sans défilement : les blocs sont compactés et le
+ * bouton d'accès reste posé en bas.
  */
 @Composable
 internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
@@ -91,56 +83,52 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
             .navigationBarsPadding(),
     ) {
         ConfettiDots()
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(Modifier.height(8.dp))
+            Surface(
+                color = Green60,
+                shape = CircleShape,
+                modifier = Modifier.size(60.dp),
+                shadowElevation = 8.dp,
             ) {
-                Spacer(Modifier.height(18.dp))
-                Surface(
-                    color = Green60,
-                    shape = CircleShape,
-                    modifier = Modifier.size(72.dp),
-                    shadowElevation = 10.dp,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Outlined.Check,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(36.dp),
-                        )
-                    }
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        painter = painterResource(Iv.Check),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(30.dp),
+                    )
                 }
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = stringResource(R.string.obn_terminer_titre),
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MissaInk,
-                )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = stringResource(R.string.obn_terminer_sous),
-                    fontSize = 12.5.sp,
-                    color = MissaMuted,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(Modifier.height(16.dp))
-
-                OnbRecapCarte(viewModel)
-                Spacer(Modifier.height(12.dp))
-                OnbLicenceCarte(viewModel)
-                Spacer(Modifier.height(14.dp))
             }
+            Spacer(Modifier.height(9.dp))
+            Text(
+                text = stringResource(R.string.obn_terminer_titre),
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.obn_terminer_sous),
+                fontSize = 11.5.sp,
+                color = MissaMuted,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+            )
+            Spacer(Modifier.height(11.dp))
 
+            OnbRecapCarte(viewModel)
+            Spacer(Modifier.height(9.dp))
+            OnbLicenceCarte(viewModel)
+
+            Spacer(Modifier.weight(1f))
             Button(
                 onClick = viewModel::suivant,
                 enabled = !viewModel.enregistrementEnCours,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
             ) {
@@ -148,17 +136,17 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                     text = stringResource(R.string.obn_acceder),
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.5.sp,
+                    fontSize = 14.sp,
                 )
-                Spacer(Modifier.size(9.dp))
+                Spacer(Modifier.size(8.dp))
                 Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                    painter = painterResource(Iv.ArrowForward),
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(17.dp),
                 )
             }
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
         }
     }
 }
@@ -170,15 +158,15 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
  */
 @Composable
 private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     val typeTaxe = remember(paysListe, viewModel.codePays) {
         paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe
     }
     val profilLabel = viewModel.profil?.let { stringResource(it.labelRes) } ?: "—"
     val tailleLabel = viewModel.palier?.let { stringResource(it.labelRes) } ?: "—"
-    // Le nom vient du référentiel ISO du système : toutes les devises sont
-    // couvertes, pas seulement le catalogue court.
+    // Le nom du pays vient du référentiel ISO du système : toutes les devises
+    // sont couvertes, pas seulement le catalogue court.
     val deviseLabel = if (viewModel.devise.isBlank()) {
         "—"
     } else {
@@ -195,16 +183,16 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MissaSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 text = stringResource(R.string.obn_recap),
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MissaInk,
             )
@@ -214,23 +202,48 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
             OnbRecapLigne(R.string.obn_recap_fiscalite, libelleTaxePays(typeTaxe, viewModel.tauxTaxe))
             OnbRecapLigne(R.string.obn_recap_identifiants, identifiants)
 
-            HorizontalDivider(color = MissaBorder, thickness = 0.8.dp)
+            HorizontalDivider(color = MissaBorder, thickness = 0.6.dp)
             OnbRecapLigne(R.string.obn_recap_profil, profilLabel)
             OnbRecapLigne(R.string.obn_recap_taille, tailleLabel)
-            OnbRecapLigne(
-                R.string.obn_recap_modules,
-                viewModel.modulesActifs.size.toString(),
-            )
+            OnbRecapLigne(R.string.obn_recap_modules, viewModel.modulesActifs.size.toString())
 
-            HorizontalDivider(color = MissaBorder, thickness = 0.8.dp)
+            HorizontalDivider(color = MissaBorder, thickness = 0.6.dp)
             OnbRecapLigne(R.string.obn_recap_proprietaire, proprietaire)
         }
     }
 }
 
+/** Une ligne du récapitulatif ; rien ne s'affiche si la valeur est vide. */
+@Composable
+private fun OnbRecapLigne(labelRes: Int, valeur: String) {
+    if (valeur.isBlank()) return
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(labelRes),
+            fontSize = 11.sp,
+            color = MissaMuted,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = valeur,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MissaInk,
+            textAlign = TextAlign.End,
+            maxLines = 1,
+            modifier = Modifier.weight(1.3f),
+        )
+    }
+}
+
 /**
- * Annonce de l'essai et commande du code. Un code déjà activé fait disparaître
- * l'argumentaire : on ne vend pas ce qui est acheté.
+ * Annonce de l'essai et commande du code, compactée pour tenir sur l'écran :
+ * l'échéance rejoint le titre, les avantages tiennent en deux lignes et les
+ * messageries se résument à leurs boutons. Un code déjà activé fait disparaître
+ * l'argumentaire — on ne vend pas ce qui est acheté.
  */
 @Composable
 private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
@@ -256,19 +269,15 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (viewModel.licenceDejaActive) {
-                        Icons.Outlined.WorkspacePremium
-                    } else {
-                        Icons.Outlined.Schedule
-                    },
+                    painter = painterResource(if (viewModel.licenceDejaActive) Iv.WorkspacePremium else Iv.Schedule),
                     contentDescription = null,
                     tint = if (viewModel.licenceDejaActive) ProfileGreen else BrandBlue,
-                    modifier = Modifier.size(18.dp),
+                    modifier = Modifier.size(17.dp),
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
@@ -279,120 +288,99 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                             R.string.obn_essai_titre
                         },
                     ),
-                    fontSize = 13.5.sp,
+                    fontSize = 12.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = MissaInk,
+                    modifier = Modifier.weight(1f),
                 )
             }
 
             // Échéance réelle, relue en base : l'essai a pu démarrer la veille.
             val echeance = viewModel.essaiExpireLe
-            Text(
-                text = if (echeance != null) {
-                    stringResource(
+            if (echeance != null) {
+                Text(
+                    text = stringResource(
                         if (viewModel.licenceDejaActive) {
                             R.string.obn_licence_jusqu_au
                         } else {
                             R.string.obn_essai_jusqu_au
                         },
                         DateUtils.formatDate(echeance),
-                    )
-                } else {
-                    stringResource(R.string.ob_licence_avantage_fonctions)
-                },
-                fontSize = 12.sp,
-                color = MissaInk,
-            )
-            Text(
-                text = stringResource(R.string.ob_licence_avantage_sans_carte),
-                fontSize = 11.5.sp,
-                color = MissaMuted,
-            )
-
-            if (!viewModel.licenceDejaActive) {
-                Text(
-                    text = stringResource(R.string.obn_essai_apres),
-                    fontSize = 11.5.sp,
-                    color = MissaMuted,
-                )
-                Spacer(Modifier.height(1.dp))
-                Text(
-                    text = stringResource(R.string.obn_code_titre),
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MissaInk,
-                )
-                Text(
-                    text = stringResource(R.string.ob_licence_note),
+                    ),
                     fontSize = 11.sp,
                     color = MissaMuted,
+                )
+            }
+
+            if (viewModel.licenceDejaActive) {
+                Text(
+                    text = stringResource(R.string.ob_licence_avantage_sans_carte),
+                    fontSize = 11.sp,
+                    color = MissaMuted,
+                    maxLines = 1,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.obn_essai_apres),
+                    fontSize = 10.5.sp,
+                    color = MissaMuted,
+                    maxLines = 2,
+                )
+                Text(
+                    text = stringResource(R.string.obn_code_titre),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MissaInk,
                 )
                 if (coordonneesManquantes) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Outlined.Warning,
+                            painter = painterResource(Iv.Warning),
                             contentDescription = null,
                             tint = Red40,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(13.dp),
                         )
                         Spacer(Modifier.size(6.dp))
                         Text(
                             text = stringResource(R.string.obn_code_a_configurer),
-                            fontSize = 11.sp,
+                            fontSize = 10.5.sp,
                             color = Red40,
                         )
                     }
                 } else {
-                    // Les deux messageries partagent une ligne, l'e-mail prend la
-                    // suivante : trois libellés côte à côte ne tiendraient pas sur
-                    // un écran étroit sans être tronqués.
-                    if (whatsappOk || telegramOk) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(9.dp),
-                            modifier = Modifier.fillMaxWidth().padding(top = 3.dp),
-                        ) {
-                            if (whatsappOk) {
-                                OnbContactBouton(
-                                    texteRes = R.string.obn_code_whatsapp,
-                                    icone = Icons.Outlined.Chat,
-                                    modifier = Modifier.weight(1f),
-                                ) {
-                                    val ouvert =
-                                        ContactCommercial.ouvrirWhatsApp(contexte, numero, message)
-                                    if (!ouvert) {
-                                        Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
-                                    }
-                                }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        if (whatsappOk) {
+                            OnbContactBouton(
+                                R.string.obn_code_whatsapp,
+                                Iv.Chat,
+                                Modifier.weight(1f),
+                            ) {
+                                val ouvert = ContactCommercial.ouvrirWhatsApp(contexte, numero, message)
+                                if (!ouvert) Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                             }
-                            if (telegramOk) {
-                                OnbContactBouton(
-                                    texteRes = R.string.obn_code_telegram,
-                                    icone = Icons.AutoMirrored.Outlined.Send,
-                                    modifier = Modifier.weight(1f),
-                                ) {
-                                    val ouvert = ContactCommercial.ouvrirTelegram(
-                                        contexte,
-                                        telegram,
-                                        message,
-                                    )
-                                    if (!ouvert) {
-                                        Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
-                                    }
-                                }
+                        }
+                        if (telegramOk) {
+                            OnbContactBouton(
+                                R.string.obn_code_telegram,
+                                Iv.Send,
+                                Modifier.weight(1f),
+                            ) {
+                                val ouvert = ContactCommercial.ouvrirTelegram(contexte, telegram, message)
+                                if (!ouvert) Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                             }
                         }
                     }
                     if (emailOk) {
                         OnbContactBouton(
-                            texteRes = R.string.obn_code_email,
-                            icone = Icons.Outlined.MailOutline,
-                            modifier = Modifier.fillMaxWidth(),
+                            R.string.obn_code_email,
+                            Iv.MailOutline,
+                            Modifier.fillMaxWidth(),
                         ) {
-                            val ouvert =
-                                ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)
-                            if (!ouvert) {
-                                Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
-                            }
+                            val ouvert = ContactCommercial.ouvrirEmail(contexte, adresse, objet, message)
+                            if (!ouvert) Toast.makeText(contexte, echec, Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -404,54 +392,31 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
 @Composable
 private fun OnbContactBouton(
     texteRes: Int,
-    icone: androidx.compose.ui.graphics.vector.ImageVector,
+    icone: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.height(42.dp),
-        shape = RoundedCornerShape(11.dp),
+        modifier = modifier.height(38.dp),
+        shape = RoundedCornerShape(10.dp),
         border = BorderStroke(1.dp, BrandBlue),
         colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 0.dp),
     ) {
         Icon(
-            imageVector = icone,
+            painter = painterResource(icone),
             contentDescription = null,
             tint = BrandBlue,
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(15.dp),
         )
-        Spacer(Modifier.size(6.dp))
+        Spacer(Modifier.size(5.dp))
         Text(
             text = stringResource(texteRes),
-            fontSize = 12.5.sp,
+            fontSize = 11.5.sp,
             fontWeight = FontWeight.SemiBold,
             color = BrandBlue,
-        )
-    }
-}
-
-/** Une ligne du récapitulatif ; rien ne s'affiche si la valeur est vide. */
-@Composable
-private fun OnbRecapLigne(labelRes: Int, valeur: String) {
-    if (valeur.isBlank()) return
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(labelRes),
-            fontSize = 12.sp,
-            color = MissaMuted,
-            modifier = Modifier.weight(1f),
-        )
-        Text(
-            text = valeur,
-            fontSize = 12.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MissaInk,
-            textAlign = TextAlign.End,
-            modifier = Modifier.weight(1.3f),
+            maxLines = 1,
         )
     }
 }

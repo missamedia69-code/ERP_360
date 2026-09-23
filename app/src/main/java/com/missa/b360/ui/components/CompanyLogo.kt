@@ -1,5 +1,7 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.ui.res.painterResource
+
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -20,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -36,7 +37,7 @@ import kotlinx.coroutines.withContext
 fun CompanyLogo(
     logoUri: String?,
     contentDescription: String?,
-    fallbackIcon: ImageVector,
+    fallbackIcon: Int,
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
     shape: androidx.compose.ui.graphics.Shape,
@@ -61,7 +62,7 @@ fun CompanyLogo(
                 )
             } else {
                 Icon(
-                    imageVector = fallbackIcon,
+                    painter = painterResource(fallbackIcon),
                     contentDescription = contentDescription,
                     tint = fallbackTint,
                     modifier = Modifier.size(size / 2),
@@ -100,3 +101,26 @@ private fun rememberCompanyLogoBitmap(logoUri: String?): ImageBitmap? {
 }
 
 private const val LOGO_PREVIEW_MAX_SIDE = 640
+
+/**
+ * Décode le logo choisi par l'utilisateur en dehors de Compose (dessin dans
+ * le PDF d'aperçu d'impression). Retourne null si aucun logo ou lecture
+ * impossible — le document est alors généré sans logo, jamais avec un autre.
+ */
+fun chargerLogoBitmap(context: android.content.Context, logoUri: String?): android.graphics.Bitmap? =
+    logoUri?.let { uriText ->
+        runCatching {
+            val uri = Uri.parse(uriText)
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, bounds)
+            }
+            val largestSide = maxOf(bounds.outWidth, bounds.outHeight).coerceAtLeast(1)
+            var sampleSize = 1
+            while (largestSide / sampleSize > LOGO_PREVIEW_MAX_SIDE) sampleSize *= 2
+            val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, options)
+            }
+        }.getOrNull()
+    }

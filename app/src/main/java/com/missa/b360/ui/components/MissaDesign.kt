@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -9,16 +10,16 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -34,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,12 +57,12 @@ import com.missa.b360.ui.theme.MissaSoftBlue
  * vers une interprétation différente de cette direction artistique.
  */
 object MissaLayout {
-    val screenHorizontal = 16.dp
+    val screenHorizontal = 16.dp // Spec: 16dp marges
     val screenVertical = 12.dp
-    val itemGap = 10.dp
-    val sectionGap = 18.dp
+    val itemGap = 12.dp // Spec grille 4/8/12/16/20/24/32
+    val sectionGap = 16.dp
     val fieldHeight = 52.dp
-    val actionHeight = 46.dp
+    val actionHeight = 48.dp // Spec: zone tactile 48dp minimum
     val cardRadius = 14.dp
 }
 
@@ -72,39 +72,48 @@ fun MissaBrandMark(
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
 ) {
+    val shape = RoundedCornerShape(size * 0.22f)
     Surface(
         modifier = modifier.size(size),
-        shape = RoundedCornerShape((size.value * .28f).dp),
-        color = MaterialTheme.colorScheme.primary,
+        shape = shape,
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFF0288D1).copy(alpha = 0.25f)),
     ) {
         Image(
             painter = painterResource(R.drawable.logo_missa),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape((size.value * .28f).dp)),
+            modifier = Modifier.fillMaxSize().clip(shape),
         )
     }
 }
 
-/** Barre haute compacte, blanche et constante pour les écrans de gestion. */
+/**
+ * Barre haute — Spec UI MISSA BUSINESS 360
+ * - Hauteur contenu 64dp + statusBar inset séparé
+ * - Padding horizontal 16dp minimum
+ * - Zones tactiles 48x48, icônes 24dp, logo 40dp, titre 15-16sp
+ * - Responsive: dp/sp, WindowInsets, pas de px
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MissaTopAppBar(
     title: String,
     onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    couleurFond: Color = Color.White,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MissaBrandMark(size = 25.dp)
+                MissaBrandMark(size = 40.dp)
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = title,
                     color = MissaInk,
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -113,23 +122,24 @@ fun MissaTopAppBar(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(42.dp)) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        painter = painterResource(Iv.ArrowBack),
                         contentDescription = null,
                         tint = MissaInk,
-                        modifier = Modifier.size(21.dp),
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White,
+            containerColor = couleurFond,
             titleContentColor = MissaInk,
             navigationIconContentColor = MissaInk,
             actionIconContentColor = MissaInk,
         ),
+        windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
     )
 }
 
@@ -195,7 +205,7 @@ fun MissaSectionTitle(
 /** État vide cohérent : pictogramme doux, titre, explication et action éventuelle. */
 @Composable
 fun MissaEmptyState(
-    icon: ImageVector,
+    icon: Int,
     title: String,
     description: String? = null,
     modifier: Modifier = Modifier,
@@ -213,7 +223,7 @@ fun MissaEmptyState(
                 color = MissaSoftBlue,
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
                 }
             }
             Text(

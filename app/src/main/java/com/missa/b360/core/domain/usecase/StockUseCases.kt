@@ -10,11 +10,14 @@ import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -52,6 +55,7 @@ sealed class StockMovementResult {
     /** Aucun site de sortie résolvable (ni site principal ni stock ailleurs). */
     data object SiteIntrouvable : StockMovementResult()
     data class StockInsuffisant(val disponible: Double, val demande: Double) : StockMovementResult()
+    data object ModuleInactif : StockMovementResult()
 }
 
 /**
@@ -67,6 +71,7 @@ class RecordStockMovementUseCase @Inject constructor(
     private val database: AppDatabase,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
 ) {
     suspend operator fun invoke(
         produitId: Long,
@@ -91,6 +96,11 @@ class RecordStockMovementUseCase @Inject constructor(
         }) {
             return StockMovementResult.Invalid
         }
+        // Activation profil : Stock doit être actif
+        val activation = activationRepository.getActivation()
+        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+            return StockMovementResult.ModuleInactif
+        }
         if (licenceManager.isReadOnly()) return StockMovementResult.LectureSeule
         val produit = productDao.getById(produitId)
         if (produit == null || !produit.active) return StockMovementResult.ProduitIntrouvable
@@ -112,7 +122,7 @@ class RecordStockMovementUseCase @Inject constructor(
             }
             val apres = (avant + delta).coerceAtLeast(0.0)
             stockDao.ensureRow(produitId, siteId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteId, apres))
+            stockDao.remplacer(produitId, siteId, apres)
             movementDao.insert(
                 StockMovementEntity(
                     produitId = produitId,
@@ -150,6 +160,7 @@ class TransferStockUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
 ) {
     sealed class Result {
         data class Succes(
@@ -162,6 +173,7 @@ class TransferStockUseCase @Inject constructor(
         data object Invalid : Result()
         data object ProduitIntrouvable : Result()
         data class StockInsuffisant(val disponible: Double, val demande: Double) : Result()
+        data object ModuleInactif : Result()
     }
 
     suspend operator fun invoke(
@@ -175,6 +187,10 @@ class TransferStockUseCase @Inject constructor(
     ): Result {
         if (!StockValidation.transfertEstValide(siteSourceId, siteDestId, quantite)) {
             return Result.Invalid
+        }
+        val activation = activationRepository.getActivation()
+        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+            return Result.ModuleInactif
         }
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         val produit = productDao.getById(produitId)
@@ -194,9 +210,9 @@ class TransferStockUseCase @Inject constructor(
             val avantDest = stockDao.quantite(produitId, siteDestId) ?: 0.0
             val apresDest = avantDest + quantite
             stockDao.ensureRow(produitId, siteSourceId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteSourceId, apresSource))
+            stockDao.remplacer(produitId, siteSourceId, apresSource)
             stockDao.ensureRow(produitId, siteDestId)
-            stockDao.remplacer(ProductStockEntity(produitId, siteDestId, apresDest))
+            stockDao.remplacer(produitId, siteDestId, apresDest)
             val reference = sequenceManager.next(DocType.TRANSFERT)
             movementDao.insert(
                 StockMovementEntity(
@@ -237,4 +253,29 @@ class ObserveStockMovementsUseCase @Inject constructor(
     private val movementDao: StockMovementDao,
 ) {
     operator fun invoke(limit: Int = 200): Flow<List<StockMovementView>> = movementDao.observeJoints(limit)
+}
+
+/**
+ * Suppression d'un article = désactivation douce : l'article disparaît des listes
+ * (requêtes filtrées sur active = 1) mais l'historique des mouvements et les
+ * références restent intacts. Bloquée tant que le stock n'est pas nul.
+ */
+class SupprimerProduitUseCase @Inject constructor(
+    private val productDao: ProductDao,
+    private val observeStock: ObserveProductStockUseCase,
+    private val licenceManager: LicenceManager,
+) {
+    sealed class Result {
+        data object Supprime : Result()
+        data class StockNonNul(val quantite: Double) : Result()
+        data object LectureSeule : Result()
+    }
+
+    suspend operator fun invoke(produitId: Long): Result {
+        if (licenceManager.isReadOnly()) return Result.LectureSeule
+        val stock = observeStock().first().filter { it.produitId == produitId }.sumOf { it.quantite }
+        if (abs(stock) >= QUANTITE_EPSILON) return Result.StockNonNul(stock)
+        productDao.desactiver(produitId)
+        return Result.Supprime
+    }
 }

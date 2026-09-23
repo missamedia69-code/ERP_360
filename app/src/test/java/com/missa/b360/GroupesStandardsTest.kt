@@ -20,10 +20,13 @@ class GroupesStandardsTest {
         modeles(referentiel).first { it.groupe.code == code }
 
     @Test
-    fun `les sept familles courantes sont livrees`() {
+    fun `les dix familles courantes sont livrees`() {
         val codes = modeles("SYSCOHADA").map { it.groupe.code }
         assertEquals(
-            listOf("MARCH", "MP", "PF", "SE", "CONSO", "SERV", "EQUIP"),
+            listOf(
+                "MARCH", "MP", "PF", "SE", "CONSO", "SERV", "PM", "EQUIP", "MAT", "AB",
+                "SF", "EMBAL", "DV", "DNV", "KIT", "CONS",
+            ),
             codes,
         )
     }
@@ -125,7 +128,7 @@ class GroupesStandardsTest {
             assertTrue("groupe absent : $code", code in codes)
             assertNotNull(nature)
         }
-        // Les cinq natures héritées sont toutes couvertes.
+        // Les neuf natures héritées sont toutes couvertes.
         assertEquals(ProductType.entries.size, GroupesStandards.natureParCode.size)
     }
 

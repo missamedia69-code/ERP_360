@@ -2,13 +2,14 @@ package com.missa.b360.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.dao.CompteTresorerieDao
-import com.missa.b360.core.data.dao.TaskDao
-import com.missa.b360.core.data.dao.MouvementTresorerieDao
+import com.missa.b360.core.data.entity.StatutNc
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.repository.HomeRepository
+import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.CockpitRules
 import com.missa.b360.core.domain.model.ModuleCode
-import com.missa.b360.core.domain.model.ModulesPersonnalises
+import com.missa.b360.core.domain.model.PointJour
 import com.missa.b360.core.domain.model.PointPerformance
 import com.missa.b360.core.domain.model.RappelsAccueil
 import com.missa.b360.core.domain.model.RappelsRules
@@ -26,10 +27,12 @@ import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.notifications.AppNotifier
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -55,6 +58,9 @@ data class HomeUiState(
     val marge: Double = 0.0,
     val tresorerie: Double = 0.0,
     val quantiteStock: Double = 0.0,
+    val valeurStock: Double = 0.0,
+    val nombreProduits: Int = 0,
+    val rupturesStock: Int = 0,
     /** Nombre de pièces validées du jour, pour les compteurs sous les montants. */
     val ventesCount: Int = 0,
     val achatsCount: Int = 0,
@@ -70,24 +76,42 @@ data class HomeUiState(
     val tendanceClients: Double? = null,
     /** Encaissements des six derniers mois civils, pour le graphique. */
     val performanceMensuelle: List<PointPerformance> = emptyList(),
+    /** Courbes des 14 derniers jours pour les popups des cartes KPI. */
+    val serieVentes: List<PointJour> = emptyList(),
+    val serieAchats: List<PointJour> = emptyList(),
+    val serieTresorerie: List<PointJour> = emptyList(),
+    val serieClients: List<PointJour> = emptyList(),
+    /** Jour suivi par le résumé d'activité (modifiable via le calendrier). */
+    val resumeJour: Long = CockpitRules.debutJour(System.currentTimeMillis()),
+    val resumeVentes: Double = 0.0,
+    val resumeAchats: Double = 0.0,
+    val resumeMarge: Double = 0.0,
+    val resumeVentesCount: Int = 0,
+    val resumeAchatsCount: Int = 0,
+    val resumeMouvements: Int = 0,
     val recentOperations: List<OperationRecordEntity> = emptyList(),
     /** Ce que l'accueil doit signaler : tâches ouvertes et impayés échus. */
     val rappels: RappelsAccueil = RappelsAccueil(),
     /** Tâches brutes pour la carte « Tâches du jour ». */
     val taches: List<TaskEntity> = emptyList(),
+    // Modules additionnels déjà implémentés
+    val projetsActifs: Int = 0,
+    val projetsEnRetard: Int = 0,
+    val nonConformitesOuvertes: Int = 0,
+    val interventionsMaintenance: Int = 0,
 )
 
 /**
  * ViewModel de l'accueil : badge (RA-23) et résumé réactif de l'entreprise.
  * Les indicateurs reposent exclusivement sur les pièces locales validées, sans données fictives.
+ * Câblage réel : ventes, achats, stock (ProductStock + StockMovement), trésorerie, clients, fournisseurs, tâches, projets, qualité, maintenance.
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appNotifier: AppNotifier,
     private val settingsStore: SettingsStore,
-    compteTresorerieDao: CompteTresorerieDao,
-    mouvementTresorerieDao: MouvementTresorerieDao,
-    taskDao: TaskDao,
+    private val activationRepository: ProfilActivationRepository,
+    private val homeRepository: HomeRepository,
     getEnterprise: GetEnterpriseUseCase,
     users: UserAdminUseCases,
     observeClients: ObserveClientsUseCase,
@@ -97,6 +121,11 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val notificationsNonLues: Flow<Int> = appNotifier.observeNonLues()
+
+    /** Activation effective du profil : source de vérité unique pour toute l'app */
+    val activation: StateFlow<ActivationProfil> =
+        activationRepository.observeActivation()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ActivationProfil.VIDE)
 
     /**
      * Modules retenus au moment du choix du pack. La liste pilote l'accueil :
@@ -111,6 +140,14 @@ class HomeViewModel @Inject constructor(
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /** Actions rapides épinglées sur l'accueil ; vide = tout afficher (comportement d'usine). */
+    val actionsRapidesEpingles: StateFlow<List<String>> =
+        settingsStore.observe(SettingsStore.Keys.ACCUEIL_ACTIONS)
+            .map { valeur ->
+                valeur.orEmpty().split(',').map { it.trim() }.filter { it.isNotEmpty() }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     /** Enregistre la sélection ; une liste vide rétablit la disposition d'usine. */
     fun epinglerModules(modules: List<String>) {
         viewModelScope.launch {
@@ -118,9 +155,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun epinglerActionsRapides(actions: List<String>) {
+        viewModelScope.launch {
+            settingsStore.set(SettingsStore.Keys.ACCUEIL_ACTIONS, actions.joinToString(","))
+        }
+    }
+
     val modulesActifs: StateFlow<List<ModuleCode>> =
-        settingsStore.observe(SettingsStore.Keys.MODULES_ACTIFS)
-            .map { ModulesPersonnalises.deserialiser(it) }
+        activation.map { it.modulesActifs.toList() }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val baseState = combine(
@@ -156,21 +198,75 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private val taches = taskDao.observeAll()
+    /** Jour sélectionné dans le résumé d'activité (défaut : aujourd'hui). */
+    private val jourResume = kotlinx.coroutines.flow.MutableStateFlow(
+        CockpitRules.debutJour(System.currentTimeMillis()),
+    )
 
-    private val soldeTresorerie = combine(
-        compteTresorerieDao.observeAll(),
-        mouvementTresorerieDao.observeAll(),
-    ) { comptes, mouvements -> TresorerieRules.soldeGlobal(comptes, mouvements) }
+    /** Change le jour suivi par le résumé d'activité. */
+    fun selectionnerJour(jour: Long) {
+        jourResume.value = CockpitRules.debutJour(jour)
+    }
+
+    private val taches = homeRepository.observeTaches()
+
+    private val soldeTresorerie = homeRepository.observeSoldeTresorerie()
+
+    private val stockQuantites = homeRepository.observeStockQuantites()
+    private val stockMouvements = homeRepository.observeStockMouvements()
+    private val produits = homeRepository.observeProduits()
+    private val nonConformites = homeRepository.observeNonConformites()
 
     val uiState: StateFlow<HomeUiState> = combine(
         baseState,
         operations.observeAll(),
         soldeTresorerie,
         taches,
-    ) { base, records, soldeComptes, listeTaches ->
+        activation,
+        stockQuantites,
+        stockMouvements,
+        produits,
+        nonConformites,
+        observeClients(),
+        jourResume,
+    ) { args ->
+        val base = args[0] as HomeUiState
+        @Suppress("UNCHECKED_CAST")
+        val records = args[1] as List<OperationRecordEntity>
+        val soldeComptes = args[2] as Double
+        @Suppress("UNCHECKED_CAST")
+        val listeTaches = args[3] as List<com.missa.b360.core.data.entity.TaskEntity>
+        val act = args[4] as ActivationProfil
+        @Suppress("UNCHECKED_CAST")
+        val stocks = args[5] as List<com.missa.b360.core.data.entity.ProductStockEntity>
+        @Suppress("UNCHECKED_CAST")
+        val clientsListe = args[9] as List<com.missa.b360.core.data.entity.ClientEntity>
+        val jourSel = args[10] as Long
+        @Suppress("UNCHECKED_CAST")
+        val mouvementsStock = args[6] as List<com.missa.b360.core.data.entity.StockMovementEntity>
+        @Suppress("UNCHECKED_CAST")
+        val listeProduits = args[7] as List<com.missa.b360.core.data.entity.ProductEntity>
+        @Suppress("UNCHECKED_CAST")
+        val listeNc = args[8] as List<com.missa.b360.core.data.entity.NonConformiteEntity>
+
         val maintenant = System.currentTimeMillis()
-        val validated = records.filter { it.status == OperationStatus.VALIDATED.name }
+        // Filtre les opérations par modules actifs si activation définie
+        val recordsFiltres = if (act.modulesActifs.isEmpty()) records else records.filter { rec ->
+            val code = when (rec.module) {
+                OperationModule.VENTE.name -> ModuleCode.VEN
+                OperationModule.ACHATS.name -> ModuleCode.ACH
+                OperationModule.STOCK.name -> ModuleCode.STK
+                OperationModule.FINANCES.name -> ModuleCode.CPT
+                OperationModule.LIVRAISON.name -> ModuleCode.LOG
+                OperationModule.PRODUCTION.name -> ModuleCode.PRO
+                OperationModule.SERVICES.name -> ModuleCode.SER
+                OperationModule.RH.name -> ModuleCode.RH
+                OperationModule.PROJETS.name -> ModuleCode.PRJ
+                else -> null
+            }
+            code == null || act.isModuleActif(code)
+        }
+        val validated = recordsFiltres.filter { it.status == OperationStatus.VALIDATED.name }
         // Les cartes libellées « Aujourd’hui » ne doivent jamais agréger les
         // opérations des jours précédents. La trésorerie reste, elle, un solde cumulé.
         val startOfToday = CockpitRules.debutJour(maintenant)
@@ -185,14 +281,8 @@ class HomeViewModel @Inject constructor(
             .filter { it.module == OperationModule.ACHATS.name }
             .filter { it.createdAt >= startOfToday }
             .sumOf { it.amount ?: 0.0 }
-        val ventesCountHier = validated.count {
-            it.module == OperationModule.VENTE.name && it.createdAt in startOfYesterday until startOfToday
-        }
         val ventesCount = validated.count {
             it.module == OperationModule.VENTE.name && it.createdAt >= startOfToday
-        }
-        val achatsCountHier = validated.count {
-            it.module == OperationModule.ACHATS.name && it.createdAt in startOfYesterday until startOfToday
         }
         val achatsCount = validated.count {
             it.module == OperationModule.ACHATS.name && it.createdAt >= startOfToday
@@ -215,24 +305,54 @@ class HomeViewModel @Inject constructor(
         val tresorerie = soldeComptes + fluxFinances
         val fluxJour = CockpitRules.fluxJour(validated, startOfToday)
         val fluxHier = CockpitRules.fluxJour(validated, startOfYesterday)
-        val quantiteStock = validated
-            .filter { it.module == OperationModule.STOCK.name }
-            .sumOf { it.quantity ?: 0.0 }
-        val mouvementsCount = validated.count {
-            it.module == OperationModule.STOCK.name && it.createdAt >= startOfToday
+
+        // Stock réel depuis ProductStockDao + StockMovementDao
+        val quantiteStockReelle = stocks.sumOf { it.quantite }
+        val mouvementsDuJourReels = mouvementsStock.count { it.horodatage >= startOfToday }
+        val valeurStockReelle = run {
+            val parProduit = listeProduits.associateBy { it.id }
+            stocks.sumOf { ligne ->
+                val produit = parProduit[ligne.produitId]
+                val cout = produit?.prixRevient ?: produit?.prixAchat ?: 0.0
+                ligne.quantite * cout
+            }
         }
+        val nombreProduitsReel = listeProduits.count { it.active }
+        val rupturesReelles = run {
+            val quantites = stocks.groupBy { it.produitId }.mapValues { (_, lignes) -> lignes.sumOf { it.quantite } }
+            listeProduits.count { it.active && (quantites[it.id] ?: 0.0) <= 0.0 }
+        }
+
         val commandesAttente = records.count {
             it.module == OperationModule.ACHATS.name && it.status == OperationStatus.DRAFT.name
         }
+
+        // Projets réels depuis operation_records PROJETS
+        val projetsRecords = validated.filter { it.module == OperationModule.PROJETS.name }
+        val projetsActifsCount = projetsRecords.size
+        val projetsEnRetardCount = projetsRecords.count { rec ->
+            val payload = com.missa.b360.core.domain.model.ProjetCodec.decode(rec.notes)
+            if (payload == null) false else {
+                val etat = com.missa.b360.core.domain.model.ProjetRules.etat(payload.etat)
+                if (etat == com.missa.b360.core.domain.model.EtatProjet.LIVRE) false
+                else payload.echeance?.let { it < maintenant } == true
+            }
+        }
+
+        val ncOuvertes = listeNc.count { it.statut == StatutNc.OUVERTE.name || it.statut == StatutNc.EN_COURS.name }
+
         base.copy(
             ventes = ventes,
             achats = achats,
             marge = marge,
             tresorerie = tresorerie,
-            quantiteStock = quantiteStock,
+            quantiteStock = quantiteStockReelle,
+            valeurStock = valeurStockReelle,
+            nombreProduits = nombreProduitsReel,
+            rupturesStock = rupturesReelles,
             ventesCount = ventesCount,
             achatsCount = achatsCount,
-            mouvementsStockCount = mouvementsCount,
+            mouvementsStockCount = mouvementsDuJourReels,
             commandesFournisseurAttente = commandesAttente,
             tendanceVentes = CockpitRules.variationPct(ventes, ventesHier),
             tendanceAchats = CockpitRules.variationPct(achats, achatsHier),
@@ -240,11 +360,29 @@ class HomeViewModel @Inject constructor(
             else (marge / ventes - margeHier / ventesHier) * 100.0,
             tendanceTresorerie = CockpitRules.variationPct(fluxJour, fluxHier),
             performanceMensuelle = CockpitRules.performanceMensuelle(validated, maintenant),
-            recentOperations = records.take(4),
-            rappels = RappelsRules.rappels(listeTaches, records, maintenant),
+            serieVentes = CockpitRules.serieVentes(validated, maintenant),
+            serieAchats = CockpitRules.serieAchats(validated, maintenant),
+            serieTresorerie = CockpitRules.serieTresorerie(validated, maintenant),
+            serieClients = CockpitRules.serieClients(clientsListe.map { it.createdAt }, maintenant),
+            resumeJour = jourSel,
+            resumeVentes = CockpitRules.encaissements(records, jourSel),
+            resumeAchats = CockpitRules.achatsJour(records, jourSel),
+            resumeMarge = CockpitRules.margeJour(
+                CockpitRules.encaissements(records, jourSel),
+                CockpitRules.achatsJour(records, jourSel),
+            ),
+            resumeVentesCount = CockpitRules.piecesJour(records, jourSel, OperationModule.VENTE),
+            resumeAchatsCount = CockpitRules.piecesJour(records, jourSel, OperationModule.ACHATS),
+            resumeMouvements = CockpitRules.mouvementsJour(records, jourSel),
+            recentOperations = recordsFiltres.sortedByDescending { it.createdAt }.take(4),
+            rappels = RappelsRules.rappels(listeTaches, recordsFiltres, maintenant),
             taches = listeTaches,
+            projetsActifs = projetsActifsCount,
+            projetsEnRetard = projetsEnRetardCount,
+            nonConformitesOuvertes = ncOuvertes,
+            interventionsMaintenance = 0,
         )
-    }.stateIn(
+    }.flowOn(Dispatchers.Default).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeUiState(),

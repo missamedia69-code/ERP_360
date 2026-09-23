@@ -29,6 +29,7 @@ class OperationsViewModel @Inject constructor(
         data class Created(val reference: String) : Result()
         data object Invalid : Result()
         data object ReadOnly : Result()
+        data object ModuleInactif : Result()
         data object Error : Result()
     }
 
@@ -82,6 +83,7 @@ class OperationsViewModel @Inject constructor(
                     is OperationUseCases.CreateResult.Success -> Result.Created(result.reference)
                     OperationUseCases.CreateResult.Invalid -> Result.Invalid
                     OperationUseCases.CreateResult.ReadOnly -> Result.ReadOnly
+                    OperationUseCases.CreateResult.ModuleInactif -> Result.ModuleInactif
                 }
             } catch (exception: CancellationException) {
                 throw exception

@@ -21,8 +21,14 @@ object ProduitRules {
      * fonctionnement de l'entreprise, pas à son chiffre d'affaires.
      */
     fun estVendable(type: ProductType): Boolean = when (type) {
-        ProductType.ACHATE_REVENDU, ProductType.FABRIQUE, ProductType.COMPOSE -> true
-        ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE -> false
+        ProductType.ACHATE_REVENDU, ProductType.FABRIQUE, ProductType.COMPOSE,
+        ProductType.PRESTATION, ProductType.SEMI_FINI, ProductType.DECHET_VALORISABLE,
+        ProductType.KIT -> true
+        ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN,
+        ProductType.EMBALLAGE, ProductType.DECHET_NON_VALORISABLE,
+        ProductType.CONSIGNATION -> false
     }
 
     /**
@@ -33,20 +39,58 @@ object ProduitRules {
      * s'assemble à partir de ses composants.
      */
     fun estAchetable(type: ProductType): Boolean = when (type) {
-        ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE -> true
-        ProductType.FABRIQUE, ProductType.COMPOSE -> false
+        ProductType.ACHATE_REVENDU, ProductType.MATIERE_PREMIERE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT, ProductType.MATERIEL,
+        ProductType.AUTRE_BIEN, ProductType.EMBALLAGE,
+        // Une prestation s'achète auprès d'un fournisseur (sous-traitance, honoraires) :
+        // non stockable, elle s'impute directement en charge à la validation.
+        ProductType.PRESTATION -> true
+        ProductType.FABRIQUE, ProductType.COMPOSE,
+        ProductType.SEMI_FINI, ProductType.DECHET_VALORISABLE,
+        ProductType.DECHET_NON_VALORISABLE, ProductType.KIT,
+        ProductType.CONSIGNATION -> false
     }
 
     /** Articles utilisables comme composant d'un ordre de fabrication. */
     fun estComposant(type: ProductType): Boolean = when (type) {
-        ProductType.MATIERE_PREMIERE, ProductType.ACHATE_REVENDU, ProductType.COMPOSE -> true
-        ProductType.FABRIQUE, ProductType.CONNOMMABLE -> false
+        ProductType.MATIERE_PREMIERE, ProductType.ACHATE_REVENDU, ProductType.COMPOSE,
+        ProductType.SEMI_FINI, ProductType.EMBALLAGE -> true
+        ProductType.FABRIQUE, ProductType.CONNOMMABLE,
+        ProductType.PIECE_MAINTENANCE, ProductType.EQUIPEMENT,
+        ProductType.MATERIEL, ProductType.AUTRE_BIEN, ProductType.PRESTATION,
+        ProductType.DECHET_VALORISABLE, ProductType.DECHET_NON_VALORISABLE,
+        ProductType.KIT, ProductType.CONSIGNATION -> false
     }
 
     /** Articles qu'un ordre de fabrication peut produire. */
     fun estFabricable(type: ProductType): Boolean = when (type) {
-        ProductType.FABRIQUE, ProductType.COMPOSE -> true
+        ProductType.FABRIQUE, ProductType.COMPOSE, ProductType.SEMI_FINI,
+        ProductType.KIT -> true
         else -> false
+    }
+
+    /**
+     * Articles suivis physiquement en stock.
+     *
+     * Une prestation ne se stocke pas ; un déchet non valorisable reste suivi
+     * physiquement (quantité à éliminer) sans valeur commerciale ; équipements
+     * et matériel sont des immobilisations, pas des stocks.
+     */
+    fun estStockable(type: ProductType): Boolean = when (type) {
+        ProductType.PRESTATION, ProductType.EQUIPEMENT, ProductType.MATERIEL -> false
+        else -> true
+    }
+
+    /**
+     * Un article valorisé porte une valeur de stock (CUMP). Les familles non
+     * stockées ne sont jamais valorisées, et déchets non valorisables comme
+     * consignations sont stockés sans valeur (le stock n'appartient pas à
+     * l'entreprise ou n'a pas de coût d'acquisition).
+     */
+    fun estValorise(type: ProductType): Boolean = when (type) {
+        ProductType.PRESTATION, ProductType.EQUIPEMENT, ProductType.MATERIEL,
+        ProductType.DECHET_NON_VALORISABLE, ProductType.CONSIGNATION -> false
+        else -> true
     }
 
     /** Filtre d'un catalogue pour la vente : actifs et vendables. */

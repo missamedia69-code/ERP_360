@@ -115,7 +115,8 @@ class ProduitRulesTest {
             val utile = ProduitRules.estVendable(type) ||
                 ProduitRules.estAchetable(type) ||
                 ProduitRules.estComposant(type) ||
-                ProduitRules.estFabricable(type)
+                ProduitRules.estFabricable(type) ||
+                ProduitRules.estStockable(type)
             assertTrue("Nature inutilisable : $type", utile)
         }
     }

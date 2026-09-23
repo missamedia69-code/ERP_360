@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew testDebugUnitTest)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(./gradlew testDebugUnitTest --tests:*)",
+      "Bash(gradlew.bat testDebugUnitTest)",
+      "Bash(gradlew.bat assembleDebug)",
+      "Bash(./gradlew.bat:*)",
+      "Bash(python3 .github/scripts/*)",
+      "Bash(python .github/scripts/*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)"
+    ]
+  }
+}

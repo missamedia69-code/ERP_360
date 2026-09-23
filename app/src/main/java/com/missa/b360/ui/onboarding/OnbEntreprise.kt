@@ -1,5 +1,6 @@
 package com.missa.b360.ui.onboarding
 
+import com.missa.b360.ui.icons.Iv
 import android.content.Intent
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,22 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Backup
-import androidx.compose.material.icons.outlined.Badge
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Call
-import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.ExpandLess
-import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material.icons.outlined.Gavel
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Percent
-import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.Public
-import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,9 +40,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -105,7 +90,7 @@ private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     // Devise officielle de chaque pays : calculée une fois, réutilisée par la liste
     // des pays et par le pack appliqué à la sélection.
@@ -171,7 +156,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             // --- 1. Identité : ce qui nomme l'entreprise et son site ---
             MissaSectionPliable(
                 titre = stringResource(R.string.obn_section_identite),
-                icone = Icons.Outlined.Business,
+                icone = Iv.Business,
                 resume = resume(
                     viewModel.nomEntreprise,
                     viewModel.secteur,
@@ -191,7 +176,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                             }
                         },
                         label = stringResource(R.string.ob_nom_entreprise),
-                        icone = Icons.Outlined.Business,
+                        icone = Iv.Business,
                         placeholder = stringResource(R.string.obn_nom_ex),
                         active = !viewModel.enregistrementEnCours,
                     )
@@ -199,7 +184,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         valeur = viewModel.secteur,
                         onValeur = { viewModel.secteur = it },
                         label = stringResource(R.string.obn_secteur),
-                        icone = Icons.Outlined.Category,
+                        icone = Iv.Category,
                         placeholder = stringResource(R.string.obn_secteur_ex),
                         active = !viewModel.enregistrementEnCours,
                     )
@@ -210,7 +195,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                             viewModel.nomSitePrincipal = it
                         },
                         label = stringResource(R.string.ob_site_principal),
-                        icone = Icons.Outlined.Storefront,
+                        icone = Iv.Storefront,
                         active = !viewModel.enregistrementEnCours,
                     )
                 }
@@ -219,7 +204,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             // --- 2. Localisation : le pays pilote tout le pack fiscal ---
             MissaSectionPliable(
                 titre = stringResource(R.string.obn_entreprise_localisation),
-                icone = Icons.Outlined.Public,
+                icone = Iv.Public,
                 resume = if (viewModel.pays.isBlank()) {
                     stringResource(R.string.ob_selectionne)
                 } else {
@@ -277,7 +262,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                             valeur = viewModel.tauxTaxeTexte,
                             onValeur = viewModel::modifierTauxTaxe,
                             label = stringResource(R.string.ob_taux_taxe),
-                            icone = Icons.Outlined.Percent,
+                            icone = Iv.Percent,
                             clavier = KeyboardType.Decimal,
                             erreur = tauxTaxeInvalide,
                             aide = stringResource(R.string.ob_erreur_taux_taxe)
@@ -288,7 +273,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                             valeur = viewModel.pays,
                             onValeur = viewModel::modifierPaysManuel,
                             label = stringResource(R.string.ob_pays_personnalise),
-                            icone = Icons.Outlined.Public,
+                            icone = Iv.Public,
                             aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
                             active = !viewModel.enregistrementEnCours,
                         )
@@ -299,7 +284,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             // --- 3. Coordonnées : reprises sur les documents commerciaux ---
             MissaSectionPliable(
                 titre = stringResource(R.string.obn_section_coordonnees),
-                icone = Icons.Outlined.Call,
+                icone = Iv.Call,
                 resume = resume(viewModel.telephone, viewModel.email, viewModel.adresse)
                     ?: stringResource(R.string.obn_entreprise_contact_sous),
                 etiquette = if (emailValide) facultatif else aCompleter,
@@ -313,7 +298,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         valeur = viewModel.telephone,
                         onValeur = { viewModel.telephone = it },
                         label = stringResource(R.string.obn_telephone),
-                        icone = Icons.Outlined.Call,
+                        icone = Iv.Call,
                         placeholder = indicatif,
                         clavier = KeyboardType.Phone,
                         active = !viewModel.enregistrementEnCours,
@@ -322,7 +307,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         valeur = viewModel.email,
                         onValeur = { viewModel.email = it },
                         label = stringResource(R.string.obn_email),
-                        icone = Icons.Outlined.MailOutline,
+                        icone = Iv.MailOutline,
                         placeholder = stringResource(R.string.obn_email_ex),
                         clavier = KeyboardType.Email,
                         erreur = !emailValide,
@@ -334,7 +319,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         valeur = viewModel.adresse,
                         onValeur = { viewModel.adresse = it },
                         label = stringResource(R.string.obn_adresse),
-                        icone = Icons.Outlined.Place,
+                        icone = Iv.Place,
                         placeholder = stringResource(R.string.obn_adresse_ex),
                         lignesMin = 2,
                         active = !viewModel.enregistrementEnCours,
@@ -360,7 +345,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 }
                 MissaSectionPliable(
                     titre = stringResource(R.string.fisc_pack_identifiants),
-                    icone = Icons.Outlined.Badge,
+                    icone = Iv.Badge,
                     resume = saisis.takeIf { it.isNotEmpty() }?.joinToString(" · ")
                         ?: reglesIdentifiants.joinToString(" · ") { it.libelle },
                     etiquette = if (formatsIncorrects) {
@@ -388,8 +373,8 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                                 },
                                 label = regle.libelle,
                                 icone = when (regle.cle) {
-                                    CleIdentifiant.FISCAL -> Icons.Outlined.Badge
-                                    CleIdentifiant.REGISTRE -> Icons.Outlined.Gavel
+                                    CleIdentifiant.FISCAL -> Iv.Badge
+                                    CleIdentifiant.REGISTRE -> Iv.Gavel
                                 },
                                 placeholder = regle.exemple.takeIf { it.isNotEmpty() },
                                 erreur = formatIncorrect,
@@ -444,7 +429,7 @@ private fun OnbChampTexte(
     valeur: String,
     onValeur: (String) -> Unit,
     label: String,
-    icone: ImageVector,
+    icone: Int,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     clavier: KeyboardType = KeyboardType.Text,
@@ -460,7 +445,7 @@ private fun OnbChampTexte(
         label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         leadingIcon = {
             Icon(
-                imageVector = icone,
+                painter = painterResource(icone),
                 contentDescription = null,
                 tint = if (erreur) Red40 else BrandBlue,
                 modifier = Modifier.size(18.dp),
@@ -529,7 +514,7 @@ private fun OnbPackPays(
         Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Outlined.Public,
+                    painter = painterResource(Iv.Public),
                     contentDescription = null,
                     tint = BrandBlue,
                     modifier = Modifier.size(16.dp),
@@ -687,7 +672,7 @@ private fun OnbPackLien(texteRes: Int, ouvert: Boolean, onClic: () -> Unit) {
         ),
     ) {
         Icon(
-            imageVector = if (ouvert) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+            painter = painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
             contentDescription = null,
             modifier = Modifier.size(15.dp),
         )
@@ -798,7 +783,7 @@ private fun OnbLogoSection(
 
     MissaSectionPliable(
         titre = stringResource(R.string.obn_logo_titre),
-        icone = Icons.Outlined.Image,
+        icone = Iv.Image,
         resume = if (logoUri == null) {
             stringResource(R.string.obn_logo_formats)
         } else {
@@ -816,7 +801,7 @@ private fun OnbLogoSection(
                     color = BrandBlue.copy(alpha = 0.025f),
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Backup,
+                        painter = painterResource(Iv.Backup),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.padding(16.dp),
@@ -826,7 +811,7 @@ private fun OnbLogoSection(
                 CompanyLogo(
                     logoUri = logoUri,
                     contentDescription = stringResource(R.string.ob_logo_apercu),
-                    fallbackIcon = Icons.Outlined.Backup,
+                    fallbackIcon = Iv.Backup,
                     modifier = Modifier.size(56.dp),
                     size = 56.dp,
                     shape = RoundedCornerShape(12.dp),
@@ -873,7 +858,7 @@ private fun OnbLogoSection(
             if (logoUri != null) {
                 IconButton(onClick = onLogoCleared, enabled = enabled) {
                     Icon(
-                        imageVector = Icons.Outlined.DeleteOutline,
+                        painter = painterResource(Iv.DeleteOutline),
                         contentDescription = stringResource(R.string.ob_logo_supprimer),
                         tint = Red40,
                         modifier = Modifier.size(19.dp),

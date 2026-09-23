@@ -1,0 +1,500 @@
+package com.missa.b360.ui.stock
+
+import com.missa.b360.ui.navigation.AppModule
+
+import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.missa.b360.R
+import com.missa.b360.ui.components.MissaTopAppBar
+import com.missa.b360.ui.navigation.Routes
+import com.missa.b360.ui.theme.Blue90
+import com.missa.b360.ui.theme.BrandBlue
+import com.missa.b360.ui.theme.Green60
+import com.missa.b360.ui.theme.Green90
+import com.missa.b360.ui.theme.Red40
+import com.missa.b360.ui.theme.Red80
+import com.missa.b360.ui.theme.MissaInk
+import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.ProfileOrange
+
+/** Maquette 4 — détail d'un article : en-tête, onglets, tuiles de stock, bouton Modifier. */
+@Composable
+fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
+    val vm: StockDetailViewModel = hiltViewModel()
+    val etat by vm.etat.collectAsStateWithLifecycle()
+    val categorieNom by vm.categorieNom.collectAsStateWithLifecycle()
+    val produit = etat.product
+    val contexte = androidx.compose.ui.platform.LocalContext.current
+    var dialogueSuppression by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    val suppression by vm.suppressionResult.collectAsStateWithLifecycle()
+
+    suppression?.let { r ->
+        when (r) {
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.Supprime -> {
+                vm.clearSuppressionResult()
+                onBack()
+            }
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.StockNonNul -> {
+                Toast.makeText(
+                    contexte,
+                    stringResource(R.string.st_suppression_stock_non_nul, fmtQuantite(r.quantite)),
+                    Toast.LENGTH_LONG,
+                ).show()
+                vm.clearSuppressionResult()
+            }
+            is com.missa.b360.core.domain.usecase.SupprimerProduitUseCase.Result.LectureSeule -> {
+                Toast.makeText(contexte, stringResource(R.string.clients_lecture_seule), Toast.LENGTH_LONG).show()
+                vm.clearSuppressionResult()
+            }
+        }
+    }
+
+    if (dialogueSuppression) {
+        AlertDialog(
+            onDismissRequest = { dialogueSuppression = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    dialogueSuppression = false
+                    vm.supprimer()
+                }) { Text(stringResource(R.string.st_supprimer), color = Red40) }
+            },
+            dismissButton = {
+                TextButton(onClick = { dialogueSuppression = false }) { Text(stringResource(R.string.st_annuler)) }
+            },
+            title = { Text(stringResource(R.string.st_supprimer_article)) },
+            text = { Text(stringResource(R.string.st_supprimer_article_msg)) },
+        )
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        MissaTopAppBar(
+            title = stringResource(R.string.st_detail_article),
+            onBack = onBack,
+            couleurFond = AppModule.STOCK.couleurPale,
+            actions = {
+                IconButton(onClick = { dialogueSuppression = true }, modifier = Modifier.size(48.dp)) {
+                    Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                }
+            },
+        )
+        if (produit == null) {
+            Box(Modifier.fillMaxSize())
+            return
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+        ) {
+            Spacer(Modifier.height(8.dp))
+            // En-tête article.
+            CarteStock {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val photo = rememberPhotoProduit(produit.photoPath)
+                    Surface(modifier = Modifier.size(56.dp), shape = RoundedCornerShape(14.dp), color = Blue90) {
+                        Box(contentAlignment = Alignment.Center) {
+                            if (photo != null) {
+                                Image(
+                                    bitmap = photo,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            } else {
+                                Icon(painterResource(produit.type.icone()), null, tint = MissaInk, modifier = Modifier.size(26.dp))
+                            }
+                        }
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(produit.nom, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
+                        Text(
+                            text = produit.reference?.takeIf { it.isNotBlank() } ?: produit.code,
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Surface(shape = RoundedCornerShape(8.dp), color = Green90) {
+                            Text(
+                                text = stringResource(produit.type.libelleTypeRes()),
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Green60,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            var onglet by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
+            val equipement by vm.equipement.collectAsStateWithLifecycle()
+            val estEquipement = TYPES_EQUIPEMENTS.contains(produit.type)
+            if (estEquipement) {
+                StockOnglets(
+                    onglets = listOf(
+                        stringResource(R.string.st_tab_general),
+                        stringResource(R.string.st_maintenance),
+                        stringResource(R.string.st_tab_historique),
+                    ),
+                    selection = onglet,
+                    onSelection = { onglet = it },
+                )
+                Spacer(Modifier.height(12.dp))
+                when (onglet) {
+                    0 -> OngletGeneralEquipement(produit, equipement, categorieNom, etat.devise)
+                    1 -> OngletMaintenance(equipement, vm)
+                    else -> {
+                        if (etat.mouvements.isEmpty()) {
+                            Text(stringResource(R.string.st_aucun_resultat), fontSize = 11.5.sp, color = MissaMuted)
+                        } else {
+                            etat.mouvements.take(20).forEach { LigneMouvement(it) ; Spacer(Modifier.height(8.dp)) }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                Row {
+                    val enMaint = equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE
+                    Button(
+                        onClick = {
+                            vm.setStatutEquipement(
+                                if (enMaint) com.missa.b360.core.data.entity.StatutEquipement.EN_SERVICE
+                                else com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE,
+                            )
+                        },
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    ) {
+                        Text(
+                            stringResource(if (enMaint) R.string.st_remettre_service else R.string.st_maintenancer),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
+                        modifier = Modifier.weight(1f).height(46.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                    ) {
+                        Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(15.dp))
+                        Spacer(Modifier.width(6.dp))
+                        Text(stringResource(R.string.st_modifier), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            } else {
+                StockOnglets(
+                    onglets = listOf(
+                        stringResource(R.string.st_tab_general),
+                        stringResource(R.string.st_tab_stock),
+                        stringResource(R.string.st_tab_prix),
+                        stringResource(R.string.st_tab_fournisseur),
+                    ),
+                    selection = onglet,
+                    onSelection = { onglet = it },
+                )
+                Spacer(Modifier.height(12.dp))
+                when (onglet) {
+                    0 -> OngletGeneral(etat, produit, categorieNom)
+                    1 -> OngletStock(etat, produit)
+                    2 -> OngletPrix(etat, produit)
+                    else -> OngletFournisseur(etat)
+                }
+                SectionExtension(produit.type, vm)
+                Spacer(Modifier.height(16.dp))
+                Button(
+                    onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
+                    modifier = Modifier.fillMaxWidth().height(46.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                ) {
+                    Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(7.dp))
+                    Text(stringResource(R.string.st_modifier), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(Modifier.height(20.dp))
+        }
+    }
+}
+
+/** Sections lecture seule des extensions par famille (déchets, emballage, consignation, kit). */
+@Composable
+private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, vm: StockDetailViewModel) {
+    val dechet by vm.dechet.collectAsStateWithLifecycle()
+    val emballage by vm.emballage.collectAsStateWithLifecycle()
+    val consignation by vm.consignation.collectAsStateWithLifecycle()
+    val kit by vm.kit.collectAsStateWithLifecycle()
+    val composants by vm.composantsKit.collectAsStateWithLifecycle()
+    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    when (type) {
+        com.missa.b360.core.data.entity.ProductType.DECHET_VALORISABLE,
+        com.missa.b360.core.data.entity.ProductType.DECHET_NON_VALORISABLE -> dechet?.let { d ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_dechet), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_type_dechet), d.typeDechet)
+                LigneInfo(stringResource(R.string.st_code_dechet), d.codeReglementaire)
+                LigneInfo(stringResource(R.string.st_dangereux), stringResource(if (d.dangereux) R.string.st_oui else R.string.st_non))
+                LigneInfo(stringResource(R.string.st_origine_dechet), d.origine)
+                LigneInfo(stringResource(R.string.st_zone_stockage), d.zoneStockage)
+                LigneInfo(stringResource(R.string.st_mode_elimination), d.modeElimination)
+                LigneInfo(stringResource(R.string.st_prestataire), d.prestataire)
+                LigneInfo(stringResource(R.string.st_cout_elimination), d.coutElimination?.let { fmtValeur(it, "") })
+                LigneInfo(stringResource(R.string.st_filiere_recyclage), d.filiereRecyclage)
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.EMBALLAGE -> emballage?.let { e ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_emballage), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_type_emballage), e.typeEmballage)
+                LigneInfo(stringResource(R.string.st_matiere), e.matiere)
+                LigneInfo(stringResource(R.string.st_dimensions), e.dimensions)
+                LigneInfo(stringResource(R.string.st_reutilisable), stringResource(if (e.reutilisable) R.string.st_oui else R.string.st_non))
+                LigneInfo(stringResource(R.string.st_consigne), stringResource(if (e.consigne) R.string.st_oui else R.string.st_non))
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.CONSIGNATION -> consignation?.let { c ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_consignation), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(stringResource(R.string.st_proprietaire), c.proprietaire)
+                LigneInfo(stringResource(R.string.st_ref_contrat), c.referenceContrat)
+                LigneInfo(stringResource(R.string.st_debut), c.dateDebut?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_fin), c.dateFin?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_conditions_retour), c.conditionsRetour)
+            }
+        }
+        com.missa.b360.core.data.entity.ProductType.KIT -> kit?.let { k ->
+            Spacer(Modifier.height(12.dp))
+            CarteStock {
+                Text(stringResource(R.string.st_donnees_kit), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(6.dp))
+                LigneInfo(
+                    stringResource(R.string.st_methode_stock),
+                    stringResource(if (k.methode == "ASSEMBLE") R.string.st_kit_assemble else R.string.st_kit_virtuel),
+                )
+                composants.forEach { c ->
+                    LigneInfo("#${c.composantId}", fmtQuantite(c.quantite))
+                }
+            }
+        }
+        else -> Unit
+    }
+}
+
+@Composable
+private fun OngletGeneral(
+    etat: StockDetailState,
+    produit: com.missa.b360.core.data.entity.ProductEntity,
+    categorieNom: String?,
+) {
+    CarteStock {
+        Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+        Spacer(Modifier.height(6.dp))
+        LigneInfo(stringResource(R.string.st_marque), produit.marque)
+        LigneInfo(stringResource(R.string.st_code_barres), produit.barcode)
+        LigneInfo(stringResource(R.string.st_unite), produit.unite)
+        LigneInfo(stringResource(R.string.st_emplacement), produit.emplacement)
+        LigneInfo(stringResource(R.string.st_categorie), categorieNom)
+    }
+}
+
+@Composable
+private fun OngletStock(
+    etat: StockDetailState,
+    produit: com.missa.b360.core.data.entity.ProductEntity,
+) {
+    // Stock réel, négatif compris : masquer un stock négatif cacherait une anomalie.
+    val total = etat.stocks.sumOf { it.quantite }
+    CarteStock {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TuileStock(stringResource(R.string.st_disponible), fmtQuantite(total), MissaInk, Modifier.weight(1f))
+            TuileStock(stringResource(R.string.st_minimum), fmtQuantite(produit.stockMin), ProfileOrange, Modifier.weight(1f))
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TuileStock(stringResource(R.string.st_maximum), produit.stockMax?.let { fmtQuantite(it) } ?: "—", MissaInk, Modifier.weight(1f))
+            TuileStock(stringResource(R.string.st_securite), fmtQuantite(produit.stockSecurite), Green60, Modifier.weight(1f))
+        }
+        if (etat.stocks.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            etat.stocks.forEach { ligne ->
+                LigneInfo(
+                    libelle = etat.sites.firstOrNull { it.id == ligne.siteId }?.nom ?: stringResource(R.string.st_site),
+                    valeur = fmtQuantite(ligne.quantite),
+                )
+            }
+        }
+        // Historique des mouvements, aussi pour les articles non équipement.
+        if (etat.mouvements.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            Text(stringResource(R.string.st_historique), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            Spacer(Modifier.height(6.dp))
+            etat.mouvements.take(10).forEach { mv ->
+                LigneMouvement(mv)
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun TuileStock(libelle: String, valeur: String, teinte: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(10.dp), color = com.missa.b360.ui.theme.MissaCanvas) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(libelle, fontSize = 10.sp, color = MissaMuted)
+            Spacer(Modifier.height(2.dp))
+            Text(valeur, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = teinte)
+        }
+    }
+}
+
+@Composable
+private fun OngletPrix(
+    etat: StockDetailState,
+    produit: com.missa.b360.core.data.entity.ProductEntity,
+) {
+    val achat = produit.prixAchat
+    val vente = produit.prixVente
+    val marge = if (achat != null && vente != null && achat > 0) (vente - achat) / achat * 100 else null
+    CarteStock {
+        Text(stringResource(R.string.st_prix), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+        Spacer(Modifier.height(6.dp))
+        LigneInfo(stringResource(R.string.st_prix_achat), achat?.let { fmtValeur(it, etat.devise) })
+        LigneInfo(stringResource(R.string.st_prix_vente), vente?.let { fmtValeur(it, etat.devise) })
+        LigneInfo(stringResource(R.string.st_marge), marge?.let { "%.1f %%".format(it) })
+        LigneInfo(stringResource(R.string.st_remise_max), "%.0f %%".format(produit.remiseMaxPct))
+    }
+}
+
+@Composable
+private fun OngletFournisseur(etat: StockDetailState) {
+    val f = etat.fournisseur
+    CarteStock {
+        LigneInfo(stringResource(R.string.st_fournisseur), f?.nom)
+        LigneInfo(stringResource(R.string.st_reference), etat.product?.refFournisseur)
+    }
+}
+
+@Composable
+private fun OngletGeneralEquipement(
+    produit: com.missa.b360.core.data.entity.ProductEntity,
+    equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
+    categorieNom: String?,
+    devise: String,
+) {
+    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
+    CarteStock {
+        Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+        Spacer(Modifier.height(6.dp))
+        LigneInfo(stringResource(R.string.st_type), stringResource(produit.type.libelleTypeRes()))
+        LigneInfo(stringResource(R.string.st_prix_achat), produit.prixAchat?.let { fmtValeur(it, devise) })
+        // Immobilisations vendables : le prix de vente est visible comme pour les autres articles.
+        LigneInfo(stringResource(R.string.st_prix_vente), produit.prixVente?.let { fmtValeur(it, devise) })
+        LigneInfo(stringResource(R.string.st_marque), produit.marque)
+        LigneInfo(stringResource(R.string.st_modele), equipement?.modele)
+        LigneInfo(stringResource(R.string.st_num_serie), equipement?.numeroSerie)
+        LigneInfo(stringResource(R.string.st_date_acquisition), equipement?.dateAcquisition?.let { fmt.format(java.util.Date(it)) })
+        LigneInfo(stringResource(R.string.st_emplacement), produit.emplacement)
+        LigneInfo(stringResource(R.string.st_responsable), equipement?.responsable)
+        LigneInfo(stringResource(R.string.st_categorie), categorieNom)
+    }
+    Spacer(Modifier.height(10.dp))
+    CarteStock {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.st_garantie), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(4.dp))
+                LigneInfo(stringResource(R.string.st_debut), equipement?.garantieDebut?.let { fmt.format(java.util.Date(it)) })
+                LigneInfo(stringResource(R.string.st_fin), equipement?.garantieFin?.let { fmt.format(java.util.Date(it)) })
+            }
+            val fin = equipement?.garantieFin
+            val valide = fin != null && fin > System.currentTimeMillis()
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (valide) Green90 else com.missa.b360.ui.theme.Red80,
+            ) {
+                Text(
+                    text = stringResource(if (valide) R.string.st_valide else R.string.st_expiree),
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (valide) Green60 else com.missa.b360.ui.theme.Red40,
+                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OngletMaintenance(
+    equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
+    vm: StockDetailViewModel,
+) {
+    CarteStock {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.st_maintenance), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(
+                        when (equipement?.statut) {
+                            com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE -> R.string.st_maintenance
+                            com.missa.b360.core.data.entity.StatutEquipement.HORS_SERVICE -> R.string.st_hors_service
+                            else -> R.string.st_en_service
+                        },
+                    ),
+                    fontSize = 11.5.sp,
+                    color = MissaMuted,
+                )
+            }
+            BadgeStatutEquipement(equipement)
+        }
+    }
+}

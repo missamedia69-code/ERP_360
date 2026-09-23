@@ -13,12 +13,16 @@ import com.missa.b360.core.backup.ResultatRestauration
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.entity.LicenceStatus
 import com.missa.b360.core.domain.model.CleIdentifiant
+import com.missa.b360.core.domain.model.DependancesModules
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ModuleDependency
 import com.missa.b360.core.domain.model.ModulesPersonnalises
 import com.missa.b360.core.domain.model.ModulesSocle
+import com.missa.b360.core.domain.model.OptionsConfigProfil
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ReferentielFiscal
+import com.missa.b360.core.domain.model.ValidationProfil
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
@@ -99,6 +103,14 @@ class OnboardingViewModel @Inject constructor(
     /** Vente sans stock physique : drop, commande, service — stock négatif autorisé. */
     var venteSansStock by mutableStateOf(false)
         private set
+
+    /**
+     * Dépendances de la règle d'or dont le module d'origine est actif dans la
+     * configuration courante. La barre d'information de l'onboarding les affiche
+     * pour expliquer pourquoi Stock a été ajouté automatiquement (spec §2.1).
+     */
+    val dependancesActives: List<ModuleDependency>
+        get() = DependancesModules.liste.filter { it.from in modulesMetier() }
 
     // --- Étape entreprise (informations + logo) ---
     var nomEntreprise by mutableStateOf("")
@@ -324,15 +336,15 @@ class OnboardingViewModel @Inject constructor(
             settingsStore.set(SettingsStore.Keys.VENTE_SANS_STOCK, venteSansStock.toString())
         }
         if (!venteSansStock) {
+            // En repassant la vente « avec stock », la règle d'or exige VEN → STK :
+            // on rétablit le Stock pour la config courante, que VEN soit seul ou non.
             val metier = modulesMetier()
             if (ModuleCode.VEN in metier && ModuleCode.STK !in metier) {
-                if (ModuleCode.ACH in metier || ModuleCode.PRO in metier) {
-                    val nouvelle = modulesPersonnalises.toMutableSet()
-                    nouvelle.add(ModuleCode.STK)
-                    modulesPersonnalises = nouvelle
-                    rafraichirSocle()
-                    enregistrerModules()
-                }
+                val nouvelle = modulesPersonnalises.toMutableSet()
+                nouvelle.add(ModuleCode.STK)
+                modulesPersonnalises = nouvelle
+                rafraichirSocle()
+                enregistrerModules()
             }
         }
     }
@@ -341,7 +353,8 @@ class OnboardingViewModel @Inject constructor(
      * Ajoute ou retire un module métier **hors pack**. Un module inclus dans le
      * profil est verrouillé : l'appel est sans effet, la cohérence du pack
      * prime sur le clic. ACH→STK et PRO→STK sont ajoutés automatiquement ;
-     * retirer STK bloque si ACH ou PRO reste.
+     * retirer STK est bloqué si la configuration violerait la règle d'or
+     * (spec §7.2, `ValidationProfil`).
      */
     fun basculerModule(module: ModuleCode) {
         if (module in ModulesSocle.metierDuPack(profil)) return
@@ -350,12 +363,10 @@ class OnboardingViewModel @Inject constructor(
         val ajout = nouvelle.add(module)
         if (!ajout) {
             nouvelle.remove(module)
-            if (module == ModuleCode.STK) {
-                val restant = (pack + nouvelle)
-                if (ModuleCode.ACH in restant || ModuleCode.PRO in restant) {
-                    erreurRes = R.string.obn_stock_requis
-                    return
-                }
+            val options = OptionsConfigProfil(venteSansStock = venteSansStock)
+            if (ValidationProfil.violations(pack + nouvelle, options).isNotEmpty()) {
+                erreurRes = R.string.obn_stock_requis
+                return
             }
             modulesPersonnalises = nouvelle
         } else {
@@ -435,9 +446,55 @@ class OnboardingViewModel @Inject constructor(
         val actifs = ModulesPersonnalises.modulesActifs(profil, modulesPersonnalises, modulesSupport)
         val valeurActifs = ModulesPersonnalises.serialiser(actifs)
         val valeurExtras = ModulesPersonnalises.serialiser(ModulesSocle.filtrerSupport(extrasSupport))
+        // Barre du bas : place directement les modules du profil sur la barre (max 3)
+        // Ex: Achat-Vente => VENTE, ACHATS, TRESORERIE sur la barre, le reste dans Plus
+        val ordrePrioritaire = listOf(
+            ModuleCode.VEN,
+            ModuleCode.ACH,
+            ModuleCode.STK,
+            ModuleCode.TRE,
+            ModuleCode.CPT,
+            ModuleCode.PRO,
+            ModuleCode.SER,
+            ModuleCode.PRJ,
+            ModuleCode.LOG,
+            ModuleCode.CRM,
+            ModuleCode.RH,
+            ModuleCode.QUA,
+            ModuleCode.MAI,
+            ModuleCode.REP,
+        )
+        val tries = actifs.sortedBy { code ->
+            val idx = ordrePrioritaire.indexOf(code)
+            if (idx == -1) 99 else idx
+        }
+        val mapPrincipal = mapOf(
+            ModuleCode.ACH to "ACHATS",
+            ModuleCode.VEN to "VENTE",
+            ModuleCode.STK to "STOCK",
+            ModuleCode.PRO to "PRODUCTION",
+            ModuleCode.SER to "SERVICES",
+            ModuleCode.PRJ to "PROJETS",
+            ModuleCode.RH to "RH",
+            ModuleCode.CPT to "COMPTABILITE",
+            ModuleCode.TRE to "TRESORERIE",
+            ModuleCode.CRM to "CRM",
+            ModuleCode.QUA to "QUALITE",
+            ModuleCode.MAI to "MAINTENANCE",
+            ModuleCode.LOG to "LOGISTIQUE",
+            ModuleCode.REP to "REPORTING",
+        )
+        val barre = tries.mapNotNull { mapPrincipal[it] }.take(3).joinToString(",")
         viewModelScope.launch {
             settingsStore.set(SettingsStore.Keys.MODULES_ACTIFS, valeurActifs)
             settingsStore.set(SettingsStore.Keys.MODULES_SUPPORT, valeurExtras)
+            settingsStore.set(SettingsStore.Keys.BARRE_MODULES, barre)
+            // Nouveau système : vide les éléments personnalisés à l'onboarding
+            // (les éléments par défaut du profil seront calculés par ActivationProfil)
+            // On ne touche pas à MODULES_ELEMENTS s'il existe déjà pour permettre reprise
+            if (settingsStore.get(SettingsStore.Keys.MODULES_ELEMENTS) == null) {
+                settingsStore.set(SettingsStore.Keys.MODULES_ELEMENTS, "")
+            }
         }
     }
 
@@ -446,11 +503,17 @@ class OnboardingViewModel @Inject constructor(
      *
      * Le cas « Personnalisé » n'est plus proposé à l'installation, mais reste
      * traité : une application installée avant ce changement peut avoir ce
-     * profil enregistré et doit continuer à s'ouvrir normalement.
+     * profil enregistré et doit continuer à s'ouvrir normalement. Une telle
+     * configuration doit en outre respecter la règle d'or (spec §7.2).
      */
     fun profilEcranValide(): Boolean = when (profil) {
         null -> false
-        ProfilActivite.CUSTOM -> modulesPersonnalises.isNotEmpty()
+        ProfilActivite.CUSTOM ->
+            modulesPersonnalises.isNotEmpty() &&
+                ValidationProfil.estValide(
+                    modulesPersonnalises,
+                    OptionsConfigProfil(venteSansStock = venteSansStock),
+                )
         else -> true
     }
 

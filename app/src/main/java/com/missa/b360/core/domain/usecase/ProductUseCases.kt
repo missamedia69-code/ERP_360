@@ -27,6 +27,10 @@ data class ProductInput(
     val barcode: String? = null,
     val sku: String? = null,
     val categorieId: Long? = null,
+    /** Drapeaux surchargeant les règles du groupe (spec §14). */
+    val vendable: Boolean = true,
+    val achetable: Boolean = true,
+    val stockable: Boolean = true,
     val marque: String? = null,
     val unite: String? = null,
     val prixAchat: Double? = null,
@@ -171,6 +175,9 @@ class CreateProductUseCase @Inject constructor(
                     barcode = barcode,
                     sku = ProductValidation.normaliseTexte(input.sku),
                     categorieId = input.categorieId,
+                    vendable = input.vendable,
+                    achetable = input.achetable,
+                    stockable = input.stockable,
                     marque = ProductValidation.normaliseTexte(input.marque),
                     unite = ProductValidation.normaliseTexte(input.unite),
                     prixAchat = input.prixAchat,
@@ -195,9 +202,9 @@ class CreateProductUseCase @Inject constructor(
                 ),
             )
             if (stock > 0.0) {
-                val siteId = input.siteId!!
+                val siteId = input.siteId ?: return@withTransaction 0L // déjà vérifié plus haut, garde-fou
                 stockDao.ensureRow(produitId, siteId)
-                stockDao.remplacer(ProductStockEntity(produitId, siteId, stock))
+                stockDao.remplacer(produitId, siteId, stock)
                 movementDao.insert(
                     StockMovementEntity(
                         produitId = produitId,
@@ -246,6 +253,9 @@ class UpdateProductUseCase @Inject constructor(
                 barcode = barcode,
                 sku = ProductValidation.normaliseTexte(input.sku),
                 categorieId = input.categorieId,
+                vendable = input.vendable,
+                achetable = input.achetable,
+                stockable = input.stockable,
                 marque = ProductValidation.normaliseTexte(input.marque),
                 unite = ProductValidation.normaliseTexte(input.unite),
                 prixAchat = input.prixAchat,

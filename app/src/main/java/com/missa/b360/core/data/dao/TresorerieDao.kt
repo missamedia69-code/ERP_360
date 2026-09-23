@@ -49,6 +49,10 @@ interface MouvementTresorerieDao {
     @Query("SELECT COUNT(*) FROM tresorerie_mouvements WHERE reference = :reference")
     suspend fun compterParReference(reference: String): Int
 
+    /** Mouvements dont la référence commence par un préfixe — règlements numérotés d'une facture. */
+    @Query("SELECT COUNT(*) FROM tresorerie_mouvements WHERE reference LIKE :prefixe || '%'")
+    suspend fun compterParReferenceCommencant(prefixe: String): Int
+
     @Insert
     suspend fun insert(mouvement: MouvementTresorerieEntity): Long
 

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -17,9 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -36,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -129,7 +127,7 @@ fun MissaSelecteurLigne(
             }
         }
         Icon(
-            imageVector = Icons.Outlined.ArrowDropDown,
+            painter = painterResource(Iv.ArrowDropDown),
             contentDescription = null,
             tint = MissaMuted,
             modifier = Modifier.size(18.dp),
@@ -164,7 +162,7 @@ fun MissaSelecteurBleu(
     selectionCle: String?,
     onSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
-    icone: ImageVector? = null,
+    icone: Int? = null,
     enabled: Boolean = true,
     placeholder: String = "",
     titreDialogue: String = label,
@@ -186,7 +184,7 @@ fun MissaSelecteurBleu(
         ) {
             if (icone != null) {
                 Icon(
-                    imageVector = icone,
+                    painter = painterResource(icone),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
@@ -200,15 +198,41 @@ fun MissaSelecteurBleu(
                     color = Color.White.copy(alpha = 0.75f),
                 )
                 Spacer(Modifier.height(2.dp))
-                Text(
-                    text = choisie?.titre ?: placeholder,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (choisie?.badge != null) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = Color.White.copy(alpha = 0.22f),
+                        ) {
+                            Text(
+                                text = choisie.badge,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(7.dp))
+                    }
+                    Text(
+                        text = choisie?.titre ?: placeholder,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                    )
+                }
+                if (choisie?.sousTitre != null) {
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = choisie.sousTitre,
+                        fontSize = 11.sp,
+                        color = Color.White.copy(alpha = 0.8f),
+                        maxLines = 1,
+                    )
+                }
             }
             Icon(
-                imageVector = Icons.Outlined.ArrowDropDown,
+                painter = painterResource(Iv.ArrowDropDown),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(22.dp),
@@ -368,7 +392,7 @@ private fun MissaOptionLigne(
         }
         if (actif) {
             Icon(
-                imageVector = Icons.Outlined.Check,
+                painter = painterResource(Iv.Check),
                 contentDescription = null,
                 tint = BrandBlue,
                 modifier = Modifier.size(18.dp),

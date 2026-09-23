@@ -100,9 +100,6 @@ dependencies {
     // WorkManager — sauvegarde auto + purge journal 12 mois
     implementation(libs.androidx.work.runtime)
 
-    // Sécurité — hash PIN (jamais en clair)
-    implementation(libs.androidx.security.crypto)
-
     // Export JSON (kotlinx-serialization)
     implementation(libs.kotlinx.serialization.json)
 

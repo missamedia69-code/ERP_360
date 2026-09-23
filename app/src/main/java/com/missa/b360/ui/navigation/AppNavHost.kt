@@ -1,5 +1,7 @@
 package com.missa.b360.ui.navigation
 
+import com.missa.b360.ui.theme.MissaInk
+
 import androidx.compose.runtime.CompositionLocalProvider
 import com.missa.b360.ui.components.LocalBarreNavigation
 import androidx.compose.material3.DrawerValue
@@ -28,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +39,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.missa.b360.R
 import com.missa.b360.ui.components.MissaBarreModules
+import com.missa.b360.ui.components.ModuleInactifScreen
 import com.missa.b360.ui.home.HomeViewModel
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaMuted
@@ -56,6 +60,8 @@ import androidx.navigation.navArgument
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.domain.model.ActivationProfil
+import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.ui.admin.AdminAProposScreen
 import com.missa.b360.ui.admin.AdminJournalScreen
 import com.missa.b360.ui.admin.AdminLicenceScreen
@@ -91,6 +97,11 @@ import com.missa.b360.ui.stock.InventoryScreen
 import com.missa.b360.ui.stock.ProductFormScreen
 import com.missa.b360.ui.stock.StockMovementFormScreen
 import com.missa.b360.ui.stock.StockAccueilScreen
+import com.missa.b360.ui.stock.StockAlertesScreen
+import com.missa.b360.ui.stock.StockCategoriesScreen
+import com.missa.b360.ui.stock.StockDetailScreen
+import com.missa.b360.ui.stock.StockEquipementsScreen
+import com.missa.b360.ui.stock.StockMouvementsScreen
 import com.missa.b360.ui.stock.StockScreen
 import com.missa.b360.ui.stock.StockTransferFormScreen
 import com.missa.b360.ui.screens.SplashVideoScreen
@@ -103,9 +114,6 @@ fun AppNavHost() {
     val startup: StartupViewModel = hiltViewModel()
     val state by startup.state.collectAsState()
 
-    // L'introduction de marque ouvre l'application, une fois par lancement.
-    // Son drapeau vit dans le ViewModel : un changement de langue recrée
-    // l'activité, et la vidéo se rejouait — c'était le bref écran noir.
     if (!startup.introVue) {
         SplashVideoScreen(onFinished = startup::marquerIntroVue)
         return
@@ -113,14 +121,8 @@ fun AppNavHost() {
 
     when (state) {
         StartupState.Chargement -> Box(Modifier.fillMaxSize())
-
-        // 1re ouverture : parcours d'onboarding, à partir de l'écran bleu.
         StartupState.Onboarding -> OnboardingScreen(onFinished = startup::evaluer)
-
-        // RA-01 : verrou PIN demandé à chaque ouverture
         StartupState.VerrouPin -> PinLockScreen(onUnlocked = startup::deverrouiller)
-
-        // Accueil + modules métier
         StartupState.Pret -> MainNavHost()
     }
 }
@@ -129,22 +131,43 @@ fun AppNavHost() {
 private fun MainNavHost() {
     val navController = rememberNavController()
     val accueilViewModel: HomeViewModel = hiltViewModel()
-    val modulesActifs by accueilViewModel.modulesActifs.collectAsState()
+    val activation by accueilViewModel.activation.collectAsState()
     val modulesEpingles by accueilViewModel.modulesEpingles.collectAsState()
     val routeCourante = navController.currentBackStackEntryAsState().value?.destination?.route
     var plusDeModules by remember { mutableStateOf(false) }
     var assistance by remember { mutableStateOf(false) }
+    var ficheEntreprise by remember { mutableStateOf(false) }
+    val ficheViewModel: com.missa.b360.ui.components.FicheEntrepriseViewModel = hiltViewModel()
+    val ficheEtat by ficheViewModel.etat.collectAsState()
     val etatTiroir = rememberDrawerState(DrawerValue.Closed)
     val portee = rememberCoroutineScope()
     val etatAccueil by accueilViewModel.uiState.collectAsState()
 
-    // Barre unique, déclarée ici et nulle part ailleurs. L'accueil en avait sa
-    // propre copie : selon l'écran, on en voyait une, deux superposées, ou
-    // aucune.
-    // Un écran peut réclamer tout le bas de l'écran le temps d'une saisie.
     val barreDemandee = remember { mutableStateOf(true) }
+    // Reset la demande de masquage à chaque changement de route : si un écran a masqué
+    // la barre via LocalBarreNavigation, elle doit réapparaître en sortant.
+    androidx.compose.runtime.LaunchedEffect(routeCourante) {
+        barreDemandee.value = true
+    }
+    // Barre visible partout sauf sur les formulaires plein écran.
+    // Important pour que le changement de profil dans Réglages se répercute
+    // directement sur la barre du bas et le menu Plus sans retour arrière.
+    val estFormulairePleinEcran = routeCourante?.let { r ->
+        r.startsWith(Routes.STOCK_PRODUCT_FORM) ||
+            r.startsWith(Routes.STOCK_MOVEMENT_FORM) ||
+            r.startsWith(Routes.STOCK_TRANSFER_FORM) ||
+            r.startsWith(Routes.OPERATION_FORM) ||
+            r.startsWith(Routes.SALES_RETURN)
+    } == true
     val afficherBarre = (
-        AppModule.barreVisibleSur(routeCourante) || routeCourante == Routes.HOME
+        !estFormulairePleinEcran && (
+            AppModule.barreVisibleSur(routeCourante) ||
+                routeCourante == Routes.HOME ||
+                routeCourante?.startsWith("admin_") == true ||
+                routeCourante == Routes.TASKS ||
+                routeCourante == Routes.ADMIN_REFERENTIELS ||
+                routeCourante == Routes.NOTIFICATIONS
+            )
         ) && barreDemandee.value
 
     val nomEntreprise = etatAccueil.entrepriseNom.ifBlank {
@@ -153,6 +176,9 @@ private fun MainNavHost() {
     val etatSauvegarde = etatAccueil.derniereSauvegarde?.let {
         stringResource(R.string.home_backup_date, DateUtils.formatDateHeure(it))
     } ?: stringResource(R.string.home_backup_never)
+
+    val nonLues by accueilViewModel.notificationsNonLues.collectAsState(initial = 0)
+    val isHome = routeCourante == Routes.HOME || routeCourante?.startsWith(Routes.HOME) == true
 
     CompositionLocalProvider(LocalBarreNavigation provides barreDemandee) {
     ModalNavigationDrawer(
@@ -168,6 +194,10 @@ private fun MainNavHost() {
                     portee.launch { etatTiroir.close() }
                     navController.navigate(route)
                 },
+                onCompanyFiche = {
+                    portee.launch { etatTiroir.close() }
+                    ficheEntreprise = true
+                },
                 onSupport = {
                     portee.launch { etatTiroir.close() }
                     assistance = true
@@ -176,10 +206,27 @@ private fun MainNavHost() {
         },
     ) {
     Scaffold(
+        containerColor = com.missa.b360.ui.theme.MissaCanvas,
+        topBar = {
+            // Spec: Header fixe 64dp + statusBars — global pour Home, autres écrans ont leur propre MissaTopAppBar 64dp
+            // Pour éviter double header, on affiche MissaAppHeader seulement sur HOME
+            if (isHome && !estFormulairePleinEcran) {
+                com.missa.b360.ui.components.MissaAppHeader(
+                    companyLogoUri = etatAccueil.entrepriseLogoUri,
+                    companyName = etatAccueil.entrepriseNom,
+                    secteur = etatAccueil.secteur,
+                    profilActivite = etatAccueil.profilActivite,
+                    isHome = true,
+                    onMenuClick = { portee.launch { etatTiroir.open() } },
+                    onBackClick = { navController.popBackStack() },
+                    onProfileClick = { ficheEntreprise = true },
+                )
+            }
+        },
         bottomBar = {
             if (afficherBarre) {
                 MissaBarreModules(
-                    modules = AppModule.barreBas(modulesActifs, modulesEpingles),
+                    modules = AppModule.barreBas(activation, modulesEpingles),
                     routeCourante = routeCourante,
                     onAccueil = { navController.naviguerVers(Routes.HOME) },
                     onModule = { navController.naviguerVers(it.route) },
@@ -187,23 +234,28 @@ private fun MainNavHost() {
                 )
             }
         },
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { padding ->
+    // Spec: Content entre Header 64dp et BottomNav 80dp, scrollable seul, respecte WindowInsets
     NavHost(
         navController = navController,
         startDestination = Routes.HOME,
-        modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding),
     ) {
         composable(Routes.HOME) {
             HomeScreen(
                 navController = navController,
                 onOuvrirMenu = { portee.launch { etatTiroir.open() } },
+                onSupport = { assistance = true },
             )
         }
         composable(Routes.NOTIFICATIONS) {
             NotificationsScreen(onBack = { navController.popBackStack() })
         }
 
-        // ☰ Administration & Paramétrage (module 9.1 — Phase C)
+        // Administration
         composable(Routes.ADMIN_REGLAGES) {
             AdminReglagesScreen(onBack = { navController.popBackStack() })
         }
@@ -226,308 +278,357 @@ private fun MainNavHost() {
             AdminAProposScreen(onBack = { navController.popBackStack() })
         }
 
-// Phase D — Clients & Fournisseurs (9.2/9.3)
+        // Clients & Fournisseurs
         composable(
             route = "${AppModule.CLIENTS.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            ClientsScreen(
-                onBack = { navController.popBackStack() },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-                onNavigate = { route -> navController.navigate(route) },
-            )
+            GuardedModule(AppModule.CLIENTS, activation, navController) {
+                ClientsScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
         }
         composable(
             route = "${AppModule.FOURNISSEURS.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            FournisseursScreen(
-                onBack = { navController.popBackStack() },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.FOURNISSEURS, activation, navController) {
+                FournisseursScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Phase E — Module Stock : produits, mouvements et transferts (spec §7/§11/§13).
+        // Stock
         composable(
             route = "${AppModule.STOCK.route}?create={create}&direction={direction}",
             arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-                navArgument("direction") {
-                    type = NavType.StringType
-                    defaultValue = "NONE"
-                },
+                navArgument("create") { type = NavType.BoolType; defaultValue = false },
+                navArgument("direction") { type = NavType.StringType; defaultValue = "NONE" },
             ),
         ) {
-            StockAccueilScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.navigate(route) },
-            )
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockAccueilScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(Routes.STOCK_ARTICLES) {
-            StockScreen(
-                onBack = { navController.popBackStack() },
-                onNavigate = { route -> navController.navigate(route) },
-                initialMovement = null,
-            )
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                    initialMovement = null,
+                )
+            }
+        }
+
+        composable(Routes.STOCK_CATEGORIES) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockCategoriesScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(
-            route = "${Routes.STOCK_PRODUCT_FORM}?productId={productId}",
+            route = "${Routes.STOCK_LISTE}?type={type}&cat={cat}",
             arguments = listOf(
-                navArgument("productId") {
-                    type = NavType.LongType
-                    defaultValue = 0L
-                },
+                navArgument("type") { type = NavType.StringType; nullable = true; defaultValue = null },
+                navArgument("cat") { type = NavType.StringType; nullable = true; defaultValue = null },
+            ),
+        ) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                    initialMovement = null,
+                )
+            }
+        }
+        composable(
+            route = Routes.STOCK_DETAIL,
+            arguments = listOf(navArgument("id") { type = NavType.LongType }),
+        ) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
+        }
+        composable(Routes.STOCK_EQUIPEMENTS) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockEquipementsScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
+        }
+        composable(Routes.STOCK_MOUVEMENTS) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockMouvementsScreen(
+                    onBack = { navController.popBackStack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                )
+            }
+        }
+        composable(Routes.STOCK_ALERTES) {
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockAlertesScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
+        }
+        composable(
+            route = "${Routes.STOCK_PRODUCT_FORM}?productId={productId}&cat={cat}&type={type}",
+            arguments = listOf(
+                navArgument("productId") { type = NavType.LongType; defaultValue = 0L },
+                navArgument("cat") { type = NavType.StringType; defaultValue = "" },
+                navArgument("type") { type = NavType.StringType; defaultValue = "" },
             ),
         ) { entry ->
-            ProductFormScreen(
-                onBack = { navController.popBackStack() },
-                productId = entry.arguments?.getLong("productId")?.takeIf { it > 0L },
-            )
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                ProductFormScreen(
+                    onBack = { navController.popBackStack() },
+                    productId = entry.arguments?.getLong("productId")?.takeIf { it > 0L },
+                    initialCategorieId = entry.arguments?.getString("cat")?.toLongOrNull(),
+                    initialType = entry.arguments?.getString("type")
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { runCatching { com.missa.b360.core.data.entity.ProductType.valueOf(it) }.getOrNull() },
+                )
+            }
         }
         composable(
             route = "${Routes.STOCK_MOVEMENT_FORM}?type={type}",
-            arguments = listOf(
-                navArgument("type") {
-                    type = NavType.StringType
-                    defaultValue = "ENTREE"
-                },
-            ),
+            arguments = listOf(navArgument("type") { type = NavType.StringType; defaultValue = "ENTREE" }),
         ) { entry ->
-            StockMovementFormScreen(
-                onBack = { navController.popBackStack() },
-                initialDirection = runCatching {
-                    StockMovementType.valueOf(entry.arguments?.getString("type") ?: "ENTREE")
-                }.getOrDefault(StockMovementType.ENTREE),
-                onOpenTransfer = { navController.navigate(Routes.STOCK_TRANSFER_FORM) },
-            )
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockMovementFormScreen(
+                    onBack = { navController.popBackStack() },
+                    initialDirection = runCatching {
+                        StockMovementType.valueOf(entry.arguments?.getString("type") ?: "ENTREE")
+                    }.getOrDefault(StockMovementType.ENTREE),
+                    onOpenTransfer = { navController.navigate(Routes.STOCK_TRANSFER_FORM) },
+                )
+            }
         }
         composable(Routes.STOCK_TRANSFER_FORM) {
-            StockTransferFormScreen(onBack = { navController.popBackStack() })
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                StockTransferFormScreen(onBack = { navController.popBackStack() })
+            }
         }
         composable(Routes.STOCK_INVENTORY) {
-            InventoryScreen(onBack = { navController.popBackStack() })
+            GuardedModule(AppModule.STOCK, activation, navController) {
+                InventoryScreen(onBack = { navController.popBackStack() })
+            }
         }
-        // RH (spec §RH/§Paie) — écran dédié : employés, absences, paie, avances.
+        // RH
         composable(
             route = "${AppModule.RH.route}?create={create}&direction={direction}",
             arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-                navArgument("direction") {
-                    type = NavType.StringType
-                    defaultValue = "NONE"
-                },
+                navArgument("create") { type = NavType.BoolType; defaultValue = false },
+                navArgument("direction") { type = NavType.StringType; defaultValue = "NONE" },
             ),
         ) { entry ->
-            RhScreen(
-                onBack = { navController.popBackStack() },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.RH, activation, navController) {
+                RhScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Production (spec §Production) — écran dédié : ordres de production (OP).
+        // Production
         composable(
             route = "${AppModule.PRODUCTION.route}?create={create}&direction={direction}",
             arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-                navArgument("direction") {
-                    type = NavType.StringType
-                    defaultValue = "NONE"
-                },
+                navArgument("create") { type = NavType.BoolType; defaultValue = false },
+                navArgument("direction") { type = NavType.StringType; defaultValue = "NONE" },
             ),
         ) { entry ->
-            ProductionScreen(
-                onBack = { navController.popBackStack() },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.PRODUCTION, activation, navController) {
+                ProductionScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Modules opérationnels : chacun a sa propre liste, création, validation et journalisation.
+        // Vente
         composable(
             route = "${AppModule.VENTE.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            SalesScreen(
-                onNavigate = { route -> navController.navigate(route) },
-                onOpenClientCreate = {
-                    navController.navigate("${AppModule.CLIENTS.route}?create=true")
-                },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.VENTE, activation, navController) {
+                SalesScreen(
+                    onNavigate = { route -> navController.navigate(route) },
+                    onOpenClientCreate = { navController.navigate("${AppModule.CLIENTS.route}?create=true") },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Achat — écran dédié (spec §6) : facture fournisseur, réception de stock et passif.
+        // Achats
         composable(
             route = "${AppModule.ACHATS.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            PurchasesScreen(
-                onBack = { navController.popBackStack() },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.ACHATS, activation, navController) {
+                PurchasesScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Devis & commandes (spec §20) — cycle commercial avant facturation.
+        // Devis & commandes
         composable(Routes.DEVIS_COMMANDE) {
-            DevisCommandeScreen(onBack = { navController.popBackStack() })
+            // Devis appartient à VEN
+            GuardedModule(AppModule.VENTE, activation, navController) {
+                DevisCommandeScreen(onBack = { navController.popBackStack() })
+            }
         }
-        // Retour de vente + avoir (spec §22) — recordId optionnel : 0 = liste des factures retournables.
+        // Retour de vente
         composable(
             route = "${Routes.SALES_RETURN}?recordId={recordId}",
-            arguments = listOf(
-                navArgument("recordId") {
-                    type = NavType.LongType
-                    defaultValue = 0L
-                },
-            ),
+            arguments = listOf(navArgument("recordId") { type = NavType.LongType; defaultValue = 0L }),
         ) { entry ->
-            ReturnSaleScreen(
-                onBack = { navController.popBackStack() },
-                recordId = entry.arguments?.getLong("recordId")?.takeIf { it > 0L },
-            )
+            GuardedModule(AppModule.VENTE, activation, navController) {
+                ReturnSaleScreen(
+                    onBack = { navController.popBackStack() },
+                    recordId = entry.arguments?.getLong("recordId")?.takeIf { it > 0L },
+                )
+            }
         }
-        operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController)
+        operationDestination(AppModule.FINANCES, OperationModule.FINANCES, navController, activation)
         composable(
-            route = "${'$'}{AppModule.LIVRAISON.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            route = "${AppModule.LIVRAISON.route}?create={create}",
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            LivraisonScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.LIVRAISON, activation, navController) {
+                LivraisonScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
         composable(
-            route = "${'$'}{AppModule.SERVICES.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            route = "${AppModule.SERVICES.route}?create={create}",
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            ServicesScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.SERVICES, activation, navController) {
+                ServicesScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
         composable(
-            route = "${'$'}{AppModule.PROJETS.route}?create={create}",
-            arguments = listOf(
-                navArgument("create") {
-                    type = NavType.BoolType
-                    defaultValue = false
-                },
-            ),
+            route = "${AppModule.PROJETS.route}?create={create}",
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
         ) { entry ->
-            ProjetsScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-                openCreate = entry.arguments?.getBoolean("create") == true,
-            )
+            GuardedModule(AppModule.PROJETS, activation, navController) {
+                ProjetsScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
+            }
         }
-        // Nouveaux modules (structure ERP 360 complète)
         composable(AppModule.COMPTABILITE.route) {
-            ComptabiliteScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.COMPTABILITE, activation, navController) {
+                ComptabiliteScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(AppModule.TRESORERIE.route) {
-            TresorerieScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.TRESORERIE, activation, navController) {
+                TresorerieScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(AppModule.CRM.route) {
-            CrmScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.CRM, activation, navController) {
+                CrmScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(AppModule.QUALITE.route) {
-            QualiteScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.QUALITE, activation, navController) {
+                QualiteScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(AppModule.MAINTENANCE.route) {
-            MaintenanceScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.MAINTENANCE, activation, navController) {
+                MaintenanceScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
         composable(AppModule.LOGISTIQUE.route) {
-            LogistiqueScreen(
-                onBack = { navController.popBackStack() },
-                onNaviguer = { route -> navController.naviguerVers(route) },
-            )
+            GuardedModule(AppModule.LOGISTIQUE, activation, navController) {
+                LogistiqueScreen(
+                    onBack = { navController.popBackStack() },
+                    onNaviguer = { route -> navController.navigate(route) { launchSingleTop = true } },
+                )
+            }
         }
-        // Référentiels (spec §30) — moyens de paiement, taxes, unités.
         composable(Routes.ADMIN_REFERENTIELS) {
             ReferentielsScreen(onBack = { navController.popBackStack() })
         }
-        // Tâches de suivi (spec §Tâches).
         composable(Routes.TASKS) {
             TasksScreen(onBack = { navController.popBackStack() })
         }
-        // Formulaire d'opération — page dédiée unique (spec §3.2) : [Retour | Titre] ... [Annuler][Enregistrer].
         composable(
             route = "${Routes.OPERATION_FORM}?module={module}&direction={direction}",
             arguments = listOf(
-                navArgument("module") {
-                    type = NavType.StringType
-                },
-                navArgument("direction") {
-                    type = NavType.StringType
-                    defaultValue = "NONE"
-                },
+                navArgument("module") { type = NavType.StringType },
+                navArgument("direction") { type = NavType.StringType; defaultValue = "NONE" },
             ),
         ) { entry ->
             val module = runCatching {
                 OperationModule.valueOf(entry.arguments?.getString("module").orEmpty())
             }.getOrNull()
             if (module != null) {
-                OperationFormScreen(
-                    module = module,
-                    initialDirection = OperationDirection.entries.firstOrNull {
-                        it.name == entry.arguments?.getString("direction")
-                    } ?: OperationDirection.NONE,
-                    onBack = { navController.popBackStack() },
-                )
+                // Guard par module opérationnel
+                val appModule = when (module) {
+                    OperationModule.VENTE -> AppModule.VENTE
+                    OperationModule.ACHATS -> AppModule.ACHATS
+                    OperationModule.STOCK -> AppModule.STOCK
+                    OperationModule.FINANCES -> AppModule.FINANCES
+                    else -> null
+                }
+                if (appModule != null && activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(appModule.moduleCode)) {
+                    ModuleInactifScreen(module = appModule, activation = activation, onBack = { navController.popBackStack() }, onActiver = { navController.naviguerVers(Routes.ADMIN_REGLAGES) })
+                } else {
+                    OperationFormScreen(
+                        module = module,
+                        initialDirection = OperationDirection.entries.firstOrNull {
+                            it.name == entry.arguments?.getString("direction")
+                        } ?: OperationDirection.NONE,
+                        onBack = { navController.popBackStack() },
+                    )
+                }
             }
         }
         composable(AppModule.REPORTING.route) {
-            ReportingScreen(onBack = { navController.popBackStack() })
+            GuardedModule(AppModule.REPORTING, activation, navController) {
+                ReportingScreen(onBack = { navController.popBackStack() })
+            }
         }
     }
     }
@@ -542,9 +643,16 @@ private fun MainNavHost() {
         )
     }
 
+    if (ficheEntreprise) {
+        com.missa.b360.ui.components.FicheEntrepriseDialog(
+            etat = ficheEtat,
+            onDismiss = { ficheEntreprise = false },
+        )
+    }
+
     if (plusDeModules) {
         PlusDeModulesFeuille(
-            modules = AppModule.secondaires(modulesActifs, modulesEpingles),
+            modules = AppModule.secondaires(activation, modulesEpingles),
             onFermer = { plusDeModules = false },
             onModule = { module ->
                 plusDeModules = false
@@ -554,41 +662,53 @@ private fun MainNavHost() {
     }
 }
 
-/** Route commune aux opérations : le paramètre crée un document immédiatement si demandé. */
-private fun NavGraphBuilder.operationDestination(
+@Composable
+private fun GuardedModule(
     appModule: AppModule,
-    operationModule: OperationModule,
-    navController: androidx.navigation.NavController,
+    activation: ActivationProfil,
+    navController: NavController,
+    content: @Composable () -> Unit,
 ) {
-    composable(
-        route = "${appModule.route}?create={create}&direction={direction}",
-        arguments = listOf(
-            navArgument("create") {
-                type = NavType.BoolType
-                defaultValue = false
-            },
-            navArgument("direction") {
-                type = NavType.StringType
-                defaultValue = "NONE"
-            },
-        ),
-    ) { entry ->
-        OperationModuleScreen(
-            module = operationModule,
+    if (activation.modulesActifs.isEmpty() || activation.isModuleActif(appModule.moduleCode)) {
+        content()
+    } else {
+        ModuleInactifScreen(
+            module = appModule,
+            activation = activation,
             onBack = { navController.popBackStack() },
-            onNavigate = { route -> navController.navigate(route) },
-            openCreate = entry.arguments?.getBoolean("create") == true,
-            initialDirection = OperationDirection.entries.firstOrNull {
-                it.name == entry.arguments?.getString("direction")
-            } ?: OperationDirection.NONE,
+            onActiver = { navController.naviguerVers(Routes.ADMIN_REGLAGES) },
         )
     }
 }
 
-/**
- * Navigation par onglet : sans ces garde-fous, chaque appui empile un écran de
- * plus et le retour arrière devient interminable.
- */
+/** Route commune aux opérations : le paramètre crée un document immédiatement si demandé. */
+private fun NavGraphBuilder.operationDestination(
+    appModule: AppModule,
+    operationModule: OperationModule,
+    navController: NavController,
+    activation: ActivationProfil,
+) {
+    composable(
+        route = "${appModule.route}?create={create}&direction={direction}",
+        arguments = listOf(
+            navArgument("create") { type = NavType.BoolType; defaultValue = false },
+            navArgument("direction") { type = NavType.StringType; defaultValue = "NONE" },
+        ),
+    ) { entry ->
+        GuardedModule(appModule, activation, navController) {
+            OperationModuleScreen(
+                module = operationModule,
+                onBack = { navController.popBackStack() },
+                onNavigate = { route -> navController.navigate(route) },
+                openCreate = entry.arguments?.getBoolean("create") == true,
+                initialDirection = OperationDirection.entries.firstOrNull {
+                    it.name == entry.arguments?.getString("direction")
+                } ?: OperationDirection.NONE,
+            )
+        }
+    }
+}
+
 private fun NavController.naviguerVers(route: String) {
     navigate(route) {
         popUpTo(Routes.HOME) { inclusive = route == Routes.HOME }
@@ -597,12 +717,6 @@ private fun NavController.naviguerVers(route: String) {
     }
 }
 
-/**
- * Liste des modules hors barre, ouverte par le bouton « Plus ».
- *
- * Elle est ici, au niveau du graphe, et non dans l'accueil : sinon changer de
- * module depuis un module obligerait à repasser par l'accueil.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlusDeModulesFeuille(
@@ -637,12 +751,12 @@ private fun PlusDeModulesFeuille(
                         Surface(
                             modifier = Modifier.size(42.dp),
                             shape = RoundedCornerShape(12.dp),
-                            color = MissaSoftBlue,
+                            color = module.couleurDouce,
                         ) {
                             Icon(
-                                imageVector = module.icon,
+                                painter = painterResource(module.icon),
                                 contentDescription = null,
-                                tint = BrandBlue,
+                                tint = MissaInk,
                                 modifier = Modifier.padding(10.dp),
                             )
                         }

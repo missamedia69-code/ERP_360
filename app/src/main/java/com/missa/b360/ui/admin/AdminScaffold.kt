@@ -3,6 +3,7 @@ package com.missa.b360.ui.admin
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +28,10 @@ fun AdminScaffold(
 ) {
     Scaffold(
         containerColor = MissaCanvas,
+        // Les insets système sont déjà gérés par l'échafaudage global et la
+        // barre du bas : ne pas les réserver une seconde fois ici, sinon une
+        // bande vide s'intercale au-dessus de la barre et elle paraît différente.
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             MissaTopAppBar(
                 title = stringResource(titreRes),

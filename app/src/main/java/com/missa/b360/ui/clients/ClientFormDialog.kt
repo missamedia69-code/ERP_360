@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients
 
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -90,7 +90,7 @@ fun ClientFormDialog(
         notes: String?,
     ) -> Unit,
 ) {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysAvecIndicatif = remember(locale) { Iso4217.paysAvecIndicatif(locale) }
     val codePaysInitial = client?.telephone?.let(Iso4217::codePaysDepuisTelephone)
         ?: codePaysParDefaut
@@ -176,7 +176,7 @@ fun ClientFormDialog(
                         navigationIcon = {
                             IconButton(onClick = onDismiss) {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                    painter = painterResource(Iv.ArrowBack),
                                     contentDescription = stringResource(R.string.ob_retour),
                                 )
                             }

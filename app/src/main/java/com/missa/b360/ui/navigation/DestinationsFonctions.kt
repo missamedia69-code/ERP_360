@@ -1,5 +1,6 @@
 package com.missa.b360.ui.navigation
 
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModuleSousElements
 
@@ -150,9 +151,36 @@ object DestinationsFonctions {
             FonctionModule(libelle = libelle, route = routes[libelle])
         }
 
+    /** Version filtrée par l'activation effective du profil */
+    fun pour(module: ModuleCode, activation: ActivationProfil): List<FonctionModule> {
+        val actifs = activation.elementsActifsPour(module)
+        // Si activation vide ou module non actif, on retourne tout le catalogue (compatibilité)
+        // Mais si activation a des éléments définis, on filtre
+        val source = if (actifs.isEmpty() && activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(module)) {
+            emptyList()
+        } else if (actifs.isNotEmpty()) {
+            actifs.toList()
+        } else {
+            ModuleSousElements.elements[module].orEmpty()
+        }
+        return source.map { libelle ->
+            FonctionModule(libelle = libelle, route = routes[libelle])
+        }
+    }
+
     fun disponibles(module: ModuleCode): List<FonctionModule> =
         pour(module).filter { it.disponible }
 
+    fun disponibles(module: ModuleCode, activation: ActivationProfil): List<FonctionModule> =
+        pour(module, activation).filter { it.disponible }
+
     fun aVenir(module: ModuleCode): List<FonctionModule> =
         pour(module).filterNot { it.disponible }
+
+    fun aVenir(module: ModuleCode, activation: ActivationProfil): List<FonctionModule> =
+        pour(module, activation).filterNot { it.disponible }
+
+    /** Vérifie si une fonctionnalité est active selon le profil */
+    fun isFonctionActive(module: ModuleCode, fonction: String, activation: ActivationProfil): Boolean =
+        activation.isElementActif(module, fonction)
 }

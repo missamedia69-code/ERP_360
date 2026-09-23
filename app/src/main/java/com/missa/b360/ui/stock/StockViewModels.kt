@@ -3,6 +3,7 @@ package com.missa.b360.ui.stock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.dao.FournisseurDao
+import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
@@ -113,6 +114,7 @@ class StockViewModel @Inject constructor(
  */
 @HiltViewModel
 class ProductFormViewModel @Inject constructor(
+    private val productDao: ProductDao,
     private val getProduct: GetProductUseCase,
     private val createProduct: CreateProductUseCase,
     private val updateProduct: UpdateProductUseCase,
@@ -121,10 +123,18 @@ class ProductFormViewModel @Inject constructor(
     sites: SiteUseCases,
     fournisseurDao: FournisseurDao,
     observeStock: ObserveProductStockUseCase,
+    private val equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+    private val extrasDao: com.missa.b360.core.data.dao.ProductExtrasDao,
+    observeProducts: ObserveProductsUseCase,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val contexte: android.content.Context,
 ) : ViewModel() {
 
+    /** Articles actifs (choix des composants d'un kit). */
+    val produits: StateFlow<List<ProductEntity>> = observeProducts()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     sealed interface SaveResult {
-        data class Saved(val code: String, val isCreate: Boolean) : SaveResult
+        data class Saved(val code: String, val isCreate: Boolean, val id: Long = 0L) : SaveResult
         data object NomObligatoire : SaveResult
         data object DonneesInvalides : SaveResult
         data object BarcodeExistant : SaveResult
@@ -169,9 +179,36 @@ class ProductFormViewModel @Inject constructor(
         observing = viewModelScope.launch {
             getProduct(productId).collect { _product.value = it }
         }
+        viewModelScope.launch { extrasDao.observeDechet(productId).collect { _dechet.value = it } }
+        viewModelScope.launch { extrasDao.observeEmballage(productId).collect { _emballage.value = it } }
+        viewModelScope.launch { extrasDao.observeConsignation(productId).collect { _consignation.value = it } }
+        viewModelScope.launch { extrasDao.observeKit(productId).collect { _kit.value = it } }
+        viewModelScope.launch { extrasDao.observeComposants(productId).collect { _composants.value = it } }
     }
 
-    fun save(input: ProductInput, initialStock: Double?) {
+    private val _dechet = kotlinx.coroutines.flow.MutableStateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?>(null)
+    val dechet: StateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?> = _dechet
+    private val _emballage = kotlinx.coroutines.flow.MutableStateFlow<com.missa.b360.core.data.entity.ProductEmballageEntity?>(null)
+    val emballage: StateFlow<com.missa.b360.core.data.entity.ProductEmballageEntity?> = _emballage
+    private val _consignation = kotlinx.coroutines.flow.MutableStateFlow<com.missa.b360.core.data.entity.ProductConsignationEntity?>(null)
+    val consignation: StateFlow<com.missa.b360.core.data.entity.ProductConsignationEntity?> = _consignation
+    private val _kit = kotlinx.coroutines.flow.MutableStateFlow<com.missa.b360.core.data.entity.ProductKitEntity?>(null)
+    val kit: StateFlow<com.missa.b360.core.data.entity.ProductKitEntity?> = _kit
+    private val _composants = kotlinx.coroutines.flow.MutableStateFlow<List<com.missa.b360.core.data.entity.KitComposantEntity>>(emptyList())
+    val composants: StateFlow<List<com.missa.b360.core.data.entity.KitComposantEntity>> = _composants
+
+    fun save(
+        input: ProductInput,
+        initialStock: Double?,
+        equipement: com.missa.b360.core.data.entity.ProductEquipementEntity? = null,
+        imageTemp: String? = null,
+        supprimerImage: Boolean = false,
+        dechet: com.missa.b360.core.data.entity.ProductDechetEntity? = null,
+        emballage: com.missa.b360.core.data.entity.ProductEmballageEntity? = null,
+        consignation: com.missa.b360.core.data.entity.ProductConsignationEntity? = null,
+        kit: com.missa.b360.core.data.entity.ProductKitEntity? = null,
+        composants: List<com.missa.b360.core.data.entity.KitComposantEntity> = emptyList(),
+    ) {
         if (_busy.value) return
         val id = _editingId.value
         viewModelScope.launch {
@@ -179,7 +216,12 @@ class ProductFormViewModel @Inject constructor(
             val result = try {
                 if (id == null) {
                     when (val r = createProduct(input, initialStock)) {
-                        is CreateProductUseCase.Result.Succes -> SaveResult.Saved(r.code, true)
+                        is CreateProductUseCase.Result.Succes -> {
+                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = r.productId)) }
+                            persisterExtensions(r.productId, dechet, emballage, consignation, kit, composants)
+                            appliquerImage(r.productId, imageTemp, supprimerImage)
+                            SaveResult.Saved(r.code, true, r.productId)
+                        }
                         CreateProductUseCase.Result.NomObligatoire -> SaveResult.NomObligatoire
                         CreateProductUseCase.Result.DonneesInvalides -> SaveResult.DonneesInvalides
                         CreateProductUseCase.Result.BarcodeExistant -> SaveResult.BarcodeExistant
@@ -189,7 +231,12 @@ class ProductFormViewModel @Inject constructor(
                 } else {
                     val success = updateProduct(id, input)
                     when {
-                        success -> SaveResult.Saved(_product.value?.code ?: "", false)
+                        success -> {
+                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = id)) }
+                            persisterExtensions(id, dechet, emballage, consignation, kit, composants)
+                            appliquerImage(id, imageTemp, supprimerImage)
+                            SaveResult.Saved(_product.value?.code ?: "", false, id)
+                        }
                         _product.value == null -> SaveResult.Introuvable
                         else -> SaveResult.Error
                     }
@@ -201,6 +248,45 @@ class ProductFormViewModel @Inject constructor(
             }
             _busy.value = false
             _saveResult.value = result
+        }
+    }
+
+    /**
+     * Écrit le JPEG compact dans le stockage interne et persiste son chemin
+     * dans `photoPath` (colonne existante, lue par les écrans de détail/liste).
+     */
+    private suspend fun appliquerImage(produitId: Long, imageTemp: String?, supprimerImage: Boolean) {
+        val chemin = if (imageTemp != null) {
+            com.missa.b360.core.util.ImageProduit.promouvoirTemp(contexte, produitId, imageTemp)
+        } else if (supprimerImage) {
+            com.missa.b360.core.util.ImageProduit.supprimer(contexte, produitId)
+            null
+        } else {
+            return
+        }
+        productDao.getById(produitId)?.let { p ->
+            productDao.update(p.copy(photoPath = chemin))
+        }
+    }
+
+    /** True si l'article en cours d'édition a déjà une image sur le disque. */
+    fun imageExiste(produitId: Long): Boolean =
+        com.missa.b360.core.util.ImageProduit.existe(contexte, produitId)
+
+    private suspend fun persisterExtensions(
+        produitId: Long,
+        dechet: com.missa.b360.core.data.entity.ProductDechetEntity?,
+        emballage: com.missa.b360.core.data.entity.ProductEmballageEntity?,
+        consignation: com.missa.b360.core.data.entity.ProductConsignationEntity?,
+        kit: com.missa.b360.core.data.entity.ProductKitEntity?,
+        composants: List<com.missa.b360.core.data.entity.KitComposantEntity>,
+    ) {
+        dechet?.let { extrasDao.upsertDechet(it.copy(produitId = produitId)) }
+        emballage?.let { extrasDao.upsertEmballage(it.copy(produitId = produitId)) }
+        consignation?.let { extrasDao.upsertConsignation(it.copy(produitId = produitId)) }
+        kit?.let { extrasDao.upsertKit(it.copy(produitId = produitId)) }
+        if (kit != null) {
+            composants.forEach { c -> extrasDao.upsertComposant(c.copy(kitId = produitId)) }
         }
     }
 

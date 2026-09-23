@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Règles de transfert d'appareil à appareil (Android 12+/API 31+). -->
+<!--
+    Sauvegarde et transfert — Android 12 (API 31) et suivants.
+    Ces règles remplacent `backup_rules.xml` à partir de cette version.
+
+    cloud-backup : mêmes exclusions que la sauvegarde héritée, pour la même
+    raison — la base, ses annexes, les réglages (empreinte du PIN comprise) et
+    les copies locales du dossier `backups/` ne partent pas chez Google.
+
+    device-transfer : volontairement vide, donc le transfert direct reste
+    complet. Passer d'un téléphone à l'autre se fait appareil en main, avec
+    l'accord de l'utilisateur ; un envoi vers Google copierait les mêmes
+    données à son insu. La restauration manuelle (Admin › Sauvegarde) reste
+    disponible dans les deux cas.
+-->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- Aucune exclusion pour l'instant : à compléter avec les données
-             sensibles (identifiants, jetons…) quand elles existeront. -->
+        <exclude domain="database" path="missa_b360.db" />
+        <exclude domain="database" path="missa_b360.db-wal" />
+        <exclude domain="database" path="missa_b360.db-shm" />
+        <exclude domain="database" path="missa_b360.db-journal" />
+        <exclude domain="file" path="datastore" />
+        <exclude domain="file" path="backups" />
     </cloud-backup>
     <device-transfer>
-        <!-- Idem pour les transferts directs entre appareils. -->
+        <!-- Vide : le transfert direct appareil → appareil reste autorisé. -->
     </device-transfer>
 </data-extraction-rules>

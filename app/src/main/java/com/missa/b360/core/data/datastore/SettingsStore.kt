@@ -36,9 +36,13 @@ class SettingsStore @Inject constructor(
         const val PROFIL_ACTIVITE = "profil_activite"
         const val MODULES_ACTIFS = "modules_actifs"
         const val MODULES_SUPPORT = "modules_support"
+        /** Éléments (sous-fonctionnalités) personnalisés par module : JSON {"ACH":["Fournisseurs",...]} */
+        const val MODULES_ELEMENTS = "modules_elements"
 
         /** Modules épinglés dans la barre du bas (RA-22), choisis par le Propriétaire. */
         const val BARRE_MODULES = "barre_modules"
+        /** Actions rapides épinglées sur l'accueil (personnalisation effective) */
+        const val ACCUEIL_ACTIONS = "accueil_actions"
         const val PALIER_TAILLE = "palier_taille"
         const val ONBOARDING_TERMINE = "onboarding_termine"
         const val VIDEO_SPLASH_ACTIVE = "video_splash_active"
@@ -67,12 +71,6 @@ class SettingsStore @Inject constructor(
         Keys.VERROU_PAIEMENTS,
     )
 
-    private val lockedValues = setOf(
-        Keys.DEVISE,
-        Keys.REFERENTIEL_COMPTABLE,
-        Keys.REFERENTIEL_PAIE,
-    )
-
     fun observe(key: String): Flow<String?> =
         context.dataStore.data.map { prefs -> prefs[stringPreferencesKey(key)] }
 
@@ -80,13 +78,20 @@ class SettingsStore @Inject constructor(
         context.dataStore.data.first()[stringPreferencesKey(key)]
 
     suspend fun getLong(key: String): Long? {
-        val value = get(key) ?: return null
-        return value.toLongOrNull()
+        val prefs = context.dataStore.data.first()
+        // Nouveau format typé Long + fallback ancien format String pour migration
+        prefs[longPreferencesKey(key)]?.let { return it }
+        return prefs[stringPreferencesKey(key)]?.toLongOrNull()
     }
 
     suspend fun set(key: String, value: String) = write(key, value)
 
-    suspend fun setLong(key: String, value: Long) = write(key, value.toString())
+    suspend fun setLong(key: String, value: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[longPreferencesKey(key)] = value
+            prefs.remove(stringPreferencesKey(key))
+        }
+    }
 
     /**
      * RA-19 — écriture refusée si la clé relève d'un verrou d'amont activé.
@@ -122,7 +127,10 @@ class SettingsStore @Inject constructor(
 
     suspend fun setPinFailCount(count: Int) {
         if (count <= 0) {
-            context.dataStore.edit { prefs -> prefs.remove(longKey(Keys.PIN_FAIL_COUNT)) }
+            context.dataStore.edit { prefs ->
+                prefs.remove(longKey(Keys.PIN_FAIL_COUNT))
+                prefs.remove(stringPreferencesKey(Keys.PIN_FAIL_COUNT))
+            }
         } else {
             setLong(Keys.PIN_FAIL_COUNT, count.toLong())
         }
@@ -132,7 +140,10 @@ class SettingsStore @Inject constructor(
 
     suspend fun setPinLockUntil(timestamp: Long) {
         if (timestamp <= 0L) {
-            context.dataStore.edit { prefs -> prefs.remove(longKey(Keys.PIN_LOCK_UNTIL)) }
+            context.dataStore.edit { prefs ->
+                prefs.remove(longKey(Keys.PIN_LOCK_UNTIL))
+                prefs.remove(stringPreferencesKey(Keys.PIN_LOCK_UNTIL))
+            }
         } else {
             setLong(Keys.PIN_LOCK_UNTIL, timestamp)
         }

@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,7 +56,7 @@ internal fun OnbProfilDetailDialogue(
     profil: ProfilActivite,
     titreRes: Int,
     sousTitreRes: Int,
-    icone: ImageVector,
+    icone: Int,
     palier: PalierTaille?,
     dejaChoisi: Boolean,
     onChoisir: () -> Unit,
@@ -92,7 +92,7 @@ internal fun OnbProfilDetailDialogue(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = icone,
+                        painter = painterResource(icone),
                         contentDescription = null,
                         tint = BrandBlue,
                         modifier = Modifier.size(24.dp),

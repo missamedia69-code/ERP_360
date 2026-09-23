@@ -1,35 +1,27 @@
 package com.missa.b360.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.TrendingUp
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.Build
-import androidx.compose.material.icons.outlined.Business
-import androidx.compose.material.icons.outlined.Campaign
-import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Handshake
-import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.LineWeight
-import androidx.compose.material.icons.outlined.LocalShipping
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.PointOfSale
-import androidx.compose.material.icons.outlined.RequestQuote
-import androidx.compose.material.icons.outlined.Savings
-import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material.icons.outlined.Workspaces
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.missa.b360.ui.icons.Iv
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 
 /**
  * ModuleRegistry (RA-22) — les 14 modules métier de Missa Business 360.
  * Chaque module = un package `ui/...` avec activation dynamique (profil AV/CUSTOM, 9.1).
  * La barre du bas par défaut : Vente · Stock · Clients · Finances + ➕.
+ *
+ * Ce registre tient lieu d'`UiScreen` de la spec : chacune des 18 entrées est un
+ * écran rattaché à un [ModuleCode] (deux écrans peuvent partager un module, ex.
+ * ACHATS et FOURNISSEURS ≠ ACH). Les profils, équivalents du `ProfileCode` de la
+ * spec, vivent dans `core/domain/model/Configuration.kt` (`ProfilActivite`).
+ * `AppModule.visibles(...)` est l'équivalent de `allowedScreens()`.
  */
 enum class AppModule(
     val route: String,
     val titleRes: Int,
-    val icon: ImageVector,
+    val icon: Int,
     val moduleCode: ModuleCode,
     /**
      * Rang de candidature à la barre du bas : 1 = le plus prioritaire, 0 = ne
@@ -43,29 +35,43 @@ enum class AppModule(
      * cinq.
      */
     val prioriteBarre: Int = 0,
+    /**
+     * Couleur caractéristique du module : identité visuelle stable dans toute
+     * l'application (feuille « Plus », onglet actif de la barre, tuiles et
+     * cartes de l'accueil). Les teintes sont réparties sur le cercle
+     * chromatique pour rester distinctes deux à deux.
+     */
+    val couleur: Color,
 ) {
-    VENTE("module_vente", R.string.module_vente, Icons.Outlined.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1),
-    STOCK("module_stock", R.string.module_stock, Icons.Outlined.Inventory2, ModuleCode.STK, prioriteBarre = 2),
-    CLIENTS("module_clients", R.string.module_clients, Icons.Outlined.Group, ModuleCode.VEN, prioriteBarre = 7),
-    FINANCES("module_finances", R.string.module_finances, Icons.AutoMirrored.Outlined.TrendingUp, ModuleCode.CPT),
-    ACHATS("module_achats", R.string.module_achats, Icons.Outlined.ShoppingCart, ModuleCode.ACH),
-    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Icons.Outlined.Handshake, ModuleCode.ACH),
-    LIVRAISON("module_livraison", R.string.module_livraison, Icons.Outlined.LocalShipping, ModuleCode.LOG, prioriteBarre = 8),
-    PRODUCTION("module_production", R.string.module_production, Icons.Outlined.LineWeight, ModuleCode.PRO, prioriteBarre = 6),
-    SERVICES("module_services", R.string.module_services, Icons.Outlined.RequestQuote, ModuleCode.SER, prioriteBarre = 4),
-    RH("module_rh", R.string.module_rh, Icons.Outlined.Person, ModuleCode.RH, prioriteBarre = 9),
-    PROJETS("module_projets", R.string.module_projets, Icons.Outlined.Workspaces, ModuleCode.PRJ, prioriteBarre = 5),
-    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Icons.Outlined.Savings, ModuleCode.CPT),
-    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Icons.Outlined.Savings, ModuleCode.TRE, prioriteBarre = 3),
-    CRM("module_crm", R.string.module_crm, Icons.Outlined.Campaign, ModuleCode.CRM),
-    QUALITE("module_qualite", R.string.module_qualite, Icons.Outlined.Build, ModuleCode.QUA),
-    MAINTENANCE("module_maintenance", R.string.module_maintenance, Icons.Outlined.Build, ModuleCode.MAI),
-    LOGISTIQUE("module_logistique", R.string.module_logistique, Icons.Outlined.LocalShipping, ModuleCode.LOG),
-    REPORTING("module_reporting", R.string.module_reporting, Icons.Outlined.Analytics, ModuleCode.REP),
+    VENTE("module_vente", R.string.module_vente, Iv.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1, couleur = Color(0xFF2563EB)), 
+    STOCK("module_stock", R.string.module_stock, Iv.Inventory2, ModuleCode.STK, prioriteBarre = 2, couleur = Color(0xFF6B7280)), 
+    CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7, couleur = Color(0xFF8B5CF6)), 
+    FINANCES("module_finances", R.string.module_finances, Iv.TrendingUp, ModuleCode.CPT, couleur = Color(0xFF16A34A)), 
+    ACHATS("module_achats", R.string.module_achats, Iv.CartArrowDown, ModuleCode.ACH, couleur = Color(0xFFFACC15)), 
+    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH, couleur = Color(0xFF92400E)), 
+    LIVRAISON("module_livraison", R.string.module_livraison, Iv.LocalShipping, ModuleCode.LOG, prioriteBarre = 8, couleur = Color(0xFF38BDF8)), 
+    PRODUCTION("module_production", R.string.module_production, Iv.LineWeight, ModuleCode.PRO, prioriteBarre = 6, couleur = Color(0xFFF97316)), 
+    SERVICES("module_services", R.string.module_services, Iv.RequestQuote, ModuleCode.SER, prioriteBarre = 4, couleur = Color(0xFFDB2777)), 
+    RH("module_rh", R.string.module_rh, Iv.Person, ModuleCode.RH, prioriteBarre = 9, couleur = Color(0xFFE11D48)), 
+    PROJETS("module_projets", R.string.module_projets, Iv.Workspaces, ModuleCode.PRJ, prioriteBarre = 5, couleur = Color(0xFF6366F1)), 
+    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Iv.Calculator, ModuleCode.CPT, couleur = Color(0xFF16A34A)), 
+    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Iv.Bank, ModuleCode.TRE, prioriteBarre = 3, couleur = Color(0xFF16A34A)), 
+    CRM("module_crm", R.string.module_crm, Iv.Campaign, ModuleCode.CRM, couleur = Color(0xFFC026D3)), 
+    QUALITE("module_qualite", R.string.module_qualite, Iv.QualityBadge, ModuleCode.QUA, couleur = Color(0xFF7C3AED)), 
+    MAINTENANCE("module_maintenance", R.string.module_maintenance, Iv.HammerWrench, ModuleCode.MAI, couleur = Color(0xFFB91C1C)), 
+    LOGISTIQUE("module_logistique", R.string.module_logistique, Iv.Warehouse, ModuleCode.LOG, couleur = Color(0xFF65A30D)), 
+    REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP, couleur = Color(0xFF0E7490)), 
     ;
 
-    companion object {
+    /** Fond vif dérivé de [couleur] pour les pastilles et vignettes. */
+    val couleurDouce: Color
+        get() = couleur.copy(alpha = 0.26f)
 
+    /** Fond vif opaque (teinte du module fondue dans le blanc) : headers et barre du bas. */
+    val couleurPale: Color
+        get() = couleur.copy(alpha = 0.45f).compositeOver(Color.White)
+
+    companion object {
 
         /** Retourne les modules correspondant à une liste de ModuleCode. */
         fun fromCodes(codes: List<ModuleCode>): List<AppModule> =
@@ -81,6 +87,15 @@ enum class AppModule(
          */
         fun visibles(actifs: List<ModuleCode>): List<AppModule> =
             if (actifs.isEmpty()) entries.toList() else entries.filter { it.moduleCode in actifs }
+
+        /** Version qui prend l'activation effective du profil (nouveau système) */
+        fun visibles(activation: ActivationProfil): List<AppModule> =
+            if (activation.modulesActifs.isEmpty()) entries.toList()
+            else entries.filter { it.moduleCode in activation.modulesActifs }
+
+        /** Vérifie si un module est actif selon l'activation */
+        fun isActif(module: AppModule, activation: ActivationProfil): Boolean =
+            activation.isModuleActif(module.moduleCode)
 
         /**
          * Barre du bas : les modules épinglés par le Propriétaire, à défaut les
@@ -104,6 +119,76 @@ enum class AppModule(
             }.take(MAX_ONGLETS)
         }
 
+        fun barreBas(activation: ActivationProfil, epingles: List<String> = emptyList()): List<AppModule> {
+            if (activation.modulesActifs.isEmpty()) {
+                return barreBas(emptyList(), epingles)
+            }
+            val visibles = visibles(activation)
+            // Si l'utilisateur a épinglé (via profil auto), on respecte même SANS_BARRE
+            if (epingles.isNotEmpty()) {
+                val choisis = epingles.mapNotNull { nom -> visibles.firstOrNull { it.name == nom } }
+                if (choisis.isNotEmpty()) return choisis.take(MAX_ONGLETS)
+            }
+            // Sinon : place directement les modules du profil sur la barre (max 3)
+            // Ordre prioritaire demandé : VEN, ACH, STK, TRE, CPT, PRO, SER, PRJ, LOG, CRM, RH, QUA, MAI, REP
+            val ordrePrioritaire = listOf(
+                ModuleCode.VEN,
+                ModuleCode.ACH,
+                ModuleCode.STK,
+                ModuleCode.TRE,
+                ModuleCode.CPT,
+                ModuleCode.PRO,
+                ModuleCode.SER,
+                ModuleCode.PRJ,
+                ModuleCode.LOG,
+                ModuleCode.CRM,
+                ModuleCode.RH,
+                ModuleCode.QUA,
+                ModuleCode.MAI,
+                ModuleCode.REP,
+            )
+            // Map ModuleCode -> AppModule principal (pour éviter doublons VEN->VENTE+CLIENTS)
+            val principalParCode = mapOf(
+                ModuleCode.ACH to ACHATS,
+                ModuleCode.VEN to VENTE,
+                ModuleCode.STK to STOCK,
+                ModuleCode.PRO to PRODUCTION,
+                ModuleCode.SER to SERVICES,
+                ModuleCode.PRJ to PROJETS,
+                ModuleCode.RH to RH,
+                ModuleCode.CPT to COMPTABILITE,
+                ModuleCode.TRE to TRESORERIE,
+                ModuleCode.CRM to CRM,
+                ModuleCode.QUA to QUALITE,
+                ModuleCode.MAI to MAINTENANCE,
+                ModuleCode.LOG to LOGISTIQUE,
+                ModuleCode.REP to REPORTING,
+            )
+            val triesCodes = activation.modulesActifs.sortedBy { code ->
+                val idx = ordrePrioritaire.indexOf(code)
+                if (idx == -1) 99 else idx
+            }
+            val result = mutableListOf<AppModule>()
+            val vus = mutableSetOf<ModuleCode>()
+            for (code in triesCodes) {
+                if (code in vus) continue
+                vus.add(code)
+                val app = principalParCode[code] ?: visibles.firstOrNull { it.moduleCode == code } ?: continue
+                // On autorise même SANS_BARRE pour le profil (ex: ACHATS)
+                if (app.moduleCode in activation.modulesActifs) {
+                    result.add(app)
+                    if (result.size >= MAX_ONGLETS) break
+                }
+            }
+            // Si moins de 3, complète avec les autres visibles (ex: CLIENTS, FOURNISSEURS)
+            if (result.size < MAX_ONGLETS) {
+                val complement = visibles.filter { it !in result && it.moduleCode in activation.modulesActifs }
+                    .sortedBy { it.prioriteBarre.let { p -> if (p == 0) 99 else p } }
+                result.addAll(complement.take(MAX_ONGLETS - result.size))
+            }
+            return result.take(MAX_ONGLETS)
+        }
+
         /**
          * Modules qu'il est permis d'épingler.
          *
@@ -113,20 +198,19 @@ enum class AppModule(
         fun epinglables(actifs: List<ModuleCode>): List<AppModule> =
             visibles(actifs).filter { it !in SANS_BARRE }
 
+        fun epinglables(activation: ActivationProfil): List<AppModule> =
+            epinglables(activation.modulesActifs.toList())
+
         /** Nombre maximal d'onglets, l'accueil et « Plus » occupant déjà deux places. */
         const val MAX_ONGLETS = 3
 
         /**
-         * Modules dont la route ouvre un **formulaire de saisie** et non une
-         * liste : la barre de navigation n'y aurait pas sa place.
-         *
-         * Achats et Finances ouvrent leur formulaire **en surimpression** de la
-         * liste, avec sa propre barre « Annuler / Valider » : la barre de
-         * navigation apparaîtrait dessous, deux barres empilées. Ils sont donc
-         * exclus, et ne figurent pas non plus dans la disposition d'usine — un
-         * onglet dont l'écran masque la barre est une contradiction.
+         * Historiquement Achats et Finances masquaient la barre car leur
+         * formulaire était en surimpression. Désormais chaque module est une
+         * vraie liste : la barre du bas doit rester visible partout, seul le
+         * formulaire plein écran la masque via LocalBarreNavigation.
          */
-        private val SANS_BARRE = setOf(ACHATS, FINANCES)
+        private val SANS_BARRE: Set<AppModule> = emptySet()
 
         /**
          * Vrai si la barre de navigation doit rester visible sur cette route.
@@ -154,6 +238,44 @@ enum class AppModule(
         ): List<AppModule> {
             val barre = barreBas(actifs, epingles).toSet()
             return visibles(actifs).filterNot { it in barre }
+        }
+
+        fun secondaires(
+            activation: ActivationProfil,
+            epingles: List<String> = emptyList(),
+        ): List<AppModule> {
+            val barre = barreBas(activation, epingles)
+            val barreCodes = barre.map { it.moduleCode }.toSet()
+            val visibles = visibles(activation)
+            // Pour Plus, on veut les modules restants du profil, pas tous les AppModule doublons
+            // On garde un seul AppModule par ModuleCode restant (le principal)
+            val principalParCode = mapOf(
+                ModuleCode.ACH to ACHATS,
+                ModuleCode.VEN to VENTE,
+                ModuleCode.STK to STOCK,
+                ModuleCode.PRO to PRODUCTION,
+                ModuleCode.SER to SERVICES,
+                ModuleCode.PRJ to PROJETS,
+                ModuleCode.RH to RH,
+                ModuleCode.CPT to COMPTABILITE,
+                ModuleCode.TRE to TRESORERIE,
+                ModuleCode.CRM to CRM,
+                ModuleCode.QUA to QUALITE,
+                ModuleCode.MAI to MAINTENANCE,
+                ModuleCode.LOG to LOGISTIQUE,
+                ModuleCode.REP to REPORTING,
+            )
+            val restantsCodes = activation.modulesActifs.filterNot { it in barreCodes }
+            val result = mutableListOf<AppModule>()
+            for (code in restantsCodes) {
+                val app = principalParCode[code] ?: visibles.firstOrNull { it.moduleCode == code } ?: continue
+                if (app !in barre) result.add(app)
+            }
+            // Ajoute aussi les AppModule secondaires du même ModuleCode qui sont dans le pack mais pas principaux
+            // (ex: CLIENTS pour VEN, FOURNISSEURS pour ACH) s'ils sont actifs et non dans la barre
+            val secondairesDoublons = visibles.filter { it.moduleCode in restantsCodes && it !in result && it !in barre }
+            result.addAll(secondairesDoublons)
+            return result.distinctBy { it.name }
         }
     }
 }

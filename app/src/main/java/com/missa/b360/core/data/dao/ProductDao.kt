@@ -6,6 +6,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.missa.b360.core.data.entity.ProductCategoryEntity
+import com.missa.b360.core.data.entity.InventaireEntity
+import com.missa.b360.core.data.entity.InventaireLigneEntity
+import com.missa.b360.core.data.entity.ProductEquipementEntity
+import com.missa.b360.core.data.entity.ProductConsignationEntity
+import com.missa.b360.core.data.entity.ProductDechetEntity
+import com.missa.b360.core.data.entity.ProductEmballageEntity
+import com.missa.b360.core.data.entity.ProductKitEntity
+import com.missa.b360.core.data.entity.KitComposantEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
 import com.missa.b360.core.data.entity.StockMovementEntity
@@ -86,12 +94,24 @@ interface ProductStockDao {
     fun observeToutes(): Flow<List<ProductStockEntity>>
 
     /** Crée la ligne à 0 si elle n'existe pas (no-op sinon). */
-    @Query("INSERT OR IGNORE INTO product_stock (produitId, siteId, quantite) VALUES (:produitId, :siteId, 0)")
+    @Query("INSERT OR IGNORE INTO product_stock (produitId, siteId, quantite, valeur) VALUES (:produitId, :siteId, 0, 0)")
     suspend fun ensureRow(produitId: Long, siteId: Long)
 
-    /** Écrase la ligne — à appeler uniquement dans une transaction après relecture. */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun remplacer(ligne: ProductStockEntity)
+    /**
+     * Met à jour la quantité **sans toucher à la valeur** — à appeler uniquement
+     * dans une transaction après relecture. (Un INSERT REPLACE remettrait la
+     * valeur valorisée à zéro à chaque vente ou ajustement.)
+     */
+    @Query("UPDATE product_stock SET quantite = :quantite WHERE produitId = :produitId AND siteId = :siteId")
+    suspend fun remplacer(produitId: Long, siteId: Long, quantite: Double)
+
+    /** Ajoute (ou retire) de la valeur au stock — réceptions d'achat (CUMP). */
+    @Query("UPDATE product_stock SET valeur = valeur + :delta WHERE produitId = :produitId AND siteId = :siteId")
+    suspend fun ajouterValeur(produitId: Long, siteId: Long, delta: Double)
+
+    /** Valeur actuelle du stock d'un produit dans un site (0 si aucune ligne). */
+    @Query("SELECT COALESCE(valeur, 0) FROM product_stock WHERE produitId = :produitId AND siteId = :siteId LIMIT 1")
+    suspend fun valeur(produitId: Long, siteId: Long): Double
 
     /** Site ayant la plus grande quantité positive (sortie sans site principal). */
     @Query(
@@ -145,3 +165,78 @@ data class StockMovementView(
     val commentaire: String?,
     val horodatage: Long,
 )
+
+/** Extension immobilisation d'un produit (maquette Équipements). */
+@Dao
+interface ProductEquipementDao {
+    @Query("SELECT * FROM product_equipements WHERE produitId = :id LIMIT 1")
+    fun observeById(id: Long): Flow<ProductEquipementEntity?>
+
+    @Query("SELECT * FROM product_equipements")
+    fun observeAll(): Flow<List<ProductEquipementEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(equipement: ProductEquipementEntity)
+
+    @Query("UPDATE product_equipements SET statut = :statut WHERE produitId = :id")
+    suspend fun setStatut(id: Long, statut: String)
+}
+
+/** Inventaires physiques (maquette 8). */
+@Dao
+interface InventaireDao {
+    @Query("SELECT * FROM inventaires WHERE statut = 'EN_COURS' ORDER BY debut DESC LIMIT 1")
+    fun observeEnCours(): Flow<InventaireEntity?>
+
+    @Query("SELECT * FROM inventaires ORDER BY debut DESC LIMIT 20")
+    fun observeRecents(): Flow<List<InventaireEntity>>
+
+    @Insert
+    suspend fun insert(inventaire: InventaireEntity): Long
+
+    @Query("UPDATE inventaires SET statut = 'CLOTURE', fin = :fin WHERE id = :id")
+    suspend fun cloturer(id: Long, fin: Long)
+
+    @Query("SELECT * FROM inventaire_lignes WHERE inventaireId = :id")
+    fun observeLignes(id: Long): Flow<List<InventaireLigneEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertLigne(ligne: InventaireLigneEntity)
+}
+
+/** DAO des extensions par famille d'article (déchets, emballages, consignations, kits). */
+@Dao
+interface ProductExtrasDao {
+    @Query("SELECT * FROM product_dechets WHERE produitId = :id LIMIT 1")
+    fun observeDechet(id: Long): Flow<ProductDechetEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertDechet(entity: ProductDechetEntity)
+
+    @Query("SELECT * FROM product_emballages WHERE produitId = :id LIMIT 1")
+    fun observeEmballage(id: Long): Flow<ProductEmballageEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertEmballage(entity: ProductEmballageEntity)
+
+    @Query("SELECT * FROM product_consignations WHERE produitId = :id LIMIT 1")
+    fun observeConsignation(id: Long): Flow<ProductConsignationEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertConsignation(entity: ProductConsignationEntity)
+
+    @Query("SELECT * FROM product_kits WHERE produitId = :id LIMIT 1")
+    fun observeKit(id: Long): Flow<ProductKitEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertKit(entity: ProductKitEntity)
+
+    @Query("SELECT * FROM kit_composants WHERE kitId = :id ORDER BY composantId")
+    fun observeComposants(id: Long): Flow<List<KitComposantEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertComposant(entity: KitComposantEntity)
+
+    @Query("DELETE FROM kit_composants WHERE kitId = :kitId AND composantId = :composantId")
+    suspend fun retirerComposant(kitId: Long, composantId: Long)
+}
