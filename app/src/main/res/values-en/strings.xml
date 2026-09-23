@@ -1667,4 +1667,7 @@
     <string name="st_creer_categorie_invite">Create a category to classify this item</string>
     <string name="tre_aucun_compte">No account available</string>
     <string name="tre_creer_compte_invite">Create an account to record this transaction</string>
+    <string name="admin_charger_demo">Load sample data</string>
+    <string name="admin_charger_demo_desc">Fill the application with complete demo data (sales, purchases, inventory, cash, clients, suppliers).</string>
+    <string name="admin_demo_chargees">Sample data loaded successfully.</string>
 </resources>

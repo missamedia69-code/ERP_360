@@ -33,6 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.widget.Toast
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -72,8 +76,17 @@ fun AdminReglagesScreen(
 ) {
     val activation by viewModel.activation.collectAsState()
     val entreprise by viewModel.entreprise.collectAsState()
+    val msg by viewModel.message.collectAsState()
+    val context = LocalContext.current
     var showChangerProfil by remember { mutableStateOf(false) }
     var moduleDetail by remember { mutableStateOf<ModuleCode?>(null) }
+
+    LaunchedEffect(msg) {
+        if (msg == "demo_ok") {
+            Toast.makeText(context, context.getString(R.string.admin_demo_chargees), Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
+        }
+    }
 
     AdminScaffold(
         titreRes = R.string.activation_titre,
@@ -228,6 +241,34 @@ fun AdminReglagesScreen(
                     Text(stringResource(R.string.activation_entreprise_info), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.activation_entreprise_nom, entreprise.nom), fontSize = 12.sp, color = MissaInk)
                     Text(stringResource(R.string.activation_entreprise_devise, entreprise.devise), fontSize = 11.sp, color = MissaMuted)
+                }
+            }
+        }
+
+        // Données d'exemple complètes
+        Card(
+            shape = RoundedCornerShape(14.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            border = BorderStroke(1.dp, MissaBorder),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(Modifier.padding(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(painterResource(Iv.Restore), contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.admin_charger_demo), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                }
+                Spacer(Modifier.height(6.dp))
+                Text(stringResource(R.string.admin_charger_demo_desc), fontSize = 11.sp, color = MissaMuted)
+                Spacer(Modifier.height(10.dp))
+                OutlinedButton(
+                    onClick = { viewModel.rechargerDonneesExemple() },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Icon(painterResource(Iv.CloudDone), contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.admin_charger_demo), fontSize = 12.sp)
                 }
             }
         }

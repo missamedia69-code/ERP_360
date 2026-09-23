@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.datastore.SettingsStore
 import com.missa.b360.core.data.repository.ProfilActivationRepository
+import com.missa.b360.core.data.seed.DemoDataSeeder
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModulesSocle
@@ -30,6 +31,7 @@ class ActivationViewModel @Inject constructor(
     private val getEnterprise: GetEnterpriseUseCase,
     private val updateEnterprise: UpdateEnterpriseUseCase,
     private val settingsStore: SettingsStore,
+    private val demoDataSeeder: DemoDataSeeder,
 ) : ViewModel() {
 
     val activation: StateFlow<ActivationProfil> =
@@ -202,6 +204,14 @@ class ActivationViewModel @Inject constructor(
             val locales = androidx.core.os.LocaleListCompat.forLanguageTags(code)
             androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(locales)
             _message.value = "ok"
+        }
+    }
+
+    fun rechargerDonneesExemple() {
+        viewModelScope.launch {
+            demoDataSeeder.seedDemoData()
+            chargerEntreprise()
+            _message.value = "demo_ok"
         }
     }
 

@@ -1663,4 +1663,7 @@
     <string name="st_creer_categorie_invite">إنشاء فئة لتصنيف هذا العنصر</string>
     <string name="tre_aucun_compte">لا يوجد حساب متاح</string>
     <string name="tre_creer_compte_invite">إنشاء حساب لتسجيل العملية</string>
+    <string name="admin_charger_demo">تحميل بيانات تجريبية</string>
+    <string name="admin_charger_demo_desc">ملء التطبيق ببيانات تجريبية كاملة (مبيعات، مشتريات، مخزون، خزينة، عملاء، موردون).</string>
+    <string name="admin_demo_chargees">تم تحميل البيانات التجريبية بنجاح.</string>
 </resources>

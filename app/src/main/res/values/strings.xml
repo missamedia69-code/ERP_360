@@ -1710,4 +1710,7 @@
     <string name="st_creer_categorie_invite">Créer une catégorie pour classer cet article</string>
     <string name="tre_aucun_compte">Aucun compte disponible</string>
     <string name="tre_creer_compte_invite">Créer un compte pour enregistrer l\'opération</string>
+    <string name="admin_charger_demo">Charger les données d\'exemple</string>
+    <string name="admin_charger_demo_desc">Remplir l\'application avec un jeu de démonstration complet (ventes, achats, stocks, trésorerie, clients, fournisseurs).</string>
+    <string name="admin_demo_chargees">Données d\'exemple chargées avec succès.</string>
 </resources>

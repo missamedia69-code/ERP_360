@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.data.seed.DemoDataSeeder
 import com.missa.b360.core.util.FormatPrefs
 import com.missa.b360.ui.navigation.AppNavHost
 import com.missa.b360.ui.theme.Erp360Theme
@@ -21,11 +22,15 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsStore: SettingsStore
 
+    @Inject
+    lateinit var demoDataSeeder: DemoDataSeeder
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         // Ne plus bloquer le thread principal : charge en arrière-plan
         lifecycleScope.launch {
+            demoDataSeeder.seedIfEmpty()
             applyStoredLocaleAsync()
             applyStoredFormatsAsync()
         }
