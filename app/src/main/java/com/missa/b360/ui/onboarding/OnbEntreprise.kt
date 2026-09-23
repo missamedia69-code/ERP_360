@@ -90,7 +90,7 @@ private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     // Devise officielle de chaque pays : calculée une fois, réutilisée par la liste
     // des pays et par le pack appliqué à la sélection.

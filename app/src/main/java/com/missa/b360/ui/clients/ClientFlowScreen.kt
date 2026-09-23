@@ -927,7 +927,7 @@ private fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, s
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountryCode: (String) -> Unit, onPhone: (String) -> Unit, isError: Boolean) {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: Locale.getDefault()
     val countries = remember(locale) { Iso4217.paysAvecIndicatif(locale) }
     val selected = countries.firstOrNull { it.code == countryCode }
     var pickerVisible by remember { mutableStateOf(false) }

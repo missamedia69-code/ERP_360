@@ -158,7 +158,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
  */
 @Composable
 private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
     val typeTaxe = remember(paysListe, viewModel.codePays) {
         paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe

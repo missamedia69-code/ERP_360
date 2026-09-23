@@ -90,7 +90,7 @@ fun ClientFormDialog(
         notes: String?,
     ) -> Unit,
 ) {
-    val locale = LocalConfiguration.current.locales[0]
+    val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysAvecIndicatif = remember(locale) { Iso4217.paysAvecIndicatif(locale) }
     val codePaysInitial = client?.telephone?.let(Iso4217::codePaysDepuisTelephone)
         ?: codePaysParDefaut
