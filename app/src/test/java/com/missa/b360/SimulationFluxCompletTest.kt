@@ -13,11 +13,10 @@ import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.CommandeAchatLigne
 import com.missa.b360.core.domain.model.CommandeAchatPayload
-import com.missa.b360.core.domain.model.ComposantBesoin
+import com.missa.b360.core.domain.model.ProductionComponent
 import com.missa.b360.core.domain.model.ProductionRecordPayload
 import com.missa.b360.core.domain.model.ProductionRules
 import com.missa.b360.core.domain.model.PurchaseLine
-import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.domain.model.ReceptionLigne
 import com.missa.b360.core.domain.model.ReturnRules
@@ -71,16 +70,18 @@ class SimulationFluxCompletTest {
             siteId = siteId,
             prixAchat = 5_000.0,
             active = true,
+            createdAt = now,
         )
         val produitFini = ProductEntity(
             id = 202L,
             code = "PRD-2026-0002",
             nom = "Sac Besace Prestige",
-            type = ProductType.PRODUIT_FABRIQUE,
+            type = ProductType.FABRIQUE,
             categorieId = categorie.id,
             siteId = siteId,
             prixVente = 25_000.0,
             active = true,
+            createdAt = now,
         )
 
         // --- 3. Fournisseur & Cycle d'Achat ---
@@ -140,6 +141,9 @@ class SimulationFluxCompletTest {
                     unitPrice = 5_000.0,
                 ),
             ),
+            subtotal = 50_000.0,
+            taxRate = 0.0,
+            taxAmount = 0.0,
             total = 50_000.0,
             paymentMethod = "Espèces",
             paidAmount = 50_000.0,
@@ -162,9 +166,9 @@ class SimulationFluxCompletTest {
             produitNom = produitFini.nom,
             quantite = 4.0,
             composants = listOf(
-                ComposantBesoin(
-                    composantId = matierePremiere.id,
-                    composantNom = matierePremiere.nom,
+                ProductionComponent(
+                    productId = matierePremiere.id,
+                    nom = matierePremiere.nom,
                     quantite = 8.0, // 2 m² par sac
                 ),
             ),
@@ -248,11 +252,27 @@ class SimulationFluxCompletTest {
                 unitPrice = 25_000.0,
             ),
         )
-        val avoirPayload = ReturnRules.construireAvoir(
-            factureOriginale = factureVentePayload,
-            lignesRetournees = ligneRetour,
-            modeRemboursement = "Espèces",
-            motif = "Erreur taille client",
+        val retourDemande = mapOf(ReturnRules.lineKey(ligneRetour.first()) to 1.0)
+        val estValide = ReturnRules.retourEstValide(
+            original = factureVentePayload,
+            returns = emptyList(),
+            demande = retourDemande,
+        )
+        assertTrue("Le retour de 1 sac vendu doit être validé", estValide)
+
+        val avoirPayload = SaleRecordPayload(
+            clientId = factureVentePayload.clientId,
+            clientName = factureVentePayload.clientName,
+            lines = ligneRetour,
+            subtotal = 25_000.0,
+            discount = 0.0,
+            delivery = 0.0,
+            taxRate = 0.0,
+            taxAmount = 0.0,
+            total = 25_000.0,
+            paymentMethod = "Espèces",
+            paidAmount = 25_000.0,
+            note = "Erreur taille client",
             sourceRecordId = 501L,
         )
         assertEquals(25_000.0, avoirPayload.total, 1e-9)
