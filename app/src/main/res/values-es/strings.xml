@@ -625,6 +625,14 @@
     <string name="home_overview">Aquí tiene una visión general de su actividad.</string>
     <string name="home_quick_actions">Acciones rápidas</string>
     <string name="home_personalize">Personalizar</string>
+    <string name="header_entreprise_cliente">Empresa cliente</string>
+    <string name="home_plus_produit">+ Producto</string>
+    <string name="home_plus_livraison">+ Entrega</string>
+    <string name="home_plus_devis">+ Presupuesto</string>
+    <string name="home_plus_facture">+ Factura</string>
+    <string name="home_besoin_aide">¿Necesitas ayuda?</string>
+    <string name="home_support_desc">Nuestro centro de soporte está para acompañarle en todo momento.</string>
+    <string name="home_acceder_support">Acceder al soporte</string>
     <string name="home_ventes_du_jour">Ventas del día</string>
     <string name="home_achats_du_jour">Compras del día</string>
     <string name="home_tresorerie_card">Tesorería</string>

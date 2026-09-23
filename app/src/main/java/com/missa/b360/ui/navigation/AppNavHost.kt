@@ -214,6 +214,8 @@ private fun MainNavHost() {
                 com.missa.b360.ui.components.MissaAppHeader(
                     companyLogoUri = etatAccueil.entrepriseLogoUri,
                     companyName = etatAccueil.entrepriseNom,
+                    secteur = etatAccueil.secteur,
+                    profilActivite = etatAccueil.profilActivite,
                     isHome = true,
                     onMenuClick = { portee.launch { etatTiroir.open() } },
                     onBackClick = { navController.popBackStack() },
@@ -246,6 +248,7 @@ private fun MainNavHost() {
             HomeScreen(
                 navController = navController,
                 onOuvrirMenu = { portee.launch { etatTiroir.open() } },
+                onSupport = { assistance = true },
             )
         }
         composable(Routes.NOTIFICATIONS) {

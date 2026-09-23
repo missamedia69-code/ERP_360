@@ -635,6 +635,14 @@
     <string name="home_overview">Here is an overview of your business.</string>
     <string name="home_quick_actions">Quick actions</string>
     <string name="home_personalize">Customize</string>
+    <string name="header_entreprise_cliente">Client enterprise</string>
+    <string name="home_plus_produit">+ Product</string>
+    <string name="home_plus_livraison">+ Delivery</string>
+    <string name="home_plus_devis">+ Quotation</string>
+    <string name="home_plus_facture">+ Invoice</string>
+    <string name="home_besoin_aide">Need help?</string>
+    <string name="home_support_desc">Our support center is here to assist you at all times.</string>
+    <string name="home_acceder_support">Access support</string>
     <string name="home_ventes_du_jour">Sales today</string>
     <string name="home_achats_du_jour">Purchases today</string>
     <string name="home_tresorerie_card">Cash</string>

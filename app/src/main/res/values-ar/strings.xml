@@ -625,6 +625,14 @@
     <string name="home_overview">إليك نظرة عامة على نشاطك.</string>
     <string name="home_quick_actions">إجراءات سريعة</string>
     <string name="home_personalize">تخصيص</string>
+    <string name="header_entreprise_cliente">الشركة العميلة</string>
+    <string name="home_plus_produit">+ منتج</string>
+    <string name="home_plus_livraison">+ تسليم</string>
+    <string name="home_plus_devis">+ عرض سعر</string>
+    <string name="home_plus_facture">+ فاتورة</string>
+    <string name="home_besoin_aide">هل تحتاج مساعدة؟</string>
+    <string name="home_support_desc">مركز الدعم لدينا موجود لمساعدتك في أي وقت.</string>
+    <string name="home_acceder_support">الوصول إلى الدعم</string>
     <string name="home_ventes_du_jour">مبيعات اليوم</string>
     <string name="home_achats_du_jour">مشتريات اليوم</string>
     <string name="home_tresorerie_card">الخزينة</string>

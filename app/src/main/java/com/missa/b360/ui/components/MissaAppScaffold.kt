@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.style.TextOverflow
 
 import androidx.compose.foundation.layout.widthIn
@@ -84,10 +85,19 @@ private val PuceHeader = MissaInk.copy(alpha = 0.05f)
  *
  * Tous les clics conservent leur comportement d'origine (menu/retour, notifications, profil).
  */
+/**
+ * En-tête mobile unifié selon la charte visuelle MISSA BUSINESS 360 :
+ * - Compartiment gauche : Logo officiel circulaire MISSA + titre "MISSA BUSINESS 360" + slogan
+ * - Séparateur vertical fin
+ * - Compartiment droit : "Entreprise cliente" + Nom de l'entreprise + Badge activité (Commerce général...) + Médaillon logo/store
+ * - Zéro chevauchement ni décalage grâce au partitionnement équilibré et aux contraintes bornées.
+ */
 @Composable
 fun MissaAppHeader(
     companyLogoUri: String?,
     companyName: String,
+    secteur: String = "",
+    profilActivite: String? = null,
     isHome: Boolean,
     onMenuClick: () -> Unit,
     onBackClick: () -> Unit,
@@ -108,105 +118,180 @@ fun MissaAppHeader(
             color = Color.White,
             shadowElevation = 3.dp,
             tonalElevation = 0.dp,
-            border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.35f)),
+            border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.4f)),
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(76.dp)
-                    .padding(horizontal = 10.dp),
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Hamburger / retour — zone tactile 48dp, icône bleu foncé équilibrée avec le logo.
-                IconButton(
-                    onClick = if (isHome) onMenuClick else onBackClick,
+                // Compartiment Gauche : Identité MISSA BUSINESS 360
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(PuceHeader),
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable { if (isHome) onMenuClick() else onBackClick() }
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        painter = painterResource(if (isHome) Iv.Menu else Iv.ArrowBack),
-                        contentDescription = if (isHome) stringResource(R.string.drawer_admin) else "Retour",
-                        tint = MissaInk,
-                        modifier = Modifier.size(24.dp),
-                    )
+                    Box(
+                        modifier = Modifier.size(46.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.logo_missa),
+                            contentDescription = "MISSA BUSINESS 360",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                                .border(1.2.dp, Color(0xFF0288D1).copy(alpha = 0.3f), CircleShape),
+                        )
+                        if (!isHome) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.35f), CircleShape),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(Iv.ArrowBack),
+                                    contentDescription = "Retour",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Column {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "MISSA BUSINESS ",
+                                color = MissaInk,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                            )
+                            Text(
+                                text = "360",
+                                color = Color(0xFF0288D1),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                maxLines = 1,
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.app_slogan),
+                            color = MissaMuted,
+                            fontSize = 10.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
+
                 Spacer(Modifier.width(6.dp))
-                // Logo officiel MISSA BUSINESS 360 — conteneur légèrement arrondi.
-                Image(
-                    painter = painterResource(R.drawable.logo_missa),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                // Séparateur vertical fin
+                Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(14.dp)),
-                )
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text(
-                        text = "MISSA BUSINESS",
-                        color = MissaInk,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 17.sp,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = "360",
-                        color = TendrePositive,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        lineHeight = 17.sp,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = stringResource(R.string.app_slogan),
-                        color = MissaMuted,
-                        fontSize = 11.sp,
-                        lineHeight = 13.sp,
-                        maxLines = 1,
-                    )
-                }
-                Spacer(Modifier.weight(1f))
-                // Nom de l'entreprise à côté de son logo — la cloche vit désormais
-                // au niveau du « Bonjour » de l'accueil.
-                Text(
-                    text = companyName,
-                    color = MissaInk,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.widthIn(max = 130.dp),
+                        .width(1.dp)
+                        .height(38.dp)
+                        .background(MissaBorder.copy(alpha = 0.6f)),
                 )
                 Spacer(Modifier.width(6.dp))
-                // Bouton entreprise — parfaitement rond, fond très légèrement teinté de vert.
-                IconButton(
-                    onClick = onProfileClick,
+
+                // Compartiment Droit : Entreprise cliente
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Green90),
+                        .weight(1f)
+                        .clip(RoundedCornerShape(14.dp))
+                        .clickable(onClick = onProfileClick)
+                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (companyLogoUri != null) {
-                        CompanyLogo(
-                            logoUri = companyLogoUri,
-                            contentDescription = stringResource(R.string.home_company_active),
-                            fallbackIcon = Iv.Store,
-                            modifier = Modifier.fillMaxSize(),
-                            size = 48.dp,
-                            shape = CircleShape,
-                            fallbackTint = TendrePositive,
-                            fallbackBackground = Green90,
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.Start,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painter = painterResource(Iv.Business),
+                                contentDescription = null,
+                                tint = Color(0xFF0288D1),
+                                modifier = Modifier.size(11.dp),
+                            )
+                            Spacer(Modifier.width(3.dp))
+                            Text(
+                                text = stringResource(R.string.header_entreprise_cliente),
+                                fontSize = 9.sp,
+                                color = MissaMuted,
+                                maxLines = 1,
+                            )
+                        }
+                        Text(
+                            text = companyName.ifBlank { stringResource(R.string.home_company_placeholder) },
+                            color = MissaInk,
+                            fontSize = 12.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
-                    } else {
-                        Icon(
-                            painter = painterResource(Iv.Store),
-                            contentDescription = stringResource(R.string.home_company_active),
-                            tint = TendrePositive,
-                            modifier = Modifier.size(24.dp),
-                        )
+                        val activiteLibelle = secteur.ifBlank {
+                            when (profilActivite) {
+                                "AV" -> "Achat & Vente"
+                                "ASV" -> "Achat, Stock & Vente"
+                                "APSV" -> "Commerce général"
+                                "SER" -> "Service & Prestations"
+                                "PRJ" -> "Gestion de projets"
+                                else -> "Commerce général"
+                            }
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = Color(0xFFE0F2FE),
+                            modifier = Modifier.padding(top = 1.dp),
+                        ) {
+                            Text(
+                                text = activiteLibelle,
+                                color = Color(0xFF0284C7),
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(6.dp))
+                    Surface(
+                        modifier = Modifier.size(38.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFDCFCE7),
+                        border = BorderStroke(1.dp, Color(0xFF86EFAC)),
+                    ) {
+                        if (companyLogoUri != null) {
+                            CompanyLogo(
+                                logoUri = companyLogoUri,
+                                contentDescription = stringResource(R.string.home_company_active),
+                                fallbackIcon = Iv.Store,
+                                modifier = Modifier.fillMaxSize(),
+                                size = 38.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                fallbackTint = Color(0xFF15803D),
+                                fallbackBackground = Color(0xFFDCFCE7),
+                            )
+                        } else {
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                Icon(
+                                    painter = painterResource(Iv.Store),
+                                    contentDescription = stringResource(R.string.home_company_active),
+                                    tint = Color(0xFF15803D),
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        }
                     }
                 }
             }

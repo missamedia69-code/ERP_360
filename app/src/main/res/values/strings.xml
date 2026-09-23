@@ -648,6 +648,14 @@
     <string name="home_overview">Voici la vue d’ensemble de votre activité.</string>
     <string name="home_quick_actions">Actions rapides</string>
     <string name="home_personalize">Personnaliser</string>
+    <string name="header_entreprise_cliente">Entreprise cliente</string>
+    <string name="home_plus_produit">+ Produit</string>
+    <string name="home_plus_livraison">+ Livraison</string>
+    <string name="home_plus_devis">+ Devis</string>
+    <string name="home_plus_facture">+ Facture</string>
+    <string name="home_besoin_aide">Besoin d\'aide ?</string>
+    <string name="home_support_desc">Notre centre d\'assistance est là pour vous accompagner à tout moment.</string>
+    <string name="home_acceder_support">Accéder au support</string>
     <string name="home_ventes_du_jour">Ventes du jour</string>
     <string name="home_achats_du_jour">Achats du jour</string>
     <string name="home_tresorerie_card">Trésorerie</string>
