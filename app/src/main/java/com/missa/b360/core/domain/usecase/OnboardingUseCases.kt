@@ -100,7 +100,7 @@ class SetupEnterpriseUseCase @Inject constructor(
             // Couvre aussi une interruption après Room mais avant l'écriture DataStore.
             settingsStore.set(SettingsStore.Keys.PAYS, params.codePays.orEmpty())
             if (database.compteTresorerieDao().getAll().isEmpty()) {
-                val siteNom = siteDao.idPrincipal()?.let { siteDao.getById(it)?.nom } ?: "Principal"
+                val siteNom = siteDao.idPrincipal()?.let { siteDao.getNomById(it) } ?: "Principal"
                 database.compteTresorerieDao().insert(
                     CompteTresorerieEntity(
                         nom = "Caisse Principale",
