@@ -1636,4 +1636,8 @@
     <string name="ref_tuile_taxes">الضرائب</string>
     <string name="ref_titre_registre">بيانات المرجع الأساسية النشطة</string>
     <string name="ach_fermer">إغلاق</string>
+    <string name="retour_err_introuvable">المبيعات غير موجودة</string>
+    <string name="retour_err_lignes">يرجى تحديد بند صالح واحد على الأقل للإرجاع</string>
+    <string name="retour_err_lecture">خطأ أثناء قراءة المبيعات</string>
+    <string name="retour_err_brouillon">لا يمكن معالجة إرجاع على عملية بيع في حالة مسودة</string>
 </resources>

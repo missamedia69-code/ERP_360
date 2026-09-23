@@ -1640,4 +1640,8 @@
     <string name="ref_tuile_taxes">Taxes / VAT</string>
     <string name="ref_titre_registre">Active reference master data</string>
     <string name="ach_fermer">Close</string>
+    <string name="retour_err_introuvable">Sale not found</string>
+    <string name="retour_err_lignes">Please select at least one valid line to return</string>
+    <string name="retour_err_lecture">Error loading sale</string>
+    <string name="retour_err_brouillon">Cannot process a return on a draft sale</string>
 </resources>

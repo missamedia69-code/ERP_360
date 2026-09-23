@@ -1683,5 +1683,8 @@
     <string name="ref_tuile_taxes">Taxes / TVA</string>
     <string name="ref_titre_registre">Données référentielles actives</string>
     <string name="ach_fermer">Fermer</string>
+    <string name="retour_err_introuvable">Vente introuvable</string>
+    <string name="retour_err_lignes">Veuillez sélectionner au moins une ligne valide à retourner</string>
+    <string name="retour_err_lecture">Erreur de lecture de la vente</string>
+    <string name="retour_err_brouillon">Impossible d\'effectuer un retour sur une vente en brouillon</string>
 </resources>
-<!-- Temp insert will be replaced -->
