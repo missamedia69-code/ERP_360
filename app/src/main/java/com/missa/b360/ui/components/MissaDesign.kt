@@ -72,9 +72,10 @@ fun MissaBrandMark(
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
 ) {
+    val shape = RoundedCornerShape(size * 0.22f)
     Surface(
         modifier = modifier.size(size),
-        shape = CircleShape,
+        shape = shape,
         color = Color.White,
         border = BorderStroke(1.dp, Color(0xFF0288D1).copy(alpha = 0.25f)),
     ) {
@@ -82,7 +83,7 @@ fun MissaBrandMark(
             painter = painterResource(R.drawable.logo_missa),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().clip(CircleShape),
+            modifier = Modifier.fillMaxSize().clip(shape),
         )
     }
 }

@@ -1,5 +1,13 @@
 package com.missa.b360.ui.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.style.TextOverflow
 
@@ -104,6 +112,38 @@ fun MissaAppHeader(
     onProfileClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Effet de clignotement / pulsation bleue signalant le bouton de menu MISSA
+    val infiniteTransition = rememberInfiniteTransition(label = "menu_pulse")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.25f,
+        targetValue = 0.95f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "menuPulseAlpha",
+    )
+    val pulseBorderWidth by infiniteTransition.animateDp(
+        initialValue = 1.5.dp,
+        targetValue = 3.dp,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "menuPulseWidth",
+    )
+    val pulseHaloPadding by infiniteTransition.animateDp(
+        initialValue = 0.5.dp,
+        targetValue = 2.5.dp,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "menuHaloPadding",
+    )
+
+    val logoShape = RoundedCornerShape(12.dp)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -127,7 +167,7 @@ fun MissaAppHeader(
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Compartiment Gauche : Identité MISSA BUSINESS 360
+                // Compartiment Gauche : Identité MISSA BUSINESS 360 (Logo carré aux abords arrondis avec effet clignotant bleu)
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(14.dp))
@@ -136,23 +176,32 @@ fun MissaAppHeader(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
-                        modifier = Modifier.size(46.dp),
+                        modifier = Modifier
+                            .size(46.dp)
+                            .background(
+                                color = if (isHome) Color(0xFF0288D1).copy(alpha = pulseAlpha * 0.18f) else Color.Transparent,
+                                shape = RoundedCornerShape(14.dp),
+                            )
+                            .padding(if (isHome) pulseHaloPadding else 1.dp)
+                            .border(
+                                width = if (isHome) pulseBorderWidth else 1.2.dp,
+                                color = if (isHome) Color(0xFF0288D1).copy(alpha = pulseAlpha) else Color(0xFF0288D1).copy(alpha = 0.35f),
+                                shape = logoShape,
+                            )
+                            .clip(logoShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
                             painter = painterResource(R.drawable.logo_missa),
-                            contentDescription = "MISSA BUSINESS 360",
+                            contentDescription = if (isHome) "Menu MISSA BUSINESS 360" else "Retour",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .border(1.2.dp, Color(0xFF0288D1).copy(alpha = 0.3f), CircleShape),
+                            modifier = Modifier.fillMaxSize(),
                         )
                         if (!isHome) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.35f), CircleShape),
+                                    .background(Color.Black.copy(alpha = 0.35f)),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
@@ -160,6 +209,24 @@ fun MissaAppHeader(
                                     contentDescription = "Retour",
                                     tint = Color.White,
                                     modifier = Modifier.size(20.dp),
+                                )
+                            }
+                        } else {
+                            // Badge menu discret et élégant au coin inférieur droit
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(2.dp)
+                                    .size(15.dp)
+                                    .background(Color(0xFF0288D1), RoundedCornerShape(4.dp))
+                                    .border(0.8.dp, Color.White, RoundedCornerShape(4.dp)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(Iv.Menu),
+                                    contentDescription = "Menu",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(10.dp),
                                 )
                             }
                         }

@@ -436,7 +436,7 @@ private fun HomeDashboard(
                 }
             }
         }
-        // Matrice KPI 4 cartes 2×2 (dégradés pastels + illustrations 3D + chevrons)
+        // Matrice KPI 4 cartes 2×2 (dégradés pastels + typographie nette + chevrons)
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -452,7 +452,6 @@ private fun HomeDashboard(
                         gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
                             listOf(Color(0xFFF0F9FF), Color(0xFFE0F2FE)),
                         ),
-                        illustrationRes = R.drawable.illustration_ventes,
                         onClick = { kpiEnVue = 0 },
                     )
                     AccueilKpiCard(
@@ -467,7 +466,6 @@ private fun HomeDashboard(
                         gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
                             listOf(Color(0xFFFFFBEB), Color(0xFFFEF3C7)),
                         ),
-                        illustrationRes = R.drawable.illustration_stock,
                         onClick = { kpiEnVue = 1 },
                     )
                 }
@@ -484,7 +482,6 @@ private fun HomeDashboard(
                         gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
                             listOf(Color(0xFFF0FDF4), Color(0xFFDCFCE7)),
                         ),
-                        illustrationRes = R.drawable.illustration_tresorerie,
                         onClick = { kpiEnVue = 2 },
                     )
                     AccueilKpiCard(
@@ -499,7 +496,6 @@ private fun HomeDashboard(
                         gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
                             listOf(Color(0xFFFAF5FF), Color(0xFFF3E8FF)),
                         ),
-                        illustrationRes = R.drawable.illustration_clients,
                         onClick = { kpiEnVue = 3 },
                     )
                 }
@@ -679,12 +675,11 @@ private fun AccueilKpiCard(
     iconBg: Color,
     iconTint: Color,
     gradient: androidx.compose.ui.graphics.Brush,
-    illustrationRes: Int? = null,
     onClick: () -> Unit,
 ) {
     Surface(
         modifier = modifier
-            .height(176.dp)
+            .height(140.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         color = Color.White,
@@ -694,24 +689,11 @@ private fun AccueilKpiCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(gradient),
+                .background(gradient)
+                .padding(14.dp),
         ) {
-            if (illustrationRes != null) {
-                Image(
-                    painter = painterResource(id = illustrationRes),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(92.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 6.dp, bottom = 6.dp)
-                        .alpha(0.85f),
-                )
-            }
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(14.dp),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
