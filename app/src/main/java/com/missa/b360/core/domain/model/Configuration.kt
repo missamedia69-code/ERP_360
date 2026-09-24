@@ -108,6 +108,7 @@ enum class ProfilActivite(val labelRes: Int, val description: String) {
     SER(R.string.profil_ser, "Prestations de service"),
     PRJ(R.string.profil_prj, "Société de projets / ingénierie"),
     FULL(R.string.profil_full, "Tous les modules activés"),
+    PERSONNEL(R.string.profil_personnel, "Gestion personnelle des dépenses et des entrées"),
     CUSTOM(R.string.profil_custom, "Activation manuelle par l'utilisateur");
 }
 
@@ -279,6 +280,7 @@ object ModulesPersonnalises {
         ProfilActivite.SER -> R.string.profil_ser
         ProfilActivite.PRJ -> R.string.profil_prj
         ProfilActivite.FULL -> R.string.profil_full
+        ProfilActivite.PERSONNEL -> R.string.profil_personnel
         ProfilActivite.CUSTOM -> R.string.profil_custom
     }
 

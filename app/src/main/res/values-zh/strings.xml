@@ -482,6 +482,7 @@
     <string name="profil_ser">服务</string>
     <string name="profil_prj">项目</string>
     <string name="profil_full">完整</string>
+    <string name="profil_personnel">个人</string>
     <string name="profil_custom">自定义</string>
     <string name="obn_profil_av">买卖</string>
     <string name="obn_profil_av_sous">简单贸易</string>
@@ -494,6 +495,8 @@
     <string name="obn_profil_prj">项目</string>
     <string name="obn_profil_prj_sous">项目管理</string>
     <string name="obn_profil_full">完整</string>
+    <string name="obn_profil_personnel">个人</string>
+    <string name="obn_profil_personnel_sous">收支管理</string>
     <string name="obn_profil_full_sous">所有模块</string>
 
     <string name="palier_p1">个人 / 纳米 (1)</string>
@@ -511,6 +514,7 @@
     <string name="ob_taux_taxe">税率 (%)</string>
     <string name="ob_site_principal">主站点名称</string>
     <string name="ob_erreur_nom_entreprise">请填写公司名称。</string>
+    <string name="ob_erreur_votre_nom">请填写您的姓名。</string>
     <string name="ob_erreur_site_principal">请填写主站点名称。</string>
     <string name="ob_erreur_taux_taxe">请输入介于 0 到 100% 之间的税率。</string>
     <string name="ob_erreur_configuration_entreprise">无法保存公司配置，请重试。</string>
@@ -779,7 +783,9 @@
     <string name="obn_profil_titre">选择您的业务类型</string>
     <string name="obn_profil_sous">我们将根据您的需求调整 Missa Business 360。</string>
     <string name="obn_entreprise_titre">您的企业信息</string>
+    <string name="obn_entreprise_titre_personnel">您的个人空间</string>
     <string name="obn_entreprise_sous">这些信息将用于个性化您的环境。</string>
+    <string name="obn_entreprise_sous_personnel">提供少量信息以配置您的 Missa 空间。</string>
     <string name="obn_nom_ex">例：Missa SARL</string>
     <string name="obn_secteur">业务领域</string>
     <string name="obn_secteur_ex">例：零售业</string>
@@ -1178,12 +1184,21 @@
     <string name="fisc_pack_efacture_aucune">暂无国家系统</string>
     <string name="fisc_pack_seuil_aucun">无起征点：首笔交易即计税</string>
     <string name="obn_section_identite">企业身份</string>
+    <string name="obn_section_personnelle">您</string>
     <string name="obn_section_coordonnees">联系方式</string>
     <string name="obn_section_a_completer">待填写</string>
     <string name="obn_section_format">格式</string>
     <string name="obn_logo_present">已添加标志</string>
     <string name="fisc_pack_detail">税务明细</string>
     <string name="obn_pack_inclus">该方案包含</string>
+    <string name="obn_pers_revenus">按来源的收入</string>
+    <string name="obn_pers_revenus_sous">工资、自由职业、租金、其他</string>
+    <string name="obn_pers_depenses">按类别的支出</string>
+    <string name="obn_pers_depenses_sous">住房、餐饮、交通、健康、休闲</string>
+    <string name="obn_pers_budgets">预算与提醒</string>
+    <string name="obn_pers_budgets_sous">每月分类预算，超支提醒</string>
+    <string name="obn_pers_note">企业模块不属于此套餐；如业务变化，仍可在设置中启用。</string>
+    <string name="obn_pers_dialog_resume">包含 3 项功能</string>
     <string name="obn_pack_inclus_note">这些模块相互配合，始终保持启用。</string>
     <string name="obn_pack_ajouter">添加其他模块</string>
     <string name="obn_pack_ajouter_note">可选：稍后可在设置中开启或关闭。</string>

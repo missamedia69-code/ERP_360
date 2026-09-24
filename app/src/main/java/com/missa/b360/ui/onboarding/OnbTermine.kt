@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
@@ -162,6 +163,7 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
         paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe
     }
     val profilLabel = viewModel.profil?.let { stringResource(it.labelRes) } ?: "—"
+    val personnel = viewModel.profil == ProfilActivite.PERSONNEL
     val tailleLabel = viewModel.palier?.let { stringResource(it.labelRes) } ?: "—"
     // Le nom du pays vient du référentiel ISO du système : toutes les devises
     // sont couvertes, pas seulement le catalogue court.
@@ -197,13 +199,18 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
             OnbRecapLigne(R.string.obn_recap_entreprise, viewModel.nomEntreprise)
             OnbRecapLigne(R.string.obn_recap_pays, viewModel.pays)
             OnbRecapLigne(R.string.obn_recap_devise, deviseLabel)
-            OnbRecapLigne(R.string.obn_recap_fiscalite, libelleTaxePays(typeTaxe, viewModel.tauxTaxe))
+            // Fiscalité, taille et modules : sans objet pour le pack Personnel.
+            if (!personnel) {
+                OnbRecapLigne(R.string.obn_recap_fiscalite, libelleTaxePays(typeTaxe, viewModel.tauxTaxe))
+            }
             OnbRecapLigne(R.string.obn_recap_identifiants, identifiants)
 
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
             OnbRecapLigne(R.string.obn_recap_profil, profilLabel)
-            OnbRecapLigne(R.string.obn_recap_taille, tailleLabel)
-            OnbRecapLigne(R.string.obn_recap_modules, viewModel.modulesActifs.size.toString())
+            if (!personnel) {
+                OnbRecapLigne(R.string.obn_recap_taille, tailleLabel)
+                OnbRecapLigne(R.string.obn_recap_modules, viewModel.modulesActifs.size.toString())
+            }
 
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
             OnbRecapLigne(R.string.obn_recap_proprietaire, proprietaire)

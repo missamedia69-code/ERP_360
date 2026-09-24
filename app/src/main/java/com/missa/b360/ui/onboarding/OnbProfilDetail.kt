@@ -38,6 +38,7 @@ import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ProfilConfiguration
+import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -63,15 +64,18 @@ internal fun OnbProfilDetailDialogue(
     onFermer: () -> Unit,
 ) {
     val catalogueComplet = profil == ProfilActivite.CUSTOM
-    val metier: List<ModuleCode> = if (catalogueComplet) {
-        ModulesSocle.metier
-    } else {
-        ModulesSocle.metierActifs(profil, emptyList())
+    val personnel = profil == ProfilActivite.PERSONNEL
+    val metier: List<ModuleCode> = when {
+        catalogueComplet -> ModulesSocle.metier
+        // Le pack Personnel n'a pas de modules entreprise : la boîte présente
+        // ses trois fonctionnalités à la place du catalogue.
+        personnel -> emptyList()
+        else -> ModulesSocle.metierActifs(profil, emptyList())
     }
-    val socle: List<ModuleCode> = if (catalogueComplet) {
-        ModulesSocle.support
-    } else {
-        ModulesSocle.support.filter { it in ModulesSocle.recommandes(profil, palier, metier) }
+    val socle: List<ModuleCode> = when {
+        catalogueComplet -> ModulesSocle.support
+        personnel -> emptyList()
+        else -> ModulesSocle.support.filter { it in ModulesSocle.recommandes(profil, palier, metier) }
     }
     // Un module métier peut n'être activé qu'en partie par le profil ; une brique
     // socle est toujours proposée entière.
@@ -123,11 +127,15 @@ internal fun OnbProfilDetailDialogue(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = stringResource(
-                            R.string.obn_profil_detail_resume,
-                            totalModules,
-                            totalFonctions,
-                        ),
+                        text = if (personnel) {
+                            stringResource(R.string.obn_pers_dialog_resume)
+                        } else {
+                            stringResource(
+                                R.string.obn_profil_detail_resume,
+                                totalModules,
+                                totalFonctions,
+                            )
+                        },
                         fontSize = 12.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = BrandBlue,
@@ -137,8 +145,11 @@ internal fun OnbProfilDetailDialogue(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(
-                        if (catalogueComplet) R.string.obn_profil_detail_custom
-                        else R.string.obn_profil_detail_modifiable,
+                        when {
+                            catalogueComplet -> R.string.obn_profil_detail_custom
+                            personnel -> R.string.obn_pers_note
+                            else -> R.string.obn_profil_detail_modifiable
+                        },
                     ),
                     fontSize = 11.5.sp,
                     color = MissaMuted,
@@ -149,24 +160,54 @@ internal fun OnbProfilDetailDialogue(
                         .fillMaxWidth()
                         .heightIn(max = 340.dp),
                 ) {
-                    item {
-                        OnbProfilDetailSection(
-                            titreRes = R.string.obn_profil_detail_metier,
-                            nombre = blocsMetier.size,
-                        )
-                    }
-                    items(blocsMetier, key = { "metier_" + it.first.name }) { (module, fonctions) ->
-                        OnbProfilDetailModule(module = module, fonctions = fonctions)
-                    }
-                    if (blocsSocle.isNotEmpty()) {
+                    if (personnel) {
                         item {
                             OnbProfilDetailSection(
-                                titreRes = R.string.obn_profil_detail_support,
-                                nombre = blocsSocle.size,
+                                titreRes = R.string.obn_pack_inclus,
+                                nombre = 3,
                             )
                         }
-                        items(blocsSocle, key = { "socle_" + it.first.name }) { (module, fonctions) ->
+                        item {
+                            OnbPersFonctionLigne(
+                                icone = Iv.TrendingUp,
+                                titreRes = R.string.obn_pers_revenus,
+                                sousTitreRes = R.string.obn_pers_revenus_sous,
+                            )
+                        }
+                        item {
+                            OnbPersFonctionLigne(
+                                icone = Iv.CartArrowDown,
+                                titreRes = R.string.obn_pers_depenses,
+                                sousTitreRes = R.string.obn_pers_depenses_sous,
+                            )
+                        }
+                        item {
+                            OnbPersFonctionLigne(
+                                icone = Iv.Savings,
+                                titreRes = R.string.obn_pers_budgets,
+                                sousTitreRes = R.string.obn_pers_budgets_sous,
+                            )
+                        }
+                    } else {
+                        item {
+                            OnbProfilDetailSection(
+                                titreRes = R.string.obn_profil_detail_metier,
+                                nombre = blocsMetier.size,
+                            )
+                        }
+                        items(blocsMetier, key = { "metier_" + it.first.name }) { (module, fonctions) ->
                             OnbProfilDetailModule(module = module, fonctions = fonctions)
+                        }
+                        if (blocsSocle.isNotEmpty()) {
+                            item {
+                                OnbProfilDetailSection(
+                                    titreRes = R.string.obn_profil_detail_support,
+                                    nombre = blocsSocle.size,
+                                )
+                            }
+                            items(blocsSocle, key = { "socle_" + it.first.name }) { (module, fonctions) ->
+                                OnbProfilDetailModule(module = module, fonctions = fonctions)
+                            }
                         }
                     }
                 }
@@ -259,6 +300,46 @@ private fun OnbProfilDetailModule(module: ModuleCode, fonctions: List<String>) {
                 fontSize = 11.5.sp,
                 color = MissaMuted,
                 modifier = Modifier.padding(start = 15.dp, top = 1.dp),
+            )
+        }
+    }
+}
+
+/** Une fonctionnalité du pack Personnel dans la boîte de détail. */
+@Composable
+private fun OnbPersFonctionLigne(icone: Int, titreRes: Int, sousTitreRes: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp),
+    ) {
+        Surface(
+            shape = RoundedCornerShape(9.dp),
+            color = BrandBlue.copy(alpha = 0.09f),
+            modifier = Modifier.size(30.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(icone),
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(titreRes),
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(sousTitreRes),
+                fontSize = 11.sp,
+                color = MissaMuted,
             )
         }
     }

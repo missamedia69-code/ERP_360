@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.CleIdentifiant
 import com.missa.b360.core.domain.model.PackPays
+import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ReferentielFiscal
 import com.missa.b360.core.domain.model.ReferentielPackPays
 import com.missa.b360.core.domain.model.TypeImpotRevenu
@@ -140,10 +141,14 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     )
     val aCompleter = stringResource(R.string.obn_section_a_completer)
     val facultatif = stringResource(R.string.obn_logo_optionnel)
+    // Pack Personnel : l'écran devient « votre espace » — pas d'identité
+    // sociale, pas d'identifiants fiscaux, pas de taux ; le nom, le pays,
+    // la devise et les coordonnées restent.
+    val personnel = viewModel.profil == ProfilActivite.PERSONNEL
 
     OnbScaffold(
-        titreRes = R.string.obn_entreprise_titre,
-        sousTitreRes = R.string.obn_entreprise_sous,
+        titreRes = if (personnel) R.string.obn_entreprise_titre_personnel else R.string.obn_entreprise_titre,
+        sousTitreRes = if (personnel) R.string.obn_entreprise_sous_personnel else R.string.obn_entreprise_sous,
         viewModel = viewModel,
         boutonPleineLargeur = true,
         boutonActive = !viewModel.enregistrementEnCours && emailValide,
@@ -153,6 +158,26 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            if (personnel) {
+                // --- 1. Vous : le pack Personnel n'a pas d'identité sociale ---
+                MissaSectionPliable(
+                    titre = stringResource(R.string.obn_section_personnelle),
+                    icone = Iv.Person,
+                    resume = resume(viewModel.votreNom),
+                    etiquette = aCompleter.takeIf { viewModel.votreNom.isBlank() },
+                    ouvertParDefaut = true,
+                ) {
+                    OnbChampsEmpiles {
+                        OnbChampTexte(
+                            valeur = viewModel.votreNom,
+                            onValeur = { viewModel.votreNom = it },
+                            label = stringResource(R.string.ob_votre_nom),
+                            icone = Iv.Person,
+                            active = !viewModel.enregistrementEnCours,
+                        )
+                    }
+                }
+            } else {
             // --- 1. Identité : ce qui nomme l'entreprise et son site ---
             MissaSectionPliable(
                 titre = stringResource(R.string.obn_section_identite),
@@ -200,6 +225,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                     )
                 }
             }
+            }
 
             // --- 2. Localisation : le pays pilote tout le pack fiscal ---
             MissaSectionPliable(
@@ -207,6 +233,9 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 icone = Iv.Public,
                 resume = if (viewModel.pays.isBlank()) {
                     stringResource(R.string.ob_selectionne)
+                } else if (personnel) {
+                    // Pas de taux dans le résumé : il est porté par le pack pays.
+                    resume(viewModel.pays, viewModel.devise)
                 } else {
                     resume(
                         viewModel.pays,
@@ -249,7 +278,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                     pack = ReferentielPackPays.pack(viewModel.codePays),
                     indicatif = indicatif,
                     zone = zoneFiscale,
-                    identifiants = reglesIdentifiants.map { it.libelle },
+                    identifiants = if (personnel) emptyList() else reglesIdentifiants.map { it.libelle },
                 ) {
                     MissaSelecteurLigne(
                         label = stringResource(R.string.obn_devise_principale),
@@ -261,28 +290,32 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         bordureCarte = BorderStroke(1.dp, MissaBorder),
                         rayonCarte = RoundedCornerShape(12.dp),
                     )
-                    HorizontalDivider(color = MissaBorder)
-                    Spacer(Modifier.height(12.dp))
-                    OnbChampsEmpiles {
-                        OnbChampTexte(
-                            valeur = viewModel.tauxTaxeTexte,
-                            onValeur = viewModel::modifierTauxTaxe,
-                            label = stringResource(R.string.ob_taux_taxe),
-                            icone = Iv.Percent,
-                            clavier = KeyboardType.Decimal,
-                            erreur = tauxTaxeInvalide,
-                            aide = stringResource(R.string.ob_erreur_taux_taxe)
-                                .takeIf { tauxTaxeInvalide },
-                            active = !viewModel.enregistrementEnCours,
-                        )
-                        OnbChampTexte(
-                            valeur = viewModel.pays,
-                            onValeur = viewModel::modifierPaysManuel,
-                            label = stringResource(R.string.ob_pays_personnalise),
-                            icone = Iv.Public,
-                            aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
-                            active = !viewModel.enregistrementEnCours,
-                        )
+                    // Taux de taxe et pays libre : sans objet pour le pack
+                    // Personnel — le taux est porté par le pack pays.
+                    if (!personnel) {
+                        HorizontalDivider(color = MissaBorder)
+                        Spacer(Modifier.height(12.dp))
+                        OnbChampsEmpiles {
+                            OnbChampTexte(
+                                valeur = viewModel.tauxTaxeTexte,
+                                onValeur = viewModel::modifierTauxTaxe,
+                                label = stringResource(R.string.ob_taux_taxe),
+                                icone = Iv.Percent,
+                                clavier = KeyboardType.Decimal,
+                                erreur = tauxTaxeInvalide,
+                                aide = stringResource(R.string.ob_erreur_taux_taxe)
+                                    .takeIf { tauxTaxeInvalide },
+                                active = !viewModel.enregistrementEnCours,
+                            )
+                            OnbChampTexte(
+                                valeur = viewModel.pays,
+                                onValeur = viewModel::modifierPaysManuel,
+                                label = stringResource(R.string.ob_pays_personnalise),
+                                icone = Iv.Public,
+                                aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
+                                active = !viewModel.enregistrementEnCours,
+                            )
+                        }
                     }
                 }
             }
@@ -334,7 +367,8 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             }
 
             // --- 4. Identifiants légaux : ceux qu'attend le pays choisi ---
-            if (reglesIdentifiants.isNotEmpty()) {
+            // (sans objet pour le pack Personnel : personne, pas d'entité)
+            if (reglesIdentifiants.isNotEmpty() && !personnel) {
                 val saisis = reglesIdentifiants.mapNotNull { regle ->
                     when (regle.cle) {
                         CleIdentifiant.FISCAL -> viewModel.numeroFiscal

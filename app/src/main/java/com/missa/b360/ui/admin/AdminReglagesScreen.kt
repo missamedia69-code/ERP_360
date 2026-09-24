@@ -413,7 +413,10 @@ private fun ActivationChangerProfilDialogue(
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(stringResource(R.string.activation_confirmer_changement), fontSize = 12.sp, color = MissaMuted)
                 Spacer(Modifier.height(8.dp))
-                for (profil in ProfilActivite.entries) {
+                // Le pack Achat-Vente n'est plus proposé (supprimé de la
+                // matrice) : seules les installations AV existantes le
+                // conservent. Le reste du catalogue, dont le pack Personnel.
+                for (profil in ProfilActivite.entries.filter { it != ProfilActivite.AV }) {
                     val selected = profil == actuel
                     Card(
                         shape = RoundedCornerShape(10.dp),

@@ -147,6 +147,9 @@ object ModulesSocle {
         metierRetenus: Collection<ModuleCode>,
     ): Set<ModuleCode> {
         if (profil == null) return emptySet()
+        // Le pack Personnel n'active aucun module entreprise : c'est un carnet
+        // de dépenses et de revenus, pas une activité économique.
+        if (profil == ProfilActivite.PERSONNEL) return emptySet()
         val achat = ModuleCode.ACH in metierRetenus
         val vente = ModuleCode.VEN in metierRetenus
         val stock = ModuleCode.STK in metierRetenus

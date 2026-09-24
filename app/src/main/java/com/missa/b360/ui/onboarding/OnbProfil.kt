@@ -59,12 +59,13 @@ import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 
-/** Un pack de la matrice : profil ciblé, libellés et icône (fiche + dialogue). */
+/** Un pack de la matrice : profil ciblé, libellés, icône et code du carré. */
 private data class OnbProfilCarteInfo(
     val profil: ProfilActivite,
     val titreRes: Int,
     val sousTitreRes: Int,
     val icone: Int,
+    val codeAffiche: String,
 )
 
 /**
@@ -76,42 +77,51 @@ private data class OnbProfilCarteInfo(
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
+    // Le pack Achat-Vente (ex-3) n'est plus proposé : son périmètre est
+    // couvert par ASV. Les installations AV existantes continuent de
+    // fonctionner ; le pack Personnel (6) est le carnet d'une personne seule.
     val cartes = listOf(
         OnbProfilCarteInfo(
             ProfilActivite.ASV,
             R.string.obn_profil_asv,
             R.string.obn_profil_asv_sous,
             Iv.Inventory2,
+            "ASV",
         ),
         OnbProfilCarteInfo(
             ProfilActivite.APSV,
             R.string.obn_profil_apsv,
             R.string.obn_profil_apsv_sous,
             Iv.Construction,
-        ),
-        OnbProfilCarteInfo(
-            ProfilActivite.AV,
-            R.string.obn_profil_av,
-            R.string.obn_profil_av_sous,
-            Iv.ShoppingCart,
+            "APSV",
         ),
         OnbProfilCarteInfo(
             ProfilActivite.SER,
             R.string.obn_profil_ser,
             R.string.obn_profil_ser_sous,
             Iv.Handshake,
+            "SER",
         ),
         OnbProfilCarteInfo(
             ProfilActivite.PRJ,
             R.string.obn_profil_prj,
             R.string.obn_profil_prj_sous,
             Iv.Workspaces,
+            "PRJ",
         ),
         OnbProfilCarteInfo(
             ProfilActivite.FULL,
             R.string.obn_profil_full,
             R.string.obn_profil_full_sous,
             Iv.Business,
+            "FULL",
+        ),
+        OnbProfilCarteInfo(
+            ProfilActivite.PERSONNEL,
+            R.string.obn_profil_personnel,
+            R.string.obn_profil_personnel_sous,
+            Iv.Person,
+            "PERSO",
         ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
@@ -123,7 +133,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         onRetour = viewModel::precedent,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            // --- Matrice des packs : petits carrés numérotés (1 = ASV … 6 = FULL) ---
+            // --- Matrice des packs : petits carrés numérotés (1 = ASV … 6 = PERSO) ---
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.fillMaxWidth(),
@@ -131,7 +141,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 cartes.forEachIndexed { index, carte ->
                     OnbProfilCarre(
                         numero = index + 1,
-                        code = carte.profil.name,
+                        code = carte.codeAffiche,
                         selected = viewModel.profil == carte.profil,
                         onClick = { viewModel.choisirProfil(carte.profil) },
                         modifier = Modifier.weight(1f),
@@ -139,27 +149,31 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 }
             }
 
-            MissaSelecteurBleu(
-                label = stringResource(R.string.obn_effectif_label),
-                options = PalierTaille.entries.map { palier ->
-                    MissaOption(
-                        cle = palier.name,
-                        titre = stringResource(palier.labelRes),
-                        sousTitre = stringResource(palier.impactRes),
-                        badge = palier.tranche,
-                        badgeSecondaire = "${palier.emoji} ${palier.modulesDebloques}",
-                    )
-                },
-                selectionCle = viewModel.palier?.name,
-                onSelection = { cle ->
-                    runCatching { PalierTaille.valueOf(cle) }.getOrNull()
-                        ?.let(viewModel::choisirPalier)
-                },
-                icone = Iv.Groups,
-                enabled = !viewModel.enregistrementEnCours,
-                placeholder = stringResource(R.string.obn_effectif_placeholder),
-                titreDialogue = stringResource(R.string.palier_choisir_titre),
-            )
+            // L'effectif n'a pas de sens pour le pack Personnel (une seule
+            // personne) : le sélecteur est masqué pour ce pack.
+            if (viewModel.profil != ProfilActivite.PERSONNEL) {
+                MissaSelecteurBleu(
+                    label = stringResource(R.string.obn_effectif_label),
+                    options = PalierTaille.entries.map { palier ->
+                        MissaOption(
+                            cle = palier.name,
+                            titre = stringResource(palier.labelRes),
+                            sousTitre = stringResource(palier.impactRes),
+                            badge = palier.tranche,
+                            badgeSecondaire = "${palier.emoji} ${palier.modulesDebloques}",
+                        )
+                    },
+                    selectionCle = viewModel.palier?.name,
+                    onSelection = { cle ->
+                        runCatching { PalierTaille.valueOf(cle) }.getOrNull()
+                            ?.let(viewModel::choisirPalier)
+                    },
+                    icone = Iv.Groups,
+                    enabled = !viewModel.enregistrementEnCours,
+                    placeholder = stringResource(R.string.obn_effectif_placeholder),
+                    titreDialogue = stringResource(R.string.palier_choisir_titre),
+                )
+            }
 
             // --- Détail du pack sélectionné, sous la matrice ---
             val profilChoisi = viewModel.profil
@@ -171,7 +185,11 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                     icone = infoChoisi.icone,
                     onInfo = { detailProfil = infoChoisi.profil.name },
                 )
-                OnbModulesDuPack(viewModel = viewModel)
+                if (profilChoisi == ProfilActivite.PERSONNEL) {
+                    OnbPackPersonnel()
+                } else {
+                    OnbModulesDuPack(viewModel = viewModel)
+                }
             }
         }
     }
@@ -293,6 +311,82 @@ private fun OnbDetailPackEntete(
                     modifier = Modifier.size(16.dp),
                 )
             }
+        }
+    }
+}
+
+/**
+ * Fiche du pack Personnel : aucun module entreprise — le pack couvre les
+ * revenus, les dépenses par catégorie et les budgets d'une seule personne.
+ * Le périmètre foyer/famille restera proposé dans une version suivante.
+ */
+@Composable
+private fun OnbPackPersonnel() {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+            Text(
+                text = stringResource(R.string.obn_pack_inclus),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = MissaInk,
+            )
+            Spacer(Modifier.height(7.dp))
+            OnbPackPersonnelLigne(Iv.TrendingUp, R.string.obn_pers_revenus, R.string.obn_pers_revenus_sous)
+            OnbPackPersonnelLigne(Iv.CartArrowDown, R.string.obn_pers_depenses, R.string.obn_pers_depenses_sous)
+            OnbPackPersonnelLigne(Iv.Savings, R.string.obn_pers_budgets, R.string.obn_pers_budgets_sous)
+            Spacer(Modifier.height(9.dp))
+            HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
+            Spacer(Modifier.height(9.dp))
+            Text(
+                text = stringResource(R.string.obn_pers_note),
+                fontSize = 11.sp,
+                color = MissaMuted,
+            )
+        }
+    }
+}
+
+/** Une fonctionnalité du pack Personnel : puce iconée, titre, sous-titre. */
+@Composable
+private fun OnbPackPersonnelLigne(icone: Int, titreRes: Int, sousTitreRes: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+    ) {
+        Surface(
+            shape = RoundedCornerShape(9.dp),
+            color = BrandBlue.copy(alpha = 0.12f),
+            modifier = Modifier.size(30.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(icone),
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(titreRes),
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(sousTitreRes),
+                fontSize = 11.sp,
+                color = MissaMuted,
+            )
         }
     }
 }

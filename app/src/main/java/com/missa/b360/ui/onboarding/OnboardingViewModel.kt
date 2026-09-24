@@ -244,6 +244,12 @@ class OnboardingViewModel @Inject constructor(
                     registreCommerce = entreprise.registreCommerce.orEmpty()
                     codePays = Iso4217.codePaysDepuisNom(entreprise.pays)
                     if (nomSitePrincipal.isBlank()) nomSitePrincipal = entreprise.nom
+                    // Pack Personnel : le nom de la personne est stocké comme
+                    // nom d'espace — on le restaure dans « Votre nom »
+                    // (réutilisé à l'étape PIN).
+                    if (profil == ProfilActivite.PERSONNEL && votreNom.isBlank()) {
+                        votreNom = entreprise.nom
+                    }
                 }
                 progression.tauxTaxe?.let { definirTauxTaxe(it) }
                 fuseau = Fuseaux.resoudre(settingsStore.get(SettingsStore.Keys.FUSEAU_HORAIRE)).id
@@ -601,20 +607,32 @@ class OnboardingViewModel @Inject constructor(
         .toDoubleOrNull()
         ?.takeIf { it in 0.0..100.0 }
 
-    /** RA-19 / D4 / D5 — enregistre entreprise + verrous (UseCase transactionnel). */
+    /**
+     * RA-19 / D4 / D5 — enregistre entreprise + verrous (UseCase transactionnel).
+     *
+     * Pack Personnel : pas d'identité sociale — le seul champ exigé est le nom
+     * de la personne, qui sert aussi de nom d'« entreprise » (l'espace
+     * personnel porte le nom de son propriétaire).
+     */
     private fun enregistrerEntreprise() {
+        val personnel = profil == ProfilActivite.PERSONNEL
         val nomEntrepriseValide = nomEntreprise.trim()
         val nomSiteValide = nomSitePrincipal.trim()
+        val nomPersonnelValide = votreNom.trim()
         val tauxTaxeValide = tauxTaxeValide() ?: run {
             erreurRes = R.string.ob_erreur_taux_taxe
             return
         }
         when {
-            nomEntrepriseValide.isEmpty() -> {
+            personnel && nomPersonnelValide.isEmpty() -> {
+                erreurRes = R.string.ob_erreur_votre_nom
+                return
+            }
+            !personnel && nomEntrepriseValide.isEmpty() -> {
                 erreurRes = R.string.ob_erreur_nom_entreprise
                 return
             }
-            nomSiteValide.isEmpty() -> {
+            !personnel && nomSiteValide.isEmpty() -> {
                 erreurRes = R.string.ob_erreur_site_principal
                 return
             }
@@ -634,21 +652,22 @@ class OnboardingViewModel @Inject constructor(
             val ok = runCatching {
                 setupEnterprise(
                     SetupEnterpriseUseCase.Params(
-                        nomEntreprise = nomEntrepriseValide,
+                        nomEntreprise = if (personnel) nomPersonnelValide else nomEntrepriseValide,
                         devise = deviseSelectionnee,
                         pays = paysSelectionne,
                         codePays = codePays,
                         tauxTaxe = tauxTaxeValide,
-                        nomSitePrincipal = nomSiteValide,
+                        nomSitePrincipal = if (personnel) nomPersonnelValide else nomSiteValide,
                         profilActivite = profil?.name,
-                        palierTaille = palier?.name,
-                        secteur = secteurValide,
+                        // L'effectif n'existe pas pour une personne seule.
+                        palierTaille = if (personnel) null else palier?.name,
+                        secteur = if (personnel) null else secteurValide,
                         telephone = telephone.trim()
                             .takeUnless { it.isEmpty() || Iso4217.estIndicatifSeul(it) },
                         email = email.trim().ifEmpty { null },
                         adresse = adresse.trim().ifEmpty { null },
-                        numeroFiscal = numeroFiscal.trim().ifEmpty { null },
-                        registreCommerce = registreCommerce.trim().ifEmpty { null },
+                        numeroFiscal = if (personnel) null else numeroFiscal.trim().ifEmpty { null },
+                        registreCommerce = if (personnel) null else registreCommerce.trim().ifEmpty { null },
                         logoUri = logoUriSelectionnee,
                     ),
                 )

@@ -482,6 +482,7 @@
     <string name="profil_ser">خدمة</string>
     <string name="profil_prj">مشروع</string>
     <string name="profil_full">كامل</string>
+    <string name="profil_personnel">شخصي</string>
     <string name="profil_custom">مخصص</string>
     <string name="obn_profil_av">شراء - بيع</string>
     <string name="obn_profil_av_sous">تجارة بسيطة</string>
@@ -494,6 +495,8 @@
     <string name="obn_profil_prj">مشروع</string>
     <string name="obn_profil_prj_sous">إدارة المشاريع</string>
     <string name="obn_profil_full">كامل</string>
+    <string name="obn_profil_personnel">شخصي</string>
+    <string name="obn_profil_personnel_sous">المصاريف والدخل</string>
     <string name="obn_profil_full_sous">جميع الوحدات</string>
 
     <string name="palier_p1">فردي / نانو (1)</string>
@@ -511,6 +514,7 @@
     <string name="ob_taux_taxe">نسبة الضريبة (%)</string>
     <string name="ob_site_principal">اسم الموقع الرئيسي</string>
     <string name="ob_erreur_nom_entreprise">يرجى إدخال اسم الشركة.</string>
+    <string name="ob_erreur_votre_nom">يرجى إدخال اسمك.</string>
     <string name="ob_erreur_site_principal">يرجى إدخال اسم الموقع الرئيسي.</string>
     <string name="ob_erreur_taux_taxe">أدخل معدل ضريبة بين 0 و100٪.</string>
     <string name="ob_erreur_configuration_entreprise">تعذر حفظ إعداد الشركة. يرجى المحاولة مرة أخرى.</string>
@@ -779,7 +783,9 @@
     <string name="obn_profil_titre">اختر ملف نشاطك</string>
     <string name="obn_profil_sous">سنكيّف Missa Business 360 مع احتياجاتك.</string>
     <string name="obn_entreprise_titre">معلومات شركتك</string>
+    <string name="obn_entreprise_titre_personnel">مساحتك الشخصية</string>
     <string name="obn_entreprise_sous">ستُستخدم هذه المعلومات لتخصيص بيئة عملك.</string>
+    <string name="obn_entreprise_sous_personnel">بعض المعلومات لتحضير مساحتك في Missa.</string>
     <string name="obn_nom_ex">مثال: Missa SARL</string>
     <string name="obn_secteur">قطاع النشاط</string>
     <string name="obn_secteur_ex">مثال: تجارة التجزئة</string>
@@ -1178,12 +1184,21 @@
     <string name="fisc_pack_efacture_aucune">لا يوجد نظام وطني</string>
     <string name="fisc_pack_seuil_aucun">لا يوجد حد: الضريبة مستحقة من أول عملية</string>
     <string name="obn_section_identite">هوية الشركة</string>
+    <string name="obn_section_personnelle">أنت</string>
     <string name="obn_section_coordonnees">بيانات الاتصال</string>
     <string name="obn_section_a_completer">مطلوب استكماله</string>
     <string name="obn_section_format">الصيغة</string>
     <string name="obn_logo_present">تمت إضافة الشعار</string>
     <string name="fisc_pack_detail">التفاصيل الضريبية</string>
     <string name="obn_pack_inclus">مضمَّن في هذه الحزمة</string>
+    <string name="obn_pers_revenus">الدخل حسب المصدر</string>
+    <string name="obn_pers_revenus_sous">الراتب، العمل الحر، الإيجار، أخرى</string>
+    <string name="obn_pers_depenses">المصاريف حسب الفئة</string>
+    <string name="obn_pers_depenses_sous">السكن، الطعام، النقل، الصحة، الترفيه</string>
+    <string name="obn_pers_budgets">الميزانيات والتنبيهات</string>
+    <string name="obn_pers_budgets_sous">ميزانية شهرية لكل فئة، تنبيه عند التجاوز</string>
+    <string name="obn_pers_note">وحدات الأعمال ليست جزءًا من هذه الحزمة؛ يمكن تفعيلها من الإعدادات إذا تطور نشاطك.</string>
+    <string name="obn_pers_dialog_resume">3 مزايا مشمولة</string>
     <string name="obn_pack_inclus_note">تعمل هذه الوحدات معًا وتبقى مفعَّلة.</string>
     <string name="obn_pack_ajouter">إضافة وحدات أخرى</string>
     <string name="obn_pack_ajouter_note">اختياري: يمكن تفعيلها أو إيقافها لاحقًا من الإعدادات.</string>

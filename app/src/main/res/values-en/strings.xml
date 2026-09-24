@@ -482,6 +482,7 @@
     <string name="profil_ser">Services</string>
     <string name="profil_prj">Projects</string>
     <string name="profil_full">Full</string>
+    <string name="profil_personnel">Personal</string>
     <string name="profil_custom">Custom</string>
     <string name="obn_profil_av">Buy - Sell</string>
     <string name="obn_profil_av_sous">Simple trading</string>
@@ -494,6 +495,8 @@
     <string name="obn_profil_prj">Projects</string>
     <string name="obn_profil_prj_sous">Project management</string>
     <string name="obn_profil_full">Full</string>
+    <string name="obn_profil_personnel">Personal</string>
+    <string name="obn_profil_personnel_sous">Expenses &amp; income</string>
     <string name="obn_profil_full_sous">All modules</string>
 
     <string name="palier_p1">Solo / Nano (1)</string>
@@ -511,6 +514,7 @@
     <string name="ob_taux_taxe">Tax rate (%)</string>
     <string name="ob_site_principal">Main site name</string>
     <string name="ob_erreur_nom_entreprise">Please enter the company name.</string>
+    <string name="ob_erreur_votre_nom">Please enter your name.</string>
     <string name="ob_erreur_site_principal">Please enter the main site name.</string>
     <string name="ob_erreur_taux_taxe">Enter a tax rate between 0 and 100%.</string>
     <string name="ob_erreur_configuration_entreprise">The company setup could not be saved. Please try again.</string>
@@ -783,7 +787,9 @@
     <string name="obn_profil_titre">Choose your activity profile</string>
     <string name="obn_profil_sous">We will adapt Missa Business 360 to your needs.</string>
     <string name="obn_entreprise_titre">Company information</string>
+    <string name="obn_entreprise_titre_personnel">Your personal space</string>
     <string name="obn_entreprise_sous">This information will be used to personalize your environment.</string>
+    <string name="obn_entreprise_sous_personnel">A few details to set up your Missa space.</string>
     <string name="obn_nom_ex">e.g.: Missa SARL</string>
     <string name="obn_secteur">Business sector</string>
     <string name="obn_secteur_ex">e.g. Retail trade</string>
@@ -1182,12 +1188,21 @@
     <string name="fisc_pack_efacture_aucune">No national system</string>
     <string name="fisc_pack_seuil_aucun">No threshold: tax due from the first sale</string>
     <string name="obn_section_identite">Company identity</string>
+    <string name="obn_section_personnelle">You</string>
     <string name="obn_section_coordonnees">Contact details</string>
     <string name="obn_section_a_completer">To complete</string>
     <string name="obn_section_format">Format</string>
     <string name="obn_logo_present">Logo added</string>
     <string name="fisc_pack_detail">Tax details</string>
     <string name="obn_pack_inclus">Included in this pack</string>
+    <string name="obn_pers_revenus">Income by source</string>
+    <string name="obn_pers_revenus_sous">Salary, freelance, rental, other</string>
+    <string name="obn_pers_depenses">Expenses by category</string>
+    <string name="obn_pers_depenses_sous">Housing, food, transport, health, leisure</string>
+    <string name="obn_pers_budgets">Budgets &amp; alerts</string>
+    <string name="obn_pers_budgets_sous">Monthly budget per category, overspending alert</string>
+    <string name="obn_pers_note">Business modules are not part of this pack; they can still be enabled from settings if your activity evolves.</string>
+    <string name="obn_pers_dialog_resume">3 features included</string>
     <string name="obn_pack_inclus_note">These modules work together and stay enabled.</string>
     <string name="obn_pack_ajouter">Add other modules</string>
     <string name="obn_pack_ajouter_note">Optional: can be turned on or off later in settings.</string>

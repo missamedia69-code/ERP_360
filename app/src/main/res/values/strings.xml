@@ -485,6 +485,7 @@
     <string name="profil_ser">Service</string>
     <string name="profil_prj">Projet</string>
     <string name="profil_full">Complet</string>
+    <string name="profil_personnel">Personnel</string>
     <string name="profil_custom">Personnalisé</string>
     <string name="obn_profil_av">Achat - Vente</string>
     <string name="obn_profil_av_sous">Négoce simple</string>
@@ -497,6 +498,8 @@
     <string name="obn_profil_prj">Projet</string>
     <string name="obn_profil_prj_sous">Gestion de projets</string>
     <string name="obn_profil_full">Complet</string>
+    <string name="obn_profil_personnel">Personnel</string>
+    <string name="obn_profil_personnel_sous">Dépenses &amp; revenus</string>
     <string name="obn_profil_full_sous">Tous les modules</string>
 
     <string name="palier_p1">Solo / Nano (1)</string>
@@ -521,6 +524,7 @@
     <string name="ob_taux_taxe">Taux de taxe (%)</string>
     <string name="ob_site_principal">Nom du site principal</string>
     <string name="ob_erreur_nom_entreprise">Veuillez renseigner le nom de l\'entreprise.</string>
+    <string name="ob_erreur_votre_nom">Veuillez renseigner votre nom.</string>
     <string name="ob_erreur_site_principal">Veuillez renseigner le nom du site principal.</string>
     <string name="ob_erreur_taux_taxe">Saisissez un taux de taxe compris entre 0 et 100 %.</string>
     <string name="ob_erreur_configuration_entreprise">La configuration de l\'entreprise n\'a pas pu être enregistrée. Réessayez.</string>
@@ -797,7 +801,9 @@
     <string name="obn_profil_titre">Choisissez votre profil d\'activité</string>
     <string name="obn_profil_sous">Nous adapterons Missa Business 360 à vos besoins.</string>
     <string name="obn_entreprise_titre">Informations sur votre entreprise</string>
+    <string name="obn_entreprise_titre_personnel">Votre espace personnel</string>
     <string name="obn_entreprise_sous">Ces informations seront utilisées pour personnaliser votre environnement.</string>
+    <string name="obn_entreprise_sous_personnel">Quelques informations pour préparer votre espace Missa.</string>
     <string name="obn_nom_ex">ex: Missa SARL</string>
     <string name="obn_secteur">Secteur d\'activité</string>
     <string name="obn_secteur_ex">ex : Commerce de détail</string>
@@ -1196,12 +1202,21 @@
     <string name="fisc_pack_efacture_aucune">Aucun dispositif national</string>
     <string name="fisc_pack_seuil_aucun">Aucun seuil : taxe due dès le premier franc</string>
     <string name="obn_section_identite">Identité de l\'entreprise</string>
+    <string name="obn_section_personnelle">Vous</string>
     <string name="obn_section_coordonnees">Coordonnées</string>
     <string name="obn_section_a_completer">À compléter</string>
     <string name="obn_section_format">Format</string>
     <string name="obn_logo_present">Logo ajouté</string>
     <string name="fisc_pack_detail">Détail fiscal</string>
     <string name="obn_pack_inclus">Inclus dans ce pack</string>
+    <string name="obn_pers_revenus">Revenus par source</string>
+    <string name="obn_pers_revenus_sous">Salaire, freelance, location, autres</string>
+    <string name="obn_pers_depenses">Dépenses par catégorie</string>
+    <string name="obn_pers_depenses_sous">Logement, alimentation, transport, santé, loisirs</string>
+    <string name="obn_pers_budgets">Budgets &amp; alertes</string>
+    <string name="obn_pers_budgets_sous">Budget mensuel par catégorie, alerte de dépassement</string>
+    <string name="obn_pers_note">Les modules métier d\'entreprise ne font pas partie de ce pack ; ils restent activables depuis les réglages si votre activité évolue.</string>
+    <string name="obn_pers_dialog_resume">3 fonctionnalités incluses</string>
     <string name="obn_pack_inclus_note">Ces modules forment un ensemble cohérent et restent actifs.</string>
     <string name="obn_pack_ajouter">Ajouter d\'autres modules</string>
     <string name="obn_pack_ajouter_note">Facultatif : activable ou désactivable plus tard dans les réglages.</string>
