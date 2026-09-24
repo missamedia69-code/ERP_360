@@ -107,8 +107,8 @@ private fun OnbCouleursChampBlanc(): TextFieldColors = TextFieldDefaults.colors(
  * Dans les coordonnées, l'email de récupération du compte Propriétaire occupe
  * la place de la seconde ligne d'adresse. La zone logo reprend l'allure de la
  * restauration de sauvegarde (cadre blanc, bouton vert). Les cadres sont
- * serrés (padding 12 × 10, espacements 6–8 dp) et leur hauteur est resserrée
- * pour épouser celle des sélecteurs.
+ * serrés (padding 12 × 10, espacements 6–8 dp) et les sélecteurs sont
+ * resserrés (padding vertical 10 dp) pour épouser la hauteur des champs.
  *
  * Les champs utilisent le libellé flottant de Material 3 plutôt qu'un titre
  * posé au-dessus : même information, une trentaine de points gagnés par champ.
@@ -644,11 +644,6 @@ private fun OnbChampTexte(
                 )
             }
         },
-        // Quelques dp de resserrement pour épouser la hauteur des sélecteurs.
-        contentPadding = PaddingValues(
-            horizontal = 12.dp,
-            vertical = 9.dp,
-        ),
         textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
         shape = RoundedCornerShape(10.dp),
         modifier = modifier.fillMaxWidth(),
