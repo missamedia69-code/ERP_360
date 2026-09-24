@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
@@ -88,6 +89,9 @@ fun MissaSelecteurLigne(
     titreDialogue: String = label,
     indiceRecherche: String? = null,
     avecRecherche: Boolean = options.size >= 8,
+    /** Hauteur intérieure du cadre : 14 dp par défaut, resserable (10 dp sur
+     * l'écran entreprise) pour épouser la hauteur des champs de saisie. */
+    paddingVertical: Dp = 14.dp,
     couleurCarte: Color = MissaSurface,
     bordureCarte: BorderStroke? = BorderStroke(1.dp, MissaBorder),
     rayonCarte: RoundedCornerShape = RoundedCornerShape(12.dp),
@@ -107,7 +111,7 @@ fun MissaSelecteurLigne(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable { ouvert = true } else Modifier)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = paddingVertical),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {

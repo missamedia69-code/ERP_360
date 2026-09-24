@@ -863,7 +863,9 @@ class OnboardingViewModel @Inject constructor(
         }
         if (enregistrementEnCours) return
         val pinACreer = pin
-        val nomProprietaire = votreNom
+        // Pack Personnel : le nom saisi sur l'écran entreprise. Les autres packs
+        // ne saisissent plus de nom propre : l'entreprise porte le compte.
+        val nomProprietaire = votreNom.trim().ifBlank { nomEntreprise.trim() }
         val emailProprietaire = emailSecours.trim()
         enregistrementEnCours = true
         viewModelScope.launch {

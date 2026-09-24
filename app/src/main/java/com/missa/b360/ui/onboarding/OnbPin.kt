@@ -17,13 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -36,11 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.ui.components.MissaSectionPliable
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
@@ -48,28 +43,24 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.ProfileGreen
-import com.missa.b360.ui.theme.Red40
 
 /**
  * Écran 6 — Sécurisez votre accès.
  *
  * Le code PIN (RA-01) est saisi **deux fois** sur le pavé de la maquette :
  * quatre chiffres tapés une seule fois, c'est une faute de frappe qui enferme
- * l'utilisateur dehors dès la première ouverture. Le contact de récupération,
- * qui crée le Propriétaire (RA-03 / D1), suit dans une section repliable de
- * même facture que l'écran entreprise — il n'est pas facultatif : sans e-mail
- * valide, aucun compte ne peut être créé.
+ * l'utilisateur dehors dès la première ouverture. L'email de récupération qui
+ * crée le Propriétaire (RA-03 / D1) n'est plus saisi ici : il l'est sur l'écran
+ * entreprise, avec les coordonnées — sans e-mail valide, aucun compte ne peut
+ * être créé (la validation reste portée par le ViewModel).
  */
 @Composable
 internal fun OnbPinStep(viewModel: OnboardingViewModel) {
-    val emailValide = viewModel.emailEstValide()
-    val emailInvalide = viewModel.emailSecours.isNotBlank() && !emailValide
-
     OnbScaffold(
         titreRes = R.string.obn_pin_titre,
         sousTitreRes = R.string.obn_pin_sous,
         viewModel = viewModel,
-        boutonActive = viewModel.pinEcranValide() && emailValide,
+        boutonActive = viewModel.pinEcranValide(),
         onRetour = viewModel::precedent,
     ) {
         Column(
@@ -105,77 +96,6 @@ internal fun OnbPinStep(viewModel: OnboardingViewModel) {
                 )
             }
 
-            // --- Contact de récupération : obligatoire, donc ouvert ---
-            MissaSectionPliable(
-                titre = stringResource(R.string.obn_pin_recup_titre),
-                icone = Iv.Person,
-                resume = listOf(viewModel.votreNom, viewModel.emailSecours)
-                    .filter { it.isNotBlank() }
-                    .joinToString(" · ")
-                    .ifBlank { stringResource(R.string.obn_pin_recup_sous) },
-                etiquette = if (emailValide) {
-                    null
-                } else {
-                    stringResource(R.string.obn_section_a_completer)
-                },
-                etiquetteEnErreur = emailInvalide,
-                ouvertParDefaut = true,
-                ouvrirDOffice = !emailValide,
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    OutlinedTextField(
-                        value = viewModel.votreNom,
-                        onValueChange = { viewModel.votreNom = it },
-                        label = { Text(stringResource(R.string.ob_votre_nom)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(Iv.Person),
-                                contentDescription = null,
-                                tint = BrandBlue,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        },
-                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    OutlinedTextField(
-                        value = viewModel.emailSecours,
-                        onValueChange = { viewModel.emailSecours = it },
-                        label = { Text(stringResource(R.string.ob_email)) },
-                        singleLine = true,
-                        enabled = !viewModel.enregistrementEnCours,
-                        isError = emailInvalide,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(Iv.Email),
-                                contentDescription = null,
-                                tint = if (emailInvalide) Red40 else BrandBlue,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        },
-                        supportingText = {
-                            Text(
-                                text = stringResource(
-                                    if (emailInvalide) {
-                                        R.string.ob_email_invalide
-                                    } else {
-                                        R.string.obn_pin_recup_sous
-                                    },
-                                ),
-                                fontSize = 11.sp,
-                                color = if (emailInvalide) Red40 else MissaMuted,
-                            )
-                        },
-                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
         }
     }
 }

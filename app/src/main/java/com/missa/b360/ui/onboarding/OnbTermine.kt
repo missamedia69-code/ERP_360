@@ -176,7 +176,7 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
         .map { it.trim() }
         .filter { it.isNotEmpty() }
         .joinToString(" · ")
-    val proprietaire = listOf(viewModel.votreNom.trim(), viewModel.emailSecours.trim())
+    val proprietaire = listOf(viewModel.votreNom.trim().ifBlank { viewModel.nomEntreprise.trim() }, viewModel.emailSecours.trim())
         .filter { it.isNotEmpty() }
         .joinToString(" · ")
 

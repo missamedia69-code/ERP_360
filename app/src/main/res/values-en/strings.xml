@@ -1128,6 +1128,7 @@
     <string name="obn_telephone">Phone</string>
     <string name="obn_email">Email</string>
     <string name="obn_email_ex">contact@company.com</string>
+    <string name="obn_email_recuperation">Recovery email</string>
     <string name="obn_adresse">Address</string>
     <string name="obn_adresse_ex">Street, district, city</string>
     <string name="obn_entreprise_contact_sous">Automatically reused on your quotes, invoices and delivery notes.</string>

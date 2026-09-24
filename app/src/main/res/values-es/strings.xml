@@ -1124,6 +1124,7 @@
     <string name="obn_telephone">Teléfono</string>
     <string name="obn_email">Correo electrónico</string>
     <string name="obn_email_ex">contacto@empresa.com</string>
+    <string name="obn_email_recuperation">Correo de recuperación</string>
     <string name="obn_adresse">Dirección</string>
     <string name="obn_adresse_ex">Calle, barrio, ciudad</string>
     <string name="obn_entreprise_contact_sous">Se reutilizan en presupuestos, facturas y albaranes.</string>

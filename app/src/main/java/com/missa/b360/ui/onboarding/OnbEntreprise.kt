@@ -21,10 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -71,6 +72,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbActionGreen
 import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 
@@ -99,11 +101,14 @@ private fun OnbCouleursChampBlanc(): TextFieldColors = TextFieldDefaults.colors(
  * comme dernière rangée de sa matrice. Les cadres de saisie et de sélection
  * sont remplis de blanc pour se détacher de la carte bleue.
  *
- * Dans la localisation, « Pays personnalisé » est posé juste à côté du
- * sélecteur de pays ; le bas de la carte est réservé au pack fiscal
- * (synthèse en une ligne, détail derrière un lien discret). Les cadres sont
- * serrés (padding 12 × 10, espacements 6–8 dp) et les paires de champs courts
- * passent sur deux colonnes.
+ * Dans la localisation, le choix de la devise est posé juste à côté du
+ * sélecteur de pays (matrice deux colonnes) ; le bas de la carte est réservé
+ * au pack fiscal (synthèse en une ligne, détail derrière un lien discret).
+ * Dans les coordonnées, l'email de récupération du compte Propriétaire occupe
+ * la place de la seconde ligne d'adresse. La zone logo reprend l'allure de la
+ * restauration de sauvegarde (cadre blanc, bouton vert). Les cadres sont
+ * serrés (padding 12 × 10, espacements 6–8 dp) et leur hauteur est resserrée
+ * pour épouser celle des sélecteurs.
  *
  * Les champs utilisent le libellé flottant de Material 3 plutôt qu'un titre
  * posé au-dessus : même information, une trentaine de points gagnés par champ.
@@ -111,7 +116,6 @@ private fun OnbCouleursChampBlanc(): TextFieldColors = TextFieldDefaults.colors(
 @Composable
 internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     var siteModifieManuellement by remember { mutableStateOf(viewModel.nomSitePrincipal.isNotBlank()) }
-    var paysLibreOuvert by rememberSaveable { mutableStateOf(false) }
     var detailFiscalOuvert by rememberSaveable { mutableStateOf(false) }
     val locale = LocalConfiguration.current.locales.takeIf { !it.isEmpty }?.get(0) ?: java.util.Locale.getDefault()
     val paysListe = remember(locale) { Iso4217.paysDisponibles(locale) }
@@ -154,6 +158,10 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     val typeTaxePays = paysListe.firstOrNull { it.code == viewModel.codePays }?.typeTaxe
     val tauxTaxeInvalide = !viewModel.tauxTaxeEstValide()
     val emailValide = viewModel.emailEntrepriseEstValide()
+    // Email de récupération : il crée le compte Propriétaire (RA-03 / D1),
+    // saisi ici avec les coordonnées — sans lui valide, on n'avance pas.
+    val emailSecoursValide = viewModel.emailEstValide()
+    val emailSecoursInvalide = viewModel.emailSecours.isNotBlank() && !emailSecoursValide
     val zoneFiscale = ReferentielFiscal.zone(viewModel.codePays)
     val libelleZone = stringResource(zoneFiscale.libelleRes)
     val zoneComplet = zoneFiscale.referentielComptable?.let { "$libelleZone · $it" } ?: libelleZone
@@ -182,7 +190,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
         sousTitreRes = if (personnel) R.string.obn_entreprise_sous_personnel else R.string.obn_entreprise_sous,
         viewModel = viewModel,
         boutonPleineLargeur = true,
-        boutonActive = !viewModel.enregistrementEnCours && emailValide,
+        boutonActive = !viewModel.enregistrementEnCours && emailValide && emailSecoursValide,
         onRetour = viewModel::precedent,
     ) {
         Column(
@@ -258,9 +266,10 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 icone = Iv.Public,
                 etiquette = aCompleter.takeIf { viewModel.pays.isBlank() },
             ) {
+                // Matrice pays / devise sur une seule rangée : le choix de la
+                // devise remonte ici, au niveau du pays qui la pilote.
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     MissaSelecteurLigne(
@@ -277,32 +286,11 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         placeholder = viewModel.pays.ifBlank {
                             stringResource(R.string.ob_selectionne)
                         },
+                        paddingVertical = 10.dp,
                         couleurCarte = MissaSurface,
                         bordureCarte = BorderStroke(1.dp, MissaBorder),
                         rayonCarte = RoundedCornerShape(12.dp),
                     )
-                    // Pays hors catalogue, juste à côté du sélecteur : un clic
-                    // ouvre le champ de saisie, en place, sous la rangée.
-                    OnbPackLien(
-                        texteRes = R.string.ob_pays_personnalise,
-                        ouvert = paysLibreOuvert,
-                        onClic = { paysLibreOuvert = !paysLibreOuvert },
-                    )
-                }
-                AnimatedVisibility(visible = paysLibreOuvert) {
-                    OnbChampTexte(
-                        valeur = viewModel.pays,
-                        onValeur = viewModel::modifierPaysManuel,
-                        label = stringResource(R.string.ob_pays_personnalise),
-                        icone = Iv.Public,
-                        aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
-                        active = !viewModel.enregistrementEnCours,
-                    )
-                }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
                     MissaSelecteurLigne(
                         label = stringResource(R.string.obn_devise_principale),
                         options = optionsDevise,
@@ -310,26 +298,26 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         onSelection = { code -> viewModel.devise = code },
                         modifier = Modifier.weight(1f),
                         enabled = !viewModel.enregistrementEnCours,
+                        paddingVertical = 10.dp,
                         couleurCarte = MissaSurface,
                         bordureCarte = BorderStroke(1.dp, MissaBorder),
                         rayonCarte = RoundedCornerShape(12.dp),
                     )
-                    // Taux de taxe : sans objet pour le pack Personnel — il est
-                    // porté d'office par le pack pays.
-                    if (!personnel) {
-                        OnbChampTexte(
-                            valeur = viewModel.tauxTaxeTexte,
-                            onValeur = viewModel::modifierTauxTaxe,
-                            label = stringResource(R.string.ob_taux_taxe),
-                            icone = Iv.Percent,
-                            clavier = KeyboardType.Decimal,
-                            erreur = tauxTaxeInvalide,
-                            aide = stringResource(R.string.ob_erreur_taux_taxe)
-                                .takeIf { tauxTaxeInvalide },
-                            modifier = Modifier.weight(1f),
-                            active = !viewModel.enregistrementEnCours,
-                        )
-                    }
+                }
+                // Taux de taxe : sans objet pour le pack Personnel — il est
+                // porté d'office par le pack pays.
+                if (!personnel) {
+                    OnbChampTexte(
+                        valeur = viewModel.tauxTaxeTexte,
+                        onValeur = viewModel::modifierTauxTaxe,
+                        label = stringResource(R.string.ob_taux_taxe),
+                        icone = Iv.Percent,
+                        clavier = KeyboardType.Decimal,
+                        erreur = tauxTaxeInvalide,
+                        aide = stringResource(R.string.ob_erreur_taux_taxe)
+                            .takeIf { tauxTaxeInvalide },
+                        active = !viewModel.enregistrementEnCours,
+                    )
                 }
                 // Le bas de la carte est réservé au pack fiscal du pays :
                 // une ligne de synthèse, le détail derrière un lien discret.
@@ -425,8 +413,8 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             OnbCompactCarte(
                 titreRes = R.string.obn_section_coordonnees,
                 icone = Iv.Call,
-                etiquette = if (emailValide) facultatif else aCompleter,
-                etiquetteEnErreur = !emailValide,
+                etiquette = if (emailValide && emailSecoursValide) facultatif else aCompleter,
+                etiquetteEnErreur = !emailValide || emailSecoursInvalide,
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -456,15 +444,34 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         active = !viewModel.enregistrementEnCours,
                     )
                 }
-                OnbChampTexte(
-                    valeur = viewModel.adresse,
-                    onValeur = { viewModel.adresse = it },
-                    label = stringResource(R.string.obn_adresse),
-                    icone = Iv.Place,
-                    placeholder = stringResource(R.string.obn_adresse_ex),
-                    lignesMin = 2,
-                    active = !viewModel.enregistrementEnCours,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    OnbChampTexte(
+                        valeur = viewModel.adresse,
+                        onValeur = { viewModel.adresse = it },
+                        label = stringResource(R.string.obn_adresse),
+                        icone = Iv.Place,
+                        placeholder = stringResource(R.string.obn_adresse_ex),
+                        modifier = Modifier.weight(1f),
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                    // Email de récupération (Propriétaire) : il s'est remplacé
+                    // dans l'espace libéré par l'adresse réduite à une ligne.
+                    OnbChampTexte(
+                        valeur = viewModel.emailSecours,
+                        onValeur = { viewModel.emailSecours = it },
+                        label = stringResource(R.string.obn_email_recuperation),
+                        icone = Iv.Email,
+                        clavier = KeyboardType.Email,
+                        erreur = emailSecoursInvalide,
+                        aide = stringResource(R.string.ob_email_invalide)
+                            .takeIf { emailSecoursInvalide },
+                        modifier = Modifier.weight(1f),
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                }
                 // Identifiants légaux : sans objet pour le pack Personnel
                 // (personne, pas d'entité).
                 if (!personnel && reglesIdentifiants.isNotEmpty()) {
@@ -637,6 +644,11 @@ private fun OnbChampTexte(
                 )
             }
         },
+        // Quelques dp de resserrement pour épouser la hauteur des sélecteurs.
+        contentPadding = PaddingValues(
+            horizontal = 12.dp,
+            vertical = 9.dp,
+        ),
         textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
         shape = RoundedCornerShape(10.dp),
         modifier = modifier.fillMaxWidth(),
@@ -756,8 +768,9 @@ internal fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
 /**
  * Logo, directement accessible sur une seule ligne : vignette, formats,
  * bouton « Ajouter » — plus de section à dérouler avant de voir la zone.
- * Rangée de la carte Coordonnées (pas de cadre propre : la carte héberge la
- * matrice de champs et la logo tient la dernière ligne).
+ * Rangée de la carte Coordonnées, présentée comme la zone de chargement des
+ * sauvegardes de la configuration initiale : cadre blanc à bordure fine et
+ * bouton d'action vert plein.
  */
 @Composable
 private fun OnbLogoDirect(
@@ -795,90 +808,106 @@ private fun OnbLogoDirect(
         }
     }
 
-    Row(
+    Surface(
+        color = MissaSurface,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MissaBorder),
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (logoUri == null) {
-            Surface(
-                modifier = Modifier
-                    .size(40.dp)
-                    .dashedBorder(1.2.dp, MissaBorder, 10.dp),
-                color = BrandBlue.copy(alpha = 0.025f),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        painter = painterResource(Iv.Backup),
-                        contentDescription = null,
-                        tint = BrandBlue,
-                        modifier = Modifier.size(18.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (logoUri == null) {
+                Surface(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .dashedBorder(1.2.dp, MissaBorder, 10.dp),
+                    color = MissaSurface,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(Iv.Backup),
+                            contentDescription = null,
+                            tint = BrandBlue,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
+            } else {
+                CompanyLogo(
+                    logoUri = logoUri,
+                    contentDescription = stringResource(R.string.ob_logo_apercu),
+                    fallbackIcon = Iv.Backup,
+                    modifier = Modifier.size(40.dp),
+                    size = 40.dp,
+                    shape = RoundedCornerShape(10.dp),
+                    fallbackTint = BrandBlue,
+                    fallbackBackground = BrandBlue.copy(alpha = 0.07f),
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.obn_logo_titre),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MissaInk,
+                )
+                Text(
+                    text = stringResource(R.string.obn_logo_formats),
+                    fontSize = 10.sp,
+                    color = MissaMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (logoTropGrand) {
+                    Text(
+                        text = stringResource(R.string.obn_logo_trop_grand),
+                        fontSize = 10.sp,
+                        color = Red40,
                     )
                 }
             }
-        } else {
-            CompanyLogo(
-                logoUri = logoUri,
-                contentDescription = stringResource(R.string.ob_logo_apercu),
-                fallbackIcon = Iv.Backup,
-                modifier = Modifier.size(40.dp),
-                size = 40.dp,
-                shape = RoundedCornerShape(10.dp),
-                fallbackTint = BrandBlue,
-                fallbackBackground = BrandBlue.copy(alpha = 0.07f),
-            )
-        }
-        Spacer(Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(R.string.obn_logo_titre),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MissaInk,
-            )
-            Text(
-                text = stringResource(R.string.obn_logo_formats),
-                fontSize = 10.sp,
-                color = MissaMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            if (logoTropGrand) {
+            Spacer(Modifier.width(6.dp))
+            // Bouton vert plein, comme la zone de restauration des sauvegardes.
+            Button(
+                onClick = { launcher.launch(IMAGE_MIME_TYPES) },
+                enabled = enabled,
+                shape = RoundedCornerShape(9.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = OnbActionGreen,
+                    disabledContainerColor = OnbActionGreen.copy(alpha = 0.4f),
+                ),
+                contentPadding = PaddingValues(
+                    horizontal = 12.dp,
+                    vertical = 7.dp,
+                ),
+            ) {
                 Text(
-                    text = stringResource(R.string.obn_logo_trop_grand),
-                    fontSize = 10.sp,
-                    color = Red40,
+                    text = stringResource(
+                        if (logoUri == null) {
+                            R.string.obn_logo_parcourir
+                        } else {
+                            R.string.ob_logo_modifier
+                        },
+                    ),
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
                 )
             }
-        }
-        Spacer(Modifier.width(6.dp))
-        OutlinedButton(
-            onClick = { launcher.launch(IMAGE_MIME_TYPES) },
-            enabled = enabled,
-            shape = RoundedCornerShape(9.dp),
-            contentPadding = PaddingValues(
-                horizontal = 12.dp,
-                vertical = 5.dp,
-            ),
-        ) {
-            Text(
-                text = stringResource(
-                    if (logoUri == null) {
-                        R.string.obn_logo_parcourir
-                    } else {
-                        R.string.ob_logo_modifier
-                    },
-                ),
-                fontSize = 12.sp,
-            )
-        }
-        if (logoUri != null) {
-            IconButton(onClick = onLogoCleared, enabled = enabled) {
-                Icon(
-                    painter = painterResource(Iv.DeleteOutline),
-                    contentDescription = stringResource(R.string.ob_logo_supprimer),
-                    tint = Red40,
-                    modifier = Modifier.size(18.dp),
-                )
+            if (logoUri != null) {
+                IconButton(onClick = onLogoCleared, enabled = enabled) {
+                    Icon(
+                        painter = painterResource(Iv.DeleteOutline),
+                        contentDescription = stringResource(R.string.ob_logo_supprimer),
+                        tint = Red40,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
             }
         }
     }

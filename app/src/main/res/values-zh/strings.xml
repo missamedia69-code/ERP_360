@@ -1124,6 +1124,7 @@
     <string name="obn_telephone">电话</string>
     <string name="obn_email">电子邮箱</string>
     <string name="obn_email_ex">contact@company.com</string>
+    <string name="obn_email_recuperation">恢复邮箱</string>
     <string name="obn_adresse">地址</string>
     <string name="obn_adresse_ex">街道、区、城市</string>
     <string name="obn_entreprise_contact_sous">将自动出现在报价单、发票和送货单上。</string>

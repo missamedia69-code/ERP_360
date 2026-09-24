@@ -1124,6 +1124,7 @@
     <string name="obn_telephone">الهاتف</string>
     <string name="obn_email">البريد الإلكتروني</string>
     <string name="obn_email_ex">contact@company.com</string>
+    <string name="obn_email_recuperation">البريد الإلكتروني للاسترداد</string>
     <string name="obn_adresse">العنوان</string>
     <string name="obn_adresse_ex">الشارع، الحي، المدينة</string>
     <string name="obn_entreprise_contact_sous">تُستخدم تلقائيًا في عروض الأسعار والفواتير وسندات التسليم.</string>
