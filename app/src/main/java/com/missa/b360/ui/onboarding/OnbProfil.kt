@@ -1,7 +1,6 @@
 package com.missa.b360.ui.onboarding
 
 import com.missa.b360.ui.icons.Iv
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -68,13 +68,10 @@ private data class OnbProfilCarteInfo(
 )
 
 /**
- * Écran — Profil d'activité : les six familles de la maquette. Chaque carte
- * porte un bouton « i » qui ouvre une boîte détaillant les modules et les
- * fonctionnalités réellement activés par ce choix.
- *
- * Il n'y a plus de septième carte « Personnalisé » : puisque tout module hors
- * pack se coche depuis n'importe quel profil, partir d'une feuille blanche
- * n'apportait qu'une décision de plus à prendre avant d'avoir vu le produit.
+ * Écran — Profil d'activité (structure matricielle) : les six familles en
+ * grille 2 × 3 en haut (gauche → droite), puis — en bas — le détail du pack
+ * sélectionné : modules verrouillés, modules ajoutables, option vente sans
+ * stock. L'info « i » d'une tuile ouvre la boîte de détail du profil.
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
@@ -117,44 +114,39 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
-    // Panneau déplié sous une carte : indépendant de la sélection, pour qu'un
-    // second clic (ou le retour) le referme sans perdre le profil choisi.
-    var panneauOuvert by rememberSaveable { mutableStateOf<String?>(null) }
-    // Le retour referme d'abord le bloc ouvert, et seulement ensuite l'écran.
-    BackHandler(enabled = panneauOuvert != null) { panneauOuvert = null }
     OnbScaffold(
         titreRes = R.string.obn_profil_titre,
         sousTitreRes = R.string.obn_profil_sous,
         viewModel = viewModel,
         boutonActive = viewModel.profilEcranValide(),
-        onRetour = {
-            if (panneauOuvert != null) panneauOuvert = null else viewModel.precedent()
-        },
+        onRetour = viewModel::precedent,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            for (carte in cartes) {
-                val selectionnee = viewModel.profil == carte.profil
-                val ouvert = selectionnee && panneauOuvert == carte.profil.name
-                OnbProfilCarte(
-                    titreRes = carte.titreRes,
-                    sousTitreRes = carte.sousTitreRes,
-                    icone = carte.icone,
-                    selected = selectionnee,
-                    ouvert = ouvert,
-                    onClick = {
-                        if (ouvert) {
-                            panneauOuvert = null
-                        } else {
-                            viewModel.choisirProfil(carte.profil)
-                            panneauOuvert = carte.profil.name
-                        }
-                    },
-                    onInfo = { detailProfil = carte.profil.name },
-                )
-                if (ouvert) {
-                    OnbModulesDuPack(viewModel = viewModel)
+            // --- Matrice des packs : 2 colonnes, lecture gauche → droite ---
+            for (ligne in cartes.chunked(2)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    for (carte in ligne) {
+                        OnbProfilTuile(
+                            titreRes = carte.titreRes,
+                            sousTitreRes = carte.sousTitreRes,
+                            icone = carte.icone,
+                            code = carte.profil.name,
+                            selected = viewModel.profil == carte.profil,
+                            onClick = { viewModel.choisirProfil(carte.profil) },
+                            onInfo = { detailProfil = carte.profil.name },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    // Tuile impaire sur la dernière rangée : garde l'alignement.
+                    if (ligne.size == 1) {
+                        Spacer(Modifier.weight(1f))
+                    }
                 }
             }
+
             MissaSelecteurBleu(
                 label = stringResource(R.string.obn_effectif_label),
                 options = PalierTaille.entries.map { palier ->
@@ -176,6 +168,19 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
                 placeholder = stringResource(R.string.obn_effectif_placeholder),
                 titreDialogue = stringResource(R.string.palier_choisir_titre),
             )
+
+            // --- Détail du pack sélectionné, sous la matrice ---
+            val profilChoisi = viewModel.profil
+            val infoChoisi = cartes.firstOrNull { it.profil == profilChoisi }
+            if (profilChoisi != null && infoChoisi != null) {
+                OnbDetailPackEntete(
+                    titreRes = infoChoisi.titreRes,
+                    sousTitreRes = infoChoisi.sousTitreRes,
+                    icone = infoChoisi.icone,
+                    onInfo = { detailProfil = infoChoisi.profil.name },
+                )
+                OnbModulesDuPack(viewModel = viewModel)
+            }
         }
     }
     val carteDetaillee = cartes.firstOrNull { it.profil.name == detailProfil }
@@ -193,6 +198,161 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
             },
             onFermer = { detailProfil = null },
         )
+    }
+}
+
+/**
+ * Tuile de la matrice de choix : compacte (icône + titre + code + sous-titre),
+ * bleu clair / bleu de marque plein si sélectionnée — même facture que la
+ * configuration initiale.
+ */
+@Composable
+private fun OnbProfilTuile(
+    titreRes: Int,
+    sousTitreRes: Int,
+    icone: Int,
+    code: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    onInfo: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) BrandBlue else OnbConfigCard,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = modifier,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(contentAlignment = Alignment.TopEnd) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (selected) Color.White.copy(alpha = 0.18f) else BrandBlue.copy(alpha = 0.12f),
+                    modifier = Modifier.size(44.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(icone),
+                            contentDescription = null,
+                            tint = if (selected) Color.White else BrandBlue,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+                // Pastille d'info discrète dans l'angle de la tuile.
+                Surface(
+                    shape = CircleShape,
+                    color = if (selected) Color.White.copy(alpha = 0.22f) else MissaSurface,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .clickable(onClick = onInfo),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(Iv.Info),
+                            contentDescription = stringResource(R.string.obn_profil_info),
+                            tint = if (selected) Color.White else BrandBlue,
+                            modifier = Modifier.size(12.dp),
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = code,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (selected) Color.White.copy(alpha = 0.75f) else BrandBlue,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = stringResource(titreRes),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = if (selected) Color.White else MissaInk,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = stringResource(sousTitreRes),
+                fontSize = 11.sp,
+                color = if (selected) Color.White.copy(alpha = 0.78f) else MissaMuted,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+/** En-tête du détail sous la matrice : pack choisi + lien « i ». */
+@Composable
+private fun OnbDetailPackEntete(
+    titreRes: Int,
+    sousTitreRes: Int,
+    icone: Int,
+    onInfo: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            color = BrandBlue.copy(alpha = 0.12f),
+            modifier = Modifier.size(34.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(icone),
+                    contentDescription = null,
+                    tint = BrandBlue,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(titreRes),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(sousTitreRes),
+                fontSize = 12.sp,
+                color = MissaMuted,
+            )
+        }
+        Surface(
+            shape = CircleShape,
+            color = OnbConfigCard,
+            modifier = Modifier
+                .size(30.dp)
+                .clip(CircleShape)
+                .clickable(onClick = onInfo),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(Iv.Info),
+                    contentDescription = stringResource(R.string.obn_profil_info),
+                    tint = BrandBlue,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 }
 
@@ -460,98 +620,6 @@ private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: ()
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-        }
-    }
-}
-
-/**
- * Carte d'option de la maquette : fond bleu clair plein sans bordure, puce
- * iconée, titre, sous-titre. La carte sélectionnée passe en bleu de marque
- * plein pour un contraste franc.
- */
-@Composable
-internal fun OnbProfilCarte(
-    titreRes: Int,
-    sousTitreRes: Int,
-    icone: Int,
-    selected: Boolean,
-    onClick: () -> Unit,
-    ouvert: Boolean = false,
-    onInfo: (() -> Unit)? = null,
-) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) BrandBlue else OnbConfigCard,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = if (selected) Color.White.copy(alpha = 0.18f) else BrandBlue.copy(alpha = 0.12f),
-                modifier = Modifier.size(42.dp),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        painter = painterResource(icone),
-                        contentDescription = null,
-                        tint = if (selected) Color.White else BrandBlue,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
-            }
-            Spacer(Modifier.width(14.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(titreRes),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (selected) Color.White else MissaInk,
-                )
-                Text(
-                    text = stringResource(sousTitreRes),
-                    fontSize = 12.5.sp,
-                    color = if (selected) Color.White.copy(alpha = 0.78f) else MissaMuted,
-                )
-            }
-            if (selected) {
-                Icon(
-                    painter = painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
-                    contentDescription = stringResource(
-                        if (ouvert) R.string.obn_socle_replier else R.string.obn_socle_deplier,
-                    ),
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            if (onInfo != null) {
-                Spacer(Modifier.width(2.dp))
-                Surface(
-                    shape = CircleShape,
-                    color = if (selected) Color.White.copy(alpha = 0.2f) else MissaSurface,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .clickable(onClick = onInfo),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            painter = painterResource(Iv.Info),
-                            contentDescription = stringResource(R.string.obn_profil_info),
-                            tint = if (selected) Color.White else BrandBlue,
-                            modifier = Modifier.size(16.dp),
-                        )
-                    }
-                }
-            }
         }
     }
 }
