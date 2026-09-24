@@ -51,7 +51,7 @@ import javax.inject.Inject
  * La configuration (langue, fuseau, formats, sauvegardes) est appliquée en direct
  * via FormatPrefs pour toute l'application.
  */
-enum class OnboardingStep { BIENVENUE, CONFIGURATION, PROFIL, ENTREPRISE, PIN, TERMINE }
+enum class OnboardingStep { BIENVENUE, ANNONCES, CONFIGURATION, PROFIL, ENTREPRISE, PIN, TERMINE }
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -292,7 +292,8 @@ class OnboardingViewModel @Inject constructor(
         if (!initialisationTerminee) return
         erreurRes = null
         when (step) {
-            OnboardingStep.BIENVENUE -> step = OnboardingStep.CONFIGURATION
+            OnboardingStep.BIENVENUE -> step = OnboardingStep.ANNONCES
+            OnboardingStep.ANNONCES -> step = OnboardingStep.CONFIGURATION
             OnboardingStep.CONFIGURATION -> {
                 appliquerConfiguration()
                 step = OnboardingStep.PROFIL
@@ -307,7 +308,8 @@ class OnboardingViewModel @Inject constructor(
     fun precedent() {
         erreurRes = null
         step = when (step) {
-            OnboardingStep.CONFIGURATION -> OnboardingStep.BIENVENUE
+            OnboardingStep.ANNONCES -> OnboardingStep.BIENVENUE
+            OnboardingStep.CONFIGURATION -> OnboardingStep.ANNONCES
             OnboardingStep.PROFIL -> OnboardingStep.CONFIGURATION
             OnboardingStep.ENTREPRISE -> OnboardingStep.PROFIL
             OnboardingStep.PIN -> OnboardingStep.ENTREPRISE

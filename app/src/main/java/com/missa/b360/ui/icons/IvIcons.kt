@@ -76,6 +76,7 @@ object Iv {
     val ShoppingCart = R.drawable.ph_shopping_cart
     val Store = R.drawable.ph_storefront
     val Storefront = R.drawable.ph_storefront
+    val Star = R.drawable.ph_star
     val SwapHoriz = R.drawable.ph_arrows_left_right
     val Warning = R.drawable.ph_warning
     val Workspaces = R.drawable.ph_kanban
