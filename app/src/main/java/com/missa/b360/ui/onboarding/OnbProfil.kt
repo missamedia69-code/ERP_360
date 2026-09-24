@@ -52,11 +52,11 @@ import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.ui.components.MissaOption
 import com.missa.b360.ui.components.MissaSelecteurBleu
 import com.missa.b360.ui.theme.BrandBlue
-import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 
 /** Une carte de l'écran : profil ciblé, libellés et icône de la maquette. */
@@ -224,13 +224,13 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
     val selectionVide = profil == ProfilActivite.CUSTOM && metierChoisi.isEmpty()
 
     Card(
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, if (selectionVide) Red40 else BrandBlue.copy(alpha = 0.45f)),
-        colors = CardDefaults.cardColors(containerColor = MissaSoftBlue),
+        shape = RoundedCornerShape(16.dp),
+        border = if (selectionVide) BorderStroke(1.dp, Red40) else null,
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.obn_pack_inclus),
@@ -464,7 +464,11 @@ private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: ()
     }
 }
 
-/** Carte d'option de la maquette : puce iconée, titre, sous-titre, chevron si sélectionné. */
+/**
+ * Carte d'option de la maquette : fond bleu clair plein sans bordure, puce
+ * iconée, titre, sous-titre. La carte sélectionnée passe en bleu de marque
+ * plein pour un contraste franc.
+ */
 @Composable
 internal fun OnbProfilCarte(
     titreRes: Int,
@@ -477,13 +481,9 @@ internal fun OnbProfilCarte(
 ) {
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(
-            if (selected) 1.5.dp else 1.dp,
-            if (selected) BrandBlue else MissaBorder,
-        ),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) BrandBlue.copy(alpha = 0.045f) else MissaSurface,
+            containerColor = if (selected) BrandBlue else OnbConfigCard,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
@@ -491,19 +491,19 @@ internal fun OnbProfilCarte(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 13.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                shape = RoundedCornerShape(11.dp),
-                color = BrandBlue.copy(alpha = 0.09f),
+                shape = RoundedCornerShape(12.dp),
+                color = if (selected) Color.White.copy(alpha = 0.18f) else BrandBlue.copy(alpha = 0.12f),
                 modifier = Modifier.size(42.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         painter = painterResource(icone),
                         contentDescription = null,
-                        tint = BrandBlue,
+                        tint = if (selected) Color.White else BrandBlue,
                         modifier = Modifier.size(22.dp),
                     )
                 }
@@ -514,12 +514,12 @@ internal fun OnbProfilCarte(
                     text = stringResource(titreRes),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = MissaInk,
+                    color = if (selected) Color.White else MissaInk,
                 )
                 Text(
                     text = stringResource(sousTitreRes),
                     fontSize = 12.5.sp,
-                    color = MissaMuted,
+                    color = if (selected) Color.White.copy(alpha = 0.78f) else MissaMuted,
                 )
             }
             if (selected) {
@@ -528,7 +528,7 @@ internal fun OnbProfilCarte(
                     contentDescription = stringResource(
                         if (ouvert) R.string.obn_socle_replier else R.string.obn_socle_deplier,
                     ),
-                    tint = BrandBlue,
+                    tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -536,7 +536,7 @@ internal fun OnbProfilCarte(
                 Spacer(Modifier.width(2.dp))
                 Surface(
                     shape = CircleShape,
-                    color = if (selected) BrandBlue else MissaSoftBlue,
+                    color = if (selected) Color.White.copy(alpha = 0.2f) else MissaSurface,
                     modifier = Modifier
                         .size(28.dp)
                         .clip(CircleShape)

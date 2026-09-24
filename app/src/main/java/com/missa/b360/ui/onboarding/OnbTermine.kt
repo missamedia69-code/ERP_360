@@ -48,12 +48,10 @@ import com.missa.b360.core.util.DateUtils
 import com.missa.b360.core.util.Iso4217
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.Green60
-import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaLime
 import com.missa.b360.ui.theme.MissaMuted
-import com.missa.b360.ui.theme.MissaSoftBlue
-import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.OnboardingHeroGreen
 import com.missa.b360.ui.theme.ProfileGreen
 import com.missa.b360.ui.theme.ProfileOrange
@@ -182,17 +180,17 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 13.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Text(
                 text = stringResource(R.string.obn_recap),
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MissaInk,
             )
@@ -202,12 +200,12 @@ private fun OnbRecapCarte(viewModel: OnboardingViewModel) {
             OnbRecapLigne(R.string.obn_recap_fiscalite, libelleTaxePays(typeTaxe, viewModel.tauxTaxe))
             OnbRecapLigne(R.string.obn_recap_identifiants, identifiants)
 
-            HorizontalDivider(color = MissaBorder, thickness = 0.6.dp)
+            HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
             OnbRecapLigne(R.string.obn_recap_profil, profilLabel)
             OnbRecapLigne(R.string.obn_recap_taille, tailleLabel)
             OnbRecapLigne(R.string.obn_recap_modules, viewModel.modulesActifs.size.toString())
 
-            HorizontalDivider(color = MissaBorder, thickness = 0.6.dp)
+            HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
             OnbRecapLigne(R.string.obn_recap_proprietaire, proprietaire)
         }
     }
@@ -263,21 +261,20 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
 
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MissaSoftBlue),
-        border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.35f)),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp),
-            verticalArrangement = Arrangement.spacedBy(5.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(if (viewModel.licenceDejaActive) Iv.WorkspacePremium else Iv.Schedule),
                     contentDescription = null,
                     tint = if (viewModel.licenceDejaActive) ProfileGreen else BrandBlue,
-                    modifier = Modifier.size(17.dp),
+                    modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
@@ -288,7 +285,7 @@ private fun OnbLicenceCarte(viewModel: OnboardingViewModel) {
                             R.string.obn_essai_titre
                         },
                     ),
-                    fontSize = 12.5.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = MissaInk,
                     modifier = Modifier.weight(1f),

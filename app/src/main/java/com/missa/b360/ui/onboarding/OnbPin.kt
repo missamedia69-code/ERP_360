@@ -46,6 +46,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.ProfileGreen
 import com.missa.b360.ui.theme.Red40
 
@@ -190,13 +191,13 @@ private fun OnbPinPave(viewModel: OnboardingViewModel) {
     val saisieCourante = if (premiereSaisie) viewModel.pin else viewModel.pinConfirmation
     Card(
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, if (viewModel.pinConfirme) ProfileGreen else MissaBorder),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        border = if (viewModel.pinConfirme) BorderStroke(1.5.dp, ProfileGreen) else null,
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 13.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -329,7 +330,7 @@ private fun OnbPinTouches(
     }
 }
 
-/** Touche du pavé : carrée, sobre, assez haute pour le pouce. */
+/** Touche du pavé : blanche sur la carte bleue, assez haute pour le pouce. */
 @Composable
 private fun OnbTouche(
     onClick: () -> Unit,
@@ -343,6 +344,9 @@ private fun OnbTouche(
         modifier = modifier.height(52.dp),
         shape = RoundedCornerShape(13.dp),
         border = BorderStroke(1.dp, MissaBorder),
+        colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+            containerColor = MissaSurface,
+        ),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
         content = { contenu() },
     )
@@ -352,12 +356,12 @@ private fun OnbTouche(
 @Composable
 private fun OnbPinBandeau(texteRes: Int, couleur: Color) {
     Surface(
-        color = couleur.copy(alpha = 0.10f),
-        shape = RoundedCornerShape(12.dp),
+        color = couleur.copy(alpha = 0.12f),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(

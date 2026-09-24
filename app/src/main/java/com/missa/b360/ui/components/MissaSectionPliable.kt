@@ -37,28 +37,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.ui.theme.BrandBlue
-import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
-import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 import com.missa.b360.ui.theme.Red80
 
 /**
- * Section repliable standard : une carte dont l'en-tête — icône de marque,
- * titre, résumé de ce qui est déjà rempli, étiquette d'état — s'ouvre et se
- * referme au clic.
+ * Section repliable standard (style maquette onboarding) : carte bleu clair
+ * pleine sans bordure, titre + résumé, étiquette d'état et chevron. L'en-tête
+ * s'ouvre et se referme au clic.
  *
  * Elle sert à découper un écran long en blocs qui tiennent tous à l'écran une
- * fois refermés : replié, chaque bloc dit en une ligne ce qu'il contient, ce
- * qui évite de faire défiler une page entière pour retrouver un champ.
+ * fois refermés : replié, chaque bloc dit en une ligne ce qu'il contient.
  *
  * @param resume ligne d'état affichée sous le titre (valeurs déjà saisies)
  * @param etiquette pastille de droite : « Facultatif », « À compléter »…
- * @param etiquetteEnErreur passe la pastille en rouge (saisie à corriger)
- * @param ouvrirDOffice force l'ouverture quand la valeur devient vraie : le
- *   contenu fautif ne peut pas rester caché derrière un en-tête replié
+ * @param etiquetteEnErreur passe la pastille et le contour en rouge
+ * @param ouvrirDOffice force l'ouverture quand la valeur devient vraie
  */
 @Composable
 fun MissaSectionPliable(
@@ -78,8 +75,8 @@ fun MissaSectionPliable(
     }
     Card(
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, if (etiquetteEnErreur) Red40 else MissaBorder),
-        colors = CardDefaults.cardColors(containerColor = MissaSurface),
+        border = if (etiquetteEnErreur) BorderStroke(1.dp, Red40) else null,
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -87,10 +84,10 @@ fun MissaSectionPliable(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { ouvert = !ouvert }
-                .padding(horizontal = 13.dp, vertical = 11.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(color = MissaSoftBlue, shape = RoundedCornerShape(9.dp)) {
+            Surface(color = BrandBlue.copy(alpha = 0.12f), shape = RoundedCornerShape(10.dp)) {
                 Icon(
                     painter = painterResource(icone),
                     contentDescription = null,
@@ -102,14 +99,14 @@ fun MissaSectionPliable(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = titre,
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MissaInk,
                 )
                 if (!resume.isNullOrBlank()) {
                     Text(
                         text = resume,
-                        fontSize = 11.5.sp,
+                        fontSize = 12.sp,
                         color = MissaMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -119,8 +116,8 @@ fun MissaSectionPliable(
             if (etiquette != null) {
                 Spacer(Modifier.width(8.dp))
                 Surface(
-                    color = if (etiquetteEnErreur) Red80 else MissaSoftBlue,
-                    shape = RoundedCornerShape(6.dp),
+                    color = if (etiquetteEnErreur) Red80 else MissaSurface,
+                    shape = RoundedCornerShape(7.dp),
                 ) {
                     Text(
                         text = etiquette,
@@ -140,13 +137,13 @@ fun MissaSectionPliable(
         }
         AnimatedVisibility(visible = ouvert) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                HorizontalDivider(color = MissaBorder)
+                HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
                 Spacer(Modifier.height(12.dp))
                 Column(
-                    modifier = Modifier.padding(horizontal = 13.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     content = contenu,
                 )
-                Spacer(Modifier.height(13.dp))
+                Spacer(Modifier.height(14.dp))
             }
         }
     }

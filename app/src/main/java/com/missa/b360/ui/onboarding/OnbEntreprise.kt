@@ -67,8 +67,8 @@ import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
-import com.missa.b360.ui.theme.MissaSoftBlue
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 
 private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
@@ -230,6 +230,9 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                     placeholder = viewModel.pays.ifBlank {
                         stringResource(R.string.ob_selectionne)
                     },
+                    couleurCarte = OnbConfigCard,
+                    bordureCarte = null,
+                    rayonCarte = RoundedCornerShape(16.dp),
                 )
                 Spacer(Modifier.height(4.dp))
                 // Le pack : valeurs remplies d'office par le pays. Devise, taux et
@@ -254,6 +257,9 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         selectionCle = viewModel.devise,
                         onSelection = { code -> viewModel.devise = code },
                         enabled = !viewModel.enregistrementEnCours,
+                        couleurCarte = MissaSurface,
+                        bordureCarte = BorderStroke(1.dp, MissaBorder),
+                        rayonCarte = RoundedCornerShape(12.dp),
                     )
                     HorizontalDivider(color = MissaBorder)
                     Spacer(Modifier.height(12.dp))
@@ -506,12 +512,11 @@ private fun OnbPackPays(
         else -> "$tauxTaxe % · " + stringResource(typeTaxe.libelleRes)
     }
     Surface(
-        color = MissaSoftBlue,
-        shape = RoundedCornerShape(14.dp),
-        border = BorderStroke(1.dp, BrandBlue),
+        color = OnbConfigCard,
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 11.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(Iv.Public),
