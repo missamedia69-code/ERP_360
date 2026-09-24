@@ -245,6 +245,7 @@ fun MissaAppHeader(
                                 "APSV" -> "Commerce général"
                                 "SER" -> "Service & Prestations"
                                 "PRJ" -> "Gestion de projets"
+                                "PERSONNEL" -> "Espace personnel"
                                 else -> "Commerce général"
                             }
                         }
