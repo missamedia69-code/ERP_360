@@ -7,6 +7,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.BackupEntity
+import com.missa.b360.core.domain.model.RestaurationRules
 import com.missa.b360.core.journal.JournalManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +86,11 @@ class BackupManager @Inject constructor(
 
             val version = versionSauvegarde(temporaire)
                 ?: return@withContext echec(ResultatRestauration.Motif.FORMAT_INVALIDE)
-            if (version > AppDatabase.VERSION_SCHEMA) {
+            // Le plafond est la version de la base reellement ouverte, pas une
+            // constante recopiee : les deux avaient diverge (constante 7, base 17)
+            // et l'application refusait ses propres sauvegardes.
+            val versionCourante = database.openHelper.readableDatabase.version
+            if (!RestaurationRules.versionAcceptable(version, versionCourante)) {
                 return@withContext echec(ResultatRestauration.Motif.VERSION_TROP_RECENTE)
             }
 
