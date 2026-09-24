@@ -90,7 +90,7 @@ app/src/main/java/com/missa/b360/
 
 ## Organisation du travail
 
-- La branche `arena/01a0a9d0-erp-360` est pilotée par l'agent Arena (sessions de spécification
+- La branche `arena/01a0d29b-erp-360` est pilotée par l'agent Arena (sessions de spécification
   par module). Pour du travail local : créer une branche dédiée depuis la pointe à jour et
   fusionner par PR — ne jamais éditer en parallèle les mêmes fichiers sur deux agents
   (conflits de fusion garantis, ex. `strings.xml`).

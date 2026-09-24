@@ -5,8 +5,7 @@
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white">
   <img alt="UI" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Licence" src="https://img.shields.io/badge/licence-Apache%202.0-blue">
-  <!-- Dernière exécution verte vérifiée sur cette branche : 35089341325 (commit 056f11e). -->
-  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=arena/01a0a9d0-erp-360">
+  <img alt="Build" src="https://github.com/missamedia69-code/ERP_360/actions/workflows/android.yml/badge.svg?branch=main">
 </p>
 
 **Missa Business 360** (`com.missa.b360`) est un **ERP complet et natif pour Android**, pensé
@@ -23,13 +22,14 @@ d'activité**. Implémentation du cahier de charge **E9**.
 > Le transfert direct d'un téléphone à l'autre reste autorisé, et la restauration
 > manuelle passe par **Admin › Sauvegarde**.
 
-> **Branche de travail actuelle : `arena/01a0a9d0-erp-360` — version *Accueil seul*.** Créée depuis
-> `390d9eb`, pointe de `arena/01a0a160-erp-360` sur `origin` (qui ne porte plus que cette branche et
-> `main`). Le socle provient des itérations précédentes — `arena/01a0a0db-erp-360`, puis fusion de
-> `arena/01a0773a-erp-360` : schéma Room 12, règles de validation des modules/profils, PIN à
-> 4 chiffres — branches aujourd'hui supprimées d'`origin`. L'accueil est la référence visuelle
-> figée ; tous les autres modules affichent un placeholder cohérent et seront reconstruits un par
-> un dans la même charte.
+> **Branche de travail : `arena/01a0d29b-erp-360`** — identique à `main`. Le socle est stable
+> (base **v17**, chaîne de migrations 1→17) et la CI est verte : parité des traductions,
+> `assembleDebug`, `testDebugUnitTest`, APK publié. Les écrans encore en placeholder sont listés
+> explicitement dans le tableau des modules — aucun module n'est annoncé terminé à tort.
+>
+> Le travail inachevé (retours de vente, refonte d'écrans) est conservé hors de la ligne de
+> travail, dans les branches d'archive `archive-retours-vente` et
+> `archive-travail-local-2026-09-24`.
 
 ---
 
@@ -187,7 +187,7 @@ sur `ProductType` via `ProduitRules`) :
 Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
 
 ```bash
-git clone -b arena/01a0a9d0-erp-360 https://github.com/missamedia69-code/ERP_360.git
+git clone -b main https://github.com/missamedia69-code/ERP_360.git
 ./gradlew assembleDebug
 ./gradlew testDebugUnitTest
 python3 .github/scripts/verifier_traductions.py
@@ -210,8 +210,8 @@ précédente de la même branche (`concurrency`). Chaque exécution enchaîne :
 | **Traductions** | 5 `strings.xml` parité parfaite |
 | **Compilation et tests** | `assembleDebug` + `testDebugUnitTest` (JDK 21, SDK 36) |
 
-Dernière exécution verte vérifiée : **35089341325** (branche `arena/01a0a9d0-erp-360`, commit
-`056f11e` — Traductions + `assembleDebug` + `testDebugUnitTest` + APK).
+Dernière exécution verte vérifiée : **35991689835** (branche `main`, commit
+`5472f88` — Traductions + `assembleDebug` + `testDebugUnitTest` + APK).
 
 APK : onglet *Actions* → exécution → *erp360-debug-apk*.
 

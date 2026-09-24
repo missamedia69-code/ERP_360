@@ -29,3 +29,11 @@ local.properties
 *.log
 /build.log
 /tests.log
+
+# Dépendances et résidus Node/npm (sans rapport avec l'app Android)
+/node_modules/
+/package.json
+/package-lock.json
+
+# Outillage local (génération d'icônes, scripts d'audit) — hors dépôt par défaut
+/tools/
