@@ -2,6 +2,7 @@ package com.missa.b360.ui.onboarding
 
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +59,7 @@ import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
 
-/** Une carte de l'écran : profil ciblé, libellés et icône de la maquette. */
+/** Un pack de la matrice : profil ciblé, libellés et icône (fiche + dialogue). */
 private data class OnbProfilCarteInfo(
     val profil: ProfilActivite,
     val titreRes: Int,
@@ -68,10 +68,11 @@ private data class OnbProfilCarteInfo(
 )
 
 /**
- * Écran — Profil d'activité (structure matricielle) : les six familles en
- * grille 2 × 3 en haut (gauche → droite), puis — en bas — le détail du pack
- * sélectionné : modules verrouillés, modules ajoutables, option vente sans
- * stock. L'info « i » d'une tuile ouvre la boîte de détail du profil.
+ * Écran — Profil d'activité (structure matricielle) : en haut, une rangée de
+ * petits carrés numérotés (1 → 6), chaque numéro correspondant à un pack ; en
+ * bas, la fiche complète du pack sélectionné — modules verrouillés, modules
+ * ajoutables, option vente sans stock. L'info « i » de la fiche ouvre la boîte
+ * de détail du profil.
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
@@ -122,28 +123,19 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         onRetour = viewModel::precedent,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            // --- Matrice des packs : 2 colonnes, lecture gauche → droite ---
-            for (ligne in cartes.chunked(2)) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    for (carte in ligne) {
-                        OnbProfilTuile(
-                            titreRes = carte.titreRes,
-                            sousTitreRes = carte.sousTitreRes,
-                            icone = carte.icone,
-                            code = carte.profil.name,
-                            selected = viewModel.profil == carte.profil,
-                            onClick = { viewModel.choisirProfil(carte.profil) },
-                            onInfo = { detailProfil = carte.profil.name },
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    // Tuile impaire sur la dernière rangée : garde l'alignement.
-                    if (ligne.size == 1) {
-                        Spacer(Modifier.weight(1f))
-                    }
+            // --- Matrice des packs : petits carrés numérotés (1 = ASV … 6 = FULL) ---
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                cartes.forEachIndexed { index, carte ->
+                    OnbProfilCarre(
+                        numero = index + 1,
+                        code = carte.profil.name,
+                        selected = viewModel.profil == carte.profil,
+                        onClick = { viewModel.choisirProfil(carte.profil) },
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
 
@@ -202,97 +194,46 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
 }
 
 /**
- * Tuile de la matrice de choix : compacte (icône + titre + code + sous-titre),
- * bleu clair / bleu de marque plein si sélectionnée — même facture que la
- * configuration initiale.
+ * Petit carré numéroté de la matrice : chaque numéro correspond à un pack
+ * (1 = ASV, 2 = APSV, 3 = AV, 4 = SER, 5 = PRJ, 6 = FULL). Le clic sélectionne
+ * le pack et affiche sa fiche complète (modules) sous la matrice ; le code du
+ * pack, sous le carré, rappelle quel numéro est le bon sans avoir à cliquer.
  */
 @Composable
-private fun OnbProfilTuile(
-    titreRes: Int,
-    sousTitreRes: Int,
-    icone: Int,
+private fun OnbProfilCarre(
+    numero: Int,
     code: String,
     selected: Boolean,
     onClick: () -> Unit,
-    onInfo: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (selected) BrandBlue else OnbConfigCard,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+    Column(
         modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 14.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .size(44.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (selected) BrandBlue else OnbConfigCard)
+                .clickable(onClick = onClick),
         ) {
-            Box(contentAlignment = Alignment.TopEnd) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = if (selected) Color.White.copy(alpha = 0.18f) else BrandBlue.copy(alpha = 0.12f),
-                    modifier = Modifier.size(44.dp),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            painter = painterResource(icone),
-                            contentDescription = null,
-                            tint = if (selected) Color.White else BrandBlue,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                }
-                // Pastille d'info discrète dans l'angle de la tuile.
-                Surface(
-                    shape = CircleShape,
-                    color = if (selected) Color.White.copy(alpha = 0.22f) else MissaSurface,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clip(CircleShape)
-                        .clickable(onClick = onInfo),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            painter = painterResource(Iv.Info),
-                            contentDescription = stringResource(R.string.obn_profil_info),
-                            tint = if (selected) Color.White else BrandBlue,
-                            modifier = Modifier.size(12.dp),
-                        )
-                    }
-                }
-            }
-            Spacer(Modifier.height(8.dp))
             Text(
-                text = code,
-                fontSize = 11.sp,
+                text = numero.toString(),
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (selected) Color.White.copy(alpha = 0.75f) else BrandBlue,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = stringResource(titreRes),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = if (selected) Color.White else MissaInk,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                minLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = stringResource(sousTitreRes),
-                fontSize = 11.sp,
-                color = if (selected) Color.White.copy(alpha = 0.78f) else MissaMuted,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                color = if (selected) Color.White else BrandBlue,
             )
         }
+        Spacer(Modifier.height(5.dp))
+        Text(
+            text = code,
+            fontSize = 10.5.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (selected) BrandBlue else MissaMuted,
+            maxLines = 1,
+        )
     }
 }
 
