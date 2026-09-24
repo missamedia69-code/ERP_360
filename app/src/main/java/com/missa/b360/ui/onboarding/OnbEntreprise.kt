@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -76,13 +77,30 @@ private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
 private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
 
 /**
+ * Remplissage des zones de saisie : toujours blanc, sur la carte bleue comme
+ * ailleurs — le fond transparent par défaut de Material 3 laissait apparaître
+ * le bleu de la carte et la zone à remplir ne se distinguait pas.
+ */
+private val OnbCouleursChampBlanc = OutlinedTextFieldDefaults.colors(
+    unfocusedContainerColor = Color.White,
+    focusedContainerColor = Color.White,
+    disabledContainerColor = Color.White,
+    errorContainerColor = Color.White,
+)
+
+/**
  * Écran 4 — Informations sur votre entreprise (version compacte).
  *
  * Plus de sections repliables : trois cartes toujours visibles — identité,
- * localisation, coordonnées — et une ligne logo directement accessible.
- * Les cartons sont serrés (padding 12 × 10, espacements 6–8 dp) et les
- * paires de champs courts passent sur deux colonnes ; le pack pays se résume
- * à une ligne, la documentation fiscale restant derrière un lien discret.
+ * localisation, coordonnées — la carte coordonnées portant aussi la zone logo
+ * comme dernière rangée de sa matrice. Les cadres de saisie et de sélection
+ * sont remplis de blanc pour se détacher de la carte bleue.
+ *
+ * Dans la localisation, « Pays personnalisé » est posé juste à côté du
+ * sélecteur de pays ; le bas de la carte est réservé au pack fiscal
+ * (synthèse en une ligne, détail derrière un lien discret). Les cadres sont
+ * serrés (padding 12 × 10, espacements 6–8 dp) et les paires de champs courts
+ * passent sur deux colonnes.
  *
  * Les champs utilisent le libellé flottant de Material 3 plutôt qu'un titre
  * posé au-dessus : même information, une trentaine de points gagnés par champ.
@@ -237,23 +255,47 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                 icone = Iv.Public,
                 etiquette = aCompleter.takeIf { viewModel.pays.isBlank() },
             ) {
-                MissaSelecteurLigne(
-                    label = stringResource(R.string.ob_pays),
-                    options = optionsPays,
-                    selectionCle = viewModel.codePays,
-                    onSelection = { code ->
-                        paysListe.firstOrNull { it.code == code }?.let { pays ->
-                            viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
-                        }
-                    },
-                    enabled = !viewModel.enregistrementEnCours,
-                    placeholder = viewModel.pays.ifBlank {
-                        stringResource(R.string.ob_selectionne)
-                    },
-                    couleurCarte = MissaSurface,
-                    bordureCarte = BorderStroke(1.dp, MissaBorder),
-                    rayonCarte = RoundedCornerShape(12.dp),
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    MissaSelecteurLigne(
+                        label = stringResource(R.string.ob_pays),
+                        options = optionsPays,
+                        selectionCle = viewModel.codePays,
+                        onSelection = { code ->
+                            paysListe.firstOrNull { it.code == code }?.let { pays ->
+                                viewModel.choisirPays(pays.nom, pays.code, pays.tauxTaxeSuggere)
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        enabled = !viewModel.enregistrementEnCours,
+                        placeholder = viewModel.pays.ifBlank {
+                            stringResource(R.string.ob_selectionne)
+                        },
+                        couleurCarte = MissaSurface,
+                        bordureCarte = BorderStroke(1.dp, MissaBorder),
+                        rayonCarte = RoundedCornerShape(12.dp),
+                    )
+                    // Pays hors catalogue, juste à côté du sélecteur : un clic
+                    // ouvre le champ de saisie, en place, sous la rangée.
+                    OnbPackLien(
+                        texteRes = R.string.ob_pays_personnalise,
+                        ouvert = paysLibreOuvert,
+                        onClic = { paysLibreOuvert = !paysLibreOuvert },
+                    )
+                }
+                AnimatedVisibility(visible = paysLibreOuvert) {
+                    OnbChampTexte(
+                        valeur = viewModel.pays,
+                        onValeur = viewModel::modifierPaysManuel,
+                        label = stringResource(R.string.ob_pays_personnalise),
+                        icone = Iv.Public,
+                        aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
+                        active = !viewModel.enregistrementEnCours,
+                    )
+                }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth(),
@@ -286,23 +328,8 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         )
                     }
                 }
-                // Pays hors catalogue : un lien discret, le champ s'ouvre en place.
-                OnbPackLien(
-                    texteRes = R.string.ob_pays_personnalise,
-                    ouvert = paysLibreOuvert,
-                    onClic = { paysLibreOuvert = !paysLibreOuvert },
-                )
-                AnimatedVisibility(visible = paysLibreOuvert) {
-                    OnbChampTexte(
-                        valeur = viewModel.pays,
-                        onValeur = viewModel::modifierPaysManuel,
-                        label = stringResource(R.string.ob_pays_personnalise),
-                        icone = Iv.Public,
-                        aide = stringResource(R.string.ob_pays_saisie_manuelle_note),
-                        active = !viewModel.enregistrementEnCours,
-                    )
-                }
-                // Le pack pays en une ligne : taxe, zone, identifiants, indicatif.
+                // Le bas de la carte est réservé au pack fiscal du pays :
+                // une ligne de synthèse, le détail derrière un lien discret.
                 if (viewModel.pays.isBlank()) {
                     Text(
                         text = stringResource(R.string.fisc_pack_aucun_pays),
@@ -480,15 +507,15 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
                         }
                     }
                 }
+                // La zone logo complète la matrice de la carte : toujours
+                // visible, directement accessible, sans section à dérouler.
+                OnbLogoDirect(
+                    logoUri = viewModel.logoUri,
+                    enabled = !viewModel.enregistrementEnCours,
+                    onLogoSelected = viewModel::definirLogoUri,
+                    onLogoCleared = { viewModel.definirLogoUri(null) },
+                )
             }
-
-            // --- 4. Logo : une ligne directement accessible, pas de section ---
-            OnbLogoDirect(
-                logoUri = viewModel.logoUri,
-                enabled = !viewModel.enregistrementEnCours,
-                onLogoSelected = viewModel::definirLogoUri,
-                onLogoCleared = { viewModel.definirLogoUri(null) },
-            )
         }
     }
 }
@@ -595,6 +622,7 @@ private fun OnbChampTexte(
         singleLine = lignesMin == 1,
         minLines = lignesMin,
         isError = erreur,
+        colors = OnbCouleursChampBlanc,
         enabled = active,
         keyboardOptions = KeyboardOptions(keyboardType = clavier),
         supportingText = aide?.let {
@@ -725,6 +753,8 @@ internal fun libelleTaxePays(typeTaxe: TypeTaxe?, taux: Double): String = when {
 /**
  * Logo, directement accessible sur une seule ligne : vignette, formats,
  * bouton « Ajouter » — plus de section à dérouler avant de voir la zone.
+ * Rangée de la carte Coordonnées (pas de cadre propre : la carte héberge la
+ * matrice de champs et la logo tient la dernière ligne).
  */
 @Composable
 private fun OnbLogoDirect(
@@ -762,98 +792,90 @@ private fun OnbLogoDirect(
         }
     }
 
-    Surface(
-        color = OnbConfigCard,
-        shape = RoundedCornerShape(14.dp),
+    Row(
         modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (logoUri == null) {
-                Surface(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .dashedBorder(1.2.dp, MissaBorder, 10.dp),
-                    color = BrandBlue.copy(alpha = 0.025f),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            painter = painterResource(Iv.Backup),
-                            contentDescription = null,
-                            tint = BrandBlue,
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
-                }
-            } else {
-                CompanyLogo(
-                    logoUri = logoUri,
-                    contentDescription = stringResource(R.string.ob_logo_apercu),
-                    fallbackIcon = Iv.Backup,
-                    modifier = Modifier.size(40.dp),
-                    size = 40.dp,
-                    shape = RoundedCornerShape(10.dp),
-                    fallbackTint = BrandBlue,
-                    fallbackBackground = BrandBlue.copy(alpha = 0.07f),
-                )
-            }
-            Spacer(Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.obn_logo_titre),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MissaInk,
-                )
-                Text(
-                    text = stringResource(R.string.obn_logo_formats),
-                    fontSize = 10.sp,
-                    color = MissaMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                if (logoTropGrand) {
-                    Text(
-                        text = stringResource(R.string.obn_logo_trop_grand),
-                        fontSize = 10.sp,
-                        color = Red40,
-                    )
-                }
-            }
-            Spacer(Modifier.width(6.dp))
-            OutlinedButton(
-                onClick = { launcher.launch(IMAGE_MIME_TYPES) },
-                enabled = enabled,
-                shape = RoundedCornerShape(9.dp),
-                contentPadding = PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 5.dp,
-                ),
+        if (logoUri == null) {
+            Surface(
+                modifier = Modifier
+                    .size(40.dp)
+                    .dashedBorder(1.2.dp, MissaBorder, 10.dp),
+                color = BrandBlue.copy(alpha = 0.025f),
             ) {
-                Text(
-                    text = stringResource(
-                        if (logoUri == null) {
-                            R.string.obn_logo_parcourir
-                        } else {
-                            R.string.ob_logo_modifier
-                        },
-                    ),
-                    fontSize = 12.sp,
-                )
-            }
-            if (logoUri != null) {
-                IconButton(onClick = onLogoCleared, enabled = enabled) {
+                Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        painter = painterResource(Iv.DeleteOutline),
-                        contentDescription = stringResource(R.string.ob_logo_supprimer),
-                        tint = Red40,
+                        painter = painterResource(Iv.Backup),
+                        contentDescription = null,
+                        tint = BrandBlue,
                         modifier = Modifier.size(18.dp),
                     )
                 }
+            }
+        } else {
+            CompanyLogo(
+                logoUri = logoUri,
+                contentDescription = stringResource(R.string.ob_logo_apercu),
+                fallbackIcon = Iv.Backup,
+                modifier = Modifier.size(40.dp),
+                size = 40.dp,
+                shape = RoundedCornerShape(10.dp),
+                fallbackTint = BrandBlue,
+                fallbackBackground = BrandBlue.copy(alpha = 0.07f),
+            )
+        }
+        Spacer(Modifier.width(10.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.obn_logo_titre),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MissaInk,
+            )
+            Text(
+                text = stringResource(R.string.obn_logo_formats),
+                fontSize = 10.sp,
+                color = MissaMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (logoTropGrand) {
+                Text(
+                    text = stringResource(R.string.obn_logo_trop_grand),
+                    fontSize = 10.sp,
+                    color = Red40,
+                )
+            }
+        }
+        Spacer(Modifier.width(6.dp))
+        OutlinedButton(
+            onClick = { launcher.launch(IMAGE_MIME_TYPES) },
+            enabled = enabled,
+            shape = RoundedCornerShape(9.dp),
+            contentPadding = PaddingValues(
+                horizontal = 12.dp,
+                vertical = 5.dp,
+            ),
+        ) {
+            Text(
+                text = stringResource(
+                    if (logoUri == null) {
+                        R.string.obn_logo_parcourir
+                    } else {
+                        R.string.ob_logo_modifier
+                    },
+                ),
+                fontSize = 12.sp,
+            )
+        }
+        if (logoUri != null) {
+            IconButton(onClick = onLogoCleared, enabled = enabled) {
+                Icon(
+                    painter = painterResource(Iv.DeleteOutline),
+                    contentDescription = stringResource(R.string.ob_logo_supprimer),
+                    tint = Red40,
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
     }
