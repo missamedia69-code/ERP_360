@@ -23,7 +23,9 @@ class ModulesPackTest {
 
     @Test
     fun `le pack d'un profil reprend exactement ses modules metier`() {
-        for (profil in ProfilActivite.entries - ProfilActivite.CUSTOM) {
+        // Personnalisé n'impose rien ; le pack Personnel n'active aucun module
+        // entreprise (carnet de dépenses et de revenus d'une personne).
+        for (profil in ProfilActivite.entries - ProfilActivite.CUSTOM - ProfilActivite.PERSONNEL) {
             val pack = ModulesSocle.metierDuPack(profil)
             assertEquals(
                 "pack métier de $profil",
@@ -38,6 +40,21 @@ class ModulesPackTest {
     fun `le profil personnalise n'impose aucun module`() {
         assertTrue(ModulesSocle.metierDuPack(ProfilActivite.CUSTOM).isEmpty())
         assertTrue(ModulesSocle.metierDuPack(null).isEmpty())
+    }
+
+    @Test
+    fun `le pack personnel n'active aucun module entreprise`() {
+        assertTrue(ModulesSocle.metierDuPack(ProfilActivite.PERSONNEL).isEmpty())
+        for (palier in PalierTaille.entries) {
+            assertTrue(
+                "aucune recommandation pour PERSONNEL / $palier",
+                ModulesSocle.recommandes(ProfilActivite.PERSONNEL, palier, emptyList()).isEmpty(),
+            )
+        }
+        assertTrue(
+            "aucun module actif pour PERSONNEL",
+            ModulesPersonnalises.modulesActifs(ProfilActivite.PERSONNEL, emptySet(), emptySet()).isEmpty(),
+        )
     }
 
     @Test
@@ -68,7 +85,8 @@ class ModulesPackTest {
 
     @Test
     fun `comptabilite et reporting sont recommandes quel que soit le profil`() {
-        for (profil in ProfilActivite.entries) {
+        // ... sauf le pack Personnel, qui ne recommande aucun module entreprise.
+        for (profil in ProfilActivite.entries - ProfilActivite.PERSONNEL) {
             val recommandes = ModulesSocle.recommandes(
                 profil,
                 PalierTaille.P1,
