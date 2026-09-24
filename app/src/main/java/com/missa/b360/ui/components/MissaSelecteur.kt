@@ -88,22 +88,26 @@ fun MissaSelecteurLigne(
     titreDialogue: String = label,
     indiceRecherche: String? = null,
     avecRecherche: Boolean = options.size >= 8,
+    couleurCarte: Color = MissaSurface,
+    bordureCarte: BorderStroke? = BorderStroke(1.dp, MissaBorder),
+    rayonCarte: RoundedCornerShape = RoundedCornerShape(12.dp),
 ) {
     var ouvert by remember { mutableStateOf(false) }
     val choisie = options.firstOrNull { it.cle == selectionCle }
     // Un cadre franc et un fond blanc : sans eux, le sélecteur se confondait
     // avec l'arrière-plan et rien ne signalait la zone à toucher.
+    // (L'onboarding de configuration passe une carte bleue sans bordure — maquette.)
     Surface(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        color = if (enabled) MissaSurface else MissaCanvas,
-        border = BorderStroke(1.dp, MissaBorder),
+        shape = rayonCarte,
+        color = if (enabled) couleurCarte else MissaCanvas,
+        border = bordureCarte,
     ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable { ouvert = true } else Modifier)
-            .padding(horizontal = 13.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {

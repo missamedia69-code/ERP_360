@@ -50,6 +50,10 @@ val MissaLime = Color(0xFFB6E52B)
 // Écrans d'onboarding « maquette » : bleu roi d'accueil et fond vert clair du récapitulatif.
 val OnboardingHeroBlue = Color(0xFF1E2EC8)
 val OnboardingHeroGreen = Color(0xFFEFF8F1)
+/** Cartes de paramètres de la configuration initiale (maquette : bleu clair plein). */
+val OnbConfigCard = Color(0xFFE2F0FE)
+/** Bouton d'action vert vif de l'onboarding (maquette : « Choisir un fichier… »). */
+val OnbActionGreen = Color(0xFF22C55E)
 
 // Alias de compatibilité des écrans d'onboarding.
 val OnboardingPrimary = BrandBlue
