@@ -29,6 +29,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -81,7 +83,8 @@ private const val LOGO_MAX_BYTES = 2L * 1024 * 1024
  * ailleurs — le fond transparent par défaut de Material 3 laissait apparaître
  * le bleu de la carte et la zone à remplir ne se distinguait pas.
  */
-private val OnbCouleursChampBlanc = OutlinedTextFieldDefaults.colors(
+@Composable
+private fun OnbCouleursChampBlanc(): TextFieldColors = TextFieldDefaults.colors(
     unfocusedContainerColor = Color.White,
     focusedContainerColor = Color.White,
     disabledContainerColor = Color.White,
@@ -622,7 +625,7 @@ private fun OnbChampTexte(
         singleLine = lignesMin == 1,
         minLines = lignesMin,
         isError = erreur,
-        colors = OnbCouleursChampBlanc,
+        colors = OnbCouleursChampBlanc(),
         enabled = active,
         keyboardOptions = KeyboardOptions(keyboardType = clavier),
         supportingText = aide?.let {
