@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -229,21 +230,35 @@ internal fun OnbScaffold(
                         active = viewModel.step.ordinal,
                     )
                 }
-                Button(
-                    onClick = viewModel::suivant,
-                    enabled = boutonActive && !viewModel.enregistrementEnCours,
+                // Tuile en dégradé : finition soignée, cohérente avec le bouton
+                // « Commencer » de la page d'annonces.
+                Row(
                     modifier = Modifier
                         .then(
                             if (boutonPleineLargeur) Modifier.fillMaxWidth()
                             else Modifier.width(150.dp),
                         )
-                        .height(50.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BrandBlue,
-                        disabledContainerColor = BrandBlue.copy(alpha = 0.35f),
-                    ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
+                        .height(50.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .then(
+                            if (boutonActive && !viewModel.enregistrementEnCours) {
+                                Modifier.background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color(0xFF3E7BFA), BrandBlue),
+                                    ),
+                                )
+                            } else {
+                                Modifier.background(BrandBlue.copy(alpha = 0.35f))
+                            },
+                        )
+                        .clickable(
+                            enabled = boutonActive && !viewModel.enregistrementEnCours,
+                            onClickLabel = stringResource(boutonLabelRes),
+                            role = Role.Button,
+                            onClick = viewModel::suivant,
+                        ),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(boutonLabelRes),
@@ -286,7 +301,11 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(OnboardingHeroBlue)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF2A3BDD), OnboardingHeroBlue, Color(0xFF131C8F)),
+                ),
+            )
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 30.dp),

@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -139,20 +138,22 @@ fun MissaAppHeader(
                         modifier = Modifier.size(46.dp),
                         contentAlignment = Alignment.Center,
                     ) {
+                        // Logo de marque en carré à bords arrondis (et non rond)
+                        // : la charte l'exige sur toutes les pages.
                         Image(
                             painter = painterResource(R.drawable.logo_missa),
                             contentDescription = "MISSA BUSINESS 360",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clip(CircleShape)
-                                .border(1.2.dp, Color(0xFF0288D1).copy(alpha = 0.3f), CircleShape),
+                                .clip(RoundedCornerShape(13.dp))
+                                .border(1.2.dp, Color(0xFF0288D1).copy(alpha = 0.3f), RoundedCornerShape(13.dp)),
                         )
                         if (!isHome) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.35f), CircleShape),
+                                    .background(Color.Black.copy(alpha = 0.35f), RoundedCornerShape(13.dp)),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(

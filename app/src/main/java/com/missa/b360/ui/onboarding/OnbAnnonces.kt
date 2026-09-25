@@ -66,49 +66,63 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
             .fillMaxSize()
             .background(MissaSurface),
     ) {
-        Row(
+        // En-tête aux couleurs de l'image (teintes échantillonnées sur le haut
+        // de l'illustration) : la sensation que l'image commence depuis le
+        // tout début de l'écran.
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .statusBarsPadding()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF0C48DB), Color(0xFF165AE4)),
+                    ),
+                ),
         ) {
-            IconButton(
-                onClick = viewModel::precedent,
-                modifier = Modifier.size(38.dp),
-            ) {
-                Icon(
-                    painter = painterResource(Iv.ArrowBack),
-                    contentDescription = stringResource(R.string.ob_retour),
-                    tint = MissaMuted,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-            Spacer(Modifier.weight(1f))
             Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(
-                        onClickLabel = stringResource(R.string.obn_ann_passer),
-                        role = Role.Button,
-                        onClick = viewModel::suivant,
-                    )
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = stringResource(R.string.obn_ann_passer),
-                    color = BrandBlue,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Spacer(Modifier.width(3.dp))
-                Icon(
-                    painter = painterResource(Iv.ChevronRight),
-                    contentDescription = null,
-                    tint = BrandBlue,
-                    modifier = Modifier.size(14.dp),
-                )
+                IconButton(
+                    onClick = viewModel::precedent,
+                    modifier = Modifier.size(38.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(Iv.ArrowBack),
+                        contentDescription = stringResource(R.string.ob_retour),
+                        tint = Color.White.copy(alpha = 0.92f),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.12f))
+                        .clickable(
+                            onClickLabel = stringResource(R.string.obn_ann_passer),
+                            role = Role.Button,
+                            onClick = viewModel::suivant,
+                        )
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.obn_ann_passer),
+                        color = Color.White,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Spacer(Modifier.width(3.dp))
+                    Icon(
+                        painter = painterResource(Iv.ChevronRight),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(14.dp),
+                    )
+                }
             }
         }
 
@@ -416,7 +430,11 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
             .fillMaxWidth()
             .height(52.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(BrandBlue)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF3E7BFA), BrandBlue),
+                ),
+            )
             .clickable(onClickLabel = libelle, role = Role.Button, onClick = onClick),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

@@ -66,15 +66,19 @@ object MissaLayout {
     val cardRadius = 14.dp
 }
 
-/** Petit logo de marque utilisable dans les en-têtes sans alourdir les écrans métier. */
+/**
+ * Petit logo de marque utilisable dans les en-têtes sans alourdir les écrans
+ * métier. Carré à bords arrondis (charte : le logo Missa n'est jamais rond).
+ */
 @Composable
 fun MissaBrandMark(
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
 ) {
+    val forme = RoundedCornerShape(size * 0.3f)
     Surface(
         modifier = modifier.size(size),
-        shape = CircleShape,
+        shape = forme,
         color = Color.White,
         border = BorderStroke(1.dp, Color(0xFF0288D1).copy(alpha = 0.25f)),
     ) {
@@ -82,7 +86,7 @@ fun MissaBrandMark(
             painter = painterResource(R.drawable.logo_missa),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().clip(CircleShape),
+            modifier = Modifier.fillMaxSize().clip(forme),
         )
     }
 }
