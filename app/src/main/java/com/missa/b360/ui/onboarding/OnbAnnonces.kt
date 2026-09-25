@@ -1,6 +1,7 @@
 package com.missa.b360.ui.onboarding
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,20 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.aspectRatio
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -35,7 +37,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
@@ -45,7 +50,6 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaLime
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
-import com.missa.b360.ui.theme.OnboardingHeroBlue
 
 /**
  * Écran 2 — Annonces : présenté juste après le choix de la langue (maquette).
@@ -135,207 +139,101 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
 }
 
 /**
- * Bandeau bleu : dégradé royal qui se fond dans le blanc de la page, tuile
- * logo, nom de la marque, slogan, trait vert signature et illustration des
- * écrans (ordinateur + téléphone + indicateur de progression).
+ * Bandeau de la page d'annonces : illustration de marque pleine largeur
+ * (téléphone avec l'application, icônes de modules en orbite, dégradé bleu —
+ * moitié gauche volontairement libre) sur laquelle se superposent les textes
+ * gérés par l'application : tuile logo, nom de la marque avec « 360 » vert,
+ * trait signature, slogan et accroche — traduits dans les cinq langues.
  */
 @Composable
 private fun OnbAnnoncesHero() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(330.dp)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        OnboardingHeroBlue,
-                        BrandBlue,
-                        Color(0xFFDCE8FF),
-                    ),
-                ),
-            ),
+            .aspectRatio(1104f / 960f),
     ) {
+        Image(
+            painter = painterResource(R.drawable.hero_annonce),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
         Column(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 24.dp, top = 22.dp, end = 132.dp, bottom = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+                .padding(start = 24.dp, top = 22.dp)
+                .fillMaxWidth(0.52f),
         ) {
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFF13229B)),
-                contentAlignment = Alignment.Center,
+                    .size(58.dp)
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = RoundedCornerShape(17.dp),
+                        spotColor = Color(0xFF000A2E).copy(alpha = 0.35f),
+                    )
+                    .clip(RoundedCornerShape(17.dp))
+                    .background(Color(0xFF0544CE)),
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.logo_missa),
+                Image(
+                    painter = painterResource(R.drawable.logo_missa_mark),
                     contentDescription = stringResource(R.string.app_name),
-                    tint = Color.White,
-                    modifier = Modifier.size(32.dp),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
+            Spacer(Modifier.height(16.dp))
+            OnbAnnoncesTitre()
             Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.app_name).uppercase(),
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 2,
+            Box(
+                modifier = Modifier
+                    .width(44.dp)
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(MissaLime),
             )
+            Spacer(Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.obn_ann_slogan),
                 color = Color.White,
                 fontSize = 13.5.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 2,
+                lineHeight = 18.sp,
             )
-            Box(
-                modifier = Modifier
-                    .padding(top = 2.dp)
-                    .width(40.dp)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(MissaLime),
-            )
-            Spacer(Modifier.height(3.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(R.string.obn_ann_paragraphe),
                 color = Color.White.copy(alpha = 0.85f),
-                fontSize = 12.sp,
-                lineHeight = 17.sp,
-            )
-        }
-        // Illustration : écran d'ordinateur avec graphique en barres, téléphone
-        // posé devant et indicateur de progression flottant — composé aux
-        // couleurs de la marque (aucun asset binaire).
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 22.dp)
-                .width(158.dp)
-                .height(168.dp),
-        ) {
-        // Ordinateur : écran + socle.
-        Column(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(y = 14.dp)
-                .width(138.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(
-                modifier = Modifier
-                    .width(118.dp)
-                    .height(74.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color.White),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OnbAnnoncesBarre(14.dp, 20.dp, Color(0xFFAFC8FF))
-                    OnbAnnoncesBarre(14.dp, 34.dp, Color(0xFF6E96F5))
-                    OnbAnnoncesBarre(14.dp, 26.dp, Color(0xFF3D6DF0))
-                    OnbAnnoncesBarre(14.dp, 44.dp, BrandBlue)
-                }
-            }
-            Spacer(Modifier.height(2.dp))
-            Box(
-                modifier = Modifier
-                    .width(138.dp)
-                    .height(7.dp)
-                    .clip(RoundedCornerShape(3.5.dp))
-                    .background(Color(0xFFD9E6FF)),
-            )
-        }
-        // Téléphone posé devant l'ordinateur.
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .offset(x = -12.dp, y = -2.dp)
-                .width(48.dp)
-                .height(92.dp)
-                .shadow(8.dp, RoundedCornerShape(13.dp))
-                .clip(RoundedCornerShape(13.dp))
-                .background(Color.White)
-                .padding(7.dp),
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF22C55E)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(Iv.Check),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(10.dp),
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .clip(RoundedCornerShape(1.5.dp))
-                        .background(Color(0xFFDCE6F7)),
-                )
-                Box(
-                    modifier = Modifier
-                        .width(30.dp)
-                        .height(3.dp)
-                        .clip(RoundedCornerShape(1.5.dp))
-                        .background(Color(0xFFE6EEFA)),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color(0xFFEAF1FF)),
-                )
-                Spacer(Modifier.weight(1f))
-            }
-        }
-        // Indicateur de progression flottant.
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(34.dp)
-                .shadow(8.dp, RoundedCornerShape(10.dp))
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color.White),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(Iv.TrendingUp),
-                contentDescription = null,
-                tint = Color(0xFF16A34A),
-                modifier = Modifier.size(18.dp),
+                fontSize = 11.5.sp,
+                lineHeight = 16.sp,
             )
         }
     }
 }
-}
 
+/** Nom de la marque en capitales : le « 360 » final est surligné en vert. */
 @Composable
-private fun OnbAnnoncesBarre(largeur: androidx.compose.ui.unit.Dp, hauteur: androidx.compose.ui.unit.Dp, couleur: Color) {
-    Box(
-        modifier = Modifier
-            .width(largeur)
-            .height(hauteur)
-            .clip(RoundedCornerShape(4.dp))
-            .background(couleur),
+private fun OnbAnnoncesTitre() {
+    val nom = stringResource(R.string.app_name).uppercase()
+    val titre = remember(nom) {
+        buildAnnotatedString {
+            val index = nom.lastIndexOf("360")
+            if (index >= 0) {
+                append(nom.substring(0, index))
+                withStyle(SpanStyle(color = MissaLime)) {
+                    append(nom.substring(index))
+                }
+            } else {
+                append(nom)
+            }
+        }
+    }
+    Text(
+        text = titre,
+        color = Color.White,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        lineHeight = 24.sp,
     )
 }
 
