@@ -342,24 +342,28 @@ private fun OnbAnnoncesBarre(largeur: androidx.compose.ui.unit.Dp, hauteur: andr
 /** Les six briques mises en avant sur la page d'annonces (maquette). */
 private data class OnbAvantage(
     val icone: Int,
+    val debut: Color,
+    val fin: Color,
+    val bordure: Color,
     val fond: Color,
-    val couleur: Color,
     val titreRes: Int,
     val descriptionRes: Int,
 )
 
 private val OnbAvantages = listOf(
-    OnbAvantage(Iv.ShoppingCart, Color(0xFFE3F0FE), Color(0xFF2563EB), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
-    OnbAvantage(Iv.Inventory2, Color(0xFFE8F7EC), Color(0xFF16A34A), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
-    OnbAvantage(Iv.Group, Color(0xFFF0EBFB), Color(0xFF7C3AED), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
-    OnbAvantage(Iv.Description, Color(0xFFE3F0FE), Color(0xFF2563EB), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
-    OnbAvantage(Iv.Chat, Color(0xFFE8F7EC), Color(0xFF22C55E), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
-    OnbAvantage(Iv.Security, Color(0xFFF0EBFB), Color(0xFF7C3AED), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
+    OnbAvantage(Iv.ShoppingCart, Color(0xFF7CB0FF), Color(0xFF2563EB), Color(0xFFD9E7FC), Color(0xFFEFF5FF), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
+    OnbAvantage(Iv.Inventory2, Color(0xFF57D98A), Color(0xFF16A34A), Color(0xFFD7EFDF), Color(0xFFEFFAF3), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
+    OnbAvantage(Iv.Group, Color(0xFFB09CFF), Color(0xFF7C3AED), Color(0xFFE6E0FC), Color(0xFFF5F2FF), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
+    OnbAvantage(Iv.Description, Color(0xFF7CB0FF), Color(0xFF2563EB), Color(0xFFD9E7FC), Color(0xFFEFF5FF), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
+    OnbAvantage(Iv.Chat, Color(0xFF57D98A), Color(0xFF22C55E), Color(0xFFD7EFDF), Color(0xFFEFFAF3), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
+    OnbAvantage(Iv.Security, Color(0xFFB09CFF), Color(0xFF7C3AED), Color(0xFFE6E0FC), Color(0xFFF5F2FF), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
 )
 
 /**
- * Carte « Une application, plusieurs avantages » : badge étoile, titre,
- * sous-titre et grille 2 × 3 de briques (icônes colorées, titres, textes).
+ * Carte « Une application, plusieurs avantages » : pastille étoile en dégradé
+ * vert sur fond de halo, titre, sous-titre, filet tricolore de transition et
+ * grille 2 × 3 de briques — chaque brique porte son icône en dégradé avec
+ * halo coloré, sa bordure teintée et son fond en dégradé doux.
  */
 @Composable
 private fun OnbAvantagesCarte() {
@@ -367,43 +371,65 @@ private fun OnbAvantagesCarte() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 10.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .border(1.dp, Color(0xFFE4EBF6), RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(24.dp))
+            .border(1.dp, Color(0xFFE4EBF6), RoundedCornerShape(24.dp))
             .background(Color.White)
-            .padding(20.dp),
+            .padding(22.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF22C55E)),
+                    .size(46.dp)
+                    .shadow(
+                        elevation = 7.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        spotColor = Color(0xFF16A34A).copy(alpha = 0.4f),
+                    )
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color(0xFF4ADE80), Color(0xFF16A34A)),
+                        ),
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(Iv.Star),
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(12.dp))
             Column {
                 Text(
                     text = stringResource(R.string.obn_avantages_titre),
                     color = MissaInk,
-                    fontSize = 15.5.sp,
+                    fontSize = 16.5.sp,
                     fontWeight = FontWeight.Bold,
                 )
-                Spacer(Modifier.height(3.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.obn_avantages_sous),
                     color = MissaMuted,
-                    fontSize = 11.5.sp,
-                    lineHeight = 16.sp,
+                    fontSize = 12.sp,
+                    lineHeight = 16.5.sp,
                 )
             }
         }
+        Spacer(Modifier.height(15.dp))
+        // Filet de transition : les trois couleurs de marque en dégradé.
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(3.dp)
+                .clip(RoundedCornerShape(1.5.dp))
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(BrandBlue, Color(0xFF22C55E), Color(0xFF7C3AED)),
+                    ),
+                ),
+        )
         Spacer(Modifier.height(16.dp))
         for (ligne in 0 until 3) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -417,33 +443,47 @@ private fun OnbAvantagesCarte() {
 
 @Composable
 private fun OnbAvantageTuile(avantage: OnbAvantage, modifier: Modifier = Modifier) {
+    val formeTuile = RoundedCornerShape(18.dp)
     Column(
         modifier = modifier
-            .height(130.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .border(1.dp, Color(0xFFE8EEF7), RoundedCornerShape(14.dp))
-            .background(Color(0xFFF7FAFF))
+            .height(132.dp)
+            .clip(formeTuile)
+            .border(1.5.dp, avantage.bordure, formeTuile)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(avantage.fond, Color.White),
+                ),
+            )
             .padding(14.dp),
     ) {
         Box(
             modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(avantage.fond),
+                .size(46.dp)
+                .shadow(
+                    elevation = 5.dp,
+                    shape = RoundedCornerShape(15.dp),
+                    spotColor = avantage.fin.copy(alpha = 0.35f),
+                )
+                .clip(RoundedCornerShape(15.dp))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(avantage.debut, avantage.fin),
+                    ),
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(avantage.icone),
                 contentDescription = null,
-                tint = avantage.couleur,
-                modifier = Modifier.size(20.dp),
+                tint = Color.White,
+                modifier = Modifier.size(22.dp),
             )
         }
         Spacer(Modifier.height(10.dp))
         Text(
             text = stringResource(avantage.titreRes),
             color = MissaInk,
-            fontSize = 12.5.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 16.sp,
             maxLines = 2,
