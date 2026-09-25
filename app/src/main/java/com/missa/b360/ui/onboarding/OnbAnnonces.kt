@@ -4,15 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.LayoutDirection
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.layoutDirection
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,9 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
@@ -33,31 +34,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaInk
-import com.missa.b360.ui.theme.MissaLime
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
 
 /**
  * Écran 2 — Annonces : présenté juste après le choix de la langue (maquette).
  *
- * Bandeau bleu de marque (logo, nom, slogan, accroche et illustration), carte
- * « Une application, plusieurs avantages » (six briques), rappel de l'essai
- * gratuit et bouton « Commencer ». Le lien « Passer » court-circuite la
- * lecture mais conduit au même endroit : la configuration initiale.
+ * Bandeau bleu de marque : l'illustration intègre le logo, le nom de la marque
+ * et le trait signature ; le slogan et l'accroche, gérés par l'application,
+ * se superposent dans la zone libre. Carte « Une application, de nombreux
+ * avantages » où les six avantages sont présentés en liste, rappel de l'essai
+ * gratuit et bouton « Commencer » qui épouse le bas de l'écran. Le lien
+ * « Passer » court-circuite la lecture mais conduit au même endroit : la
+ * configuration initiale.
  */
 @Composable
 internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
@@ -120,85 +122,71 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
             OnbAnnoncesHero()
             OnbAvantagesCarte()
             OnbEssaiBanniere()
-            OnbAnnoncesBoutonCommencer(onClick = viewModel::suivant)
         }
 
-        Row(
+        // Barre basse : le bouton « Commencer » épouse le bas de l'écran —
+        // le fond de la barre descend jusqu'au bord physique, la zone de
+        // navigation système est absorbée dans la barre.
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
-                .padding(vertical = 14.dp),
-            horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
+                .background(MissaSurface),
+            shadowElevation = 4.dp,
         ) {
-            OnbDots(
-                total = OnboardingStep.TERMINE.ordinal,
-                active = viewModel.step.ordinal,
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .navigationBarsPadding(),
+            ) {
+                OnbAnnoncesBoutonCommencer(onClick = viewModel::suivant)
+            }
         }
     }
 }
 
 /**
  * Bandeau de la page d'annonces : illustration de marque pleine largeur
- * (téléphone avec l'application, icônes de modules en orbite, dégradé bleu —
- * moitié gauche volontairement libre) sur laquelle se superposent les textes
- * gérés par l'application : tuile logo, nom de la marque avec « 360 » vert,
- * trait signature, slogan et accroche — traduits dans les cinq langues.
+ * (téléphone avec l'application, icônes de modules en orbite, dégradé bleu ;
+ * le logo, le nom de la marque et le trait signature sont intégrés à
+ * l'image). Dans la zone libre en bas à gauche, les textes gérés par
+ * l'application — slogan et accroche — se superposent, traduits dans les
+ * cinq langues.
+ *
+ * L'illustration garde sa mise en page physique (LTR) dans toutes les
+ * langues ; les textes superposés conservent la direction de lecture de
+ * leur langue.
  */
 @Composable
 private fun OnbAnnoncesHero() {
+    val direction = LocalLayoutDirection.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1104f / 960f),
+            .aspectRatio(1341f / 1173f)
+            .layoutDirection(LayoutDirection.LTR),
     ) {
         Image(
             painter = painterResource(R.drawable.hero_annonce),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.app_name),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
         Column(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 24.dp, top = 22.dp)
-                .fillMaxWidth(0.52f),
+                .align(Alignment.BottomStart)
+                .padding(start = 24.dp, bottom = 26.dp)
+                .fillMaxWidth(0.52f)
+                .layoutDirection(direction),
+            horizontalAlignment = Alignment.Start,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(58.dp)
-                    .shadow(
-                        elevation = 10.dp,
-                        shape = RoundedCornerShape(17.dp),
-                        spotColor = Color(0xFF000A2E).copy(alpha = 0.35f),
-                    )
-                    .clip(RoundedCornerShape(17.dp))
-                    .background(Color(0xFF0544CE)),
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.logo_missa_mark),
-                    contentDescription = stringResource(R.string.app_name),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-            Spacer(Modifier.height(16.dp))
-            OnbAnnoncesTitre()
-            Spacer(Modifier.height(8.dp))
-            Box(
-                modifier = Modifier
-                    .width(44.dp)
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(MissaLime),
-            )
-            Spacer(Modifier.height(18.dp))
             Text(
                 text = stringResource(R.string.obn_ann_slogan),
                 color = Color.White,
                 fontSize = 13.5.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 18.sp,
+                textAlign = TextAlign.Start,
             )
             Spacer(Modifier.height(6.dp))
             Text(
@@ -206,62 +194,35 @@ private fun OnbAnnoncesHero() {
                 color = Color.White.copy(alpha = 0.85f),
                 fontSize = 11.5.sp,
                 lineHeight = 16.sp,
+                textAlign = TextAlign.Start,
             )
         }
     }
 }
 
-/** Nom de la marque en capitales : le « 360 » final est surligné en vert. */
-@Composable
-private fun OnbAnnoncesTitre() {
-    val nom = stringResource(R.string.app_name).uppercase()
-    val titre = remember(nom) {
-        buildAnnotatedString {
-            val index = nom.lastIndexOf("360")
-            if (index >= 0) {
-                append(nom.substring(0, index))
-                withStyle(SpanStyle(color = MissaLime)) {
-                    append(nom.substring(index))
-                }
-            } else {
-                append(nom)
-            }
-        }
-    }
-    Text(
-        text = titre,
-        color = Color.White,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        lineHeight = 24.sp,
-    )
-}
-
-/** Les six briques mises en avant sur la page d'annonces (maquette). */
+/** Les six avantages mis en avant sur la page d'annonces (maquette). */
 private data class OnbAvantage(
     val icone: Int,
     val debut: Color,
     val fin: Color,
-    val bordure: Color,
-    val fond: Color,
     val titreRes: Int,
     val descriptionRes: Int,
 )
 
 private val OnbAvantages = listOf(
-    OnbAvantage(Iv.ShoppingCart, Color(0xFF7CB0FF), Color(0xFF2563EB), Color(0xFFD9E7FC), Color(0xFFEFF5FF), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
-    OnbAvantage(Iv.Inventory2, Color(0xFF57D98A), Color(0xFF16A34A), Color(0xFFD7EFDF), Color(0xFFEFFAF3), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
-    OnbAvantage(Iv.Group, Color(0xFFB09CFF), Color(0xFF7C3AED), Color(0xFFE6E0FC), Color(0xFFF5F2FF), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
-    OnbAvantage(Iv.Description, Color(0xFF7CB0FF), Color(0xFF2563EB), Color(0xFFD9E7FC), Color(0xFFEFF5FF), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
-    OnbAvantage(Iv.Chat, Color(0xFF57D98A), Color(0xFF22C55E), Color(0xFFD7EFDF), Color(0xFFEFFAF3), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
-    OnbAvantage(Iv.Security, Color(0xFFB09CFF), Color(0xFF7C3AED), Color(0xFFE6E0FC), Color(0xFFF5F2FF), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
+    OnbAvantage(Iv.ShoppingCart, Color(0xFF7CB0FF), Color(0xFF2563EB), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
+    OnbAvantage(Iv.Inventory2, Color(0xFF57D98A), Color(0xFF16A34A), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
+    OnbAvantage(Iv.Group, Color(0xFFB09CFF), Color(0xFF7C3AED), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
+    OnbAvantage(Iv.Description, Color(0xFF7CB0FF), Color(0xFF2563EB), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
+    OnbAvantage(Iv.Chat, Color(0xFF57D98A), Color(0xFF22C55E), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
+    OnbAvantage(Iv.Security, Color(0xFFB09CFF), Color(0xFF7C3AED), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
 )
 
 /**
- * Carte « Une application, plusieurs avantages » : pastille étoile en dégradé
- * vert sur fond de halo, titre, sous-titre, filet tricolore de transition et
- * grille 2 × 3 de briques — chaque brique porte son icône en dégradé avec
- * halo coloré, sa bordure teintée et son fond en dégradé doux.
+ * Carte « One app, many benefits » : pastille étoile en dégradé vert sur fond
+ * de halo, titre, sous-titre, filet tricolore de transition, puis les six
+ * avantages en liste simple — chacun sur sa ligne, icône en dégradé avec halo
+ * coloré, titre et description.
  */
 @Composable
 private fun OnbAvantagesCarte() {
@@ -328,41 +289,41 @@ private fun OnbAvantagesCarte() {
                     ),
                 ),
         )
-        Spacer(Modifier.height(16.dp))
-        for (ligne in 0 until 3) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OnbAvantageTuile(OnbAvantages[ligne * 2], Modifier.weight(1f))
-                OnbAvantageTuile(OnbAvantages[ligne * 2 + 1], Modifier.weight(1f))
+        Spacer(Modifier.height(14.dp))
+        OnbAvantages.forEachIndexed { index, avantage ->
+            OnbAvantageLigne(avantage)
+            if (index < OnbAvantages.lastIndex) {
+                Spacer(Modifier.height(6.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Color(0xFFEFF3F9)),
+                )
+                Spacer(Modifier.height(6.dp))
             }
-            if (ligne < 2) Spacer(Modifier.height(12.dp))
         }
     }
 }
 
+/** Une ligne de la liste des avantages : puce iconée en dégradé, titre, description. */
 @Composable
-private fun OnbAvantageTuile(avantage: OnbAvantage, modifier: Modifier = Modifier) {
-    val formeTuile = RoundedCornerShape(18.dp)
-    Column(
-        modifier = modifier
-            .height(132.dp)
-            .clip(formeTuile)
-            .border(1.5.dp, avantage.bordure, formeTuile)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(avantage.fond, Color.White),
-                ),
-            )
-            .padding(14.dp),
+private fun OnbAvantageLigne(avantage: OnbAvantage) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(46.dp)
+                .size(40.dp)
                 .shadow(
                     elevation = 5.dp,
-                    shape = RoundedCornerShape(15.dp),
+                    shape = RoundedCornerShape(13.dp),
                     spotColor = avantage.fin.copy(alpha = 0.35f),
                 )
-                .clip(RoundedCornerShape(15.dp))
+                .clip(RoundedCornerShape(13.dp))
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(avantage.debut, avantage.fin),
@@ -374,25 +335,26 @@ private fun OnbAvantageTuile(avantage: OnbAvantage, modifier: Modifier = Modifie
                 painter = painterResource(avantage.icone),
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.height(10.dp))
-        Text(
-            text = stringResource(avantage.titreRes),
-            color = MissaInk,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 16.sp,
-            maxLines = 2,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(avantage.descriptionRes),
-            color = MissaMuted,
-            fontSize = 10.5.sp,
-            lineHeight = 14.5.sp,
-        )
+        Spacer(Modifier.width(11.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(avantage.titreRes),
+                color = MissaInk,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 16.sp,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = stringResource(avantage.descriptionRes),
+                color = MissaMuted,
+                fontSize = 11.sp,
+                lineHeight = 14.5.sp,
+            )
+        }
     }
 }
 
@@ -448,12 +410,11 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
             .height(52.dp)
             .clip(RoundedCornerShape(14.dp))
             .background(BrandBlue)
             .clickable(onClickLabel = libelle, role = Role.Button, onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

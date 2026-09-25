@@ -23,6 +23,7 @@ import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ReferentielFiscal
 import com.missa.b360.core.domain.model.ValidationProfil
+import com.missa.b360.core.domain.model.ViolationProfil
 import com.missa.b360.core.domain.usecase.BackupUseCases
 import com.missa.b360.core.domain.usecase.CompleteOnboardingUseCase
 import com.missa.b360.core.domain.usecase.CreateOwnerUserUseCase
@@ -298,7 +299,13 @@ class OnboardingViewModel @Inject constructor(
                 appliquerConfiguration()
                 step = OnboardingStep.PROFIL
             }
-            OnboardingStep.PROFIL -> if (profilEcranValide()) step = OnboardingStep.ENTREPRISE
+            OnboardingStep.PROFIL -> when {
+                profil == null -> erreurRes = R.string.obn_profil_non_choisi
+                profil == ProfilActivite.CUSTOM && modulesPersonnalises.isEmpty() ->
+                    erreurRes = R.string.obn_profil_perso_vide
+                !profilEcranValide() -> erreurRes = R.string.obn_stock_requis
+                else -> step = OnboardingStep.ENTREPRISE
+            }
             OnboardingStep.ENTREPRISE -> enregistrerEntreprise()
             OnboardingStep.PIN -> validerPinEtProprietaire()
             OnboardingStep.TERMINE -> terminer()
@@ -327,6 +334,7 @@ class OnboardingViewModel @Inject constructor(
     fun choisirProfil(p: ProfilActivite) {
         val changementDeProfil = profil != p
         profil = p
+        erreurRes = null
         viewModelScope.launch { settingsStore.set(SettingsStore.Keys.PROFIL_ACTIVITE, p.name) }
         if (p != ProfilActivite.CUSTOM) {
             val packBrut = ModulesSocle.metierDuPack(p)
@@ -355,6 +363,27 @@ class OnboardingViewModel @Inject constructor(
                 enregistrerModules()
             }
         }
+        // L'option modifie la validité d'une composition avec Vente : on
+        // réévalue le message d'erreur de l'écran (libéré ou posé).
+        val bloquantes = violationsBloquantes()
+        erreurRes = if (bloquantes.isEmpty()) null else R.string.obn_stock_requis
+    }
+
+    /**
+     * Violations de la règle d'or qui bloquent l'écran, pour [candidat] (ou la
+     * configuration courante). Le cœur figé d'un pack est valide par définition
+     * (un pack de services ou de projets vend sans stock sans que ce soit un
+     * problème) : seules comptent les violations dont le module d'origine
+     * n'est pas imposé par le pack.
+     */
+    private fun violationsBloquantes(candidat: Collection<ModuleCode>? = null): List<ViolationProfil> {
+        val pack = ModulesSocle.metierDuPack(profil)
+        return ValidationProfil
+            .violations(
+                pack + (candidat ?: modulesPersonnalises),
+                OptionsConfigProfil(venteSansStock = venteSansStock),
+            )
+            .filter { it.from !in pack }
     }
 
     /**
@@ -369,20 +398,25 @@ class OnboardingViewModel @Inject constructor(
         val pack = ModulesSocle.metierDuPack(profil)
         val nouvelle = modulesPersonnalises.toMutableSet()
         val ajout = nouvelle.add(module)
-        if (!ajout) {
-            nouvelle.remove(module)
-            val options = OptionsConfigProfil(venteSansStock = venteSansStock)
-            if (ValidationProfil.violations(pack + nouvelle, options).isNotEmpty()) {
-                erreurRes = R.string.obn_stock_requis
-                return
-            }
-            modulesPersonnalises = nouvelle
-        } else {
+        if (!ajout) nouvelle.remove(module)
+        // Les dépendances incompressibles (ACH/PRO → STK) sont résolues avant
+        // le contrôle : l'ajout d'un Achat n'est jamais bloqué, le Stock vient
+        // avec. Ce qui reste à contrôler, c'est ce que l'utilisateur a
+        // réellement composé.
+        if (ajout) {
             val avecDeps = ModulesSocle.avecDependances(pack + nouvelle, venteSansStock)
             val aAjouter = avecDeps.filter { it !in pack && it !in nouvelle }
             nouvelle.addAll(aAjouter)
-            modulesPersonnalises = nouvelle
         }
+        // Une composition invalide (Vente sans Stock et option désactivée,
+        // Achat ou Production sans Stock) est bloquée avec un message, et le
+        // message se libère dès que la composition redevient valide.
+        if (violationsBloquantes(nouvelle).isNotEmpty()) {
+            erreurRes = R.string.obn_stock_requis
+            return
+        }
+        modulesPersonnalises = nouvelle
+        erreurRes = null
         rafraichirSocle()
         enregistrerModules()
     }
@@ -405,6 +439,7 @@ class OnboardingViewModel @Inject constructor(
         extrasSupport = emptySet()
         val packBrut = ModulesSocle.metierDuPack(profil)
         modulesPersonnalises = ModulesSocle.avecDependances(packBrut, venteSansStock)
+        erreurRes = null
         rafraichirSocle()
         enregistrerModules()
     }

@@ -914,6 +914,7 @@
     <string name="obn_retention_365_sous">推荐：覆盖一个会计年度的完整审计</string>
 
     <string name="obn_profil_perso_vide">请至少选择一个模块以继续。</string>
+    <string name="obn_profil_non_choisi">请先选择一种业务类型以继续。</string>
     <string name="obn_profil_perso_fonctions">%1$d 项功能</string>
 
     

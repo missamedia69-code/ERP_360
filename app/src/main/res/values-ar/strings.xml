@@ -914,6 +914,7 @@
     <string name="obn_retention_365_sous">موصى به: تدقيق كامل على مدى سنة مالية</string>
 
     <string name="obn_profil_perso_vide">اختر وحدة واحدة على الأقل للمتابعة.</string>
+    <string name="obn_profil_non_choisi">اختر ملف نشاطٍ أولًا للمتابعة.</string>
     <string name="obn_profil_perso_fonctions">%1$d ميزة</string>
 
     

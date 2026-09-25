@@ -918,6 +918,7 @@
     <string name="obn_retention_365_sous">Recommended: full audit over a fiscal year</string>
 
     <string name="obn_profil_perso_vide">Select at least one module to continue.</string>
+    <string name="obn_profil_non_choisi">First choose an activity profile to continue.</string>
     <string name="obn_profil_perso_fonctions">%1$d features</string>
 
     

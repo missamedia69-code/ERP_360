@@ -914,6 +914,7 @@
     <string name="obn_retention_365_sous">Recomendado: auditoría completa de un ejercicio</string>
 
     <string name="obn_profil_perso_vide">Seleccione al menos un módulo para continuar.</string>
+    <string name="obn_profil_non_choisi">Seleccione primero un perfil de actividad para continuar.</string>
     <string name="obn_profil_perso_fonctions">%1$d funcionalidades</string>
 
     

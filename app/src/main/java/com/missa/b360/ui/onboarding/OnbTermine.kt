@@ -201,11 +201,12 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
 
         OnbActivationCarte(viewModel)
 
+        // Le bouton épouse le bas de l'écran : le fond de l'écran descend
+        // déjà jusqu'au bord physique (insets appliqués après le fond).
         OnbBoutonAcceder(
             actif = !viewModel.enregistrementEnCours,
             onClick = viewModel::suivant,
         )
-        Spacer(Modifier.height(6.dp))
     }
 }
 

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -124,8 +123,7 @@ internal fun OnbScaffold(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MissaSurface)
-            .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.safeDrawing),
+            .background(MissaSurface),
     ) {
         Row(
             modifier = Modifier
@@ -203,17 +201,20 @@ internal fun OnbScaffold(
             content()
         }
 
+        // La barre basse épouse le bas de l'écran : son fond blanc descend
+        // jusqu'au bord physique, la zone de navigation système est absorbée
+        // dans la barre (plus de bande vide sous le bouton).
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
                 .background(MissaSurface),
             shadowElevation = 4.dp,
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                    .navigationBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
@@ -318,7 +319,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(vertical = 18.dp),
+            modifier = Modifier.padding(top = 18.dp, bottom = 10.dp),
         ) {
             OnbLanguesDrapeaux(
                 selection = viewModel.langue,
@@ -348,7 +349,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
                     modifier = Modifier.size(18.dp),
                 )
             }
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                 for (index in 0 until OnboardingStep.TERMINE.ordinal) {
                     Box(

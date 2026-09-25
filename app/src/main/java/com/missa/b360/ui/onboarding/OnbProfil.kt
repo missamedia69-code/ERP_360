@@ -72,8 +72,8 @@ private data class OnbProfilCarteInfo(
  * Écran — Profil d'activité (structure matricielle) : en haut, une rangée de
  * petits carrés numérotés (1 → 6), chaque numéro correspondant à un pack ; en
  * bas, la fiche complète du pack sélectionné — modules verrouillés, modules
- * ajoutables, option vente sans stock. L'info « i » de la fiche ouvre la boîte
- * de détail du profil.
+ * ajoutables et, en profil personnalisé, l'option vente sans stock. L'info
+ * « i » de la fiche ouvre la boîte de détail du profil.
  */
 @Composable
 internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
@@ -125,11 +125,13 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         ),
     )
     var detailProfil by rememberSaveable { mutableStateOf<String?>(null) }
+    // Le bouton reste actif : en cas de sélection absente ou incohérente,
+    // le clic affiche le message d'erreur de l'étape au lieu de laisser un
+    // bouton grisé dont personne ne comprendrait la raison.
     OnbScaffold(
         titreRes = R.string.obn_profil_titre,
         sousTitreRes = R.string.obn_profil_sous,
         viewModel = viewModel,
-        boutonActive = viewModel.profilEcranValide(),
         onRetour = viewModel::precedent,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
@@ -547,37 +549,44 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
             Spacer(Modifier.height(9.dp))
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.18f))
             Spacer(Modifier.height(9.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.obn_vente_sans_stock),
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MissaInk,
-                    )
-                    Text(
-                        text = stringResource(R.string.obn_vente_sans_stock_sous),
-                        fontSize = 11.sp,
-                        color = MissaMuted,
+            // L'option « vente sans stock » n'a de sens que si l'utilisateur
+            // compose lui-même ses modules (profil Personnalisé) et y a la
+            // Vente active : dans un pack figé, la présence du Stock est
+            // tranchée par le pack lui-même — un pack projets ou services
+            // vend sans stock de par sa nature, l'option n'a pas à se poser.
+            if (profil == ProfilActivite.CUSTOM && ModuleCode.VEN in viewModel.modulesMetier()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.obn_vente_sans_stock),
+                            fontSize = 12.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MissaInk,
+                        )
+                        Text(
+                            text = stringResource(R.string.obn_vente_sans_stock_sous),
+                            fontSize = 11.sp,
+                            color = MissaMuted,
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Switch(
+                        checked = viewModel.venteSansStock,
+                        onCheckedChange = { viewModel.basculerVenteSansStock() },
+                        colors = SwitchDefaults.colors(checkedTrackColor = BrandBlue),
                     )
                 }
-                Spacer(Modifier.width(10.dp))
-                Switch(
-                    checked = viewModel.venteSansStock,
-                    onCheckedChange = { viewModel.basculerVenteSansStock() },
-                    colors = SwitchDefaults.colors(checkedTrackColor = BrandBlue),
-                )
-            }
-            if (viewModel.erreurRes == R.string.obn_stock_requis) {
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = stringResource(R.string.obn_stock_requis),
-                    fontSize = 11.5.sp,
-                    color = Red40,
-                )
+                if (viewModel.erreurRes == R.string.obn_stock_requis) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.obn_stock_requis),
+                        fontSize = 11.5.sp,
+                        color = Red40,
+                    )
+                }
             }
         }
     }

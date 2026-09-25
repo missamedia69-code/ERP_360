@@ -76,7 +76,7 @@ fun MissaBarreModules(
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 8.dp),
+            .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 4.dp),
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
