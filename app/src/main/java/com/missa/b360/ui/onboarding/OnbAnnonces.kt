@@ -33,14 +33,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
@@ -119,7 +117,7 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-            OnbAnnoncesHero()
+            OnbAnnoncesHero(langue = viewModel.langue)
             OnbAvantagesCarte()
             OnbEssaiBanniere()
         }
@@ -159,8 +157,11 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
  * les textes conservent la direction de lecture de leur langue.
  */
 @Composable
-private fun OnbAnnoncesHero() {
-    val rtl = LocalLayoutDirection.current == LayoutDirection.RTL
+private fun OnbAnnoncesHero(langue: String) {
+    // Parmi les cinq locales de l'application, seul l'arabe est RTL : la
+    // détection par la langue est déterministe (la langue est appliquée en
+    // direct à l'interface dès l'écran de bienvenue).
+    val rtl = langue.substringBefore('-').lowercase() == "ar"
     Box(
         modifier = Modifier
             .fillMaxWidth()
