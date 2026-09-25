@@ -4,16 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.LayoutDirection
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.layoutDirection
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,6 +40,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
@@ -153,18 +153,18 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
  * l'application — slogan et accroche — se superposent, traduits dans les
  * cinq langues.
  *
- * L'illustration garde sa mise en page physique (LTR) dans toutes les
- * langues ; les textes superposés conservent la direction de lecture de
- * leur langue.
+ * L'illustration est un actif de marque à mise en page physique : la zone
+ * de texte reste en bas à gauche de l'écran dans toutes les langues, y
+ * compris en arabe (RTL) où l'alignement « End » est physiquement à gauche ;
+ * les textes conservent la direction de lecture de leur langue.
  */
 @Composable
 private fun OnbAnnoncesHero() {
-    val direction = LocalLayoutDirection.current
+    val rtl = LocalLayoutDirection.current == LayoutDirection.RTL
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1341f / 1173f)
-            .layoutDirection(LayoutDirection.LTR),
+            .aspectRatio(1341f / 1173f),
     ) {
         Image(
             painter = painterResource(R.drawable.hero_annonce),
@@ -174,10 +174,13 @@ private fun OnbAnnoncesHero() {
         )
         Column(
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 24.dp, bottom = 26.dp)
-                .fillMaxWidth(0.52f)
-                .layoutDirection(direction),
+                .align(if (rtl) Alignment.BottomEnd else Alignment.BottomStart)
+                .padding(
+                    start = if (rtl) 0.dp else 24.dp,
+                    end = if (rtl) 24.dp else 0.dp,
+                    bottom = 26.dp,
+                )
+                .fillMaxWidth(0.52f),
             horizontalAlignment = Alignment.Start,
         ) {
             Text(
@@ -414,7 +417,7 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
             .clip(RoundedCornerShape(14.dp))
             .background(BrandBlue)
             .clickable(onClickLabel = libelle, role = Role.Button, onClick = onClick),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
