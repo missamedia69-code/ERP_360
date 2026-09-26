@@ -98,7 +98,7 @@ Changement à chaud (per-app language). Deux garde-fous en CI :
 
 ## 🎨 Skills d'agent (design et engineering)
 
-Le dépôt embarque **290 skills** au format [Agent Skills](https://agentskills.io) dans
+Le dépôt embarque **407 skills** au format [Agent Skills](https://agentskills.io) dans
 `.github/skills/` (un dossier par skill, `SKILL.md` + références) et un dossier de
 références esthétiques (`design-references/`) :
 
@@ -114,6 +114,10 @@ références esthétiques (`design-references/`) :
 - **Création de documents** (5) : `docx`, `pdf`, `pptx`, `xlsx`, `canvas-design` (Anthropic).
 - **Engineering production-grade** (40, Addy Osmani + superpowers) : revue de code,
   TDD, debugging systématique, performance, planification, livraison.
+- **Processus UX** (117, lot 3 de l'article UI/UX) : `interface-design` (cohérence
+  entre sessions), `ui-refactor` (Refactoring UI), `ux-heuristics` (Nielsen),
+  `design-sprint`, `hooked-ux` (rétention), `apple-hig-design`, et les 111 skills
+  d'Owl-Listener/designer-skills (recherche → handoff).
 - **Android / Kotlin / Compose** (22, lot initial) : architecture, ViewModel, tests,
   accessibilité, coroutines, Gradle, composables.
 

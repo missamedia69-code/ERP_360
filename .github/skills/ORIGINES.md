@@ -42,8 +42,21 @@ Skills copiés depuis des dépôts open source (format Agent Skills, agentskills
 | vercel-find-skills | github.com/vercel-labs/skills | Vercel (officiel) |
 | anydesign (image/URL/Figma → `design.md` structuré) | github.com/uxKero/anydesign | uxKero |
 
+## Design / UX process (lot 3 — 117 skills, article « 20 Best Claude Code Skills for UI/UX »)
+
+| Dossier | Source | Auteur |
+|---|---|---|
+| interface-design (système de design persistant `system.md`, cohérence entre sessions) | github.com/Dammyjay93/interface-design | Dammyjay93 |
+| ui-refactor (méthode Refactoring UI : audit hiérarchie visuelle, espacements, ombres, palette) | github.com/LovroPodobnik/refactoring-ui-skill | LovroPodobnik |
+| ux-heuristics (10 heuristiques de Nielsen + lois de Krug, sévérité), design-sprint (sprint 5 jours Google Ventures), hooked-ux (modèle Hook de rétention) | github.com/wondelai/skills | wondelai |
+| apple-hig-design (HIG Apple : Liquid Glass, SF Symbols, typographie, haptics, prototypage UI) | github.com/rshankras/claude-code-apple-skills (`skills/design/`) | rshankras |
+| 111 skills du cycle design complet : design-research, ux-strategy, design-systems, ui-design, interaction-design, prototyping-testing, design-ops, designer-toolkit, visual-critique | github.com/Owl-Listener/designer-skills | Owl-Listener |
+
 ## Notes de curation
 
+- wondelai/skills : marketplace de 72 skills — seules les 3 skills UX de l'article sont installées (pointeur vers le repo pour le reste).
+- rshankras/claude-code-apple-skills : seule la skill `design/` (HIG) est installée ; le repo couvre aussi App Store, Core ML, Swift…
+- Scan de sécurité léger effectué sur le lot 3 (recommandation Snyk de l'article : 36 % de skills contenant des injections) : aucun payload suspect.
 - `frontend-design` de seb1n non repris : doublon de `frontend-design` officiel (Anthropic), déjà plus complet.
 - `test-driven-development` de superpowers renommé `superpowers-test-driven-development` pour éviter le doublon avec Addy Osmani.
 - La skill `figma` citée dans l'article n'existe plus dans `anthropics/skills` (repo mis à jour) — remplacée par les 14 skills officielles de `figma/mcp-server-guide`.
