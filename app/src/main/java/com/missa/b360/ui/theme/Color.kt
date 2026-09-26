@@ -27,7 +27,8 @@ val ProfileViolet = Color(0xFF8B5CF6)
 /** Vert de la tendance positive, plus vif que le vert de marque. */
 val TendrePositive = Color(0xFF16A34A)
 
-// Alerte.
+// Alerte : ton clair de surface et premier plan foncé (contraste AA).
+val Red20 = Color(0xFFB42318)
 val Red40 = Color(0xFFEC5A67)
 val Red80 = Color(0xFFFFE8EA)
 

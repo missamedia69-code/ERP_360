@@ -531,6 +531,7 @@
     <string name="ob_terminer">开始使用 Missa 360</string>
 
     <string name="lock_title">输入您的 PIN 码</string>
+    <string name="lock_pin_progress">PIN 输入：已输入 %1$d / %2$d 位数字。</string>
     <string name="lock_essais_restants">PIN 码错误 — 锁定前还剩 %1$d 次尝试机会。</string>
     <string name="lock_bloque">尝试次数过多。请几分钟后再试。</string>
     <string name="clients_recherche">搜索客户…</string>

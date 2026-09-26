@@ -531,6 +531,7 @@
     <string name="ob_terminer">Start using Missa 360</string>
 
     <string name="lock_title">Enter your PIN</string>
+    <string name="lock_pin_progress">PIN entry: %1$d of %2$d digits entered.</string>
     <string name="lock_essais_restants">Wrong PIN — %1$d attempt(s) left before lockout.</string>
     <string name="lock_bloque">Too many attempts. Try again in a few minutes.</string>
     <string name="adm_sauvegarder">Save</string>

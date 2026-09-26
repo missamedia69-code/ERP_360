@@ -531,6 +531,7 @@
     <string name="ob_terminer">البدء في استخدام Missa 360</string>
 
     <string name="lock_title">أدخل رمز PIN</string>
+    <string name="lock_pin_progress">إدخال PIN: تم إدخال %1$d من أصل %2$d أرقام.</string>
     <string name="lock_essais_restants">رمز PIN خاطئ — بقي %1$d محاولة قبل القفل.</string>
     <string name="lock_bloque">محاولات كثيرة جداً. أعد المحاولة بعد بضع دقائق.</string>
     <string name="clients_recherche">البحث عن عميل…</string>

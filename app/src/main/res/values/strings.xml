@@ -542,6 +542,7 @@
 
     <!-- Verrou PIN -->
     <string name="lock_title">Entrez votre PIN</string>
+    <string name="lock_pin_progress">Code PIN : %1$d / %2$d chiffres saisis.</string>
     <string name="lock_essais_restants">PIN incorrect — %1$d essai(s) restant(s) avant blocage.</string>
     <string name="lock_bloque">Trop de tentatives. Réessayez dans quelques minutes.</string>
     <!-- Phase C — Administration & Paramétrage (module 9.1) -->
