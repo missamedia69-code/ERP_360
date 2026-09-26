@@ -96,6 +96,26 @@ Changement à chaud (per-app language). Deux garde-fous en CI :
 
 ---
 
+## 🎨 Skills d'agent (design et engineering)
+
+Le dépôt embarque **74 skills** au format [Agent Skills](https://agentskills.io) dans
+`.github/skills/` (un dossier par skill, `SKILL.md` + références) et un dossier de
+références esthétiques (`design-references/`) :
+
+- **Design / UI-UX** (30 skills) : `ui-ux-pro-max` (design system automatique),
+  `frontend-design` (Anthropic), familles esthétiques `taste-skill` / `minimalist` / `soft` /
+  `brutalist`, `design-review`, `design-consultation`, `devex-review`, anti-« AI slop »
+  (`no-ai-design-slop`, `audit-ai-design-slop`), `logo-design`, `wireframing`,
+  `user-flow-mapping`, `accessibility-testing`, `theme-factory`, `design-system`, etc.
+- **Création de documents** : `docx`, `pdf`, `pptx`, `xlsx` (Anthropic), `canvas-design`.
+- **Engineering production-grade** (40 skills, Addy Osmani + superpowers) : revue de code,
+  TDD, debugging systématique, performance, planification, livraison.
+
+Origines et auteurs : [.github/skills/ORIGINES.md](.github/skills/ORIGINES.md) —
+utilisation : demander « applique le skill `<nom>` » à l'agent dans la session.
+
+---
+
 ## 🛠️ Stack technique
 
 | Couche | Choix |
@@ -215,53 +235,4 @@ sur `ProductType` via `ProduitRules`) :
 | Phase | Contenu | État |
 |---|---|---|
 | **A — Socle** | Gradle, Hilt, Room, DataStore, PIN, Licence, Journal, Séquences, Nav | ✅ |
-| **B — Onboarding** | bienvenue/langue → configuration → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK + vente sans stock) |
-| **C — Accueil** | `HomeScreen` (4 KPI + 8 actions + résumé + activités) + barre 5 items + splash vidéo | ✅ |
-| **D — Placeholders** | Écrans en placeholder cohérent pour repartir propre | ✅ (jalon passé — reconstruction livrée module par module) |
-| **E — Stock** | Hub Stock (valeur, alertes, actions) + articles, mouvements, transferts, inventaires | ✅ **livré** |
-| **F — Achats** | Hub Achats (commandes, réceptions, factures, règlements) + Fournisseurs | ✅ **livré** |
-| **G — Ventes** | Vente directe + historique ✅ ; devis → commande → facture et retours/avoirs ⏳ (règles + tests déjà en main) | 🟡 en cours |
-| **H+** | Écrans réels des modules support (Livraison … Reporting, Tâches) ✅ ; Admin partiel (Licence, Sauvegarde, Journal, Utilisateurs, À propos ⏳) ; Notifications ⏳ ; liste d'opérations Finances ⏳ | 🟡 en cours |
-
----
-
-## 🚀 Build & lancement
-
-Prérequis : **Android Studio Quail 3 | 2026.1.3+** (AGP 9.4) et JDK 21.
-
-```bash
-git clone -b main https://github.com/missamedia69-code/ERP_360.git
-./gradlew assembleDebug
-./gradlew testDebugUnitTest          # 37 fichiers de test, 373 tests JVM
-python3 .github/scripts/verifier_traductions.py
-python3 .github/scripts/verifier_cles_manquantes.py
-```
-
-> Après `git clean -fdx`, recrée `local.properties` :
-> `sdk.dir=<chemin de ton SDK Android>` — par exemple `D:/Android_Studio` sous Windows
-> ou `~/Android/Sdk` sous Linux/macOS.
-
----
-
-## 🔁 Intégration continue
-
-`.github/workflows/android.yml` se déclenche sur toute poussée vers `main` ou `arena/**`, sur toute
-pull request et en manuel (`workflow_dispatch`) ; une poussée successive annule l'exécution
-précédente de la même branche (`concurrency`). Chaque exécution enchaîne :
-
-| Étape | Ce qu'elle garantit |
-|---|---|
-| **Traductions** | 5 `strings.xml` parité parfaite (1 622 clés chacune) |
-| **Clés manquantes** | toute clé `R.string` référencée existe (1 597 référencées) |
-| **Compilation et tests** | `assembleDebug` + `testDebugUnitTest` (JDK 21, SDK 36) |
-| **APK** | artefact `erp360-debug-apk` **et** release fixe [`apk-latest`](https://github.com/missamedia69-code/ERP_360/releases/download/apk-latest/app-debug.apk) mise à jour à chaque poussée verte |
-
-Dernière exécution verte vérifiée sur `main` : **35994735505** (commit `e40dd3f` —
-*fix(sauvegarde): restaure enfin les sauvegardes de l'application*).
-
-Téléchargement direct : onglet *Actions* → exécution → `erp360-debug-apk`, ou la release
-`apk-latest` (lien ci-dessus).
-
----
-
-*README tenu à jour à chaque boucle `Plan → Applique → Teste → Corrige`.*
+| **B — Onboarding** | bienvenue/langue → configuration → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK +
