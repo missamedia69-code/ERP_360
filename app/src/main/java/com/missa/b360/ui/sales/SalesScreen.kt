@@ -22,7 +22,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,6 +63,7 @@ import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.stock.ProductWithStock
 import com.missa.b360.ui.stock.fmtQuantite
 import com.missa.b360.ui.stock.fmtValeur
+import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -491,7 +492,7 @@ private fun SelecteurClient(
                 }
             },
         )
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             DropdownMenuItem(
                 text = { Text("+ " + stringResource(R.string.clients_nouveau_client), fontWeight = FontWeight.Bold, color = BleuVente) },
                 onClick = {
@@ -500,8 +501,23 @@ private fun SelecteurClient(
                 },
             )
             clients.forEach { client ->
+                val choisie = client.id == selectedClient?.id
                 DropdownMenuItem(
-                    text = { Text(client.nom, color = MissaInk) },
+                    leadingIcon = if (choisie) {
+                        Icon(
+                            painter = painterResource(Iv.Check),
+                            contentDescription = null,
+                            tint = BrandBlue,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    } else null,
+                    text = {
+                        Text(
+                            text = client.nom,
+                            color = if (choisie) BrandBlue else MissaInk,
+                            fontWeight = if (choisie) FontWeight.SemiBold else FontWeight.Normal,
+                        )
+                    },
                     onClick = {
                         onSelect(client)
                         ouvert = false
@@ -694,10 +710,25 @@ private fun SelecteurModePaiement(
             modifier = Modifier.fillMaxWidth(),
         )
         Box(Modifier.matchParentSize().clickable { ouvert = true })
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             modes.forEach { mode ->
+                val choisie = mode == selectionne
                 DropdownMenuItem(
-                    text = { Text(mode, color = MissaInk) },
+                    leadingIcon = if (choisie) {
+                        Icon(
+                            painter = painterResource(Iv.Check),
+                            contentDescription = null,
+                            tint = BrandBlue,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    } else null,
+                    text = {
+                        Text(
+                            text = mode,
+                            color = if (choisie) BrandBlue else MissaInk,
+                            fontWeight = if (choisie) FontWeight.SemiBold else FontWeight.Normal,
+                        )
+                    },
                     onClick = {
                         onChoix(mode)
                         ouvert = false

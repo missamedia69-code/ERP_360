@@ -27,7 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -710,7 +710,7 @@ private fun Selecteur(
                     }
                 },
         )
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             if (onNouveau != null) {
                 DropdownMenuItem(
                     text = {

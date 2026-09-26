@@ -917,7 +917,9 @@ private fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, s
     val selected = choices.firstOrNull { it.first == selectedId }?.second.orEmpty()
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }, modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(value = selected, onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable), label = { Text(stringResource(label)) }, placeholder = { Text(emptyLabel) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }, singleLine = true)
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) {
             androidx.compose.material3.DropdownMenuItem(text = { Text(emptyLabel) }, onClick = { onSelect(null); expanded = false })
             choices.forEach { (id, name) -> androidx.compose.material3.DropdownMenuItem(text = { Text(name) }, onClick = { onSelect(id); expanded = false }) }
         }
@@ -1291,7 +1293,9 @@ private fun ClientStringPicker(label: Int, choices: List<Pair<String, String>>, 
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         OutlinedTextField(value = choices.firstOrNull { it.first == selected }?.second.orEmpty(), onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable), label = { Text(stringResource(label)) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }, singleLine = true)
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) { choices.forEach { (id, text) -> androidx.compose.material3.DropdownMenuItem(text = { Text(text) }, onClick = { onSelect(id); expanded = false }) } }
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) { choices.forEach { (id, text) -> androidx.compose.material3.DropdownMenuItem(text = { Text(text) }, onClick = { onSelect(id); expanded = false }) } }
     }
 }
 

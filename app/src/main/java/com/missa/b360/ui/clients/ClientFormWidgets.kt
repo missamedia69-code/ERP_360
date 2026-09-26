@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.annotation.StringRes
 import com.missa.b360.R
@@ -53,7 +54,9 @@ fun ChampsCategorie(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catOuvert) },
             modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
-        ExposedDropdownMenu(expanded = catOuvert, onDismissRequest = { onExpanded(false) }) {
+        ExposedDropdownMenu(expanded = catOuvert, onDismissRequest = { onExpanded(false) },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) {
             DropdownMenuItem(
                 text = { Text("—") },
                 onClick = onClear,
@@ -92,7 +95,9 @@ fun ChampsBadge(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = badgeOuvert) },
             modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
-        ExposedDropdownMenu(expanded = badgeOuvert, onDismissRequest = { onExpanded(false) }) {
+        ExposedDropdownMenu(expanded = badgeOuvert, onDismissRequest = { onExpanded(false) },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) {
             DropdownMenuItem(
                 text = { Text("—") },
                 onClick = onClear,

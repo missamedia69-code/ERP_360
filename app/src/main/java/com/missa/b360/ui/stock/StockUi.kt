@@ -17,7 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -372,7 +372,7 @@ fun DropdownChamp(
                     }
                 },
         )
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             if (onNouveau != null) {
                 DropdownMenuItem(
                     text = {

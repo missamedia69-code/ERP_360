@@ -23,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -247,4 +249,27 @@ fun MissaEmptyState(
             action?.invoke()
         }
     }
+}
+
+/**
+ * Menu déroulant au style de l'application : carte blanche, coins arrondis
+ * 14 dp et ombre douce — même finition pour toutes les listes de sélection
+ * de l'application, quel que soit le module.
+ */
+@Composable
+fun MissaMenuDeroulant(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable DropdownMenuScope.() -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(14.dp),
+        containerColor = Color.White,
+        tonalElevation = 6.dp,
+        modifier = modifier,
+        content = content,
+    )
 }

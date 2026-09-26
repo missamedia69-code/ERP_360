@@ -323,7 +323,9 @@ private fun ClientTypeField(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = { expanded = false },,
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp
         ) {
             ClientType.entries.forEach { item ->
                 DropdownMenuItem(
@@ -465,7 +467,9 @@ private fun CountryCodeField(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
+            onDismissRequest = { onExpandedChange(false) },,
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp
         ) {
             if (paysFiltres.isEmpty()) {
                 DropdownMenuItem(
@@ -588,7 +592,9 @@ private fun CategoryField(
                 .fillMaxWidth()
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.clients_aucune_categorie)) },
                 onClick = {
@@ -635,7 +641,9 @@ private fun SiteField(
                 .fillMaxWidth()
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            shape = RoundedCornerShape(14.dp),
+            tonalElevation = 6.dp) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.clients_aucun_site)) },
                 onClick = {

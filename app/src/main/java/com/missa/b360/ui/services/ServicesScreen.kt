@@ -21,7 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -481,7 +481,7 @@ private fun DialogueNouvellePrestation(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
                         clients.forEach { cl ->
                             DropdownMenuItem(
                                 text = { Text(cl.nom, color = MissaInk) },

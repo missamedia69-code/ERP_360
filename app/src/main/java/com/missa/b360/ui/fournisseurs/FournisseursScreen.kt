@@ -29,7 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -1437,7 +1437,7 @@ private fun DialogueCompte(
                         },
                         modifier = Modifier.fillMaxWidth().clickable { operateurOuvert = true },
                     )
-                    DropdownMenu(expanded = operateurOuvert, onDismissRequest = { operateurOuvert = false }) {
+                    MissaMenuDeroulant(expanded = operateurOuvert, onDismissRequest = { operateurOuvert = false }) {
                         OPERATEURS_MOBILE.forEach { option ->
                             DropdownMenuItem(
                                 text = { Text(option, fontSize = 12.sp) },
@@ -1509,7 +1509,7 @@ private fun DialogueDocument(
                         trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
                         modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
                     )
-                    DropdownMenu(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
+                    MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
                         FournisseurDocType.entries.forEach { option ->
                             DropdownMenuItem(
                                 text = { Text(libelleDocument(option), fontSize = 12.sp) },
@@ -1637,7 +1637,7 @@ private fun DialogueArticle(
                         trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
                         modifier = Modifier.fillMaxWidth().clickable { produitOuvert = true },
                     )
-                    DropdownMenu(expanded = produitOuvert, onDismissRequest = { produitOuvert = false }) {
+                    MissaMenuDeroulant(expanded = produitOuvert, onDismissRequest = { produitOuvert = false }) {
                         candidats.forEach { produit ->
                             DropdownMenuItem(
                                 text = { Text(produit.nom, fontSize = 12.sp) },
@@ -1955,7 +1955,7 @@ private fun SelecteurSimple(
             trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
             modifier = Modifier.fillMaxWidth().clickable { ouvert = true },
         )
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             options.forEach { option ->
                 DropdownMenuItem(
                     text = { Text(option, fontSize = 12.sp) },
@@ -1984,7 +1984,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
                 trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
                 modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
             )
-            DropdownMenu(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
+            MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
                 TypeFournisseur.entries.forEach { option ->
                     DropdownMenuItem(
                         text = { Text(libelleType(option), fontSize = 12.sp) },
@@ -2484,7 +2484,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
                         trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
                         modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
                     )
-                    DropdownMenu(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
+                    MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
                         FournisseurDocType.entries.forEach { option ->
                             DropdownMenuItem(
                                 text = { Text(libelleDocument(option), fontSize = 12.sp) },

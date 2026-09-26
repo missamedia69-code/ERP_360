@@ -19,7 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
+import com.missa.b360.ui.components.MissaMenuDeroulant
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -417,7 +417,7 @@ private fun SelecteurProduitFini(
             modifier = Modifier.fillMaxWidth(),
         )
         Box(Modifier.matchParentSize().clickable { ouvert = true })
-        DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
             options.forEach { prod ->
                 DropdownMenuItem(
                     text = { Text(prod.nom, color = MissaInk) },
@@ -457,7 +457,7 @@ private fun DialogueAjoutComposant(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
                         options.forEach { opt ->
                             DropdownMenuItem(
                                 text = { Text("${opt.nom} (Stock: ${fmtQuantite(opt.stock)})", color = MissaInk) },

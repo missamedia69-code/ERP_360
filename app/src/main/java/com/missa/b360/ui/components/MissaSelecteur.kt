@@ -3,7 +3,9 @@ package com.missa.b360.ui.components
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +22,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -290,6 +295,10 @@ fun MissaSelecteurDialogue(
     LaunchedEffect(Unit) {
         if (indexCourant > 1) etatListe.scrollToItem(indexCourant - 1)
     }
+    // La boîte respecte la géométrie de l'application (coins 20dp) plutôt que
+    // le carré d'origine des dialogues Material : les listes s'intègrent mieux
+    // aux cartes de l'interface.
+    MaterialTheme(shapes = Shapes(extraLarge = RoundedCornerShape(20.dp))) {
     AlertDialog(
         onDismissRequest = onFermer,
         confirmButton = {
@@ -316,17 +325,45 @@ fun MissaSelecteurDialogue(
                                 fontSize = 12.sp,
                             )
                         },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(Iv.Search),
+                                contentDescription = null,
+                                tint = MissaMuted,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = BrandBlue,
+                            unfocusedBorderColor = MissaBorder,
+                            cursorColor = BrandBlue,
+                        ),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(10.dp))
                 }
                 if (visibles.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.selecteur_aucun),
-                        fontSize = 12.5.sp,
-                        color = MissaMuted,
-                        modifier = Modifier.padding(vertical = 12.dp),
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 18.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            painter = painterResource(Iv.Search),
+                            contentDescription = null,
+                            tint = MissaMuted.copy(alpha = 0.7f),
+                            modifier = Modifier.size(22.dp),
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(R.string.selecteur_aucun),
+                            fontSize = 13.sp,
+                            color = MissaMuted,
+                        )
+                    }
                 } else {
                     LazyColumn(
                         state = etatListe,
@@ -345,7 +382,8 @@ fun MissaSelecteurDialogue(
                 }
             }
         },
-    )
+        )
+    }
 }
 
 /** Une entrée de la boîte : pastille, titre (+ sous-titre) et coche si active. */
@@ -358,11 +396,18 @@ private fun MissaOptionLigne(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp)
+            .padding(vertical = 3.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(if (actif) MissaSoftBlue else MissaSurface)
+            // Liseré de marque sur la ligne active : la sélection se lit
+            // instantanément, même dans une liste longue.
+            .border(
+                if (actif) 1.dp else 0.dp,
+                if (actif) BrandBlue.copy(alpha = 0.45f) else Color.Transparent,
+                RoundedCornerShape(10.dp),
+            )
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (option.badge != null) {
@@ -403,7 +448,7 @@ private fun MissaOptionLigne(
                 painter = painterResource(Iv.Check),
                 contentDescription = null,
                 tint = BrandBlue,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(20.dp),
             )
         }
     }
