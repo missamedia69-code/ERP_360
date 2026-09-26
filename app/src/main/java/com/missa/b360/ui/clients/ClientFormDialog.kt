@@ -323,9 +323,9 @@ private fun ClientTypeField(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },,
+            onDismissRequest = { expanded = false },
             shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp
+            tonalElevation = 6.dp,
         ) {
             ClientType.entries.forEach { item ->
                 DropdownMenuItem(
@@ -467,9 +467,9 @@ private fun CountryCodeField(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },,
+            onDismissRequest = { onExpandedChange(false) },
             shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp
+            tonalElevation = 6.dp,
         ) {
             if (paysFiltres.isEmpty()) {
                 DropdownMenuItem(
