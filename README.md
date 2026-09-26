@@ -98,18 +98,24 @@ Changement à chaud (per-app language). Deux garde-fous en CI :
 
 ## 🎨 Skills d'agent (design et engineering)
 
-Le dépôt embarque **74 skills** au format [Agent Skills](https://agentskills.io) dans
+Le dépôt embarque **290 skills** au format [Agent Skills](https://agentskills.io) dans
 `.github/skills/` (un dossier par skill, `SKILL.md` + références) et un dossier de
 références esthétiques (`design-references/`) :
 
-- **Design / UI-UX** (30 skills) : `ui-ux-pro-max` (design system automatique),
-  `frontend-design` (Anthropic), familles esthétiques `taste-skill` / `minimalist` / `soft` /
-  `brutalist`, `design-review`, `design-consultation`, `devex-review`, anti-« AI slop »
-  (`no-ai-design-slop`, `audit-ai-design-slop`), `logo-design`, `wireframing`,
-  `user-flow-mapping`, `accessibility-testing`, `theme-factory`, `design-system`, etc.
-- **Création de documents** : `docx`, `pdf`, `pptx`, `xlsx` (Anthropic), `canvas-design`.
-- **Engineering production-grade** (40 skills, Addy Osmani + superpowers) : revue de code,
+- **Design / UI-UX / Motion** (~220 skills) : les 142 skills de MengTo/Skills
+  (web-design, 3D, média, animations), `ui-ux-pro-max` (design system automatique),
+  `frontend-design` (Anthropic), familles esthétiques `taste` / `minimalist` / `soft` /
+  `brutalist`, `design-review`, `design-consultation`, `devex-review`, anti-« AI slop »,
+  `logo-design`, `wireframing`, `user-flow-mapping`, `accessibility-testing`,
+  `theme-factory`, `design-system`…
+- **Skills officielles des éditeurs** (~50) : **Figma** (14, dont Figma→code 1:1),
+  **GSAP/GreenSock** (8), **Google Labs/Stitch** (16, design→code), **Remotion** (12,
+  vidéo), **Notion** (2), **Vercel** (1), **anydesign** (image/URL/Figma → `design.md`).
+- **Création de documents** (5) : `docx`, `pdf`, `pptx`, `xlsx`, `canvas-design` (Anthropic).
+- **Engineering production-grade** (40, Addy Osmani + superpowers) : revue de code,
   TDD, debugging systématique, performance, planification, livraison.
+- **Android / Kotlin / Compose** (22, lot initial) : architecture, ViewModel, tests,
+  accessibilité, coroutines, Gradle, composables.
 
 Origines et auteurs : [.github/skills/ORIGINES.md](.github/skills/ORIGINES.md) —
 utilisation : demander « applique le skill `<nom>` » à l'agent dans la session.
