@@ -504,12 +504,14 @@ private fun SelecteurClient(
                 val choisie = client.id == selectedClient?.id
                 DropdownMenuItem(
                     leadingIcon = if (choisie) {
-                        Icon(
-                            painter = painterResource(Iv.Check),
-                            contentDescription = null,
-                            tint = BrandBlue,
-                            modifier = Modifier.size(16.dp),
-                        )
+                        {
+                            Icon(
+                                painter = painterResource(Iv.Check),
+                                contentDescription = null,
+                                tint = BrandBlue,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                     } else null,
                     text = {
                         Text(
@@ -715,12 +717,14 @@ private fun SelecteurModePaiement(
                 val choisie = mode == selectionne
                 DropdownMenuItem(
                     leadingIcon = if (choisie) {
-                        Icon(
-                            painter = painterResource(Iv.Check),
-                            contentDescription = null,
-                            tint = BrandBlue,
-                            modifier = Modifier.size(16.dp),
-                        )
+                        {
+                            Icon(
+                                painter = painterResource(Iv.Check),
+                                contentDescription = null,
+                                tint = BrandBlue,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                     } else null,
                     text = {
                         Text(
