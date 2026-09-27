@@ -459,26 +459,34 @@ private fun MainNavHost() {
         }
         // Vente
         composable(
-            route = "${AppModule.VENTE.route}?create={create}",
-            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
+            route = "${AppModule.VENTE.route}?create={create}&overdue={overdue}",
+            arguments = listOf(
+                navArgument("create") { type = NavType.BoolType; defaultValue = false },
+                navArgument("overdue") { type = NavType.BoolType; defaultValue = false },
+            ),
         ) { entry ->
             GuardedModule(AppModule.VENTE, activation, navController) {
                 SalesScreen(
                     onNavigate = { route -> navController.navigate(route) },
                     onOpenClientCreate = { navController.navigate("${AppModule.CLIENTS.route}?create=true") },
                     openCreate = entry.arguments?.getBoolean("create") == true,
+                    openOverdue = entry.arguments?.getBoolean("overdue") == true,
                 )
             }
         }
         // Achats
         composable(
-            route = "${AppModule.ACHATS.route}?create={create}",
-            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
+            route = "${AppModule.ACHATS.route}?create={create}&pending={pending}",
+            arguments = listOf(
+                navArgument("create") { type = NavType.BoolType; defaultValue = false },
+                navArgument("pending") { type = NavType.BoolType; defaultValue = false },
+            ),
         ) { entry ->
             GuardedModule(AppModule.ACHATS, activation, navController) {
                 PurchasesScreen(
                     onBack = { navController.popBackStack() },
                     openCreate = entry.arguments?.getBoolean("create") == true,
+                    openPending = entry.arguments?.getBoolean("pending") == true,
                 )
             }
         }

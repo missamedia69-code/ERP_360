@@ -35,8 +35,8 @@ internal object HomeNavigation {
     }
 
     fun rappel(rappel: Rappel): String = when (rappel) {
-        Rappel.FACTURES_EN_RETARD -> AppModule.VENTE.route
-        Rappel.COMMANDES_FOURNISSEUR -> AppModule.ACHATS.route
+        Rappel.FACTURES_EN_RETARD -> "${AppModule.VENTE.route}?overdue=true"
+        Rappel.COMMANDES_FOURNISSEUR -> "${AppModule.ACHATS.route}?pending=true"
         Rappel.RUPTURES_STOCK -> Routes.STOCK_ALERTES
         Rappel.NON_CONFORMITES -> AppModule.QUALITE.route
     }

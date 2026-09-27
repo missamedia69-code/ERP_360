@@ -1,6 +1,10 @@
 package com.missa.b360.core.domain.model
 
 import kotlinx.serialization.Serializable
+import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.OperationRecordEntity
+import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.numbering.DocType
 import kotlinx.serialization.json.Json
 import kotlin.math.abs
 
@@ -150,6 +154,15 @@ object AchatCommandeRules {
     fun commandeSoldee(commandeeParProduit: Map<Long, Double>, recuParProduit: Map<Long, Double>): Boolean =
         commandeeParProduit.all { (produitId, quantite) ->
             (recuParProduit[produitId] ?: 0.0) >= quantite - 1e-9
+        }
+
+    /** Brouillons qui sont réellement des bons de commande, pas des factures d'achat. */
+    fun commandesEnAttente(pieces: List<OperationRecordEntity>): List<OperationRecordEntity> =
+        pieces.filter {
+            it.module == OperationModule.ACHATS.name &&
+                it.status == OperationStatus.DRAFT.name &&
+                it.reference.startsWith(DocType.BON_COMMANDE.prefix) &&
+                CommandeAchatCodec.decode(it.notes) != null
         }
 }
 

@@ -64,6 +64,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.ProductType
+import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.AchatReportRules
 import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.CommandeAchatLigne
@@ -123,7 +124,7 @@ private fun typeDe(piece: OperationRecordEntity): TypePiece {
  * Annulation = contre-passation transactionnelle, jamais de suppression.
  */
 @Composable
-fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false) {
+fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false, openPending: Boolean = false) {
     val vm: PurchasesViewModel = hiltViewModel()
     var ecran by remember { mutableStateOf(if (openCreate) EcranAchat.FACTURE else EcranAchat.LISTE) }
     var pieceARegler by remember { mutableStateOf<OperationRecordEntity?>(null) }
@@ -136,6 +137,7 @@ fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false) {
             vm = vm,
             onBack = onBack,
             actionResult = actionResult,
+            openPending = openPending,
             onNouvelleFacture = {
                 vm.clearCart()
                 ecran = EcranAchat.FACTURE
@@ -217,6 +219,7 @@ private fun ListeAchats(
     vm: PurchasesViewModel,
     onBack: () -> Unit,
     actionResult: PurchasesViewModel.ActionAchatResult?,
+    openPending: Boolean,
     onNouvelleFacture: () -> Unit,
     onNouvelleCommande: () -> Unit,
     onReporting: () -> Unit,
@@ -240,6 +243,10 @@ private fun ListeAchats(
         ((piece.amount ?: 0.0) - (payload?.paidAmount ?: 0.0)).coerceAtLeast(0.0)
     }
     val brouillons = pieces.count { it.status == OperationStatus.DRAFT.name }
+    var afficherCommandesEnAttente by remember(openPending) { mutableStateOf(openPending) }
+    val piecesAffichees = if (afficherCommandesEnAttente) {
+        AchatCommandeRules.commandesEnAttente(pieces)
+    } else pieces
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -309,6 +316,27 @@ private fun ListeAchats(
                         }
                     }
                 }
+                if (afficherCommandesEnAttente) {
+                    item(key = "commandes-attente-banner") {
+                        Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF7E6)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    stringResource(R.string.ach_pending_banner, piecesAffichees.size),
+                                    color = MissaInk,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(onClick = { afficherCommandesEnAttente = false }) {
+                                    Text(stringResource(R.string.ach_show_all))
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
@@ -327,7 +355,21 @@ private fun ListeAchats(
                         }
                     }
                 }
-                items(pieces, key = { it.id }) { piece ->
+                if (piecesAffichees.isEmpty()) {
+                    item(key = "commandes-attente-empty") {
+                        MissaEmptyState(
+                            icon = Iv.CheckCircle,
+                            title = stringResource(R.string.ach_pending_empty),
+                            description = stringResource(R.string.ach_pending_empty_desc),
+                            action = {
+                                TextButton(onClick = { afficherCommandesEnAttente = false }) {
+                                    Text(stringResource(R.string.ach_show_all))
+                                }
+                            },
+                        )
+                    }
+                }
+                items(piecesAffichees, key = { it.id }) { piece ->
                     CartePiece(
                         piece = piece,
                         devise = devise,

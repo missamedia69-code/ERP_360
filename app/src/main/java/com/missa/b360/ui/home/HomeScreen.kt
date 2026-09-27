@@ -268,10 +268,10 @@ fun HomeScreen(
             actionsRapidesSelection = actionsEpingles,
             onPersonnaliser = { showPersonnaliser = true },
             modifier = Modifier.fillMaxSize(),
-            onNavigate = { navController.navigate(it) },
+            onNavigate = { route -> navController.navigate(route) { launchSingleTop = true } },
             onSupport = onSupport,
             notificationCount = nonLues,
-            onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) },
+            onNotificationClick = { navController.navigate(Routes.NOTIFICATIONS) { launchSingleTop = true } },
             onSelectionJour = viewModel::selectionnerJour,
         )
     }

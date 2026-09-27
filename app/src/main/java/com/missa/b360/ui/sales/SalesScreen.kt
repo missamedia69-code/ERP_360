@@ -56,6 +56,7 @@ import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
+import com.missa.b360.core.domain.model.RappelsRules
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
@@ -81,6 +82,7 @@ fun SalesScreen(
     onNavigate: (String) -> Unit = {},
     onOpenClientCreate: () -> Unit = {},
     openCreate: Boolean = false,
+    openOverdue: Boolean = false,
 ) {
     val vm: SalesViewModel = hiltViewModel()
     var ecran by remember { mutableStateOf(if (openCreate) EcranVente.FACTURE else EcranVente.LISTE) }
@@ -102,6 +104,7 @@ fun SalesScreen(
             },
             onOuvrirFacture = { ecran = EcranVente.FACTURE },
             onAnnuler = { pieceAAnnuler = it },
+            openOverdue = openOverdue,
         )
         EcranVente.FACTURE -> FormulaireVente(
             vm = vm,
@@ -136,6 +139,7 @@ private fun ListeVentes(
     onNouvelleVente: () -> Unit,
     onOuvrirFacture: () -> Unit,
     onAnnuler: (OperationRecordEntity) -> Unit,
+    openOverdue: Boolean,
 ) {
     val pieces by vm.history.collectAsStateWithLifecycle(initialValue = emptyList())
     val clients by vm.clients.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -145,6 +149,10 @@ private fun ListeVentes(
     val caTotal = validees.sumOf { it.amount ?: 0.0 }
     val brouillons = pieces.count { it.status == OperationStatus.DRAFT.name }
     var filtreStatut by remember { mutableStateOf<String?>(null) }
+    var afficherRetards by remember(openOverdue) { mutableStateOf(openOverdue) }
+    val idsFacturesEnRetard = remember(pieces) {
+        RappelsRules.facturesEnRetard(pieces, System.currentTimeMillis()).map { it.first.id }.toSet()
+    }
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -192,6 +200,27 @@ private fun ListeVentes(
                         }
                     }
                 }
+                if (afficherRetards) {
+                    item(key = "factures-en-retard-banner") {
+                        Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF1E8)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    stringResource(R.string.sales_overdue_title, idsFacturesEnRetard.size),
+                                    color = Color(0xFF9A3412),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(onClick = { afficherRetards = false; filtreStatut = null }) {
+                                    Text(stringResource(R.string.sales_show_all))
+                                }
+                            }
+                        }
+                    }
+                }
                 // --- Structure Matricielle 4 Tuiles ---
                 item {
                     Row(
@@ -202,9 +231,9 @@ private fun ListeVentes(
                             icone = Iv.ShoppingCart,
                             titre = stringResource(R.string.crm_tuile_tous),
                             sousTitre = pieces.size.toString(),
-                            estActif = filtreStatut == null,
+                            estActif = filtreStatut == null && !afficherRetards,
                             modifier = Modifier.weight(1f),
-                            onClick = { filtreStatut = null },
+                            onClick = { afficherRetards = false; filtreStatut = null },
                         )
                         TuileVente(
                             icone = Iv.CheckCircle,
@@ -212,7 +241,7 @@ private fun ListeVentes(
                             sousTitre = validees.size.toString(),
                             estActif = filtreStatut == OperationStatus.VALIDATED.name,
                             modifier = Modifier.weight(1f),
-                            onClick = { filtreStatut = OperationStatus.VALIDATED.name },
+                            onClick = { afficherRetards = false; filtreStatut = OperationStatus.VALIDATED.name },
                         )
                         TuileVente(
                             icone = Iv.Edit,
@@ -220,7 +249,7 @@ private fun ListeVentes(
                             sousTitre = brouillons.toString(),
                             estActif = filtreStatut == OperationStatus.DRAFT.name,
                             modifier = Modifier.weight(1f),
-                            onClick = { filtreStatut = OperationStatus.DRAFT.name },
+                            onClick = { afficherRetards = false; filtreStatut = OperationStatus.DRAFT.name },
                         )
                         TuileVente(
                             icone = Iv.Add,
@@ -232,7 +261,25 @@ private fun ListeVentes(
                         )
                     }
                 }
-                val piecesAffichees = pieces.filter { filtreStatut == null || it.status == filtreStatut }
+                val piecesAffichees = when {
+                    afficherRetards -> pieces.filter { it.id in idsFacturesEnRetard }
+                    filtreStatut != null -> pieces.filter { it.status == filtreStatut }
+                    else -> pieces
+                }
+                if (piecesAffichees.isEmpty()) {
+                    item(key = "factures-en-retard-empty") {
+                        MissaEmptyState(
+                            icon = Iv.CheckCircle,
+                            title = stringResource(if (afficherRetards) R.string.sales_overdue_empty else R.string.sales_filter_empty),
+                            description = stringResource(if (afficherRetards) R.string.sales_overdue_empty_desc else R.string.sales_empty_desc),
+                            action = {
+                                TextButton(onClick = { afficherRetards = false; filtreStatut = null }) {
+                                    Text(stringResource(R.string.sales_show_all))
+                                }
+                            },
+                        )
+                    }
+                }
                 items(piecesAffichees, key = { it.id }) { piece ->
                     CartePieceVente(
                         piece = piece,

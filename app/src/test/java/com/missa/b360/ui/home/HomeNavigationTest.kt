@@ -13,10 +13,17 @@ class HomeNavigationTest {
         AccueilActionKeys.ALL.forEach { key ->
             assertNotNull("No destination for quick action $key", HomeNavigation.quickAction(key))
         }
-        assertEquals("${AppModule.LIVRAISON.route}?create=true", HomeNavigation.quickAction(AccueilActionKeys.LIVRAISON))
-        assertEquals(Routes.STOCK_PRODUCT_FORM, HomeNavigation.quickAction(AccueilActionKeys.PRODUIT))
-        assertEquals("${Routes.DEVIS_COMMANDE}?create=true", HomeNavigation.quickAction(AccueilActionKeys.DEVIS))
-        assertEquals("${AppModule.VENTE.route}?create=true", HomeNavigation.quickAction(AccueilActionKeys.FACTURE))
+        val expected = mapOf(
+            AccueilActionKeys.VENTE to "${AppModule.VENTE.route}?create=true",
+            AccueilActionKeys.ACHAT to "${AppModule.ACHATS.route}?create=true",
+            AccueilActionKeys.CLIENT to "${AppModule.CLIENTS.route}?create=true",
+            AccueilActionKeys.FOURNISSEUR to "${AppModule.FOURNISSEURS.route}?create=true",
+            AccueilActionKeys.PRODUIT to Routes.STOCK_PRODUCT_FORM,
+            AccueilActionKeys.LIVRAISON to "${AppModule.LIVRAISON.route}?create=true",
+            AccueilActionKeys.DEVIS to "${Routes.DEVIS_COMMANDE}?create=true",
+            AccueilActionKeys.FACTURE to "${AppModule.VENTE.route}?create=true",
+        )
+        expected.forEach { (key, route) -> assertEquals("Wrong destination for $key", route, HomeNavigation.quickAction(key)) }
         assertEquals(null, HomeNavigation.quickAction("unknown"))
     }
 
@@ -43,8 +50,8 @@ class HomeNavigationTest {
 
     @Test
     fun remindersOpenTheirOwningWorkflows() {
-        assertEquals(AppModule.VENTE.route, HomeNavigation.rappel(HomeNavigation.Rappel.FACTURES_EN_RETARD))
-        assertEquals(AppModule.ACHATS.route, HomeNavigation.rappel(HomeNavigation.Rappel.COMMANDES_FOURNISSEUR))
+        assertEquals("${AppModule.VENTE.route}?overdue=true", HomeNavigation.rappel(HomeNavigation.Rappel.FACTURES_EN_RETARD))
+        assertEquals("${AppModule.ACHATS.route}?pending=true", HomeNavigation.rappel(HomeNavigation.Rappel.COMMANDES_FOURNISSEUR))
         assertEquals(Routes.STOCK_ALERTES, HomeNavigation.rappel(HomeNavigation.Rappel.RUPTURES_STOCK))
         assertEquals(AppModule.QUALITE.route, HomeNavigation.rappel(HomeNavigation.Rappel.NON_CONFORMITES))
     }
