@@ -532,6 +532,7 @@
 
     <string name="lock_title">Introduzca su PIN</string>
     <string name="lock_pin_progress">PIN: %1$d de %2$d dígitos introducidos.</string>
+    <string name="lock_verifying">Verificando el PIN…</string>
     <string name="lock_essais_restants">PIN incorrecto — quedan %1$d intento(s) antes del bloqueo.</string>
     <string name="lock_bloque">Demasiados intentos. Vuelva a intentarlo en unos minutos.</string>
     <string name="clients_recherche">Buscar un cliente…</string>

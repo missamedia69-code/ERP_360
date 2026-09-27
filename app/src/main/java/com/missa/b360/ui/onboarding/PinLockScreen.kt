@@ -212,19 +212,9 @@ private fun LockBrandHeader() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Surface(
-            shape = RoundedCornerShape(18.dp),
-            color = MissaSurface,
-            border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.7f)),
-            shadowElevation = 2.dp,
-        ) {
-            Box(
-                modifier = Modifier.padding(7.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                MissaBrandMark(size = 48.dp)
-            }
-        }
+        // Le logo porte déjà son propre cadre carré arrondi : pas de second
+        // médaillon autour, pour garder une seule bordure nette.
+        MissaBrandMark(size = 52.dp)
         Spacer(Modifier.width(12.dp))
         Text(
             text = stringResource(R.string.app_name),
@@ -296,11 +286,7 @@ private fun LockPinCard(
                 }
                 state.verificationEnCours -> {
                     Spacer(Modifier.height(11.dp))
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        color = BrandBlue,
-                        strokeWidth = 2.dp,
-                    )
+                    LockVerificationStatus()
                 }
             }
         }
@@ -376,6 +362,33 @@ private fun LockStateMessage(
     }
 }
 
+/** État de vérification explicite, annoncé aux lecteurs d'écran. */
+@Composable
+private fun LockVerificationStatus() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) {
+                liveRegion = LiveRegionMode.Polite
+            },
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(18.dp),
+            color = BrandBlue,
+            strokeWidth = 2.dp,
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.lock_verifying),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = BrandBlue,
+        )
+    }
+}
+
 /** Pavé numérique centré, quatre rangées, le 0 sur sa colonne centrale. */
 @Composable
 private fun Keypad(
@@ -392,7 +405,7 @@ private fun Keypad(
             .widthIn(max = 340.dp)
             .fillMaxWidth(),
         shape = forme,
-        color = MissaSurface,
+        color = MissaSoftBlue,
         border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.65f)),
         shadowElevation = 2.dp,
     ) {
