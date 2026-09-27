@@ -683,6 +683,7 @@
 
     
     <string name="home_close">Close</string>
+    <string name="home_open_menu">Open menu</string>
     <string name="home_settings">Settings</string>
     <string name="home_licence_activation">Licence &amp; activation</string>
     <string name="home_sites_sales">Sites &amp; points of sale</string>
@@ -1710,4 +1711,25 @@
     <string name="st_creer_categorie_invite">Create a category to classify this item</string>
     <string name="tre_aucun_compte">No account available</string>
     <string name="tre_creer_compte_invite">Create an account to record this transaction</string>
+
+    <string name="devis_screen_title">Quotes &amp; orders</string>
+    <string name="devis_page_desc">Create quotes and turn them into orders.</string>
+    <string name="devis_new">New quote</string>
+    <string name="devis_empty">No quotes yet. Create one to get started.</string>
+    <string name="devis_convert">Convert to order</string>
+    <string name="devis_error_select_client">Select a customer.</string>
+    <string name="devis_error_line">Enter a valid description and amount.</string>
+    <string name="devis_result_created">Quote created.</string>
+    <string name="devis_result_readonly">This action is unavailable in read-only mode.</string>
+    <string name="devis_result_order">Quote converted to order.</string>
+    <string name="devis_result_invalid">Unable to process this quote.</string>
+    <string name="devis_select_client">Choose a customer</string>
+    <string name="devis_line_label">Description</string>
+    <string name="devis_total">Amount including tax</string>
+    <string name="devis_save">Save</string>
+    <string name="devis_cancel">Cancel</string>
+    <string name="devis_result_already_order">This quote has already been converted to an order.</string>
+    <string name="devis_quotes_header">Quotes</string>
+    <string name="devis_orders_header">Orders</string>
+    <string name="devis_no_clients">No active customers. Create a customer first to prepare a quote.</string>
 </resources>

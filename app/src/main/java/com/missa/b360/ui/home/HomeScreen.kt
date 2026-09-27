@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -87,7 +88,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.missa.b360.BuildConfig
 import com.missa.b360.R
-import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.ModuleCode
@@ -173,7 +173,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.ShoppingCart,
         tint = MissaInk,
         bg = Color(0xFFEFF6FF),
-        route = AppModule.VENTE.createRoute(),
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.VENTE)),
         module = ModuleCode.VEN,
     ),
     AccueilActionDef(
@@ -182,7 +182,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.CartArrowDown,
         tint = MissaInk,
         bg = Color(0xFFFEF3C7),
-        route = AppModule.ACHATS.createRoute(),
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.ACHAT)),
         module = ModuleCode.ACH,
     ),
     AccueilActionDef(
@@ -191,7 +191,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.PersonAdd,
         tint = MissaInk,
         bg = Color(0xFFF3E8FF),
-        route = AppModule.CLIENTS.route + "?create=true",
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.CLIENT)),
         module = ModuleCode.VEN,
     ),
     AccueilActionDef(
@@ -200,7 +200,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.Handshake,
         tint = MissaInk,
         bg = Color(0xFFFCE7F3),
-        route = AppModule.FOURNISSEURS.createRoute(),
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FOURNISSEUR)),
         module = ModuleCode.ACH,
     ),
     AccueilActionDef(
@@ -209,7 +209,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.Inventory2,
         tint = MissaInk,
         bg = Color(0xFFCCFBF1),
-        route = Routes.STOCK_PRODUCT_FORM,
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.PRODUIT)),
         module = ModuleCode.STK,
     ),
     AccueilActionDef(
@@ -218,8 +218,8 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.LocalShipping,
         tint = MissaInk,
         bg = Color(0xFFE0E7FF),
-        route = Routes.STOCK_TRANSFER_FORM,
-        module = ModuleCode.STK,
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.LIVRAISON)),
+        module = ModuleCode.LOG,
     ),
     AccueilActionDef(
         key = AccueilActionKeys.DEVIS,
@@ -227,7 +227,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.Description,
         tint = MissaInk,
         bg = Color(0xFFDCFCE7),
-        route = "${Routes.OPERATION_FORM}?module=DEVIS",
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.DEVIS)),
         module = ModuleCode.VEN,
     ),
     AccueilActionDef(
@@ -236,7 +236,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         icon = Iv.RequestQuote,
         tint = MissaInk,
         bg = Color(0xFFFFE4E6),
-        route = "${Routes.OPERATION_FORM}?module=VENTE",
+        route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FACTURE)),
         module = ModuleCode.VEN,
     ),
 )
@@ -248,7 +248,6 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
 @Composable
 fun HomeScreen(
     navController: NavController,
-    onOuvrirMenu: () -> Unit,
     onSupport: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -890,13 +889,17 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(R.string.home_activites_recentes), color = HomeTextDark, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text(
-                    text = stringResource(R.string.home_see_all),
-                    color = HomeBlue,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onNavigate(AppModule.REPORTING.route) },
-                )
+                TextButton(
+                    onClick = { onNavigate(AppModule.REPORTING.route) },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.home_see_all),
+                        color = HomeBlue,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
             }
             Spacer(Modifier.height(10.dp))
             if (records.isEmpty()) {
@@ -928,7 +931,7 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                             else -> null
                         },
                         heure = DateUtils.formatDateHeure(rec.createdAt),
-                        onClick = { onNavigate(rec.module.appModuleRoute()) },
+                        onClick = { onNavigate(HomeNavigation.operation(rec.module)) },
                     )
                     if (idx < records.lastIndex) Spacer(Modifier.height(8.dp))
                 }
@@ -949,7 +952,11 @@ private fun AccueilActiviteRow(
     heure: String,
     onClick: () -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick).padding(vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = iconBg) {
             Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
         }
@@ -981,57 +988,81 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
     val ruptures = state.rupturesStock
     val hasAlert = factures > 0 || commandes > 0 || nc > 0 || ruptures > 0
     Surface(
-        modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         color = if (hasAlert) HomeBackground else Color.White,
-        border = BorderStroke(1.dp, if (hasAlert) HomeBorder else HomeBorder),
+        border = BorderStroke(1.dp, HomeBorder),
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = if (hasAlert) HomeBackground else HomeBackground) {
-                Box(contentAlignment = Alignment.Center) { Icon(painter = painterResource(Iv.Notifications), contentDescription = null, tint = if (hasAlert) ProfileOrange else HomeTextMuted, modifier = Modifier.size(18.dp)) }
-            }
-            Spacer(Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(R.string.home_rappels_importants), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(4.dp))
-                if (!hasAlert) {
-                    Text(text = stringResource(R.string.home_no_alerts), color = HomeTextMuted, fontSize = 11.sp)
-                } else {
-                    if (factures > 0) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(ProfileOrange))
-                            Spacer(Modifier.width(6.dp))
-                            Text(text = stringResource(R.string.home_overdue_invoices, factures), color = HomeTextDark, fontSize = 11.sp)
-                        }
-                        Spacer(Modifier.height(2.dp))
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(modifier = Modifier.size(34.dp), shape = CircleShape, color = Color.White) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(Iv.Notifications),
+                            contentDescription = null,
+                            tint = if (hasAlert) ProfileOrange else HomeTextMuted,
+                            modifier = Modifier.size(18.dp),
+                        )
                     }
-                    if (commandes > 0) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(ProfileOrange))
-                            Spacer(Modifier.width(6.dp))
-                            Text(text = stringResource(R.string.home_commande_fournisseur_attente, commandes), color = HomeTextDark, fontSize = 11.sp)
-                        }
-                        Spacer(Modifier.height(2.dp))
-                    }
-                    if (ruptures > 0) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Red40))
-                            Spacer(Modifier.width(6.dp))
-                            Text(text = stringResource(R.string.home_produits_rupture, ruptures), color = HomeTextDark, fontSize = 11.sp)
-                        }
-                        Spacer(Modifier.height(2.dp))
-                    }
-                    if (nc > 0) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(Red40))
-                            Spacer(Modifier.width(6.dp))
-                            Text(text = stringResource(R.string.home_nc_ouvertes_detail, nc), color = HomeTextDark, fontSize = 11.sp)
-                        }
+                }
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text(stringResource(R.string.home_rappels_importants), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    if (!hasAlert) {
+                        Text(stringResource(R.string.home_no_alerts), color = HomeTextMuted, fontSize = 11.sp)
                     }
                 }
             }
-            Icon(painter = painterResource(Iv.ChevronRight), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+            if (hasAlert) {
+                Spacer(Modifier.height(4.dp))
+                if (factures > 0) {
+                    AccueilRappelLigne(
+                        texte = stringResource(R.string.home_overdue_invoices, factures),
+                        couleur = ProfileOrange,
+                        onClick = { onNavigate(HomeNavigation.rappel(HomeNavigation.Rappel.FACTURES_EN_RETARD)) },
+                    )
+                }
+                if (commandes > 0) {
+                    AccueilRappelLigne(
+                        texte = stringResource(R.string.home_commande_fournisseur_attente, commandes),
+                        couleur = ProfileOrange,
+                        onClick = { onNavigate(HomeNavigation.rappel(HomeNavigation.Rappel.COMMANDES_FOURNISSEUR)) },
+                    )
+                }
+                if (ruptures > 0) {
+                    AccueilRappelLigne(
+                        texte = stringResource(R.string.home_produits_rupture, ruptures),
+                        couleur = Red40,
+                        onClick = { onNavigate(HomeNavigation.rappel(HomeNavigation.Rappel.RUPTURES_STOCK)) },
+                    )
+                }
+                if (nc > 0) {
+                    AccueilRappelLigne(
+                        texte = stringResource(R.string.home_nc_ouvertes_detail, nc),
+                        couleur = Red40,
+                        onClick = { onNavigate(HomeNavigation.rappel(HomeNavigation.Rappel.NON_CONFORMITES)) },
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun AccueilRappelLigne(texte: String, couleur: Color, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 6.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(7.dp).clip(CircleShape).background(couleur))
+        Spacer(Modifier.width(8.dp))
+        Text(texte, color = HomeTextDark, fontSize = 11.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
     }
 }
 
@@ -1057,13 +1088,13 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
                 Text(text = stringResource(R.string.home_no_tasks), color = HomeTextMuted, fontSize = 11.sp, modifier = Modifier.padding(vertical = 8.dp))
             } else {
                 taches.forEachIndexed { idx, t ->
-                    AccueilTacheRow(titre = t.titre)
+                    AccueilTacheRow(titre = t.titre, statut = t.statut, onClick = { onNavigate(Routes.TASKS) })
                     if (idx < taches.lastIndex) Spacer(Modifier.height(8.dp))
                 }
             }
             Spacer(Modifier.height(10.dp))
             Row(
-                modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.TASKS) },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { onNavigate(Routes.TASKS) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(text = stringResource(R.string.home_voir_toutes_taches), color = HomeBlue, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
@@ -1074,36 +1105,27 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
 }
 
 @Composable
-private fun AccueilTacheRow(titre: String) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+private fun AccueilTacheRow(titre: String, statut: String, onClick: () -> Unit) {
+    val terminee = statut == com.missa.b360.core.data.entity.TaskStatus.FAITE.name
+    val enCours = statut == com.missa.b360.core.data.entity.TaskStatus.EN_COURS.name
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(9.dp)).clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(if (terminee) Iv.CheckCircle else if (enCours) Iv.Schedule else Iv.Checklist),
+            contentDescription = null,
+            tint = if (terminee) TendrePositive else if (enCours) ProfileOrange else HomeTextMuted,
+            modifier = Modifier.size(17.dp),
+        )
+        Spacer(Modifier.width(8.dp))
         Text(text = titre, color = HomeTextDark, fontSize = 11.sp, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Surface(
-            modifier = Modifier.size(18.dp),
-            shape = RoundedCornerShape(4.dp),
-            color = Color.White,
-            border = BorderStroke(1.2.dp, HomeBorder),
-        ) {}
+        Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(15.dp))
     }
 }
 
-
-
-private fun AppModule.createRoute(direction: OperationDirection? = null): String =
-    "$route?create=true" + direction?.let { "&direction=${it.name}" }.orEmpty()
-
-private fun String.appModuleRoute(): String = when (this) {
-    OperationModule.STOCK.name -> AppModule.STOCK.route
-    OperationModule.DEVIS.name, OperationModule.COMMANDE.name -> Routes.DEVIS_COMMANDE
-    OperationModule.VENTE.name -> AppModule.VENTE.route
-    OperationModule.ACHATS.name -> AppModule.ACHATS.route
-    OperationModule.FINANCES.name -> AppModule.FINANCES.route
-    OperationModule.LIVRAISON.name -> AppModule.LIVRAISON.route
-    OperationModule.PRODUCTION.name -> AppModule.PRODUCTION.route
-    OperationModule.SERVICES.name -> AppModule.SERVICES.route
-    OperationModule.RH.name -> AppModule.RH.route
-    OperationModule.PROJETS.name -> AppModule.PROJETS.route
-    else -> Routes.HOME
-}
 
 @Composable
 internal fun MissaBusinessDrawer(
@@ -1447,7 +1469,7 @@ private fun HomeSupportBouton(
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(44.dp),
+        modifier = Modifier.fillMaxWidth().height(48.dp),
         shape = RoundedCornerShape(11.dp),
         border = BorderStroke(1.dp, HomeBlue),
     ) {

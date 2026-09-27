@@ -696,6 +696,7 @@
 
     <!-- Navigation latérale détaillée -->
     <string name="home_close">Fermer</string>
+    <string name="home_open_menu">Ouvrir le menu</string>
     <string name="home_settings">Paramètres</string>
     <string name="home_licence_activation">Licence &amp; activation</string>
     <string name="home_sites_sales">Sites &amp; points de vente</string>
@@ -1753,4 +1754,25 @@
     <string name="st_creer_categorie_invite">Créer une catégorie pour classer cet article</string>
     <string name="tre_aucun_compte">Aucun compte disponible</string>
     <string name="tre_creer_compte_invite">Créer un compte pour enregistrer l\'opération</string>
+
+    <string name="devis_screen_title">Devis &amp; commandes</string>
+    <string name="devis_page_desc">Créez des devis et transformez-les en commandes.</string>
+    <string name="devis_new">Nouveau devis</string>
+    <string name="devis_empty">Aucun devis pour le moment. Créez un devis pour commencer.</string>
+    <string name="devis_convert">Convertir en commande</string>
+    <string name="devis_error_select_client">Sélectionnez un client.</string>
+    <string name="devis_error_line">Saisissez une désignation et un montant valides.</string>
+    <string name="devis_result_created">Devis créé.</string>
+    <string name="devis_result_readonly">Cette action est indisponible en mode lecture seule.</string>
+    <string name="devis_result_order">Devis converti en commande.</string>
+    <string name="devis_result_invalid">Impossible de traiter ce devis.</string>
+    <string name="devis_select_client">Choisir un client</string>
+    <string name="devis_line_label">Désignation</string>
+    <string name="devis_total">Montant TTC</string>
+    <string name="devis_save">Enregistrer</string>
+    <string name="devis_cancel">Annuler</string>
+    <string name="devis_result_already_order">Ce devis a déjà été converti en commande.</string>
+    <string name="devis_quotes_header">Devis</string>
+    <string name="devis_orders_header">Commandes</string>
+    <string name="devis_no_clients">Aucun client actif. Créez d’abord un client pour pouvoir établir un devis.</string>
 </resources>

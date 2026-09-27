@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.widthIn
 
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,6 +17,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -36,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -126,87 +124,44 @@ fun MissaAppHeader(
                     .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Compartiment Gauche : Identité MISSA BUSINESS 360
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
-                        .clickable { if (isHome) onMenuClick() else onBackClick() }
-                        .padding(horizontal = 4.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                // Le menu possède sa propre cible tactile : le logo reste purement décoratif.
+                IconButton(
+                    onClick = { if (isHome) onMenuClick() else onBackClick() },
+                    modifier = Modifier.size(48.dp),
                 ) {
-                    Box(
-                        modifier = Modifier.size(46.dp),
-                        contentAlignment = Alignment.Center,
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        color = PuceHeader,
                     ) {
-                        // Logo de marque en carré à bords arrondis (et non rond)
-                        // : la charte l'exige sur toutes les pages.
-                        Image(
-                            painter = painterResource(R.drawable.logo_missa),
-                            contentDescription = "MISSA BUSINESS 360",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(13.dp))
-                                .border(1.2.dp, Color(0xFF0288D1).copy(alpha = 0.3f), RoundedCornerShape(13.dp)),
-                        )
-                        if (!isHome) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.35f), RoundedCornerShape(13.dp)),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    painter = painterResource(Iv.ArrowBack),
-                                    contentDescription = "Retour",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-                        }
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "MISSA BUSINESS ",
-                                color = MissaInk,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = "360",
-                                color = Color(0xFF0288D1),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                maxLines = 1,
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                painter = painterResource(if (isHome) Iv.Menu else Iv.ArrowBack),
+                                contentDescription = stringResource(
+                                    if (isHome) R.string.home_open_menu else R.string.ob_retour,
+                                ),
+                                tint = MissaInk,
+                                modifier = Modifier.size(22.dp),
                             )
                         }
-                        Text(
-                            text = stringResource(R.string.app_slogan),
-                            color = MissaMuted,
-                            fontSize = 10.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
                     }
                 }
-
-                Spacer(Modifier.width(6.dp))
-                // Séparateur vertical fin
+                Spacer(Modifier.width(5.dp))
+                MissaBrandMark(size = 40.dp)
+                Spacer(Modifier.width(8.dp))
                 Box(
                     modifier = Modifier
                         .width(1.dp)
                         .height(38.dp)
-                        .background(MissaBorder.copy(alpha = 0.6f)),
+                        .background(MissaBorder.copy(alpha = 0.55f)),
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(8.dp))
 
                 // Compartiment Droit : Entreprise cliente
                 Row(
                     modifier = Modifier
                         .weight(1f)
+                        .heightIn(min = 48.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .clickable(onClick = onProfileClick)
                         .padding(horizontal = 4.dp, vertical = 2.dp),

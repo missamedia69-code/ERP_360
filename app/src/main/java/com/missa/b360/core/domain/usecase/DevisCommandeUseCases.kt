@@ -167,6 +167,7 @@ class ConvertDevisToOrderUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object Introuvable : Result()
         data object DejaAnnulee : Result()
+        data object DejaConverti : Result()
         data object DonneesInvalides : Result()
     }
 
@@ -195,6 +196,10 @@ class ConvertDevisToOrderUseCase @Inject constructor(
             }
             val payload = SaleRecordCodec.decode(devis.notes)
                 ?: return@withTransaction Result.DonneesInvalides
+            val dejaConverti = operationDao.getByModule(targetOrder.module.name).any { commande ->
+                SaleRecordCodec.decode(commande.notes)?.sourceRecordId == devisRecordId
+            }
+            if (dejaConverti) return@withTransaction Result.DejaConverti
 
             val reference = sequenceManager.next(targetOrder.docType)
             val commandeId = operationDao.insert(

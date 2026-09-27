@@ -673,6 +673,7 @@
 
     
     <string name="home_close">关闭</string>
+    <string name="home_open_menu">打开菜单</string>
     <string name="home_settings">设置</string>
     <string name="home_licence_activation">许可证和激活</string>
     <string name="home_sites_sales">站点和销售点</string>
@@ -1706,4 +1707,25 @@
     <string name="st_creer_categorie_invite">创建分类以归类此商品</string>
     <string name="tre_aucun_compte">暂无可用账户</string>
     <string name="tre_creer_compte_invite">创建账户以记录此笔账目</string>
+
+    <string name="devis_screen_title">报价与订单</string>
+    <string name="devis_page_desc">创建报价并将其转换为订单。</string>
+    <string name="devis_new">新建报价</string>
+    <string name="devis_empty">暂无报价。创建一份报价以开始。</string>
+    <string name="devis_convert">转换为订单</string>
+    <string name="devis_error_select_client">请选择客户。</string>
+    <string name="devis_error_line">请输入有效的描述和金额。</string>
+    <string name="devis_result_created">报价已创建。</string>
+    <string name="devis_result_readonly">只读模式下无法执行此操作。</string>
+    <string name="devis_result_order">报价已转换为订单。</string>
+    <string name="devis_result_invalid">无法处理此报价。</string>
+    <string name="devis_select_client">选择客户</string>
+    <string name="devis_line_label">描述</string>
+    <string name="devis_total">含税金额</string>
+    <string name="devis_save">保存</string>
+    <string name="devis_cancel">取消</string>
+    <string name="devis_result_already_order">此报价已转换为订单。</string>
+    <string name="devis_quotes_header">报价</string>
+    <string name="devis_orders_header">订单</string>
+    <string name="devis_no_clients">没有活跃客户。请先创建客户，然后再创建报价。</string>
 </resources>

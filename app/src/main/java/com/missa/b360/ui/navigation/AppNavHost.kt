@@ -247,7 +247,6 @@ private fun MainNavHost() {
         composable(Routes.HOME) {
             HomeScreen(
                 navController = navController,
-                onOuvrirMenu = { portee.launch { etatTiroir.open() } },
                 onSupport = { assistance = true },
             )
         }
@@ -484,10 +483,16 @@ private fun MainNavHost() {
             }
         }
         // Devis & commandes
-        composable(Routes.DEVIS_COMMANDE) {
+        composable(
+            route = "${Routes.DEVIS_COMMANDE}?create={create}",
+            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
+        ) { entry ->
             // Devis appartient à VEN
             GuardedModule(AppModule.VENTE, activation, navController) {
-                DevisCommandeScreen(onBack = { navController.popBackStack() })
+                DevisCommandeScreen(
+                    onBack = { navController.popBackStack() },
+                    openCreate = entry.arguments?.getBoolean("create") == true,
+                )
             }
         }
         // Retour de vente
