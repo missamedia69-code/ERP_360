@@ -559,17 +559,26 @@ private fun AccueilKpiCard(
         border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.72f)),
     ) {
         Box(Modifier.fillMaxSize()) {
-            // Illustrations métier intégrées à l'APK : elles restent disponibles hors ligne.
-            // Le filigrane apporte de la matière sans concurrencer la lecture des chiffres.
+            // Illustration originale pleine carte, embarquée dans l'APK pour le mode hors ligne.
             Image(
                 painter = painterResource(illustrationRes),
                 contentDescription = null,
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(18.dp)),
+            )
+            // Voile lumineux : réserve visuellement la zone texte à gauche et adoucit l'image.
+            Box(
                 modifier = Modifier
-                    .size(width = 78.dp, height = 64.dp)
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 3.dp, bottom = 2.dp)
-                    .alpha(0.38f),
+                    .fillMaxSize()
+                    .background(
+                        androidx.compose.ui.graphics.Brush.horizontalGradient(
+                            listOf(
+                                Color.White.copy(alpha = 0.96f),
+                                Color.White.copy(alpha = 0.86f),
+                                Color.White.copy(alpha = 0.40f),
+                            ),
+                        ),
+                    ),
             )
             Column(Modifier.fillMaxSize().padding(horizontal = 13.dp, vertical = 11.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
