@@ -465,12 +465,12 @@ private fun HomeDashboard(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_ventes_du_jour), formatMontantSansDecimales(state.ventes, currency), stringResource(R.string.home_sales_count, state.ventesCount), state.tendanceVentes, Iv.ShoppingCart, Color(0xFFE8F1FF), HomeBlue, { kpiEnVue = 0 })
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_achats_du_jour), formatMontantSansDecimales(state.achats, currency), stringResource(R.string.home_purchases_count, state.achatsCount), state.tendanceAchats, Iv.CartArrowDown, Color(0xFFFFF3DB), Color(0xFFB66A00), { kpiEnVue = 1 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_ventes_du_jour), formatMontantSansDecimales(state.ventes, currency), stringResource(R.string.home_sales_count, state.ventesCount), state.tendanceVentes, Iv.ShoppingCart, Color(0xFFE8F1FF), HomeBlue, R.drawable.illustration_ventes, { kpiEnVue = 0 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_achats_du_jour), formatMontantSansDecimales(state.achats, currency), stringResource(R.string.home_purchases_count, state.achatsCount), state.tendanceAchats, Iv.CartArrowDown, Color(0xFFFFF3DB), Color(0xFFB66A00), R.drawable.illustration_stock, { kpiEnVue = 1 })
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_tresorerie_card), formatMontantSansDecimales(state.tresorerie, currency), stringResource(R.string.home_solde_disponible), state.tendanceTresorerie, Iv.Bank, Color(0xFFE5F7F0), Color(0xFF16845C), { kpiEnVue = 2 })
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_clients_card), state.nombreClients.toString(), stringResource(R.string.home_total_label), state.tendanceClients, Iv.People, Color(0xFFF1EBFF), Color(0xFF7046B8), { kpiEnVue = 3 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_tresorerie_card), formatMontantSansDecimales(state.tresorerie, currency), stringResource(R.string.home_solde_disponible), state.tendanceTresorerie, Iv.Bank, Color(0xFFE5F7F0), Color(0xFF16845C), R.drawable.illustration_tresorerie, { kpiEnVue = 2 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_clients_card), state.nombreClients.toString(), stringResource(R.string.home_total_label), state.tendanceClients, Iv.People, Color(0xFFF1EBFF), Color(0xFF7046B8), R.drawable.illustration_clients, { kpiEnVue = 3 })
                 }
             }
         }
@@ -548,6 +548,7 @@ private fun AccueilKpiCard(
     icon: Int,
     iconBg: Color,
     iconTint: Color,
+    illustrationRes: Int,
     onClick: () -> Unit,
 ) {
     val deltaColor = if ((tendance ?: 0.0) >= 0.0) Color(0xFF16845C) else Color(0xFFB42332)
@@ -557,44 +558,58 @@ private fun AccueilKpiCard(
         color = Color.White,
         border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.72f)),
     ) {
-        Column(Modifier.fillMaxSize().padding(horizontal = 13.dp, vertical = 11.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = RoundedCornerShape(9.dp), color = iconBg, modifier = Modifier.size(30.dp)) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(17.dp))
+        Box(Modifier.fillMaxSize()) {
+            // Illustrations métier intégrées à l'APK : elles restent disponibles hors ligne.
+            // Le filigrane apporte de la matière sans concurrencer la lecture des chiffres.
+            Image(
+                painter = painterResource(illustrationRes),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(width = 78.dp, height = 64.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 3.dp, bottom = 2.dp)
+                    .alpha(0.38f),
+            )
+            Column(Modifier.fillMaxSize().padding(horizontal = 13.dp, vertical = 11.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = RoundedCornerShape(9.dp), color = iconBg, modifier = Modifier.size(30.dp)) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(17.dp))
+                        }
                     }
+                    Spacer(Modifier.weight(1f))
+                    Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted.copy(alpha = 0.65f), modifier = Modifier.size(16.dp))
                 }
-                Spacer(Modifier.weight(1f))
-                Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted.copy(alpha = 0.65f), modifier = Modifier.size(16.dp))
-            }
-            Spacer(Modifier.height(9.dp))
-            Text(titre, color = HomeTextMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(valeur, color = HomeTextDark, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = sousTitre,
-                    color = HomeTextMuted,
-                    fontSize = 9.5.sp,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
-                )
-                if (tendance != null) {
-                    Spacer(Modifier.width(3.dp))
-                    Icon(
-                        painter = painterResource(if (tendance >= 0) Iv.TrendingUp else Iv.TrendingDown),
-                        contentDescription = null,
-                        tint = deltaColor,
-                        modifier = Modifier.size(11.dp),
-                    )
+                Spacer(Modifier.height(9.dp))
+                Text(titre, color = HomeTextMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(valeur, color = HomeTextDark, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${if (tendance >= 0) "+" else ""}${String.format(java.util.Locale.ROOT, "%.0f%%", tendance)}",
-                        color = deltaColor,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        text = sousTitre,
+                        color = HomeTextMuted,
+                        fontSize = 9.5.sp,
+                        fontWeight = FontWeight.Medium,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
                     )
+                    if (tendance != null) {
+                        Spacer(Modifier.width(3.dp))
+                        Icon(
+                            painter = painterResource(if (tendance >= 0) Iv.TrendingUp else Iv.TrendingDown),
+                            contentDescription = null,
+                            tint = deltaColor,
+                            modifier = Modifier.size(11.dp),
+                        )
+                        Text(
+                            text = "${if (tendance >= 0) "+" else ""}${String.format(java.util.Locale.ROOT, "%.0f%%", tendance)}",
+                            color = deltaColor,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }
