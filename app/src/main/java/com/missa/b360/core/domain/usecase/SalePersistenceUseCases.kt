@@ -57,6 +57,7 @@ class SaveSaleUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val checkCreditLimit: CheckCreditLimitUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -64,6 +65,7 @@ class SaveSaleUseCase @Inject constructor(
         data object DonneesInvalides : Result()
         data object BrouillonIntrouvable : Result()
         data object ClientNonEligible : Result()
+        data object ValidationCreditRequise : Result()
         /** Stock insuffisant re-lu transactionnellement (§43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : Result()
     }
@@ -149,6 +151,28 @@ class SaveSaleUseCase @Inject constructor(
                 ?: return@withTransaction Result.ClientNonEligible
             if (!ClientLifecycleRules.venteAutorisee(client, totals.total, payload.paidAmount)) {
                 return@withTransaction Result.ClientNonEligible
+            }
+            val nouvelleCreance = (totals.total - payload.paidAmount).coerceAtLeast(0.0)
+            if (nouvelleCreance > QUANTITE_EPSILON && client.limiteCredit != null) {
+                // Solde dérivé des ventes validées et avoirs, en cohérence avec la fiche client.
+                val soldeActuel = operationDao.getByModule(OperationModule.VENTE.name)
+                    .asSequence()
+                    .filter { it.status == OperationStatus.VALIDATED.name }
+                    .mapNotNull { SaleRecordCodec.decode(it.notes) }
+                    .filter { it.clientId == client.id }
+                    .sumOf { payloadVente ->
+                        val restant = (payloadVente.total - payloadVente.paidAmount).coerceAtLeast(0.0)
+                        if (payloadVente.sourceRecordId != null) -restant else restant
+                    }
+                    .coerceAtLeast(0.0)
+                val verdictCredit = checkCreditLimit(
+                    soldeActuel = soldeActuel,
+                    montantNouvelleVente = nouvelleCreance,
+                    limiteCredit = client.limiteCredit,
+                )
+                if (verdictCredit != CheckCreditLimitUseCase.Verdict.AUTORISE) {
+                    return@withTransaction Result.ValidationCreditRequise
+                }
             }
             val besoins = SaleStockEffects.besoinsParProduit(payload.lines)
             val sorties = mutableListOf<Triple<Long, Long, Double>>() // produit, site de sortie, quantité

@@ -100,6 +100,7 @@ class SalesViewModel @Inject constructor(
         data object InvalidAmount : SaveResult
         data object ReadOnly : SaveResult
         data object ClientNonEligible : SaveResult
+        data object ValidationCreditRequise : SaveResult
         /** Stock insuffisant (contrôle UI ou transactionnel — spec §43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SaveResult
         data object Cancelled : SaveResult
@@ -396,6 +397,7 @@ class SalesViewModel @Inject constructor(
                     SaveSaleUseCase.Result.DonneesInvalides -> _saveResult.value = SaveResult.InvalidAmount
                     SaveSaleUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
                     SaveSaleUseCase.Result.ClientNonEligible -> _saveResult.value = SaveResult.ClientNonEligible
+                    SaveSaleUseCase.Result.ValidationCreditRequise -> _saveResult.value = SaveResult.ValidationCreditRequise
                     is SaveSaleUseCase.Result.StockInsuffisant -> _saveResult.value = SaveResult.StockInsuffisant(
                         result.produitNom,
                         result.disponible,

@@ -1767,4 +1767,5 @@
     <string name="sales_err_client_inactive">Venta bloqueada: active el cliente o asegúrese de que el borrador esté pagado por completo.</string>
     <string name="sales_quick_client_duplicate">Existe un cliente similar. Revíselo y confirme cualquier alta en el módulo Clientes.</string>
     <string name="sales_quick_client_invalid">Datos no válidos o licencia de solo lectura. Revise la información del cliente.</string>
+    <string name="sales_err_credit_limit">Crédito rechazado: se supera el límite o se alcanza el umbral de alerta. Se requiere aprobación autorizada o pago total.</string>
 </resources>

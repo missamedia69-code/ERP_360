@@ -1771,4 +1771,5 @@
     <string name="sales_err_client_inactive">Sale blocked: activate this client, or make sure the draft is fully paid.</string>
     <string name="sales_quick_client_duplicate">A similar client exists. Review it and confirm any new record in the Clients module.</string>
     <string name="sales_quick_client_invalid">Invalid information or read-only license. Check the client details.</string>
+    <string name="sales_err_credit_limit">Credit refused: the limit is exceeded or its alert threshold is reached. Authorized approval or full payment is required.</string>
 </resources>

@@ -492,6 +492,7 @@ private fun FormulaireVente(
                 SalesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
                 SalesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 SalesViewModel.SaveResult.ClientNonEligible -> stringResource(R.string.sales_err_client_inactive)
+                SalesViewModel.SaveResult.ValidationCreditRequise -> stringResource(R.string.sales_err_credit_limit)
                 is SalesViewModel.SaveResult.StockInsuffisant -> {
                     val res = saveResult as SalesViewModel.SaveResult.StockInsuffisant
                     stringResource(R.string.sales_err_stock_insufficient, res.produitNom, fmtQuantite(res.disponible))
