@@ -118,9 +118,11 @@ class UpdateFournisseurUseCase @Inject constructor(
         if (licenceManager.isReadOnly()) return false
         val existant = fournisseurDao.getById(modifie.id) ?: return false
         val reapprobation = FournisseurRules.reapprobationRequise(existant, modifie)
+        val fiscaliteModifiee = FournisseurRules.fiscaliteModifiee(existant, modifie)
         val aEnregistrer = modifie.copy(
             statut = if (reapprobation) FournisseurStatus.A_VALIDER else modifie.statut,
             soumisLe = if (reapprobation) now else modifie.soumisLe,
+            dateValidationFiscale = if (fiscaliteModifiee) null else modifie.dateValidationFiscale,
             updatedAt = now,
         )
         fournisseurDao.update(aEnregistrer)

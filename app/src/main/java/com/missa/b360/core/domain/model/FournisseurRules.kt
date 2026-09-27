@@ -88,10 +88,8 @@ object FournisseurRules {
      * Modification sensible (spec §3.2) : toute évolution d'un fournisseur ACTIF sur
      * ces champs impose un retour en A_VALIDER (réapprobation).
      */
-    fun reapprobationRequise(ancien: FournisseurEntity, nouveau: FournisseurEntity): Boolean {
-        if (ancien.statut != FournisseurStatus.ACTIF) return false
-        return ancien.nom.trim().equals(nouveau.nom.trim(), ignoreCase = true).not() ||
-            ancien.type != nouveau.type ||
+    fun fiscaliteModifiee(ancien: FournisseurEntity, nouveau: FournisseurEntity): Boolean =
+        ancien.type != nouveau.type ||
             ancien.pays != nouveau.pays ||
             ancien.typeIdentifiantFiscal != nouveau.typeIdentifiantFiscal ||
             ancien.identifiantFiscal != nouveau.identifiantFiscal ||
@@ -99,8 +97,12 @@ object FournisseurRules {
             ancien.numTva != nouveau.numTva ||
             ancien.assujettiTva != nouveau.assujettiTva ||
             ancien.tauxRetenue != nouveau.tauxRetenue ||
-            ancien.exonere != nouveau.exonere ||
-            ancien.dateValidationFiscale != nouveau.dateValidationFiscale ||
+            ancien.exonere != nouveau.exonere
+
+    fun reapprobationRequise(ancien: FournisseurEntity, nouveau: FournisseurEntity): Boolean {
+        if (ancien.statut != FournisseurStatus.ACTIF) return false
+        return ancien.nom.trim().equals(nouveau.nom.trim(), ignoreCase = true).not() ||
+            fiscaliteModifiee(ancien, nouveau) ||
             ancien.conditionsPaiement != nouveau.conditionsPaiement ||
             ancien.modePaiementPrefere != nouveau.modePaiementPrefere ||
             ancien.joursEcheance != nouveau.joursEcheance ||

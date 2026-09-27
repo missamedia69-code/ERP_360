@@ -129,6 +129,9 @@ class FournisseurRulesTest {
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(rccm = "RC-2026")))
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(tauxRetenue = 5.0)))
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(plafondPaiement = 100_000.0)))
+        assertTrue(FournisseurRules.fiscaliteModifiee(actif, actif.copy(exonere = true)))
+        assertFalse(FournisseurRules.fiscaliteModifiee(actif, actif.copy(description = "Nouvelle note")))
+        assertFalse(FournisseurRules.reapprobationRequise(actif, actif.copy(dateValidationFiscale = 123L)))
         assertFalse(FournisseurRules.reapprobationRequise(actif, actif.copy(description = "Nouvelle note")))
         assertFalse(
             FournisseurRules.reapprobationRequise(

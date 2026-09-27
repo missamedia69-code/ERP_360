@@ -554,6 +554,7 @@ class FournisseursViewModel @Inject constructor(
                 soumisLe = existant.soumisLe,
                 approuveLe = existant.approuveLe,
                 approuve = existant.approuve,
+                dateValidationFiscale = existant.dateValidationFiscale,
                 plafondPaiement = existant.plafondPaiement,
                 paiementBloque = existant.paiementBloque,
                 noteEvaluation = existant.noteEvaluation,
