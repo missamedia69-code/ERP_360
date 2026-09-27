@@ -1755,4 +1755,6 @@
     <string name="ach_show_all">Show all</string>
     <string name="ach_pending_empty">No pending purchase orders</string>
     <string name="ach_pending_empty_desc">Draft supplier purchase orders will appear here.</string>
+    <string name="home_partially_paid">Partially paid</string>
+    <string name="home_to_collect">To collect</string>
 </resources>

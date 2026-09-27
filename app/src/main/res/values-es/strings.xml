@@ -1751,4 +1751,6 @@
     <string name="ach_show_all">Ver todo</string>
     <string name="ach_pending_empty">No hay pedidos de compra pendientes</string>
     <string name="ach_pending_empty_desc">Aquí aparecerán los pedidos de compra de proveedores en borrador.</string>
+    <string name="home_partially_paid">Parcialmente pagada</string>
+    <string name="home_to_collect">Pendiente de cobro</string>
 </resources>

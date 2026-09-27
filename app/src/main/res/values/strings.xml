@@ -1798,4 +1798,6 @@
     <string name="ach_show_all">Afficher tout</string>
     <string name="ach_pending_empty">Aucun bon de commande en attente</string>
     <string name="ach_pending_empty_desc">Les bons de commande fournisseur en brouillon apparaîtront ici.</string>
+    <string name="home_partially_paid">Partiellement payée</string>
+    <string name="home_to_collect">À encaisser</string>
 </resources>

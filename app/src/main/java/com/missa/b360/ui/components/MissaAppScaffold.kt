@@ -194,17 +194,18 @@ fun MissaAppHeader(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
-                        val activiteLibelle = secteur.ifBlank {
-                            when (profilActivite) {
-                                "AV" -> "Achat & Vente"
-                                "ASV" -> "Achat, Stock & Vente"
-                                "APSV" -> "Commerce général"
-                                "SER" -> "Service & Prestations"
-                                "PRJ" -> "Gestion de projets"
-                                "PERSONNEL" -> "Espace personnel"
-                                else -> "Commerce général"
-                            }
+                        val profilLibelle = when (profilActivite) {
+                            "AV" -> R.string.profil_av
+                            "ASV" -> R.string.profil_asv
+                            "APSV" -> R.string.profil_apsv
+                            "SER" -> R.string.profil_ser
+                            "PRJ" -> R.string.profil_prj
+                            "PERSONNEL" -> R.string.profil_personnel
+                            "FULL" -> R.string.profil_full
+                            "CUSTOM" -> R.string.profil_custom
+                            else -> R.string.home_not_configured
                         }
+                        val activiteLibelle = secteur.ifBlank { stringResource(profilLibelle) }
                         Surface(
                             shape = RoundedCornerShape(4.dp),
                             color = Color(0xFFE0F2FE),

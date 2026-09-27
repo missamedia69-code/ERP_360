@@ -91,6 +91,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.util.ContactCommercial
 import com.missa.b360.core.util.DateUtils
 import com.missa.b360.ui.components.CompanyLogo
@@ -787,7 +788,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                         modifier = Modifier.weight(1f), icon = Iv.SwapHoriz, iconTint = Color(0xFF16845C),
                         iconBg = Color(0xFFE5F7F0), titre = stringResource(R.string.home_mouvements_stock_label),
                         valeur = state.resumeMouvements.toString(),
-                        sousTitre = if (state.rupturesStock > 0) "${state.rupturesStock} ruptures" else stringResource(R.string.home_operations_label),
+                        sousTitre = if (state.rupturesStock > 0) stringResource(R.string.home_produits_rupture, state.rupturesStock) else stringResource(R.string.home_operations_label),
                         tendance = null,
                     )
                     AccueilResumeCell(
@@ -912,6 +913,9 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                 )
             } else {
                 records.forEachIndexed { idx, rec ->
+                    val saleDetails = remember(rec.notes) { SaleRecordCodec.decode(rec.notes) }
+                    val saleEntierementPayee = saleDetails?.let { it.paidAmount >= it.total - 0.01 } == true
+                    val ventePartiellementPayee = saleDetails?.let { it.paidAmount > 0.01 && it.paidAmount < it.total - 0.01 } == true
                     val (icon, bg, tint) = when (rec.module) {
                         OperationModule.VENTE.name -> Triple(Iv.ShoppingCart, HomeBlueSoft, HomeBlue)
                         OperationModule.ACHATS.name -> Triple(Iv.Inventory2, Green90, TendrePositive)
@@ -925,11 +929,17 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
                         titre = rec.title.ifBlank { rec.reference },
                         sousTitre = rec.counterpart ?: rec.reference,
                         montant = rec.amount?.let { formatMontantSansDecimales(it, currency) },
-                        badge = when (rec.status) {
-                            OperationStatus.VALIDATED.name -> stringResource(R.string.home_payee)
-                            OperationStatus.DRAFT.name -> "Brouillon"
+                        badge = when {
+                            rec.status == OperationStatus.DRAFT.name -> stringResource(R.string.ach_brouillon)
+                            rec.status == OperationStatus.VALIDATED.name && rec.module != OperationModule.VENTE.name -> stringResource(R.string.ach_valide)
+                            rec.status == OperationStatus.VALIDATED.name && saleDetails == null -> stringResource(R.string.ach_valide)
+                            rec.status == OperationStatus.VALIDATED.name && saleEntierementPayee -> stringResource(R.string.home_payee)
+                            rec.status == OperationStatus.VALIDATED.name && ventePartiellementPayee -> stringResource(R.string.home_partially_paid)
+                            rec.status == OperationStatus.VALIDATED.name -> stringResource(R.string.home_to_collect)
                             else -> null
                         },
+                        badgeBackground = if (rec.status == OperationStatus.DRAFT.name) Color(0xFFFFF3DB) else Green90,
+                        badgeTint = if (rec.status == OperationStatus.DRAFT.name) ProfileOrange else TendrePositive,
                         heure = DateUtils.formatDateHeure(rec.createdAt),
                         onClick = { onNavigate(HomeNavigation.operation(rec.module)) },
                     )
@@ -949,6 +959,8 @@ private fun AccueilActiviteRow(
     sousTitre: String,
     montant: String?,
     badge: String?,
+    badgeBackground: Color,
+    badgeTint: Color,
     heure: String,
     onClick: () -> Unit,
 ) {
@@ -971,8 +983,8 @@ private fun AccueilActiviteRow(
                 Text(text = heure, color = HomeTextMuted, fontSize = 10.sp)
                 if (badge != null) {
                     Spacer(Modifier.width(6.dp))
-                    Surface(shape = RoundedCornerShape(6.dp), color = Green90) {
-                        Text(text = badge, color = TendrePositive, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                    Surface(shape = RoundedCornerShape(6.dp), color = badgeBackground) {
+                        Text(text = badge, color = badgeTint, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
                     }
                 }
             }
@@ -1380,6 +1392,7 @@ private fun String?.profileLabel(): Int? = when (this) {
     "APSV" -> R.string.profil_apsv
     "SER" -> R.string.profil_ser
     "PRJ" -> R.string.profil_prj
+    "PERSONNEL" -> R.string.profil_personnel
     "FULL" -> R.string.profil_full
     "CUSTOM" -> R.string.profil_custom
     else -> null

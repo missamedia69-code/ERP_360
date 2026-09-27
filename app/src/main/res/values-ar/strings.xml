@@ -1751,4 +1751,6 @@
     <string name="ach_show_all">عرض الكل</string>
     <string name="ach_pending_empty">لا توجد أوامر شراء معلقة</string>
     <string name="ach_pending_empty_desc">ستظهر هنا أوامر شراء الموردين المحفوظة كمسودات.</string>
+    <string name="home_partially_paid">مدفوعة جزئياً</string>
+    <string name="home_to_collect">مستحق التحصيل</string>
 </resources>

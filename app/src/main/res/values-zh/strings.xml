@@ -1751,4 +1751,6 @@
     <string name="ach_show_all">显示全部</string>
     <string name="ach_pending_empty">没有待处理的采购订单</string>
     <string name="ach_pending_empty_desc">供应商采购订单草稿将显示在这里。</string>
+    <string name="home_partially_paid">部分已付</string>
+    <string name="home_to_collect">待收款</string>
 </resources>
