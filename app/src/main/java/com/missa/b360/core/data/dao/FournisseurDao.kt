@@ -106,6 +106,13 @@ interface FournisseurContactDao {
 
     @Query("SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId AND actif = 1")
     suspend fun compterActifs(fournisseurId: Long): Int
+
+    @Query(
+        "SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId " +
+            "AND actif = 1 AND principal = 1 AND TRIM(nom) != '' " +
+            "AND ((telephone IS NOT NULL AND TRIM(telephone) != '') OR (email IS NOT NULL AND TRIM(email) != ''))",
+    )
+    suspend fun compterPrincipauxContactablesActifs(fournisseurId: Long): Int
 }
 
 /** Comptes bancaires / Mobile Money — compte principal unique, vérification tracée. */
@@ -123,11 +130,14 @@ interface FournisseurCompteBancaireDao {
     @Update
     suspend fun update(compte: FournisseurCompteBancaireEntity)
 
+    @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE id = :id")
+    suspend fun getById(id: Long): FournisseurCompteBancaireEntity?
+
     @Query("UPDATE fournisseur_comptes_bancaires SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerComptePrincipal(fournisseurId: Long)
 
     @Query("UPDATE fournisseur_comptes_bancaires SET verification = :statut, verifieLe = :date WHERE id = :id")
-    suspend fun majVerification(id: Long, statut: VerificationStatut, date: Long)
+    suspend fun majVerification(id: Long, statut: VerificationStatut, date: Long): Int
 }
 
 /** Documents de conformité — échéances suivies pour les alertes d'expiration. */

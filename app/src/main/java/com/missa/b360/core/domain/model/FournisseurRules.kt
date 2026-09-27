@@ -90,12 +90,21 @@ object FournisseurRules {
      */
     fun reapprobationRequise(ancien: FournisseurEntity, nouveau: FournisseurEntity): Boolean {
         if (ancien.statut != FournisseurStatus.ACTIF) return false
-        return ancien.identifiantFiscal != nouveau.identifiantFiscal ||
-            ancien.nom.trim().equals(nouveau.nom.trim(), ignoreCase = true).not() ||
+        return ancien.nom.trim().equals(nouveau.nom.trim(), ignoreCase = true).not() ||
+            ancien.type != nouveau.type ||
             ancien.pays != nouveau.pays ||
+            ancien.typeIdentifiantFiscal != nouveau.typeIdentifiantFiscal ||
+            ancien.identifiantFiscal != nouveau.identifiantFiscal ||
+            ancien.rccm != nouveau.rccm ||
+            ancien.numTva != nouveau.numTva ||
+            ancien.assujettiTva != nouveau.assujettiTva ||
+            ancien.tauxRetenue != nouveau.tauxRetenue ||
+            ancien.exonere != nouveau.exonere ||
+            ancien.dateValidationFiscale != nouveau.dateValidationFiscale ||
             ancien.conditionsPaiement != nouveau.conditionsPaiement ||
             ancien.modePaiementPrefere != nouveau.modePaiementPrefere ||
-            ancien.joursEcheance != nouveau.joursEcheance
+            ancien.joursEcheance != nouveau.joursEcheance ||
+            ancien.plafondPaiement != nouveau.plafondPaiement
     }
 
     /** Gravité d'alerte d'un document selon le délai restant (spec §6.9). */

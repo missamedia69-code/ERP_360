@@ -125,6 +125,10 @@ class FournisseurRulesTest {
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(nom = "Autre SARL")))
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(pays = "SN")))
         assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(conditionsPaiement = "Comptant")))
+        assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(numTva = "TVA-123")))
+        assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(rccm = "RC-2026")))
+        assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(tauxRetenue = 5.0)))
+        assertTrue(FournisseurRules.reapprobationRequise(actif, actif.copy(plafondPaiement = 100_000.0)))
         assertFalse(FournisseurRules.reapprobationRequise(actif, actif.copy(description = "Nouvelle note")))
         assertFalse(
             FournisseurRules.reapprobationRequise(

@@ -308,7 +308,7 @@ private fun HubFournisseurs(
     val devise by vm.devise.collectAsStateWithLifecycle()
     var query by remember { mutableStateOf("") }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -504,7 +504,7 @@ private fun ListeFournisseurs(
     val recherche by vm.recherche.collectAsStateWithLifecycle()
     val devise by vm.devise.collectAsStateWithLifecycle()
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -679,7 +679,7 @@ private fun FicheFournisseurEcran(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = fournisseur?.nom ?: stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -1205,6 +1205,15 @@ private fun SectionRepliable(
     }
 }
 
+private fun masquerReferenceConfidentielle(valeur: String?): String? = valeur?.let { reference ->
+    val compacte = reference.filterNot { it.isWhitespace() }
+    when {
+        compacte.isEmpty() -> null
+        compacte.length <= 4 -> "••••"
+        else -> "•••• ${compacte.takeLast(4)}"
+    }
+}
+
 @Composable
 private fun LigneCompte(
     compte: FournisseurCompteBancaireEntity,
@@ -1227,7 +1236,7 @@ private fun LigneCompte(
                 Text(
                     listOfNotNull(
                         compte.banque ?: compte.operateurMobile,
-                        compte.numeroCompte ?: compte.iban ?: compte.numeroMobile,
+                        masquerReferenceConfidentielle(compte.numeroCompte ?: compte.iban ?: compte.numeroMobile),
                     ).joinToString(" · "),
                     fontSize = 10.sp,
                     color = MissaMuted,
@@ -1776,7 +1785,7 @@ private fun FormulaireFournisseur(
         stringResource(R.string.four_etape_validation),
     )
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = if (form.enEditionId == null) {
                 stringResource(R.string.four_nouveau)

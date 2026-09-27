@@ -168,7 +168,7 @@ class SoumettreFournisseurUseCase @Inject constructor(
         if (!FournisseurRules.transitionAutorisee(fournisseur.statut, FournisseurStatus.A_VALIDER)) {
             return Result.TransitionRefusee
         }
-        val contactPrincipal = contactDao.compterActifs(id) > 0
+        val contactPrincipal = contactDao.compterPrincipauxContactablesActifs(id) > 0
         val manquants = FournisseurRules.manquantsPourSoumission(fournisseur, contactPrincipal)
         if (manquants.isNotEmpty()) return Result.ChampsManquants(manquants)
         fournisseurDao.update(fournisseur.copy(statut = FournisseurStatus.A_VALIDER, soumisLe = now, updatedAt = now))
@@ -191,6 +191,7 @@ class SoumettreFournisseurUseCase @Inject constructor(
  */
 class ChangerStatutFournisseurUseCase @Inject constructor(
     private val fournisseurDao: FournisseurDao,
+    private val contactDao: FournisseurContactDao,
     private val evenementDao: FournisseurEvenementDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
@@ -201,6 +202,7 @@ class ChangerStatutFournisseurUseCase @Inject constructor(
         data object TransitionRefusee : Result()
         data object MotifObligatoire : Result()
         data object Introuvable : Result()
+        data class ChampsManquants(val champs: List<String>) : Result()
     }
 
     suspend operator fun invoke(
@@ -212,6 +214,13 @@ class ChangerStatutFournisseurUseCase @Inject constructor(
         if (licenceManager.isReadOnly()) return Result.TransitionRefusee
         val fournisseur = fournisseurDao.getById(id) ?: return Result.Introuvable
         if (!FournisseurRules.transitionAutorisee(fournisseur.statut, vers)) return Result.TransitionRefusee
+        val dossierDoitEtreComplet = vers == FournisseurStatus.A_VALIDER ||
+            (fournisseur.statut == FournisseurStatus.A_VALIDER && vers == FournisseurStatus.ACTIF)
+        if (dossierDoitEtreComplet) {
+            val contactPrincipal = contactDao.compterPrincipauxContactablesActifs(id) > 0
+            val manquants = FournisseurRules.manquantsPourSoumission(fournisseur, contactPrincipal)
+            if (manquants.isNotEmpty()) return Result.ChampsManquants(manquants)
+        }
         if (vers == FournisseurStatus.BLOQUE && !FournisseurRules.blocageValide(motif)) {
             return Result.MotifObligatoire
         }
@@ -311,11 +320,14 @@ class VerifierCompteBancaireUseCase @Inject constructor(
         now: Long = System.currentTimeMillis(),
     ): Boolean {
         if (licenceManager.isReadOnly()) return false
-        compteDao.majVerification(
-            id = compteId,
-            statut = if (approuve) VerificationStatut.VERIFIE else VerificationStatut.REJETE,
-            date = now,
-        )
+        val compte = compteDao.getById(compteId) ?: return false
+        if (compte.fournisseurId != fournisseurId) return false
+        if (compteDao.majVerification(
+                id = compteId,
+                statut = if (approuve) VerificationStatut.VERIFIE else VerificationStatut.REJETE,
+                date = now,
+            ) == 0
+        ) return false
         evenementDao.insert(
             FournisseurEvenementEntity(
                 fournisseurId = fournisseurId,
@@ -325,7 +337,7 @@ class VerifierCompteBancaireUseCase @Inject constructor(
                 } else {
                     FournisseurEvenementType.COMPTE_REJETE
                 },
-                details = if (approuve) "Compte de paiement vérifié" else "Compte de paiement rejeté",
+                details = if (approuve) "Compte de paiement #$compteId vérifié" else "Compte de paiement #$compteId rejeté",
             ),
         )
         return true

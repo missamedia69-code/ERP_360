@@ -259,6 +259,7 @@
     <string name="ach_erreur_reception_liee">Cette commande a déjà été réceptionnée</string>
     <string name="ach_erreur_compte">Aucun compte de trésorerie pour ce mode de paiement</string>
     <string name="ach_erreur_fournisseur_non_actif">Fournisseur non actif : approbation requise avant de commander</string>
+    <string name="ach_erreur_fournisseur_doublon">Un fournisseur similaire existe déjà. Vérifiez le référentiel avant de le créer.</string>
     <string name="ach_erreur_paiement_bloque">Paiement bloqué pour ce fournisseur</string>
     <string name="four_a_payer">À payer</string>
     <string name="four_a_traiter">À traiter</string>

@@ -259,6 +259,7 @@
     <string name="ach_erreur_reception_liee">This order was already received</string>
     <string name="ach_erreur_compte">No treasury account for this payment method</string>
     <string name="ach_erreur_fournisseur_non_actif">Supplier not active: approval required before ordering</string>
+    <string name="ach_erreur_fournisseur_doublon">A similar supplier already exists. Review it in Suppliers before creating another record.</string>
     <string name="ach_erreur_paiement_bloque">Payment blocked for this supplier</string>
     <string name="four_a_payer">Due</string>
     <string name="four_a_traiter">To process</string>

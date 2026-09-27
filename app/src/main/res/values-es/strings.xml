@@ -259,6 +259,7 @@
     <string name="ach_erreur_reception_liee">Este pedido ya fue recibido</string>
     <string name="ach_erreur_compte">Sin cuenta de tesorería para este modo de pago</string>
     <string name="ach_erreur_fournisseur_non_actif">Proveedor no activo: se requiere aprobación antes de pedir</string>
+    <string name="ach_erreur_fournisseur_doublon">Ya existe un proveedor similar. Revíselo en Proveedores antes de crear otro registro.</string>
     <string name="ach_erreur_paiement_bloque">Pago bloqueado para este proveedor</string>
     <string name="four_a_payer">Por pagar</string>
     <string name="four_a_traiter">Por procesar</string>

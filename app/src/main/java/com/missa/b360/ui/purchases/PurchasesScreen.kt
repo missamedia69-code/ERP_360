@@ -785,6 +785,7 @@ private fun Selecteur(
 /** Boîte de dialogue de création rapide d'un fournisseur sans quitter le flux d'achat. */
 @Composable
 private fun DialogueCreationFournisseurRapide(
+    erreur: String? = null,
     onDismiss: () -> Unit,
     onValider: (nom: String, telephone: String, email: String?, adresse: String?) -> Unit,
 ) {
@@ -847,6 +848,14 @@ private fun DialogueCreationFournisseurRapide(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
+                erreur?.let { code ->
+                    val message = when (code) {
+                        "doublon" -> stringResource(R.string.ach_erreur_fournisseur_doublon)
+                        "licence" -> stringResource(R.string.ach_erreur_lecture_seule)
+                        else -> stringResource(R.string.ach_erreur)
+                    }
+                    Text(message, color = Color(0xFFB91C1C), fontSize = 12.sp)
+                }
             }
         },
         confirmButton = {
@@ -929,6 +938,7 @@ private fun FormulaireAchat(
     var modePaiement by remember { mutableStateOf("") }
     var ligneOuverte by remember { mutableStateOf<Long?>(null) }
     var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
+    var erreurCreationFournisseur by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
     LaunchedEffect(resultat) {
@@ -1144,6 +1154,7 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.EmptyCart -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
                 PurchasesViewModel.SaveResult.FournisseurIntrouvable -> stringResource(R.string.ach_erreur_fournisseur)
+                PurchasesViewModel.SaveResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
                 else -> null
@@ -1153,10 +1164,18 @@ private fun FormulaireAchat(
 
     if (dialogueNouveauFournisseur) {
         DialogueCreationFournisseurRapide(
+            erreur = erreurCreationFournisseur,
             onDismiss = { dialogueNouveauFournisseur = false },
             onValider = { nom, telephone, email, adresse ->
-                vm.creerFournisseurRapide(nom, telephone, email, adresse)
-                dialogueNouveauFournisseur = false
+                erreurCreationFournisseur = null
+                vm.creerFournisseurRapide(
+                    nom,
+                    telephone,
+                    email,
+                    adresse,
+                    onSuccess = { dialogueNouveauFournisseur = false },
+                    onFailure = { erreurCreationFournisseur = it },
+                )
             },
         )
     }
@@ -1361,6 +1380,7 @@ private fun FormulaireCommande(
     val actionResult by vm.actionResult.collectAsStateWithLifecycle()
     val itemsFournisseur by vm.itemsFournisseur.collectAsStateWithLifecycle()
     var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
+    var erreurCreationFournisseur by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(actionResult) {
         if (actionResult == PurchasesViewModel.ActionAchatResult.CommandeEnregistree) {
@@ -1480,10 +1500,18 @@ private fun FormulaireCommande(
 
     if (dialogueNouveauFournisseur) {
         DialogueCreationFournisseurRapide(
+            erreur = erreurCreationFournisseur,
             onDismiss = { dialogueNouveauFournisseur = false },
             onValider = { nom, telephone, email, adresse ->
-                vm.creerFournisseurRapide(nom, telephone, email, adresse)
-                dialogueNouveauFournisseur = false
+                erreurCreationFournisseur = null
+                vm.creerFournisseurRapide(
+                    nom,
+                    telephone,
+                    email,
+                    adresse,
+                    onSuccess = { dialogueNouveauFournisseur = false },
+                    onFailure = { erreurCreationFournisseur = it },
+                )
             },
         )
     }

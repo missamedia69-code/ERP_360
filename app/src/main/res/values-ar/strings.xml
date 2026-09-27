@@ -259,6 +259,7 @@
     <string name="ach_erreur_reception_liee">تم استلام هذا الطلب مسبقاً</string>
     <string name="ach_erreur_compte">لا يوجد حساب خزينة لطريقة الدفع هذه</string>
     <string name="ach_erreur_fournisseur_non_actif">المورد غير نشط: يجب الموافقة قبل الطلب</string>
+    <string name="ach_erreur_fournisseur_doublon">يوجد مورد مشابه بالفعل. راجعه في قسم الموردين قبل إنشاء سجل آخر.</string>
     <string name="ach_erreur_paiement_bloque">الدفع محظور لهذا المورد</string>
     <string name="four_a_payer">مستحق الدفع</string>
     <string name="four_a_traiter">قيد المعالجة</string>

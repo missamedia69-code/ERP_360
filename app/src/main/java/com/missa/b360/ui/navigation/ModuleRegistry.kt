@@ -48,7 +48,7 @@ enum class AppModule(
     CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7, couleur = Color(0xFF8B5CF6)), 
     FINANCES("module_finances", R.string.module_finances, Iv.TrendingUp, ModuleCode.CPT, couleur = Color(0xFF16A34A)), 
     ACHATS("module_achats", R.string.module_achats, Iv.CartArrowDown, ModuleCode.ACH, couleur = Color(0xFFFACC15)), 
-    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH, couleur = Color(0xFF92400E)), 
+    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH, couleur = Color(0xFFF28A16)),
     LIVRAISON("module_livraison", R.string.module_livraison, Iv.LocalShipping, ModuleCode.LOG, prioriteBarre = 8, couleur = Color(0xFF38BDF8)), 
     PRODUCTION("module_production", R.string.module_production, Iv.LineWeight, ModuleCode.PRO, prioriteBarre = 6, couleur = Color(0xFFF97316)), 
     SERVICES("module_services", R.string.module_services, Iv.RequestQuote, ModuleCode.SER, prioriteBarre = 4, couleur = Color(0xFFDB2777)), 

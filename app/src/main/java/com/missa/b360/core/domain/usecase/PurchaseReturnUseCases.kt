@@ -23,6 +23,7 @@ import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.InventoryRules
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseRecordPayload
+import com.missa.b360.core.domain.model.FournisseurRules
 import com.missa.b360.core.domain.model.PurchaseStockEffects
 import com.missa.b360.core.domain.model.ReglesGroupesArticles
 import com.missa.b360.core.domain.model.SaleLine
@@ -71,6 +72,7 @@ class SavePurchaseUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object DonneesInvalides : Result()
         data object FournisseurIntrouvable : Result()
+        data object FournisseurNonActif : Result()
         data object BrouillonIntrouvable : Result()
     }
 
@@ -87,7 +89,10 @@ class SavePurchaseUseCase @Inject constructor(
         if (payload.paidAmount < -QUANTITE_EPSILON || payload.paidAmount > payload.total + QUANTITE_EPSILON) {
             return Result.DonneesInvalides
         }
-        if (fournisseurDao.getById(payload.supplierId) == null) return Result.FournisseurIntrouvable
+        val fournisseur = fournisseurDao.getById(payload.supplierId) ?: return Result.FournisseurIntrouvable
+        if (!draft && !FournisseurRules.peutCommander(fournisseur.statut)) {
+            return Result.FournisseurNonActif
+        }
 
         if (draft) {
             // Brouillon : pièce seule, aucune entrée de stock (spec §3).
