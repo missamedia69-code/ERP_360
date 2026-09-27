@@ -1754,4 +1754,17 @@
     <string name="ach_pending_empty_desc">供应商采购订单草稿将显示在这里。</string>
     <string name="home_partially_paid">部分已付</string>
     <string name="home_to_collect">待收款</string>
+    <string name="clients_flow_activate">启用</string>
+    <string name="clients_flow_activation_success">客户已启用，现在可以用于销售。</string>
+    <string name="clients_flow_activation_contact">无法启用：请检查姓名并提供有效的电话或电子邮件。</string>
+    <string name="clients_flow_activation_fiscal">无法启用：请补充此客户类型所需的税号和地址。</string>
+    <string name="clients_status_draft">草稿</string>
+    <string name="clients_status_complete">待补全</string>
+    <string name="clients_status_watch">受监控</string>
+    <string name="clients_status_credit_block">信用受限</string>
+    <string name="clients_status_admin_block">行政冻结</string>
+    <string name="clients_status_archived">已归档</string>
+    <string name="sales_err_client_inactive">销售被拒绝：请先启用客户，或确保草稿已全额付款。</string>
+    <string name="sales_quick_client_duplicate">发现相似客户。请检查，并在客户模块中确认是否新建。</string>
+    <string name="sales_quick_client_invalid">信息无效或许可证处于只读模式。请检查客户资料。</string>
 </resources>

@@ -1754,4 +1754,17 @@
     <string name="ach_pending_empty_desc">ستظهر هنا أوامر شراء الموردين المحفوظة كمسودات.</string>
     <string name="home_partially_paid">مدفوعة جزئياً</string>
     <string name="home_to_collect">مستحق التحصيل</string>
+    <string name="clients_flow_activate">تفعيل</string>
+    <string name="clients_flow_activation_success">تم تفعيل العميل وأصبح متاحًا للمبيعات.</string>
+    <string name="clients_flow_activation_contact">تعذر التفعيل: تحقق من الاسم وأدخل هاتفًا أو بريدًا إلكترونيًا صالحًا.</string>
+    <string name="clients_flow_activation_fiscal">تعذر التفعيل: أضف الرقم الضريبي والعنوان المطلوبين.</string>
+    <string name="clients_status_draft">مسودة</string>
+    <string name="clients_status_complete">غير مكتمل</string>
+    <string name="clients_status_watch">قيد المراقبة</string>
+    <string name="clients_status_credit_block">حظر ائتماني</string>
+    <string name="clients_status_admin_block">حظر إداري</string>
+    <string name="clients_status_archived">مؤرشف</string>
+    <string name="sales_err_client_inactive">تم رفض البيع: فعّل العميل أو تأكد من سداد المسودة بالكامل.</string>
+    <string name="sales_quick_client_duplicate">يوجد عميل مشابه. راجعه وأكد أي إنشاء جديد من وحدة العملاء.</string>
+    <string name="sales_quick_client_invalid">البيانات غير صالحة أو الترخيص للقراءة فقط. تحقق من معلومات العميل.</string>
 </resources>

@@ -1754,4 +1754,17 @@
     <string name="ach_pending_empty_desc">Aquí aparecerán los pedidos de compra de proveedores en borrador.</string>
     <string name="home_partially_paid">Parcialmente pagada</string>
     <string name="home_to_collect">Pendiente de cobro</string>
+    <string name="clients_flow_activate">Activar</string>
+    <string name="clients_flow_activation_success">Cliente activado y disponible para las ventas.</string>
+    <string name="clients_flow_activation_contact">No se puede activar: compruebe el nombre y añada un teléfono o correo válido.</string>
+    <string name="clients_flow_activation_fiscal">No se puede activar: añada el identificador fiscal y la dirección requeridos.</string>
+    <string name="clients_status_draft">Borrador</string>
+    <string name="clients_status_complete">Incompleto</string>
+    <string name="clients_status_watch">En observación</string>
+    <string name="clients_status_credit_block">Crédito bloqueado</string>
+    <string name="clients_status_admin_block">Bloqueo administrativo</string>
+    <string name="clients_status_archived">Archivado</string>
+    <string name="sales_err_client_inactive">Venta bloqueada: active el cliente o asegúrese de que el borrador esté pagado por completo.</string>
+    <string name="sales_quick_client_duplicate">Existe un cliente similar. Revíselo y confirme cualquier alta en el módulo Clientes.</string>
+    <string name="sales_quick_client_invalid">Datos no válidos o licencia de solo lectura. Revise la información del cliente.</string>
 </resources>
