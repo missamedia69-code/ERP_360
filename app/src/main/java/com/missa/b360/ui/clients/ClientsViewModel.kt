@@ -15,6 +15,7 @@ import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
+import com.missa.b360.core.domain.usecase.ActiverClientUseCase
 import com.missa.b360.core.domain.usecase.ClientProfileInput
 import com.missa.b360.core.domain.usecase.ClientProfileUseCase
 import com.missa.b360.core.domain.usecase.CreateClientUseCase
@@ -43,6 +44,7 @@ class ClientsViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val observeAllClients: ObserveAllClientsUseCase,
     private val createClient: CreateClientUseCase,
+    private val activerClient: ActiverClientUseCase,
     private val updateClient: UpdateClientUseCase,
     private val desactiverClient: DesactiverClientUseCase,
     private val clientProfile: ClientProfileUseCase,
@@ -334,6 +336,24 @@ class ClientsViewModel @Inject constructor(
                 throw exception
             } catch (_: Exception) {
                 _resultat.value = Resultat(erreur = "import")
+            }
+        }
+    }
+
+    fun activer(id: Long) {
+        viewModelScope.launch {
+            _resultat.value = try {
+                when (activerClient(id)) {
+                    ActiverClientUseCase.Result.Succes -> Resultat(code = "activate")
+                    ActiverClientUseCase.Result.Introuvable -> Resultat(erreur = "err")
+                    ActiverClientUseCase.Result.CoordonneesManquantes -> Resultat(erreur = "activation_contact")
+                    ActiverClientUseCase.Result.InformationsFiscalesManquantes -> Resultat(erreur = "activation_fiscal")
+                    ActiverClientUseCase.Result.LicenceExpiree -> Resultat(erreur = "licence")
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                Resultat(erreur = "err")
             }
         }
     }

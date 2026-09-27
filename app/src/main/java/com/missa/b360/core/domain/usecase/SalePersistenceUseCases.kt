@@ -1,6 +1,7 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.OperationRecordDao
@@ -46,6 +47,7 @@ import kotlin.math.abs
  */
 class SaveSaleUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
+    private val clientDao: ClientDao,
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val productDao: ProductDao,
@@ -61,6 +63,7 @@ class SaveSaleUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object DonneesInvalides : Result()
         data object BrouillonIntrouvable : Result()
+        data object ClientNonEligible : Result()
         /** Stock insuffisant re-lu transactionnellement (§43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : Result()
     }
@@ -142,6 +145,11 @@ class SaveSaleUseCase @Inject constructor(
         // Vente validée : toutes les vérifications de lecture précèdent toute écriture,
         // afin qu'un échec ne laisse aucun état partiel (§44).
         return database.withTransaction {
+            val client = clientDao.getById(payload.clientId)
+                ?: return@withTransaction Result.ClientNonEligible
+            if (!ClientLifecycleRules.venteAutorisee(client, totals.total, payload.paidAmount)) {
+                return@withTransaction Result.ClientNonEligible
+            }
             val besoins = SaleStockEffects.besoinsParProduit(payload.lines)
             val sorties = mutableListOf<Triple<Long, Long, Double>>() // produit, site de sortie, quantité
             for ((produitId, demande) in besoins) {

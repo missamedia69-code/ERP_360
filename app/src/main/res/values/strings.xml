@@ -1801,4 +1801,17 @@
     <string name="ach_pending_empty_desc">Les bons de commande fournisseur en brouillon apparaîtront ici.</string>
     <string name="home_partially_paid">Partiellement payée</string>
     <string name="home_to_collect">À encaisser</string>
+    <string name="clients_flow_activate">Activer</string>
+    <string name="clients_flow_activation_success">Client activé. Il est maintenant disponible pour les ventes.</string>
+    <string name="clients_flow_activation_contact">Activation impossible : vérifiez le nom et au moins un téléphone ou e-mail valide.</string>
+    <string name="clients_flow_activation_fiscal">Activation impossible : ajoutez l’identifiant fiscal et l’adresse requis pour ce type de client.</string>
+    <string name="clients_status_draft">Brouillon</string>
+    <string name="clients_status_complete">À compléter</string>
+    <string name="clients_status_watch">Sous surveillance</string>
+    <string name="clients_status_credit_block">Bloqué crédit</string>
+    <string name="clients_status_admin_block">Bloqué administratif</string>
+    <string name="clients_status_archived">Archivé</string>
+    <string name="sales_err_client_inactive">Vente refusée : ce client doit être activé, ou le brouillon doit être entièrement réglé.</string>
+    <string name="sales_quick_client_duplicate">Un client similaire existe. Vérifiez-le et confirmez toute création depuis le module Clients.</string>
+    <string name="sales_quick_client_invalid">Informations invalides ou licence en lecture seule. Vérifiez les coordonnées du client.</string>
 </resources>

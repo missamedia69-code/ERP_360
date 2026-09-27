@@ -156,7 +156,8 @@ object ClientValidation {
         adresse: String? = null,
         notes: String? = null,
     ): Boolean = nomEstValide(nom) &&
-        telephoneEstValide(telephone) &&
+        (telephone.isBlank() || telephoneEstValide(telephone)) &&
+        (!telephone.isBlank() || !normaliseEmail(email).isNullOrBlank()) &&
         emailEstValide(email) &&
         adresseEstValide(adresse) &&
         notesSontValides(notes) &&
@@ -250,8 +251,8 @@ class CreateClientUseCase @Inject constructor(
             return when {
                 nomNormalise.isEmpty() -> Result.NomObligatoire
                 !ClientValidation.nomEstValide(nom) -> Result.NomInvalide
-                telephoneNormalise.isEmpty() -> Result.TelephoneObligatoire
-                !ClientValidation.telephoneEstValide(telephone) -> Result.TelephoneInvalide
+                telephoneNormalise.isEmpty() && ClientValidation.normaliseEmail(email).isNullOrBlank() -> Result.TelephoneObligatoire
+                telephoneNormalise.isNotEmpty() && !ClientValidation.telephoneEstValide(telephone) -> Result.TelephoneInvalide
                 !ClientValidation.emailEstValide(email) -> Result.EmailInvalide
                 else -> Result.DonneesInvalides
             }
@@ -281,9 +282,11 @@ class CreateClientUseCase @Inject constructor(
                 limiteCredit = limiteCredit,
                 badgeId = badgeId,
                 notes = ClientValidation.normaliseTexte(notes),
-                statut = ClientStatus.ACTIF,
+                // Création toujours non transactionnelle : l'activation est un acte séparé.
+                statut = ClientStatus.BROUILLON,
                 prospect = type == ClientType.PROSPECT,
                 createdAt = now,
+                active = false,
             ),
             contacts = profile.contacts,
             addresses = profile.addresses,
@@ -292,6 +295,55 @@ class CreateClientUseCase @Inject constructor(
         return Result.Succes(id, code)
     }
 }
+/** Règles pures du cycle de vie client, utilisées aussi par les tests. */
+object ClientLifecycleRules {
+    fun peutActiver(client: ClientEntity): Boolean =
+        client.statut in setOf(ClientStatus.BROUILLON, ClientStatus.A_COMPLETER, ClientStatus.INACTIF, ClientStatus.DESACTIVE) &&
+            ClientValidation.nomEstValide(client.nom) &&
+            (ClientValidation.telephoneEstValide(client.telephone) ||
+                (!client.email.isNullOrBlank() && ClientValidation.emailEstValide(client.email))) &&
+            (client.email.isNullOrBlank() || ClientValidation.emailEstValide(client.email)) &&
+            (client.type !in setOf(ClientType.ENTREPRISE, ClientType.ADMINISTRATION) ||
+                (!client.nif.isNullOrBlank() && !client.adresse.isNullOrBlank()))
+
+    /** Les brouillons ne peuvent porter une créance ; ils sont acceptés uniquement réglés. */
+    fun venteAutorisee(client: ClientEntity, montant: Double, regle: Double): Boolean = when (client.statut) {
+        ClientStatus.ACTIF -> client.active
+        ClientStatus.BROUILLON, ClientStatus.A_COMPLETER -> client.active.not() && regle >= montant
+        ClientStatus.BLOQUE_CREDIT -> client.active && regle >= montant
+        else -> false
+    }
+}
+
+/** Activation explicite après vérification des coordonnées et éléments requis. */
+class ActiverClientUseCase @Inject constructor(
+    private val clientDao: ClientDao,
+    private val licenceManager: LicenceManager,
+    private val journalManager: JournalManager,
+) {
+    sealed class Result {
+        data object Succes : Result()
+        data object Introuvable : Result()
+        data object CoordonneesManquantes : Result()
+        data object InformationsFiscalesManquantes : Result()
+        data object LicenceExpiree : Result()
+    }
+
+    suspend operator fun invoke(id: Long): Result {
+        if (licenceManager.isReadOnly()) return Result.LicenceExpiree
+        val client = clientDao.getById(id) ?: return Result.Introuvable
+        if (!ClientLifecycleRules.peutActiver(client)) {
+            val infosFiscalesManquantes = client.type in setOf(ClientType.ENTREPRISE, ClientType.ADMINISTRATION) &&
+                (client.nif.isNullOrBlank() || client.adresse.isNullOrBlank())
+            return if (infosFiscalesManquantes) Result.InformationsFiscalesManquantes
+            else Result.CoordonneesManquantes
+        }
+        clientDao.update(client.copy(statut = ClientStatus.ACTIF, active = true))
+        journalManager.log("CLIENTS", "ACTIVATION_CLIENT", "Client ${client.code} activé")
+        return Result.Succes
+    }
+}
+
 /** Édition d'un client existant (jamais de suppression physique — C7). */
 class UpdateClientUseCase @Inject constructor(
     private val clientDao: ClientDao,

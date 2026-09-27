@@ -4,9 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
-import com.missa.b360.core.data.dao.ClientDao
-import com.missa.b360.core.numbering.DocType
-import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.SaleCalculator
@@ -15,6 +12,8 @@ import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
 import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.domain.model.ProduitRules
+import com.missa.b360.core.domain.usecase.ClientValidation
+import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.CheckSaleStockUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
@@ -91,8 +90,7 @@ class SalesViewModel @Inject constructor(
     private val saveSale: SaveSaleUseCase,
     private val reverseSaleStock: ReverseSaleStockUseCase,
     private val checkSaleStock: CheckSaleStockUseCase,
-    private val clientDao: ClientDao,
-    private val sequenceManager: SequenceManager,
+    private val createClient: CreateClientUseCase,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -101,6 +99,7 @@ class SalesViewModel @Inject constructor(
         data object EmptyCart : SaveResult
         data object InvalidAmount : SaveResult
         data object ReadOnly : SaveResult
+        data object ClientNonEligible : SaveResult
         /** Stock insuffisant (contrôle UI ou transactionnel — spec §43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SaveResult
         data object Cancelled : SaveResult
@@ -150,30 +149,47 @@ class SalesViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(selectedClient = client)
     }
 
-    /** Création rapide in-situ d'un client actif sans abandonner le panier en cours. */
+    /** Création rapide via le cas d'usage maître ; doublon à confirmer dans Clients. */
     fun creerClientRapide(
         nom: String,
         telephone: String,
         email: String? = null,
         adresse: String? = null,
         onSuccess: (ClientEntity) -> Unit = {},
+        onFailure: (String) -> Unit = {},
     ) {
         viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val code = sequenceManager.next(DocType.CLIENT)
-            val nouveau = ClientEntity(
-                code = code,
-                nom = nom.trim(),
-                telephone = telephone.trim(),
-                email = email?.trim()?.ifBlank { null },
-                adresse = adresse?.trim()?.ifBlank { null },
-                statut = ClientStatus.ACTIF,
-                createdAt = now,
-            )
-            val id = clientDao.insert(nouveau)
-            val cree = nouveau.copy(id = id)
-            selectClient(cree)
-            onSuccess(cree)
+            try {
+                when (val result = createClient(
+                    nom = nom,
+                    telephone = telephone,
+                    email = email,
+                    adresse = adresse,
+                    doublonConfirme = false,
+                )) {
+                    is CreateClientUseCase.Result.Succes -> {
+                        val cree = ClientEntity(
+                            id = result.clientId,
+                            code = result.code,
+                            nom = nom.trim(),
+                            telephone = ClientValidation.normaliseTelephone(telephone),
+                            email = email?.trim()?.ifBlank { null },
+                            adresse = adresse?.trim()?.ifBlank { null },
+                            statut = ClientStatus.BROUILLON,
+                            active = false,
+                            createdAt = System.currentTimeMillis(),
+                        )
+                        selectClient(cree)
+                        onSuccess(cree)
+                    }
+                    CreateClientUseCase.Result.DoublonPotentiel -> onFailure("doublon")
+                    else -> onFailure("invalide")
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                onFailure("invalide")
+            }
         }
     }
 
@@ -379,6 +395,7 @@ class SalesViewModel @Inject constructor(
                     SaveSaleUseCase.Result.LectureSeule -> _saveResult.value = SaveResult.ReadOnly
                     SaveSaleUseCase.Result.DonneesInvalides -> _saveResult.value = SaveResult.InvalidAmount
                     SaveSaleUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
+                    SaveSaleUseCase.Result.ClientNonEligible -> _saveResult.value = SaveResult.ClientNonEligible
                     is SaveSaleUseCase.Result.StockInsuffisant -> _saveResult.value = SaveResult.StockInsuffisant(
                         result.produitNom,
                         result.disponible,

@@ -7,8 +7,13 @@ import androidx.room.PrimaryKey
 /** Les 6 types de client (spec 9.9). */
 enum class ClientType { PARTICULIER, ENTREPRISE, ADMINISTRATION, ONG, REVENDEUR, PROSPECT }
 
-/** Statut client — « Désactivé » unique (RC-03) ; jamais de suppression physique. */
-enum class ClientStatus { ACTIF, DESACTIVE }
+/** Cycle de vie Client 360°. Les valeurs historiques ACTIF/DESACTIVE restent lisibles. */
+enum class ClientStatus {
+    BROUILLON, A_COMPLETER, ACTIF, SOUS_SURVEILLANCE,
+    BLOQUE_CREDIT, BLOQUE_ADMINISTRATIF, INACTIF, ARCHIVE,
+    /** Compatibilité avec les enregistrements antérieurs au cycle de vie complet. */
+    DESACTIVE,
+}
 
 /** Badge de fidélité — paramétrable, remise automatique à la vente (RC-16). */
 @Entity(tableName = "loyalty_badges")
@@ -59,7 +64,7 @@ data class ClientEntity(
     val remiseDefautPct: Double = 0.0,
     /** Limite de crédit dans la devise de l'entreprise (RC-05) ; null = illimitée. */
     val limiteCredit: Double? = null,
-    val statut: ClientStatus = ClientStatus.ACTIF,
+    val statut: ClientStatus = ClientStatus.BROUILLON,
     val badgeId: Long? = null,
     /** Prospect auto-converti à la 1re vente (RC-02). */
     val prospect: Boolean = false,
@@ -71,7 +76,7 @@ data class ClientEntity(
     /** Référence croisée client ↔ fournisseur (champ libre). */
     val codeFournisseur: String? = null,
     val createdAt: Long,
-    val active: Boolean = true, // C7 : désactivation, jamais de DELETE
+    val active: Boolean = false, // Un nouveau client reste en brouillon jusqu’à activation explicite
 )
 
 /** Prix spécifique client × produit (RC-07) — consommé par 9.6 Vente (RV-17). */

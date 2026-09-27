@@ -1758,4 +1758,17 @@
     <string name="ach_pending_empty_desc">Draft supplier purchase orders will appear here.</string>
     <string name="home_partially_paid">Partially paid</string>
     <string name="home_to_collect">To collect</string>
+    <string name="clients_flow_activate">Activate</string>
+    <string name="clients_flow_activation_success">Client activated and available for sales.</string>
+    <string name="clients_flow_activation_contact">Activation failed: check the name and provide a valid phone number or email.</string>
+    <string name="clients_flow_activation_fiscal">Activation failed: add the tax identifier and address required for this client type.</string>
+    <string name="clients_status_draft">Draft</string>
+    <string name="clients_status_complete">Incomplete</string>
+    <string name="clients_status_watch">Under review</string>
+    <string name="clients_status_credit_block">Credit blocked</string>
+    <string name="clients_status_admin_block">Administrative block</string>
+    <string name="clients_status_archived">Archived</string>
+    <string name="sales_err_client_inactive">Sale blocked: activate this client, or make sure the draft is fully paid.</string>
+    <string name="sales_quick_client_duplicate">A similar client exists. Review it and confirm any new record in the Clients module.</string>
+    <string name="sales_quick_client_invalid">Invalid information or read-only license. Check the client details.</string>
 </resources>

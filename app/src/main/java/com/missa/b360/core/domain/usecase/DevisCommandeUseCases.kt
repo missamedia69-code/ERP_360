@@ -303,6 +303,7 @@ class ConvertOrderToSaleUseCase @Inject constructor(
                 SaveSaleUseCase.Result.LectureSeule -> Result.LectureSeule
                 SaveSaleUseCase.Result.DonneesInvalides -> Result.DonneesInvalides
                 SaveSaleUseCase.Result.BrouillonIntrouvable -> Result.DonneesInvalides
+                SaveSaleUseCase.Result.ClientNonEligible -> Result.DonneesInvalides
                 is SaveSaleUseCase.Result.StockInsuffisant ->
                     Result.StockInsuffisant(facturation.produitNom, facturation.disponible, facturation.demande)
             }

@@ -101,6 +101,28 @@ class ClientValidationTest {
     }
 
     @Test
+    fun `un telephone ou un email valide suffit comme coordonnee client`() {
+        assertTrue(
+            ClientValidation.coordonneesEtConditionsSontValides(
+                nom = "Client test",
+                telephone = "",
+                email = "contact@example.cm",
+                remiseDefautPct = 0.0,
+                limiteCredit = null,
+            ),
+        )
+        assertFalse(
+            ClientValidation.coordonneesEtConditionsSontValides(
+                nom = "Client test",
+                telephone = "",
+                email = null,
+                remiseDefautPct = 0.0,
+                limiteCredit = null,
+            ),
+        )
+    }
+
+    @Test
     fun `les champs texte facultatifs sont normalisés avant persistance`() {
         assertEquals("contact@example.com", ClientValidation.normaliseTexte(" contact@example.com "))
         assertNull(ClientValidation.normaliseTexte("   "))

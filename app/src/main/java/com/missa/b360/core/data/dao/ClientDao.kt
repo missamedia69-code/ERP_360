@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ClientDao {
-    @Query("SELECT * FROM clients WHERE active = 1 ORDER BY nom")
+    @Query("SELECT * FROM clients WHERE active = 1 AND statut = 'ACTIF' ORDER BY nom")
     fun observeAll(): Flow<List<ClientEntity>>
 
     /** Liste complète destinée au module Client, y compris les comptes désactivés. */
@@ -37,8 +37,8 @@ interface ClientDao {
 
     /** Détection de doublons RC-01 : même téléphone OU nom proche. */
     @Query(
-        "SELECT * FROM clients WHERE active = 1 AND (telephone = :telephone " +
-            "OR LOWER(TRIM(nom)) = LOWER(TRIM(:nom)))",
+        "SELECT * FROM clients WHERE statut NOT IN ('INACTIF', 'DESACTIVE', 'ARCHIVE') AND (" +
+            "(:telephone != '' AND telephone = :telephone) OR LOWER(TRIM(nom)) = LOWER(TRIM(:nom)))",
     )
     suspend fun findDoublonsPotentiels(telephone: String, nom: String): List<ClientEntity>
 

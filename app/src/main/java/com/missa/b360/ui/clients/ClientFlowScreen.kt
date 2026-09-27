@@ -295,10 +295,12 @@ fun ClientsScreen(
                 viewModel.acquitterResultat()
             }
             outcome.code != null -> {
-                snackbar.showSnackbar(
-                    if (outcome.code == "edit") context.getString(R.string.clients_client_modifie)
-                    else context.getString(R.string.clients_client_cree, outcome.code),
-                )
+                val message = when (outcome.code) {
+                    "edit" -> context.getString(R.string.clients_client_modifie)
+                    "activate" -> context.getString(R.string.clients_flow_activation_success)
+                    else -> context.getString(R.string.clients_client_cree, outcome.code)
+                }
+                snackbar.showSnackbar(message)
                 if (outcome.clientId != null) {
                     selectedClientId = outcome.clientId
                     currentViewName = ClientView.DETAIL.name
@@ -317,6 +319,8 @@ fun ClientsScreen(
                     "telephone" -> R.string.clients_telephone_obligatoire
                     "telephone_invalide" -> R.string.clients_telephone_invalide
                     "email_invalide" -> R.string.clients_email_invalide
+                    "activation_contact" -> R.string.clients_flow_activation_contact
+                    "activation_fiscal" -> R.string.clients_flow_activation_fiscal
                     "import" -> R.string.clients_flow_import_error
                     else -> R.string.clients_erreur_sauvegarde
                 }
@@ -375,6 +379,7 @@ fun ClientsScreen(
                     onHistory = { currentViewName = ClientView.HISTORY.name },
                     onAccount = { currentViewName = ClientView.ACCOUNT.name },
                     onDeactivate = { currentViewName = ClientView.DEACTIVATE.name },
+                    onActivate = { viewModel.activer(client.id) },
                 )
             }
             ClientView.FORM_INFO -> ClientInfoFormScreen(
@@ -640,13 +645,29 @@ private fun ClientAvatar(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ClientStatusChip(client: ClientEntity) {
-    val active = client.isActive()
+    val label = when (client.statut) {
+        ClientStatus.BROUILLON -> R.string.clients_status_draft
+        ClientStatus.A_COMPLETER -> R.string.clients_status_complete
+        ClientStatus.ACTIF -> R.string.clients_actif
+        ClientStatus.SOUS_SURVEILLANCE -> R.string.clients_status_watch
+        ClientStatus.BLOQUE_CREDIT -> R.string.clients_status_credit_block
+        ClientStatus.BLOQUE_ADMINISTRATIF -> R.string.clients_status_admin_block
+        ClientStatus.INACTIF, ClientStatus.DESACTIVE -> R.string.clients_inactif
+        ClientStatus.ARCHIVE -> R.string.clients_status_archived
+    }
+    val tint = when (client.statut) {
+        ClientStatus.ACTIF -> ClientGreen
+        ClientStatus.BROUILLON, ClientStatus.A_COMPLETER -> ClientBlue
+        ClientStatus.SOUS_SURVEILLANCE -> Color(0xFFD97706)
+        ClientStatus.BLOQUE_CREDIT, ClientStatus.BLOQUE_ADMINISTRATIF, ClientStatus.INACTIF, ClientStatus.DESACTIVE -> ClientRed
+        ClientStatus.ARCHIVE -> ClientMuted
+    }
     AssistChip(
         onClick = {}, enabled = false,
-        label = { Text(stringResource(if (active) R.string.clients_actif else R.string.clients_inactif), fontSize = 8.sp) },
+        label = { Text(stringResource(label), fontSize = 8.sp) },
         colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
-            disabledContainerColor = (if (active) ClientGreen else ClientRed).copy(alpha = .10f),
-            disabledLabelColor = if (active) ClientGreen else ClientRed,
+            disabledContainerColor = tint.copy(alpha = .10f),
+            disabledLabelColor = tint,
         ),
         border = null,
     )
@@ -671,6 +692,7 @@ private fun ClientDetailScreen(
     onHistory: () -> Unit,
     onAccount: () -> Unit,
     onDeactivate: () -> Unit,
+    onActivate: () -> Unit,
 ) {
     Scaffold(
         containerColor = ClientBackground,
@@ -681,6 +703,9 @@ private fun ClientDetailScreen(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
                 actions = {
+                    if (client.statut in setOf(ClientStatus.BROUILLON, ClientStatus.A_COMPLETER, ClientStatus.INACTIF, ClientStatus.DESACTIVE)) {
+                        TextButton(onClick = onActivate) { Text(stringResource(R.string.clients_flow_activate), fontSize = 11.sp, color = ClientBlue) }
+                    }
                     TextButton(onClick = onEdit) { Text(stringResource(R.string.clients_flow_edit), fontSize = 11.sp) }
                     IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = MissaInk) }
                 },
@@ -859,8 +884,11 @@ private fun ClientInfoFormScreen(
     saveMode: Boolean = false,
 ) {
     val fullPhone = ClientValidation.telephoneAvecIndicatif(draft.phoneLocal, Iso4217.indicatifTelephone(draft.countryCode))
-    val valid = draft.countryCode != null && ClientValidation.nomEstValide(draft.name) &&
-        ClientValidation.telephoneEstValide(fullPhone) && ClientValidation.emailEstValide(draft.email)
+    val phoneProvided = draft.phoneLocal.isNotBlank()
+    val validContact = (phoneProvided && draft.countryCode != null && ClientValidation.telephoneEstValide(fullPhone)) ||
+        (draft.email.isNotBlank() && ClientValidation.emailEstValide(draft.email))
+    val valid = ClientValidation.nomEstValide(draft.name) && validContact &&
+        ClientValidation.emailEstValide(draft.email)
     ClientWizardScaffold(
         title = title,
         step = if (saveMode) null else 0,
@@ -935,7 +963,7 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
     var pickerVisible by remember { mutableStateOf(false) }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         OutlinedButton(onClick = { pickerVisible = true }, modifier = Modifier.width(110.dp).height(56.dp)) { Text(selected?.indicatif ?: "…", fontSize = 13.sp); Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(16.dp)) }
-        OutlinedTextField(value = phoneLocal, onValueChange = onPhone, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_telephone)) }, singleLine = true, isError = isError || countryCode == null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+        OutlinedTextField(value = phoneLocal, onValueChange = onPhone, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_telephone)) }, singleLine = true, isError = isError || (countryCode == null && phoneLocal.isNotBlank()), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
     }
     if (pickerVisible) {
         var query by rememberSaveable { mutableStateOf("") }

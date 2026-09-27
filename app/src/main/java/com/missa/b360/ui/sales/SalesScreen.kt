@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -370,7 +371,9 @@ private fun FormulaireVente(
     val taxRate by vm.taxRate.collectAsStateWithLifecycle()
     val saving by vm.saving.collectAsStateWithLifecycle()
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var dialogueNouveauClient by remember { mutableStateOf(false) }
+    var quickClientError by remember { mutableStateOf<String?>(null) }
 
     var modePaiement by remember { mutableStateOf("") }
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
@@ -488,6 +491,7 @@ private fun FormulaireVente(
                 SalesViewModel.SaveResult.EmptyCart -> stringResource(R.string.ach_erreur_panier)
                 SalesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
                 SalesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
+                SalesViewModel.SaveResult.ClientNonEligible -> stringResource(R.string.sales_err_client_inactive)
                 is SalesViewModel.SaveResult.StockInsuffisant -> {
                     val res = saveResult as SalesViewModel.SaveResult.StockInsuffisant
                     stringResource(R.string.sales_err_stock_insufficient, res.produitNom, fmtQuantite(res.disponible))
@@ -500,10 +504,18 @@ private fun FormulaireVente(
 
     if (dialogueNouveauClient) {
         DialogueCreationClientRapide(
-            onDismiss = { dialogueNouveauClient = false },
+            error = quickClientError,
+            onDismiss = { dialogueNouveauClient = false; quickClientError = null },
             onValider = { nom, telephone, email, adresse ->
-                vm.creerClientRapide(nom, telephone, email, adresse)
-                dialogueNouveauClient = false
+                vm.creerClientRapide(
+                    nom, telephone, email, adresse,
+                    onSuccess = { dialogueNouveauClient = false; quickClientError = null },
+                    onFailure = { cause ->
+                        quickClientError = if (cause == "doublon")
+                            context.getString(R.string.sales_quick_client_duplicate)
+                        else context.getString(R.string.sales_quick_client_invalid)
+                    },
+                )
             },
         )
     }
@@ -580,6 +592,7 @@ private fun SelecteurClient(
 /** Boîte de dialogue de création rapide d'un client in-situ sans abandonner le panier vente. */
 @Composable
 private fun DialogueCreationClientRapide(
+    error: String?,
     onDismiss: () -> Unit,
     onValider: (nom: String, telephone: String, email: String?, adresse: String?) -> Unit,
 ) {
@@ -634,6 +647,7 @@ private fun DialogueCreationClientRapide(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
+                if (error != null) Text(error, color = Color(0xFFB91C1C), fontSize = 11.sp)
                 OutlinedTextField(
                     value = adresse,
                     onValueChange = { adresse = it.take(150) },
