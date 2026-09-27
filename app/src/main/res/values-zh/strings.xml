@@ -625,8 +625,8 @@
     
     <string name="home_company_placeholder">您的企业</string>
     <string name="home_not_configured">待设置</string>
-    <string name="home_greeting">您好，%1$s 👋</string>
-    <string name="home_greeting_anonymous">您好 👋</string>
+    <string name="home_greeting">您好，%1$s</string>
+    <string name="home_greeting_anonymous">您好</string>
     <string name="home_more_modules_description">访问 ERP 的补充功能。</string>
     <string name="home_overview">以下是您的业务概览。</string>
     <string name="home_quick_actions">快捷操作</string>
@@ -657,6 +657,8 @@
     <string name="home_aujourdhui">今天</string>
     <string name="home_ventes_label">销售</string>
     <string name="home_achats_label">采购</string>
+    <string name="home_sales_count">%1$d 笔销售</string>
+    <string name="home_purchases_count">%1$d 笔采购</string>
     <string name="home_mouvements_stock_label">库存变动</string>
     <string name="home_marge_brute_label">毛利</string>
     <string name="home_operations_label">操作</string>

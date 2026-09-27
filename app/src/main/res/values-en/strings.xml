@@ -635,8 +635,8 @@
     
     <string name="home_company_placeholder">Your company</string>
     <string name="home_not_configured">Not set up</string>
-    <string name="home_greeting">Hello, %1$s 👋</string>
-    <string name="home_greeting_anonymous">Hello 👋</string>
+    <string name="home_greeting">Hello, %1$s</string>
+    <string name="home_greeting_anonymous">Hello</string>
     <string name="home_more_modules_description">Access the additional features of your ERP.</string>
     <string name="home_overview">Here is an overview of your business.</string>
     <string name="home_quick_actions">Quick actions</string>
@@ -667,6 +667,8 @@
     <string name="home_aujourdhui">Today</string>
     <string name="home_ventes_label">Sales</string>
     <string name="home_achats_label">Purchases</string>
+    <string name="home_sales_count">%1$d sales</string>
+    <string name="home_purchases_count">%1$d purchases</string>
     <string name="home_mouvements_stock_label">Stock moves</string>
     <string name="home_marge_brute_label">Gross margin</string>
     <string name="home_operations_label">Operations</string>

@@ -304,358 +304,228 @@ private fun HomeDashboard(
     onNotificationClick: () -> Unit = {},
     onSelectionJour: (Long) -> Unit = {},
 ) {
-    // Carte KPI consultée en popup (0 ventes · 1 achats · 2 trésorerie · 3 clients).
     var kpiEnVue by remember { mutableStateOf(-1) }
     val currency = state.devise
     val greeting = state.prenomUtilisateur?.let { stringResource(R.string.home_greeting, it) }
         ?: stringResource(R.string.home_greeting_anonymous)
-    // Dashboard : chaque carte KPI ouvre un popup avec la courbe d'évolution.
     when (kpiEnVue) {
         0 -> KpiPopup(stringResource(R.string.home_ventes_du_jour), state.serieVentes, AppModule.VENTE.couleur, stringResource(R.string.kpi_ventes_explication)) { kpiEnVue = -1 }
         1 -> KpiPopup(stringResource(R.string.home_achats_du_jour), state.serieAchats, AppModule.ACHATS.couleur, stringResource(R.string.kpi_achats_explication)) { kpiEnVue = -1 }
         2 -> KpiPopup(stringResource(R.string.home_tresorerie_card), state.serieTresorerie, AppModule.TRESORERIE.couleur, stringResource(R.string.kpi_tresorerie_explication)) { kpiEnVue = -1 }
         3 -> KpiPopup(stringResource(R.string.home_clients_card), state.serieClients, AppModule.CLIENTS.couleur, stringResource(R.string.kpi_clients_explication)) { kpiEnVue = -1 }
     }
-    // Spec: contenu entre Header 64dp et BottomNav 80dp, scrollable seul, marges 16dp, grille 4/8/12/16/20/24/32
+    val profil = state.profilActivite.profileLabel()?.let { stringResource(it) }
+        ?: state.profilActivite ?: "—"
+    val taille = state.palierTaille.sizeLabel()?.let { stringResource(it) }
+        ?: state.palierTaille ?: stringResource(R.string.home_not_configured)
+    val dateDuJour = remember {
+        java.text.SimpleDateFormat("EEEE d MMMM", java.util.Locale.getDefault())
+            .format(java.util.Date())
+    }
+
     LazyColumn(
         modifier = modifier.background(HomeBackground),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            // Salutation + cloche des notifications avec pastille rouge numérotée
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = greeting,
-                            color = HomeTextDark,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(text = "👋", fontSize = 18.sp)
-                    }
-                    Spacer(Modifier.height(3.dp))
-                    Text(
-                        text = stringResource(R.string.home_overview),
-                        color = HomeTextMuted,
-                        fontSize = 13.sp,
-                    )
-                }
-                Box {
-                    IconButton(onClick = onNotificationClick, modifier = Modifier.size(44.dp)) {
-                        Icon(
-                            painter = painterResource(Iv.Notifications),
-                            contentDescription = stringResource(R.string.notifications),
-                            tint = MissaInk,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                    if (notificationCount > 0) {
-                        Surface(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(top = 4.dp, end = 4.dp),
-                            shape = CircleShape,
-                            color = Red40,
-                        ) {
-                            Text(
-                                text = notificationCount.coerceAtMost(99).toString(),
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        item {
-            // Bandeau capsule Profil & Taille
+            // Identité de l'entreprise : repère immédiatement l'espace de travail ouvert.
             Surface(
-                modifier = Modifier.fillMaxWidth().clickable { onNavigate(Routes.ADMIN_REGLAGES) },
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.7f)),
-                shadowElevation = 0.5.dp,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(22.dp),
+                color = MissaInk,
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(Iv.Business),
-                        contentDescription = null,
-                        tint = Color(0xFF0288D1),
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "Profil : " + (state.profilActivite ?: "APSV"),
-                        color = HomeTextDark,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Box(modifier = Modifier.width(1.dp).height(16.dp).background(HomeBorder))
-                    Spacer(Modifier.width(12.dp))
-                    Icon(
-                        painter = painterResource(Iv.Groups),
-                        contentDescription = null,
-                        tint = Color(0xFF0288D1),
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "Taille : " + (
-                            when (state.palierTaille) {
-                                "P3" -> "P3 - Petite (10-49)"
-                                "P1" -> "P1 - Micro (1-2)"
-                                "P2" -> "P2 - Très petite (3-9)"
-                                "P4" -> "P4 - Moyenne (50-199)"
-                                "P5" -> "P5 - Grande (200-499)"
-                                "P6" -> "P6 - Groupe (500+)"
-                                else -> state.palierTaille ?: "P3 - Petite (10-49)"
-                            }
-                        ),
-                        color = HomeTextDark,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Icon(
-                        painter = painterResource(Iv.ChevronRight),
-                        contentDescription = null,
-                        tint = MissaInk,
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-            }
-        }
-        // Matrice KPI 4 cartes 2×2 (dégradés pastels + illustrations 3D + chevrons)
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AccueilKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_ventes_du_jour),
-                        valeur = formatMontantSansDecimales(state.ventes, currency),
-                        sousTitre = "${state.ventesCount} ventes",
-                        tendance = state.tendanceVentes,
-                        icon = Iv.ShoppingCart,
-                        iconBg = Color(0xFF0288D1),
-                        iconTint = Color.White,
-                        gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            listOf(Color(0xFFF0F9FF), Color(0xFFE0F2FE)),
-                        ),
-                        illustrationRes = R.drawable.illustration_ventes,
-                        onClick = { kpiEnVue = 0 },
-                    )
-                    AccueilKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_achats_du_jour),
-                        valeur = formatMontantSansDecimales(state.achats, currency),
-                        sousTitre = "${state.achatsCount} achats",
-                        tendance = state.tendanceAchats,
-                        icon = Iv.CartArrowDown,
-                        iconBg = Color(0xFFF59E0B),
-                        iconTint = Color.White,
-                        gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            listOf(Color(0xFFFFFBEB), Color(0xFFFEF3C7)),
-                        ),
-                        illustrationRes = R.drawable.illustration_stock,
-                        onClick = { kpiEnVue = 1 },
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AccueilKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_tresorerie_card),
-                        valeur = formatMontantSansDecimales(state.tresorerie, currency),
-                        sousTitre = stringResource(R.string.home_solde_disponible),
-                        tendance = state.tendanceTresorerie,
-                        icon = Iv.Bank,
-                        iconBg = Color(0xFF10B981),
-                        iconTint = Color.White,
-                        gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            listOf(Color(0xFFF0FDF4), Color(0xFFDCFCE7)),
-                        ),
-                        illustrationRes = R.drawable.illustration_tresorerie,
-                        onClick = { kpiEnVue = 2 },
-                    )
-                    AccueilKpiCard(
-                        modifier = Modifier.weight(1f),
-                        titre = stringResource(R.string.home_clients_card),
-                        valeur = state.nombreClients.toString(),
-                        sousTitre = stringResource(R.string.home_total_label),
-                        tendance = state.tendanceClients,
-                        icon = Iv.People,
-                        iconBg = Color(0xFF8B5CF6),
-                        iconTint = Color.White,
-                        gradient = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            listOf(Color(0xFFFAF5FF), Color(0xFFF3E8FF)),
-                        ),
-                        illustrationRes = R.drawable.illustration_clients,
-                        onClick = { kpiEnVue = 3 },
-                    )
-                }
-            }
-        }
-        item {
-            // Actions rapides avec icône éclair et bouton Personnaliser
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(text = "⚡", fontSize = 16.sp)
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.home_quick_actions),
-                            color = HomeTextDark,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.clickable(onClick = onPersonnaliser),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_personalize),
-                            color = Color(0xFF0288D1),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            painter = painterResource(Iv.Settings),
-                            contentDescription = null,
-                            tint = Color(0xFF0288D1),
-                            modifier = Modifier.size(15.dp),
-                        )
-                    }
-                }
-                Spacer(Modifier.height(10.dp))
-                AccueilActionsGrid(
-                    modulesActifs = modulesActifs,
-                    actionsSelection = actionsRapidesSelection,
-                    onNavigate = onNavigate,
-                )
-            }
-        }
-        item {
-            // Bannière d'aide & assistance (conforme nouvelle charte)
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSupport() },
-                shape = RoundedCornerShape(18.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, Color(0xFFBAE6FD)),
-                shadowElevation = 1.dp,
-            ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color(0xFFF0F9FF),
-                                    Color(0xFFE0F2FE),
-                                    Color(0xFFBAE6FD).copy(alpha = 0.4f),
-                                ),
+                            androidx.compose.ui.graphics.Brush.linearGradient(
+                                listOf(Color(0xFF101C43), Color(0xFF183E91), Color(0xFF1554E8)),
                             ),
                         )
-                        .padding(14.dp),
+                        .padding(horizontal = 18.dp, vertical = 16.dp),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Surface(
-                            modifier = Modifier.size(44.dp),
-                            shape = CircleShape,
-                            color = Color.White,
-                            border = BorderStroke(1.5.dp, Color(0xFF38BDF8)),
-                            shadowElevation = 2.dp,
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    painter = painterResource(Iv.Chat),
-                                    contentDescription = null,
-                                    tint = Color(0xFF0288D1),
-                                    modifier = Modifier.size(24.dp),
-                                )
-                            }
-                        }
-                        Spacer(Modifier.width(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CompanyLogo(
+                            logoUri = state.entrepriseLogoUri,
+                            contentDescription = null,
+                            fallbackIcon = Iv.Business,
+                            modifier = Modifier.size(42.dp),
+                            size = 42.dp,
+                            shape = RoundedCornerShape(13.dp),
+                            fallbackTint = Color.White,
+                            fallbackBackground = Color.White.copy(alpha = 0.15f),
+                        )
+                        Spacer(Modifier.width(11.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = stringResource(R.string.home_besoin_aide),
-                                color = HomeTextDark,
-                                fontSize = 13.5.sp,
+                                text = state.entrepriseNom.ifBlank { stringResource(R.string.home_company_placeholder) },
+                                color = Color.White,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
-                            Spacer(Modifier.height(2.dp))
                             Text(
-                                text = stringResource(R.string.home_support_desc),
-                                color = HomeTextMuted,
-                                fontSize = 10.5.sp,
-                                lineHeight = 13.sp,
-                                maxLines = 2,
+                                text = state.secteur.ifBlank { "MISSA BUSINESS 360" },
+                                color = Color.White.copy(alpha = 0.90f),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
-                        Spacer(Modifier.width(8.dp))
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = Color.White,
-                            border = BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.5f)),
-                            shadowElevation = 1.dp,
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
+                        Box {
+                            Surface(
+                                modifier = Modifier.size(48.dp).clickable(onClick = onNotificationClick),
+                                shape = CircleShape,
+                                color = Color.White.copy(alpha = 0.12f),
                             ) {
-                                Text(
-                                    text = stringResource(R.string.home_acceder_support),
-                                    color = Color(0xFF0284C7),
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                                Spacer(Modifier.width(2.dp))
-                                Icon(
-                                    painter = painterResource(Iv.ChevronRight),
-                                    contentDescription = null,
-                                    tint = Color(0xFF0284C7),
-                                    modifier = Modifier.size(13.dp),
-                                )
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(
+                                        painter = painterResource(Iv.Notifications),
+                                        contentDescription = stringResource(R.string.notifications),
+                                        tint = Color.White,
+                                        modifier = Modifier.size(21.dp),
+                                    )
+                                }
+                            }
+                            if (notificationCount > 0) {
+                                Surface(
+                                    modifier = Modifier.align(Alignment.TopEnd),
+                                    shape = CircleShape,
+                                    color = Color(0xFFFF5C63),
+                                    border = BorderStroke(1.5.dp, Color(0xFF183E91)),
+                                ) {
+                                    Text(
+                                        text = notificationCount.coerceAtMost(99).toString(),
+                                        color = Color.White,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp),
+                                    )
+                                }
                             }
                         }
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    Text(
+                        text = greeting,
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.home_overview),
+                            color = Color.White.copy(alpha = 0.90f),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = dateDuJour,
+                            color = Color.White.copy(alpha = 0.76f),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                        )
                     }
                 }
             }
         }
         item {
-            // Résumé de l'activité
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.White)
+                    .clickable { onNavigate(Routes.ADMIN_REGLAGES) }
+                    .padding(horizontal = 13.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(painterResource(Iv.Business), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(17.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.home_profil_ligne, profil), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(8.dp))
+                Box(Modifier.width(1.dp).height(17.dp).background(HomeBorder))
+                Spacer(Modifier.width(8.dp))
+                Icon(painterResource(Iv.Groups), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(17.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(text = stringResource(R.string.home_taille_ligne, taille), color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Spacer(Modifier.width(5.dp))
+                Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted, modifier = Modifier.size(16.dp))
+            }
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_ventes_du_jour), formatMontantSansDecimales(state.ventes, currency), stringResource(R.string.home_sales_count, state.ventesCount), state.tendanceVentes, Iv.ShoppingCart, Color(0xFFE8F1FF), HomeBlue, { kpiEnVue = 0 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_achats_du_jour), formatMontantSansDecimales(state.achats, currency), stringResource(R.string.home_purchases_count, state.achatsCount), state.tendanceAchats, Iv.CartArrowDown, Color(0xFFFFF3DB), Color(0xFFB66A00), { kpiEnVue = 1 })
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_tresorerie_card), formatMontantSansDecimales(state.tresorerie, currency), stringResource(R.string.home_solde_disponible), state.tendanceTresorerie, Iv.Bank, Color(0xFFE5F7F0), Color(0xFF16845C), { kpiEnVue = 2 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_clients_card), state.nombreClients.toString(), stringResource(R.string.home_total_label), state.tendanceClients, Iv.People, Color(0xFFF1EBFF), Color(0xFF7046B8), { kpiEnVue = 3 })
+                }
+            }
+        }
+        item {
+            Column {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.home_quick_actions),
+                        color = HomeTextDark,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = onPersonnaliser, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)) {
+                        Icon(painterResource(Iv.Settings), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(5.dp))
+                        Text(stringResource(R.string.home_personalize), color = HomeBlue, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                AccueilActionsGrid(modulesActifs, actionsRapidesSelection, onNavigate)
+            }
+        }
+        item {
             AccueilResumeCard(state = state, currency = currency, onSelectionJour = onSelectionJour)
         }
         item {
-            // Activités récentes + Rappels + Tâches
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Sur mobile, on empile : Activités en haut, puis Rappels, puis Tâches
                 AccueilActivitesRecentesCard(state = state, currency = currency, onNavigate = onNavigate)
                 AccueilRappelsCard(state = state, onNavigate = onNavigate)
                 AccueilTachesCard(state = state, onNavigate = onNavigate)
+            }
+        }
+        item {
+            Surface(
+                modifier = Modifier.fillMaxWidth().clickable(onClick = onSupport),
+                shape = RoundedCornerShape(15.dp),
+                color = Color(0xFFEAF2FF),
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Surface(shape = RoundedCornerShape(10.dp), color = Color.White, modifier = Modifier.size(36.dp)) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(painterResource(Iv.Chat), contentDescription = null, tint = HomeBlue, modifier = Modifier.size(19.dp))
+                        }
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.home_besoin_aide), color = HomeTextDark, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.home_support_desc), color = HomeTextMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Icon(painterResource(Iv.ChevronRight), contentDescription = stringResource(R.string.home_acceder_support), tint = HomeBlue, modifier = Modifier.size(20.dp))
+                }
             }
         }
     }
@@ -678,111 +548,52 @@ private fun AccueilKpiCard(
     icon: Int,
     iconBg: Color,
     iconTint: Color,
-    gradient: androidx.compose.ui.graphics.Brush,
-    illustrationRes: Int? = null,
     onClick: () -> Unit,
 ) {
+    val deltaColor = if ((tendance ?: 0.0) >= 0.0) Color(0xFF16845C) else Color(0xFFB42332)
     Surface(
-        modifier = modifier
-            .height(176.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
+        modifier = modifier.height(126.dp).clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
         color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.5f)),
-        shadowElevation = 1.dp,
+        border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.72f)),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(gradient),
-        ) {
-            if (illustrationRes != null) {
-                Image(
-                    painter = painterResource(id = illustrationRes),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(92.dp)
-                        .align(Alignment.BottomEnd)
-                        .padding(end = 6.dp, bottom = 6.dp)
-                        .alpha(0.85f),
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(14.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Surface(
-                        modifier = Modifier.size(36.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        color = iconBg,
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(19.dp))
-                        }
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Surface(
-                        modifier = Modifier.size(24.dp),
-                        shape = CircleShape,
-                        color = Color.White.copy(alpha = 0.75f),
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                painter = painterResource(Iv.ChevronRight),
-                                contentDescription = null,
-                                tint = MissaInk,
-                                modifier = Modifier.size(14.dp),
-                            )
-                        }
+        Column(Modifier.fillMaxSize().padding(horizontal = 13.dp, vertical = 11.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(9.dp), color = iconBg, modifier = Modifier.size(30.dp)) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(17.dp))
                     }
                 }
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = titre,
-                    color = HomeTextDark,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = valeur,
-                    color = HomeTextDark,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Spacer(Modifier.weight(1f))
+                Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = HomeTextMuted.copy(alpha = 0.65f), modifier = Modifier.size(16.dp))
+            }
+            Spacer(Modifier.height(9.dp))
+            Text(titre, color = HomeTextMuted, fontSize = 11.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(valeur, color = HomeTextDark, fontSize = 17.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = sousTitre,
                     color = HomeTextMuted,
-                    fontSize = 11.sp,
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
-                Spacer(Modifier.weight(1f))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(Iv.TrendingUp),
-                        contentDescription = null,
-                        tint = TendrePositive,
-                        modifier = Modifier.size(13.dp),
-                    )
+                if (tendance != null) {
                     Spacer(Modifier.width(3.dp))
+                    Icon(
+                        painter = painterResource(if (tendance >= 0) Iv.TrendingUp else Iv.TrendingDown),
+                        contentDescription = null,
+                        tint = deltaColor,
+                        modifier = Modifier.size(11.dp),
+                    )
                     Text(
-                        text = stringResource(R.string.home_vs_hier) + " " + (
-                            tendance?.let { (if (it >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", it) } ?: "—"
-                        ),
-                        color = HomeTextMuted,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
+                        text = "${if (tendance >= 0) "+" else ""}${String.format(java.util.Locale.ROOT, "%.0f%%", tendance)}",
+                        color = deltaColor,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
                     )
                 }
             }
@@ -841,12 +652,11 @@ private fun AccueilActionCard(
 ) {
     Surface(
         modifier = modifier
-            .height(82.dp)
+            .height(72.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.5f)),
-        shadowElevation = 0.5.dp,
+        border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.55f)),
     ) {
         Column(
             modifier = Modifier
@@ -855,16 +665,16 @@ private fun AccueilActionCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Surface(modifier = Modifier.size(36.dp), shape = RoundedCornerShape(10.dp), color = bg) {
+            Surface(modifier = Modifier.size(30.dp), shape = RoundedCornerShape(9.dp), color = bg) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(painterResource(icon), contentDescription = null, tint = tint, modifier = Modifier.size(20.dp))
                 }
             }
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = label,
                 color = HomeTextDark,
-                fontSize = 11.5.sp,
+                fontSize = 10.5.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -920,7 +730,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                     shape = RoundedCornerShape(20.dp),
                     color = HomeBackground,
                     border = BorderStroke(1.dp, HomeBorder),
-                    modifier = Modifier.clickable { choixDate = true },
+                    modifier = Modifier.height(48.dp).clickable { choixDate = true },
                 ) {
                     Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(painter = painterResource(Iv.Calendar), contentDescription = null, tint = MissaInk, modifier = Modifier.size(14.dp))
@@ -931,51 +741,40 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                     }
                 }
             }
-            Spacer(Modifier.height(14.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                AccueilResumeCell(
-                    modifier = Modifier.weight(1f),
-                    icon = Iv.BarChart,
-                    iconTint = MissaInk,
-                    iconBg = HomeBlueSoft,
-                    titre = stringResource(R.string.home_ventes_label),
-                    valeur = formatMontantSansDecimales(state.resumeVentes, currency),
-                    sousTitre = "${state.resumeVentesCount} ventes",
-                    tendance = if (estAujourdhui) state.tendanceVentes else null,
-                )
-                Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
-                AccueilResumeCell(
-                    modifier = Modifier.weight(1f),
-                    icon = Iv.CartArrowDown,
-                    iconTint = MissaInk,
-                    iconBg = AppModule.ACHATS.couleurDouce,
-                    titre = stringResource(R.string.home_achats_label),
-                    valeur = formatMontantSansDecimales(state.resumeAchats, currency),
-                    sousTitre = "${state.resumeAchatsCount} achats",
-                    tendance = if (estAujourdhui) state.tendanceAchats else null,
-                )
-                Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
-                AccueilResumeCell(
-                    modifier = Modifier.weight(1f),
-                    icon = Iv.SwapHoriz,
-                    iconTint = MissaInk,
-                    iconBg = AppModule.STOCK.couleurDouce,
-                    titre = stringResource(R.string.home_mouvements_stock_label),
-                    valeur = state.resumeMouvements.toString(),
-                    sousTitre = if (state.rupturesStock > 0) "${state.rupturesStock} ruptures" else stringResource(R.string.home_operations_label),
-                    tendance = null,
-                )
-                Box(modifier = Modifier.width(1.dp).height(90.dp).background(HomeBorder))
-                AccueilResumeCell(
-                    modifier = Modifier.weight(1f),
-                    icon = Iv.Percent,
-                    iconTint = MissaInk,
-                    iconBg = AppModule.FINANCES.couleurDouce,
-                    titre = stringResource(R.string.home_marge_brute_label),
-                    valeur = formatMontantSansDecimales(state.resumeMarge, currency),
-                    sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
-                    tendance = if (estAujourdhui) state.tendanceMarge else null,
-                )
+            Spacer(Modifier.height(12.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilResumeCell(
+                        modifier = Modifier.weight(1f), icon = Iv.BarChart, iconTint = HomeBlue,
+                        iconBg = HomeBlueSoft, titre = stringResource(R.string.home_ventes_label),
+                        valeur = formatMontantSansDecimales(state.resumeVentes, currency),
+                        sousTitre = stringResource(R.string.home_sales_count, state.resumeVentesCount),
+                        tendance = if (estAujourdhui) state.tendanceVentes else null,
+                    )
+                    AccueilResumeCell(
+                        modifier = Modifier.weight(1f), icon = Iv.CartArrowDown, iconTint = Color(0xFFB66A00),
+                        iconBg = Color(0xFFFFF3DB), titre = stringResource(R.string.home_achats_label),
+                        valeur = formatMontantSansDecimales(state.resumeAchats, currency),
+                        sousTitre = stringResource(R.string.home_purchases_count, state.resumeAchatsCount),
+                        tendance = if (estAujourdhui) state.tendanceAchats else null,
+                    )
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    AccueilResumeCell(
+                        modifier = Modifier.weight(1f), icon = Iv.SwapHoriz, iconTint = Color(0xFF16845C),
+                        iconBg = Color(0xFFE5F7F0), titre = stringResource(R.string.home_mouvements_stock_label),
+                        valeur = state.resumeMouvements.toString(),
+                        sousTitre = if (state.rupturesStock > 0) "${state.rupturesStock} ruptures" else stringResource(R.string.home_operations_label),
+                        tendance = null,
+                    )
+                    AccueilResumeCell(
+                        modifier = Modifier.weight(1f), icon = Iv.Percent, iconTint = Color(0xFF7046B8),
+                        iconBg = Color(0xFFF1EBFF), titre = stringResource(R.string.home_marge_brute_label),
+                        valeur = formatMontantSansDecimales(state.resumeMarge, currency),
+                        sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
+                        tendance = if (estAujourdhui) state.tendanceMarge else null,
+                    )
+                }
             }
             // Ligne additionnelle réelle : stock, projets, qualité – 100% i18n
             if (state.nombreProduits > 0 || state.projetsActifs > 0 || state.nonConformitesOuvertes > 0) {
@@ -1026,25 +825,31 @@ private fun AccueilResumeCell(
     sousTitre: String,
     tendance: Double?,
 ) {
-    Column(modifier = modifier.padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Surface(modifier = Modifier.size(28.dp), shape = CircleShape, color = iconBg) {
-            Box(contentAlignment = Alignment.Center) { Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp)) }
-        }
-        Spacer(Modifier.height(6.dp))
-        Text(text = titre, color = HomeTextMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(4.dp))
-        Text(text = valeur, color = HomeTextDark, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(3.dp))
-        Text(text = sousTitre, color = HomeTextMuted, fontSize = 9.5.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(4.dp))
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            Text(text = stringResource(R.string.home_vs_hier), color = HomeTextMuted, fontSize = 9.sp)
-            Spacer(Modifier.width(4.dp))
-            if (tendance != null) {
-                Text(text = (if (tendance >= 0) "+" else "") + String.format(java.util.Locale.ROOT, "%.0f%%", tendance), color = if (tendance >= 0) TendrePositive else Red40, fontSize = 9.sp, fontWeight = FontWeight.Bold)
-            } else {
-                Text(text = "—", color = HomeTextMuted, fontSize = 9.sp)
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(HomeBackground)
+            .padding(horizontal = 10.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(modifier = Modifier.size(30.dp), shape = RoundedCornerShape(9.dp), color = iconBg) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(painterResource(icon), contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp))
             }
+        }
+        Spacer(Modifier.width(9.dp))
+        Column(Modifier.weight(1f)) {
+            Text(titre, color = HomeTextMuted, fontSize = 10.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(valeur, color = HomeTextDark, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = if (tendance != null) {
+                    "$sousTitre · ${if (tendance >= 0) "+" else ""}${String.format(java.util.Locale.ROOT, "%.0f%%", tendance)}"
+                } else sousTitre,
+                color = if (tendance == null) HomeTextMuted else if (tendance >= 0) TendrePositive else Red40,
+                fontSize = 9.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

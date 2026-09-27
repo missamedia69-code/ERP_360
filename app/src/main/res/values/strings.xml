@@ -648,8 +648,8 @@
     <!-- Tableau de bord d’accueil -->
     <string name="home_company_placeholder">Votre entreprise</string>
     <string name="home_not_configured">À configurer</string>
-    <string name="home_greeting">Bonjour, %1$s 👋</string>
-    <string name="home_greeting_anonymous">Bonjour 👋</string>
+    <string name="home_greeting">Bonjour, %1$s</string>
+    <string name="home_greeting_anonymous">Bonjour</string>
     <string name="home_more_modules_description">Accédez aux fonctions complémentaires de votre ERP.</string>
     <string name="home_overview">Voici la vue d’ensemble de votre activité.</string>
     <string name="home_quick_actions">Actions rapides</string>
@@ -680,6 +680,8 @@
     <string name="home_aujourdhui">Aujourd\'hui</string>
     <string name="home_ventes_label">Ventes</string>
     <string name="home_achats_label">Achats</string>
+    <string name="home_sales_count">%1$d ventes</string>
+    <string name="home_purchases_count">%1$d achats</string>
     <string name="home_mouvements_stock_label">Mouvements stock</string>
     <string name="home_marge_brute_label">Marge brute</string>
     <string name="home_operations_label">Opérations</string>

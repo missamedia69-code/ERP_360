@@ -625,8 +625,8 @@
     
     <string name="home_company_placeholder">شركتك</string>
     <string name="home_not_configured">غير مُعدّ</string>
-    <string name="home_greeting">مرحباً، %1$s 👋</string>
-    <string name="home_greeting_anonymous">مرحباً 👋</string>
+    <string name="home_greeting">مرحباً، %1$s</string>
+    <string name="home_greeting_anonymous">مرحباً</string>
     <string name="home_more_modules_description">يمكنك الوصول إلى الوظائف الإضافية لنظام ERP الخاص بك.</string>
     <string name="home_overview">إليك نظرة عامة على نشاطك.</string>
     <string name="home_quick_actions">إجراءات سريعة</string>
@@ -657,6 +657,8 @@
     <string name="home_aujourdhui">اليوم</string>
     <string name="home_ventes_label">المبيعات</string>
     <string name="home_achats_label">المشتريات</string>
+    <string name="home_sales_count">%1$d مبيعات</string>
+    <string name="home_purchases_count">%1$d مشتريات</string>
     <string name="home_mouvements_stock_label">حركات المخزون</string>
     <string name="home_marge_brute_label">هامش إجمالي</string>
     <string name="home_operations_label">العمليات</string>
