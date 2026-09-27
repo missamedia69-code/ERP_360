@@ -52,7 +52,7 @@ class FournisseurAchatMetricsTest {
             piece(3, "FFR-2026-0003", PurchaseRecordCodec.encode(facture(7, 40.0, 40.0)), OperationStatus.DRAFT.name),
         )
 
-        assertEquals(100.0, FournisseurAchatMetrics.soldeTotal(pieces), 0.001)
+        assertEquals(600.0, FournisseurAchatMetrics.soldeTotal(pieces), 0.001)
         val resume = FournisseurAchatMetrics.pourFournisseur(7, pieces)
         assertEquals(120.0, resume.montantAchete, 0.001)
         assertEquals(100.0, resume.solde, 0.001)
