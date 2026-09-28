@@ -272,7 +272,7 @@ data class StockDetailState(
 /** Détail d'un article : infos, stock par site, prix, fournisseur, historique. */
 @HiltViewModel
 class StockDetailViewModel @Inject constructor(
-    stockModule: StockModuleUseCases,
+    private val stockModule: StockModuleUseCases,
     getEnterprise: GetEnterpriseUseCase,
     savedStateHandle: SavedStateHandle,
     private val supprimerProduit: SupprimerProduitUseCase,
