@@ -204,7 +204,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
         if (payload.lignes.none { it.quantiteRecue > 0.0 } || payload.lignes.any {
                 !it.quantiteRecue.isFinite() || it.quantiteRecue < 0.0 ||
                     (it.prixReel != null && (!it.prixReel.isFinite() || it.prixReel < 0.0))
-            } || payload.lignes.map { it.id }.distinct().size != payload.lignes.size
+            }
         ) return Result.DonneesInvalides
         if (fournisseurDao.getById(payload.supplierId) == null) return Result.FournisseurIntrouvable
 
