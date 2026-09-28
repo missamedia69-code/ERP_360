@@ -6,10 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
-import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.entity.InventaireEntity
 import com.missa.b360.core.data.entity.InventaireLigneEntity
-import com.missa.b360.core.data.entity.ProductStatus
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.usecase.RecordStockMovementUseCase
 import com.missa.b360.core.data.dao.ProductStockDao
@@ -26,7 +24,7 @@ import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.domain.usecase.ObserveStockMovementsUseCase
-import com.missa.b360.core.domain.usecase.SiteUseCases
+import com.missa.b360.core.domain.usecase.StockModuleUseCases
 import com.missa.b360.core.domain.usecase.SupprimerProduitUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -96,7 +94,7 @@ class StockAccueilViewModel @Inject constructor(
     observeMovements: ObserveStockMovementsUseCase,
     getEnterprise: GetEnterpriseUseCase,
     private val categoriesUseCases: CategorieProduitUseCases,
-    inventaireDao: com.missa.b360.core.data.dao.InventaireDao,
+    stockModule: StockModuleUseCases,
 ) : ViewModel() {
 
     /** Crée une catégorie utilisateur depuis la matrice (matrice rafraîchie par le flux). */
@@ -123,7 +121,7 @@ class StockAccueilViewModel @Inject constructor(
         observeMovements(1_500),
         getEnterprise.observer(),
         categoriesUseCases.observer(),
-        inventaireDao.observeEnCours(),
+        stockModule.observeCurrentInventory(),
     ) { lignes, mouvements, entreprise, catsLibres, sessionInventaire ->
         val devise = entreprise?.devise.orEmpty()
         // Valorisation au coût de revient, à défaut au prix d'achat (même règle que StockHubRules).
@@ -215,7 +213,7 @@ data class StockListeState(
 class StockListeViewModel @Inject constructor(
     observeProducts: ObserveProductsUseCase,
     observeStock: ObserveProductStockUseCase,
-    productDao: ProductDao,
+    stockModule: StockModuleUseCases,
     getEnterprise: GetEnterpriseUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -239,7 +237,7 @@ class StockListeViewModel @Inject constructor(
         combine(observeProducts(), observeStock()) { produits, stocks ->
             ProductStocks.combine(produits, stocks)
         },
-        productDao.observeCategories(),
+        stockModule.observeProductCategories(),
         getEnterprise.observer(),
         _requete,
         _categorieId,
@@ -274,14 +272,8 @@ data class StockDetailState(
 /** Détail d'un article : infos, stock par site, prix, fournisseur, historique. */
 @HiltViewModel
 class StockDetailViewModel @Inject constructor(
-    productDao: ProductDao,
-    observeStock: ObserveProductStockUseCase,
-    sites: SiteUseCases,
-    observeMovements: ObserveStockMovementsUseCase,
-    fournisseurDao: FournisseurDao,
+    stockModule: StockModuleUseCases,
     getEnterprise: GetEnterpriseUseCase,
-    equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
-    extrasDao: com.missa.b360.core.data.dao.ProductExtrasDao,
     savedStateHandle: SavedStateHandle,
     private val supprimerProduit: SupprimerProduitUseCase,
 ) : ViewModel() {
@@ -300,64 +292,48 @@ class StockDetailViewModel @Inject constructor(
         _suppressionResult.value = null
     }
 
-    val etat: StateFlow<StockDetailState> = combine(
-        combine(
-            productDao.observeById(id),
-            observeStock(),
-            sites.observerSites(),
-        ) { product, stocks, listeSites -> Triple(product, stocks, listeSites) },
-        combine(
-            observeMovements(),
-            fournisseurDao.observeAll(),
-            getEnterprise.observer(),
-        ) { mouvements, fournisseurs, entreprise -> Triple(mouvements, fournisseurs, entreprise) },
-    ) { a, b ->
-        val product = a.first
-        val stocks = a.second
-        val sites = a.third
-        val mouvements = b.first
-        val fournisseurs = b.second
-        val entreprise = b.third
+    private val detail = stockModule.observeProductDetail(id)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), com.missa.b360.core.data.repository.StockProductDetailProjection())
+
+    val etat: StateFlow<StockDetailState> = combine(detail, getEnterprise.observer()) { projection, entreprise ->
         StockDetailState(
             devise = entreprise?.devise.orEmpty(),
-            product = product,
-            stocks = stocks.filter { it.produitId == id },
-            sites = sites,
-            categorie = null,
-            fournisseur = fournisseurs.firstOrNull { it.id == product?.fournisseurId },
-            mouvements = mouvements.filter { m ->
-                // StockMovementView ne porte pas produitId : filtre par code produit.
-                product != null && m.produitCode == product.code
-            },
+            product = projection.product,
+            stocks = projection.stocks,
+            sites = projection.sites,
+            categorie = projection.category?.nom,
+            fournisseur = projection.supplier,
+            mouvements = projection.movements,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockDetailState())
 
-    /** Nom de la catégorie de l'article (résolu séparément). */
-    val categorieNom: StateFlow<String?> = productDao.observeById(id)
-        .map { p -> p?.categorieId?.let { productDao.getCategorieById(it)?.nom } }
+    val categorieNom: StateFlow<String?> = detail
+        .map { it.category?.nom }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    /** Extension immobilisation (équipements) de l'article, si applicable. */
-    val equipement: StateFlow<com.missa.b360.core.data.entity.ProductEquipementEntity?> =
-        equipementDao.observeById(id)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val equipement: StateFlow<com.missa.b360.core.data.entity.ProductEquipementEntity?> = detail
+        .map { it.equipment }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    val dechet: StateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?> =
-        extrasDao.observeDechet(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-    val emballage: StateFlow<com.missa.b360.core.data.entity.ProductEmballageEntity?> =
-        extrasDao.observeEmballage(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-    val consignation: StateFlow<com.missa.b360.core.data.entity.ProductConsignationEntity?> =
-        extrasDao.observeConsignation(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-    val kit: StateFlow<com.missa.b360.core.data.entity.ProductKitEntity?> =
-        extrasDao.observeKit(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-    val composantsKit: StateFlow<List<com.missa.b360.core.data.entity.KitComposantEntity>> =
-        extrasDao.observeComposants(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val dechet: StateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?> = detail
+        .map { it.waste }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val emballage: StateFlow<com.missa.b360.core.data.entity.ProductEmballageEntity?> = detail
+        .map { it.packaging }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val consignation: StateFlow<com.missa.b360.core.data.entity.ProductConsignationEntity?> = detail
+        .map { it.consignment }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val kit: StateFlow<com.missa.b360.core.data.entity.ProductKitEntity?> = detail
+        .map { it.kit }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val composantsKit: StateFlow<List<com.missa.b360.core.data.entity.KitComposantEntity>> = detail
+        .map { it.kitComponents }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    private val equipementDao2 = equipementDao
-
-    /** Change le statut de service d'un équipement (maquette 6). */
+    /** Change le statut de service via la couche Stock data/use cases. */
     fun setStatutEquipement(statut: com.missa.b360.core.data.entity.StatutEquipement) {
-        viewModelScope.launch { equipementDao2.setStatut(id, statut.name) }
+        viewModelScope.launch { stockModule.setEquipmentStatus(id, statut) }
     }
 }
 
@@ -436,7 +412,7 @@ class StockAlertesViewModel @Inject constructor(
 @HiltViewModel
 class StockEquipementsViewModel @Inject constructor(
     observeProducts: ObserveProductsUseCase,
-    equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
+    stockModule: StockModuleUseCases,
     getEnterprise: GetEnterpriseUseCase,
 ) : ViewModel() {
 
@@ -462,7 +438,7 @@ class StockEquipementsViewModel @Inject constructor(
     )
 
     val etat: StateFlow<Etat> = combine(
-        combine(observeProducts(), equipementDao.observeAll()) { produits, eqs ->
+        combine(observeProducts(), stockModule.observeAllEquipment()) { produits, eqs ->
             produits.filter { TYPES_EQUIPEMENTS.contains(it.type) }
                 .map { p -> LigneEquipement(p, eqs.firstOrNull { it.produitId == p.id }) }
         },
