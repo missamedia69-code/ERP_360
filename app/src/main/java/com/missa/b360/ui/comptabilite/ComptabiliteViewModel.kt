@@ -113,6 +113,7 @@ class ComptabiliteViewModel @Inject constructor(
             CreateAccountingVoucherUseCase.Result.PermissionDenied -> _feedback.value = "Permission de création refusée."
             CreateAccountingVoucherUseCase.Result.JournalNotFound -> _feedback.value = "Journal OD introuvable."
             CreateAccountingVoucherUseCase.Result.AccountNotFound -> _feedback.value = "Un compte est inactif ou n'appartient pas au référentiel courant."
+            CreateAccountingVoucherUseCase.Result.PostingRuleNotFound -> _feedback.value = "Aucune règle comptable active n'est configurée pour cet événement."
             CreateAccountingVoucherUseCase.Result.PeriodClosed -> _feedback.value = "La période de cette écriture est clôturée."
         }
     }
