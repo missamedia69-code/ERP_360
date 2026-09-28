@@ -24,6 +24,9 @@ interface ServiceWorkflowDao {
     @Query("SELECT * FROM service_contracts ORDER BY startAt DESC")
     fun observeContracts(): Flow<List<ServiceContractEntity>>
 
+    @Query("SELECT * FROM service_reports ORDER BY updatedAt DESC")
+    fun observeReports(): Flow<List<ServiceReportEntity>>
+
     @Query("SELECT * FROM customer_service_assets WHERE customerId = :customerId AND status = 'ACTIF' ORDER BY name")
     fun observeAssets(customerId: Long): Flow<List<CustomerServiceAssetEntity>>
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ServiceRequestEntity
+import com.missa.b360.core.data.entity.ServiceReportEntity
 import com.missa.b360.core.data.entity.ServiceWorkOrderEntity
 import com.missa.b360.core.domain.model.ServicePriority
 import com.missa.b360.core.domain.model.ServiceRequestChannel
@@ -33,6 +34,7 @@ class ServiceFieldViewModel @Inject constructor(
         val workOrders: List<ServiceWorkOrderEntity> = emptyList(),
         val clients: List<ClientEntity> = emptyList(),
         val employees: List<com.missa.b360.core.data.entity.EmployeeEntity> = emptyList(),
+        val reports: List<ServiceReportEntity> = emptyList(),
     )
 
     sealed interface Message {
@@ -46,9 +48,9 @@ class ServiceFieldViewModel @Inject constructor(
     val busy: StateFlow<Boolean> = _busy
 
     val state: StateFlow<State> = combine(
-        services.observeRequests(), services.observeWorkOrders(), observeClients(), services.observeEmployees(),
-    ) { requests, workOrders, clients, employees ->
-        State(requests, workOrders, clients, employees)
+        services.observeRequests(), services.observeWorkOrders(), observeClients(), services.observeEmployees(), services.observeReports(),
+    ) { requests, workOrders, clients, employees, reports ->
+        State(requests, workOrders, clients, employees, reports)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), State())
 
     fun clearMessage() { _message.value = null }

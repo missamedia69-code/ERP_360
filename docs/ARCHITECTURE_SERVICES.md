@@ -39,7 +39,7 @@ Les anciennes prestations génériques restent visibles dans une section distinc
 
 ## Prochaines phases recommandées
 
-1. Compléter le terrain : fiche de rapport consultable, capture de signature et photos avec tests appareils, recherche/historique, rôles technicien/dispatch/validation et contrôles d'accès éprouvés.
+1. Compléter le terrain : fiche de rapport détaillée et visualisation des médias, capture de signature, essais photos sur appareils, recherche/historique, rôles technicien/dispatch/validation et contrôles d'accès éprouvés.
 2. Ajouter la réservation/consommation de pièces via Stock, puis l'émission de devis/factures via Vente et l'émission d'événements vers CPT, avec clés idempotentes et audit.
 3. Ajouter les écrans contrats/SLA, garanties, équipements et SAV, ainsi que les règles de quotas/dépassement.
 4. Ajouter une optimisation de planning et des rapports plus avancés seulement après mesure et tests des étapes précédentes.

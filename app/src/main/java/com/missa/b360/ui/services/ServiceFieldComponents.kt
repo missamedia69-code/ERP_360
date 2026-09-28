@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.core.data.entity.ServiceRequestEntity
+import com.missa.b360.core.data.entity.ServiceReportEntity
 import com.missa.b360.core.data.entity.ServiceWorkOrderEntity
 import com.missa.b360.core.domain.model.ServicePriority
 import com.missa.b360.core.domain.model.ServiceWorkOrderStatus
@@ -119,6 +120,7 @@ internal fun ServiceRequestCard(
 @Composable
 internal fun ServiceWorkOrderCard(
     order: ServiceWorkOrderEntity,
+    report: ServiceReportEntity?,
     technicianName: String?,
     onSchedule: () -> Unit,
     onTransition: (ServiceWorkOrderStatus) -> Unit,
@@ -151,6 +153,17 @@ internal fun ServiceWorkOrderCard(
             )
             if (ServiceWorkflowRules.isOverdue(order.resolutionDeadlineAt, System.currentTimeMillis(), status in setOf(ServiceWorkOrderStatus.READY_TO_BILL, ServiceWorkOrderStatus.CLOSED, ServiceWorkOrderStatus.CANCELLED))) {
                 Text("SLA de résolution dépassé", fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
+            }
+            if (status == ServiceWorkOrderStatus.AWAITING_VALIDATION && report != null) {
+                Spacer(Modifier.height(6.dp))
+                Text("Diagnostic : ${report.diagnosis}", fontSize = 11.sp, color = Color(0xFF374151))
+                Text("Travaux : ${report.workPerformed}", fontSize = 11.sp, color = Color(0xFF374151))
+                Text(
+                    if (report.customerSignatureUri.isNullOrBlank()) "Signature client manquante" else "Signé par ${report.customerSignerName.orEmpty()}",
+                    fontSize = 10.sp,
+                    color = if (report.customerSignatureUri.isNullOrBlank()) Color(0xFFB91C1C) else Color(0xFF15803D),
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {

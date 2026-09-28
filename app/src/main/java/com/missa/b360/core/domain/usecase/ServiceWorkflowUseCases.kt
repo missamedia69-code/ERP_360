@@ -72,6 +72,7 @@ class ServiceWorkflowUseCases @Inject constructor(
     fun observeWorkOrders(): Flow<List<ServiceWorkOrderEntity>> = dao.observeWorkOrders()
     fun observeEmployees() = employeeDao.observeActifs()
     fun observeContracts(): Flow<List<ServiceContractEntity>> = dao.observeContracts()
+    fun observeReports(): Flow<List<ServiceReportEntity>> = dao.observeReports()
     fun observeTimesheets(workOrderId: Long) = dao.observeTimesheets(workOrderId)
     fun observeAttachments(workOrderId: Long) = dao.observeAttachments(workOrderId)
 

@@ -167,6 +167,7 @@ fun ServicesScreen(
                 items(fieldState.workOrders, key = { "service-order-${it.id}" }) { order ->
                     ServiceWorkOrderCard(
                         order = order,
+                        report = fieldState.reports.firstOrNull { it.workOrderId == order.id },
                         technicianName = fieldState.employees.firstOrNull { it.id == order.technicianId }?.nom,
                         onSchedule = { orderToSchedule = order },
                         onTransition = { fieldVm.transition(order.id, it) },
