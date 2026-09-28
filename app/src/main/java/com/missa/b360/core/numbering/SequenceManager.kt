@@ -32,6 +32,7 @@ enum class DocType(val prefix: String) {
     ORDRE_PRODUCTION("OP"),
     DEVIS_PRESTATION("DP"),
     ORDRE_SERVICE("OS"),
+    CONTRAT_SERVICE("CS"),
     AVANCE_SALAIRE("AV"),
     PROJET("PRJ"),
 

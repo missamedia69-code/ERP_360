@@ -37,6 +37,7 @@ import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.ServiceWorkflowDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.entity.AbsenceEntity
@@ -97,6 +98,13 @@ import com.missa.b360.core.data.entity.RolePermissionEntity
 import com.missa.b360.core.data.entity.SequenceEntity
 import com.missa.b360.core.data.entity.SettingEntity
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.data.entity.ServiceContractEntity
+import com.missa.b360.core.data.entity.CustomerServiceAssetEntity
+import com.missa.b360.core.data.entity.ServiceRequestEntity
+import com.missa.b360.core.data.entity.ServiceWorkOrderEntity
+import com.missa.b360.core.data.entity.ServiceTimesheetEntity
+import com.missa.b360.core.data.entity.ServiceReportEntity
+import com.missa.b360.core.data.entity.ServiceAttachmentEntity
 import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.data.entity.UserEntity
@@ -167,8 +175,15 @@ import com.missa.b360.core.data.entity.UserEntity
         FournisseurDocumentEntity::class,
         FournisseurItemEntity::class,
         FournisseurEvenementEntity::class,
+        ServiceContractEntity::class,
+        CustomerServiceAssetEntity::class,
+        ServiceRequestEntity::class,
+        ServiceWorkOrderEntity::class,
+        ServiceTimesheetEntity::class,
+        ServiceReportEntity::class,
+        ServiceAttachmentEntity::class,
     ],
-    version = 20,
+    version = 21,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -193,6 +208,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun fournisseurItemDao(): FournisseurItemDao
     abstract fun fournisseurEvenementDao(): FournisseurEvenementDao
     abstract fun operationRecordDao(): OperationRecordDao
+    abstract fun serviceWorkflowDao(): ServiceWorkflowDao
     abstract fun productDao(): ProductDao
     abstract fun productExtrasDao(): ProductExtrasDao
     abstract fun productStockDao(): ProductStockDao
@@ -558,6 +574,37 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_immutable` BEFORE UPDATE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') AND ((OLD.`status` = 'REVERSED' AND NEW.`status` != 'REVERSED') OR (OLD.`status` = 'POSTED' AND NEW.`status` NOT IN ('POSTED', 'REVERSED')) OR OLD.`id` IS NOT NEW.`id` OR OLD.`journalId` IS NOT NEW.`journalId` OR OLD.`reference` IS NOT NEW.`reference` OR OLD.`accountingDate` IS NOT NEW.`accountingDate` OR OLD.`documentDate` IS NOT NEW.`documentDate` OR OLD.`sourceModule` IS NOT NEW.`sourceModule` OR OLD.`sourceDocumentType` IS NOT NEW.`sourceDocumentType` OR OLD.`sourceDocumentId` IS NOT NEW.`sourceDocumentId` OR OLD.`sourceKey` IS NOT NEW.`sourceKey` OR OLD.`description` IS NOT NEW.`description` OR OLD.`currencyCode` IS NOT NEW.`currencyCode` OR OLD.`exchangeRate` IS NOT NEW.`exchangeRate` OR OLD.`totalDebit` IS NOT NEW.`totalDebit` OR OLD.`totalCredit` IS NOT NEW.`totalCredit` OR OLD.`createdBy` IS NOT NEW.`createdBy` OR OLD.`validatedBy` IS NOT NEW.`validatedBy` OR OLD.`postedAt` IS NOT NEW.`postedAt` OR OLD.`reversedVoucherId` IS NOT NEW.`reversedVoucherId` OR OLD.`createdAt` IS NOT NEW.`createdAt`) BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers are immutable'); END")
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_no_delete` BEFORE DELETE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers cannot be deleted'); END")
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_account_identity_immutable_when_used` BEFORE UPDATE OF `code`, `standard`, `name` ON `accounting_accounts` WHEN EXISTS (SELECT 1 FROM `accounting_entry_lines` l JOIN `accounting_vouchers` v ON v.`id` = l.`voucherId` WHERE l.`accountId` = OLD.`id` AND v.`status` IN ('POSTED', 'REVERSED')) BEGIN SELECT RAISE(ABORT, 'Used accounting account codes are immutable'); END")
+            }
+        }
+
+        val MIGRATION_20_21 = object : Migration(20, 21) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_contracts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, `customerId` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL, `startAt` INTEGER NOT NULL, `endAt` INTEGER, `autoRenew` INTEGER NOT NULL, `responseSlaMinutes` INTEGER, `resolutionSlaMinutes` INTEGER, `includedHours` REAL NOT NULL, `includedInterventions` INTEGER NOT NULL, `fixedFee` REAL NOT NULL, `hourlyRate` REAL NOT NULL, `coversParts` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `createdBy` INTEGER, FOREIGN KEY(`customerId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_service_contracts_reference` ON `service_contracts` (`reference`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_contracts_customerId_status` ON `service_contracts` (`customerId`, `status`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `customer_service_assets` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `customerId` INTEGER NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `brand` TEXT, `model` TEXT, `serialNumber` TEXT, `installedAt` INTEGER, `warrantyEndAt` INTEGER, `contractId` INTEGER, `status` TEXT NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL, FOREIGN KEY(`customerId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`contractId`) REFERENCES `service_contracts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_customer_service_assets_customerId_status` ON `customer_service_assets` (`customerId`, `status`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_customer_service_assets_contractId` ON `customer_service_assets` (`contractId`)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_customer_service_assets_serialNumber` ON `customer_service_assets` (`serialNumber`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_requests` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, `customerId` INTEGER NOT NULL, `customerName` TEXT NOT NULL, `contactName` TEXT, `contactPhone` TEXT, `address` TEXT, `requestType` TEXT NOT NULL, `channel` TEXT NOT NULL, `priority` TEXT NOT NULL, `status` TEXT NOT NULL, `description` TEXT NOT NULL, `customerAssetId` INTEGER, `contractId` INTEGER, `projectReference` TEXT, `requestedAt` INTEGER, `responseDeadlineAt` INTEGER, `resolutionDeadlineAt` INTEGER, `qualifiedAt` INTEGER, `convertedWorkOrderId` INTEGER, `closedAt` INTEGER, `createdAt` INTEGER NOT NULL, `createdBy` INTEGER, FOREIGN KEY(`customerId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`contractId`) REFERENCES `service_contracts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`customerAssetId`) REFERENCES `customer_service_assets`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_service_requests_reference` ON `service_requests` (`reference`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_requests_status_priority_createdAt` ON `service_requests` (`status`, `priority`, `createdAt`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_requests_customerId_createdAt` ON `service_requests` (`customerId`, `createdAt`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_requests_contractId` ON `service_requests` (`contractId`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_work_orders` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reference` TEXT NOT NULL, `requestId` INTEGER, `customerId` INTEGER NOT NULL, `customerName` TEXT NOT NULL, `customerAssetId` INTEGER, `contractId` INTEGER, `interventionType` TEXT NOT NULL, `priority` TEXT NOT NULL, `status` TEXT NOT NULL, `technicianId` INTEGER, `teamName` TEXT, `plannedStartAt` INTEGER, `plannedEndAt` INTEGER, `actualStartAt` INTEGER, `actualEndAt` INTEGER, `responseDeadlineAt` INTEGER, `resolutionDeadlineAt` INTEGER, `address` TEXT, `description` TEXT NOT NULL, `diagnosis` TEXT, `resolution` TEXT, `isBillable` INTEGER NOT NULL, `billingMethod` TEXT NOT NULL, `fixedFee` REAL NOT NULL, `hourlyRate` REAL NOT NULL, `salesInvoiceId` INTEGER, `createdAt` INTEGER NOT NULL, `createdBy` INTEGER, `updatedAt` INTEGER NOT NULL, FOREIGN KEY(`customerId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`requestId`) REFERENCES `service_requests`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`contractId`) REFERENCES `service_contracts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`customerAssetId`) REFERENCES `customer_service_assets`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`technicianId`) REFERENCES `employees`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_service_work_orders_reference` ON `service_work_orders` (`reference`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_work_orders_status_plannedStartAt` ON `service_work_orders` (`status`, `plannedStartAt`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_work_orders_technicianId_plannedStartAt_plannedEndAt` ON `service_work_orders` (`technicianId`, `plannedStartAt`, `plannedEndAt`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_work_orders_requestId` ON `service_work_orders` (`requestId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_work_orders_customerId_createdAt` ON `service_work_orders` (`customerId`, `createdAt`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_timesheets` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workOrderId` INTEGER NOT NULL, `technicianId` INTEGER NOT NULL, `activityDate` INTEGER NOT NULL, `travelMinutes` INTEGER NOT NULL, `workMinutes` INTEGER NOT NULL, `adminMinutes` INTEGER NOT NULL, `costRate` REAL NOT NULL, `billRate` REAL NOT NULL, `isBillable` INTEGER NOT NULL, `status` TEXT NOT NULL, `note` TEXT, `createdAt` INTEGER NOT NULL, `createdBy` INTEGER, FOREIGN KEY(`workOrderId`) REFERENCES `service_work_orders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`technicianId`) REFERENCES `employees`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_timesheets_workOrderId_activityDate` ON `service_timesheets` (`workOrderId`, `activityDate`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_timesheets_technicianId_activityDate` ON `service_timesheets` (`technicianId`, `activityDate`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_reports` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workOrderId` INTEGER NOT NULL, `status` TEXT NOT NULL, `diagnosis` TEXT NOT NULL, `workPerformed` TEXT NOT NULL, `recommendations` TEXT, `customerResolved` INTEGER NOT NULL, `customerComment` TEXT, `customerSignerName` TEXT, `customerSignatureUri` TEXT, `technicianSignatureUri` TEXT, `signedAt` INTEGER, `submittedAt` INTEGER, `approvedBy` INTEGER, `approvedAt` INTEGER, `pdfUri` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, FOREIGN KEY(`workOrderId`) REFERENCES `service_work_orders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_service_reports_workOrderId` ON `service_reports` (`workOrderId`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_reports_status_updatedAt` ON `service_reports` (`status`, `updatedAt`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `service_attachments` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workOrderId` INTEGER NOT NULL, `kind` TEXT NOT NULL, `localUri` TEXT NOT NULL, `caption` TEXT, `capturedAt` INTEGER NOT NULL, `capturedBy` INTEGER, FOREIGN KEY(`workOrderId`) REFERENCES `service_work_orders`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_service_attachments_workOrderId_capturedAt` ON `service_attachments` (`workOrderId`, `capturedAt`)")
             }
         }
 

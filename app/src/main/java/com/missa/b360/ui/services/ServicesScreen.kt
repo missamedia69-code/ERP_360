@@ -89,8 +89,25 @@ fun ServicesScreen(
     val message by vm.message.collectAsStateWithLifecycle()
     val enCours by vm.enCours.collectAsStateWithLifecycle()
     val filtre by vm.filtre.collectAsStateWithLifecycle()
+    val fieldVm: ServiceFieldViewModel = hiltViewModel()
+    val fieldState by fieldVm.state.collectAsStateWithLifecycle()
+    val fieldMessage by fieldVm.message.collectAsStateWithLifecycle()
+    val fieldBusy by fieldVm.busy.collectAsStateWithLifecycle()
 
-    var dialogueNouvellePrestation by remember { mutableStateOf(openCreate) }
+    var requestDialog by remember { mutableStateOf(openCreate) }
+    var orderDialog by remember { mutableStateOf(false) }
+    var orderToSchedule by remember { mutableStateOf<com.missa.b360.core.data.entity.ServiceWorkOrderEntity?>(null) }
+    var orderToReport by remember { mutableStateOf<com.missa.b360.core.data.entity.ServiceWorkOrderEntity?>(null) }
+    var orderToTimesheet by remember { mutableStateOf<com.missa.b360.core.data.entity.ServiceWorkOrderEntity?>(null) }
+
+    LaunchedEffect(fieldMessage) {
+        if (fieldMessage != null) {
+            kotlinx.coroutines.delay(4_000)
+            fieldVm.clearMessage()
+        }
+    }
+
+    var dialogueNouvellePrestation by remember { mutableStateOf(false) }
     var prestationAAnnuler by remember { mutableStateOf<Prestation?>(null) }
     var prestationAjusterHeures by remember { mutableStateOf<Prestation?>(null) }
 
@@ -116,7 +133,54 @@ fun ServicesScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // --- Carte Synthèse Prestations ---
+            item {
+                ServiceFieldOverview(
+                    requests = fieldState.requests,
+                    workOrders = fieldState.workOrders,
+                    onNewRequest = { requestDialog = true },
+                    onNewOrder = { orderDialog = true },
+                )
+            }
+            fieldMessage?.let { result ->
+                item {
+                    val (text, color) = when (result) {
+                        is ServiceFieldViewModel.Message.Success -> (result.reference?.let { "${result.text} · $it" } ?: result.text) to Color(0xFF15803D)
+                        is ServiceFieldViewModel.Message.Error -> result.reason.toServicesError() to Color(0xFFB91C1C)
+                    }
+                    Surface(shape = RoundedCornerShape(10.dp), color = color.copy(alpha = 0.12f)) {
+                        Text(text, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = color, modifier = Modifier.fillMaxWidth().padding(10.dp))
+                    }
+                }
+            }
+            if (fieldState.requests.isNotEmpty()) {
+                item { Text("Demandes clients", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk) }
+                items(fieldState.requests, key = { "request-${it.id}" }) { request ->
+                    ServiceRequestCard(
+                        request = request,
+                        onQualify = { fieldVm.qualifyRequest(request.id) },
+                        onConvert = { fieldVm.convertRequest(request.id) },
+                    )
+                }
+            }
+            if (fieldState.workOrders.isNotEmpty()) {
+                item { Text("Ordres d'intervention", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk) }
+                items(fieldState.workOrders, key = { "service-order-${it.id}" }) { order ->
+                    ServiceWorkOrderCard(
+                        order = order,
+                        technicianName = fieldState.employees.firstOrNull { it.id == order.technicianId }?.nom,
+                        onSchedule = { orderToSchedule = order },
+                        onTransition = { fieldVm.transition(order.id, it) },
+                        onReport = { orderToReport = order },
+                        onTimesheet = { orderToTimesheet = order },
+                        onApprove = { fieldVm.approveReport(order.id) },
+                    )
+                }
+            }
+            if (etat.prestations.isNotEmpty()) {
+                item {
+                    Text("Prestations simples · historique", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                }
+                // --- Carte Synthèse Prestations ---
             item {
                 Surface(
                     shape = RoundedCornerShape(18.dp),
@@ -185,9 +249,9 @@ fun ServicesScreen(
                     ),
                     TuileMatriceSpec(
                         icone = Iv.Add,
-                        titre = stringResource(R.string.srv_nouvelle_prestation),
+                        titre = "Nouvelle demande",
                         sousTitre = stringResource(R.string.st_creer),
-                        onClick = { dialogueNouvellePrestation = true },
+                        onClick = { requestDialog = true },
                     ),
                 )
 
@@ -260,7 +324,16 @@ fun ServicesScreen(
                 }
             }
 
-            if (etat.prestations.isEmpty()) {
+            items(etat.prestations, key = { it.record.id }) { prestation ->
+                CartePrestation(
+                    prestation = prestation,
+                    devise = devise,
+                    onAvancer = { vm.avancer(prestation.record.id) },
+                    onAjusterHeures = { prestationAjusterHeures = prestation },
+                    onAnnuler = { prestationAAnnuler = prestation },
+                )
+            }
+            } else if (fieldState.requests.isEmpty() && fieldState.workOrders.isEmpty()) {
                 item {
                     MissaEmptyState(
                         icon = Iv.RequestQuote,
@@ -269,18 +342,58 @@ fun ServicesScreen(
                         modifier = Modifier.padding(16.dp),
                     )
                 }
-            } else {
-                items(etat.prestations, key = { it.record.id }) { prestation ->
-                    CartePrestation(
-                        prestation = prestation,
-                        devise = devise,
-                        onAvancer = { vm.avancer(prestation.record.id) },
-                        onAjusterHeures = { prestationAjusterHeures = prestation },
-                        onAnnuler = { prestationAAnnuler = prestation },
-                    )
-                }
             }
         }
+    }
+
+    if (requestDialog) {
+        ServiceRequestDialog(
+            clients = fieldState.clients,
+            onDismiss = { requestDialog = false },
+            onSubmit = { client, description, type, priority, contact, phone ->
+                fieldVm.createRequest(client, description, type, priority, contact = contact, phone = phone)
+                requestDialog = false
+            },
+        )
+    }
+    if (orderDialog) {
+        ServiceOrderDialog(
+            clients = fieldState.clients,
+            onDismiss = { orderDialog = false },
+            onSubmit = { client, description, priority ->
+                fieldVm.createWorkOrder(client, description, priority)
+                orderDialog = false
+            },
+        )
+    }
+    orderToSchedule?.let { order ->
+        ServiceScheduleDialog(
+            employees = fieldState.employees,
+            onDismiss = { orderToSchedule = null },
+            onSubmit = { technicianId, startAt, endAt ->
+                fieldVm.schedule(order.id, technicianId, startAt, endAt)
+                orderToSchedule = null
+            },
+        )
+    }
+    orderToReport?.let { order ->
+        ServiceReportDialog(
+            onDismiss = { orderToReport = null },
+            onSubmit = { diagnosis, work, resolved, signer, signatureUri ->
+                fieldVm.submitReport(order.id, diagnosis, work, resolved, signer, signatureUri)
+                orderToReport = null
+            },
+            onAttachPhoto = { uri -> fieldVm.addAttachment(order.id, uri) },
+        )
+    }
+    orderToTimesheet?.let { order ->
+        ServiceTimesheetDialog(
+            onDismiss = { orderToTimesheet = null },
+            onSubmit = { minutes ->
+                order.technicianId?.let { fieldVm.addTimesheet(order.id, it, minutes) }
+                orderToTimesheet = null
+            },
+        )
     }
 
     if (dialogueNouvellePrestation) {
@@ -321,6 +434,20 @@ fun ServicesScreen(
             },
         )
     }
+}
+
+private fun com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.toServicesError(): String = when (this) {
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.Invalid -> "Informations invalides ou champs obligatoires manquants."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.NotFound -> "Élément ou technicien introuvable."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.Forbidden -> "Action non autorisée pour ce rôle."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.ReadOnly -> "Licence en lecture seule."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.ModuleInactive -> "Le module Services n'est pas activé dans ce profil."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.InvalidTransition -> "Cette étape ne peut pas être modifiée ainsi."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.ScheduleConflict -> "Ce technicien a déjà une intervention sur ce créneau."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.TechnicianUnavailable -> "Technicien inactif ou indisponible."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.SignatureRequired -> "Une signature client enregistrée est requise."
+    com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.SelfApprovalNotAllowed -> "La validation doit être faite par une autre personne que le créateur."
+    is com.missa.b360.core.domain.usecase.ServiceWorkflowUseCases.Result.Success -> "Terminé."
 }
 
 @Composable

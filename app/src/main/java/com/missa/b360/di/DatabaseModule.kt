@@ -33,6 +33,7 @@ import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.ServiceWorkflowDao
 import com.missa.b360.core.data.dao.TaskDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
@@ -55,7 +56,7 @@ object DatabaseModule {
         Room.databaseBuilder(context, AppDatabase::class.java, "missa_b360.db")
             .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
                 AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7,
-                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12, AppDatabase.MIGRATION_12_13, AppDatabase.MIGRATION_13_14, AppDatabase.MIGRATION_14_15, AppDatabase.MIGRATION_15_16, AppDatabase.MIGRATION_16_17, AppDatabase.MIGRATION_17_18, AppDatabase.MIGRATION_18_19, AppDatabase.MIGRATION_19_20)
+                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12, AppDatabase.MIGRATION_12_13, AppDatabase.MIGRATION_13_14, AppDatabase.MIGRATION_14_15, AppDatabase.MIGRATION_15_16, AppDatabase.MIGRATION_16_17, AppDatabase.MIGRATION_17_18, AppDatabase.MIGRATION_18_19, AppDatabase.MIGRATION_19_20, AppDatabase.MIGRATION_20_21)
             .build()
 
     @Provides fun provideGroupeArticleDao(db: AppDatabase): GroupeArticleDao = db.groupeArticleDao()
@@ -93,6 +94,7 @@ object DatabaseModule {
     @Provides fun provideFournisseurEvenementDao(db: AppDatabase): FournisseurEvenementDao =
         db.fournisseurEvenementDao()
     @Provides fun provideOperationRecordDao(db: AppDatabase): OperationRecordDao = db.operationRecordDao()
+    @Provides fun provideServiceWorkflowDao(db: AppDatabase): ServiceWorkflowDao = db.serviceWorkflowDao()
     @Provides fun provideProductDao(db: AppDatabase): ProductDao = db.productDao()
     @Provides fun provideProductStockDao(db: AppDatabase): ProductStockDao = db.productStockDao()
     @Provides fun provideStockMovementDao(db: AppDatabase): StockMovementDao = db.stockMovementDao()
