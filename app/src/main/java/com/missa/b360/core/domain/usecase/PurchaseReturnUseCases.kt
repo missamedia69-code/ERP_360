@@ -22,6 +22,7 @@ import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.domain.model.InventoryRules
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
+import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.domain.model.PurchaseLine
 import com.missa.b360.core.domain.model.ReceptionCodec
