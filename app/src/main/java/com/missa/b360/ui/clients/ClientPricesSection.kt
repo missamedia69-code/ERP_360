@@ -72,7 +72,7 @@ internal fun ClientPricesSection(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(products.firstOrNull { it.id == price.produitId }?.nom ?: stringResource(R.string.clients_flow_unknown_product), color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                            Text("${price.prix.fmtValeur()} $devise", color = MissaMuted, fontSize = 9.sp)
+                            Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 9.sp)
                         }
                         IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(30.dp)) {
                             Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.clients_flow_remove_price), tint = MissaInk, modifier = Modifier.size(17.dp))
