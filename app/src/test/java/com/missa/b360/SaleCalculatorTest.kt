@@ -4,6 +4,7 @@ import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
+import com.missa.b360.core.domain.model.SaleValidation
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -47,6 +48,20 @@ class SaleCalculatorTest {
         val restored = SaleRecordCodec.decode(SaleRecordCodec.encode(payload))
 
         assertEquals(payload, restored)
+    }
+
+    @Test
+    fun `la vente comptoir anonyme exige un paiement integral`() {
+        assertEquals(true, SaleValidation.venteComptantSansClientAutorisee(0L, 1_000.0, 1_000.0))
+        assertEquals(false, SaleValidation.venteComptantSansClientAutorisee(0L, 1_000.0, 999.0))
+        assertEquals(false, SaleValidation.venteComptantSansClientAutorisee(7L, 1_000.0, 1_000.0))
+    }
+
+    @Test
+    fun `rejette les lignes non finies ou les quantites invalides avant toute ecriture`() {
+        assertEquals(false, SaleValidation.lignesValides(listOf(SaleLine(1, "Pile", 500.0, Double.NaN))))
+        assertEquals(false, SaleValidation.lignesValides(listOf(SaleLine(1, "Pile", Double.POSITIVE_INFINITY, 1.0))))
+        assertEquals(false, SaleValidation.lignesValides(listOf(SaleLine(1, "Pile", 500.0, -1.0))))
     }
 
     @Test

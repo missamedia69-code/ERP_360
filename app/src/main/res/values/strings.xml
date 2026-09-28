@@ -1815,4 +1815,7 @@
     <string name="sales_quick_client_duplicate">Un client similaire existe. Vérifiez-le et confirmez toute création depuis le module Clients.</string>
     <string name="sales_quick_client_invalid">Informations invalides ou licence en lecture seule. Vérifiez les coordonnées du client.</string>
     <string name="sales_err_credit_limit">Crédit refusé : dépassement ou alerte de plafond. Une validation autorisée ou un paiement intégral est requis.</string>
+    <string name="sales_cash_customer">Client comptant</string>
+    <string name="sales_err_cash_account">Un compte de trésorerie actif est requis pour enregistrer l’encaissement.</string>
+    <string name="sales_err_stock_module_inactive">Le module Stock doit être activé pour vendre des articles suivis en stock.</string>
 </resources>

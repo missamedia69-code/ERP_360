@@ -7,7 +7,6 @@ import com.missa.b360.core.data.dao.MouvementTresorerieDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
-import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.CategorieTresorerie
@@ -16,12 +15,11 @@ import com.missa.b360.core.data.entity.OperationModule
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.SensMouvement
-import com.missa.b360.core.data.entity.ProductStockEntity
-import com.missa.b360.core.data.entity.StockMovementEntity
-import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
+import com.missa.b360.core.domain.model.SaleValidation
 import com.missa.b360.core.domain.model.SaleStockEffects
 import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.journal.JournalManager
@@ -51,8 +49,7 @@ class SaveSaleUseCase @Inject constructor(
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
+    private val stockService: StockService,
     private val database: AppDatabase,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
@@ -66,6 +63,8 @@ class SaveSaleUseCase @Inject constructor(
         data object BrouillonIntrouvable : Result()
         data object ClientNonEligible : Result()
         data object ValidationCreditRequise : Result()
+        data object CompteEncaissementRequis : Result()
+        data object ModuleStockInactif : Result()
         /** Stock insuffisant re-lu transactionnellement (§43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : Result()
     }
@@ -85,9 +84,17 @@ class SaveSaleUseCase @Inject constructor(
             delivery = payload.delivery,
             taxRate = payload.taxRate,
         )
-        if (payload.lines.isEmpty() || totals.total <= 0.0) return Result.DonneesInvalides
-        if (abs(totals.total - payload.total) > 0.01) return Result.DonneesInvalides
-        if (payload.paidAmount < -QUANTITE_EPSILON || payload.paidAmount > totals.total + QUANTITE_EPSILON) {
+        if (!SaleValidation.lignesValides(payload.lines) || payload.clientId < 0L || payload.clientName.isBlank()) {
+            return Result.DonneesInvalides
+        }
+        if (!payload.discount.isFinite() || payload.discount < 0.0 ||
+            !payload.delivery.isFinite() || payload.delivery < 0.0 ||
+            !payload.taxRate.isFinite() || payload.taxRate !in 0.0..100.0 ||
+            !totals.total.isFinite() || totals.total <= 0.0 || !payload.total.isFinite() ||
+            !payload.paidAmount.isFinite() || payload.paidAmount < 0.0 ||
+            payload.paidAmount > totals.total + QUANTITE_EPSILON
+        ) return Result.DonneesInvalides
+        if (payload.discount > totals.subtotal + QUANTITE_EPSILON || abs(totals.total - payload.total) > 0.01) {
             return Result.DonneesInvalides
         }
         val detail = SaleRecordCodec.encode(
@@ -147,13 +154,24 @@ class SaveSaleUseCase @Inject constructor(
         // Vente validée : toutes les vérifications de lecture précèdent toute écriture,
         // afin qu'un échec ne laisse aucun état partiel (§44).
         return database.withTransaction {
-            val client = clientDao.getById(payload.clientId)
-                ?: return@withTransaction Result.ClientNonEligible
-            if (!ClientLifecycleRules.venteAutorisee(client, totals.total, payload.paidAmount)) {
+            val client = if (payload.clientId == 0L) null else clientDao.getById(payload.clientId)
+            if (payload.clientId > 0L && client == null) return@withTransaction Result.ClientNonEligible
+            if (client == null) {
+                // Client comptant/vente anonyme : aucun crédit sans fiche maître.
+                if (!SaleValidation.venteComptantSansClientAutorisee(payload.clientId, totals.total, payload.paidAmount)) {
+                    return@withTransaction Result.ClientNonEligible
+                }
+            } else if (!ClientLifecycleRules.venteAutorisee(client, totals.total, payload.paidAmount)) {
                 return@withTransaction Result.ClientNonEligible
             }
+            // Aucun montant ne peut être marqué payé sans destination Finance active.
+            val compteEncaissement = if (payload.paidAmount > QUANTITE_EPSILON) {
+                TresorerieRules.compteCible(payload.paymentMethod, comptesTresorerieDao.getAll())
+                    ?: return@withTransaction Result.CompteEncaissementRequis
+            } else null
             val nouvelleCreance = (totals.total - payload.paidAmount).coerceAtLeast(0.0)
-            if (nouvelleCreance > QUANTITE_EPSILON && client.limiteCredit != null) {
+            val limiteCredit = client?.limiteCredit
+            if (nouvelleCreance > QUANTITE_EPSILON && limiteCredit != null) {
                 // Solde dérivé des ventes validées et avoirs, en cohérence avec la fiche client.
                 val soldeActuel = operationDao.getByModule(OperationModule.VENTE.name)
                     .asSequence()
@@ -168,98 +186,95 @@ class SaveSaleUseCase @Inject constructor(
                 val verdictCredit = checkCreditLimit(
                     soldeActuel = soldeActuel,
                     montantNouvelleVente = nouvelleCreance,
-                    limiteCredit = client.limiteCredit,
+                    limiteCredit = limiteCredit,
                 )
                 if (verdictCredit != CheckCreditLimitUseCase.Verdict.AUTORISE) {
                     return@withTransaction Result.ValidationCreditRequise
                 }
             }
-            val besoins = SaleStockEffects.besoinsParProduit(payload.lines)
-            val sorties = mutableListOf<Triple<Long, Long, Double>>() // produit, site de sortie, quantité
-            for ((produitId, demande) in besoins) {
+            // Revalider le catalogue côté serveur ; l'indicateur de stock du client n'est pas fiable.
+            val produitsCatalogue = mutableMapOf<Long, com.missa.b360.core.data.entity.ProductEntity>()
+            for (produitId in payload.lines.mapNotNull { it.productId }.distinct()) {
                 val produit = productDao.getById(produitId)
-                if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
-                val siteId = produit.siteId
-                    ?: stockDao.siteAvecPlusDeStock(produitId)
-                    ?: return@withTransaction Result.StockInsuffisant(produit.nom, 0.0, demande)
-                val disponible = stockDao.quantite(produitId, siteId) ?: 0.0
-                if (disponible < demande - QUANTITE_EPSILON) {
-                    return@withTransaction Result.StockInsuffisant(produit.nom, disponible, demande)
+                    ?: return@withTransaction Result.DonneesInvalides
+                if (!produit.active || !produit.vendable || !ProduitRules.estVendable(produit.type)) {
+                    return@withTransaction Result.DonneesInvalides
                 }
-                sorties += Triple(produitId, siteId, demande)
+                produitsCatalogue[produitId] = produit
+            }
+            // Normaliser depuis le catalogue : garantit aussi la compatibilité des brouillons antérieurs.
+            val lignesValidees = payload.lines.map { line ->
+                val productId = line.productId
+                val stockable = productId?.let { produitsCatalogue[it] }
+                    ?.let { it.stockable && ProduitRules.estStockable(it.type) } ?: false
+                line.copy(stockTracked = stockable)
+            }
+            val detailValide = SaleRecordCodec.encode(
+                payload.copy(
+                    lines = lignesValidees,
+                    subtotal = totals.subtotal,
+                    discount = totals.discount,
+                    delivery = totals.delivery,
+                    taxAmount = totals.taxAmount,
+                    total = totals.total,
+                ),
+            )
+            val stockPlan = when (val plan = stockService.planifierSortieVente(SaleStockEffects.besoinsParProduit(lignesValidees))) {
+                is StockService.SortieResultat.Pret -> plan.lignes
+                is StockService.SortieResultat.StockInsuffisant ->
+                    return@withTransaction Result.StockInsuffisant(plan.produitNom, plan.disponible, plan.demande)
+                StockService.SortieResultat.DonneesInvalides -> return@withTransaction Result.DonneesInvalides
+                StockService.SortieResultat.ModuleInactif -> return@withTransaction Result.ModuleStockInactif
             }
 
-            val (recordIdFinal, reference) = when (val id = recordId) {
-                null -> {
-                    val ref = sequenceManager.next(DocType.FACTURE)
-                    val newId = operationDao.insert(
-                        OperationRecordEntity(
-                            module = OperationModule.VENTE.name,
-                            reference = ref,
-                            title = payload.clientName,
-                            counterpart = payload.clientName,
-                            tiersId = payload.clientId.takeIf { it > 0 },
-                            amount = totals.total,
-                            status = OperationStatus.VALIDATED.name,
-                            notes = detail,
-                            createdAt = now,
-                        ),
-                    )
-                    newId to ref
-                }
-                else -> {
-                    val existant = operationDao.getById(id)
-                    if (existant == null ||
-                        existant.module != OperationModule.VENTE.name ||
-                        existant.status != OperationStatus.DRAFT.name
-                    ) {
-                        return@withTransaction Result.BrouillonIntrouvable
-                    }
-                    operationDao.update(
-                        existant.copy(
-                            title = payload.clientName,
-                            counterpart = payload.clientName,
-                            tiersId = payload.clientId.takeIf { it > 0 },
-                            amount = totals.total,
-                            status = OperationStatus.VALIDATED.name,
-                            notes = detail,
-                        ),
-                    )
-                    id to existant.reference
-                }
+            val existant = recordId?.let { operationDao.getById(it) }
+            if (recordId != null && (existant == null || existant.module != OperationModule.VENTE.name || existant.status != OperationStatus.DRAFT.name)) {
+                return@withTransaction Result.BrouillonIntrouvable
+            }
+            val reference = existant?.reference ?: sequenceManager.next(DocType.FACTURE)
+            when (val sortie = stockService.enregistrerSortieVente(stockPlan, reference, now)) {
+                is StockService.SortieResultat.Pret -> Unit
+                is StockService.SortieResultat.StockInsuffisant ->
+                    return@withTransaction Result.StockInsuffisant(sortie.produitNom, sortie.disponible, sortie.demande)
+                StockService.SortieResultat.DonneesInvalides -> return@withTransaction Result.DonneesInvalides
+                StockService.SortieResultat.ModuleInactif -> return@withTransaction Result.ModuleStockInactif
             }
 
-            for ((produitId, siteId, demande) in sorties) {
-                // Relecture juste avant commit (§43) — entre la vérification et le commit,
-                // rien d'autre ne s'exécute dans la même transaction, mais on re-lit
-                // pour rester cohérent avec la règle du cahier de charges.
-                val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-                val apres = (avant - demande).coerceAtLeast(0.0)
-                stockDao.ensureRow(produitId, siteId)
-                stockDao.remplacer(produitId, siteId, apres)
-                movementDao.insert(
-                    StockMovementEntity(
-                        produitId = produitId,
-                        siteId = siteId,
-                        type = StockMovementType.SORTIE,
-                        quantite = demande,
-                        motif = "VENTE",
+            val recordIdFinal = when (val id = recordId) {
+                null -> operationDao.insert(
+                    OperationRecordEntity(
+                        module = OperationModule.VENTE.name,
                         reference = reference,
-                        horodatage = now,
+                        title = payload.clientName,
+                        counterpart = payload.clientName,
+                        tiersId = payload.clientId.takeIf { it > 0 },
+                        amount = totals.total,
+                        status = OperationStatus.VALIDATED.name,
+                        notes = detailValide,
+                        createdAt = now,
                     ),
                 )
+                else -> {
+                    operationDao.update(
+                        existant!!.copy(
+                            title = payload.clientName,
+                            counterpart = payload.clientName,
+                            tiersId = payload.clientId.takeIf { it > 0 },
+                            amount = totals.total,
+                            status = OperationStatus.VALIDATED.name,
+                            notes = detailValide,
+                        ),
+                    )
+                    id
+                }
             }
 
             // La somme réellement encaissée entre en trésorerie, sur le premier
             // compte ouvert, avec la référence de la facture comme garde-fou :
             // rouvrir puis revalider la vente ne crédite jamais deux fois.
-            // Aucun compte configuré ⇒ rien n'est écrit, l'utilisateur n'a pas
-            // encore ouvert sa caisse et le solde n'a donc pas de sens.
+            // Une référence financière dédiée protège des doubles encaissements ;
+            // les validations déjà réglées n'écrivent aucune seconde entrée.
             val referenceEncaissement = TresorerieRules.referenceEncaissement(reference)
-            val compteEncaissement = TresorerieRules.compteCible(
-                payload.paymentMethod,
-                comptesTresorerieDao.getAll(),
-            )
             val montantEncaisse = TresorerieRules.encaissementAEnregistrer(
                 montantPaye = payload.paidAmount,
                 dejaEnregistre = mouvementsTresorerieDao
@@ -294,15 +309,13 @@ class SaveSaleUseCase @Inject constructor(
 }
 
 /**
- * Annulation d'une vente validée (spec §3 ANNULATION / C7) — **compensation**,
- * jamais de suppression : la pièce passe au statut ANNULÉ et le stock sortant est
- * recomposé par des mouvements d'entrée portant la même référence.
+ * Garde de compatibilité : une facture validée est immuable. La correction passe par
+ * un avoir dédié ; une annulation directe ne peut pas contourner les compensations
+ * de trésorerie et les écritures réglementaires.
  */
 class ReverseSaleStockUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
-    private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
+    private val stockService: StockService,
     private val database: AppDatabase,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
@@ -312,6 +325,8 @@ class ReverseSaleStockUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object Introuvable : Result()
         data object DejaAnnulee : Result()
+        /** Une facture validée reste immuable : utiliser un avoir plutôt qu'une annulation directe. */
+        data object AvoirRequis : Result()
         /** Une vente brouillon ne s'annule pas : on la laisse en brouillon ou on la valide. */
         data object Brouillon : Result()
     }
@@ -326,30 +341,11 @@ class ReverseSaleStockUseCase @Inject constructor(
             when (record.status) {
                 OperationStatus.CANCELLED.name -> return@withTransaction Result.DejaAnnulee
                 OperationStatus.DRAFT.name -> return@withTransaction Result.Brouillon
-                else -> Unit
+                OperationStatus.VALIDATED.name -> return@withTransaction Result.AvoirRequis
+                else -> return@withTransaction Result.Introuvable
             }
-            val payload = SaleRecordCodec.decode(record.notes)
-            if (payload != null) {
-                for ((produitId, quantite) in SaleStockEffects.besoinsParProduit(payload.lines)) {
-                    val produit = productDao.getById(produitId) ?: continue
-                    val siteId = produit.siteId
-                        ?: stockDao.siteAvecPlusDeStock(produitId)
-                        ?: continue
-                    val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-                    stockDao.ensureRow(produitId, siteId)
-                    stockDao.remplacer(produitId, siteId, avant + quantite)
-                    movementDao.insert(
-                        StockMovementEntity(
-                            produitId = produitId,
-                            siteId = siteId,
-                            type = StockMovementType.ENTREE,
-                            quantite = quantite,
-                            motif = "ANNULATION_VENTE",
-                            reference = record.reference,
-                            horodatage = now,
-                        ),
-                    )
-                }
+            if (!stockService.compenserSortieVente(record.reference, now)) {
+                return@withTransaction Result.Introuvable
             }
             operationDao.update(record.copy(status = OperationStatus.CANCELLED.name))
             journalManager.log(
@@ -378,7 +374,11 @@ class CheckSaleStockUseCase @Inject constructor(
         for ((produitId, demande) in SaleStockEffects.besoinsParProduit(payload.lines)) {
             val produit = productDao.getById(produitId) ?: continue
             val siteId = produit.siteId ?: stockDao.siteAvecPlusDeStock(produitId) ?: return Verdict(produit.nom, 0.0, demande)
-            val disponible = stockDao.quantite(produitId, siteId) ?: 0.0
+            var disponible = stockDao.quantite(produitId, siteId) ?: 0.0
+            if (disponible < demande - QUANTITE_EPSILON) {
+                val autreSite = stockDao.siteAvecPlusDeStock(produitId)
+                if (autreSite != null) disponible = stockDao.quantite(produitId, autreSite) ?: 0.0
+            }
             if (disponible < demande - QUANTITE_EPSILON) return Verdict(produit.nom, disponible, demande)
         }
         return null

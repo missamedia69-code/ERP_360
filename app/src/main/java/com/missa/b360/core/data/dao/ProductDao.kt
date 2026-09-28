@@ -134,6 +134,9 @@ interface StockMovementDao {
     @Insert
     suspend fun insert(movement: StockMovementEntity): Long
 
+    @Query("SELECT * FROM stock_movements WHERE reference = :reference ORDER BY id")
+    suspend fun getByReference(reference: String): List<StockMovementEntity>
+
     @Query("SELECT * FROM stock_movements ORDER BY horodatage DESC, id DESC LIMIT :limit")
     fun observeRecent(limit: Int = 200): Flow<List<StockMovementEntity>>
 

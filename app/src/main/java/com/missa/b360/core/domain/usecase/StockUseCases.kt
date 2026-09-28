@@ -145,6 +145,178 @@ class RecordStockMovementUseCase @Inject constructor(
     }
 }
 
+
+/**
+ * Port d'écriture Stock consommé par les ventes : le module Vente transmet ses
+ * besoins métier, Stock choisit le dépôt effectif, vérifie la disponibilité et
+ * possède les écritures de balance et de mouvements.
+ *
+ * Les mutations doivent être appelées dans la transaction AppDatabase du document
+ * commercial afin que facture et mouvement soient atomiques.
+ */
+class StockService @Inject constructor(
+    private val productDao: ProductDao,
+    private val stockDao: ProductStockDao,
+    private val movementDao: StockMovementDao,
+    private val journalManager: JournalManager,
+    private val activationRepository: ProfilActivationRepository,
+) {
+    data class SortiePlanifiee(val produitId: Long, val siteId: Long, val quantite: Double)
+    sealed interface SortieResultat {
+        data class Pret(val lignes: List<SortiePlanifiee>) : SortieResultat
+        data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SortieResultat
+        data object DonneesInvalides : SortieResultat
+        data object ModuleInactif : SortieResultat
+    }
+
+    /** Lecture/validation seulement : aucune écriture tant que tous les articles ne passent pas. */
+    suspend fun planifierSortieVente(besoins: Map<Long, Double>): SortieResultat {
+        if (besoins.isEmpty()) return SortieResultat.Pret(emptyList())
+        if (!stockModuleActif()) return SortieResultat.ModuleInactif
+        val plan = mutableListOf<SortiePlanifiee>()
+        for ((produitId, demande) in besoins.toSortedMap()) {
+            if (!demande.isFinite() || demande <= 0.0) return SortieResultat.DonneesInvalides
+            val produit = productDao.getById(produitId)
+                ?: return SortieResultat.StockInsuffisant("Article introuvable", 0.0, demande)
+            if (!produit.active) return SortieResultat.DonneesInvalides
+
+            val sitePrefere = produit.siteId
+            val stockPrefere = sitePrefere?.let { stockDao.quantite(produitId, it) } ?: 0.0
+            val siteEffectif = if (sitePrefere != null && stockPrefere >= demande - QUANTITE_EPSILON) {
+                sitePrefere
+            } else {
+                stockDao.siteAvecPlusDeStock(produitId) ?: sitePrefere
+            } ?: return SortieResultat.StockInsuffisant(produit.nom, 0.0, demande)
+            val disponible = stockDao.quantite(produitId, siteEffectif) ?: 0.0
+            if (disponible < demande - QUANTITE_EPSILON) {
+                return SortieResultat.StockInsuffisant(produit.nom, disponible, demande)
+            }
+            plan += SortiePlanifiee(produitId, siteEffectif, demande)
+        }
+        return SortieResultat.Pret(plan)
+    }
+
+    /** Relecture groupée avant toute écriture, puis stock + mouvements dans la transaction parente. */
+    suspend fun enregistrerSortieVente(
+        plan: List<SortiePlanifiee>,
+        reference: String,
+        now: Long,
+    ): SortieResultat {
+        if (plan.isNotEmpty() && !stockModuleActif()) return SortieResultat.ModuleInactif
+        if (plan.isNotEmpty() && movementDao.getByReference(reference).any {
+                it.type == StockMovementType.SORTIE && it.motif == "VENTE"
+            }) return SortieResultat.DonneesInvalides
+        for (ligne in plan) {
+            val disponible = stockDao.quantite(ligne.produitId, ligne.siteId) ?: 0.0
+            if (disponible < ligne.quantite - QUANTITE_EPSILON) {
+                val nom = productDao.getById(ligne.produitId)?.nom ?: "Article"
+                return SortieResultat.StockInsuffisant(nom, disponible, ligne.quantite)
+            }
+        }
+        for (ligne in plan) {
+            val avant = stockDao.quantite(ligne.produitId, ligne.siteId) ?: 0.0
+            stockDao.ensureRow(ligne.produitId, ligne.siteId)
+            stockDao.remplacer(ligne.produitId, ligne.siteId, (avant - ligne.quantite).coerceAtLeast(0.0))
+            movementDao.insert(
+                StockMovementEntity(
+                    produitId = ligne.produitId,
+                    siteId = ligne.siteId,
+                    type = StockMovementType.SORTIE,
+                    quantite = ligne.quantite,
+                    motif = "VENTE",
+                    reference = reference,
+                    horodatage = now,
+                ),
+            )
+        }
+        if (plan.isNotEmpty()) journalManager.log("STOCK", "SORTIE_VENTE", "Vente $reference — ${plan.size} ligne(s) sortie(s)")
+        return SortieResultat.Pret(plan)
+    }
+
+    /** Entrée Stock pour un retour accepté ; Vente transmet seulement les besoins métier. */
+    suspend fun enregistrerRetourVente(
+        besoins: Map<Long, Double>,
+        reference: String,
+        now: Long,
+        sourceReference: String,
+    ): Boolean {
+        if (besoins.isNotEmpty() && !stockModuleActif()) return false
+        if (movementDao.getByReference(reference).any {
+                it.type == StockMovementType.ENTREE && it.motif == "RETOUR_VENTE"
+            }) return false
+        val sortiesOriginales = movementDao.getByReference(sourceReference)
+            .filter { it.type == StockMovementType.SORTIE && it.motif == "VENTE" }
+        val lignes = mutableListOf<SortiePlanifiee>()
+        for ((produitId, quantite) in besoins.toSortedMap()) {
+            if (!quantite.isFinite() || quantite <= 0.0) return false
+            val produit = productDao.getById(produitId) ?: return false
+            val siteId = sortiesOriginales.firstOrNull { it.produitId == produitId }?.siteId
+                ?: produit.siteId
+                ?: stockDao.siteAvecPlusDeStock(produitId)
+                ?: return false
+            lignes += SortiePlanifiee(produitId, siteId, quantite)
+        }
+        // Tout valider avant d'écrire pour éviter un retour partiellement enregistré.
+        if (lignes.any { !it.quantite.isFinite() || it.quantite <= 0.0 }) return false
+        for (ligne in lignes) {
+            val avant = stockDao.quantite(ligne.produitId, ligne.siteId) ?: 0.0
+            stockDao.ensureRow(ligne.produitId, ligne.siteId)
+            stockDao.remplacer(ligne.produitId, ligne.siteId, avant + ligne.quantite)
+            movementDao.insert(
+                StockMovementEntity(
+                    produitId = ligne.produitId,
+                    siteId = ligne.siteId,
+                    type = StockMovementType.ENTREE,
+                    quantite = ligne.quantite,
+                    motif = "RETOUR_VENTE",
+                    reference = reference,
+                    commentaire = "Retour client accepté",
+                    horodatage = now,
+                ),
+            )
+        }
+        if (lignes.isNotEmpty()) journalManager.log("STOCK", "RETOUR_VENTE", "Avoir $reference — ${lignes.size} entrée(s) de stock")
+        return true
+    }
+
+    private suspend fun stockModuleActif(): Boolean {
+        val activation = activationRepository.getActivation()
+        return activation.modulesActifs.isEmpty() || activation.isModuleActif(ModuleCode.STK)
+    }
+
+    /** Compensation fidèle aux sites des sorties d'origine (pas au site produit actuel). */
+    suspend fun compenserSortieVente(reference: String, now: Long): Boolean {
+        val mouvements = movementDao.getByReference(reference)
+        // Une compensation précédente est un no-op idempotent.
+        if (mouvements.any { it.type == StockMovementType.ENTREE && it.motif == "ANNULATION_VENTE" }) return true
+        val sorties = mouvements
+            .filter { it.type == StockMovementType.SORTIE && it.motif == "VENTE" }
+            .groupBy { it.produitId to it.siteId }
+            .map { (cle, lignes) -> SortiePlanifiee(cle.first, cle.second, lignes.sumOf { it.quantite }) }
+        for (ligne in sorties) {
+            if (!ligne.quantite.isFinite() || ligne.quantite <= 0.0) return false
+        }
+        for (ligne in sorties) {
+            val avant = stockDao.quantite(ligne.produitId, ligne.siteId) ?: 0.0
+            stockDao.ensureRow(ligne.produitId, ligne.siteId)
+            stockDao.remplacer(ligne.produitId, ligne.siteId, avant + ligne.quantite)
+            movementDao.insert(
+                StockMovementEntity(
+                    produitId = ligne.produitId,
+                    siteId = ligne.siteId,
+                    type = StockMovementType.ENTREE,
+                    quantite = ligne.quantite,
+                    motif = "ANNULATION_VENTE",
+                    reference = reference,
+                    horodatage = now,
+                ),
+            )
+        }
+        if (sorties.isNotEmpty()) journalManager.log("STOCK", "ANNULATION_SORTIE_VENTE", "Vente $reference — stock compensé")
+        return true
+    }
+}
+
 /**
  * Transfert de stock entre deux entrepôts (spec §13) — transactionnel :
  * vérification source ≠ destination, quantité > 0, quantité ≤ stock disponible,

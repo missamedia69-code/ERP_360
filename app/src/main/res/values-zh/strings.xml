@@ -1768,4 +1768,7 @@
     <string name="sales_quick_client_duplicate">发现相似客户。请检查，并在客户模块中确认是否新建。</string>
     <string name="sales_quick_client_invalid">信息无效或许可证处于只读模式。请检查客户资料。</string>
     <string name="sales_err_credit_limit">信用申请被拒：已超过额度或达到预警阈值。需要授权审批或全额付款。</string>
+    <string name="sales_cash_customer">现金客户</string>
+    <string name="sales_err_cash_account">需要一个有效的资金账户才能登记这笔收款。</string>
+    <string name="sales_err_stock_module_inactive">必须启用库存模块才能销售库存跟踪商品。</string>
 </resources>

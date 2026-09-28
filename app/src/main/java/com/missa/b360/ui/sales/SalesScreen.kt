@@ -87,7 +87,6 @@ fun SalesScreen(
 ) {
     val vm: SalesViewModel = hiltViewModel()
     var ecran by remember { mutableStateOf(if (openCreate) EcranVente.FACTURE else EcranVente.LISTE) }
-    var pieceAAnnuler by remember { mutableStateOf<OperationRecordEntity?>(null) }
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
 
     LaunchedEffect(saveResult) {
@@ -104,7 +103,6 @@ fun SalesScreen(
                 ecran = EcranVente.FACTURE
             },
             onOuvrirFacture = { ecran = EcranVente.FACTURE },
-            onAnnuler = { pieceAAnnuler = it },
             openOverdue = openOverdue,
         )
         EcranVente.FACTURE -> FormulaireVente(
@@ -114,24 +112,7 @@ fun SalesScreen(
         )
     }
 
-    pieceAAnnuler?.let { piece ->
-        AlertDialog(
-            onDismissRequest = { pieceAAnnuler = null },
-            title = { Text(stringResource(R.string.ach_annuler), color = MissaInk) },
-            text = { Text(stringResource(R.string.ach_confirmer_annulation, piece.reference), color = MissaInk) },
-            confirmButton = {
-                TextButton(onClick = {
-                    vm.cancelSale(piece.id)
-                    pieceAAnnuler = null
-                }) { Text(stringResource(R.string.ach_annuler), color = Color(0xFFB91C1C)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { pieceAAnnuler = null }) {
-                    Text(stringResource(R.string.st_annuler), color = MissaInk)
-                }
-            },
-        )
-    }
+
 }
 
 @Composable
@@ -139,7 +120,6 @@ private fun ListeVentes(
     vm: SalesViewModel,
     onNouvelleVente: () -> Unit,
     onOuvrirFacture: () -> Unit,
-    onAnnuler: (OperationRecordEntity) -> Unit,
     openOverdue: Boolean,
 ) {
     val pieces by vm.history.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -288,7 +268,6 @@ private fun ListeVentes(
                         onReprendre = {
                             if (vm.loadDraft(piece, clients)) onOuvrirFacture()
                         },
-                        onAnnuler = { onAnnuler(piece) },
                     )
                 }
             }
@@ -301,7 +280,6 @@ private fun CartePieceVente(
     piece: OperationRecordEntity,
     devise: String,
     onReprendre: () -> Unit,
-    onAnnuler: () -> Unit,
 ) {
     val dateStr = remember(piece.createdAt) {
         SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(piece.createdAt))
@@ -333,13 +311,8 @@ private fun CartePieceVente(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
                 ) { Text(stringResource(R.string.ach_reprendre), fontSize = 11.sp) }
-            } else if (piece.status == OperationStatus.VALIDATED.name) {
-                Spacer(Modifier.height(6.dp))
-                OutlinedButton(
-                    onClick = onAnnuler,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(stringResource(R.string.ach_annuler), color = Color(0xFFB91C1C), fontSize = 11.sp) }
             }
+            // Une facture validée est immuable ; sa correction passe par un avoir, jamais par une annulation directe.
         }
     }
 }
@@ -397,6 +370,7 @@ private fun FormulaireVente(
                     clients = clients,
                     onSelect = vm::selectClient,
                     onOpenClientCreate = { dialogueNouveauClient = true },
+                    onSelectCashCustomer = { vm.selectCashClient(context.getString(R.string.sales_cash_customer)) },
                 )
             }
             if (clients.isEmpty()) {
@@ -493,6 +467,8 @@ private fun FormulaireVente(
                 SalesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 SalesViewModel.SaveResult.ClientNonEligible -> stringResource(R.string.sales_err_client_inactive)
                 SalesViewModel.SaveResult.ValidationCreditRequise -> stringResource(R.string.sales_err_credit_limit)
+                SalesViewModel.SaveResult.CompteEncaissementRequis -> stringResource(R.string.sales_err_cash_account)
+                SalesViewModel.SaveResult.ModuleStockInactif -> stringResource(R.string.sales_err_stock_module_inactive)
                 is SalesViewModel.SaveResult.StockInsuffisant -> {
                     val res = saveResult as SalesViewModel.SaveResult.StockInsuffisant
                     stringResource(R.string.sales_err_stock_insufficient, res.produitNom, fmtQuantite(res.disponible))
@@ -528,6 +504,7 @@ private fun SelecteurClient(
     clients: List<ClientEntity>,
     onSelect: (ClientEntity) -> Unit,
     onOpenClientCreate: () -> Unit,
+    onSelectCashCustomer: () -> Unit,
 ) {
     var ouvert by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxWidth()) {
@@ -538,21 +515,19 @@ private fun SelecteurClient(
             label = { Text(stringResource(R.string.sales_select_client), fontSize = 11.sp, color = MissaMuted) },
             trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
             placeholder = if (clients.isEmpty()) {
-                { Text("+ " + stringResource(R.string.sales_nouveau_client_rapide), fontSize = 12.sp, color = MissaMuted) }
+                { Text(stringResource(R.string.sales_select_client), fontSize = 12.sp, color = MissaMuted) }
             } else null,
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
         )
         Box(
-            Modifier.matchParentSize().clickable {
-                if (clients.isEmpty()) {
-                    onOpenClientCreate()
-                } else {
-                    ouvert = true
-                }
-            },
+            Modifier.matchParentSize().clickable { ouvert = true },
         )
         MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.sales_cash_customer), fontWeight = FontWeight.SemiBold, color = BleuVente) },
+                onClick = { onSelectCashCustomer(); ouvert = false },
+            )
             DropdownMenuItem(
                 text = { Text("+ " + stringResource(R.string.clients_nouveau_client), fontWeight = FontWeight.Bold, color = BleuVente) },
                 onClick = {

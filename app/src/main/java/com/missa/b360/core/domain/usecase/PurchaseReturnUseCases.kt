@@ -338,10 +338,7 @@ class SavePurchaseUseCase @Inject constructor(
  */
 class ReturnSaleUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
-    private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
-    private val siteDao: SiteDao,
+    private val stockService: StockService,
     private val database: AppDatabase,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
@@ -404,6 +401,15 @@ class ReturnSaleUseCase @Inject constructor(
             if (totalAvoir <= 0.0) return@withTransaction Result.LignesInvalides
 
             val reference = sequenceManager.next(DocType.AVOIR)
+            if (retourStock) {
+                val besoinsStock = lignesAvoir
+                    .filter { it.productId != null && it.stockTracked && it.quantity > 0.0 }
+                    .groupBy { it.productId!! }
+                    .mapValues { (_, lines) -> lines.sumOf { it.quantity } }
+                if (!stockService.enregistrerRetourVente(besoinsStock, reference, now, vente.reference)) {
+                    return@withTransaction Result.LignesInvalides
+                }
+            }
             val recordId = operationDao.insert(
                 OperationRecordEntity(
                     module = OperationModule.VENTE.name,
@@ -433,35 +439,6 @@ class ReturnSaleUseCase @Inject constructor(
                     createdAt = now,
                 ),
             )
-
-            if (retourStock) {
-                for ((produitId, quantite) in returnedLines
-                    .filter { it.productId != null && it.quantity > 0.0 }
-                    .groupBy { it.productId }
-                    .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
-                    .toMap()
-                ) {
-                    val produit = productDao.getById(produitId) ?: continue
-                    val siteId = produit.siteId
-                        ?: stockDao.siteAvecPlusDeStock(produitId)
-                        ?: siteDao.idPrincipal()
-                        ?: continue
-                    val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-                    stockDao.ensureRow(produitId, siteId)
-                    stockDao.remplacer(produitId, siteId, avant + quantite)
-                    movementDao.insert(
-                        StockMovementEntity(
-                            produitId = produitId,
-                            siteId = siteId,
-                            type = StockMovementType.ENTREE,
-                            quantite = quantite,
-                            motif = "RETOUR_VENTE",
-                            reference = reference,
-                            horodatage = now,
-                        ),
-                    )
-                }
-            }
 
             journalManager.log(
                 "VENTE",

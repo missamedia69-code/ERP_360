@@ -1768,4 +1768,7 @@
     <string name="sales_quick_client_duplicate">يوجد عميل مشابه. راجعه وأكد أي إنشاء جديد من وحدة العملاء.</string>
     <string name="sales_quick_client_invalid">البيانات غير صالحة أو الترخيص للقراءة فقط. تحقق من معلومات العميل.</string>
     <string name="sales_err_credit_limit">رُفض الائتمان: تم تجاوز الحد أو بلوغ عتبة التنبيه. يلزم اعتماد مخول أو سداد كامل.</string>
+    <string name="sales_cash_customer">عميل نقدي</string>
+    <string name="sales_err_cash_account">يلزم وجود حساب خزينة نشط لتسجيل هذا التحصيل.</string>
+    <string name="sales_err_stock_module_inactive">يجب تفعيل وحدة المخزون لبيع الأصناف المتتبعة في المخزون.</string>
 </resources>

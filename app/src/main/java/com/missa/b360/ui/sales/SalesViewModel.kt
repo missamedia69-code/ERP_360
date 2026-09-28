@@ -88,7 +88,6 @@ class SalesViewModel @Inject constructor(
     observeProducts: ObserveProductsUseCase,
     observeStock: ObserveProductStockUseCase,
     private val saveSale: SaveSaleUseCase,
-    private val reverseSaleStock: ReverseSaleStockUseCase,
     private val checkSaleStock: CheckSaleStockUseCase,
     private val createClient: CreateClientUseCase,
 ) : ViewModel() {
@@ -101,9 +100,10 @@ class SalesViewModel @Inject constructor(
         data object ReadOnly : SaveResult
         data object ClientNonEligible : SaveResult
         data object ValidationCreditRequise : SaveResult
+        data object CompteEncaissementRequis : SaveResult
+        data object ModuleStockInactif : SaveResult
         /** Stock insuffisant (contrôle UI ou transactionnel — spec §43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SaveResult
-        data object Cancelled : SaveResult
         data object Error : SaveResult
     }
 
@@ -142,13 +142,26 @@ class SalesViewModel @Inject constructor(
     /** Anti double-soumission : sauvegarde et annulation en cours (spec §3 SAUVEGARDE). */
     private val _saving = MutableStateFlow(false)
     val saving: StateFlow<Boolean> = _saving
-    private val _cancelling = MutableStateFlow(false)
-    val cancelling: StateFlow<Boolean> = _cancelling
     private var nextLineId = 1L
 
     fun selectClient(client: ClientEntity) {
         _uiState.value = _uiState.value.copy(selectedClient = client)
     }
+
+    /** Vente anonyme/comptoir : client temporaire, jamais inséré dans CLIENTS et sans crédit. */
+    fun selectCashClient(displayName: String) {
+        _uiState.value = _uiState.value.copy(selectedClient = clientComptant(displayName))
+    }
+
+    private fun clientComptant(name: String) = ClientEntity(
+        id = 0L,
+        code = "COMPTOIR",
+        nom = name.trim().ifBlank { "Client comptant" },
+        telephone = "",
+        statut = ClientStatus.ACTIF,
+        active = true,
+        createdAt = 0L,
+    )
 
     /** Création rapide via le cas d'usage maître ; doublon à confirmer dans Clients. */
     fun creerClientRapide(
@@ -198,7 +211,8 @@ class SalesViewModel @Inject constructor(
     fun loadDraft(record: OperationRecordEntity, availableClients: List<ClientEntity>): Boolean {
         if (record.status != OperationStatus.DRAFT.name) return false
         val payload = SaleRecordCodec.decode(record.notes) ?: return false
-        val client = availableClients.firstOrNull { it.id == payload.clientId } ?: return false
+        val client = if (payload.clientId == 0L) clientComptant(payload.clientName)
+        else availableClients.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = SalesUiState(
             selectedClient = client,
@@ -230,6 +244,7 @@ class SalesViewModel @Inject constructor(
                         unitPrice = product.prixVente ?: 0.0,
                         quantity = 1.0,
                         productId = product.product.id,
+                        stockTracked = product.product.stockable && ProduitRules.estStockable(product.product.type),
                     ),
                 )
             }
@@ -398,6 +413,8 @@ class SalesViewModel @Inject constructor(
                     SaveSaleUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
                     SaveSaleUseCase.Result.ClientNonEligible -> _saveResult.value = SaveResult.ClientNonEligible
                     SaveSaleUseCase.Result.ValidationCreditRequise -> _saveResult.value = SaveResult.ValidationCreditRequise
+                    SaveSaleUseCase.Result.CompteEncaissementRequis -> _saveResult.value = SaveResult.CompteEncaissementRequis
+                    SaveSaleUseCase.Result.ModuleStockInactif -> _saveResult.value = SaveResult.ModuleStockInactif
                     is SaveSaleUseCase.Result.StockInsuffisant -> _saveResult.value = SaveResult.StockInsuffisant(
                         result.produitNom,
                         result.disponible,
@@ -416,7 +433,8 @@ class SalesViewModel @Inject constructor(
 
     /** Prépare une nouvelle vente à partir d'une facture existante sans réutiliser sa référence. */
     fun duplicate(payload: SaleRecordPayload, availableClients: List<ClientEntity>): Boolean {
-        val client = availableClients.firstOrNull { it.id == payload.clientId } ?: return false
+        val client = if (payload.clientId == 0L) clientComptant(payload.clientName)
+        else availableClients.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = SalesUiState(
             selectedClient = client,
@@ -427,29 +445,6 @@ class SalesViewModel @Inject constructor(
             note = payload.note.orEmpty(),
         )
         return true
-    }
-
-    /**
-     * Annulation d'une vente validée — **compensation** (C7) : statut ANNULÉ et
-     * recomposition du stock par des mouvements d'entrée.
-     */
-    fun cancelSale(id: Long) {
-        if (_cancelling.value) return
-        viewModelScope.launch {
-            _cancelling.value = true
-            try {
-                when (reverseSaleStock(id)) {
-                    is ReverseSaleStockUseCase.Result.Succes -> _saveResult.value = SaveResult.Cancelled
-                    else -> _saveResult.value = SaveResult.Error
-                }
-            } catch (exception: CancellationException) {
-                throw exception
-            } catch (_: Exception) {
-                _saveResult.value = SaveResult.Error
-            } finally {
-                _cancelling.value = false
-            }
-        }
     }
 
     fun clearSaveResult() {
