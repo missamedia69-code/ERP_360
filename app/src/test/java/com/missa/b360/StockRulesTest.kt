@@ -122,6 +122,17 @@ class StockRulesTest {
     }
 
     @Test
+    fun `les lignes de service referencees au catalogue ne generent pas de sortie`() {
+        val besoins = SaleStockEffects.besoinsParProduit(
+            listOf(
+                SaleLine(id = 1, name = "Intervention", unitPrice = 25_000.0, quantity = 2.0, productId = 88L, stockTracked = false),
+                SaleLine(id = 2, name = "Marchandise", unitPrice = 1_000.0, quantity = 3.0, productId = 99L),
+            ),
+        )
+        assertEquals(mapOf(99L to 3.0), besoins)
+    }
+
+    @Test
     fun `un panier sans produit du catalogue ne touche pas le stock`() {
         assertTrue(
             SaleStockEffects.besoinsParProduit(

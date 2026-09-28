@@ -63,6 +63,11 @@ object TresorerieRules {
     /** Montant maximal accepté : au-delà, c'est une faute de frappe. */
     const val MONTANT_MAX = 1_000_000_000_000.0
 
+    /** Toute sortie doit être couverte par le solde courant du compte source. */
+    fun decaissementAutorise(soldeDisponible: Double, montant: Double): Boolean =
+        soldeDisponible.isFinite() && soldeDisponible >= 0.0 &&
+            montant.isFinite() && montant > 0.0 && montant <= soldeDisponible + 0.0001
+
     /**
      * Analyse un montant saisi : virgule ou point décimal, espaces d'unités de
      * mille (y compris l'espace insécable des claviers français) tolérés.
@@ -119,6 +124,19 @@ object TresorerieRules {
         comptes: List<CompteTresorerieEntity>,
         mouvements: List<MouvementTresorerieEntity>,
     ): Double = soldes(comptes, mouvements).sumOf { it.solde }
+
+    /**
+     * Solde immédiatement mobilisable : chèques en attente, comptes de transit et
+     * comptes fermés ne sont pas présentés comme des disponibilités réelles.
+     */
+    fun soldeDisponible(soldes: List<SoldeCompte>): Double = soldes
+        .filter { it.compte.actif }
+        .filter { typeCompte(it.compte.type) !in setOf(
+            TypeCompteTresorerie.CHEQUE_A_ENCAISSER,
+            TypeCompteTresorerie.CHEQUE_A_PAYER,
+            TypeCompteTresorerie.COMPTE_TRANSIT,
+        ) }
+        .sumOf { it.solde }
 
     /**
      * Flux sur une période, bornes incluses.
@@ -184,7 +202,8 @@ object TresorerieRules {
             MOTS_BANQUE.any { texte.contains(it) } -> TypeCompteTresorerie.BANQUE
             else -> null
         }
-        return vise?.let { type -> ouverts.firstOrNull { it.type == type.name } } ?: ouverts.first()
+        if (vise != null) return ouverts.firstOrNull { it.type == vise.name }
+        return ouverts.first()
     }
 
     private val MOTS_CAISSE = listOf("espèce", "espece", "cash", "caisse", "liquide")
@@ -208,6 +227,11 @@ object TresorerieRules {
         TypeCompteTresorerie.CAISSE -> R.string.tre_type_caisse
         TypeCompteTresorerie.BANQUE -> R.string.tre_type_banque
         TypeCompteTresorerie.MOBILE_MONEY -> R.string.tre_type_mobile
+        TypeCompteTresorerie.CHEQUE_A_ENCAISSER -> R.string.tre_type_cheque_recevoir
+        TypeCompteTresorerie.CHEQUE_A_PAYER -> R.string.tre_type_cheque_payer
+        TypeCompteTresorerie.COMPTE_TRANSIT -> R.string.tre_type_transit
+        TypeCompteTresorerie.PORTEFEUILLE_NUMERIQUE -> R.string.tre_type_wallet
+        TypeCompteTresorerie.AUTRE -> R.string.tre_type_autre
     }
 
     fun libelleCategorie(categorie: CategorieTresorerie): Int = when (categorie) {

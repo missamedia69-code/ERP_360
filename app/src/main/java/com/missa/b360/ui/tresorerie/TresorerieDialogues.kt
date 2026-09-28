@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +48,6 @@ import com.missa.b360.core.util.MoneyUtils
 import com.missa.b360.ui.components.MissaOption
 import com.missa.b360.ui.components.MissaSelecteurBleu
 import com.missa.b360.ui.icons.Iv
-import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 
@@ -78,21 +78,26 @@ internal fun TreCompteDialogue(
                     onValeur = { nom = it },
                     labelRes = R.string.tre_champ_nom,
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    TypeCompteTresorerie.entries.forEach { candidat ->
-                        FilterChip(
-                            selected = type == candidat,
-                            onClick = { type = candidat },
-                            label = {
-                                Text(
-                                    stringResource(TresorerieRules.libelleType(candidat)),
-                                    fontSize = 11.5.sp,
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    TypeCompteTresorerie.entries.toList().chunked(2).forEach { range ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            range.forEach { candidat ->
+                                FilterChip(
+                                    selected = type == candidat,
+                                    onClick = { type = candidat },
+                                    label = {
+                                        Text(
+                                            stringResource(TresorerieRules.libelleType(candidat)),
+                                            fontSize = 10.sp,
+                                            maxLines = 1,
+                                        )
+                                    },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = Color(0xFF1E3A8A).copy(alpha = 0.15f),
+                                    ),
                                 )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = BrandBlue.copy(alpha = 0.15f),
-                            ),
-                        )
+                            }
+                        }
                     }
                 }
                 // Établissement et numéro n'ont de sens que hors espèces.
@@ -217,7 +222,7 @@ internal fun TreMouvementDialogue(
                                 )
                             },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = BrandBlue.copy(alpha = 0.15f),
+                                selectedContainerColor = Color(0xFF1E3A8A).copy(alpha = 0.15f),
                             ),
                         )
                     }
@@ -240,7 +245,7 @@ internal fun TreMouvementDialogue(
                 if (comptes.isEmpty() && onNouveauCompte != null) {
                     Surface(
                         shape = RoundedCornerShape(10.dp),
-                        color = BrandBlue.copy(alpha = 0.12f),
+                        color = Color(0xFF1E3A8A).copy(alpha = 0.12f),
                         modifier = Modifier.fillMaxWidth().clickable { onNouveauCompte() },
                     ) {
                         Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -1,6 +1,10 @@
 package com.missa.b360.core.domain.usecase
 
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.ProductDao
+import com.missa.b360.core.data.dao.UserDao
+import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.permissions.PermissionChecker
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
@@ -8,6 +12,7 @@ import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.domain.model.ProduitRules
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
@@ -15,11 +20,38 @@ import com.missa.b360.core.numbering.SequenceManager
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+/** Contrôle serveur des droits Clients à partir de la session réellement enregistrée. */
+class ClientPermissionGate @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val userDao: UserDao,
+    private val permissionChecker: PermissionChecker,
+) {
+    suspend fun autorise(action: PermissionChecker.Action): Boolean {
+        val currentUserId = settingsStore.getLong(SettingsStore.Keys.CURRENT_USER_ID) ?: return false
+        val user = userDao.getById(currentUserId) ?: return false
+        if (!user.actif) return false
+        return permissionChecker.hasPermission(user.roleId, "CLIENTS", action)
+    }
+}
+
 /** Informations détaillées persistées avec un client, y compris ses contacts et adresses. */
 data class ClientProfileInput(
     val nif: String? = null,
+    val typeIdentifiantFiscal: String? = null,
+    val numeroTva: String? = null,
+    val assujettiTva: Boolean = true,
+    val exonereTva: Boolean = false,
+    val motifExoneration: String? = null,
+    val tauxTva: Double? = null,
     val commercial: String? = null,
     val conditionPaiementJours: Int = 30,
+    val conditionsPaiement: String? = null,
+    val grilleTarifaire: String? = null,
+    val remiseMaxPct: Double? = null,
+    val segment: String? = null,
+    val canalVente: String? = null,
+    val territoire: String? = null,
+    val compteComptable: String? = null,
     val contacts: List<ClientContactEntity> = emptyList(),
     val addresses: List<ClientAddressEntity> = emptyList(),
     /** L'édition simple conserve les relations jusqu'à ce que leurs écrans soient validés. */
@@ -134,7 +166,19 @@ object ClientValidation {
 
     fun profilEstValide(profil: ClientProfileInput): Boolean =
         (profil.nif?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.typeIdentifiantFiscal?.trim()?.length?.let { it <= 40 } ?: true) &&
+            (profil.numeroTva?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.motifExoneration?.trim()?.length?.let { it <= 240 } ?: true) &&
+            (!profil.exonereTva || !profil.motifExoneration.isNullOrBlank()) &&
+            (profil.tauxTva == null || (profil.tauxTva.isFinite() && profil.tauxTva in 0.0..100.0)) &&
+            (profil.remiseMaxPct == null || (profil.remiseMaxPct.isFinite() && profil.remiseMaxPct in 0.0..100.0)) &&
             (profil.commercial?.trim()?.length?.let { it <= LONGUEUR_NOM_MAX } ?: true) &&
+            (profil.conditionsPaiement?.trim()?.length?.let { it <= 240 } ?: true) &&
+            (profil.grilleTarifaire?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.segment?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.canalVente?.trim()?.length?.let { it <= 80 } ?: true) &&
+            (profil.territoire?.trim()?.length?.let { it <= 120 } ?: true) &&
+            (profil.compteComptable?.trim()?.length?.let { it <= 40 } ?: true) &&
             profil.conditionPaiementJours in 0..365 &&
             profil.contacts.all { contact ->
                 nomEstValide(contact.nom) &&
@@ -156,7 +200,8 @@ object ClientValidation {
         adresse: String? = null,
         notes: String? = null,
     ): Boolean = nomEstValide(nom) &&
-        telephoneEstValide(telephone) &&
+        (telephone.isBlank() || telephoneEstValide(telephone)) &&
+        (!telephone.isBlank() || !normaliseEmail(email).isNullOrBlank()) &&
         emailEstValide(email) &&
         adresseEstValide(adresse) &&
         notesSontValides(notes) &&
@@ -187,11 +232,18 @@ class CheckCreditLimitUseCase @Inject constructor() {
         soldeActuel: Double,
         montantNouvelleVente: Double,
         limiteCredit: Double?,
-    ): Verdict = when {
-        limiteCredit == null -> Verdict.AUTORISE // null = illimitée
-        soldeActuel + montantNouvelleVente <= limiteCredit -> Verdict.AUTORISE
-        soldeActuel + montantNouvelleVente <= limiteCredit * 1.10 -> Verdict.ALERTE
-        else -> Verdict.VALIDATION_REQUISE
+    ): Verdict {
+        if (!soldeActuel.isFinite() || soldeActuel < 0.0 || !montantNouvelleVente.isFinite() ||
+            montantNouvelleVente < 0.0 || (limiteCredit != null && (!limiteCredit.isFinite() || limiteCredit < 0.0))
+        ) return Verdict.BLOQUE
+        if (limiteCredit == null) return Verdict.AUTORISE // null = illimitée
+        val futur = soldeActuel + montantNouvelleVente
+        if (!futur.isFinite()) return Verdict.BLOQUE
+        return when {
+            futur <= limiteCredit -> Verdict.AUTORISE
+            futur <= limiteCredit * 1.10 -> Verdict.ALERTE
+            else -> Verdict.VALIDATION_REQUISE
+        }
     }
 }
 
@@ -205,10 +257,12 @@ class CreateClientUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
 ) {
     sealed class Result {
         data class Succes(val clientId: Long, val code: String) : Result()
         data object LicenceExpiree : Result() // RA-05 : lecture seule
+        data object PermissionRefusee : Result()
         data object DoublonPotentiel : Result() // RC-01 : confirmation requise
         data object NomObligatoire : Result()
         data object NomInvalide : Result()
@@ -237,6 +291,7 @@ class CreateClientUseCase @Inject constructor(
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return Result.LicenceExpiree
+        if (!permissionGate.autorise(PermissionChecker.Action.CREATE)) return Result.PermissionRefusee
         val saisieValide = ClientValidation.coordonneesEtConditionsSontValides(
             nom = nom,
             telephone = telephone,
@@ -250,8 +305,8 @@ class CreateClientUseCase @Inject constructor(
             return when {
                 nomNormalise.isEmpty() -> Result.NomObligatoire
                 !ClientValidation.nomEstValide(nom) -> Result.NomInvalide
-                telephoneNormalise.isEmpty() -> Result.TelephoneObligatoire
-                !ClientValidation.telephoneEstValide(telephone) -> Result.TelephoneInvalide
+                telephoneNormalise.isEmpty() && ClientValidation.normaliseEmail(email).isNullOrBlank() -> Result.TelephoneObligatoire
+                telephoneNormalise.isNotEmpty() && !ClientValidation.telephoneEstValide(telephone) -> Result.TelephoneInvalide
                 !ClientValidation.emailEstValide(email) -> Result.EmailInvalide
                 else -> Result.DonneesInvalides
             }
@@ -273,17 +328,32 @@ class CreateClientUseCase @Inject constructor(
                 email = ClientValidation.normaliseEmail(email),
                 adresse = ClientValidation.normaliseTexte(adresse),
                 nif = ClientValidation.normaliseTexte(profile.nif),
+                typeIdentifiantFiscal = ClientValidation.normaliseTexte(profile.typeIdentifiantFiscal),
+                numeroTva = ClientValidation.normaliseTexte(profile.numeroTva),
+                assujettiTva = profile.assujettiTva,
+                exonereTva = profile.exonereTva,
+                motifExoneration = ClientValidation.normaliseTexte(profile.motifExoneration),
+                tauxTva = profile.tauxTva,
                 commercial = ClientValidation.normaliseTexte(profile.commercial),
                 conditionPaiementJours = profile.conditionPaiementJours,
+                conditionsPaiement = ClientValidation.normaliseTexte(profile.conditionsPaiement),
+                grilleTarifaire = ClientValidation.normaliseTexte(profile.grilleTarifaire),
+                remiseMaxPct = profile.remiseMaxPct,
+                segment = ClientValidation.normaliseTexte(profile.segment),
+                canalVente = ClientValidation.normaliseTexte(profile.canalVente),
+                territoire = ClientValidation.normaliseTexte(profile.territoire),
+                compteComptable = ClientValidation.normaliseTexte(profile.compteComptable),
                 categorieId = categorieId,
                 siteId = siteId,
                 remiseDefautPct = remiseDefautPct,
                 limiteCredit = limiteCredit,
                 badgeId = badgeId,
                 notes = ClientValidation.normaliseTexte(notes),
-                statut = ClientStatus.ACTIF,
+                // Création toujours non transactionnelle : l'activation est un acte séparé.
+                statut = ClientStatus.BROUILLON,
                 prospect = type == ClientType.PROSPECT,
                 createdAt = now,
+                active = false,
             ),
             contacts = profile.contacts,
             addresses = profile.addresses,
@@ -292,11 +362,88 @@ class CreateClientUseCase @Inject constructor(
         return Result.Succes(id, code)
     }
 }
+/** Détermination du taux facturé à partir du profil fiscal du client. */
+object ClientTaxRules {
+    fun effectiveRate(assujetti: Boolean, exonere: Boolean, tauxSpecifique: Double?, tauxStandard: Double): Double {
+        if (!assujetti || exonere) return 0.0
+        val taux = tauxSpecifique ?: tauxStandard
+        return taux.takeIf { it.isFinite() && it in 0.0..100.0 } ?: 0.0
+    }
+}
+
+/** Règles pures du cycle de vie client, utilisées aussi par les tests. */
+object ClientLifecycleRules {
+    private val typesAvecIdentifiantFiscal = setOf(
+        ClientType.ENTREPRISE,
+        ClientType.ADMINISTRATION,
+        ClientType.REVENDEUR,
+        ClientType.GROSSISTE,
+        ClientType.DISTRIBUTEUR,
+        ClientType.CLIENT_EXPORT,
+        ClientType.CLIENT_PROJET,
+    )
+
+    fun informationsFiscalesRequises(type: ClientType): Boolean = type in typesAvecIdentifiantFiscal
+
+    fun peutActiver(client: ClientEntity): Boolean =
+        client.statut in setOf(ClientStatus.BROUILLON, ClientStatus.A_COMPLETER, ClientStatus.INACTIF, ClientStatus.DESACTIVE) &&
+            ClientValidation.nomEstValide(client.nom) &&
+            (ClientValidation.telephoneEstValide(client.telephone) ||
+                (!client.email.isNullOrBlank() && ClientValidation.emailEstValide(client.email))) &&
+            (client.email.isNullOrBlank() || ClientValidation.emailEstValide(client.email)) &&
+            (!informationsFiscalesRequises(client.type) ||
+                (!client.nif.isNullOrBlank() && !client.adresse.isNullOrBlank()))
+
+    /** Les brouillons et comptes bloqués crédit ne peuvent porter une créance. */
+    fun venteAutorisee(client: ClientEntity, montant: Double, regle: Double): Boolean {
+        if (!montant.isFinite() || montant <= 0.0 || !regle.isFinite() || regle < 0.0 || regle > montant + 1e-9) return false
+        return when (client.statut) {
+            ClientStatus.ACTIF -> client.active
+            ClientStatus.BROUILLON, ClientStatus.A_COMPLETER -> !client.active && regle >= montant - 1e-9
+            ClientStatus.BLOQUE_CREDIT, ClientStatus.SOUS_SURVEILLANCE -> client.active && regle >= montant - 1e-9
+            else -> false
+        }
+    }
+}
+
+/** Activation explicite après vérification des coordonnées et éléments requis. */
+class ActiverClientUseCase @Inject constructor(
+    private val clientDao: ClientDao,
+    private val licenceManager: LicenceManager,
+    private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
+) {
+    sealed class Result {
+        data object Succes : Result()
+        data object Introuvable : Result()
+        data object CoordonneesManquantes : Result()
+        data object InformationsFiscalesManquantes : Result()
+        data object LicenceExpiree : Result()
+        data object PermissionRefusee : Result()
+    }
+
+    suspend operator fun invoke(id: Long): Result {
+        if (licenceManager.isReadOnly()) return Result.LicenceExpiree
+        if (!permissionGate.autorise(PermissionChecker.Action.VALIDATE)) return Result.PermissionRefusee
+        val client = clientDao.getById(id) ?: return Result.Introuvable
+        if (!ClientLifecycleRules.peutActiver(client)) {
+            val infosFiscalesManquantes = ClientLifecycleRules.informationsFiscalesRequises(client.type) &&
+                (client.nif.isNullOrBlank() || client.adresse.isNullOrBlank())
+            return if (infosFiscalesManquantes) Result.InformationsFiscalesManquantes
+            else Result.CoordonneesManquantes
+        }
+        clientDao.update(client.copy(statut = ClientStatus.ACTIF, active = true))
+        journalManager.log("CLIENTS", "ACTIVATION_CLIENT", "Client ${client.code} activé")
+        return Result.Succes
+    }
+}
+
 /** Édition d'un client existant (jamais de suppression physique — C7). */
 class UpdateClientUseCase @Inject constructor(
     private val clientDao: ClientDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
 ) {
     suspend operator fun invoke(
         id: Long,
@@ -316,7 +463,7 @@ class UpdateClientUseCase @Inject constructor(
     ): Boolean {
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
-        if (licenceManager.isReadOnly()) return false
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.EDIT)) return false
         val saisieValide = ClientValidation.coordonneesEtConditionsSontValides(
             nom = nom,
             telephone = telephone,
@@ -334,9 +481,22 @@ class UpdateClientUseCase @Inject constructor(
             type = type,
             email = ClientValidation.normaliseEmail(email),
             adresse = ClientValidation.normaliseTexte(adresse),
-            nif = profile?.let { ClientValidation.normaliseTexte(it.nif) } ?: existant.nif,
-            commercial = profile?.let { ClientValidation.normaliseTexte(it.commercial) } ?: existant.commercial,
+            nif = if (profile == null) existant.nif else ClientValidation.normaliseTexte(profile.nif),
+            typeIdentifiantFiscal = if (profile == null) existant.typeIdentifiantFiscal else ClientValidation.normaliseTexte(profile.typeIdentifiantFiscal),
+            numeroTva = if (profile == null) existant.numeroTva else ClientValidation.normaliseTexte(profile.numeroTva),
+            assujettiTva = profile?.assujettiTva ?: existant.assujettiTva,
+            exonereTva = profile?.exonereTva ?: existant.exonereTva,
+            motifExoneration = if (profile == null) existant.motifExoneration else ClientValidation.normaliseTexte(profile.motifExoneration),
+            tauxTva = if (profile == null) existant.tauxTva else profile.tauxTva,
+            commercial = if (profile == null) existant.commercial else ClientValidation.normaliseTexte(profile.commercial),
             conditionPaiementJours = profile?.conditionPaiementJours ?: existant.conditionPaiementJours,
+            conditionsPaiement = if (profile == null) existant.conditionsPaiement else ClientValidation.normaliseTexte(profile.conditionsPaiement),
+            grilleTarifaire = if (profile == null) existant.grilleTarifaire else ClientValidation.normaliseTexte(profile.grilleTarifaire),
+            remiseMaxPct = if (profile == null) existant.remiseMaxPct else profile.remiseMaxPct,
+            segment = if (profile == null) existant.segment else ClientValidation.normaliseTexte(profile.segment),
+            canalVente = if (profile == null) existant.canalVente else ClientValidation.normaliseTexte(profile.canalVente),
+            territoire = if (profile == null) existant.territoire else ClientValidation.normaliseTexte(profile.territoire),
+            compteComptable = if (profile == null) existant.compteComptable else ClientValidation.normaliseTexte(profile.compteComptable),
             categorieId = categorieId,
             siteId = siteId,
             remiseDefautPct = remiseDefautPct,
@@ -363,9 +523,10 @@ class DesactiverClientUseCase @Inject constructor(
     private val clientDao: ClientDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
 ) {
     suspend operator fun invoke(id: Long): Boolean {
-        if (licenceManager.isReadOnly()) return false
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.DELETE)) return false
         val client = clientDao.getById(id) ?: return false
         clientDao.desactiver(id)
         journalManager.log("CLIENTS", "DESACTIVATION_CLIENT", "Client ${client.code} désactivé")
@@ -392,11 +553,13 @@ class CategorieClientUseCases @Inject constructor(
     private val clientDao: ClientDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
 ) {
     sealed class SuppressionResult {
         data object Supprimee : SuppressionResult()
         data object CategorieUtilisee : SuppressionResult()
         data object LectureSeule : SuppressionResult()
+        data object PermissionRefusee : SuppressionResult()
         data object Introuvable : SuppressionResult()
     }
 
@@ -405,7 +568,7 @@ class CategorieClientUseCases @Inject constructor(
     /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
     suspend fun creer(nom: String): Long? {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom)) return null
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.CREATE) || !ClientValidation.nomEstValide(nom)) return null
         val id = clientDao.insertCategorie(CategoryClientEntity(nom = nomNormalise))
         journalManager.log("CLIENTS", "CATEGORIE_CREEE", "Catégorie client : $nomNormalise")
         return id
@@ -413,7 +576,7 @@ class CategorieClientUseCases @Inject constructor(
 
     suspend fun renommer(id: Long, nom: String): Boolean {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom)) return false
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.EDIT) || !ClientValidation.nomEstValide(nom)) return false
         val cat = clientDao.getCategorieById(id) ?: return false
         clientDao.updateCategorie(cat.copy(nom = nomNormalise))
         journalManager.log("CLIENTS", "CATEGORIE_MODIFIEE", "Catégorie -> $nomNormalise")
@@ -423,6 +586,7 @@ class CategorieClientUseCases @Inject constructor(
     /** Renvoie précisément pourquoi une suppression ne peut pas être effectuée. */
     suspend fun supprimer(id: Long): SuppressionResult {
         if (licenceManager.isReadOnly()) return SuppressionResult.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.DELETE)) return SuppressionResult.PermissionRefusee
         if (clientDao.getCategorieById(id) == null) return SuppressionResult.Introuvable
         if (clientDao.countClientsAvecCategorie(id) > 0) return SuppressionResult.CategorieUtilisee
         clientDao.deleteCategorie(id)
@@ -436,13 +600,16 @@ class BadgeLoyaltyUseCases @Inject constructor(
     private val clientDao: ClientDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: ClientPermissionGate,
 ) {
     fun observer(): Flow<List<BadgeLoyaltyEntity>> = clientDao.observeBadges()
 
     /** @return l'identifiant créé, ou null si l'écriture est interdite/invalide. */
     suspend fun creer(nom: String, remisePct: Double): Long? {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom) || remisePct !in 0.0..100.0) {
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.CREATE) ||
+            !ClientValidation.nomEstValide(nom) || !remisePct.isFinite() || remisePct !in 0.0..100.0
+        ) {
             return null
         }
         val id = clientDao.insertBadge(BadgeLoyaltyEntity(nom = nomNormalise, remisePct = remisePct))
@@ -452,7 +619,9 @@ class BadgeLoyaltyUseCases @Inject constructor(
 
     suspend fun modifier(id: Long, nom: String, remisePct: Double, actif: Boolean = true): Boolean {
         val nomNormalise = nom.trim()
-        if (licenceManager.isReadOnly() || !ClientValidation.nomEstValide(nom) || remisePct !in 0.0..100.0) {
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.EDIT) ||
+            !ClientValidation.nomEstValide(nom) || !remisePct.isFinite() || remisePct !in 0.0..100.0
+        ) {
             return false
         }
         val badge = clientDao.getBadgeById(id) ?: return false
@@ -463,6 +632,43 @@ class BadgeLoyaltyUseCases @Inject constructor(
 }
 
 
+/** Grille de prix négociés client × produit : seule Clients possède ces règles. */
+class ClientPriceUseCases @Inject constructor(
+    private val clientDao: ClientDao,
+    private val productDao: ProductDao,
+    private val licenceManager: LicenceManager,
+    private val permissionGate: ClientPermissionGate,
+    private val journalManager: JournalManager,
+) {
+    fun observer(clientId: Long): Flow<List<com.missa.b360.core.data.entity.PriceClientEntity>> =
+        clientDao.observePrix(clientId)
+
+    suspend fun definir(clientId: Long, productId: Long, prix: Double): Boolean {
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.EDIT) ||
+            clientId <= 0 || productId <= 0 || !prix.isFinite() || prix <= 0.0
+        ) return false
+        val client = clientDao.getById(clientId) ?: return false
+        val product = productDao.getById(productId) ?: return false
+        if (!product.active || !product.vendable || !ProduitRules.estVendable(product.type)) return false
+        clientDao.upsertPrix(com.missa.b360.core.data.entity.PriceClientEntity(
+            clientId = clientId,
+            produitId = productId,
+            prix = prix,
+        ))
+        journalManager.log("CLIENTS", "PRIX_NEGOCIE_MODIFIE", "Client ${client.code} — produit ${product.code}")
+        return true
+    }
+
+    suspend fun supprimer(clientId: Long, productId: Long): Boolean {
+        if (licenceManager.isReadOnly() || !permissionGate.autorise(PermissionChecker.Action.EDIT) ||
+            clientDao.getById(clientId) == null
+        ) return false
+        clientDao.deletePrix(clientId, productId)
+        journalManager.log("CLIENTS", "PRIX_NEGOCIE_SUPPRIME", "Client id=$clientId — produit id=$productId")
+        return true
+    }
+}
+
 /** Accès au profil détaillé client sans exposer le DAO à l'interface Compose. */
 class ClientProfileUseCase @Inject constructor(
     private val clientDao: ClientDao,
@@ -470,4 +676,6 @@ class ClientProfileUseCase @Inject constructor(
     fun observeContacts(clientId: Long): Flow<List<ClientContactEntity>> = clientDao.observeContacts(clientId)
 
     fun observeAddresses(clientId: Long): Flow<List<ClientAddressEntity>> = clientDao.observeAddresses(clientId)
+
+    fun observePrices(clientId: Long): Flow<List<com.missa.b360.core.data.entity.PriceClientEntity>> = clientDao.observePrix(clientId)
 }

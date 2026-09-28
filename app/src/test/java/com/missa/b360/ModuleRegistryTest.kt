@@ -1,5 +1,6 @@
 package com.missa.b360
 
+import androidx.compose.ui.graphics.Color
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.ui.navigation.AppModule
 import org.junit.Assert.assertEquals
@@ -45,6 +46,15 @@ class ModuleRegistryTest {
     fun `un pack complet rend chaque module accessible`() {
         val visibles = AppModule.visibles(ModuleCode.entries.toList())
         assertEquals(AppModule.entries.size, visibles.size)
+    }
+
+    @Test
+    fun `achats respecte la palette achats fournisseurs`() {
+        assertEquals(Color(0xFFF28A16), AppModule.ACHATS.couleur)
+        assertEquals(Color(0xFFFFF2E2), AppModule.ACHATS.couleurPale)
+        assertEquals(Color(0xFFF28A16), AppModule.FOURNISSEURS.couleur)
+        assertEquals(Color(0xFFFFF2E2), AppModule.FOURNISSEURS.couleurPale)
+        assertEquals(Color(0xFF1E3A8A), AppModule.TRESORERIE.couleur)
     }
 
     @Test

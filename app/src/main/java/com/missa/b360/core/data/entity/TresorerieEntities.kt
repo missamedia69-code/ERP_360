@@ -72,7 +72,16 @@ data class MouvementTresorerieEntity(
 )
 
 /** Nature du compte : détermine l'icône et les modes de règlement proposés. */
-enum class TypeCompteTresorerie { CAISSE, BANQUE, MOBILE_MONEY }
+enum class TypeCompteTresorerie {
+    CAISSE,
+    BANQUE,
+    MOBILE_MONEY,
+    CHEQUE_A_ENCAISSER,
+    CHEQUE_A_PAYER,
+    COMPTE_TRANSIT,
+    PORTEFEUILLE_NUMERIQUE,
+    AUTRE,
+}
 
 /** Sens du flux, du point de vue de l'entreprise. */
 enum class SensMouvement { IN, OUT }

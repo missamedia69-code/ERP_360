@@ -44,8 +44,11 @@ class TresorerieViewModel @Inject constructor(
         data object MouvementEnregistre : Message()
         data object VirementEnregistre : Message()
         data object LectureSeule : Message()
+        data object PermissionRefusee : Message()
+        data object SoldeInsuffisant : Message()
         data object Invalide : Message()
         data object NomDejaPris : Message()
+        data object ReferenceDejaUtilisee : Message()
         data object ComptesIncoherents : Message()
         data object Erreur : Message()
     }
@@ -54,6 +57,8 @@ class TresorerieViewModel @Inject constructor(
         val comptes: List<SoldeCompte> = emptyList(),
         val mouvements: List<MouvementTresorerieEntity> = emptyList(),
         val soldeGlobal: Double = 0.0,
+        val soldeDisponible: Double = 0.0,
+        val soldesParType: Map<TypeCompteTresorerie, Double> = emptyMap(),
         val fluxDuMois: FluxPeriode = FluxPeriode(0.0, 0.0),
         val repartition: List<Pair<CategorieTresorerie, Double>> = emptyList(),
         val chargement: Boolean = true,
@@ -81,10 +86,15 @@ class TresorerieViewModel @Inject constructor(
     ) { comptes, mouvements, filtre ->
         val debutMois = debutDuMois()
         val finMois = finDuMois()
+        val soldes = TresorerieRules.soldes(comptes, mouvements)
         EtatTresorerie(
-            comptes = TresorerieRules.soldes(comptes, mouvements),
+            comptes = soldes,
             mouvements = mouvements.filter { filtre == null || it.compteId == filtre },
-            soldeGlobal = TresorerieRules.soldeGlobal(comptes, mouvements),
+            soldeGlobal = soldes.sumOf { it.solde },
+            soldeDisponible = TresorerieRules.soldeDisponible(soldes),
+            soldesParType = soldes.filter { it.compte.actif }
+                .groupBy { TresorerieRules.typeCompte(it.compte.type) }
+                .mapValues { (_, rows) -> rows.sumOf { it.solde } },
             fluxDuMois = TresorerieRules.flux(mouvements, debutMois, finMois),
             repartition = TresorerieRules.repartitionSorties(mouvements, debutMois, finMois),
             chargement = false,
@@ -190,8 +200,11 @@ class TresorerieViewModel @Inject constructor(
         _message.value = when (resultat) {
             is TresorerieUseCases.Resultat.Succes -> succes
             TresorerieUseCases.Resultat.LectureSeule -> Message.LectureSeule
+            TresorerieUseCases.Resultat.PermissionRefusee -> Message.PermissionRefusee
+            is TresorerieUseCases.Resultat.SoldeInsuffisant -> Message.SoldeInsuffisant
             TresorerieUseCases.Resultat.Invalide -> Message.Invalide
             TresorerieUseCases.Resultat.NomDejaPris -> Message.NomDejaPris
+            TresorerieUseCases.Resultat.ReferenceDejaUtilisee -> Message.ReferenceDejaUtilisee
             TresorerieUseCases.Resultat.ComptesIncoherents -> Message.ComptesIncoherents
         }
     }

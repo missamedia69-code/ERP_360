@@ -27,6 +27,10 @@ fun ClientType.labelRes(): Int = when (this) {
     ClientType.ADMINISTRATION -> R.string.clients_type_administration
     ClientType.ONG -> R.string.clients_type_ong
     ClientType.REVENDEUR -> R.string.clients_type_revendeur
+    ClientType.GROSSISTE -> R.string.clients_type_grossiste
+    ClientType.DISTRIBUTEUR -> R.string.clients_type_distributeur
+    ClientType.CLIENT_EXPORT -> R.string.clients_type_export
+    ClientType.CLIENT_PROJET -> R.string.clients_type_projet
     ClientType.PROSPECT -> R.string.clients_type_prospect
 }
 

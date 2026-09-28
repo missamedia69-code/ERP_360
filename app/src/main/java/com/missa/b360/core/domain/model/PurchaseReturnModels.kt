@@ -20,6 +20,8 @@ data class PurchaseLine(
     val lot: String? = null,
     val numeroSerie: String? = null,
     val datePeremption: Long? = null,
+    /** Dépôt de réception, conservé pour les contre-passations ultérieures. */
+    val siteId: Long? = null,
 ) {
     val total: Double get() = unitPrice * quantity
 }

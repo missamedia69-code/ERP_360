@@ -8,6 +8,7 @@ import com.missa.b360.core.data.repository.HomeRepository
 import com.missa.b360.core.data.repository.ProfilActivationRepository
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.CockpitRules
+import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.PointJour
 import com.missa.b360.core.domain.model.PointPerformance
@@ -323,9 +324,7 @@ class HomeViewModel @Inject constructor(
             listeProduits.count { it.active && (quantites[it.id] ?: 0.0) <= 0.0 }
         }
 
-        val commandesAttente = records.count {
-            it.module == OperationModule.ACHATS.name && it.status == OperationStatus.DRAFT.name
-        }
+        val commandesAttente = AchatCommandeRules.commandesEnAttente(records).size
 
         // Projets réels depuis operation_records PROJETS
         val projetsRecords = validated.filter { it.module == OperationModule.PROJETS.name }

@@ -23,6 +23,16 @@ interface CompteTresorerieDao {
     @Query("SELECT COUNT(*) FROM tresorerie_comptes WHERE nom = :nom AND id <> :saufId")
     suspend fun compterHomonymes(nom: String, saufId: Long = 0): Int
 
+    /** Solde comptable courant calculé dans la base, lisible sous la transaction d'écriture. */
+    @Query(
+        "SELECT COALESCE(c.soldeInitial, 0) + COALESCE(SUM(" +
+            "CASE WHEN m.sens = 'IN' THEN m.montant " +
+            "WHEN m.sens = 'OUT' THEN -m.montant ELSE 0 END), 0) " +
+            "FROM tresorerie_comptes c LEFT JOIN tresorerie_mouvements m ON m.compteId = c.id " +
+            "WHERE c.id = :compteId GROUP BY c.id",
+    )
+    suspend fun soldeCourant(compteId: Long): Double?
+
     @Insert
     suspend fun insert(compte: CompteTresorerieEntity): Long
 

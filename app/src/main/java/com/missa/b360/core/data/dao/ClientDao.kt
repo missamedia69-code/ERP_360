@@ -2,6 +2,7 @@ package com.missa.b360.core.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ClientDao {
-    @Query("SELECT * FROM clients WHERE active = 1 ORDER BY nom")
+    @Query("SELECT * FROM clients WHERE active = 1 AND statut = 'ACTIF' ORDER BY nom")
     fun observeAll(): Flow<List<ClientEntity>>
 
     /** Liste complète destinée au module Client, y compris les comptes désactivés. */
@@ -37,8 +38,8 @@ interface ClientDao {
 
     /** Détection de doublons RC-01 : même téléphone OU nom proche. */
     @Query(
-        "SELECT * FROM clients WHERE active = 1 AND (telephone = :telephone " +
-            "OR LOWER(TRIM(nom)) = LOWER(TRIM(:nom)))",
+        "SELECT * FROM clients WHERE statut NOT IN ('INACTIF', 'DESACTIVE', 'ARCHIVE') AND (" +
+            "(:telephone != '' AND telephone = :telephone) OR LOWER(TRIM(nom)) = LOWER(TRIM(:nom)))",
     )
     suspend fun findDoublonsPotentiels(telephone: String, nom: String): List<ClientEntity>
 
@@ -53,7 +54,7 @@ interface ClientDao {
     suspend fun countTelephone(telephone: String): Int
 
     /** Désactivation (jamais de DELETE — C7). */
-    @Query("UPDATE clients SET statut = 'DESACTIVE', active = 0 WHERE id = :id")
+    @Query("UPDATE clients SET statut = 'INACTIF', active = 0 WHERE id = :id")
     suspend fun desactiver(id: Long)
 
     @Query("SELECT COUNT(*) FROM clients")
@@ -96,8 +97,11 @@ interface ClientDao {
     @Query("SELECT * FROM client_prices WHERE clientId = :clientId")
     fun observePrix(clientId: Long): Flow<List<PriceClientEntity>>
 
-    @Insert
-    suspend fun insertPrix(prix: PriceClientEntity): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertPrix(prix: PriceClientEntity): Long
+
+    @Query("DELETE FROM client_prices WHERE clientId = :clientId AND produitId = :productId")
+    suspend fun deletePrix(clientId: Long, productId: Long)
 
 
     // --- Contacts et adresses du profil client ---

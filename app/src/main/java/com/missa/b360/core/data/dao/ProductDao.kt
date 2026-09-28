@@ -134,12 +134,15 @@ interface StockMovementDao {
     @Insert
     suspend fun insert(movement: StockMovementEntity): Long
 
+    @Query("SELECT * FROM stock_movements WHERE reference = :reference ORDER BY id")
+    suspend fun getByReference(reference: String): List<StockMovementEntity>
+
     @Query("SELECT * FROM stock_movements ORDER BY horodatage DESC, id DESC LIMIT :limit")
     fun observeRecent(limit: Int = 200): Flow<List<StockMovementEntity>>
 
     /** Mouvements joints au produit et au site, prêts à afficher. */
     @Query(
-        "SELECT m.id, m.siteId, COALESCE(p.nom, 'Produit') AS produitNom, COALESCE(p.code, '') AS produitCode, " +
+        "SELECT m.id, m.produitId, m.siteId, COALESCE(p.nom, 'Produit') AS produitNom, COALESCE(p.code, '') AS produitCode, " +
             "s.nom AS siteNom, m.type, m.quantite, m.motif, m.reference, m.commentaire, m.horodatage " +
             "FROM stock_movements m " +
             "LEFT JOIN products p ON p.id = m.produitId " +
@@ -147,11 +150,23 @@ interface StockMovementDao {
             "ORDER BY m.horodatage DESC, m.id DESC LIMIT :limit",
     )
     fun observeJoints(limit: Int = 200): Flow<List<StockMovementView>>
+
+    @Query(
+        "SELECT m.id, m.produitId, m.siteId, COALESCE(p.nom, 'Produit') AS produitNom, COALESCE(p.code, '') AS produitCode, " +
+            "s.nom AS siteNom, m.type, m.quantite, m.motif, m.reference, m.commentaire, m.horodatage " +
+            "FROM stock_movements m " +
+            "LEFT JOIN products p ON p.id = m.produitId " +
+            "LEFT JOIN sites s ON s.id = m.siteId " +
+            "WHERE m.produitId = :produitId " +
+            "ORDER BY m.horodatage DESC, m.id DESC LIMIT :limit",
+    )
+    fun observeJointsPourProduit(produitId: Long, limit: Int = 1_500): Flow<List<StockMovementView>>
 }
 
 /** Ligne d'historique de mouvements, jointe pour l'affichage (pas de rechargement). */
 data class StockMovementView(
     val id: Long,
+    val produitId: Long,
     /** Site dans lequel le mouvement a été comptabilisé. */
     val siteId: Long,
     val produitNom: String,

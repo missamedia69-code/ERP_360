@@ -106,6 +106,13 @@ interface FournisseurContactDao {
 
     @Query("SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId AND actif = 1")
     suspend fun compterActifs(fournisseurId: Long): Int
+
+    @Query(
+        "SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId " +
+            "AND actif = 1 AND principal = 1 AND TRIM(nom) != '' " +
+            "AND ((telephone IS NOT NULL AND TRIM(telephone) != '') OR (email IS NOT NULL AND TRIM(email) != ''))",
+    )
+    suspend fun compterPrincipauxContactablesActifs(fournisseurId: Long): Int
 }
 
 /** Comptes bancaires / Mobile Money — compte principal unique, vérification tracée. */
@@ -123,11 +130,14 @@ interface FournisseurCompteBancaireDao {
     @Update
     suspend fun update(compte: FournisseurCompteBancaireEntity)
 
+    @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE id = :id")
+    suspend fun getById(id: Long): FournisseurCompteBancaireEntity?
+
     @Query("UPDATE fournisseur_comptes_bancaires SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerComptePrincipal(fournisseurId: Long)
 
     @Query("UPDATE fournisseur_comptes_bancaires SET verification = :statut, verifieLe = :date WHERE id = :id")
-    suspend fun majVerification(id: Long, statut: VerificationStatut, date: Long)
+    suspend fun majVerification(id: Long, statut: VerificationStatut, date: Long): Int
 }
 
 /** Documents de conformité — échéances suivies pour les alertes d'expiration. */
@@ -155,7 +165,7 @@ interface FournisseurDocumentDao {
 
     /** Seule exception à C7 : un document joint peut être retiré — l'audit garde la trace. */
     @Query("DELETE FROM fournisseur_documents WHERE id = :id")
-    suspend fun deleteById(id: Long)
+    suspend fun deleteById(id: Long): Int
 }
 
 /** Liaison fournisseur ↔ article : prix, délai, quantité minimum, préféré. */
@@ -185,8 +195,8 @@ interface FournisseurItemDao {
     @Query("UPDATE fournisseur_items SET prefere = 0 WHERE productId = :productId AND fournisseurId != :saufFournisseurId")
     suspend fun retirerPreferenceProduit(productId: Long, saufFournisseurId: Long)
 
-    @Query("UPDATE fournisseur_items SET actif = 0 WHERE id = :id")
-    suspend fun desactiver(id: Long)
+    @Query("UPDATE fournisseur_items SET actif = 0 WHERE id = :id AND actif = 1")
+    suspend fun desactiver(id: Long): Int
 }
 
 /** Journal d'audit fournisseur — append-only. */

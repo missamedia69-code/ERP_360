@@ -281,18 +281,44 @@ class TresorerieRulesTest {
     }
 
     @Test
-    fun `un compte ferme ne recoit jamais d encaissement`() {
+    fun `un compte ferme ne remplace pas le compte de paiement attendu`() {
         val comptes = listOf(
             compte(1, "Ancienne caisse", actif = false)
                 .copy(type = TypeCompteTresorerie.CAISSE.name),
             compte(2, "Banque").copy(type = TypeCompteTresorerie.BANQUE.name),
         )
-        assertEquals(2L, TresorerieRules.compteCible("Espèces", comptes)!!.id)
+        assertNull(TresorerieRules.compteCible("Espèces", comptes))
     }
 
     @Test
     fun `sans aucun compte le routage ne renvoie rien`() {
         assertNull(TresorerieRules.compteCible("Espèces", emptyList()))
+    }
+
+    @Test
+    fun `les cheques transit et comptes fermes ne gonflent pas les disponibilites`() {
+        val caisse = compte(1, "Caisse", soldeInitial = 100.0)
+        val cheque = compte(2, "Chèques", soldeInitial = 50.0).copy(
+            type = TypeCompteTresorerie.CHEQUE_A_ENCAISSER.name,
+        )
+        val transit = compte(3, "Transit", soldeInitial = 20.0).copy(
+            type = TypeCompteTresorerie.COMPTE_TRANSIT.name,
+        )
+        val ferme = compte(4, "Fermé", soldeInitial = 30.0, actif = false)
+        val soldes = TresorerieRules.soldes(listOf(caisse, cheque, transit, ferme), emptyList())
+
+        assertEquals(200.0, soldes.sumOf { it.solde }, 0.001)
+        assertEquals(100.0, TresorerieRules.soldeDisponible(soldes), 0.001)
+    }
+
+    @Test
+    fun `un decaissement ne depasse jamais le solde disponible`() {
+        assertTrue(TresorerieRules.decaissementAutorise(100_000.0, 100_000.0))
+        assertTrue(TresorerieRules.decaissementAutorise(100_000.0, 99_999.99))
+        assertTrue(!TresorerieRules.decaissementAutorise(99_999.0, 100_000.0))
+        assertTrue(!TresorerieRules.decaissementAutorise(Double.NaN, 1.0))
+        assertTrue(!TresorerieRules.decaissementAutorise(100.0, Double.POSITIVE_INFINITY))
+        assertTrue(!TresorerieRules.decaissementAutorise(-1.0, 1.0))
     }
 
     @Test

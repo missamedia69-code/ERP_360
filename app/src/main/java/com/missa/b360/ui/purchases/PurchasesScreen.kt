@@ -64,6 +64,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.ProductType
+import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.AchatReportRules
 import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.CommandeAchatLigne
@@ -123,7 +124,7 @@ private fun typeDe(piece: OperationRecordEntity): TypePiece {
  * Annulation = contre-passation transactionnelle, jamais de suppression.
  */
 @Composable
-fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false) {
+fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false, openPending: Boolean = false) {
     val vm: PurchasesViewModel = hiltViewModel()
     var ecran by remember { mutableStateOf(if (openCreate) EcranAchat.FACTURE else EcranAchat.LISTE) }
     var pieceARegler by remember { mutableStateOf<OperationRecordEntity?>(null) }
@@ -136,6 +137,7 @@ fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false) {
             vm = vm,
             onBack = onBack,
             actionResult = actionResult,
+            openPending = openPending,
             onNouvelleFacture = {
                 vm.clearCart()
                 ecran = EcranAchat.FACTURE
@@ -217,6 +219,7 @@ private fun ListeAchats(
     vm: PurchasesViewModel,
     onBack: () -> Unit,
     actionResult: PurchasesViewModel.ActionAchatResult?,
+    openPending: Boolean,
     onNouvelleFacture: () -> Unit,
     onNouvelleCommande: () -> Unit,
     onReporting: () -> Unit,
@@ -240,6 +243,10 @@ private fun ListeAchats(
         ((piece.amount ?: 0.0) - (payload?.paidAmount ?: 0.0)).coerceAtLeast(0.0)
     }
     val brouillons = pieces.count { it.status == OperationStatus.DRAFT.name }
+    var afficherCommandesEnAttente by remember(openPending) { mutableStateOf(openPending) }
+    val piecesAffichees = if (afficherCommandesEnAttente) {
+        AchatCommandeRules.commandesEnAttente(pieces)
+    } else pieces
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
@@ -309,6 +316,27 @@ private fun ListeAchats(
                         }
                     }
                 }
+                if (afficherCommandesEnAttente) {
+                    item(key = "commandes-attente-banner") {
+                        Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF7E6)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    stringResource(R.string.ach_pending_banner, piecesAffichees.size),
+                                    color = MissaInk,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                TextButton(onClick = { afficherCommandesEnAttente = false }) {
+                                    Text(stringResource(R.string.ach_show_all))
+                                }
+                            }
+                        }
+                    }
+                }
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
@@ -327,7 +355,21 @@ private fun ListeAchats(
                         }
                     }
                 }
-                items(pieces, key = { it.id }) { piece ->
+                if (piecesAffichees.isEmpty()) {
+                    item(key = "commandes-attente-empty") {
+                        MissaEmptyState(
+                            icon = Iv.CheckCircle,
+                            title = stringResource(R.string.ach_pending_empty),
+                            description = stringResource(R.string.ach_pending_empty_desc),
+                            action = {
+                                TextButton(onClick = { afficherCommandesEnAttente = false }) {
+                                    Text(stringResource(R.string.ach_show_all))
+                                }
+                            },
+                        )
+                    }
+                }
+                items(piecesAffichees, key = { it.id }) { piece ->
                     CartePiece(
                         piece = piece,
                         devise = devise,
@@ -383,7 +425,10 @@ private fun messageAction(resultat: PurchasesViewModel.ActionAchatResult): Strin
     PurchasesViewModel.ActionAchatResult.FactureLiee -> stringResource(R.string.ach_erreur_facture_liee)
     PurchasesViewModel.ActionAchatResult.ReceptionLiee -> stringResource(R.string.ach_erreur_reception_liee)
     PurchasesViewModel.ActionAchatResult.CompteIntrouvable -> stringResource(R.string.ach_erreur_compte)
+    PurchasesViewModel.ActionAchatResult.SoldeInsuffisant -> stringResource(R.string.tre_solde_insuffisant)
     PurchasesViewModel.ActionAchatResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+    PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+    PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
     PurchasesViewModel.ActionAchatResult.PaiementBloque -> stringResource(R.string.ach_erreur_paiement_bloque)
     PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
     PurchasesViewModel.ActionAchatResult.Erreur -> stringResource(R.string.ach_erreur)
@@ -743,6 +788,7 @@ private fun Selecteur(
 /** Boîte de dialogue de création rapide d'un fournisseur sans quitter le flux d'achat. */
 @Composable
 private fun DialogueCreationFournisseurRapide(
+    erreur: String? = null,
     onDismiss: () -> Unit,
     onValider: (nom: String, telephone: String, email: String?, adresse: String?) -> Unit,
 ) {
@@ -805,6 +851,14 @@ private fun DialogueCreationFournisseurRapide(
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier.fillMaxWidth(),
                 )
+                erreur?.let { code ->
+                    val message = when (code) {
+                        "doublon" -> stringResource(R.string.ach_erreur_fournisseur_doublon)
+                        "licence" -> stringResource(R.string.ach_erreur_lecture_seule)
+                        else -> stringResource(R.string.ach_erreur)
+                    }
+                    Text(message, color = Color(0xFFB91C1C), fontSize = 12.sp)
+                }
             }
         },
         confirmButton = {
@@ -887,6 +941,7 @@ private fun FormulaireAchat(
     var modePaiement by remember { mutableStateOf("") }
     var ligneOuverte by remember { mutableStateOf<Long?>(null) }
     var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
+    var erreurCreationFournisseur by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
     LaunchedEffect(resultat) {
@@ -1102,6 +1157,10 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.EmptyCart -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
                 PurchasesViewModel.SaveResult.FournisseurIntrouvable -> stringResource(R.string.ach_erreur_fournisseur)
+                PurchasesViewModel.SaveResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+                PurchasesViewModel.SaveResult.StockModuleInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+                PurchasesViewModel.SaveResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
+                PurchasesViewModel.SaveResult.ReceptionRequise -> stringResource(R.string.ach_erreur_reception_requise)
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
                 else -> null
@@ -1111,10 +1170,18 @@ private fun FormulaireAchat(
 
     if (dialogueNouveauFournisseur) {
         DialogueCreationFournisseurRapide(
+            erreur = erreurCreationFournisseur,
             onDismiss = { dialogueNouveauFournisseur = false },
             onValider = { nom, telephone, email, adresse ->
-                vm.creerFournisseurRapide(nom, telephone, email, adresse)
-                dialogueNouveauFournisseur = false
+                erreurCreationFournisseur = null
+                vm.creerFournisseurRapide(
+                    nom,
+                    telephone,
+                    email,
+                    adresse,
+                    onSuccess = { dialogueNouveauFournisseur = false },
+                    onFailure = { erreurCreationFournisseur = it },
+                )
             },
         )
     }
@@ -1319,6 +1386,7 @@ private fun FormulaireCommande(
     val actionResult by vm.actionResult.collectAsStateWithLifecycle()
     val itemsFournisseur by vm.itemsFournisseur.collectAsStateWithLifecycle()
     var dialogueNouveauFournisseur by remember { mutableStateOf(false) }
+    var erreurCreationFournisseur by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(actionResult) {
         if (actionResult == PurchasesViewModel.ActionAchatResult.CommandeEnregistree) {
@@ -1426,6 +1494,8 @@ private fun FormulaireCommande(
             onDroite = { vm.enregistrerCommande(draft = false) },
             erreur = when (actionResult) {
                 PurchasesViewModel.ActionAchatResult.FournisseurManquant -> stringResource(R.string.ach_erreur_fournisseur)
+                PurchasesViewModel.ActionAchatResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+                PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
                 PurchasesViewModel.ActionAchatResult.PanierVide -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.ActionAchatResult.DonneesInvalides,
@@ -1438,10 +1508,18 @@ private fun FormulaireCommande(
 
     if (dialogueNouveauFournisseur) {
         DialogueCreationFournisseurRapide(
+            erreur = erreurCreationFournisseur,
             onDismiss = { dialogueNouveauFournisseur = false },
             onValider = { nom, telephone, email, adresse ->
-                vm.creerFournisseurRapide(nom, telephone, email, adresse)
-                dialogueNouveauFournisseur = false
+                erreurCreationFournisseur = null
+                vm.creerFournisseurRapide(
+                    nom,
+                    telephone,
+                    email,
+                    adresse,
+                    onSuccess = { dialogueNouveauFournisseur = false },
+                    onFailure = { erreurCreationFournisseur = it },
+                )
             },
         )
     }
@@ -1579,6 +1657,8 @@ private fun FormulaireReception(
                 PurchasesViewModel.ActionAchatResult.DepasseCommande -> stringResource(R.string.ach_erreur_depasse_commande)
                 PurchasesViewModel.ActionAchatResult.CommandeIntrouvable -> stringResource(R.string.ach_erreur_commande)
                 PurchasesViewModel.ActionAchatResult.PanierVide -> stringResource(R.string.ach_erreur_panier)
+                PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+                PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
                 PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.ActionAchatResult.DonneesInvalides,
                 PurchasesViewModel.ActionAchatResult.Erreur,

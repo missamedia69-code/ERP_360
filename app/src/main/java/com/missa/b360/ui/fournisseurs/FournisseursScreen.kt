@@ -179,6 +179,38 @@ fun FournisseursScreen(onBack: () -> Unit, openCreate: Boolean = false) {
 // ======================================================================
 
 @Composable
+private fun libelleMessageFournisseur(code: String): String = stringResource(
+    when (code) {
+        "err_article" -> R.string.four_err_article
+        "err_article_delie" -> R.string.four_err_article_delie
+        "err_compte_incomplet" -> R.string.four_err_compte_incomplet
+        "err_compte_verification" -> R.string.four_err_compte_verification
+        "err_document" -> R.string.four_err_document
+        "err_document_retire" -> R.string.four_err_document_retire
+        "err_dossier_incomplet" -> R.string.four_err_dossier_incomplet
+        "err_evaluation" -> R.string.four_err_evaluation
+        "err_introuvable" -> R.string.four_err_introuvable
+        "err_modification" -> R.string.four_err_modification
+        "err_motif_obligatoire" -> R.string.four_err_motif_obligatoire
+        "err_transition" -> R.string.four_err_transition
+        "msg_article_delie" -> R.string.four_msg_article_delie
+        "msg_article_lie" -> R.string.four_msg_article_lie
+        "msg_compte_ajoute" -> R.string.four_msg_compte_ajoute
+        "msg_compte_rejete" -> R.string.four_msg_compte_rejete
+        "msg_compte_verifie" -> R.string.four_msg_compte_verifie
+        "msg_contact_ajoute" -> R.string.four_msg_contact_ajoute
+        "msg_document_ajoute" -> R.string.four_msg_document_ajoute
+        "msg_document_retire" -> R.string.four_msg_document_retire
+        "msg_evaluation" -> R.string.four_msg_evaluation
+        "msg_fournisseur_enregistre" -> R.string.four_msg_fournisseur_enregistre
+        "msg_fournisseur_modifie" -> R.string.four_msg_fournisseur_modifie
+        "msg_soumis" -> R.string.four_msg_soumis
+        "msg_statut_mis_a_jour" -> R.string.four_msg_statut_mis_a_jour
+        else -> R.string.four_err_introuvable
+    },
+)
+
+@Composable
 private fun libelleStatut(statut: FournisseurStatus): String = stringResource(
     when (statut) {
         FournisseurStatus.BROUILLON -> R.string.four_statut_brouillon
@@ -308,7 +340,7 @@ private fun HubFournisseurs(
     val devise by vm.devise.collectAsStateWithLifecycle()
     var query by remember { mutableStateOf("") }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -504,7 +536,7 @@ private fun ListeFournisseurs(
     val recherche by vm.recherche.collectAsStateWithLifecycle()
     val devise by vm.devise.collectAsStateWithLifecycle()
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -679,7 +711,7 @@ private fun FicheFournisseurEcran(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = fournisseur?.nom ?: stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -741,7 +773,12 @@ private fun FicheFournisseurEcran(
                         }
                         if (message != null) {
                             Spacer(Modifier.height(6.dp))
-                            Text(message.orEmpty(), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF15803D))
+                            Text(
+                                message?.let { libelleMessageFournisseur(it) }.orEmpty(),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (message?.startsWith("err_") == true) Color(0xFFB91C1C) else Color(0xFF15803D),
+                            )
                         }
                         Spacer(Modifier.height(8.dp))
                         // Actions selon le statut — cycle de vie (spec §3).
@@ -1024,6 +1061,11 @@ private fun FicheFournisseurEcran(
                     if (fournisseur.paiementBloque) {
                         Text(stringResource(R.string.four_paiement_bloque), fontSize = 11.sp, color = Color(0xFFB91C1C))
                     }
+                    Text(
+                        stringResource(R.string.four_verification_interne_seulement),
+                        fontSize = 10.sp,
+                        color = Color(0xFF92400E),
+                    )
                     HorizontalDivider(Modifier.padding(vertical = 6.dp), color = MissaBorder)
                     if (fiche.comptes.isEmpty()) {
                         Text(stringResource(R.string.four_aucun_compte), fontSize = 11.sp, color = MissaMuted)
@@ -1205,6 +1247,15 @@ private fun SectionRepliable(
     }
 }
 
+private fun masquerReferenceConfidentielle(valeur: String?): String? = valeur?.let { reference ->
+    val compacte = reference.filterNot { it.isWhitespace() }
+    when {
+        compacte.isEmpty() -> null
+        compacte.length <= 4 -> "••••"
+        else -> "•••• ${compacte.takeLast(4)}"
+    }
+}
+
 @Composable
 private fun LigneCompte(
     compte: FournisseurCompteBancaireEntity,
@@ -1227,7 +1278,7 @@ private fun LigneCompte(
                 Text(
                     listOfNotNull(
                         compte.banque ?: compte.operateurMobile,
-                        compte.numeroCompte ?: compte.iban ?: compte.numeroMobile,
+                        masquerReferenceConfidentielle(compte.numeroCompte ?: compte.iban ?: compte.numeroMobile),
                     ).joinToString(" · "),
                     fontSize = 10.sp,
                     color = MissaMuted,
@@ -1776,7 +1827,7 @@ private fun FormulaireFournisseur(
         stringResource(R.string.four_etape_validation),
     )
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF7F7F5))) {
+    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = if (form.enEditionId == null) {
                 stringResource(R.string.four_nouveau)

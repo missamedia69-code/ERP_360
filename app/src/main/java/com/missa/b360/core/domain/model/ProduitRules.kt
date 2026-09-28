@@ -95,7 +95,7 @@ object ProduitRules {
 
     /** Filtre d'un catalogue pour la vente : actifs et vendables. */
     fun vendables(produits: List<ProductEntity>): List<ProductEntity> =
-        produits.filter { it.active && estVendable(it.type) }
+        produits.filter { it.active && it.vendable && estVendable(it.type) }
 
     /** Filtre d'un catalogue pour l'achat : actifs et achetables. */
     fun achetables(produits: List<ProductEntity>): List<ProductEntity> =

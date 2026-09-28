@@ -2,6 +2,9 @@ package com.missa.b360.core.domain.usecase
 
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
+import com.missa.b360.core.data.dao.UserDao
+import com.missa.b360.core.data.datastore.SettingsStore
+import com.missa.b360.core.permissions.PermissionChecker
 import com.missa.b360.core.data.entity.CategorieTresorerie
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
@@ -13,8 +16,23 @@ import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import java.util.UUID
 import javax.inject.Inject
+
+/** Vérifie le rôle de l'utilisateur connecté avant toute mutation Trésorerie. */
+class TresoreriePermissionGate @Inject constructor(
+    private val settingsStore: SettingsStore,
+    private val userDao: UserDao,
+    private val permissionChecker: PermissionChecker,
+) {
+    suspend fun autorise(action: PermissionChecker.Action): Boolean {
+        val userId = settingsStore.getLong(SettingsStore.Keys.CURRENT_USER_ID) ?: return false
+        val user = userDao.getById(userId) ?: return false
+        return user.actif && permissionChecker.hasPermission(user.roleId, "TRESORERIE", action)
+    }
+}
 
 /**
  * Module Trésorerie (TRE) — comptes, mouvements, virements internes et
@@ -30,6 +48,7 @@ class TresorerieUseCases @Inject constructor(
     private val mouvementsDao: MouvementTresorerieDao,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val permissionGate: TresoreriePermissionGate,
 ) {
     companion object {
         const val MODULE = "TRESORERIE"
@@ -39,20 +58,31 @@ class TresorerieUseCases @Inject constructor(
         data class Succes(val id: Long) : Resultat()
         /** Licence expirée : consultation et export seulement. */
         data object LectureSeule : Resultat()
+        data object PermissionRefusee : Resultat()
+        data class SoldeInsuffisant(val soldeDisponible: Double) : Resultat()
         /** Saisie refusée (montant, libellé, compte fermé…). */
         data object Invalide : Resultat()
         /** Un compte porte déjà ce nom. */
         data object NomDejaPris : Resultat()
+        data object ReferenceDejaUtilisee : Resultat()
         /** Virement : compte source et destination identiques ou introuvables. */
         data object ComptesIncoherents : Resultat()
     }
 
-    fun observerComptes(): Flow<List<CompteTresorerieEntity>> = comptesDao.observeAll()
+    fun observerComptes(): Flow<List<CompteTresorerieEntity>> = flow {
+        if (permissionGate.autorise(PermissionChecker.Action.VIEW)) emitAll(comptesDao.observeAll())
+        else emit(emptyList())
+    }
 
-    fun observerMouvements(): Flow<List<MouvementTresorerieEntity>> = mouvementsDao.observeAll()
+    fun observerMouvements(): Flow<List<MouvementTresorerieEntity>> = flow {
+        if (permissionGate.autorise(PermissionChecker.Action.VIEW)) emitAll(mouvementsDao.observeAll())
+        else emit(emptyList())
+    }
 
-    fun observerMouvements(compteId: Long): Flow<List<MouvementTresorerieEntity>> =
-        mouvementsDao.observeByCompte(compteId)
+    fun observerMouvements(compteId: Long): Flow<List<MouvementTresorerieEntity>> = flow {
+        if (permissionGate.autorise(PermissionChecker.Action.VIEW)) emitAll(mouvementsDao.observeByCompte(compteId))
+        else emit(emptyList())
+    }
 
     suspend fun creerCompte(
         nom: String,
@@ -64,8 +94,12 @@ class TresorerieUseCases @Inject constructor(
     ): Resultat {
         val nomNettoye = nom.trim()
         if (!TresorerieRules.libelleValide(nomNettoye)) return Resultat.Invalide
-        if (!soldeInitial.isFinite() || soldeInitial < 0.0) return Resultat.Invalide
+        if (!soldeInitial.isFinite() || soldeInitial < 0.0 || soldeInitial > TresorerieRules.MONTANT_MAX) return Resultat.Invalide
+        if (type != TypeCompteTresorerie.CAISSE &&
+            (etablissement.isNullOrBlank() || numero.isNullOrBlank())
+        ) return Resultat.Invalide
         if (licenceManager.isReadOnly()) return Resultat.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.CREATE)) return Resultat.PermissionRefusee
         if (comptesDao.compterHomonymes(nomNettoye) > 0) return Resultat.NomDejaPris
 
         val id = comptesDao.insert(
@@ -85,6 +119,7 @@ class TresorerieUseCases @Inject constructor(
     /** Ferme ou rouvre un compte ; les mouvements passés restent consultables. */
     suspend fun basculerActivite(compteId: Long): Resultat {
         if (licenceManager.isReadOnly()) return Resultat.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.EDIT)) return Resultat.PermissionRefusee
         val compte = comptesDao.getById(compteId) ?: return Resultat.Invalide
         comptesDao.update(compte.copy(actif = !compte.actif))
         journalManager.log(
@@ -121,25 +156,39 @@ class TresorerieUseCases @Inject constructor(
             return Resultat.Invalide
         }
         if (licenceManager.isReadOnly()) return Resultat.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.CREATE)) return Resultat.PermissionRefusee
         val compte = comptesDao.getById(params.compteId) ?: return Resultat.Invalide
-        // Un compte fermé n'accepte plus rien : sinon son solde de clôture bougerait.
-        if (!compte.actif) return Resultat.Invalide
-
-        val id = mouvementsDao.insert(
-            MouvementTresorerieEntity(
-                compteId = params.compteId,
-                date = params.date,
-                sens = params.sens.name,
-                montant = params.montant,
-                categorie = params.categorie.name,
-                libelle = libelle,
-                tiers = params.tiers?.trim()?.ifEmpty { null },
-                modePaiement = params.modePaiement?.trim()?.ifEmpty { null },
-                reference = params.reference?.trim()?.ifEmpty { null },
-                notes = params.notes?.trim()?.ifEmpty { null },
-                createdAt = maintenant,
-            ),
-        )
+        // Solde, statut et écriture sont vérifiés/écrits atomiquement pour interdire les décaissements à découvert.
+        val resultat = database.withTransaction {
+            val compteCourant = comptesDao.getById(params.compteId) ?: return@withTransaction Resultat.Invalide
+            if (!compteCourant.actif) return@withTransaction Resultat.Invalide
+            val solde = comptesDao.soldeCourant(params.compteId) ?: return@withTransaction Resultat.Invalide
+            if (params.sens == SensMouvement.OUT && !TresorerieRules.decaissementAutorise(solde, params.montant)) {
+                return@withTransaction Resultat.SoldeInsuffisant(solde.coerceAtLeast(0.0))
+            }
+            val reference = params.reference?.trim()?.ifEmpty { null }
+            if (reference != null && mouvementsDao.compterParReference(reference) > 0) {
+                return@withTransaction Resultat.ReferenceDejaUtilisee
+            }
+            val id = mouvementsDao.insert(
+                MouvementTresorerieEntity(
+                    compteId = params.compteId,
+                    date = params.date,
+                    sens = params.sens.name,
+                    montant = params.montant,
+                    categorie = params.categorie.name,
+                    libelle = libelle,
+                    tiers = params.tiers?.trim()?.ifEmpty { null },
+                    modePaiement = params.modePaiement?.trim()?.ifEmpty { null },
+                    reference = params.reference?.trim()?.ifEmpty { null },
+                    notes = params.notes?.trim()?.ifEmpty { null },
+                    createdAt = maintenant,
+                ),
+            )
+            Resultat.Succes(id)
+        }
+        if (resultat !is Resultat.Succes) return resultat
+        val id = resultat.id
         journalManager.log(
             MODULE,
             if (params.sens == SensMouvement.IN) "ENCAISSEMENT" else "DECAISSEMENT",
@@ -169,12 +218,20 @@ class TresorerieUseCases @Inject constructor(
             return Resultat.Invalide
         }
         if (licenceManager.isReadOnly()) return Resultat.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.CREATE)) return Resultat.PermissionRefusee
         val source = comptesDao.getById(sourceId) ?: return Resultat.ComptesIncoherents
         val destination = comptesDao.getById(destinationId) ?: return Resultat.ComptesIncoherents
         if (!source.actif || !destination.actif) return Resultat.Invalide
 
         val transfert = "${TresorerieRules.PREFIXE_TRANSFERT}-${UUID.randomUUID()}"
-        val idSortie = database.withTransaction {
+        val resultat = database.withTransaction {
+            val sourceCourante = comptesDao.getById(sourceId) ?: return@withTransaction Resultat.ComptesIncoherents
+            val destinationCourante = comptesDao.getById(destinationId) ?: return@withTransaction Resultat.ComptesIncoherents
+            if (!sourceCourante.actif || !destinationCourante.actif) return@withTransaction Resultat.Invalide
+            val soldeSource = comptesDao.soldeCourant(sourceId) ?: return@withTransaction Resultat.ComptesIncoherents
+            if (!TresorerieRules.decaissementAutorise(soldeSource, montant)) {
+                return@withTransaction Resultat.SoldeInsuffisant(soldeSource.coerceAtLeast(0.0))
+            }
             val sortie = mouvementsDao.insert(
                 MouvementTresorerieEntity(
                     compteId = sourceId,
@@ -201,21 +258,29 @@ class TresorerieUseCases @Inject constructor(
                     createdAt = maintenant,
                 ),
             )
-            sortie
+            Resultat.Succes(sortie)
         }
+        if (resultat !is Resultat.Succes) return resultat
         journalManager.log(
             MODULE,
             "VIREMENT",
             "${source.nom} → ${destination.nom} : $montant",
         )
-        return Resultat.Succes(idSortie)
+        return resultat
     }
 
     /** Pointage d'un mouvement contre le relevé bancaire. */
     suspend fun basculerRapprochement(mouvementId: Long): Resultat {
         if (licenceManager.isReadOnly()) return Resultat.LectureSeule
+        if (!permissionGate.autorise(PermissionChecker.Action.EDIT)) return Resultat.PermissionRefusee
         val mouvement = mouvementsDao.getById(mouvementId) ?: return Resultat.Invalide
-        mouvementsDao.marquerRapproche(mouvementId, !mouvement.rapproche)
+        val nouveauStatut = !mouvement.rapproche
+        mouvementsDao.marquerRapproche(mouvementId, nouveauStatut)
+        journalManager.log(
+            MODULE,
+            if (nouveauStatut) "MOUVEMENT_POINTE" else "MOUVEMENT_DEPOINTE",
+            "Mouvement ${mouvement.id} — ${mouvement.reference.orEmpty()}",
+        )
         return Resultat.Succes(mouvementId)
     }
 }

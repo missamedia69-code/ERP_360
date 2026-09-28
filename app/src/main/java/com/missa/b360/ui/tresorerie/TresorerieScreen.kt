@@ -27,6 +27,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -79,22 +81,38 @@ fun TresorerieScreen(
     val message by vm.message.collectAsStateWithLifecycle()
     val enCours by vm.enCours.collectAsStateWithLifecycle()
     val compteFiltre by vm.compteFiltre.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val messageTexte = when (message) {
+        TresorerieViewModel.Message.CompteCree -> stringResource(R.string.tre_result_compte_cree)
+        TresorerieViewModel.Message.MouvementEnregistre -> stringResource(R.string.tre_result_mouvement_cree)
+        TresorerieViewModel.Message.VirementEnregistre -> stringResource(R.string.tre_result_virement_cree)
+        TresorerieViewModel.Message.LectureSeule -> stringResource(R.string.tre_result_lecture_seule)
+        TresorerieViewModel.Message.PermissionRefusee -> stringResource(R.string.tre_permission_refusee)
+        TresorerieViewModel.Message.SoldeInsuffisant -> stringResource(R.string.tre_solde_insuffisant)
+        TresorerieViewModel.Message.Invalide -> stringResource(R.string.tre_result_invalide)
+        TresorerieViewModel.Message.NomDejaPris -> stringResource(R.string.tre_result_nom_pris)
+        TresorerieViewModel.Message.ReferenceDejaUtilisee -> stringResource(R.string.tre_reference_deja_utilisee)
+        TresorerieViewModel.Message.ComptesIncoherents -> stringResource(R.string.tre_result_comptes_incoherents)
+        TresorerieViewModel.Message.Erreur -> stringResource(R.string.tre_result_erreur)
+        null -> ""
+    }
 
     var dialogueNouveauCompte by remember { mutableStateOf(false) }
     var dialogueMouvement by remember { mutableStateOf<SensMouvement?>(null) }
     var dialogueVirement by remember { mutableStateOf(false) }
 
-    LaunchedEffect(message) {
+    LaunchedEffect(message, messageTexte) {
         if (message != null) {
             dialogueNouveauCompte = false
             dialogueMouvement = null
             dialogueVirement = false
-            kotlinx.coroutines.delay(3_000)
+            snackbarHostState.showSnackbar(messageTexte)
             vm.effacerMessage()
         }
     }
 
-    Column(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
             title = stringResource(R.string.module_tresorerie),
             onBack = onBack,
@@ -114,17 +132,35 @@ fun TresorerieScreen(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp)) {
                         Text(
-                            stringResource(R.string.tre_solde_global),
+                            stringResource(R.string.tre_solde_disponible),
                             fontSize = 11.sp,
                             color = MissaMuted,
                         )
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            fmtValeur(etat.soldeGlobal, devise),
+                            fmtValeur(etat.soldeDisponible, devise),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
+                        Text(
+                            stringResource(R.string.tre_solde_consolide, fmtValeur(etat.soldeGlobal, devise)),
+                            fontSize = 10.sp,
+                            color = MissaMuted,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(
+                                TypeCompteTresorerie.CAISSE,
+                                TypeCompteTresorerie.BANQUE,
+                                TypeCompteTresorerie.MOBILE_MONEY,
+                            ).forEach { type ->
+                                Column(Modifier.weight(1f)) {
+                                    Text(stringResource(TresorerieRules.libelleType(type)), fontSize = 9.sp, color = MissaMuted, maxLines = 1)
+                                    Text(fmtValeur(etat.soldesParType[type] ?: 0.0, devise), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = MissaInk, maxLines = 1)
+                                }
+                            }
+                        }
                         Spacer(Modifier.height(8.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
@@ -228,8 +264,9 @@ fun TresorerieScreen(
                                         painterResource(
                                             when (TresorerieRules.typeCompte(soldeCompte.compte.type)) {
                                                 TypeCompteTresorerie.CAISSE -> Iv.Payments
-                                                TypeCompteTresorerie.BANQUE -> Iv.AccountBalance
-                                                TypeCompteTresorerie.MOBILE_MONEY -> Iv.Smartphone
+                                                TypeCompteTresorerie.MOBILE_MONEY,
+                                                TypeCompteTresorerie.PORTEFEUILLE_NUMERIQUE -> Iv.Smartphone
+                                                else -> Iv.AccountBalance
                                             },
                                         ),
                                         contentDescription = null,
@@ -301,6 +338,10 @@ fun TresorerieScreen(
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp),
+        )
     }
 
     // --- Dialogues ---
