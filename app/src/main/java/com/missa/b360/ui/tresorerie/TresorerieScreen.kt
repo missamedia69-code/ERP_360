@@ -338,6 +338,7 @@ fun TresorerieScreen(
                 }
             }
         }
+        }
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp),
