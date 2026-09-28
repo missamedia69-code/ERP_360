@@ -196,6 +196,8 @@ class DevisCommandeViewModel @Inject constructor(
                     is ConvertOrderToSaleUseCase.Result.Succes -> R.string.devis_result_invoice
                     ConvertOrderToSaleUseCase.Result.DejaFacturee -> R.string.devis_result_already_invoice
                     ConvertOrderToSaleUseCase.Result.LectureSeule -> R.string.devis_result_readonly
+                    ConvertOrderToSaleUseCase.Result.CompteEncaissementRequis -> R.string.sales_err_cash_account
+                    ConvertOrderToSaleUseCase.Result.ModuleStockInactif -> R.string.sales_err_stock_module_inactive
                     is ConvertOrderToSaleUseCase.Result.StockInsuffisant -> R.string.devis_result_stock
                     else -> R.string.devis_result_invalid
                 }

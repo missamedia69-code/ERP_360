@@ -247,6 +247,8 @@ class ConvertOrderToSaleUseCase @Inject constructor(
         data object DejaAnnulee : Result()
         data object DejaFacturee : Result()
         data object DonneesInvalides : Result()
+        data object CompteEncaissementRequis : Result()
+        data object ModuleStockInactif : Result()
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : Result()
     }
 
@@ -305,6 +307,8 @@ class ConvertOrderToSaleUseCase @Inject constructor(
                 SaveSaleUseCase.Result.BrouillonIntrouvable -> Result.DonneesInvalides
                 SaveSaleUseCase.Result.ClientNonEligible -> Result.DonneesInvalides
                 SaveSaleUseCase.Result.ValidationCreditRequise -> Result.DonneesInvalides
+                SaveSaleUseCase.Result.CompteEncaissementRequis -> Result.CompteEncaissementRequis
+                SaveSaleUseCase.Result.ModuleStockInactif -> Result.ModuleStockInactif
                 is SaveSaleUseCase.Result.StockInsuffisant ->
                     Result.StockInsuffisant(facturation.produitNom, facturation.disponible, facturation.demande)
             }
