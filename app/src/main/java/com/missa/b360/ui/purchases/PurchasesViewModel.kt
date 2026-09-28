@@ -109,6 +109,9 @@ class PurchasesViewModel @Inject constructor(
         data object ReadOnly : SaveResult
         data object FournisseurIntrouvable : SaveResult
         data object FournisseurNonActif : SaveResult
+        data object StockModuleInactif : SaveResult
+        data object SiteIntrouvable : SaveResult
+        data object ReceptionRequise : SaveResult
         data object Error : SaveResult
     }
 
@@ -369,6 +372,9 @@ class PurchasesViewModel @Inject constructor(
                     SavePurchaseUseCase.Result.DonneesInvalides -> _saveResult.value = SaveResult.InvalidAmount
                     SavePurchaseUseCase.Result.FournisseurIntrouvable -> _saveResult.value = SaveResult.FournisseurIntrouvable
                     SavePurchaseUseCase.Result.FournisseurNonActif -> _saveResult.value = SaveResult.FournisseurNonActif
+                    SavePurchaseUseCase.Result.StockModuleInactif -> _saveResult.value = SaveResult.StockModuleInactif
+                    SavePurchaseUseCase.Result.SiteIntrouvable -> _saveResult.value = SaveResult.SiteIntrouvable
+                    SavePurchaseUseCase.Result.ReceptionRequise -> _saveResult.value = SaveResult.ReceptionRequise
                     SavePurchaseUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
                 }
             } catch (exception: CancellationException) {
@@ -405,6 +411,8 @@ class PurchasesViewModel @Inject constructor(
         data object ReceptionLiee : ActionAchatResult
         data object CompteIntrouvable : ActionAchatResult
         data object FournisseurNonActif : ActionAchatResult
+        data object ModuleStockInactif : ActionAchatResult
+        data object SiteIntrouvable : ActionAchatResult
         data object PaiementBloque : ActionAchatResult
         data object LectureSeule : ActionAchatResult
         data object Erreur : ActionAchatResult
@@ -463,6 +471,7 @@ class PurchasesViewModel @Inject constructor(
                     quantity = 1.0,
                     unitPrice = product.product.prixAchat ?: 0.0,
                     productId = product.product.id,
+                    siteId = product.product.siteId,
                 ),
             )
         }
@@ -537,6 +546,7 @@ class PurchasesViewModel @Inject constructor(
                     SaveCommandeAchatUseCase.Result.DonneesInvalides -> _actionResult.value = ActionAchatResult.DonneesInvalides
                     SaveCommandeAchatUseCase.Result.FournisseurIntrouvable -> _actionResult.value = ActionAchatResult.FournisseurManquant
                     SaveCommandeAchatUseCase.Result.FournisseurNonActif -> _actionResult.value = ActionAchatResult.FournisseurNonActif
+                    SaveCommandeAchatUseCase.Result.SiteIntrouvable -> _actionResult.value = ActionAchatResult.SiteIntrouvable
                     SaveCommandeAchatUseCase.Result.BrouillonIntrouvable -> _actionResult.value = ActionAchatResult.Erreur
                 }
             } catch (exception: CancellationException) {
@@ -571,6 +581,8 @@ class PurchasesViewModel @Inject constructor(
                         name = ligne.name,
                         quantiteCommandee = ligne.quantity,
                         quantiteRecue = ligne.quantity,
+                        siteId = ligne.siteId,
+                        prixReel = ligne.unitPrice,
                     )
                 },
         )
@@ -649,6 +661,8 @@ class PurchasesViewModel @Inject constructor(
                     SaveReceptionAchatUseCase.Result.FournisseurIntrouvable -> _actionResult.value = ActionAchatResult.FournisseurManquant
                     SaveReceptionAchatUseCase.Result.CommandeIntrouvable -> _actionResult.value = ActionAchatResult.CommandeIntrouvable
                     SaveReceptionAchatUseCase.Result.DepasseCommande -> _actionResult.value = ActionAchatResult.DepasseCommande
+                    SaveReceptionAchatUseCase.Result.ModuleStockInactif -> _actionResult.value = ActionAchatResult.ModuleStockInactif
+                    SaveReceptionAchatUseCase.Result.SiteIntrouvable -> _actionResult.value = ActionAchatResult.SiteIntrouvable
                 }
             } catch (exception: CancellationException) {
                 throw exception
@@ -674,9 +688,10 @@ class PurchasesViewModel @Inject constructor(
                 PurchaseLine(
                     id = nextId++,
                     name = ligne.name,
-                    unitPrice = prixParProduit[ligne.productId] ?: 0.0,
+                    unitPrice = ligne.prixReel ?: prixParProduit[ligne.productId] ?: 0.0,
                     quantity = ligne.quantiteRecue,
                     productId = ligne.productId,
+                    siteId = ligne.siteId,
                 )
             },
             receptionRecordId = record.id,
@@ -700,6 +715,7 @@ class PurchasesViewModel @Inject constructor(
                     unitPrice = ligne.unitPrice,
                     quantity = ligne.quantity,
                     productId = ligne.productId,
+                    siteId = ligne.siteId,
                 )
             },
             commandeRecordId = record.id,

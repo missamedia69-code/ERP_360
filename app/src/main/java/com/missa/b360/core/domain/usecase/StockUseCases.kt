@@ -1,6 +1,7 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.SiteDao
@@ -12,6 +13,7 @@ import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.core.data.repository.ProfilActivationRepository
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ReglesGroupesArticles
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
@@ -160,13 +162,169 @@ class StockService @Inject constructor(
     private val movementDao: StockMovementDao,
     private val journalManager: JournalManager,
     private val activationRepository: ProfilActivationRepository,
+    private val licenceManager: LicenceManager,
+    private val groupeArticleDao: GroupeArticleDao,
+    private val siteDao: SiteDao,
 ) {
     data class SortiePlanifiee(val produitId: Long, val siteId: Long, val quantite: Double)
+
+    /** Résultats des entrées/sorties métiers demandées par un module consommateur. */
+    sealed interface MouvementAchatResultat {
+        data class Succes(val siteId: Long, val stockAvant: Double, val stockApres: Double) : MouvementAchatResultat
+        data object DonneesInvalides : MouvementAchatResultat
+        data object ModuleInactif : MouvementAchatResultat
+        data object LicenceLectureSeule : MouvementAchatResultat
+        data object ProduitIntrouvable : MouvementAchatResultat
+        data object SiteIntrouvable : MouvementAchatResultat
+        data object ArticleNonStockable : MouvementAchatResultat
+        data object MouvementDejaEnregistre : MouvementAchatResultat
+        data class StockInsuffisant(val disponible: Double, val demande: Double) : MouvementAchatResultat
+    }
+
     sealed interface SortieResultat {
         data class Pret(val lignes: List<SortiePlanifiee>) : SortieResultat
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SortieResultat
         data object DonneesInvalides : SortieResultat
         data object ModuleInactif : SortieResultat
+    }
+
+    /**
+     * Entrée physique demandée par un module consommateur (ex. ACHATS). Stock
+     * reste seul propriétaire de `product_stock`, `stock_movements` et du CUMP.
+     * À appeler dans la transaction du document source.
+     */
+    suspend fun recordInbound(
+        productId: Long,
+        siteId: Long,
+        quantity: Double,
+        unitCost: Double,
+        sourceModule: String,
+        sourceDocumentType: String,
+        sourceDocumentId: Long,
+        sourceLineId: Long,
+        reference: String,
+        lotNumber: String? = null,
+        serialNumber: String? = null,
+        expiryDate: Long? = null,
+        reason: String,
+        now: Long = System.currentTimeMillis(),
+    ): MouvementAchatResultat {
+        if (!StockValidation.quantiteEntrSortieEstValide(quantity) || !unitCost.isFinite() || unitCost < 0.0 ||
+            !(unitCost * quantity).isFinite() || productId <= 0 || siteId <= 0 ||
+            sourceDocumentId <= 0 || sourceLineId < 0 || sourceModule.isBlank() ||
+            sourceDocumentType.isBlank() || reference.isBlank() || reason.isBlank()
+        ) return MouvementAchatResultat.DonneesInvalides
+        if (!stockModuleActif()) return MouvementAchatResultat.ModuleInactif
+        if (licenceManager.isReadOnly()) return MouvementAchatResultat.LicenceLectureSeule
+        val produit = productDao.getById(productId)
+            ?: return MouvementAchatResultat.ProduitIntrouvable
+        if (!produit.active) return MouvementAchatResultat.ProduitIntrouvable
+        val groupes = groupeArticleDao.listerComplets()
+        if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
+            return MouvementAchatResultat.ArticleNonStockable
+        }
+        if (siteDao.getNomById(siteId) == null) return MouvementAchatResultat.SiteIntrouvable
+        val sourceKey = "$sourceModule|$sourceDocumentType|$sourceDocumentId|$sourceLineId|"
+        if (movementDao.getByReference(reference).any {
+                it.motif == reason && it.commentaire.orEmpty().startsWith(sourceKey)
+            }
+        ) return MouvementAchatResultat.MouvementDejaEnregistre
+
+        val avant = stockDao.quantite(productId, siteId) ?: 0.0
+        stockDao.ensureRow(productId, siteId)
+        stockDao.remplacer(productId, siteId, avant + quantity)
+        if (ReglesGroupesArticles.estValorise(produit, groupes)) {
+            stockDao.ajouterValeur(productId, siteId, unitCost * quantity)
+        }
+        movementDao.insert(
+            StockMovementEntity(
+                produitId = productId,
+                siteId = siteId,
+                type = StockMovementType.ENTREE,
+                quantite = quantity,
+                motif = reason.trim(),
+                reference = reference.trim(),
+                commentaire = "$sourceKey${produit.nom}",
+                lot = lotNumber?.trim()?.ifBlank { null },
+                numeroSerie = serialNumber?.trim()?.ifBlank { null },
+                datePeremption = expiryDate,
+                horodatage = now,
+            ),
+        )
+        journalManager.log(
+            "STOCK",
+            "ENTREE_INTERMODULE",
+            "${produit.code} $quantity — $reason ($reference)",
+        )
+        return MouvementAchatResultat.Succes(siteId, avant, avant + quantity)
+    }
+
+    /** Sortie métier (retour fournisseur/annulation) vérifiée avant mouvement et valorisation. */
+    suspend fun recordOutbound(
+        productId: Long,
+        siteId: Long?,
+        quantity: Double,
+        unitCost: Double?,
+        sourceModule: String,
+        sourceDocumentType: String,
+        sourceDocumentId: Long,
+        sourceLineId: Long,
+        reference: String,
+        reason: String,
+        now: Long = System.currentTimeMillis(),
+    ): MouvementAchatResultat {
+        if (!StockValidation.quantiteEntrSortieEstValide(quantity) ||
+            (unitCost != null && (!unitCost.isFinite() || unitCost < 0.0 || !(unitCost * quantity).isFinite())) ||
+            productId <= 0 || sourceDocumentId <= 0 || sourceLineId < 0 ||
+            sourceModule.isBlank() || sourceDocumentType.isBlank() || reference.isBlank() || reason.isBlank()
+        ) return MouvementAchatResultat.DonneesInvalides
+        if (!stockModuleActif()) return MouvementAchatResultat.ModuleInactif
+        if (licenceManager.isReadOnly()) return MouvementAchatResultat.LicenceLectureSeule
+        val produit = productDao.getById(productId)
+            ?: return MouvementAchatResultat.ProduitIntrouvable
+        if (!produit.active) return MouvementAchatResultat.ProduitIntrouvable
+        val groupes = groupeArticleDao.listerComplets()
+        if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
+            return MouvementAchatResultat.ArticleNonStockable
+        }
+        val siteEffectif = siteId ?: produit.siteId ?: stockDao.siteAvecPlusDeStock(productId) ?: siteDao.idPrincipal()
+            ?: return MouvementAchatResultat.SiteIntrouvable
+        if (siteDao.getNomById(siteEffectif) == null) return MouvementAchatResultat.SiteIntrouvable
+        val sourceKey = "$sourceModule|$sourceDocumentType|$sourceDocumentId|$sourceLineId|"
+        if (movementDao.getByReference(reference).any {
+                it.motif == reason && it.commentaire.orEmpty().startsWith(sourceKey)
+            }
+        ) return MouvementAchatResultat.MouvementDejaEnregistre
+        val avant = stockDao.quantite(productId, siteEffectif) ?: 0.0
+        if (avant < quantity - QUANTITE_EPSILON) {
+            return MouvementAchatResultat.StockInsuffisant(avant, quantity)
+        }
+        stockDao.ensureRow(productId, siteEffectif)
+        stockDao.remplacer(productId, siteEffectif, (avant - quantity).coerceAtLeast(0.0))
+        if (ReglesGroupesArticles.estValorise(produit, groupes)) {
+            val valeurAvant = stockDao.valeur(productId, siteEffectif).coerceAtLeast(0.0)
+            val coutSortie = unitCost ?: if (avant > 0.0) valeurAvant / avant else 0.0
+            val valeurSortie = (coutSortie * quantity).coerceIn(0.0, valeurAvant)
+            stockDao.ajouterValeur(productId, siteEffectif, -valeurSortie)
+        }
+        movementDao.insert(
+            StockMovementEntity(
+                produitId = productId,
+                siteId = siteEffectif,
+                type = StockMovementType.SORTIE,
+                quantite = quantity,
+                motif = reason.trim(),
+                reference = reference.trim(),
+                commentaire = "$sourceKey${produit.nom}",
+                horodatage = now,
+            ),
+        )
+        journalManager.log(
+            "STOCK",
+            "SORTIE_INTERMODULE",
+            "${produit.code} $quantity — $reason ($reference)",
+        )
+        return MouvementAchatResultat.Succes(siteEffectif, avant, (avant - quantity).coerceAtLeast(0.0))
     }
 
     /** Lecture/validation seulement : aucune écriture tant que tous les articles ne passent pas. */

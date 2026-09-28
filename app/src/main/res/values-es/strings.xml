@@ -1799,4 +1799,7 @@
     <string name="four_msg_soumis">Proveedor enviado para aprobación.</string>
     <string name="four_msg_statut_mis_a_jour">Estado del proveedor actualizado.</string>
     <string name="four_verification_interne_seulement">Solo control interno: no se registra confirmación bancaria externa ni separación entre quien registra y quien verifica.</string>
+    <string name="ach_erreur_module_stock_inactif">El módulo Stock debe estar activo para registrar una recepción física.</string>
+    <string name="ach_erreur_site_introuvable">No hay un almacén de recepción definido para este artículo.</string>
+    <string name="ach_erreur_reception_requise">Se requiere una recepción validada antes de facturar artículos almacenables de este pedido.</string>
 </resources>

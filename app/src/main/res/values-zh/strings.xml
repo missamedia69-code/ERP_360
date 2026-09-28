@@ -1799,4 +1799,7 @@
     <string name="four_msg_soumis">供应商已提交审批。</string>
     <string name="four_msg_statut_mis_a_jour">供应商状态已更新。</string>
     <string name="four_verification_interne_seulement">仅限内部检查：未记录银行外部确认，也未区分录入人与核验人的身份。</string>
+    <string name="ach_erreur_module_stock_inactif">记录实物收货前必须启用库存模块。</string>
+    <string name="ach_erreur_site_introuvable">此商品未配置收货仓库。</string>
+    <string name="ach_erreur_reception_requise">此订单中的库存商品必须先完成并验证收货，才能开具发票。</string>
 </resources>

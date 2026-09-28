@@ -1799,4 +1799,7 @@
     <string name="four_msg_soumis">تم إرسال المورد للموافقة.</string>
     <string name="four_msg_statut_mis_a_jour">تم تحديث حالة المورد.</string>
     <string name="four_verification_interne_seulement">فحص داخلي فقط: لا يتم تسجيل تأكيد مصرفي خارجي أو فصل هوية المُدخل عن هوية المُتحقق.</string>
+    <string name="ach_erreur_module_stock_inactif">يجب تفعيل وحدة المخزون لتسجيل استلام فعلي.</string>
+    <string name="ach_erreur_site_introuvable">لم يتم تحديد مستودع استلام لهذا الصنف.</string>
+    <string name="ach_erreur_reception_requise">يلزم اعتماد الاستلام قبل فوترة الأصناف المخزنية المرتبطة بهذا الطلب.</string>
 </resources>

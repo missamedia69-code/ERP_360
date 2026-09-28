@@ -426,6 +426,8 @@ private fun messageAction(resultat: PurchasesViewModel.ActionAchatResult): Strin
     PurchasesViewModel.ActionAchatResult.ReceptionLiee -> stringResource(R.string.ach_erreur_reception_liee)
     PurchasesViewModel.ActionAchatResult.CompteIntrouvable -> stringResource(R.string.ach_erreur_compte)
     PurchasesViewModel.ActionAchatResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+    PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+    PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
     PurchasesViewModel.ActionAchatResult.PaiementBloque -> stringResource(R.string.ach_erreur_paiement_bloque)
     PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
     PurchasesViewModel.ActionAchatResult.Erreur -> stringResource(R.string.ach_erreur)
@@ -1155,6 +1157,9 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
                 PurchasesViewModel.SaveResult.FournisseurIntrouvable -> stringResource(R.string.ach_erreur_fournisseur)
                 PurchasesViewModel.SaveResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+                PurchasesViewModel.SaveResult.StockModuleInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+                PurchasesViewModel.SaveResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
+                PurchasesViewModel.SaveResult.ReceptionRequise -> stringResource(R.string.ach_erreur_reception_requise)
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
                 else -> null
@@ -1488,6 +1493,8 @@ private fun FormulaireCommande(
             onDroite = { vm.enregistrerCommande(draft = false) },
             erreur = when (actionResult) {
                 PurchasesViewModel.ActionAchatResult.FournisseurManquant -> stringResource(R.string.ach_erreur_fournisseur)
+                PurchasesViewModel.ActionAchatResult.FournisseurNonActif -> stringResource(R.string.ach_erreur_fournisseur_non_actif)
+                PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
                 PurchasesViewModel.ActionAchatResult.PanierVide -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.ActionAchatResult.DonneesInvalides,
@@ -1649,6 +1656,8 @@ private fun FormulaireReception(
                 PurchasesViewModel.ActionAchatResult.DepasseCommande -> stringResource(R.string.ach_erreur_depasse_commande)
                 PurchasesViewModel.ActionAchatResult.CommandeIntrouvable -> stringResource(R.string.ach_erreur_commande)
                 PurchasesViewModel.ActionAchatResult.PanierVide -> stringResource(R.string.ach_erreur_panier)
+                PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
+                PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
                 PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.ActionAchatResult.DonneesInvalides,
                 PurchasesViewModel.ActionAchatResult.Erreur,

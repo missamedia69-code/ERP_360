@@ -1846,4 +1846,7 @@
     <string name="four_msg_soumis">Fournisseur soumis à validation.</string>
     <string name="four_msg_statut_mis_a_jour">Statut du fournisseur mis à jour.</string>
     <string name="four_verification_interne_seulement">Contrôle interne uniquement : aucune confirmation bancaire externe ni séparation saisisseur/vérificateur n’est enregistrée.</string>
+    <string name="ach_erreur_module_stock_inactif">Le module Stock doit être activé pour enregistrer une réception physique.</string>
+    <string name="ach_erreur_site_introuvable">Aucun dépôt de réception n’est défini pour cet article.</string>
+    <string name="ach_erreur_reception_requise">Une réception validée est requise avant de facturer des articles stockables liés à cette commande.</string>
 </resources>

@@ -55,10 +55,9 @@ class SavePurchaseUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val fournisseurDao: FournisseurDao,
     private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
     private val siteDao: SiteDao,
     private val groupeDao: GroupeArticleDao,
+    private val stockService: StockService,
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val appNotifier: AppNotifier,
@@ -73,8 +72,13 @@ class SavePurchaseUseCase @Inject constructor(
         data object DonneesInvalides : Result()
         data object FournisseurIntrouvable : Result()
         data object FournisseurNonActif : Result()
+        data object StockModuleInactif : Result()
+        data object SiteIntrouvable : Result()
+        data object ReceptionRequise : Result()
         data object BrouillonIntrouvable : Result()
     }
+
+    private class TransactionRefusee(val resultat: Result) : RuntimeException()
 
     suspend operator fun invoke(
         recordId: Long?,
@@ -83,7 +87,16 @@ class SavePurchaseUseCase @Inject constructor(
         now: Long = System.currentTimeMillis(),
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
-        if (payload.lines.isEmpty() || payload.total <= 0.0) return Result.DonneesInvalides
+        if (payload.lines.isEmpty() || !payload.total.isFinite() || payload.total <= 0.0 ||
+            !payload.taxRate.isFinite() || payload.taxRate < 0.0 ||
+            !payload.taxAmount.isFinite() || payload.taxAmount < 0.0 ||
+            !payload.paidAmount.isFinite() ||
+            payload.lines.any {
+                !it.quantity.isFinite() || it.quantity <= 0.0 || !it.unitPrice.isFinite() ||
+                    it.unitPrice < 0.0 || !it.total.isFinite()
+            } ||
+            payload.lines.map { it.id }.distinct().size != payload.lines.size
+        ) return Result.DonneesInvalides
         val subtotal = payload.lines.sumOf { it.total }.coerceAtLeast(0.0)
         if (abs(subtotal - payload.total) > 0.01) return Result.DonneesInvalides
         if (payload.paidAmount < -QUANTITE_EPSILON || payload.paidAmount > payload.total + QUANTITE_EPSILON) {
@@ -135,38 +148,74 @@ class SavePurchaseUseCase @Inject constructor(
             }
         }
 
-        return database.withTransaction {
+        return try {
+            database.withTransaction {
             val groupes = groupeDao.listerComplets()
-            // Résolution du site de réception : site principal produit, sinon le site
-            // qui détient déjà ce produit, sinon le site principal de l'entreprise.
-            // Un article **non stockable** (prestation…) ne génère aucun mouvement :
-            // la facture porte seule la charge (imputation directe).
-            val receptions = mutableListOf<Triple<Long, Long, Double>>() // produit, site, quantité
+            data class ReceptionStock(val ligne: PurchaseLine, val siteId: Long)
+            val receptions = mutableListOf<ReceptionStock>()
             var imputationsDirectes = 0
             if (payload.receptionRecordId != null) {
-                // Facture rattachée à un bon de réception : le stock a déjà été
-                // réceptionné et valorisé — aucun nouvel effet stock.
-                val reception = operationDao.getById(payload.receptionRecordId)
-                if (reception == null || reception.module != OperationModule.ACHATS.name ||
-                    reception.status != OperationStatus.VALIDATED.name
-                ) {
+                // Une facture rapprochée d'une réception déjà validée ne recrée aucun stock.
+                val receptionRecord = operationDao.getById(payload.receptionRecordId)
+                val receptionPayload = ReceptionCodec.decode(receptionRecord?.notes)
+                if (receptionRecord == null || receptionRecord.module != OperationModule.ACHATS.name ||
+                    receptionRecord.status != OperationStatus.VALIDATED.name ||
+                    receptionPayload?.supplierId != payload.supplierId ||
+                    (payload.commandeRecordId != null && receptionPayload.commandeRecordId != payload.commandeRecordId)
+                ) return@withTransaction Result.DonneesInvalides
+                val receptionDetail = receptionPayload ?: return@withTransaction Result.DonneesInvalides
+                val recues = receptionDetail.lignes.filter { it.quantiteRecue > 0.0 }
+                    .groupBy { it.productId }.mapValues { (_, lignes) -> lignes.sumOf { it.quantiteRecue } }
+                val facturees = payload.lines.filter { it.productId != null }
+                    .groupBy { it.productId!! }.mapValues { (_, lignes) -> lignes.sumOf { it.quantity } }
+                if (facturees.any { (id, quantite) -> quantite > (recues[id] ?: 0.0) + 1e-9 }) {
                     return@withTransaction Result.DonneesInvalides
                 }
             } else {
-                for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(payload.lines)) {
+                if (payload.commandeRecordId != null) {
+                    val commandeRecord = operationDao.getById(payload.commandeRecordId)
+                    val commandePayload = CommandeAchatCodec.decode(commandeRecord?.notes)
+                    if (commandeRecord == null || commandeRecord.module != OperationModule.ACHATS.name ||
+                        commandeRecord.status != OperationStatus.VALIDATED.name ||
+                        commandePayload?.supplierId != payload.supplierId
+                    ) return@withTransaction Result.DonneesInvalides
+                    val commandee = commandePayload?.lines.orEmpty().filter { it.productId != null }
+                        .groupBy { it.productId!! }
+                        .mapValues { (_, lignes) -> lignes.sumOf { it.quantity } }
+                    val facturees = payload.lines.filter { it.productId != null }
+                        .groupBy { it.productId!! }
+                        .mapValues { (_, lignes) -> lignes.sumOf { it.quantity } }
+                    if (facturees.any { (id, quantite) -> quantite > (commandee[id] ?: 0.0) + 1e-9 }) {
+                        return@withTransaction Result.DonneesInvalides
+                    }
+                    for (productId in facturees.keys) {
+                        val produit = productDao.getById(productId)
+                            ?: return@withTransaction Result.DonneesInvalides
+                        if (ReglesGroupesArticles.estStocke(produit, groupes)) {
+                            return@withTransaction Result.ReceptionRequise
+                        }
+                    }
+                }
+                for (ligne in payload.lines.filter { it.productId != null }) {
+                    val produitId = ligne.productId ?: continue
                     val produit = productDao.getById(produitId)
-                    if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
+                    if (produit == null || !produit.active ||
+                        ReglesGroupesArticles.achetables(listOf(produit), groupes).isEmpty()
+                    ) return@withTransaction Result.DonneesInvalides
                     if (!ReglesGroupesArticles.estStocke(produit, groupes)) {
                         imputationsDirectes++
                         continue
                     }
-                    val siteId = produit.siteId
-                        ?: stockDao.siteAvecPlusDeStock(produitId)
-                        ?: siteDao.idPrincipal()
-                        ?: return@withTransaction Result.FournisseurIntrouvable
-                    receptions += Triple(produitId, siteId, quantite)
+                    val siteId = ligne.siteId ?: produit.siteId ?: siteDao.idPrincipal()
+                        ?: return@withTransaction Result.SiteIntrouvable
+                    receptions += ReceptionStock(ligne.copy(siteId = siteId), siteId)
                 }
             }
+            val lignesAvecDepot = payload.lines.map { ligne ->
+                val site = receptions.firstOrNull { it.ligne.id == ligne.id }?.siteId
+                if (site == null) ligne else ligne.copy(siteId = site)
+            }
+            val payloadPersisted = payload.copy(lines = lignesAvecDepot)
 
             val (recordIdFinal, reference) = when (val id = recordId) {
                 null -> {
@@ -180,7 +229,7 @@ class SavePurchaseUseCase @Inject constructor(
                             amount = payload.total,
                             direction = OperationDirection.NONE.name,
                             status = OperationStatus.VALIDATED.name,
-                            notes = PurchaseRecordCodec.encode(payload),
+                            notes = PurchaseRecordCodec.encode(payloadPersisted),
                             createdAt = now,
                         ),
                     )
@@ -190,76 +239,46 @@ class SavePurchaseUseCase @Inject constructor(
                     val existant = operationDao.getById(id)
                     if (existant == null || existant.module != OperationModule.ACHATS.name ||
                         existant.status != OperationStatus.DRAFT.name
-                    ) {
-                        return@withTransaction Result.BrouillonIntrouvable
-                    }
+                    ) return@withTransaction Result.BrouillonIntrouvable
                     operationDao.update(
                         existant.copy(
                             title = "Facture fournisseur — ${payload.supplierName}",
                             counterpart = payload.supplierName,
                             amount = payload.total,
                             status = OperationStatus.VALIDATED.name,
-                            notes = PurchaseRecordCodec.encode(payload),
+                            notes = PurchaseRecordCodec.encode(payloadPersisted),
                         ),
                     )
                     id to existant.reference
                 }
             }
 
-            // Sites résolus par produit — les lignes tracées (lot/série/péremption)
-            // réutilisent la même résolution.
-            val siteParProduit = receptions.associate { (produitId, siteId, _) -> produitId to siteId }
-
-            // 1. Quantités : une seule ligne de stock par produit × site.
-            for ((produitId, siteId, quantite) in receptions) {
-                val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-                stockDao.ensureRow(produitId, siteId)
-                stockDao.remplacer(produitId, siteId, avant + quantite)
-            }
-
-            // 2. Mouvements : un par ligne tracée (traçabilité lot/série/péremption),
-            //    puis un agrégé par produit pour les lignes sans traçabilité.
-            for (line in PurchaseStockEffects.lignesTracees(payload.lines)) {
-                val siteId = line.productId?.let { siteParProduit[it] } ?: continue
-                movementDao.insert(
-                    StockMovementEntity(
-                        produitId = line.productId,
-                        siteId = siteId,
-                        type = StockMovementType.ENTREE,
-                        quantite = line.quantity,
-                        motif = "ACHAT",
-                        reference = reference,
-                        commentaire = line.name,
-                        lot = line.lot?.trim()?.ifBlank { null },
-                        numeroSerie = line.numeroSerie?.trim()?.ifBlank { null },
-                        datePeremption = line.datePeremption,
-                        horodatage = now,
-                    ),
-                )
-            }
-            for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduitSansTracees(payload.lines)) {
-                val siteId = siteParProduit[produitId] ?: continue
-                movementDao.insert(
-                    StockMovementEntity(
-                        produitId = produitId,
-                        siteId = siteId,
-                        type = StockMovementType.ENTREE,
-                        quantite = quantite,
-                        motif = "ACHAT",
-                        reference = reference,
-                        horodatage = now,
-                    ),
-                )
-            }
-
-            // 3. Valorisation CUMP : le coût d'achat entre dans la valeur du stock
-            //    pour les familles valorisées uniquement (le CUMP = valeur ÷ quantité).
-            val couts = PurchaseStockEffects.coutParProduit(payload.lines)
-            for ((produitId, siteId, _) in receptions) {
-                val produit = productDao.getById(produitId) ?: continue
-                if (!ReglesGroupesArticles.estValorise(produit, groupes)) continue
-                val cout = couts[produitId] ?: continue
-                if (cout > 0.0) stockDao.ajouterValeur(produitId, siteId, cout)
+            for ((index, reception) in receptions.withIndex()) {
+                val ligne = reception.ligne
+                val productId = ligne.productId ?: continue
+                when (stockService.recordInbound(
+                    productId = productId,
+                    siteId = reception.siteId,
+                    quantity = ligne.quantity,
+                    unitCost = ligne.unitPrice,
+                    sourceModule = "ACH",
+                    sourceDocumentType = "PURCHASE_INVOICE",
+                    sourceDocumentId = recordIdFinal,
+                    sourceLineId = ligne.id.takeIf { it >= 0 } ?: index.toLong(),
+                    reference = reference,
+                    lotNumber = ligne.lot,
+                    serialNumber = ligne.numeroSerie,
+                    expiryDate = ligne.datePeremption,
+                    reason = "PURCHASE_INVOICE_IN",
+                    now = now,
+                )) {
+                    is StockService.MouvementAchatResultat.Succes -> Unit
+                    StockService.MouvementAchatResultat.ModuleInactif ->
+                        throw TransactionRefusee(Result.StockModuleInactif)
+                    StockService.MouvementAchatResultat.SiteIntrouvable ->
+                        throw TransactionRefusee(Result.SiteIntrouvable)
+                    else -> throw TransactionRefusee(Result.DonneesInvalides)
+                }
             }
 
             // 4. Le montant réglé sort de trésorerie — même garde-fou que la vente :
@@ -317,6 +336,9 @@ class SavePurchaseUseCase @Inject constructor(
                     "imputations directes $imputationsDirectes)",
             )
             Result.Succes(recordIdFinal, reference)
+            }
+        } catch (refusee: TransactionRefusee) {
+            refusee.resultat
         }
     }
 }

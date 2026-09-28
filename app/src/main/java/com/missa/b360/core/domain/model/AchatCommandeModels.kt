@@ -29,6 +29,8 @@ data class CommandeAchatLigne(
     val unitPrice: Double,
     /** Produit du catalogue rattaché — null pour une ligne libre. */
     val productId: Long? = null,
+    /** Dépôt de réception prévu pour un article stockable. */
+    val siteId: Long? = null,
 ) {
     val total: Double get() = unitPrice * quantity
 }
@@ -68,6 +70,10 @@ data class ReceptionLigne(
     val lot: String? = null,
     val numeroSerie: String? = null,
     val datePeremption: Long? = null,
+    /** Dépôt de destination de la réception physique. */
+    val siteId: Long? = null,
+    /** Coût unitaire réel à la réception; null conserve le coût catalogue. */
+    val prixReel: Double? = null,
 )
 
 /** Détail d'un bon de réception, rattaché ou non à un bon de commande. */

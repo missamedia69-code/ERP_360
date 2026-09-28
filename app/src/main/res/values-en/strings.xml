@@ -1803,4 +1803,7 @@
     <string name="four_msg_soumis">Supplier submitted for approval.</string>
     <string name="four_msg_statut_mis_a_jour">Supplier status updated.</string>
     <string name="four_verification_interne_seulement">Internal check only: no external bank confirmation or separate submitter and verifier identities are recorded.</string>
+    <string name="ach_erreur_module_stock_inactif">The Stock module must be enabled to record a physical receipt.</string>
+    <string name="ach_erreur_site_introuvable">No receiving warehouse is configured for this item.</string>
+    <string name="ach_erreur_reception_requise">A validated receipt is required before invoicing stockable items on this order.</string>
 </resources>

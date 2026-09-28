@@ -53,6 +53,9 @@ import javax.inject.Inject
 class SaveCommandeAchatUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val fournisseurDao: FournisseurDao,
+    private val productDao: ProductDao,
+    private val siteDao: SiteDao,
+    private val groupeDao: GroupeArticleDao,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
@@ -63,6 +66,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
         data object DonneesInvalides : Result()
         data object FournisseurIntrouvable : Result()
         data object FournisseurNonActif : Result()
+        data object SiteIntrouvable : Result()
         data object BrouillonIntrouvable : Result()
     }
 
@@ -73,9 +77,11 @@ class SaveCommandeAchatUseCase @Inject constructor(
         now: Long = System.currentTimeMillis(),
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
-        if (payload.lines.isEmpty() || payload.lines.none { it.quantity > 0.0 }) {
-            return Result.DonneesInvalides
-        }
+        if (payload.lines.isEmpty() || payload.lines.any {
+                !it.quantity.isFinite() || it.quantity <= 0.0 || !it.unitPrice.isFinite() ||
+                    it.unitPrice < 0.0 || !it.total.isFinite()
+            } || payload.lines.map { it.id }.distinct().size != payload.lines.size
+        ) return Result.DonneesInvalides
         val fournisseur = fournisseurDao.getById(payload.supplierId)
             ?: return Result.FournisseurIntrouvable
         // Règle d'accès (spec Fournisseurs) : une commande ne peut être VALIDÉE
@@ -83,6 +89,28 @@ class SaveCommandeAchatUseCase @Inject constructor(
         if (!draft && !FournisseurRules.peutCommander(fournisseur.statut)) {
             return Result.FournisseurNonActif
         }
+        val groupes = groupeDao.listerComplets()
+        val lignesEnrichies = mutableListOf<com.missa.b360.core.domain.model.CommandeAchatLigne>()
+        for (ligne in payload.lines) {
+            val productId = ligne.productId
+            if (productId == null) {
+                lignesEnrichies += ligne
+                continue
+            }
+            val produit = productDao.getById(productId)
+            if (produit == null || !produit.active ||
+                ReglesGroupesArticles.achetables(listOf(produit), groupes).isEmpty()
+            ) return Result.DonneesInvalides
+            if (ReglesGroupesArticles.estStocke(produit, groupes)) {
+                val siteId = ligne.siteId ?: produit.siteId ?: siteDao.idPrincipal()
+                    ?: return Result.SiteIntrouvable
+                if (siteDao.getNomById(siteId) == null) return Result.SiteIntrouvable
+                lignesEnrichies += ligne.copy(siteId = siteId)
+            } else {
+                lignesEnrichies += ligne
+            }
+        }
+        val payloadPersisted = payload.copy(lines = lignesEnrichies)
 
         val statut = if (draft) OperationStatus.DRAFT.name else OperationStatus.VALIDATED.name
         val total = payload.lines.sumOf { it.total }.coerceAtLeast(0.0)
@@ -97,7 +125,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
                         counterpart = payload.supplierName,
                         amount = total,
                         status = statut,
-                        notes = CommandeAchatCodec.encode(payload),
+                        notes = CommandeAchatCodec.encode(payloadPersisted),
                         createdAt = now,
                     ),
                 )
@@ -121,7 +149,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
                         counterpart = payload.supplierName,
                         amount = total,
                         status = statut,
-                        notes = CommandeAchatCodec.encode(payload),
+                        notes = CommandeAchatCodec.encode(payloadPersisted),
                     ),
                 )
                 journalManager.log(
@@ -144,10 +172,9 @@ class SaveReceptionAchatUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val fournisseurDao: FournisseurDao,
     private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
     private val siteDao: SiteDao,
     private val groupeDao: GroupeArticleDao,
+    private val stockService: StockService,
     private val appNotifier: AppNotifier,
     private val database: AppDatabase,
     private val sequenceManager: SequenceManager,
@@ -161,7 +188,11 @@ class SaveReceptionAchatUseCase @Inject constructor(
         data object FournisseurIntrouvable : Result()
         data object CommandeIntrouvable : Result()
         data object DepasseCommande : Result()
+        data object ModuleStockInactif : Result()
+        data object SiteIntrouvable : Result()
     }
+
+    private class TransactionRefusee(val resultat: Result) : RuntimeException()
 
     suspend operator fun invoke(
         recordId: Long?,
@@ -170,7 +201,11 @@ class SaveReceptionAchatUseCase @Inject constructor(
         now: Long = System.currentTimeMillis(),
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
-        if (payload.lignes.none { it.quantiteRecue > 0.0 }) return Result.DonneesInvalides
+        if (payload.lignes.none { it.quantiteRecue > 0.0 } || payload.lignes.any {
+                !it.quantiteRecue.isFinite() || it.quantiteRecue < 0.0 ||
+                    (it.prixReel != null && (!it.prixReel.isFinite() || it.prixReel < 0.0))
+            } || payload.lignes.map { it.id }.distinct().size != payload.lignes.size
+        ) return Result.DonneesInvalides
         if (fournisseurDao.getById(payload.supplierId) == null) return Result.FournisseurIntrouvable
 
         if (draft) {
@@ -202,13 +237,15 @@ class SaveReceptionAchatUseCase @Inject constructor(
             }
         }
 
-        return database.withTransaction {
+        return try {
+            database.withTransaction {
             // Garde-fou commande : jamais plus que le reste à recevoir par produit.
             if (payload.commandeRecordId != null) {
                 val commande = operationDao.getById(payload.commandeRecordId)
                 val commandePayload = CommandeAchatCodec.decode(commande?.notes)
                 if (commande == null || commande.module != OperationModule.ACHATS.name ||
-                    commande.status != OperationStatus.VALIDATED.name || commandePayload == null
+                    commande.status != OperationStatus.VALIDATED.name || commandePayload == null ||
+                    commandePayload.supplierId != payload.supplierId
                 ) {
                     return@withTransaction Result.CommandeIntrouvable
                 }
@@ -227,6 +264,21 @@ class SaveReceptionAchatUseCase @Inject constructor(
                 }
             }
 
+            val groupes = groupeDao.listerComplets()
+            val lignesPersisted = payload.lignes.map { ligne ->
+                if (ligne.quantiteRecue <= 0.0) return@map ligne
+                val produit = productDao.getById(ligne.productId)
+                    ?: throw TransactionRefusee(Result.DonneesInvalides)
+                if (!produit.active || ReglesGroupesArticles.achetables(listOf(produit), groupes).isEmpty()) {
+                    throw TransactionRefusee(Result.DonneesInvalides)
+                }
+                if (!ReglesGroupesArticles.estStocke(produit, groupes)) return@map ligne
+                val siteId = ligne.siteId ?: produit.siteId ?: siteDao.idPrincipal()
+                    ?: throw TransactionRefusee(Result.SiteIntrouvable)
+                ligne.copy(siteId = siteId, prixReel = ligne.prixReel ?: produit.prixAchat ?: 0.0)
+            }
+            val payloadPersisted = payload.copy(lignes = lignesPersisted)
+
             val (recordIdFinal, reference) = when (val id = recordId) {
                 null -> {
                     val ref = sequenceManager.next(DocType.BON_RECEPTION)
@@ -239,7 +291,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
                             amount = 0.0,
                             direction = OperationDirection.NONE.name,
                             status = OperationStatus.VALIDATED.name,
-                            notes = ReceptionCodec.encode(payload),
+                            notes = ReceptionCodec.encode(payloadPersisted),
                             createdAt = now,
                         ),
                     )
@@ -255,48 +307,47 @@ class SaveReceptionAchatUseCase @Inject constructor(
                     operationDao.update(
                         existant.copy(
                             status = OperationStatus.VALIDATED.name,
-                            notes = ReceptionCodec.encode(payload),
+                            notes = ReceptionCodec.encode(payloadPersisted),
                         ),
                     )
                     id to existant.reference
                 }
             }
 
-            val groupes = groupeDao.listerComplets()
             var articlesRecus = 0
-            for (ligne in payload.lignes.filter { it.quantiteRecue > 0.0 }) {
+            payloadPersisted.lignes.forEachIndexed { index, ligne ->
+                if (ligne.quantiteRecue <= 0.0) return@forEachIndexed
                 val produit = productDao.getById(ligne.productId)
-                if (produit == null || !produit.active) return@withTransaction Result.DonneesInvalides
-                // Un article non stockable ne se réceptionne pas physiquement.
-                if (!ReglesGroupesArticles.estStocke(produit, groupes)) continue
-                val siteId = produit.siteId
-                    ?: stockDao.siteAvecPlusDeStock(ligne.productId)
-                    ?: siteDao.idPrincipal()
-                    ?: return@withTransaction Result.FournisseurIntrouvable
-                val avant = stockDao.quantite(ligne.productId, siteId) ?: 0.0
-                stockDao.ensureRow(ligne.productId, siteId)
-                stockDao.remplacer(ligne.productId, siteId, avant + ligne.quantiteRecue)
-                movementDao.insert(
-                    StockMovementEntity(
-                        produitId = ligne.productId,
-                        siteId = siteId,
-                        type = StockMovementType.ENTREE,
-                        quantite = ligne.quantiteRecue,
-                        motif = "RECEPTION",
-                        reference = reference,
-                        commentaire = ligne.name,
-                        lot = ligne.lot?.trim()?.ifBlank { null },
-                        numeroSerie = ligne.numeroSerie?.trim()?.ifBlank { null },
-                        datePeremption = ligne.datePeremption,
-                        horodatage = now,
-                    ),
-                )
-                // Valorisation au prix d'achat catalogue : le CUMP se recalcule.
-                if (ReglesGroupesArticles.estValorise(produit, groupes)) {
-                    val cout = (produit.prixAchat ?: 0.0) * ligne.quantiteRecue
-                    if (cout > 0.0) stockDao.ajouterValeur(ligne.productId, siteId, cout)
+                if (produit == null || !produit.active) {
+                    throw TransactionRefusee(Result.DonneesInvalides)
                 }
-                articlesRecus++
+                val siteId = ligne.siteId ?: produit.siteId ?: siteDao.idPrincipal()
+                if (siteId == null) throw TransactionRefusee(Result.SiteIntrouvable)
+                // Les prestations ont une réception de service, sans mouvement Stock.
+                if (!ReglesGroupesArticles.estStocke(produit, groupes)) return@forEachIndexed
+                when (stockService.recordInbound(
+                    productId = ligne.productId,
+                    siteId = siteId,
+                    quantity = ligne.quantiteRecue,
+                    unitCost = ligne.prixReel ?: produit.prixAchat ?: 0.0,
+                    sourceModule = "ACH",
+                    sourceDocumentType = "PURCHASE_RECEIPT",
+                    sourceDocumentId = recordIdFinal,
+                    sourceLineId = index.toLong(),
+                    reference = reference,
+                    lotNumber = ligne.lot,
+                    serialNumber = ligne.numeroSerie,
+                    expiryDate = ligne.datePeremption,
+                    reason = "PURCHASE_RECEIPT",
+                    now = now,
+                )) {
+                    is StockService.MouvementAchatResultat.Succes -> articlesRecus++
+                    StockService.MouvementAchatResultat.ModuleInactif ->
+                        throw TransactionRefusee(Result.ModuleStockInactif)
+                    StockService.MouvementAchatResultat.SiteIntrouvable ->
+                        throw TransactionRefusee(Result.SiteIntrouvable)
+                    else -> throw TransactionRefusee(Result.DonneesInvalides)
+                }
             }
 
             if (articlesRecus > 0) {
@@ -314,6 +365,9 @@ class SaveReceptionAchatUseCase @Inject constructor(
                     (payload.commandeReference?.let { ", commande $it" } ?: "") + ")",
             )
             Result.Succes(recordIdFinal, reference)
+            }
+        } catch (refusee: TransactionRefusee) {
+            refusee.resultat
         }
     }
 
@@ -434,10 +488,7 @@ class ReglerAchatUseCase @Inject constructor(
 class AnnulerAchatUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val productDao: ProductDao,
-    private val stockDao: ProductStockDao,
-    private val movementDao: StockMovementDao,
-    private val siteDao: SiteDao,
-    private val groupeDao: GroupeArticleDao,
+    private val stockService: StockService,
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val appNotifier: AppNotifier,
@@ -455,6 +506,8 @@ class AnnulerAchatUseCase @Inject constructor(
         data object ReceptionLiee : Result()
     }
 
+    private class TransactionRefusee(val resultat: Result) : RuntimeException()
+
     suspend operator fun invoke(recordId: Long, now: Long = System.currentTimeMillis()): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         val piece = operationDao.getById(recordId)
@@ -467,8 +520,8 @@ class AnnulerAchatUseCase @Inject constructor(
         val commande = if (achat == null && reception == null) CommandeAchatCodec.decode(piece.notes) else null
         if (achat == null && reception == null && commande == null) return Result.Introuvable
 
-        return database.withTransaction {
-            val groupes = groupeDao.listerComplets()
+        return try {
+            database.withTransaction {
             val pieces = operationDao.getByModule(OperationModule.ACHATS.name)
 
             if (reception != null) {
@@ -478,35 +531,44 @@ class AnnulerAchatUseCase @Inject constructor(
                         PurchaseRecordCodec.decode(it.notes)?.receptionRecordId == piece.id
                 }
                 if (factureLiee) return@withTransaction Result.FactureLiee
-                for (ligne in reception.lignes.filter { it.quantiteRecue > 0.0 }) {
+                reception.lignes.forEachIndexed { index, ligne ->
+                    if (ligne.quantiteRecue <= 0.0) return@forEachIndexed
+                    val cout = ligne.prixReel ?: productDao.getById(ligne.productId)?.prixAchat ?: 0.0
                     val contre = contrePasser(
-                        ligne = ligne.productId to ligne.quantiteRecue,
-                        motif = "ANNULATION_RECEPTION",
-                        reference = piece.reference,
-                        coutUnitaire = productDao.getById(ligne.productId)?.prixAchat ?: 0.0,
-                        groupes = groupes,
+                        productId = ligne.productId,
+                        siteId = ligne.siteId,
+                        quantite = ligne.quantiteRecue,
+                        sourceDocumentId = piece.id,
+                        sourceLineId = index.toLong(),
+                        sourceDocumentType = "PURCHASE_RECEIPT_CANCELLATION",
+                        reason = "PURCHASE_RECEIPT_CANCELLATION_OUT",
+                        reference = "${piece.reference}-ANN",
+                        coutUnitaire = cout,
                         now = now,
                     )
-                    if (contre == null) return@withTransaction Result.Introuvable
-                    if (!contre) return@withTransaction Result.StockInsuffisant
+                    if (contre == null) throw TransactionRefusee(Result.Introuvable)
+                    if (!contre) throw TransactionRefusee(Result.StockInsuffisant)
                 }
             }
 
             if (achat != null && achat.receptionRecordId == null) {
-                // Facture directe : ce qui était entré ressort.
-                val couts = PurchaseStockEffects.coutParProduit(achat.lines)
-                for ((produitId, quantite) in PurchaseStockEffects.besoinsParProduit(achat.lines)) {
-                    val coutUnitaire = (couts[produitId] ?: 0.0) / quantite
+                // Facture directe : chaque ligne entrée ressort du dépôt d'origine.
+                achat.lines.forEachIndexed { index, ligne ->
+                    val produitId = ligne.productId ?: return@forEachIndexed
                     val contre = contrePasser(
-                        ligne = produitId to quantite,
-                        motif = "ANNULATION_ACHAT",
-                        reference = piece.reference,
-                        coutUnitaire = coutUnitaire,
-                        groupes = groupes,
+                        productId = produitId,
+                        siteId = ligne.siteId,
+                        quantite = ligne.quantity,
+                        sourceDocumentId = piece.id,
+                        sourceLineId = ligne.id.takeIf { it >= 0 } ?: index.toLong(),
+                        sourceDocumentType = "PURCHASE_INVOICE_CANCELLATION",
+                        reason = "PURCHASE_INVOICE_CANCELLATION_OUT",
+                        reference = "${piece.reference}-ANN",
+                        coutUnitaire = ligne.unitPrice,
                         now = now,
                     )
-                    if (contre == null) return@withTransaction Result.Introuvable
-                    if (!contre) return@withTransaction Result.StockInsuffisant
+                    if (contre == null) throw TransactionRefusee(Result.Introuvable)
+                    if (!contre) throw TransactionRefusee(Result.StockInsuffisant)
                 }
             }
 
@@ -556,48 +618,46 @@ class AnnulerAchatUseCase @Inject constructor(
                 "Annulation ${piece.reference} — ${piece.counterpart} (contre-passation)",
             )
             Result.Succes
+            }
+        } catch (refusee: TransactionRefusee) {
+            refusee.resultat
         }
     }
 
     /**
-     * Sortie symétrique d'une réception : false si le stock disponible est
-     * insuffisant (refus), true si appliquée. Les articles non stockables
-     * (prestations facturées directement) sont ignorés.
+     * Sortie stock métier déléguée au propriétaire Stock. null = données/service
+     * indisponible, false = quantité insuffisante, true = appliquée ou non-stockable.
      */
     private suspend fun contrePasser(
-        ligne: Pair<Long, Double>,
-        motif: String,
+        productId: Long,
+        siteId: Long?,
+        quantite: Double,
+        sourceDocumentId: Long,
+        sourceLineId: Long,
+        sourceDocumentType: String,
+        reason: String,
         reference: String,
         coutUnitaire: Double,
-        groupes: List<com.missa.b360.core.data.dao.GroupeArticleComplet>,
         now: Long,
     ): Boolean? {
-        val (produitId, quantite) = ligne
         if (quantite <= 0.0) return true
-        val produit = productDao.getById(produitId) ?: return null
-        if (!ReglesGroupesArticles.estStocke(produit, groupes)) return true
-        val siteId = produit.siteId
-            ?: stockDao.siteAvecPlusDeStock(produitId)
-            ?: siteDao.idPrincipal()
-            ?: return null
-        val avant = stockDao.quantite(produitId, siteId) ?: 0.0
-        if (avant < quantite - 1e-9) return false
-        stockDao.remplacer(produitId, siteId, avant - quantite)
-        movementDao.insert(
-            StockMovementEntity(
-                produitId = produitId,
-                siteId = siteId,
-                type = StockMovementType.SORTIE,
-                quantite = quantite,
-                motif = motif,
-                reference = reference,
-                horodatage = now,
-            ),
-        )
-        if (ReglesGroupesArticles.estValorise(produit, groupes)) {
-            val valeur = coutUnitaire * quantite
-            if (valeur > 0.0) stockDao.ajouterValeur(produitId, siteId, -valeur)
+        return when (stockService.recordOutbound(
+            productId = productId,
+            siteId = siteId,
+            quantity = quantite,
+            unitCost = coutUnitaire,
+            sourceModule = "ACH",
+            sourceDocumentType = sourceDocumentType,
+            sourceDocumentId = sourceDocumentId,
+            sourceLineId = sourceLineId,
+            reference = reference,
+            reason = reason,
+            now = now,
+        )) {
+            is StockService.MouvementAchatResultat.Succes,
+            StockService.MouvementAchatResultat.ArticleNonStockable -> true
+            is StockService.MouvementAchatResultat.StockInsuffisant -> false
+            else -> null
         }
-        return true
     }
 }
