@@ -1508,6 +1508,12 @@
     <string name="pro_quantite_a_fabriquer">生产数量</string>
     <string name="pro_titre_nomenclature">物料清单（BOM）</string>
     <string name="pro_ajouter_composant">添加原料</string>
+    <string name="pro_disponibilite_ligne">需求：%1$s · 可用：%2$s</string>
+    <string name="pro_composant_stock_total">%1$s（总库存：%2$s）</string>
+    <string name="pro_modifier_brouillon">编辑草稿</string>
+    <string name="pro_composants_prevus">计划组件：%1$d 个</string>
+    <string name="pro_composants_consommes">已消耗组件：%1$d 个</string>
+    <string name="pro_modifier_ordre">编辑生产订单</string>
     <string name="pro_aucun_composant">配方中未添加任何物料。</string>
     <string name="pro_lancer_fabrication">确认并扣减库存</string>
     <string name="pro_choisir_matiere">选择原材料/组件</string>

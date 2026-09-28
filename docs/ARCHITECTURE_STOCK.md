@@ -39,6 +39,8 @@ Les `Entity` et projections actuellement partagées avec l'UI se trouvent princi
 
 Les écritures courantes se trouvent notamment dans `core/domain/usecase/StockUseCases.kt` et `ProductUseCases.kt` : mouvement simple, transfert, inventaire sauvegardé, création produit avec stock initial. `StockService` existe dans `StockUseCases.kt` comme classe concrète injectée : il planifie et écrit les sorties de Vente et traite certains retours/compensations dans la transaction Room du document appelant. Ce n'est pas encore le contrat intermodule typé complet (réservations, entrées d'achat avec coût/source, quarantaine, événements).
 
+Le palier PRO introduit également `ProductionStockUseCase`, un contrat Stock-owned dédié au lot complet : il prévalide les matières et le dépôt de réception, puis écrit sorties, entrée, valeurs et mouvements dans la transaction de l'OF. `SaveProductionOrderUseCase` ne dépend d'aucun DAO Stock. Cette commande ne fournit pas encore de réservation, consommation partielle, rebuts, lots/séries ni coûts autres que les matières au CUMP; voir [`ARCHITECTURE_PRODUCTION.md`](ARCHITECTURE_PRODUCTION.md).
+
 ## 3. Parcours de lecture et présentation
 
 ### Hub

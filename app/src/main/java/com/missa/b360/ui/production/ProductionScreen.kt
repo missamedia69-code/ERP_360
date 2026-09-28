@@ -56,6 +56,7 @@ import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.stock.ProductWithStock
 import com.missa.b360.ui.stock.fmtQuantite
+import com.missa.b360.ui.stock.fmtValeur
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -63,8 +64,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/** Orange industriel caractéristique du module Production — source unique : [AppModule.PRODUCTION]. */
-private val OrangeProduction: Color get() = AppModule.PRODUCTION.couleur
+/** Violet caractéristique du module Production — source unique : [AppModule.PRODUCTION]. */
+private val VioletProduction: Color get() = AppModule.PRODUCTION.couleur
 
 private enum class VueProduction { LISTE, NOUVEL_ORDRE }
 
@@ -75,8 +76,13 @@ fun ProductionScreen(
     vm: ProductionViewModel = hiltViewModel(),
 ) {
     val ordres by vm.ordres.collectAsStateWithLifecycle(initialValue = emptyList())
+    val devise by vm.devise.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     var vue by remember { mutableStateOf(if (openCreate) VueProduction.NOUVEL_ORDRE else VueProduction.LISTE) }
+
+    LaunchedEffect(openCreate) {
+        if (openCreate) vm.nouveauOrdre()
+    }
 
     LaunchedEffect(message) {
         if (message is ProductionViewModel.ActionMessage.Succes) {
@@ -89,9 +95,11 @@ fun ProductionScreen(
     when (vue) {
         VueProduction.LISTE -> ListeOrdres(
             ordres = ordres,
+            devise = devise,
             message = message,
             onBack = onBack,
-            onNouvelOrdre = { vue = VueProduction.NOUVEL_ORDRE },
+            onNouvelOrdre = { vm.nouveauOrdre(); vue = VueProduction.NOUVEL_ORDRE },
+            onEditBrouillon = { order -> vm.ouvrirBrouillon(order); vue = VueProduction.NOUVEL_ORDRE },
         )
         VueProduction.NOUVEL_ORDRE -> FormulaireOrdreProduction(
             vm = vm,
@@ -104,9 +112,11 @@ fun ProductionScreen(
 @Composable
 private fun ListeOrdres(
     ordres: List<OperationRecordEntity>,
+    devise: String,
     message: ProductionViewModel.ActionMessage?,
     onBack: () -> Unit,
     onNouvelOrdre: () -> Unit,
+    onEditBrouillon: (OperationRecordEntity) -> Unit,
 ) {
     val lances = ordres.filter { it.status == OperationStatus.VALIDATED.name }
 
@@ -125,7 +135,7 @@ private fun ListeOrdres(
             item {
                 Surface(
                     shape = RoundedCornerShape(18.dp),
-                    color = OrangeProduction.copy(alpha = 0.16f),
+                    color = VioletProduction.copy(alpha = 0.16f),
                 ) {
                     Column(Modifier.fillMaxWidth().padding(14.dp)) {
                         Text(
@@ -154,7 +164,7 @@ private fun ListeOrdres(
                 Button(
                     onClick = onNouvelOrdre,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = OrangeProduction, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = VioletProduction, contentColor = Color.White),
                 ) {
                     Icon(painterResource(Iv.Add), null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
@@ -200,7 +210,7 @@ private fun ListeOrdres(
                 }
             } else {
                 items(ordres, key = { it.id }) { ordre ->
-                    CarteOrdre(ordre = ordre)
+                    CarteOrdre(ordre = ordre, devise = devise, onEdit = { onEditBrouillon(ordre) })
                 }
             }
         }
@@ -208,7 +218,7 @@ private fun ListeOrdres(
 }
 
 @Composable
-private fun CarteOrdre(ordre: OperationRecordEntity) {
+private fun CarteOrdre(ordre: OperationRecordEntity, devise: String, onEdit: () -> Unit) {
     val dateStr = remember(ordre.createdAt) {
         SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(ordre.createdAt))
     }
@@ -246,12 +256,21 @@ private fun CarteOrdre(ordre: OperationRecordEntity) {
             )
             payload?.composants?.let { comps ->
                 Text(
-                    "${comps.size} composant(s) consommé(s)",
+                    stringResource(
+                        if (ordre.status == OperationStatus.DRAFT.name) R.string.pro_composants_prevus else R.string.pro_composants_consommes,
+                        comps.size,
+                    ),
                     fontSize = 11.sp,
-                    color = OrangeProduction,
+                    color = VioletProduction,
                 )
             }
+            payload?.coutMatieres?.let { cout ->
+                Text("Coût matières (CUMP) : ${fmtValeur(cout, devise)}", fontSize = 11.sp, color = MissaMuted)
+            }
             Text(dateStr, fontSize = 10.sp, color = MissaMuted)
+            if (ordre.status == OperationStatus.DRAFT.name) {
+                TextButton(onClick = onEdit) { Text(stringResource(R.string.pro_modifier_brouillon), color = VioletProduction, fontSize = 11.sp) }
+            }
         }
     }
 }
@@ -265,12 +284,13 @@ private fun FormulaireOrdreProduction(
     val ui by vm.uiState.collectAsStateWithLifecycle()
     val fabricables by vm.fabricables.collectAsStateWithLifecycle()
     val composantsDispo by vm.composantsDisponibles.collectAsStateWithLifecycle()
+    val enregistrement by vm.enregistrement.collectAsStateWithLifecycle()
 
     var dialogueComposant by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
-            title = stringResource(R.string.pro_nouvel_ordre),
+            title = stringResource(if (ui.editingOrderId == null) R.string.pro_nouvel_ordre else R.string.pro_modifier_ordre),
             onBack = onBack,
             couleurFond = AppModule.PRODUCTION.couleurPale,
         )
@@ -312,7 +332,7 @@ private fun FormulaireOrdreProduction(
                         modifier = Modifier.weight(1f),
                     )
                     TextButton(onClick = { dialogueComposant = true }) {
-                        Text("+ " + stringResource(R.string.pro_ajouter_composant), fontSize = 11.sp, color = OrangeProduction)
+                        Text("+ " + stringResource(R.string.pro_ajouter_composant), fontSize = 11.sp, color = VioletProduction)
                     }
                 }
             }
@@ -337,8 +357,15 @@ private fun FormulaireOrdreProduction(
                             Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(comp.nom, fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                            Text("Quantité: ${fmtQuantite(comp.quantite)}", fontSize = 11.sp, color = MissaMuted)
+                            val available = composantsDispo.firstOrNull { it.product.id == comp.productId }?.total ?: 0.0
+                            Column(Modifier.weight(1f)) {
+                                Text(comp.nom, fontSize = 12.sp, color = MissaInk)
+                                Text(
+                                    stringResource(R.string.pro_disponibilite_ligne, fmtQuantite(comp.quantite), fmtQuantite(available)),
+                                    fontSize = 10.sp,
+                                    color = if (available >= comp.quantite) Color(0xFF15803D) else Color(0xFFB91C1C),
+                                )
+                            }
                             IconButton(onClick = { vm.removeComposant(comp.productId) }) {
                                 Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                             }
@@ -374,14 +401,14 @@ private fun FormulaireOrdreProduction(
             ) {
                 OutlinedButton(
                     onClick = { vm.lancerOrdre(draft = true) },
-                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty(),
+                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty() && !enregistrement,
                     modifier = Modifier.weight(1f),
                 ) { Text(stringResource(R.string.ach_brouillon), color = MissaInk) }
                 Button(
                     onClick = { vm.lancerOrdre(draft = false) },
-                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty(),
+                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty() && !enregistrement,
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = OrangeProduction, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = VioletProduction, contentColor = Color.White),
                 ) { Text(stringResource(R.string.pro_lancer_fabrication), color = Color.White) }
             }
         }
@@ -460,7 +487,7 @@ private fun DialogueAjoutComposant(
                     MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
                         options.forEach { opt ->
                             DropdownMenuItem(
-                                text = { Text("${opt.nom} (Stock: ${fmtQuantite(opt.stock)})", color = MissaInk) },
+                                text = { Text(stringResource(R.string.pro_composant_stock_total, opt.nom, fmtQuantite(opt.total)), color = MissaInk) },
                                 onClick = {
                                     selectionne = opt
                                     ouvert = false

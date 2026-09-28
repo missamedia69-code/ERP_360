@@ -60,6 +60,11 @@ class ModuleRegistryTest {
     }
 
     @Test
+    fun `production respecte son violet identitaire`() {
+        assertEquals(Color(0xFF8B5CF6), AppModule.PRODUCTION.couleur)
+    }
+
+    @Test
     fun `chaque module declare une route unique`() {
         val routes = AppModule.entries.map { it.route }
         assertEquals(routes.size, routes.distinct().size)

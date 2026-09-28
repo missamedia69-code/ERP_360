@@ -113,6 +113,10 @@ interface ProductStockDao {
     @Query("SELECT COALESCE(valeur, 0) FROM product_stock WHERE produitId = :produitId AND siteId = :siteId LIMIT 1")
     suspend fun valeur(produitId: Long, siteId: Long): Double
 
+    /** Sites et quantités disponibles pour une sortie multi-dépôt. */
+    @Query("SELECT * FROM product_stock WHERE produitId = :produitId ORDER BY quantite DESC")
+    suspend fun lignesPourProduit(produitId: Long): List<ProductStockEntity>
+
     /** Site ayant la plus grande quantité positive (sortie sans site principal). */
     @Query(
         "SELECT siteId FROM product_stock WHERE produitId = :produitId AND quantite > 0 " +

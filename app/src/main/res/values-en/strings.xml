@@ -1512,6 +1512,12 @@
     <string name="pro_quantite_a_fabriquer">Quantity to manufacture</string>
     <string name="pro_titre_nomenclature">Bill of Materials (BOM)</string>
     <string name="pro_ajouter_composant">Add raw material</string>
+    <string name="pro_disponibilite_ligne">Required: %1$s · available: %2$s</string>
+    <string name="pro_composant_stock_total">%1$s (total stock: %2$s)</string>
+    <string name="pro_modifier_brouillon">Edit draft</string>
+    <string name="pro_composants_prevus">%1$d planned component(s)</string>
+    <string name="pro_composants_consommes">%1$d consumed component(s)</string>
+    <string name="pro_modifier_ordre">Edit manufacturing order</string>
     <string name="pro_aucun_composant">No components added to this recipe.</string>
     <string name="pro_lancer_fabrication">Validate &amp; deduct stock</string>
     <string name="pro_choisir_matiere">Select component / material</string>

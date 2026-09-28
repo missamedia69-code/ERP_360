@@ -1508,6 +1508,12 @@
     <string name="pro_quantite_a_fabriquer">Cantidad a fabricar</string>
     <string name="pro_titre_nomenclature">Lista de materiales (BOM)</string>
     <string name="pro_ajouter_composant">Añadir materia prima</string>
+    <string name="pro_disponibilite_ligne">Requerido: %1$s · disponible: %2$s</string>
+    <string name="pro_composant_stock_total">%1$s (stock total: %2$s)</string>
+    <string name="pro_modifier_brouillon">Editar borrador</string>
+    <string name="pro_composants_prevus">%1$d componente(s) previsto(s)</string>
+    <string name="pro_composants_consommes">%1$d componente(s) consumido(s)</string>
+    <string name="pro_modifier_ordre">Editar orden de fabricación</string>
     <string name="pro_aucun_composant">No se han añadido componentes a esta receta.</string>
     <string name="pro_lancer_fabrication">Validar y descontar stock</string>
     <string name="pro_choisir_matiere">Elegir componente / material</string>

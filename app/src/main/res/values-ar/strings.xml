@@ -1508,6 +1508,12 @@
     <string name="pro_quantite_a_fabriquer">الكمية المراد تصنيعها</string>
     <string name="pro_titre_nomenclature">قائمة المواد والمكونات (BOM)</string>
     <string name="pro_ajouter_composant">إضافة مادة خام</string>
+    <string name="pro_disponibilite_ligne">المطلوب: %1$s · المتاح: %2$s</string>
+    <string name="pro_composant_stock_total">%1$s (إجمالي المخزون: %2$s)</string>
+    <string name="pro_modifier_brouillon">تعديل المسودة</string>
+    <string name="pro_composants_prevus">%1$d مكوّن مخطط</string>
+    <string name="pro_composants_consommes">%1$d مكوّن مستهلك</string>
+    <string name="pro_modifier_ordre">تعديل أمر التصنيع</string>
     <string name="pro_aucun_composant">لم تتم إضافة أي مكونات لهذه الوصفة.</string>
     <string name="pro_lancer_fabrication">اعتماد وخصم المخزون</string>
     <string name="pro_choisir_matiere">اختر المكون / المادة الخام</string>

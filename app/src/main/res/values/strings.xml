@@ -1555,6 +1555,12 @@
     <string name="pro_quantite_a_fabriquer">Quantité à fabriquer</string>
     <string name="pro_titre_nomenclature">Nomenclature des matières (BOM)</string>
     <string name="pro_ajouter_composant">Ajouter une matière</string>
+    <string name="pro_disponibilite_ligne">Requis : %1$s · disponible : %2$s</string>
+    <string name="pro_composant_stock_total">%1$s (stock total : %2$s)</string>
+    <string name="pro_modifier_brouillon">Modifier le brouillon</string>
+    <string name="pro_composants_prevus">%1$d composant(s) prévu(s)</string>
+    <string name="pro_composants_consommes">%1$d composant(s) consommé(s)</string>
+    <string name="pro_modifier_ordre">Modifier l’ordre de fabrication</string>
     <string name="pro_aucun_composant">Aucune matière première ajoutée à la recette.</string>
     <string name="pro_lancer_fabrication">Valider et déstocker</string>
     <string name="pro_choisir_matiere">Choisir le composant / matière</string>
