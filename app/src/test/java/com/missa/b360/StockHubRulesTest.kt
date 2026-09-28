@@ -45,6 +45,7 @@ class StockHubRulesTest {
         horodatage: Long,
     ) = StockMovementView(
         id = id,
+        produitId = id,
         siteId = siteId,
         produitNom = produitNom,
         produitCode = "PRD-$id",

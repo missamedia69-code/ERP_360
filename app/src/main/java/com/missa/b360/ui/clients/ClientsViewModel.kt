@@ -11,12 +11,17 @@ import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.core.data.entity.ProductEntity
+import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.BadgeLoyaltyUseCases
 import com.missa.b360.core.domain.usecase.CategorieClientUseCases
+import com.missa.b360.core.domain.usecase.ActiverClientUseCase
 import com.missa.b360.core.domain.usecase.ClientProfileInput
 import com.missa.b360.core.domain.usecase.ClientProfileUseCase
+import com.missa.b360.core.domain.usecase.ClientPriceUseCases
+import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.DesactiverClientUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
@@ -31,6 +36,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -43,9 +50,12 @@ class ClientsViewModel @Inject constructor(
     private val settingsStore: SettingsStore,
     private val observeAllClients: ObserveAllClientsUseCase,
     private val createClient: CreateClientUseCase,
+    private val activerClient: ActiverClientUseCase,
     private val updateClient: UpdateClientUseCase,
     private val desactiverClient: DesactiverClientUseCase,
     private val clientProfile: ClientProfileUseCase,
+    private val clientPrices: ClientPriceUseCases,
+    observeProducts: ObserveProductsUseCase,
     private val operations: OperationUseCases,
     private val categories: CategorieClientUseCases,
     private val badges: BadgeLoyaltyUseCases,
@@ -59,6 +69,8 @@ class ClientsViewModel @Inject constructor(
     val categoriesFlow: Flow<List<CategoryClientEntity>> = categories.observer()
     val badgesFlow: Flow<List<BadgeLoyaltyEntity>> = badges.observer()
     val sitesFlow: Flow<List<SiteEntity>> = siteUseCases.observerSites()
+    val productCatalog: StateFlow<List<ProductEntity>> = observeProducts()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _deviseEntreprise = MutableStateFlow<String?>(null)
     val deviseEntreprise: StateFlow<String?> = _deviseEntreprise
@@ -237,6 +249,8 @@ class ClientsViewModel @Inject constructor(
                     }
                     is CreateClientUseCase.Result.LicenceExpiree ->
                         _resultat.value = Resultat(erreur = "licence")
+                    is CreateClientUseCase.Result.PermissionRefusee ->
+                        _resultat.value = Resultat(erreur = "permission")
                     is CreateClientUseCase.Result.NomObligatoire ->
                         _resultat.value = Resultat(erreur = "nom")
                     is CreateClientUseCase.Result.NomInvalide ->
@@ -307,6 +321,35 @@ class ClientsViewModel @Inject constructor(
     fun addresses(clientId: Long?): Flow<List<ClientAddressEntity>> =
         if (clientId == null) flowOf(emptyList()) else clientProfile.observeAddresses(clientId)
 
+    fun negotiatedPrices(clientId: Long?): Flow<List<PriceClientEntity>> =
+        if (clientId == null) flowOf(emptyList()) else clientPrices.observer(clientId)
+
+    fun setNegotiatedPrice(clientId: Long, productId: Long, price: Double) {
+        viewModelScope.launch {
+            val success = try {
+                clientPrices.definir(clientId, productId, price)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                false
+            }
+            _resultat.value = if (success) Resultat(code = "price", clientId = clientId) else Resultat(erreur = "price")
+        }
+    }
+
+    fun removeNegotiatedPrice(clientId: Long, productId: Long) {
+        viewModelScope.launch {
+            val success = try {
+                clientPrices.supprimer(clientId, productId)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                false
+            }
+            _resultat.value = if (success) Resultat(code = "price", clientId = clientId) else Resultat(erreur = "price")
+        }
+    }
+
     /** Importe uniquement des lignes valides; les doublons et lignes incomplètes sont ignorés. */
     fun importer(rows: List<ImportedClientRow>) {
         if (rows.isEmpty()) {
@@ -334,6 +377,25 @@ class ClientsViewModel @Inject constructor(
                 throw exception
             } catch (_: Exception) {
                 _resultat.value = Resultat(erreur = "import")
+            }
+        }
+    }
+
+    fun activer(id: Long) {
+        viewModelScope.launch {
+            _resultat.value = try {
+                when (activerClient(id)) {
+                    ActiverClientUseCase.Result.Succes -> Resultat(code = "activate")
+                    ActiverClientUseCase.Result.Introuvable -> Resultat(erreur = "err")
+                    ActiverClientUseCase.Result.CoordonneesManquantes -> Resultat(erreur = "activation_contact")
+                    ActiverClientUseCase.Result.InformationsFiscalesManquantes -> Resultat(erreur = "activation_fiscal")
+                    ActiverClientUseCase.Result.LicenceExpiree -> Resultat(erreur = "licence")
+                    ActiverClientUseCase.Result.PermissionRefusee -> Resultat(erreur = "permission")
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                Resultat(erreur = "err")
             }
         }
     }
@@ -372,6 +434,7 @@ class ClientsViewModel @Inject constructor(
                     CategorieClientUseCases.SuppressionResult.Supprimee -> null
                     CategorieClientUseCases.SuppressionResult.CategorieUtilisee -> "utilisee"
                     CategorieClientUseCases.SuppressionResult.LectureSeule -> "licence"
+                    CategorieClientUseCases.SuppressionResult.PermissionRefusee -> "permission"
                     CategorieClientUseCases.SuppressionResult.Introuvable -> "err"
                 }
             } catch (exception: CancellationException) {

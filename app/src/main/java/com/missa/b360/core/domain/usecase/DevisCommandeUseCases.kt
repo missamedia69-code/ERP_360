@@ -167,6 +167,7 @@ class ConvertDevisToOrderUseCase @Inject constructor(
         data object LectureSeule : Result()
         data object Introuvable : Result()
         data object DejaAnnulee : Result()
+        data object DejaConverti : Result()
         data object DonneesInvalides : Result()
     }
 
@@ -195,6 +196,10 @@ class ConvertDevisToOrderUseCase @Inject constructor(
             }
             val payload = SaleRecordCodec.decode(devis.notes)
                 ?: return@withTransaction Result.DonneesInvalides
+            val dejaConverti = operationDao.getByModule(targetOrder.module.name).any { commande ->
+                SaleRecordCodec.decode(commande.notes)?.sourceRecordId == devisRecordId
+            }
+            if (dejaConverti) return@withTransaction Result.DejaConverti
 
             val reference = sequenceManager.next(targetOrder.docType)
             val commandeId = operationDao.insert(
@@ -242,6 +247,8 @@ class ConvertOrderToSaleUseCase @Inject constructor(
         data object DejaAnnulee : Result()
         data object DejaFacturee : Result()
         data object DonneesInvalides : Result()
+        data object CompteEncaissementRequis : Result()
+        data object ModuleStockInactif : Result()
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : Result()
     }
 
@@ -298,6 +305,10 @@ class ConvertOrderToSaleUseCase @Inject constructor(
                 SaveSaleUseCase.Result.LectureSeule -> Result.LectureSeule
                 SaveSaleUseCase.Result.DonneesInvalides -> Result.DonneesInvalides
                 SaveSaleUseCase.Result.BrouillonIntrouvable -> Result.DonneesInvalides
+                SaveSaleUseCase.Result.ClientNonEligible -> Result.DonneesInvalides
+                SaveSaleUseCase.Result.ValidationCreditRequise -> Result.DonneesInvalides
+                SaveSaleUseCase.Result.CompteEncaissementRequis -> Result.CompteEncaissementRequis
+                SaveSaleUseCase.Result.ModuleStockInactif -> Result.ModuleStockInactif
                 is SaveSaleUseCase.Result.StockInsuffisant ->
                     Result.StockInsuffisant(facturation.produitNom, facturation.disponible, facturation.demande)
             }

@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
-import com.missa.b360.core.data.dao.ClientDao
-import com.missa.b360.core.numbering.DocType
-import com.missa.b360.core.numbering.SequenceManager
+import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.domain.model.SaleCalculator
@@ -15,6 +13,10 @@ import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
 import com.missa.b360.core.domain.model.SaleTotals
 import com.missa.b360.core.domain.model.ProduitRules
+import com.missa.b360.core.domain.usecase.ClientValidation
+import com.missa.b360.core.domain.usecase.ClientProfileUseCase
+import com.missa.b360.core.domain.usecase.ClientTaxRules
+import com.missa.b360.core.domain.usecase.CreateClientUseCase
 import com.missa.b360.core.domain.usecase.CheckSaleStockUseCase
 import com.missa.b360.core.domain.usecase.GetEnterpriseUseCase
 import com.missa.b360.core.domain.usecase.ObserveClientsUseCase
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -51,18 +54,30 @@ data class SalesUiState(
     val selectedClient: ClientEntity? = null,
     val lines: List<SaleLine> = emptyList(),
     val discountInput: String = "0",
+    /** Une remise explicitement saisie remplace la remise par défaut du client. */
+    val discountManual: Boolean = false,
     val deliveryInput: String = "0",
     val paidInput: String = "",
     val note: String = "",
     /** Id de la pièce brouillon en cours de reprise, null pour une nouvelle vente. */
     val editingRecordId: Long? = null,
 ) {
-    fun totals(taxRate: Double): SaleTotals = SaleCalculator.calculate(
-        lines = lines,
-        discount = discountInput.toMoneyOrZero(),
-        delivery = deliveryInput.toMoneyOrZero(),
-        taxRate = taxRate,
-    )
+    fun totals(taxRate: Double): SaleTotals {
+        val subtotal = lines.sumOf { it.unitPrice * it.quantity }.coerceAtLeast(0.0)
+        val client = selectedClient
+        val defaultPct = if (discountManual || client == null) 0.0 else {
+            val configured = client.remiseDefautPct.coerceIn(0.0, 100.0)
+            minOf(configured, client.remiseMaxPct?.coerceIn(0.0, 100.0) ?: 100.0)
+        }
+        val discount = if (discountManual) discountInput.toMoneyOrZero()
+            else subtotal * defaultPct / 100.0
+        return SaleCalculator.calculate(
+            lines = lines,
+            discount = discount,
+            delivery = deliveryInput.toMoneyOrZero(),
+            taxRate = taxRate,
+        )
+    }
 }
 
 /** Facture créée ou reprise, avec les éléments nécessaires aux écrans de succès et aperçu. */
@@ -89,10 +104,9 @@ class SalesViewModel @Inject constructor(
     observeProducts: ObserveProductsUseCase,
     observeStock: ObserveProductStockUseCase,
     private val saveSale: SaveSaleUseCase,
-    private val reverseSaleStock: ReverseSaleStockUseCase,
     private val checkSaleStock: CheckSaleStockUseCase,
-    private val clientDao: ClientDao,
-    private val sequenceManager: SequenceManager,
+    private val createClient: CreateClientUseCase,
+    private val clientProfile: ClientProfileUseCase,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -101,9 +115,12 @@ class SalesViewModel @Inject constructor(
         data object EmptyCart : SaveResult
         data object InvalidAmount : SaveResult
         data object ReadOnly : SaveResult
+        data object ClientNonEligible : SaveResult
+        data object ValidationCreditRequise : SaveResult
+        data object CompteEncaissementRequis : SaveResult
+        data object ModuleStockInactif : SaveResult
         /** Stock insuffisant (contrôle UI ou transactionnel — spec §43/§44). */
         data class StockInsuffisant(val produitNom: String, val disponible: Double, val demande: Double) : SaveResult
-        data object Cancelled : SaveResult
         data object Error : SaveResult
     }
 
@@ -111,9 +128,15 @@ class SalesViewModel @Inject constructor(
     val uiState: StateFlow<SalesUiState> = _uiState
 
     val clients: Flow<List<ClientEntity>> = observeClients()
-    val taxRate: StateFlow<Double> = observeTaxes()
+    private val standardTaxRate: StateFlow<Double> = observeTaxes()
         .map { taxes -> taxes.firstOrNull { it.parDefaut }?.taux ?: taxes.firstOrNull()?.taux ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
+    /** Taux fiscal calculé à partir du profil client, sans modifier le référentiel fiscal global. */
+    val taxRate: StateFlow<Double> = combine(_uiState, standardTaxRate) { state, standard ->
+        state.selectedClient?.let { client ->
+            ClientTaxRules.effectiveRate(client.assujettiTva, client.exonereTva, client.tauxTva, standard)
+        } ?: standard
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
     val paymentMethods: StateFlow<List<String>> = observePaymentMethods()
         .map { methods -> methods.filter { it.actif }.map { it.nom } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -142,38 +165,96 @@ class SalesViewModel @Inject constructor(
     /** Anti double-soumission : sauvegarde et annulation en cours (spec §3 SAUVEGARDE). */
     private val _saving = MutableStateFlow(false)
     val saving: StateFlow<Boolean> = _saving
-    private val _cancelling = MutableStateFlow(false)
-    val cancelling: StateFlow<Boolean> = _cancelling
     private var nextLineId = 1L
 
     fun selectClient(client: ClientEntity) {
-        _uiState.value = _uiState.value.copy(selectedClient = client)
+        _uiState.value = _uiState.value.copy(
+            selectedClient = client,
+            discountManual = false,
+            discountInput = "0",
+        )
+        refreshClientPrices(client.id)
     }
 
-    /** Création rapide in-situ d'un client actif sans abandonner le panier en cours. */
+    /** Vente anonyme/comptoir : client temporaire, jamais inséré dans CLIENTS et sans crédit. */
+    fun selectCashClient(displayName: String) {
+        _uiState.value = _uiState.value.copy(
+            selectedClient = clientComptant(displayName),
+            discountManual = false,
+            discountInput = "0",
+        )
+        refreshClientPrices(clientId = 0L)
+    }
+
+    /** Réapplique les prix client sur le panier, ou le tarif catalogue sans client négocié. */
+    private fun refreshClientPrices(clientId: Long) {
+        viewModelScope.launch {
+            val negotiated = if (clientId > 0L) {
+                clientProfile.observePrices(clientId).first().associateBy { it.produitId }
+            } else emptyMap()
+            if (_uiState.value.selectedClient?.id != clientId) return@launch
+            val catalogPrices = products.value.associate { it.product.id to it.prixVente }
+            updateKeepingFullPayment { current ->
+                current.copy(lines = current.lines.map { line ->
+                    val productId = line.productId ?: return@map line
+                    val price = negotiated[productId]?.prix ?: catalogPrices[productId]
+                    if (price != null) line.copy(unitPrice = price) else line
+                })
+            }
+        }
+    }
+
+    private fun clientComptant(name: String) = ClientEntity(
+        id = 0L,
+        code = "COMPTOIR",
+        nom = name.trim().ifBlank { "Client comptant" },
+        telephone = "",
+        statut = ClientStatus.ACTIF,
+        active = true,
+        createdAt = 0L,
+    )
+
+    /** Création rapide via le cas d'usage maître ; doublon à confirmer dans Clients. */
     fun creerClientRapide(
         nom: String,
         telephone: String,
         email: String? = null,
         adresse: String? = null,
         onSuccess: (ClientEntity) -> Unit = {},
+        onFailure: (String) -> Unit = {},
     ) {
         viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val code = sequenceManager.next(DocType.CLIENT)
-            val nouveau = ClientEntity(
-                code = code,
-                nom = nom.trim(),
-                telephone = telephone.trim(),
-                email = email?.trim()?.ifBlank { null },
-                adresse = adresse?.trim()?.ifBlank { null },
-                statut = ClientStatus.ACTIF,
-                createdAt = now,
-            )
-            val id = clientDao.insert(nouveau)
-            val cree = nouveau.copy(id = id)
-            selectClient(cree)
-            onSuccess(cree)
+            try {
+                when (val result = createClient(
+                    nom = nom,
+                    telephone = telephone,
+                    email = email,
+                    adresse = adresse,
+                    doublonConfirme = false,
+                )) {
+                    is CreateClientUseCase.Result.Succes -> {
+                        val cree = ClientEntity(
+                            id = result.clientId,
+                            code = result.code,
+                            nom = nom.trim(),
+                            telephone = ClientValidation.normaliseTelephone(telephone),
+                            email = email?.trim()?.ifBlank { null },
+                            adresse = adresse?.trim()?.ifBlank { null },
+                            statut = ClientStatus.BROUILLON,
+                            active = false,
+                            createdAt = System.currentTimeMillis(),
+                        )
+                        selectClient(cree)
+                        onSuccess(cree)
+                    }
+                    CreateClientUseCase.Result.DoublonPotentiel -> onFailure("doublon")
+                    else -> onFailure("invalide")
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                onFailure("invalide")
+            }
         }
     }
 
@@ -181,12 +262,14 @@ class SalesViewModel @Inject constructor(
     fun loadDraft(record: OperationRecordEntity, availableClients: List<ClientEntity>): Boolean {
         if (record.status != OperationStatus.DRAFT.name) return false
         val payload = SaleRecordCodec.decode(record.notes) ?: return false
-        val client = availableClients.firstOrNull { it.id == payload.clientId } ?: return false
+        val client = if (payload.clientId == 0L) clientComptant(payload.clientName)
+        else availableClients.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = SalesUiState(
             selectedClient = client,
             lines = payload.lines,
             discountInput = payload.discount.toInputAmount(),
+            discountManual = true,
             deliveryInput = payload.delivery.toInputAmount(),
             paidInput = payload.paidAmount.toInputAmount(),
             note = payload.note.orEmpty(),
@@ -197,24 +280,33 @@ class SalesViewModel @Inject constructor(
 
     /** Produit du catalogue : ajout rattaché au produit (génère la sortie de stock). */
     fun addCatalogProduct(product: ProductWithStock) {
-        updateKeepingFullPayment { current ->
-            val existing = current.lines.firstOrNull { it.productId == product.product.id }
-            if (existing != null) {
-                current.copy(
-                    lines = current.lines.map {
-                        if (it.id == existing.id) it.copy(quantity = it.quantity + 1.0) else it
-                    },
-                )
-            } else {
-                current.copy(
-                    lines = current.lines + SaleLine(
-                        id = nextLineId++,
-                        name = product.nom,
-                        unitPrice = product.prixVente ?: 0.0,
-                        quantity = 1.0,
-                        productId = product.product.id,
-                    ),
-                )
+        viewModelScope.launch {
+            val clientId = _uiState.value.selectedClient?.id ?: 0L
+            val negotiatedPrice = if (clientId > 0L) {
+                clientProfile.observePrices(clientId).first()
+                    .firstOrNull { it.produitId == product.product.id }?.prix
+            } else null
+            if ((_uiState.value.selectedClient?.id ?: 0L) != clientId) return@launch
+            updateKeepingFullPayment { current ->
+                val existing = current.lines.firstOrNull { it.productId == product.product.id }
+                if (existing != null) {
+                    current.copy(
+                        lines = current.lines.map {
+                            if (it.id == existing.id) it.copy(quantity = it.quantity + 1.0) else it
+                        },
+                    )
+                } else {
+                    current.copy(
+                        lines = current.lines + SaleLine(
+                            id = nextLineId++,
+                            name = product.nom,
+                            unitPrice = negotiatedPrice ?: product.prixVente ?: 0.0,
+                            quantity = 1.0,
+                            productId = product.product.id,
+                            stockTracked = product.product.stockable && ProduitRules.estStockable(product.product.type),
+                        ),
+                    )
+                }
             }
         }
     }
@@ -276,6 +368,7 @@ class SalesViewModel @Inject constructor(
             lines = emptyList(),
             note = "",
             discountInput = "0",
+            discountManual = false,
             deliveryInput = "0",
             paidInput = "",
             editingRecordId = null,
@@ -283,7 +376,7 @@ class SalesViewModel @Inject constructor(
     }
 
     fun updateDiscount(value: String) {
-        updateKeepingFullPayment { it.copy(discountInput = value.filterMoneyInput()) }
+        updateKeepingFullPayment { it.copy(discountInput = value.filterMoneyInput(), discountManual = true) }
     }
 
     fun updateDelivery(value: String) {
@@ -297,13 +390,13 @@ class SalesViewModel @Inject constructor(
     /** Garde le paiement au total lorsque l'utilisateur n'a pas choisi un paiement partiel. */
     private fun updateKeepingFullPayment(transform: (SalesUiState) -> SalesUiState) {
         val current = _uiState.value
-        val totalBefore = current.totals(taxRate = 0.0).total
+        val totalBefore = current.totals(taxRate = taxRate.value).total
         val paidBefore = current.paidInput.toMoneyOrNull()
         val paymentWasFull = current.paidInput.isBlank() ||
             (paidBefore != null && abs(paidBefore - totalBefore) < 0.001)
         val updated = transform(current)
         _uiState.value = if (paymentWasFull) {
-            updated.copy(paidInput = updated.totals(taxRate = 0.0).total.toInputAmount())
+            updated.copy(paidInput = updated.totals(taxRate = taxRate.value).total.toInputAmount())
         } else {
             updated
         }
@@ -329,7 +422,20 @@ class SalesViewModel @Inject constructor(
             _saveResult.value = SaveResult.EmptyCart
             return
         }
-        val totals = sale.totals(taxRate.value)
+        val effectiveTaxRate = ClientTaxRules.effectiveRate(
+            assujetti = client.assujettiTva,
+            exonere = client.exonereTva,
+            tauxSpecifique = client.tauxTva,
+            tauxStandard = standardTaxRate.value,
+        )
+        val totals = sale.totals(effectiveTaxRate)
+        val maxDiscountPct = client.remiseMaxPct
+        if (sale.discountManual && maxDiscountPct != null &&
+            totals.discount > totals.subtotal * maxDiscountPct.coerceIn(0.0, 100.0) / 100.0 + 0.001
+        ) {
+            _saveResult.value = SaveResult.InvalidAmount
+            return
+        }
         val paidAmount = sale.paidInput.toMoneyOrNull() ?: totals.total
         if (paidAmount < 0.0 || paidAmount > totals.total || paymentMethod.isBlank()) {
             _saveResult.value = SaveResult.InvalidAmount
@@ -346,7 +452,7 @@ class SalesViewModel @Inject constructor(
                     subtotal = totals.subtotal,
                     discount = totals.discount,
                     delivery = totals.delivery,
-                    taxRate = taxRate.value,
+                    taxRate = effectiveTaxRate,
                     taxAmount = totals.taxAmount,
                     total = totals.total,
                     paymentMethod = paymentMethod,
@@ -379,6 +485,10 @@ class SalesViewModel @Inject constructor(
                     SaveSaleUseCase.Result.LectureSeule -> _saveResult.value = SaveResult.ReadOnly
                     SaveSaleUseCase.Result.DonneesInvalides -> _saveResult.value = SaveResult.InvalidAmount
                     SaveSaleUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
+                    SaveSaleUseCase.Result.ClientNonEligible -> _saveResult.value = SaveResult.ClientNonEligible
+                    SaveSaleUseCase.Result.ValidationCreditRequise -> _saveResult.value = SaveResult.ValidationCreditRequise
+                    SaveSaleUseCase.Result.CompteEncaissementRequis -> _saveResult.value = SaveResult.CompteEncaissementRequis
+                    SaveSaleUseCase.Result.ModuleStockInactif -> _saveResult.value = SaveResult.ModuleStockInactif
                     is SaveSaleUseCase.Result.StockInsuffisant -> _saveResult.value = SaveResult.StockInsuffisant(
                         result.produitNom,
                         result.disponible,
@@ -397,40 +507,19 @@ class SalesViewModel @Inject constructor(
 
     /** Prépare une nouvelle vente à partir d'une facture existante sans réutiliser sa référence. */
     fun duplicate(payload: SaleRecordPayload, availableClients: List<ClientEntity>): Boolean {
-        val client = availableClients.firstOrNull { it.id == payload.clientId } ?: return false
+        val client = if (payload.clientId == 0L) clientComptant(payload.clientName)
+        else availableClients.firstOrNull { it.id == payload.clientId } ?: return false
         nextLineId = (payload.lines.maxOfOrNull { it.id } ?: 0L) + 1L
         _uiState.value = SalesUiState(
             selectedClient = client,
             lines = payload.lines.map { it.copy(id = nextLineId++) },
             discountInput = payload.discount.toInputAmount(),
+            discountManual = true,
             deliveryInput = payload.delivery.toInputAmount(),
             paidInput = payload.paidAmount.toInputAmount(),
             note = payload.note.orEmpty(),
         )
         return true
-    }
-
-    /**
-     * Annulation d'une vente validée — **compensation** (C7) : statut ANNULÉ et
-     * recomposition du stock par des mouvements d'entrée.
-     */
-    fun cancelSale(id: Long) {
-        if (_cancelling.value) return
-        viewModelScope.launch {
-            _cancelling.value = true
-            try {
-                when (reverseSaleStock(id)) {
-                    is ReverseSaleStockUseCase.Result.Succes -> _saveResult.value = SaveResult.Cancelled
-                    else -> _saveResult.value = SaveResult.Error
-                }
-            } catch (exception: CancellationException) {
-                throw exception
-            } catch (_: Exception) {
-                _saveResult.value = SaveResult.Error
-            } finally {
-                _cancelling.value = false
-            }
-        }
     }
 
     fun clearSaveResult() {

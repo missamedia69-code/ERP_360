@@ -207,13 +207,11 @@ private fun LockBrandHeader() {
             .fillMaxWidth()
             .clip(forme)
             .background(MissaSurface)
-            .border(1.dp, MissaBorder.copy(alpha = 0.65f), forme)
             .padding(horizontal = 14.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Le logo porte déjà son propre cadre carré arrondi : pas de second
-        // médaillon autour, pour garder une seule bordure nette.
+        // Le logo est présenté sans cadre ni médaillon supplémentaire.
         MissaBrandMark(size = 52.dp)
         Spacer(Modifier.width(12.dp))
         Text(

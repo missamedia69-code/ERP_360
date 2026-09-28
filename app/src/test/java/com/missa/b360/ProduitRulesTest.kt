@@ -82,6 +82,12 @@ class ProduitRulesTest {
     }
 
     @Test
+    fun `le catalogue de vente respecte aussi le drapeau vendable de la fiche`() {
+        val article = article(ProductType.ACHATE_REVENDU).copy(vendable = false)
+        assertTrue(ProduitRules.vendables(listOf(article)).isEmpty())
+    }
+
+    @Test
     fun `le catalogue d achat ecarte ce qui se fabrique`() {
         val catalogue = listOf(
             article(ProductType.ACHATE_REVENDU),

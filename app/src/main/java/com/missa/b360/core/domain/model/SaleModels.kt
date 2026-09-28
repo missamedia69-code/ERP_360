@@ -16,6 +16,8 @@ data class SaleLine(
      * Seules les lignes rattachées génèrent des mouvements de stock à la validation.
      */
     val productId: Long? = null,
+    /** Faux pour un service ou un article explicitement non stockable. */
+    val stockTracked: Boolean = true,
 ) {
     val total: Double get() = unitPrice * quantity
 }
@@ -28,10 +30,25 @@ data class SaleLine(
 object SaleStockEffects {
     fun besoinsParProduit(lines: List<SaleLine>): Map<Long, Double> =
         lines
-            .filter { it.productId != null && it.quantity > 0.0 }
+            .filter { it.productId != null && it.stockTracked && it.quantity > 0.0 }
             .groupBy { it.productId }
             .mapNotNull { (k, v) -> k?.let { it to v.sumOf { it.quantity } } }
             .toMap()
+}
+
+/** Validations pures réutilisées par la saisie et la persistance transactionnelle. */
+object SaleValidation {
+    fun lignesValides(lines: List<SaleLine>): Boolean = lines.isNotEmpty() && lines.all { line ->
+        line.name.isNotBlank() && line.name.length <= 120 &&
+            line.quantity.isFinite() && line.quantity > 0.0 &&
+            line.unitPrice.isFinite() && line.unitPrice >= 0.0 && line.total.isFinite() &&
+            (line.productId == null || line.productId > 0L)
+    }
+
+    /** Sans fiche client, une vente comptoir ne peut jamais créer d'encours. */
+    fun venteComptantSansClientAutorisee(clientId: Long, total: Double, encaisse: Double): Boolean =
+        clientId == 0L && total.isFinite() && total > 0.0 && encaisse.isFinite() &&
+            encaisse >= total - 1e-9
 }
 
 /** Montants calculés localement pour le panier de vente. Les prix sont considérés TTC. */

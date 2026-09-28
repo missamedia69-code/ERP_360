@@ -169,7 +169,7 @@ class AchatChaineTest {
         val commande = CommandeAchatPayload(
             supplierId = 3,
             supplierName = "Missa SARL",
-            lines = listOf(CommandeAchatLigne(id = 1, name = "Ciment", quantity = 50.0, unitPrice = 5_000.0, productId = 7)),
+            lines = listOf(CommandeAchatLigne(id = 1, name = "Ciment", quantity = 50.0, unitPrice = 5_000.0, productId = 7, siteId = 2)),
             note = "Livraison lundi",
         )
         assertEquals(commande, CommandeAchatCodec.decode(CommandeAchatCodec.encode(commande)))
@@ -179,9 +179,29 @@ class AchatChaineTest {
             commandeReference = "B2026-0001",
             supplierId = 3,
             supplierName = "Missa SARL",
-            lignes = listOf(reception(7L, 48.0, commandee = 50.0).copy(lot = "LOT-9", datePeremption = 1_900_000_000_000L)),
+            lignes = listOf(
+                reception(7L, 48.0, commandee = 50.0).copy(
+                    lot = "LOT-9",
+                    datePeremption = 1_900_000_000_000L,
+                    siteId = 2L,
+                    prixReel = 4_900.0,
+                ),
+            ),
         )
         assertEquals(reception, ReceptionCodec.decode(ReceptionCodec.encode(reception)))
+    }
+
+    @Test
+    fun `les anciennes lignes commande et reception gardent leurs valeurs par defaut`() {
+        val ancienneCommande = """{"supplierId":1,"supplierName":"S","lines":[{"id":1,"name":"A","quantity":2.0,"unitPrice":3.0}]}"""
+        val commande = CommandeAchatCodec.decode(ancienneCommande)!!
+        assertNull(commande.lines.single().productId)
+        assertNull(commande.lines.single().siteId)
+
+        val ancienneReception = """{"supplierId":1,"supplierName":"S","lignes":[{"productId":7,"name":"A","quantiteRecue":2.0}]}"""
+        val reception = ReceptionCodec.decode(ancienneReception)!!
+        assertNull(reception.lignes.single().siteId)
+        assertNull(reception.lignes.single().prixReel)
     }
 
     @Test

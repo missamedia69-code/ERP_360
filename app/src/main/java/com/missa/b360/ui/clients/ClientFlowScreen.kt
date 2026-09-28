@@ -89,7 +89,12 @@ import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
+import com.missa.b360.core.data.entity.PriceClientEntity
+import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.SiteEntity
+import com.missa.b360.core.domain.model.ClientLedgerItem
+import com.missa.b360.core.domain.model.ClientLedgerMetrics
+import com.missa.b360.core.domain.model.ClientMetricsRules
 import com.missa.b360.core.domain.model.MentionsLegales
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.usecase.ClientProfileInput
@@ -132,21 +137,30 @@ private data class ClientDraft(
     val phoneLocal: String = "",
     val email: String = "",
     val nif: String = "",
+    val fiscalIdType: String = "NIF",
+    val numeroTva: String = "",
+    val assujettiTva: Boolean = true,
+    val exonereTva: Boolean = false,
+    val motifExoneration: String = "",
+    val tauxTva: String = "",
     val categoryId: Long? = null,
     val siteId: Long? = null,
     val commercial: String = "",
     val paymentDays: String = "30",
     val discount: String = "0",
     val creditLimit: String = "",
+    val paymentDescription: String = "",
+    val tariffGrid: String = "",
+    val maxDiscount: String = "",
+    val segment: String = "",
+    val salesChannel: String = "",
+    val territory: String = "",
+    val accountCode: String = "",
     val badgeId: Long? = null,
     val notes: String = "",
 )
 
-private data class ClientSalesMetrics(
-    val salesTotal: Double = 0.0,
-    val outstanding: Double = 0.0,
-    val invoices: Int = 0,
-)
+private typealias ClientSalesMetrics = ClientLedgerMetrics
 
 /**
  * Parcours client relié à Room : liste, fiche, création en trois étapes, édition,
@@ -191,15 +205,18 @@ fun ClientsScreen(
     val selectedClient = clients.firstOrNull { it.id == selectedClientId }
     val contactsFlow = remember(selectedClientId) { viewModel.contacts(selectedClientId) }
     val addressesFlow = remember(selectedClientId) { viewModel.addresses(selectedClientId) }
+    val pricesFlow = remember(selectedClientId) { viewModel.negotiatedPrices(selectedClientId) }
+    val productCatalog by viewModel.productCatalog.collectAsState()
     val detailContacts by contactsFlow.collectAsState(initial = emptyList())
     val detailAddresses by addressesFlow.collectAsState(initial = emptyList())
+    val negotiatedPrices by pricesFlow.collectAsState(initial = emptyList())
     val draftContacts = remember { mutableStateListOf<ClientContactEntity>() }
     val draftAddresses = remember { mutableStateListOf<ClientAddressEntity>() }
     var draft by remember { mutableStateOf(ClientDraft(countryCode = defaultCountry)) }
     var activeFilter by rememberSaveable { mutableStateOf("ALL") }
     val currentView = runCatching { ClientView.valueOf(currentViewName) }.getOrDefault(ClientView.LIST)
     val detailTab = runCatching { ClientDetailTab.valueOf(detailTabName) }.getOrDefault(ClientDetailTab.INFO)
-    val metrics = remember(sales) { saleMetricsByClient(sales) }
+    val metrics = remember(sales, clients) { saleMetricsByClient(sales, clients, System.currentTimeMillis()) }
 
     fun startNewClient() {
         selectedClientId = null
@@ -228,12 +245,27 @@ fun ClientsScreen(
         val discount = draft.discount.decimalValue() ?: -1.0
         val limit = draft.creditLimit.trim().takeIf { it.isNotEmpty() }?.decimalValue()
         val terms = draft.paymentDays.toIntOrNull() ?: -1
+        val maxDiscount = draft.maxDiscount.trim().takeIf { it.isNotEmpty() }?.decimalValue()
+        val clientTaxRate = draft.tauxTva.trim().takeIf { it.isNotEmpty() }?.decimalValue()
         val mainAddress = draftAddresses.firstOrNull { it.principale }
             ?: draftAddresses.firstOrNull()
         val profile = ClientProfileInput(
             nif = draft.nif,
+            typeIdentifiantFiscal = draft.fiscalIdType,
+            numeroTva = draft.numeroTva,
+            assujettiTva = draft.assujettiTva,
+            exonereTva = draft.exonereTva,
+            motifExoneration = draft.motifExoneration,
+            tauxTva = clientTaxRate,
             commercial = draft.commercial,
             conditionPaiementJours = terms,
+            conditionsPaiement = draft.paymentDescription,
+            grilleTarifaire = draft.tariffGrid,
+            remiseMaxPct = maxDiscount,
+            segment = draft.segment,
+            canalVente = draft.salesChannel,
+            territoire = draft.territory,
+            compteComptable = draft.accountCode,
             contacts = draftContacts.toList().withOnePrimaryContact(),
             addresses = draftAddresses.toList().withOnePrimaryAddress(),
             replaceRelations = replaceRelations,
@@ -295,10 +327,13 @@ fun ClientsScreen(
                 viewModel.acquitterResultat()
             }
             outcome.code != null -> {
-                snackbar.showSnackbar(
-                    if (outcome.code == "edit") context.getString(R.string.clients_client_modifie)
-                    else context.getString(R.string.clients_client_cree, outcome.code),
-                )
+                val message = when (outcome.code) {
+                    "edit" -> context.getString(R.string.clients_client_modifie)
+                    "activate" -> context.getString(R.string.clients_flow_activation_success)
+                    "price" -> context.getString(R.string.clients_flow_price_saved)
+                    else -> context.getString(R.string.clients_client_cree, outcome.code)
+                }
+                snackbar.showSnackbar(message)
                 if (outcome.clientId != null) {
                     selectedClientId = outcome.clientId
                     currentViewName = ClientView.DETAIL.name
@@ -312,11 +347,15 @@ fun ClientsScreen(
             else -> {
                 val message = when (outcome.erreur) {
                     "licence" -> R.string.clients_lecture_seule
+                    "permission" -> R.string.clients_flow_permission_denied
+                    "price" -> R.string.clients_flow_price_error
                     "nom" -> R.string.clients_nom_obligatoire
                     "nom_invalide" -> R.string.clients_nom_invalide
                     "telephone" -> R.string.clients_telephone_obligatoire
                     "telephone_invalide" -> R.string.clients_telephone_invalide
                     "email_invalide" -> R.string.clients_email_invalide
+                    "activation_contact" -> R.string.clients_flow_activation_contact
+                    "activation_fiscal" -> R.string.clients_flow_activation_fiscal
                     "import" -> R.string.clients_flow_import_error
                     else -> R.string.clients_erreur_sauvegarde
                 }
@@ -362,6 +401,10 @@ fun ClientsScreen(
                     client = client,
                     contacts = detailContacts,
                     addresses = detailAddresses.ifEmpty { client.fallbackAddress() },
+                    negotiatedPrices = negotiatedPrices,
+                    products = productCatalog,
+                    onSetPrice = { productId, price -> viewModel.setNegotiatedPrice(client.id, productId, price) },
+                    onRemovePrice = { productId -> viewModel.removeNegotiatedPrice(client.id, productId) },
                     category = categories.firstOrNull { it.id == client.categorieId },
                     badge = badges.firstOrNull { it.id == client.badgeId },
                     metrics = metrics[client.id] ?: ClientSalesMetrics(),
@@ -375,6 +418,7 @@ fun ClientsScreen(
                     onHistory = { currentViewName = ClientView.HISTORY.name },
                     onAccount = { currentViewName = ClientView.ACCOUNT.name },
                     onDeactivate = { currentViewName = ClientView.DEACTIVATE.name },
+                    onActivate = { viewModel.activer(client.id) },
                 )
             }
             ClientView.FORM_INFO -> ClientInfoFormScreen(
@@ -476,6 +520,7 @@ fun ClientsScreen(
         val message = when (categoryError) {
             "utilisee" -> R.string.clients_categorie_utilisee
             "licence" -> R.string.clients_lecture_seule
+            "permission" -> R.string.clients_flow_permission_denied
             else -> R.string.clients_erreur_sauvegarde
         }
         LaunchedEffect(categoryError) {
@@ -502,18 +547,39 @@ private fun ClientListScreen(
     onRappel: (ClientEntity) -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
-    val visible = clients.filter { client ->
-        val matchesQuery = query.isBlank() || client.nom.contains(query, true) || client.code.contains(query, true) || client.telephone.contains(query)
+    val filtered = clients.filter { client ->
+        val matchesQuery = query.isBlank() || client.nom.contains(query, true) || client.code.contains(query, true) ||
+            client.telephone.contains(query, true) || client.nif.orEmpty().contains(query, true) || client.email.orEmpty().contains(query, true)
+        val clientMetrics = metrics[client.id] ?: ClientSalesMetrics()
         val matchesStatus = when (activeFilter) {
             "ACTIVE" -> client.isActive()
             "INACTIVE" -> !client.isActive()
-            "DUE" -> (metrics[client.id]?.outstanding ?: 0.0) > 0.0
+            "DUE" -> clientMetrics.outstanding > 0.0
+            "MAJOR" -> clientMetrics.salesTotal > 0.0
+            "RECENT" -> clientMetrics.lastSaleAt != null
+            "OVERDUE" -> clientMetrics.overdueAmount > 0.0
+            "DUE_SOON" -> clientMetrics.dueSoonCount > 0
+            "CREDIT" -> client.limiteCredit?.let { clientMetrics.outstanding > it + 1e-9 } == true
+            "INCOMPLETE" -> client.isIncomplete()
             else -> true
         }
         matchesQuery && matchesStatus
     }
+    val visible = when (activeFilter) {
+        "MAJOR" -> filtered.sortedByDescending { metrics[it.id]?.salesTotal ?: 0.0 }
+        "RECENT" -> filtered.sortedByDescending { metrics[it.id]?.lastSaleAt ?: Long.MIN_VALUE }
+        "OVERDUE" -> filtered.sortedByDescending { metrics[it.id]?.overdueAmount ?: 0.0 }
+        "CREDIT" -> filtered.sortedByDescending { metrics[it.id]?.outstanding ?: 0.0 }
+        else -> filtered.sortedByDescending { it.createdAt }
+    }
     val activeCount = clients.count { it.isActive() }
     val dueTotal = metrics.values.sumOf { it.outstanding }
+    val overdueTotal = metrics.values.sumOf { it.overdueAmount }
+    val dueSoonCount = metrics.values.sumOf { it.dueSoonCount }
+    val creditExceededCount = clients.count { client ->
+        client.limiteCredit?.let { (metrics[client.id]?.outstanding ?: 0.0) > it + 1e-9 } == true
+    }
+    val incompleteCount = clients.count { it.isIncomplete() }
     Scaffold(
         containerColor = ClientBackground,
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
@@ -545,6 +611,27 @@ private fun ClientListScreen(
                 ClientStats(clients.size, activeCount, dueTotal, devise)
             }
             item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    item { FilterChip(selected = activeFilter == "DUE", onClick = { onFilterChange("DUE") }, label = { Text(stringResource(R.string.clients_flow_receivables), fontSize = 10.sp) }) }
+                    item { FilterChip(selected = activeFilter == "MAJOR", onClick = { onFilterChange("MAJOR") }, label = { Text(stringResource(R.string.clients_flow_major_clients), fontSize = 10.sp) }) }
+                    item { FilterChip(selected = activeFilter == "RECENT", onClick = { onFilterChange("RECENT") }, label = { Text(stringResource(R.string.clients_flow_history), fontSize = 10.sp) }) }
+                }
+            }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(stringResource(R.string.clients_flow_to_process), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (creditExceededCount > 0) item { FilterChip(selected = activeFilter == "CREDIT", onClick = { onFilterChange("CREDIT") }, label = { Text(stringResource(R.string.clients_flow_credit_exceeded, creditExceededCount), fontSize = 9.sp) }) }
+                        if (dueSoonCount > 0) item { FilterChip(selected = activeFilter == "DUE_SOON", onClick = { onFilterChange("DUE_SOON") }, label = { Text(stringResource(R.string.clients_flow_due_soon, dueSoonCount), fontSize = 9.sp) }) }
+                        if (overdueTotal > 0.0) item { FilterChip(selected = activeFilter == "OVERDUE", onClick = { onFilterChange("OVERDUE") }, label = { Text(stringResource(R.string.clients_flow_overdue, clientMoney(overdueTotal, devise)), fontSize = 9.sp) }) }
+                        if (incompleteCount > 0) item { FilterChip(selected = activeFilter == "INCOMPLETE", onClick = { onFilterChange("INCOMPLETE") }, label = { Text(stringResource(R.string.clients_flow_incomplete, incompleteCount), fontSize = 9.sp) }) }
+                        if (creditExceededCount + dueSoonCount == 0 && overdueTotal <= 0.0 && incompleteCount == 0) {
+                            item { Text(stringResource(R.string.clients_flow_nothing_to_process), color = ClientMuted, fontSize = 9.sp, modifier = Modifier.padding(vertical = 9.dp)) }
+                        }
+                    }
+                }
+            }
+            item {
                 OutlinedTextField(
                     value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(), singleLine = true,
                     leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_recherche), fontSize = 12.sp) },
@@ -566,6 +653,7 @@ private fun ClientListScreen(
                         client = client,
                         category = categories.firstOrNull { it.id == client.categorieId },
                         outstanding = metrics[client.id]?.outstanding ?: 0.0,
+                        overdue = metrics[client.id]?.overdueAmount ?: 0.0,
                         devise = devise,
                         onOpen = { onOpen(client) },
                         onRappel = { onRappel(client) },
@@ -608,7 +696,7 @@ private fun ClientEmptyList(onNew: () -> Unit) {
 }
 
 @Composable
-private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?, outstanding: Double, devise: String, onOpen: () -> Unit, onRappel: () -> Unit) {
+private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?, outstanding: Double, overdue: Double, devise: String, onOpen: () -> Unit, onRappel: () -> Unit) {
     Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen), shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
         Row(Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
             ClientAvatar(client.nom, Modifier.size(34.dp))
@@ -618,7 +706,7 @@ private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?,
                 Text("${client.code} · ${client.telephone}", color = ClientMuted, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 category?.let { Text(it.nom, color = ClientBlue, fontSize = 9.sp) }
             }
-            if (outstanding > 0) {
+            if (overdue > 0) {
                 IconButton(onClick = onRappel, modifier = Modifier.size(30.dp)) {
                     Icon(painterResource(Iv.Notifications), contentDescription = stringResource(R.string.rappel_bell_cd), tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
@@ -640,13 +728,29 @@ private fun ClientAvatar(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun ClientStatusChip(client: ClientEntity) {
-    val active = client.isActive()
+    val label = when (client.statut) {
+        ClientStatus.BROUILLON -> R.string.clients_status_draft
+        ClientStatus.A_COMPLETER -> R.string.clients_status_complete
+        ClientStatus.ACTIF -> R.string.clients_actif
+        ClientStatus.SOUS_SURVEILLANCE -> R.string.clients_status_watch
+        ClientStatus.BLOQUE_CREDIT -> R.string.clients_status_credit_block
+        ClientStatus.BLOQUE_ADMINISTRATIF -> R.string.clients_status_admin_block
+        ClientStatus.INACTIF, ClientStatus.DESACTIVE -> R.string.clients_inactif
+        ClientStatus.ARCHIVE -> R.string.clients_status_archived
+    }
+    val tint = when (client.statut) {
+        ClientStatus.ACTIF -> ClientGreen
+        ClientStatus.BROUILLON, ClientStatus.A_COMPLETER -> ClientBlue
+        ClientStatus.SOUS_SURVEILLANCE -> Color(0xFFD97706)
+        ClientStatus.BLOQUE_CREDIT, ClientStatus.BLOQUE_ADMINISTRATIF, ClientStatus.INACTIF, ClientStatus.DESACTIVE -> ClientRed
+        ClientStatus.ARCHIVE -> ClientMuted
+    }
     AssistChip(
         onClick = {}, enabled = false,
-        label = { Text(stringResource(if (active) R.string.clients_actif else R.string.clients_inactif), fontSize = 8.sp) },
+        label = { Text(stringResource(label), fontSize = 8.sp) },
         colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
-            disabledContainerColor = (if (active) ClientGreen else ClientRed).copy(alpha = .10f),
-            disabledLabelColor = if (active) ClientGreen else ClientRed,
+            disabledContainerColor = tint.copy(alpha = .10f),
+            disabledLabelColor = tint,
         ),
         border = null,
     )
@@ -658,6 +762,10 @@ private fun ClientDetailScreen(
     client: ClientEntity,
     contacts: List<ClientContactEntity>,
     addresses: List<ClientAddressEntity>,
+    negotiatedPrices: List<PriceClientEntity>,
+    products: List<ProductEntity>,
+    onSetPrice: (Long, Double) -> Unit,
+    onRemovePrice: (Long) -> Unit,
     category: CategoryClientEntity?,
     badge: BadgeLoyaltyEntity?,
     metrics: ClientSalesMetrics,
@@ -671,6 +779,7 @@ private fun ClientDetailScreen(
     onHistory: () -> Unit,
     onAccount: () -> Unit,
     onDeactivate: () -> Unit,
+    onActivate: () -> Unit,
 ) {
     Scaffold(
         containerColor = ClientBackground,
@@ -681,6 +790,9 @@ private fun ClientDetailScreen(
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
                 actions = {
+                    if (client.statut in setOf(ClientStatus.BROUILLON, ClientStatus.A_COMPLETER, ClientStatus.INACTIF, ClientStatus.DESACTIVE)) {
+                        TextButton(onClick = onActivate) { Text(stringResource(R.string.clients_flow_activate), fontSize = 11.sp, color = ClientBlue) }
+                    }
                     TextButton(onClick = onEdit) { Text(stringResource(R.string.clients_flow_edit), fontSize = 11.sp) }
                     IconButton(onClick = onDeactivate) { Icon(painterResource(Iv.MoreVert), stringResource(R.string.clients_desactiver), tint = MissaInk) }
                 },
@@ -707,7 +819,10 @@ private fun ClientDetailScreen(
             }
             item { ClientTabRow(tab, contacts.size, addresses.size, onTabChange) }
             when (tab) {
-                ClientDetailTab.INFO -> item { ClientDetailAttributes(client, category, badge, devise) }
+                ClientDetailTab.INFO -> {
+                    item { ClientDetailAttributes(client, category, badge, devise) }
+                    item { ClientPricesSection(prices = negotiatedPrices, products = products, devise = devise, onSave = onSetPrice, onDelete = onRemovePrice) }
+                }
                 ClientDetailTab.CONTACTS -> item { ClientContactsSection(contacts, onManageContacts) }
                 ClientDetailTab.ADDRESSES -> item { ClientAddressesSection(addresses, onManageAddresses) }
                 ClientDetailTab.NOTES -> item { ClientNotesSection(client.notes, onEdit) }
@@ -776,9 +891,21 @@ private fun ClientDetailAttributes(client: ClientEntity, category: CategoryClien
         Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ClientKeyValue(R.string.clients_type, stringResource(client.type.labelRes()))
             ClientKeyValue(R.string.clients_categories, category?.nom ?: "—")
+            ClientKeyValue(R.string.clients_flow_fiscal_id_type, client.typeIdentifiantFiscal ?: "—")
+            ClientKeyValue(R.string.clients_flow_vat_number, client.numeroTva ?: "—")
+            ClientKeyValue(R.string.clients_flow_vat_subject, stringResource(if (client.assujettiTva) R.string.clients_flow_vat_yes else R.string.clients_flow_vat_no))
+            if (client.exonereTva) ClientKeyValue(R.string.clients_flow_tax_exemption_reason, client.motifExoneration ?: "—")
+            client.tauxTva?.let { ClientKeyValue(R.string.clients_flow_specific_vat_rate, "${it.decimalText()} %") }
             ClientKeyValue(R.string.clients_flow_payment_terms, stringResource(R.string.clients_flow_days_value, client.conditionPaiementJours))
+            client.conditionsPaiement?.let { ClientKeyValue(R.string.clients_flow_payment_description, it) }
             ClientKeyValue(R.string.clients_limite_credit, client.limiteCredit?.let { clientMoney(it, devise) } ?: stringResource(R.string.clients_flow_unlimited))
             ClientKeyValue(R.string.clients_remise, "${client.remiseDefautPct.decimalText()} %")
+            client.remiseMaxPct?.let { ClientKeyValue(R.string.clients_flow_max_discount, "${it.decimalText()} %") }
+            client.grilleTarifaire?.let { ClientKeyValue(R.string.clients_flow_tariff_grid, it) }
+            client.segment?.let { ClientKeyValue(R.string.clients_flow_segment, it) }
+            client.canalVente?.let { ClientKeyValue(R.string.clients_flow_sales_channel, it) }
+            client.territoire?.let { ClientKeyValue(R.string.clients_flow_territory, it) }
+            client.compteComptable?.let { ClientKeyValue(R.string.clients_flow_account_code, it) }
             ClientKeyValue(R.string.clients_badges, badge?.nom ?: "—")
             ClientKeyValue(R.string.clients_devise, devise.ifBlank { "—" })
         }
@@ -859,8 +986,11 @@ private fun ClientInfoFormScreen(
     saveMode: Boolean = false,
 ) {
     val fullPhone = ClientValidation.telephoneAvecIndicatif(draft.phoneLocal, Iso4217.indicatifTelephone(draft.countryCode))
-    val valid = draft.countryCode != null && ClientValidation.nomEstValide(draft.name) &&
-        ClientValidation.telephoneEstValide(fullPhone) && ClientValidation.emailEstValide(draft.email)
+    val phoneProvided = draft.phoneLocal.isNotBlank()
+    val validContact = (phoneProvided && draft.countryCode != null && ClientValidation.telephoneEstValide(fullPhone)) ||
+        (draft.email.isNotBlank() && ClientValidation.emailEstValide(draft.email))
+    val valid = ClientValidation.nomEstValide(draft.name) && validContact &&
+        ClientValidation.emailEstValide(draft.email)
     ClientWizardScaffold(
         title = title,
         step = if (saveMode) null else 0,
@@ -879,9 +1009,19 @@ private fun ClientInfoFormScreen(
                 OutlinedTextField(value = draft.name, onValueChange = { onDraftChange(draft.copy(name = it.take(ClientValidation.LONGUEUR_NOM_MAX))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_company_name)) }, isError = draft.name.isNotEmpty() && !ClientValidation.nomEstValide(draft.name), singleLine = true)
             }
             item { ClientReadOnlyLine(R.string.clients_flow_client_code, stringResource(R.string.clients_flow_generated_on_save)) }
+            item { ClientStringPicker(R.string.clients_flow_fiscal_id_type, listOf("NIF" to "NIF", "NIU" to "NIU", "NINEA" to "NINEA", "TVA" to "TVA", "AUTRE" to stringResource(R.string.clients_type_autre)), draft.fiscalIdType) { onDraftChange(draft.copy(fiscalIdType = it)) } }
             item {
                 OutlinedTextField(value = draft.nif, onValueChange = { onDraftChange(draft.copy(nif = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_nif)) }, singleLine = true)
             }
+            item { OutlinedTextField(value = draft.numeroTva, onValueChange = { onDraftChange(draft.copy(numeroTva = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_vat_number)) }, singleLine = true) }
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    item { FilterChip(selected = draft.assujettiTva, onClick = { onDraftChange(draft.copy(assujettiTva = !draft.assujettiTva)) }, label = { Text(stringResource(R.string.clients_flow_vat_subject), fontSize = 10.sp) }) }
+                    item { FilterChip(selected = draft.exonereTva, onClick = { onDraftChange(draft.copy(exonereTva = !draft.exonereTva)) }, label = { Text(stringResource(R.string.clients_flow_vat_exempt), fontSize = 10.sp) }) }
+                }
+            }
+            if (draft.exonereTva) item { OutlinedTextField(value = draft.motifExoneration, onValueChange = { onDraftChange(draft.copy(motifExoneration = it.take(240))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_tax_exemption_reason)) }, singleLine = true) }
+            item { OutlinedTextField(value = draft.tauxTva, onValueChange = { onDraftChange(draft.copy(tauxTva = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_specific_vat_rate)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true) }
             item {
                 ClientPhoneField(
                     countryCode = draft.countryCode ?: countryDefault,
@@ -912,7 +1052,7 @@ private fun ClientTypeChoice(selected: ClientType, onSelect: (ClientType) -> Uni
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, selectedId: Long?, onSelect: (Long?) -> Unit, emptyLabel: String) {
+internal fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, selectedId: Long?, onSelect: (Long?) -> Unit, emptyLabel: String) {
     var expanded by remember { mutableStateOf(false) }
     val selected = choices.firstOrNull { it.first == selectedId }?.second.orEmpty()
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }, modifier = Modifier.fillMaxWidth()) {
@@ -935,7 +1075,7 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
     var pickerVisible by remember { mutableStateOf(false) }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         OutlinedButton(onClick = { pickerVisible = true }, modifier = Modifier.width(110.dp).height(56.dp)) { Text(selected?.indicatif ?: "…", fontSize = 13.sp); Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(16.dp)) }
-        OutlinedTextField(value = phoneLocal, onValueChange = onPhone, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_telephone)) }, singleLine = true, isError = isError || countryCode == null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+        OutlinedTextField(value = phoneLocal, onValueChange = onPhone, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_telephone)) }, singleLine = true, isError = isError || (countryCode == null && phoneLocal.isNotBlank()), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
     }
     if (pickerVisible) {
         var query by rememberSaveable { mutableStateOf("") }
@@ -1040,7 +1180,11 @@ private fun ClientAddressesFormScreen(
     val terms = draft.paymentDays.toIntOrNull()
     val discount = draft.discount.decimalValue()
     val credit = draft.creditLimit.trim().takeIf { it.isNotEmpty() }?.decimalValue()
-    val valid = terms != null && terms in 0..365 && discount != null && discount in 0.0..100.0 && (credit == null || credit >= 0.0)
+    val maxDiscount = draft.maxDiscount.trim().takeIf { it.isNotEmpty() }?.decimalValue()
+    val taxRate = draft.tauxTva.trim().takeIf { it.isNotEmpty() }?.decimalValue()
+    val valid = terms != null && terms in 0..365 && discount != null && discount in 0.0..100.0 &&
+        (credit == null || credit >= 0.0) && (maxDiscount == null || maxDiscount in 0.0..100.0) &&
+        (taxRate == null || taxRate in 0.0..100.0) && (!draft.exonereTva || draft.motifExoneration.isNotBlank())
     ClientWizardScaffold(
         title = if (isEdit) R.string.clients_modifier else R.string.clients_nouveau,
         step = 2,
@@ -1073,8 +1217,15 @@ private fun ClientAddressesFormScreen(
             item {
                 OutlinedTextField(value = draft.paymentDays, onValueChange = { onDraftChange(draft.copy(paymentDays = it.filter(Char::isDigit).take(3))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_payment_terms)) }, suffix = { Text(stringResource(R.string.clients_flow_days_short), fontSize = 10.sp) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true, isError = draft.paymentDays.isNotEmpty() && (terms == null || terms !in 0..365))
             }
+            item { OutlinedTextField(value = draft.paymentDescription, onValueChange = { onDraftChange(draft.copy(paymentDescription = it.take(240))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_payment_description)) }, singleLine = true) }
+            item { OutlinedTextField(value = draft.tariffGrid, onValueChange = { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_tariff_grid)) }, singleLine = true) }
             item { OutlinedTextField(value = draft.discount, onValueChange = { onDraftChange(draft.copy(discount = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_remise)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = discount != null && discount !in 0.0..100.0) }
+            item { OutlinedTextField(value = draft.maxDiscount, onValueChange = { onDraftChange(draft.copy(maxDiscount = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_max_discount)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = maxDiscount != null && maxDiscount !in 0.0..100.0) }
             item { OutlinedTextField(value = draft.creditLimit, onValueChange = { onDraftChange(draft.copy(creditLimit = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_limite_credit)) }, suffix = { Text(devise, fontSize = 10.sp) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = credit != null && credit < 0) }
+            item { OutlinedTextField(value = draft.segment, onValueChange = { onDraftChange(draft.copy(segment = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_segment)) }, singleLine = true) }
+            item { OutlinedTextField(value = draft.salesChannel, onValueChange = { onDraftChange(draft.copy(salesChannel = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_sales_channel)) }, singleLine = true) }
+            item { OutlinedTextField(value = draft.territory, onValueChange = { onDraftChange(draft.copy(territory = it.take(120))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_territory)) }, singleLine = true) }
+            item { OutlinedTextField(value = draft.accountCode, onValueChange = { onDraftChange(draft.copy(accountCode = it.take(40))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_account_code)) }, singleLine = true) }
             item { ClientSelectorField(R.string.clients_badge_optionnel, badges.map { it.id to "${it.nom} (${it.remisePct.decimalText()}%)" }, draft.badgeId, { onDraftChange(draft.copy(badgeId = it)) }, stringResource(R.string.clients_flow_no_badge)) }
             item { ClientReadOnlyLine(R.string.clients_devise, devise.ifBlank { "—" }) }
             item { OutlinedTextField(value = draft.notes, onValueChange = { onDraftChange(draft.copy(notes = it.take(ClientValidation.LONGUEUR_NOTES_MAX))) }, modifier = Modifier.fillMaxWidth().height(125.dp), label = { Text(stringResource(R.string.clients_notes)) }, maxLines = 5) }
@@ -1228,8 +1379,12 @@ private fun List<OperationRecordEntity>.toAccountEntries(): List<AccountEntry> {
     var balance = 0.0
     return mapNotNull { record ->
         val payload = SaleRecordCodec.decode(record.notes) ?: return@mapNotNull null
-        balance += payload.total - payload.paidAmount
-        AccountEntry(record, payload.total, payload.paidAmount, balance)
+        val open = (payload.total - payload.paidAmount).coerceAtLeast(0.0)
+        val isCredit = payload.sourceRecordId != null
+        val debit = if (isCredit) 0.0 else payload.total
+        val credit = if (isCredit) open else payload.paidAmount
+        balance += if (isCredit) -open else open
+        AccountEntry(record, debit, credit, balance)
     }
 }
 
@@ -1255,7 +1410,7 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
     var until by rememberSaveable { mutableStateOf("") }
     val results = clients.filter { client ->
         val dates = client.createdAt
-        (query.isBlank() || client.nom.contains(query, true) || client.code.contains(query, true) || client.telephone.contains(query)) &&
+        (query.isBlank() || client.nom.contains(query, true) || client.code.contains(query, true) || client.telephone.contains(query, true) || client.nif.orEmpty().contains(query, true) || client.email.orEmpty().contains(query, true)) &&
             (status == "ALL" || (status == "ACTIVE" && client.isActive()) || (status == "INACTIVE" && !client.isActive())) &&
             (categoryId == null || client.categorieId == categoryId) &&
             (commercial.isBlank() || client.commercial.orEmpty().contains(commercial, true)) &&
@@ -1278,6 +1433,7 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
                     client = client,
                     category = categories.firstOrNull { it.id == client.categorieId },
                     outstanding = metrics[client.id]?.outstanding ?: 0.0,
+                    overdue = metrics[client.id]?.overdueAmount ?: 0.0,
                     devise = devise,
                     onOpen = { onOpen(client) },
                     onRappel = { onRappel(client) },
@@ -1327,6 +1483,12 @@ private fun ClientReadOnlyLine(label: Int, value: String) {
 }
 
 private fun ClientEntity.isActive(): Boolean = active && statut == ClientStatus.ACTIF
+
+private fun ClientEntity.isIncomplete(): Boolean =
+    statut in setOf(ClientStatus.BROUILLON, ClientStatus.A_COMPLETER) ||
+        (telephone.isBlank() && email.isNullOrBlank()) ||
+        (type in setOf(ClientType.ENTREPRISE, ClientType.ADMINISTRATION, ClientType.REVENDEUR, ClientType.GROSSISTE, ClientType.DISTRIBUTEUR, ClientType.CLIENT_EXPORT, ClientType.CLIENT_PROJET) &&
+            (nif.isNullOrBlank() || adresse.isNullOrBlank()))
 private fun String.initials(): String = trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.take(2).joinToString("") { it.first().uppercase() }.ifBlank { "?" }
 private fun Double.decimalText(): String = DecimalFormat("0.##", DecimalFormatSymbols(Locale.getDefault())).format(this)
 private fun String.decimalValue(): Double? = trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
@@ -1342,13 +1504,45 @@ private fun List<ClientAddressEntity>.withOnePrimaryAddress(): List<ClientAddres
     return mapIndexed { index, address -> address.copy(principale = index == primaryIndex) }
 }
 
-private fun saleMetricsByClient(records: List<OperationRecordEntity>): Map<Long, ClientSalesMetrics> =
-    records.filter { it.status == OperationStatus.VALIDATED.name }.mapNotNull { record -> SaleRecordCodec.decode(record.notes)?.let { it.clientId to it } }.groupBy({ it.first }, { it.second }).mapValues { (_, values) -> ClientSalesMetrics(values.sumOf { it.total }, values.sumOf { (it.total - it.paidAmount).coerceAtLeast(0.0) }, values.size) }
+private fun saleMetricsByClient(
+    records: List<OperationRecordEntity>,
+    clients: List<ClientEntity>,
+    now: Long,
+): Map<Long, ClientSalesMetrics> {
+    val termsByClient = clients.associate { it.id to it.conditionPaiementJours }
+    val ledgerByClient = records.asSequence()
+        .filter { it.status == OperationStatus.VALIDATED.name }
+        .mapNotNull { record ->
+            val payload = SaleRecordCodec.decode(record.notes) ?: return@mapNotNull null
+            if (payload.clientId <= 0L || payload.total < 0.0 || !payload.total.isFinite() ||
+                !payload.paidAmount.isFinite() || payload.paidAmount < 0.0
+            ) return@mapNotNull null
+            payload.clientId to ClientLedgerItem(
+                total = payload.total,
+                paid = payload.paidAmount.coerceAtMost(payload.total),
+                issuedAt = record.createdAt,
+                creditNote = payload.sourceRecordId != null,
+                recordId = record.id,
+                sourceRecordId = payload.sourceRecordId,
+            )
+        }
+        .groupBy({ it.first }, { it.second })
+    return clients.associate { client ->
+        client.id to ClientMetricsRules.calculate(
+            items = ledgerByClient[client.id].orEmpty(),
+            paymentDays = termsByClient[client.id] ?: 0,
+            now = now,
+        )
+    }
+}
 
 private fun List<OperationRecordEntity>.salesFor(clientId: Long): List<OperationRecordEntity> = filter { SaleRecordCodec.decode(it.notes)?.clientId == clientId }
-private fun payloadOutstanding(record: OperationRecordEntity): Double =
-    if (record.status == OperationStatus.CANCELLED.name) 0.0
-    else SaleRecordCodec.decode(record.notes)?.let { (it.total - it.paidAmount).coerceAtLeast(0.0) } ?: 0.0
+private fun payloadOutstanding(record: OperationRecordEntity): Double {
+    if (record.status != OperationStatus.VALIDATED.name) return 0.0
+    val payload = SaleRecordCodec.decode(record.notes) ?: return 0.0
+    val remaining = (payload.total - payload.paidAmount).coerceAtLeast(0.0)
+    return if (payload.sourceRecordId != null) -remaining else remaining
+}
 private fun clientMoney(amount: Double, devise: String): String {
     val fraction = runCatching { Currency.getInstance(devise).defaultFractionDigits }.getOrDefault(2)
     val pattern = if (fraction == 0) "#,##0" else "#,##0.${"0".repeat(fraction.coerceAtMost(2))}"
@@ -1426,12 +1620,25 @@ private fun ClientEntity.toDraft(defaultCountry: String?): ClientDraft {
         phoneLocal = ClientValidation.telephoneSansIndicatif(telephone, Iso4217.indicatifTelephone(country)),
         email = email.orEmpty(),
         nif = nif.orEmpty(),
+        fiscalIdType = typeIdentifiantFiscal ?: "NIF",
+        numeroTva = numeroTva.orEmpty(),
+        assujettiTva = assujettiTva,
+        exonereTva = exonereTva,
+        motifExoneration = motifExoneration.orEmpty(),
+        tauxTva = tauxTva?.decimalText().orEmpty(),
         categoryId = categorieId,
         siteId = siteId,
         commercial = commercial.orEmpty(),
         paymentDays = conditionPaiementJours.toString(),
         discount = remiseDefautPct.decimalText(),
         creditLimit = limiteCredit?.decimalText().orEmpty(),
+        paymentDescription = conditionsPaiement.orEmpty(),
+        tariffGrid = grilleTarifaire.orEmpty(),
+        maxDiscount = remiseMaxPct?.decimalText().orEmpty(),
+        segment = segment.orEmpty(),
+        salesChannel = canalVente.orEmpty(),
+        territory = territoire.orEmpty(),
+        accountCode = compteComptable.orEmpty(),
         badgeId = badgeId,
         notes = notes.orEmpty(),
     )

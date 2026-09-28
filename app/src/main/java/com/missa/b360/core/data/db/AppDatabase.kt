@@ -153,7 +153,7 @@ import com.missa.b360.core.data.entity.UserEntity
         FournisseurItemEntity::class,
         FournisseurEvenementEntity::class,
     ],
-    version = 17,
+    version = 18,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -514,6 +514,24 @@ abstract class AppDatabase : RoomDatabase() {
                     "CREATE INDEX IF NOT EXISTS `index_fournisseur_evenements_fournisseurId` " +
                         "ON `fournisseur_evenements` (`fournisseurId`)",
                 )
+            }
+        }
+
+        val MIGRATION_17_18 = object : Migration(17, 18) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE clients ADD COLUMN typeIdentifiantFiscal TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN numeroTva TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN assujettiTva INTEGER NOT NULL DEFAULT 1")
+                db.execSQL("ALTER TABLE clients ADD COLUMN exonereTva INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE clients ADD COLUMN motifExoneration TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN tauxTva REAL")
+                db.execSQL("ALTER TABLE clients ADD COLUMN grilleTarifaire TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN remiseMaxPct REAL")
+                db.execSQL("ALTER TABLE clients ADD COLUMN segment TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN canalVente TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN territoire TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN compteComptable TEXT")
+                db.execSQL("ALTER TABLE clients ADD COLUMN conditionsPaiement TEXT")
             }
         }
 

@@ -2,8 +2,6 @@ package com.missa.b360.ui.stock
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.missa.b360.core.data.dao.FournisseurDao
-import com.missa.b360.core.data.dao.ProductDao
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.data.entity.ProductStockEntity
@@ -23,6 +21,7 @@ import com.missa.b360.core.domain.usecase.SiteUseCases
 import com.missa.b360.core.domain.usecase.StockMovementResult
 import com.missa.b360.core.domain.usecase.TransferStockUseCase
 import com.missa.b360.core.domain.usecase.UpdateProductUseCase
+import com.missa.b360.core.domain.usecase.StockModuleUseCases
 import com.missa.b360.core.data.dao.StockMovementView
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -114,17 +113,14 @@ class StockViewModel @Inject constructor(
  */
 @HiltViewModel
 class ProductFormViewModel @Inject constructor(
-    private val productDao: ProductDao,
     private val getProduct: GetProductUseCase,
     private val createProduct: CreateProductUseCase,
     private val updateProduct: UpdateProductUseCase,
     private val changeStatus: ChangerStatutProduitUseCase,
     private val categoriesUseCases: CategorieProduitUseCases,
     sites: SiteUseCases,
-    fournisseurDao: FournisseurDao,
+    private val stockModule: StockModuleUseCases,
     observeStock: ObserveProductStockUseCase,
-    private val equipementDao: com.missa.b360.core.data.dao.ProductEquipementDao,
-    private val extrasDao: com.missa.b360.core.data.dao.ProductExtrasDao,
     observeProducts: ObserveProductsUseCase,
     @dagger.hilt.android.qualifiers.ApplicationContext private val contexte: android.content.Context,
 ) : ViewModel() {
@@ -158,7 +154,7 @@ class ProductFormViewModel @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val sites: StateFlow<List<SiteEntity>> = sites.observerSites()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-    val fournisseurs: StateFlow<List<FournisseurEntity>> = fournisseurDao.observeAll()
+    val fournisseurs: StateFlow<List<FournisseurEntity>> = stockModule.observeSuppliers()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Lignes de stock (lecture seule) pour afficher le stock actuel en mode édition. */
@@ -179,11 +175,15 @@ class ProductFormViewModel @Inject constructor(
         observing = viewModelScope.launch {
             getProduct(productId).collect { _product.value = it }
         }
-        viewModelScope.launch { extrasDao.observeDechet(productId).collect { _dechet.value = it } }
-        viewModelScope.launch { extrasDao.observeEmballage(productId).collect { _emballage.value = it } }
-        viewModelScope.launch { extrasDao.observeConsignation(productId).collect { _consignation.value = it } }
-        viewModelScope.launch { extrasDao.observeKit(productId).collect { _kit.value = it } }
-        viewModelScope.launch { extrasDao.observeComposants(productId).collect { _composants.value = it } }
+        viewModelScope.launch {
+            stockModule.observeProductExtensions(productId).collect { extensions ->
+                _dechet.value = extensions.waste
+                _emballage.value = extensions.packaging
+                _consignation.value = extensions.consignment
+                _kit.value = extensions.kit
+                _composants.value = extensions.kitComponents
+            }
+        }
     }
 
     private val _dechet = kotlinx.coroutines.flow.MutableStateFlow<com.missa.b360.core.data.entity.ProductDechetEntity?>(null)
@@ -217,8 +217,7 @@ class ProductFormViewModel @Inject constructor(
                 if (id == null) {
                     when (val r = createProduct(input, initialStock)) {
                         is CreateProductUseCase.Result.Succes -> {
-                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = r.productId)) }
-                            persisterExtensions(r.productId, dechet, emballage, consignation, kit, composants)
+                            persisterExtensions(r.productId, equipement, dechet, emballage, consignation, kit, composants)
                             appliquerImage(r.productId, imageTemp, supprimerImage)
                             SaveResult.Saved(r.code, true, r.productId)
                         }
@@ -232,8 +231,7 @@ class ProductFormViewModel @Inject constructor(
                     val success = updateProduct(id, input)
                     when {
                         success -> {
-                            equipement?.let { e -> equipementDao.upsert(e.copy(produitId = id)) }
-                            persisterExtensions(id, dechet, emballage, consignation, kit, composants)
+                            persisterExtensions(id, equipement, dechet, emballage, consignation, kit, composants)
                             appliquerImage(id, imageTemp, supprimerImage)
                             SaveResult.Saved(_product.value?.code ?: "", false, id)
                         }
@@ -264,9 +262,7 @@ class ProductFormViewModel @Inject constructor(
         } else {
             return
         }
-        productDao.getById(produitId)?.let { p ->
-            productDao.update(p.copy(photoPath = chemin))
-        }
+        stockModule.updateProductPhoto(produitId, chemin)
     }
 
     /** True si l'article en cours d'édition a déjà une image sur le disque. */
@@ -275,19 +271,22 @@ class ProductFormViewModel @Inject constructor(
 
     private suspend fun persisterExtensions(
         produitId: Long,
+        equipement: com.missa.b360.core.data.entity.ProductEquipementEntity?,
         dechet: com.missa.b360.core.data.entity.ProductDechetEntity?,
         emballage: com.missa.b360.core.data.entity.ProductEmballageEntity?,
         consignation: com.missa.b360.core.data.entity.ProductConsignationEntity?,
         kit: com.missa.b360.core.data.entity.ProductKitEntity?,
         composants: List<com.missa.b360.core.data.entity.KitComposantEntity>,
     ) {
-        dechet?.let { extrasDao.upsertDechet(it.copy(produitId = produitId)) }
-        emballage?.let { extrasDao.upsertEmballage(it.copy(produitId = produitId)) }
-        consignation?.let { extrasDao.upsertConsignation(it.copy(produitId = produitId)) }
-        kit?.let { extrasDao.upsertKit(it.copy(produitId = produitId)) }
-        if (kit != null) {
-            composants.forEach { c -> extrasDao.upsertComposant(c.copy(kitId = produitId)) }
-        }
+        stockModule.saveProductExtensions(
+            productId = produitId,
+            equipment = equipement,
+            waste = dechet,
+            packaging = emballage,
+            consignment = consignation,
+            kit = kit,
+            kitComponents = composants,
+        )
     }
 
     fun clearSaveResult() {

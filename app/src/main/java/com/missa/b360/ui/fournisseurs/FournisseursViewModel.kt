@@ -19,11 +19,9 @@ import com.missa.b360.core.data.entity.FournisseurEvenementEntity
 import com.missa.b360.core.data.entity.FournisseurItemEntity
 import com.missa.b360.core.data.entity.FournisseurStatus
 import com.missa.b360.core.data.entity.OperationModule
-import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.TypeFournisseur
 import com.missa.b360.core.domain.model.FournisseurRules
-import com.missa.b360.core.domain.model.PurchaseRecordCodec
-import com.missa.b360.core.domain.model.ReceptionCodec
+import com.missa.b360.core.domain.model.FournisseurAchatMetrics
 import com.missa.b360.core.domain.usecase.AjouterCompteBancaireUseCase
 import com.missa.b360.core.domain.usecase.AjouterDocumentFournisseurUseCase
 import com.missa.b360.core.domain.usecase.ChangerStatutFournisseurUseCase
@@ -211,11 +209,22 @@ class FournisseursViewModel @Inject constructor(
     val listeFiltree: StateFlow<List<FournisseurEntity>> =
         combine(tousFournisseurs, _filtreStatut, _recherche) { tous, statut, query ->
             tous.filter { f ->
+                val terme = query.trim()
                 (statut == null || f.statut == statut) &&
-                    (query.isBlank() ||
-                        f.nom.contains(query, ignoreCase = true) ||
-                        f.code.contains(query, ignoreCase = true) ||
-                        f.telephone.contains(query))
+                    (terme.isBlank() || listOfNotNull(
+                        f.nom,
+                        f.nomCommercial,
+                        f.code,
+                        f.telephone,
+                        f.telephone2,
+                        f.email,
+                        f.adresse,
+                        f.identifiantFiscal,
+                        f.typeIdentifiantFiscal,
+                        f.rccm,
+                        f.numTva,
+                        f.categoriesFournies,
+                    ).any { it.contains(terme, ignoreCase = true) })
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -229,20 +238,8 @@ class FournisseursViewModel @Inject constructor(
         compteDao.observeComptesAVerifier(),
         piecesAchat,
     ) { tous, comptesAVerifier, pieces ->
-        val facturesValidees = pieces.filter {
-            it.reference.startsWith("FA") && it.status == OperationStatus.VALIDATED.name
-        }
-        val soldeTotal = facturesValidees.sumOf { piece ->
-            val payload = PurchaseRecordCodec.decode(piece.notes)
-            if (payload == null) 0.0 else (payload.total - payload.paidAmount).coerceAtLeast(0.0)
-        }
-        val receptionsValidees = pieces.filter {
-            it.reference.startsWith("RE") && it.status == OperationStatus.VALIDATED.name
-        }.mapNotNull { ReceptionCodec.decode(it.notes)?.commandeRecordId }.toSet()
-        val commandesOuvertes = pieces.count {
-            it.reference.startsWith("BC") && it.status == OperationStatus.VALIDATED.name &&
-                it.id !in receptionsValidees
-        }
+        val soldeTotal = FournisseurAchatMetrics.soldeTotal(pieces)
+        val commandesOuvertes = FournisseurAchatMetrics.commandesOuvertes(pieces)
         HubFournisseurs(
             actifs = tous.count { it.statut == FournisseurStatus.ACTIF },
             aValider = tous.count { it.statut == FournisseurStatus.A_VALIDER },
@@ -277,15 +274,7 @@ class FournisseursViewModel @Inject constructor(
             // Les enfants (contacts, comptes…) sont observés par fournisseur : un
             // second flux les combine avec la fiche courante.
             combine(base, enfantsFlow()) { (id, fournisseur, pieces), enfants ->
-                val factures = pieces.filter {
-                    it.reference.startsWith("FA") && it.status == OperationStatus.VALIDATED.name
-                }.mapNotNull { piece -> piece to (PurchaseRecordCodec.decode(piece.notes) ?: return@mapNotNull null) }
-                    .filter { (_, payload) -> id != null && payload.supplierId == id }
-                val commandes = pieces.count { piece ->
-                    piece.reference.startsWith("BC") &&
-                        com.missa.b360.core.domain.model.CommandeAchatCodec.decode(piece.notes)
-                            ?.let { it.supplierId == id } == true
-                }
+                val achats = id?.let { FournisseurAchatMetrics.pourFournisseur(it, pieces) }
                 FicheFournisseur(
                     fournisseur = fournisseur,
                     contacts = enfants.first,
@@ -294,12 +283,10 @@ class FournisseursViewModel @Inject constructor(
                     items = enfants.fourth.first,
                     nomsProduits = enfants.fourth.second,
                     evenements = enfants.fifth,
-                    montantAchete = factures.sumOf { (_, payload) -> payload.total },
-                    nombreCommandes = commandes,
-                    solde = factures.sumOf { (_, payload) ->
-                        (payload.total - payload.paidAmount).coerceAtLeast(0.0)
-                    },
-                    dernierePiece = factures.maxOfOrNull { (piece, _) -> piece.createdAt },
+                    montantAchete = achats?.montantAchete ?: 0.0,
+                    nombreCommandes = achats?.nombreCommandes ?: 0,
+                    solde = achats?.solde ?: 0.0,
+                    dernierePiece = achats?.derniereFacture,
                 )
             }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FicheFournisseur())
         }
@@ -496,6 +483,16 @@ class FournisseursViewModel @Inject constructor(
         _form.value = etat.copy(busy = true, erreur = null, manquants = null)
         viewModelScope.launch {
             val entite = entiteDepuisForm(etat)
+            if (soumettre) {
+                val manquants = FournisseurRules.manquantsPourSoumission(
+                    entite,
+                    contactPrincipalPresent = etat.contacts.any { it.principal && it.nom.isNotBlank() },
+                )
+                if (manquants.isNotEmpty()) {
+                    _form.value = _form.value.copy(busy = false, manquants = manquants)
+                    return@launch
+                }
+            }
             val doublonConfirme = etat.doublons != null
             when (val resultat = createFournisseur(entite, doublonConfirme = doublonConfirme)) {
                 is CreateFournisseurUseCase.Result.LicenceExpiree ->
@@ -511,10 +508,16 @@ class FournisseursViewModel @Inject constructor(
                 is CreateFournisseurUseCase.Result.Succes -> {
                     persisterEnfants(resultat.fournisseurId, etat)
                     if (soumettre) {
-                        when (val soumis = soumettreFournisseur(resultat.fournisseurId)) {
-                            is SoumettreFournisseurUseCase.Result.ChampsManquants ->
-                                _form.value = _form.value.copy(busy = false, manquants = soumis.champs)
-                            else -> Unit
+                        val soumis = soumettreFournisseur(resultat.fournisseurId)
+                        if (soumis is SoumettreFournisseurUseCase.Result.ChampsManquants) {
+                            _form.value = _form.value.copy(
+                                busy = false,
+                                enregistre = true,
+                                manquants = soumis.champs,
+                            )
+                            _message.value = "err_dossier_incomplet"
+                            ouvrirFiche(resultat.fournisseurId)
+                            return@launch
                         }
                     }
                     _form.value = _form.value.copy(busy = false, enregistre = true)
@@ -551,6 +554,7 @@ class FournisseursViewModel @Inject constructor(
                 soumisLe = existant.soumisLe,
                 approuveLe = existant.approuveLe,
                 approuve = existant.approuve,
+                dateValidationFiscale = existant.dateValidationFiscale,
                 plafondPaiement = existant.plafondPaiement,
                 paiementBloque = existant.paiementBloque,
                 noteEvaluation = existant.noteEvaluation,
@@ -607,6 +611,7 @@ class FournisseursViewModel @Inject constructor(
                 ChangerStatutFournisseurUseCase.Result.MotifObligatoire -> "err_motif_obligatoire"
                 ChangerStatutFournisseurUseCase.Result.TransitionRefusee -> "err_transition"
                 ChangerStatutFournisseurUseCase.Result.Introuvable -> "err_introuvable"
+                is ChangerStatutFournisseurUseCase.Result.ChampsManquants -> "err_dossier_incomplet"
             }
         }
     }
@@ -672,8 +677,14 @@ class FournisseursViewModel @Inject constructor(
     fun verifierCompte(compteId: Long, approuve: Boolean) {
         val id = _ficheId.value ?: return
         viewModelScope.launch {
-            verifierCompteUseCase(compteId, id, approuve)
-            _message.value = if (approuve) "msg_compte_verifie" else "msg_compte_rejete"
+            val ok = verifierCompteUseCase(compteId, id, approuve)
+            _message.value = if (!ok) {
+                "err_compte_verification"
+            } else if (approuve) {
+                "msg_compte_verifie"
+            } else {
+                "msg_compte_rejete"
+            }
         }
     }
 
@@ -693,8 +704,11 @@ class FournisseursViewModel @Inject constructor(
 
     fun supprimerDocumentFiche(documentId: Long) {
         viewModelScope.launch {
-            supprimerDocument(documentId)
-            _message.value = "msg_document_retire"
+            _message.value = if (supprimerDocument(documentId)) {
+                "msg_document_retire"
+            } else {
+                "err_document_retire"
+            }
         }
     }
 
@@ -726,8 +740,11 @@ class FournisseursViewModel @Inject constructor(
     fun delierArticleFiche(liaisonId: Long) {
         val id = _ficheId.value ?: return
         viewModelScope.launch {
-            delierArticle(liaisonId, id)
-            _message.value = "msg_article_delie"
+            _message.value = if (delierArticle(liaisonId, id)) {
+                "msg_article_delie"
+            } else {
+                "err_article_delie"
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.missa.b360
 
 import com.missa.b360.core.domain.usecase.ClientValidation
+import com.missa.b360.core.domain.usecase.CheckCreditLimitUseCase
 import com.missa.b360.core.util.Iso4217
 import java.util.Locale
 import org.junit.Assert.assertEquals
@@ -98,6 +99,38 @@ class ClientValidationTest {
                 limiteCredit = -1.0,
             ),
         )
+    }
+
+    @Test
+    fun `un telephone ou un email valide suffit comme coordonnee client`() {
+        assertTrue(
+            ClientValidation.coordonneesEtConditionsSontValides(
+                nom = "Client test",
+                telephone = "",
+                email = "contact@example.cm",
+                remiseDefautPct = 0.0,
+                limiteCredit = null,
+            ),
+        )
+        assertFalse(
+            ClientValidation.coordonneesEtConditionsSontValides(
+                nom = "Client test",
+                telephone = "",
+                email = null,
+                remiseDefautPct = 0.0,
+                limiteCredit = null,
+            ),
+        )
+    }
+
+    @Test
+    fun `le controle de credit refuse les montants non finis et identifie le depassement`() {
+        val check = CheckCreditLimitUseCase()
+        assertEquals(CheckCreditLimitUseCase.Verdict.AUTORISE, check(10.0, 20.0, 50.0))
+        assertEquals(CheckCreditLimitUseCase.Verdict.ALERTE, check(90.0, 15.0, 100.0))
+        assertEquals(CheckCreditLimitUseCase.Verdict.VALIDATION_REQUISE, check(100.0, 30.0, 100.0))
+        assertEquals(CheckCreditLimitUseCase.Verdict.BLOQUE, check(Double.NaN, 1.0, 100.0))
+        assertEquals(CheckCreditLimitUseCase.Verdict.BLOQUE, check(0.0, 1.0, Double.POSITIVE_INFINITY))
     }
 
     @Test

@@ -76,20 +76,15 @@ fun MissaBrandMark(
     modifier: Modifier = Modifier,
     size: Dp = 28.dp,
 ) {
+    // Le fichier de marque porte déjà sa forme et son fond : ne pas lui ajouter
+    // un médaillon blanc ni un contour qui crée un double cadre.
     val forme = RoundedCornerShape(size * 0.3f)
-    Surface(
-        modifier = modifier.size(size),
-        shape = forme,
-        color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFF0288D1).copy(alpha = 0.25f)),
-    ) {
-        Image(
-            painter = painterResource(R.drawable.logo_missa),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().clip(forme),
-        )
-    }
+    Image(
+        painter = painterResource(R.drawable.logo_missa),
+        contentDescription = null,
+        contentScale = ContentScale.Fit,
+        modifier = modifier.size(size).clip(forme),
+    )
 }
 
 /**
