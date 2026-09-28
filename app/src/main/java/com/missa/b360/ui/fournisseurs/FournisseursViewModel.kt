@@ -677,8 +677,14 @@ class FournisseursViewModel @Inject constructor(
     fun verifierCompte(compteId: Long, approuve: Boolean) {
         val id = _ficheId.value ?: return
         viewModelScope.launch {
-            verifierCompteUseCase(compteId, id, approuve)
-            _message.value = if (approuve) "msg_compte_verifie" else "msg_compte_rejete"
+            val ok = verifierCompteUseCase(compteId, id, approuve)
+            _message.value = if (!ok) {
+                "err_compte_verification"
+            } else if (approuve) {
+                "msg_compte_verifie"
+            } else {
+                "msg_compte_rejete"
+            }
         }
     }
 
@@ -698,8 +704,11 @@ class FournisseursViewModel @Inject constructor(
 
     fun supprimerDocumentFiche(documentId: Long) {
         viewModelScope.launch {
-            supprimerDocument(documentId)
-            _message.value = "msg_document_retire"
+            _message.value = if (supprimerDocument(documentId)) {
+                "msg_document_retire"
+            } else {
+                "err_document_retire"
+            }
         }
     }
 
@@ -731,8 +740,11 @@ class FournisseursViewModel @Inject constructor(
     fun delierArticleFiche(liaisonId: Long) {
         val id = _ficheId.value ?: return
         viewModelScope.launch {
-            delierArticle(liaisonId, id)
-            _message.value = "msg_article_delie"
+            _message.value = if (delierArticle(liaisonId, id)) {
+                "msg_article_delie"
+            } else {
+                "err_article_delie"
+            }
         }
     }
 

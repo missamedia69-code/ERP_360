@@ -1818,4 +1818,32 @@
     <string name="sales_cash_customer">Client comptant</string>
     <string name="sales_err_cash_account">Un compte de trésorerie actif est requis pour enregistrer l’encaissement.</string>
     <string name="sales_err_stock_module_inactive">Le module Stock doit être activé pour vendre des articles suivis en stock.</string>
+
+    <!-- Supplier feedback and verification scope -->
+    <string name="four_err_article">Impossible de lier cet article.</string>
+    <string name="four_err_article_delie">Impossible de retirer cette liaison article.</string>
+    <string name="four_err_compte_incomplet">Renseignez le titulaire et un numéro de compte, IBAN ou numéro Mobile Money.</string>
+    <string name="four_err_compte_verification">La vérification a échoué. Le compte a peut-être déjà été modifié.</string>
+    <string name="four_err_document">Impossible d’ajouter le document.</string>
+    <string name="four_err_document_retire">Impossible de retirer ce document.</string>
+    <string name="four_err_dossier_incomplet">Le dossier est incomplet.</string>
+    <string name="four_err_evaluation">Impossible d’enregistrer cette évaluation.</string>
+    <string name="four_err_introuvable">Fournisseur introuvable.</string>
+    <string name="four_err_modification">Impossible d’enregistrer les modifications.</string>
+    <string name="four_err_motif_obligatoire">Un motif est obligatoire.</string>
+    <string name="four_err_transition">Cette transition de statut n’est pas autorisée.</string>
+    <string name="four_msg_article_delie">Liaison article retirée.</string>
+    <string name="four_msg_article_lie">Article lié au fournisseur.</string>
+    <string name="four_msg_compte_ajoute">Compte ajouté, en attente de vérification.</string>
+    <string name="four_msg_compte_rejete">Compte marqué comme rejeté.</string>
+    <string name="four_msg_compte_verifie">Compte marqué comme vérifié en interne.</string>
+    <string name="four_msg_contact_ajoute">Contact ajouté.</string>
+    <string name="four_msg_document_ajoute">Document ajouté.</string>
+    <string name="four_msg_document_retire">Document retiré.</string>
+    <string name="four_msg_evaluation">Évaluation enregistrée.</string>
+    <string name="four_msg_fournisseur_enregistre">Fournisseur enregistré.</string>
+    <string name="four_msg_fournisseur_modifie">Fournisseur modifié.</string>
+    <string name="four_msg_soumis">Fournisseur soumis à validation.</string>
+    <string name="four_msg_statut_mis_a_jour">Statut du fournisseur mis à jour.</string>
+    <string name="four_verification_interne_seulement">Contrôle interne uniquement : aucune confirmation bancaire externe ni séparation saisisseur/vérificateur n’est enregistrée.</string>
 </resources>

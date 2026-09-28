@@ -1771,4 +1771,32 @@
     <string name="sales_cash_customer">عميل نقدي</string>
     <string name="sales_err_cash_account">يلزم وجود حساب خزينة نشط لتسجيل هذا التحصيل.</string>
     <string name="sales_err_stock_module_inactive">يجب تفعيل وحدة المخزون لبيع الأصناف المتتبعة في المخزون.</string>
+
+    <!-- Supplier feedback and verification scope -->
+    <string name="four_err_article">تعذر ربط هذا الصنف.</string>
+    <string name="four_err_article_delie">تعذر إزالة ارتباط هذا الصنف.</string>
+    <string name="four_err_compte_incomplet">أدخل اسم صاحب الحساب ورقم الحساب أو IBAN أو رقم موبايل موني.</string>
+    <string name="four_err_compte_verification">فشل التحقق. ربما تم تعديل الحساب بالفعل.</string>
+    <string name="four_err_document">تعذرت إضافة المستند.</string>
+    <string name="four_err_document_retire">تعذرت إزالة هذا المستند.</string>
+    <string name="four_err_dossier_incomplet">ملف المورد غير مكتمل.</string>
+    <string name="four_err_evaluation">تعذر حفظ التقييم.</string>
+    <string name="four_err_introuvable">المورد غير موجود.</string>
+    <string name="four_err_modification">تعذر حفظ التغييرات.</string>
+    <string name="four_err_motif_obligatoire">السبب مطلوب.</string>
+    <string name="four_err_transition">انتقال الحالة هذا غير مسموح.</string>
+    <string name="four_msg_article_delie">تمت إزالة ارتباط الصنف.</string>
+    <string name="four_msg_article_lie">تم ربط الصنف بالمورد.</string>
+    <string name="four_msg_compte_ajoute">تمت إضافة الحساب وهو بانتظار التحقق.</string>
+    <string name="four_msg_compte_rejete">تم وضع علامة مرفوض على الحساب.</string>
+    <string name="four_msg_compte_verifie">تم وضع علامة تحقق داخلي على الحساب.</string>
+    <string name="four_msg_contact_ajoute">تمت إضافة جهة الاتصال.</string>
+    <string name="four_msg_document_ajoute">تمت إضافة المستند.</string>
+    <string name="four_msg_document_retire">تمت إزالة المستند.</string>
+    <string name="four_msg_evaluation">تم حفظ التقييم.</string>
+    <string name="four_msg_fournisseur_enregistre">تم حفظ المورد.</string>
+    <string name="four_msg_fournisseur_modifie">تم تحديث المورد.</string>
+    <string name="four_msg_soumis">تم إرسال المورد للموافقة.</string>
+    <string name="four_msg_statut_mis_a_jour">تم تحديث حالة المورد.</string>
+    <string name="four_verification_interne_seulement">فحص داخلي فقط: لا يتم تسجيل تأكيد مصرفي خارجي أو فصل هوية المُدخل عن هوية المُتحقق.</string>
 </resources>

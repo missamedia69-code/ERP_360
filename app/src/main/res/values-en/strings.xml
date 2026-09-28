@@ -1775,4 +1775,32 @@
     <string name="sales_cash_customer">Cash customer</string>
     <string name="sales_err_cash_account">An active cash or treasury account is required to record this payment.</string>
     <string name="sales_err_stock_module_inactive">The Stock module must be active to sell inventory-tracked products.</string>
+
+    <!-- Supplier feedback and verification scope -->
+    <string name="four_err_article">Unable to link this item.</string>
+    <string name="four_err_article_delie">Unable to remove this item link.</string>
+    <string name="four_err_compte_incomplet">Enter the account holder and an account number, IBAN, or Mobile Money number.</string>
+    <string name="four_err_compte_verification">Verification failed. The account may already have changed.</string>
+    <string name="four_err_document">Unable to add the document.</string>
+    <string name="four_err_document_retire">Unable to remove this document.</string>
+    <string name="four_err_dossier_incomplet">The supplier file is incomplete.</string>
+    <string name="four_err_evaluation">Unable to save this evaluation.</string>
+    <string name="four_err_introuvable">Supplier not found.</string>
+    <string name="four_err_modification">Unable to save the changes.</string>
+    <string name="four_err_motif_obligatoire">A reason is required.</string>
+    <string name="four_err_transition">This status transition is not allowed.</string>
+    <string name="four_msg_article_delie">Item link removed.</string>
+    <string name="four_msg_article_lie">Item linked to supplier.</string>
+    <string name="four_msg_compte_ajoute">Account added and awaiting review.</string>
+    <string name="four_msg_compte_rejete">Account marked as rejected.</string>
+    <string name="four_msg_compte_verifie">Account marked as internally checked.</string>
+    <string name="four_msg_contact_ajoute">Contact added.</string>
+    <string name="four_msg_document_ajoute">Document added.</string>
+    <string name="four_msg_document_retire">Document removed.</string>
+    <string name="four_msg_evaluation">Evaluation saved.</string>
+    <string name="four_msg_fournisseur_enregistre">Supplier saved.</string>
+    <string name="four_msg_fournisseur_modifie">Supplier updated.</string>
+    <string name="four_msg_soumis">Supplier submitted for approval.</string>
+    <string name="four_msg_statut_mis_a_jour">Supplier status updated.</string>
+    <string name="four_verification_interne_seulement">Internal check only: no external bank confirmation or separate submitter and verifier identities are recorded.</string>
 </resources>

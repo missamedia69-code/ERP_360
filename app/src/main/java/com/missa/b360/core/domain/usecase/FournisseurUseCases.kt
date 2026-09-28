@@ -393,8 +393,8 @@ class SupprimerDocumentFournisseurUseCase @Inject constructor(
     suspend operator fun invoke(documentId: Long, now: Long = System.currentTimeMillis()): Boolean {
         if (licenceManager.isReadOnly()) return false
         val document = documentDao.getById(documentId) ?: return false
+        if (documentDao.deleteById(documentId) == 0) return false
         document.cheminFichier?.let(PieceJointeAchat::supprimer)
-        documentDao.deleteById(documentId)
         evenementDao.insert(
             FournisseurEvenementEntity(
                 fournisseurId = document.fournisseurId,
@@ -453,7 +453,7 @@ class DelierArticleFournisseurUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(liaisonId: Long, fournisseurId: Long, now: Long = System.currentTimeMillis()): Boolean {
         if (licenceManager.isReadOnly()) return false
-        itemDao.desactiver(liaisonId)
+        if (itemDao.desactiver(liaisonId) == 0) return false
         evenementDao.insert(
             FournisseurEvenementEntity(
                 fournisseurId = fournisseurId,
