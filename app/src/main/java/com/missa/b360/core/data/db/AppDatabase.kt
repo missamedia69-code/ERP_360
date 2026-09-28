@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.missa.b360.core.data.dao.AbsenceDao
+import com.missa.b360.core.data.dao.AccountingDao
 import com.missa.b360.core.data.dao.BackupDao
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
@@ -39,6 +40,13 @@ import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
 import com.missa.b360.core.data.entity.AbsenceEntity
+import com.missa.b360.core.data.entity.AccountingAccountEntity
+import com.missa.b360.core.data.entity.AccountingEntryLineEntity
+import com.missa.b360.core.data.entity.AccountingJournalEntity
+import com.missa.b360.core.data.entity.AccountingPeriodEntity
+import com.missa.b360.core.data.entity.AccountingPostingRuleEntity
+import com.missa.b360.core.data.entity.AccountingSettingsEntity
+import com.missa.b360.core.data.entity.AccountingVoucherEntity
 import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
@@ -100,6 +108,13 @@ import com.missa.b360.core.data.entity.UserEntity
 @Database(
     entities = [
         EnterpriseEntity::class,
+        AccountingSettingsEntity::class,
+        AccountingAccountEntity::class,
+        AccountingJournalEntity::class,
+        AccountingPostingRuleEntity::class,
+        AccountingPeriodEntity::class,
+        AccountingVoucherEntity::class,
+        AccountingEntryLineEntity::class,
         SiteEntity::class,
         UserEntity::class,
         RoleEntity::class,
@@ -153,11 +168,12 @@ import com.missa.b360.core.data.entity.UserEntity
         FournisseurItemEntity::class,
         FournisseurEvenementEntity::class,
     ],
-    version = 18,
+    version = 20,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun enterpriseDao(): EnterpriseDao
+    abstract fun accountingDao(): AccountingDao
     abstract fun siteDao(): SiteDao
     abstract fun userDao(): UserDao
     abstract fun roleDao(): RoleDao
@@ -514,6 +530,41 @@ abstract class AppDatabase : RoomDatabase() {
                     "CREATE INDEX IF NOT EXISTS `index_fournisseur_evenements_fournisseurId` " +
                         "ON `fournisseur_evenements` (`fournisseurId`)",
                 )
+            }
+        }
+
+        /** v18 → v19 : plan, journaux, périodes et pièces à double entrée. */
+        val MIGRATION_18_19 = object : Migration(18, 19) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_settings` (`id` INTEGER NOT NULL, `standard` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `taxRegime` TEXT, `exerciceStartMonth` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_accounts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `standard` TEXT NOT NULL, `code` TEXT NOT NULL, `name` TEXT NOT NULL, `classCode` TEXT NOT NULL, `normalSide` TEXT NOT NULL, `parentCode` TEXT, `postable` INTEGER NOT NULL, `active` INTEGER NOT NULL, `customerAuxiliary` INTEGER NOT NULL, `supplierAuxiliary` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_accounts_standard_code` ON `accounting_accounts` (`standard`, `code`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_accounting_accounts_classCode` ON `accounting_accounts` (`classCode`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_journals` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `code` TEXT NOT NULL, `name` TEXT NOT NULL, `type` TEXT NOT NULL, `active` INTEGER NOT NULL, `requiresApproval` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_journals_code` ON `accounting_journals` (`code`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_periods` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `status` TEXT NOT NULL, `closedAt` INTEGER, `closedBy` INTEGER)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_periods_year_month` ON `accounting_periods` (`year`, `month`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_vouchers` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `journalId` INTEGER NOT NULL, `reference` TEXT NOT NULL, `accountingDate` INTEGER NOT NULL, `documentDate` INTEGER, `sourceModule` TEXT, `sourceDocumentType` TEXT, `sourceDocumentId` INTEGER, `sourceKey` TEXT, `status` TEXT NOT NULL, `description` TEXT NOT NULL, `currencyCode` TEXT NOT NULL, `exchangeRate` REAL NOT NULL, `totalDebit` REAL NOT NULL, `totalCredit` REAL NOT NULL, `createdBy` INTEGER, `validatedBy` INTEGER, `postedAt` INTEGER, `reversedVoucherId` INTEGER, `createdAt` INTEGER NOT NULL, FOREIGN KEY(`journalId`) REFERENCES `accounting_journals`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_vouchers_reference` ON `accounting_vouchers` (`reference`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_accounting_vouchers_journalId_accountingDate` ON `accounting_vouchers` (`journalId`, `accountingDate`)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_vouchers_sourceKey` ON `accounting_vouchers` (`sourceKey`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_accounting_vouchers_status_accountingDate` ON `accounting_vouchers` (`status`, `accountingDate`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_entry_lines` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `voucherId` INTEGER NOT NULL, `lineNumber` INTEGER NOT NULL, `accountId` INTEGER NOT NULL, `label` TEXT NOT NULL, `debitAmount` REAL NOT NULL, `creditAmount` REAL NOT NULL, `currencyAmount` REAL, `currencyCode` TEXT, `customerId` INTEGER, `supplierId` INTEGER, `treasuryAccountId` INTEGER, `taxCodeId` INTEGER, `projectId` INTEGER, `costCenterId` INTEGER, `dueDate` INTEGER, `matchingReference` TEXT, FOREIGN KEY(`voucherId`) REFERENCES `accounting_vouchers`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY(`accountId`) REFERENCES `accounting_accounts`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_entry_lines_voucherId_lineNumber` ON `accounting_entry_lines` (`voucherId`, `lineNumber`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_accounting_entry_lines_accountId` ON `accounting_entry_lines` (`accountId`)")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_lines_insert_only_draft` BEFORE INSERT ON `accounting_entry_lines` WHEN COALESCE((SELECT `status` FROM `accounting_vouchers` WHERE `id` = NEW.`voucherId`), '') != 'DRAFT' BEGIN SELECT RAISE(ABORT, 'Accounting lines can only be added to a draft'); END")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_lines_update_only_draft` BEFORE UPDATE ON `accounting_entry_lines` WHEN COALESCE((SELECT `status` FROM `accounting_vouchers` WHERE `id` = OLD.`voucherId`), '') != 'DRAFT' OR COALESCE((SELECT `status` FROM `accounting_vouchers` WHERE `id` = NEW.`voucherId`), '') != 'DRAFT' BEGIN SELECT RAISE(ABORT, 'Posted accounting lines are immutable'); END")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_lines_delete_only_draft` BEFORE DELETE ON `accounting_entry_lines` WHEN COALESCE((SELECT `status` FROM `accounting_vouchers` WHERE `id` = OLD.`voucherId`), '') != 'DRAFT' BEGIN SELECT RAISE(ABORT, 'Posted accounting lines are immutable'); END")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_immutable` BEFORE UPDATE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') AND ((OLD.`status` = 'REVERSED' AND NEW.`status` != 'REVERSED') OR (OLD.`status` = 'POSTED' AND NEW.`status` NOT IN ('POSTED', 'REVERSED')) OR OLD.`id` IS NOT NEW.`id` OR OLD.`journalId` IS NOT NEW.`journalId` OR OLD.`reference` IS NOT NEW.`reference` OR OLD.`accountingDate` IS NOT NEW.`accountingDate` OR OLD.`documentDate` IS NOT NEW.`documentDate` OR OLD.`sourceModule` IS NOT NEW.`sourceModule` OR OLD.`sourceDocumentType` IS NOT NEW.`sourceDocumentType` OR OLD.`sourceDocumentId` IS NOT NEW.`sourceDocumentId` OR OLD.`sourceKey` IS NOT NEW.`sourceKey` OR OLD.`description` IS NOT NEW.`description` OR OLD.`currencyCode` IS NOT NEW.`currencyCode` OR OLD.`exchangeRate` IS NOT NEW.`exchangeRate` OR OLD.`totalDebit` IS NOT NEW.`totalDebit` OR OLD.`totalCredit` IS NOT NEW.`totalCredit` OR OLD.`createdBy` IS NOT NEW.`createdBy` OR OLD.`validatedBy` IS NOT NEW.`validatedBy` OR OLD.`postedAt` IS NOT NEW.`postedAt` OR OLD.`reversedVoucherId` IS NOT NEW.`reversedVoucherId` OR OLD.`createdAt` IS NOT NEW.`createdAt`) BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers are immutable'); END")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_no_delete` BEFORE DELETE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers cannot be deleted'); END")
+                db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_account_identity_immutable_when_used` BEFORE UPDATE OF `code`, `standard`, `name` ON `accounting_accounts` WHEN EXISTS (SELECT 1 FROM `accounting_entry_lines` l JOIN `accounting_vouchers` v ON v.`id` = l.`voucherId` WHERE l.`accountId` = OLD.`id` AND v.`status` IN ('POSTED', 'REVERSED')) BEGIN SELECT RAISE(ABORT, 'Used accounting account codes are immutable'); END")
+            }
+        }
+
+        val MIGRATION_19_20 = object : Migration(19, 20) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `accounting_posting_rules` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `standard` TEXT NOT NULL, `eventType` TEXT NOT NULL, `journalCode` TEXT NOT NULL, `primaryAccountCode` TEXT NOT NULL, `counterpartAccountCode` TEXT NOT NULL, `primarySide` TEXT NOT NULL, `taxAccountCode` TEXT, `taxSide` TEXT, `active` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_accounting_posting_rules_standard_eventType` ON `accounting_posting_rules` (`standard`, `eventType`)")
             }
         }
 

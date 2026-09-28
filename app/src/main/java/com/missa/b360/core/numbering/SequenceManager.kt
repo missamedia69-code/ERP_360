@@ -9,7 +9,7 @@ import javax.inject.Singleton
 
 /**
  * Types de documents numérotés (RA-09 / RM-40) :
- * **9 documents de base + 9 séquences dédiées**, lettre + année + séquence (F2026-0001).
+ * Séquences dédiées par type de document, lettre + année + compteur (F2026-0001).
  */
 enum class DocType(val prefix: String) {
     // 9 documents de base
@@ -44,6 +44,9 @@ enum class DocType(val prefix: String) {
     // RH — employés, rappels de paiement (spec §RH/§22)
     EMPLOYE("EMP"),
     RAPPEL("RPP"),
+
+    /** Pièces de journal comptable (OD). */
+    COMPTABILITE("OD"),
 }
 
 /**

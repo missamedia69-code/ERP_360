@@ -109,7 +109,7 @@ data class LicenceEntity(
 
 /**
  * Séquence de numérotation — clé composite (type de document, année) (RA-09 / RM-40).
- * 9 documents de base + 9 séquences dédiées ; incrément transactionnel, aucun numéro réutilisé.
+ * Séquences dédiées par type de document ; incrément transactionnel, aucun numéro réutilisé.
  */
 @Entity(tableName = "sequences", primaryKeys = ["docType", "annee"])
 data class SequenceEntity(

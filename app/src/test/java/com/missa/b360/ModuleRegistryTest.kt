@@ -55,6 +55,8 @@ class ModuleRegistryTest {
         assertEquals(Color(0xFFF28A16), AppModule.FOURNISSEURS.couleur)
         assertEquals(Color(0xFFFFF2E2), AppModule.FOURNISSEURS.couleurPale)
         assertEquals(Color(0xFF1E3A8A), AppModule.TRESORERIE.couleur)
+        assertEquals(Color(0xFF475569), AppModule.COMPTABILITE.couleur)
+        assertEquals(Color(0xFF475569), AppModule.FINANCES.couleur)
     }
 
     @Test

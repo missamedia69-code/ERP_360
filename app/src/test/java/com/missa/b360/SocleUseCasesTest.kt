@@ -48,8 +48,9 @@ class SocleUseCasesTest {
     }
 
     @Test
-    fun `les 18 types de documents ont un préfixe non vide`() {
+    fun `tous les types de documents ont un préfixe non vide`() {
         assertTrue(DocType.entries.all { it.prefix.isNotBlank() })
+        assertEquals("OD", DocType.COMPTABILITE.prefix)
     }
 
     // --- RC-05 : limite de crédit ---
