@@ -708,47 +708,7 @@ fun ProductFormScreen(
 private fun DialogueCreationCategorieRapide(
     onDismiss: () -> Unit,
     onValider: (String) -> Unit,
-) {
-    var nom by remember { mutableStateOf("") }
-    val valide = nom.trim().isNotBlank()
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                stringResource(R.string.st_nouvelle_categorie_rapide),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MissaInk,
-            )
-        },
-        text = {
-            OutlinedTextField(
-                value = nom,
-                onValueChange = { nom = it.take(80) },
-                label = { Text(stringResource(R.string.st_nom_categorie_requis), fontSize = 11.sp) },
-                singleLine = true,
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = { onValider(nom.trim()) },
-                enabled = valide,
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue, contentColor = Color.White),
-                shape = RoundedCornerShape(8.dp),
-            ) {
-                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.ops_cancel), color = MissaInk)
-            }
-        },
-    )
-}
+) = DialogueNouvelleCategorieStock(onFermer = onDismiss, onCreer = onValider)
 
 /** Interrupteur libellé + switch (règles vendable/achetable/stockable). */
 @Composable

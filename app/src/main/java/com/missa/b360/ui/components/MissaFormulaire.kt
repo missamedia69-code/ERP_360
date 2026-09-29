@@ -848,3 +848,56 @@ fun MissaFormDialogue(
         }
     }
 }
+
+/**
+ * Icône déduite du libellé d'un moyen de paiement (espèces, mobile money, carte,
+ * banque, chèque). Les moyens sont saisis librement par l'entreprise : on reconnaît
+ * les mots courants dans les cinq langues, sinon icône « paiement » générique.
+ */
+fun iconeModePaiement(libelle: String): Int {
+    val l = libelle.lowercase()
+    return when {
+        listOf("esp", "cash", "caisse", "efectivo", "نقد", "现金").any { it in l } -> Iv.Savings
+        listOf("mobile", "momo", "orange", "mtn", "wave", "airtel", "moov", "m-pesa", "جوال", "手机").any { it in l } -> Iv.Smartphone
+        listOf("carte", "card", "tarjeta", "visa", "master", "بطاقة", "卡").any { it in l } -> Iv.Payments
+        listOf("chèque", "cheque", "check", "شيك", "支票").any { it in l } -> Iv.RequestQuote
+        listOf("banq", "bank", "virement", "transfer", "banco", "بنك", "银行").any { it in l } -> Iv.Bank
+        listOf("crédit", "credit", "terme", "مؤجل", "赊").any { it in l } -> Iv.Schedule
+        else -> Iv.Payments
+    }
+}
+
+/**
+ * Choix d'un moyen de paiement « à la maquette » : tuiles icône + libellé tant qu'il
+ * y a au plus 8 moyens, liste déroulante au-delà.
+ */
+@Composable
+fun MissaChoixPaiement(
+    moyens: List<String>,
+    selection: String?,
+    onSelection: (String) -> Unit,
+    libelle: String,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    enabled: Boolean = true,
+) {
+    if (moyens.size in 1..8) {
+        MissaChoixTuiles(
+            options = moyens.map { MissaTuile(it, it, iconeModePaiement(it)) },
+            selection = selection,
+            onSelection = onSelection,
+            modifier = modifier,
+            colonnes = if (moyens.size == 3 || moyens.size > 4 && moyens.size != 8) 3 else minOf(4, moyens.size),
+            enabled = enabled,
+        )
+    } else {
+        MissaChampListe(
+            libelle = libelle,
+            options = moyens.map { it to it },
+            selection = selection,
+            onSelection = onSelection,
+            modifier = modifier,
+            icone = selection?.let { iconeModePaiement(it) } ?: Iv.Payments,
+            enabled = enabled,
+        )
+    }
+}

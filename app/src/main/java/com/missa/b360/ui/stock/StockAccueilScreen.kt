@@ -76,30 +76,11 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
     var dialogueCategorie by remember { mutableStateOf(false) }
 
     if (dialogueCategorie) {
-        var nomCategorie by remember { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { dialogueCategorie = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (nomCategorie.isNotBlank()) {
-                        vm.creerCategorie(nomCategorie)
-                        dialogueCategorie = false
-                    }
-                }) { Text(stringResource(R.string.st_creer)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { dialogueCategorie = false }) {
-                    Text(stringResource(R.string.st_annuler))
-                }
-            },
-            title = { Text(stringResource(R.string.st_nouvelle_categorie)) },
-            text = {
-                OutlinedTextField(
-                    value = nomCategorie,
-                    onValueChange = { nomCategorie = it },
-                    label = { Text(stringResource(R.string.st_nom_categorie)) },
-                    singleLine = true,
-                )
+        DialogueNouvelleCategorieStock(
+            onFermer = { dialogueCategorie = false },
+            onCreer = { nom ->
+                vm.creerCategorie(nom)
+                dialogueCategorie = false
             },
         )
     }

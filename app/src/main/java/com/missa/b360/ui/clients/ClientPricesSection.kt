@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.core.data.entity.PriceClientEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.ui.icons.Iv
@@ -45,6 +46,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.stock.fmtValeur
+import com.missa.b360.ui.components.*
 
 @Composable
 internal fun ClientPricesSection(
@@ -99,36 +101,27 @@ private fun ClientPriceDialog(
 ) {
     var productId by remember { mutableStateOf<Long?>(products.firstOrNull { it.active && it.vendable }?.id) }
     var priceInput by remember { mutableStateOf("") }
-    val price = priceInput.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() && it > 0.0 }
+    val price = priceInput.trim().toDoubleOrNull()?.takeIf { it.isFinite() && it > 0.0 }
     val sellable = products.filter { it.active && it.vendable }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.clients_flow_add_price)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                ClientSelectorField(
-                    label = R.string.clients_flow_product,
-                    choices = sellable.map { it.id to "${it.code} · ${it.nom}" },
-                    selectedId = productId,
-                    onSelect = { productId = it },
-                    emptyLabel = stringResource(R.string.clients_flow_choose_product),
-                )
-                OutlinedTextField(
-                    value = priceInput,
-                    onValueChange = { priceInput = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(14) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.clients_flow_negotiated_price)) },
-                    suffix = { Text(devise, fontSize = 10.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = { productId?.let { id -> price?.let { onSave(id, it) } } }, enabled = productId != null && price != null) {
-                Text(stringResource(R.string.clients_enregistrer))
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ops_cancel)) } },
-    )
+
+    MissaFormDialogue(
+        titre = stringResource(R.string.clients_flow_add_price),
+        icone = Iv.Payments,
+        couleur = AppModule.CLIENTS.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.clients_enregistrer),
+        validerActif = productId != null && price != null,
+        onValider = { productId?.let { id -> price?.let { onSave(id, it) } } },
+    ) {
+        MissaChampListe(
+            libelle = stringResource(R.string.clients_flow_product),
+            options = sellable.map { it.id to "${it.code} · ${it.nom}" },
+            selection = productId,
+            onSelection = { productId = it },
+            icone = Iv.Inventory2,
+            requis = true,
+            placeholder = stringResource(R.string.clients_flow_choose_product),
+        )
+        MissaChampTexte(priceInput, { priceInput = it }, stringResource(R.string.clients_flow_negotiated_price), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise, longueurMax = 14)
+    }
 }

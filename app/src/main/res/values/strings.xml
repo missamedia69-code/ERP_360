@@ -2060,4 +2060,6 @@
     <string name="cpt_statut_brouillon">BROUILLON</string>
     <string name="cpt_piece_ligne">%1$s · %2$s · Débit %3$s / Crédit %4$s</string>
     <string name="cpt_valider_comptabiliser">Valider et comptabiliser</string>
+    <string name="form_valeur_invalide">Valeur invalide</string>
+    <string name="form_erreur_montant_max">Le montant ne peut pas dépasser %1$s</string>
 </resources>

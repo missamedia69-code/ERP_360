@@ -50,6 +50,8 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.ProfileOrange
 import com.missa.b360.ui.theme.Red40
 import com.missa.b360.ui.theme.Red80
+import com.missa.b360.ui.components.*
+import com.missa.b360.ui.icons.Iv
 
 /**
  * Maquette 8 — Inventaire : session en cours (progression), comptage physique
@@ -153,13 +155,11 @@ fun InventoryScreen(onBack: () -> Unit) {
                 )
                 Spacer(Modifier.height(10.dp))
                 if (onglet == 1) {
-                    OutlinedTextField(
-                        value = recherche,
-                        onValueChange = { recherche = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text(stringResource(R.string.st_rechercher_article), fontSize = 12.sp, color = MissaMuted) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
+                    MissaChampTexte(
+                        valeur = recherche,
+                        onValeur = { recherche = it },
+                        libelle = stringResource(R.string.st_rechercher_article),
+                        icone = Iv.Inventory2,
                     )
                     Spacer(Modifier.height(8.dp))
                 }
@@ -245,16 +245,15 @@ fun InventoryScreen(onBack: () -> Unit) {
                                         var saisie by remember(ligne.produitId, ligne.compte) {
                                             mutableStateOf(ligne.compte?.toString() ?: "")
                                         }
-                                        OutlinedTextField(
-                                            value = saisie,
-                                            onValueChange = {
+                                        MissaChampTexte(
+                                            valeur = saisie,
+                                            onValeur = {
                                                 saisie = it
                                                 vm.enregistrerCompte(ligne.produitId, it, ligne.attendu)
                                             },
-                                            modifier = Modifier.width(96.dp),
-                                            label = { Text(stringResource(R.string.st_compte), fontSize = 9.sp) },
-                                            singleLine = true,
-                                            shape = RoundedCornerShape(10.dp),
+                                            libelle = stringResource(R.string.st_compte),
+                                            modifier = Modifier.width(110.dp),
+                                            clavier = MissaClavier.DECIMAL,
                                         )
                                     } else {
                                         val ecart = ligne.ecart ?: 0.0
@@ -272,14 +271,11 @@ fun InventoryScreen(onBack: () -> Unit) {
                     }
                     item { Spacer(Modifier.height(12.dp)) }
                 }
-                Button(
+                MissaBoutonPrincipal(
+                    texte = stringResource(R.string.st_cloturer),
                     onClick = { vm.cloturer(onBack) },
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                ) {
-                    Text(stringResource(R.string.st_cloturer), fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                }
+                    couleur = AppModule.STOCK.couleur,
+                )
                 Spacer(Modifier.height(16.dp))
             }
         }

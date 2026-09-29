@@ -2013,4 +2013,6 @@
     <string name="cpt_statut_brouillon">BORRADOR</string>
     <string name="cpt_piece_ligne">%1$s · %2$s · Débito %3$s / Crédito %4$s</string>
     <string name="cpt_valider_comptabiliser">Validar y contabilizar</string>
+    <string name="form_valeur_invalide">Valor no válido</string>
+    <string name="form_erreur_montant_max">El importe no puede superar %1$s</string>
 </resources>

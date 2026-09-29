@@ -72,6 +72,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Bleu royal caractéristique du module Vente — source unique : [AppModule.VENTE]. */
 private val BleuVente: Color get() = AppModule.VENTE.couleur
@@ -353,6 +354,7 @@ private fun FormulaireVente(
 
     val totals = ui.totals(taxRate)
 
+    MissaFormulaireTheme(AppModule.VENTE.couleur) {
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
             title = stringResource(R.string.sales_new_sale),
@@ -364,6 +366,7 @@ private fun FormulaireVente(
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            item { MissaFormSectionTitre(stringResource(R.string.form_client), numero = 1) }
             item {
                 SelecteurClient(
                     selectedClient = ui.selectedClient,
@@ -404,6 +407,7 @@ private fun FormulaireVente(
                     }
                 }
             }
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
             item {
                 BlocCatalogueVente(
                     produits = produits,
@@ -452,11 +456,13 @@ private fun FormulaireVente(
                         }
                     }
                 }
+                item { MissaFormSectionTitre(stringResource(R.string.form_section_paiement), numero = 3) }
                 item {
-                    SelecteurModePaiement(
-                        modes = modes,
-                        selectionne = modePaiement,
-                        onChoix = { modePaiement = it },
+                    MissaChoixPaiement(
+                        moyens = modes,
+                        selection = modePaiement.ifBlank { null },
+                        onSelection = { modePaiement = it },
+                        libelle = stringResource(R.string.ach_mode_paiement),
                     )
                 }
             }
@@ -483,6 +489,7 @@ private fun FormulaireVente(
                 else -> null
             },
         )
+    }
     }
 
     if (dialogueNouveauClient) {
@@ -518,8 +525,10 @@ private fun SelecteurClient(
             value = selectedClient?.nom ?: "",
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.sales_select_client), fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
+            label = { Text(stringResource(R.string.sales_select_client) + " *", fontSize = 12.sp) },
+            leadingIcon = { Icon(painterResource(Iv.Person), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
+            trailingIcon = { Icon(painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore), null, tint = MissaInk) },
+            colors = missaChampCouleurs(),
             placeholder = if (clients.isEmpty()) {
                 { Text(stringResource(R.string.sales_select_client), fontSize = 12.sp, color = MissaMuted) }
             } else null,
@@ -583,79 +592,25 @@ private fun DialogueCreationClientRapide(
     var email by remember { mutableStateOf("") }
     var adresse by remember { mutableStateOf("") }
 
-    val nomValide = nom.trim().isNotBlank()
-    val telValide = telephone.trim().isNotBlank()
-    val valide = nomValide && telValide
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(22.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.sales_nouveau_client_rapide),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MissaInk,
-                )
-            }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it.take(120) },
-                    label = { Text(stringResource(R.string.clients_nom) + " *", fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = telephone,
-                    onValueChange = { telephone = it.take(25) },
-                    label = { Text(stringResource(R.string.clients_telephone) + " *", fontSize = 11.sp) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it.take(100) },
-                    label = { Text(stringResource(R.string.sales_email_optionnel), fontSize = 11.sp) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                if (error != null) Text(error, color = Color(0xFFB91C1C), fontSize = 11.sp)
-                OutlinedTextField(
-                    value = adresse,
-                    onValueChange = { adresse = it.take(150) },
-                    label = { Text(stringResource(R.string.sales_adresse_optionnelle), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
-                enabled = valide,
-                colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
-                shape = RoundedCornerShape(8.dp),
-            ) {
-                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.ops_cancel), color = MissaInk)
-            }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.sales_nouveau_client_rapide),
+        icone = Iv.PersonAdd,
+        couleur = AppModule.VENTE.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nom.isNotBlank() && telephone.isNotBlank(),
+        erreur = error,
+        onValider = { onValider(nom.trim(), telephone.trim(), email.trim().ifBlank { null }, adresse.trim().ifBlank { null }) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true, longueurMax = 120)
+            MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true, longueurMax = 25)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
+            MissaChampTexte(email, { email = it }, stringResource(R.string.sales_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, longueurMax = 100)
+            MissaChampTexte(adresse, { adresse = it }, stringResource(R.string.sales_adresse_optionnelle), icone = Iv.Place, longueurMax = 150)
+        }
+    }
 }
 
 @Composable
@@ -737,54 +692,6 @@ private fun LignePanierVente(
     }
 }
 
-@Composable
-private fun SelecteurModePaiement(
-    modes: List<String>,
-    selectionne: String,
-    onChoix: (String) -> Unit,
-) {
-    var ouvert by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = selectionne,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.ach_mode_paiement), fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(Modifier.matchParentSize().clickable { ouvert = true })
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            modes.forEach { mode ->
-                val choisie = mode == selectionne
-                DropdownMenuItem(
-                    leadingIcon = if (choisie) {
-                        {
-                            Icon(
-                                painter = painterResource(Iv.Check),
-                                contentDescription = null,
-                                tint = BrandBlue,
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
-                    } else null,
-                    text = {
-                        Text(
-                            text = mode,
-                            color = if (choisie) BrandBlue else MissaInk,
-                            fontWeight = if (choisie) FontWeight.SemiBold else FontWeight.Normal,
-                        )
-                    },
-                    onClick = {
-                        onChoix(mode)
-                        ouvert = false
-                    },
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun BarreActionsVente(
@@ -794,32 +701,15 @@ private fun BarreActionsVente(
     onValider: () -> Unit,
     erreur: String?,
 ) {
-    Surface(shadowElevation = 8.dp, color = Color.White) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            if (erreur != null) {
-                Text(
-                    text = erreur,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFB91C1C),
-                    modifier = Modifier.padding(bottom = 6.dp),
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(
-                    onClick = onBrouillon,
-                    enabled = valideActive && !busy,
-                    modifier = Modifier.weight(1f),
-                ) { Text(stringResource(R.string.ach_brouillon), color = MissaInk) }
-                Button(
-                    onClick = onValider,
-                    enabled = valideActive && !busy,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
-                ) { Text(stringResource(R.string.ach_valider), color = Color.White) }
-            }
-        }
-    }
+    MissaFormPied(
+        texte = stringResource(R.string.ach_valider),
+        onValider = onValider,
+        actif = valideActive,
+        enCours = busy,
+        secondaire = stringResource(R.string.ach_brouillon) to onBrouillon,
+        secondaireActif = valideActive,
+        erreur = erreur,
+    )
 }
 
 internal fun saleMoney(amount: Double, devise: String): String {

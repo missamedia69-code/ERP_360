@@ -2013,4 +2013,6 @@
     <string name="cpt_statut_brouillon">草稿</string>
     <string name="cpt_piece_ligne">%1$s · %2$s · 借方 %3$s / 贷方 %4$s</string>
     <string name="cpt_valider_comptabiliser">审核并过账</string>
+    <string name="form_valeur_invalide">无效的值</string>
+    <string name="form_erreur_montant_max">金额不能超过 %1$s</string>
 </resources>

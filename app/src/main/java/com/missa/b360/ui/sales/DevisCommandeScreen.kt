@@ -47,6 +47,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.missa.b360.R
+import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.OperationModule
@@ -85,6 +86,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.missa.b360.ui.components.*
 
 @HiltViewModel
 class DevisCommandeViewModel @Inject constructor(
@@ -399,64 +401,36 @@ private fun DevisCreationDialog(
     onCreate: (ClientEntity?, String, String) -> Unit,
 ) {
     var client by remember { mutableStateOf<ClientEntity?>(null) }
-    var selectionOuverte by remember { mutableStateOf(false) }
     var designation by remember { mutableStateOf("") }
     var prix by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.devis_new)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (clients.isEmpty()) {
-                    Text(stringResource(R.string.devis_no_clients), color = MissaMuted, fontSize = 12.sp)
-                }
-                Box {
-                    OutlinedButton(
-                        onClick = { selectionOuverte = true },
-                        enabled = clients.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = client?.nom ?: stringResource(R.string.devis_select_client),
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Icon(painterResource(Iv.ArrowDropDown), contentDescription = null)
-                    }
-                    DropdownMenu(expanded = selectionOuverte, onDismissRequest = { selectionOuverte = false }) {
-                        clients.forEach { choix ->
-                            DropdownMenuItem(
-                                text = { Text(choix.nom) },
-                                onClick = { client = choix; selectionOuverte = false },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = designation,
-                    onValueChange = { designation = it.take(120) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.devis_line_label)) },
-                    singleLine = true,
-                )
-                OutlinedTextField(
-                    value = prix,
-                    onValueChange = { prix = it.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(15) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.devis_total, devise)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onCreate(client, designation, prix) }) { Text(stringResource(R.string.devis_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.devis_cancel)) }
-        },
-    )
+
+    MissaFormDialogue(
+        titre = stringResource(R.string.devis_new),
+        icone = Iv.RequestQuote,
+        couleur = AppModule.VENTE.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.devis_save),
+        libelleAnnuler = stringResource(R.string.devis_cancel),
+        validerActif = client != null && designation.isNotBlank() && (prix.toDoubleOrNull() ?: 0.0) > 0.0,
+        onValider = { onCreate(client, designation.trim(), prix) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_client), numero = 1) {
+            MissaChampListe(
+                libelle = stringResource(R.string.form_client),
+                options = clients.map { it to it.nom },
+                selection = client,
+                onSelection = { client = it },
+                icone = Iv.Person,
+                requis = true,
+                placeholder = stringResource(R.string.devis_select_client),
+                aide = if (clients.isEmpty()) stringResource(R.string.devis_no_clients) else null,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 2) {
+            MissaChampTexte(designation, { designation = it }, stringResource(R.string.devis_line_label), icone = Iv.Description, requis = true, longueurMax = 120)
+            MissaChampTexte(prix, { prix = it }, stringResource(R.string.devis_total, devise), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, longueurMax = 15)
+        }
+    }
 }
 
 @Composable
@@ -468,61 +442,38 @@ private fun FacturerCommandeDialog(
     onInvoice: (String?, String) -> Unit,
 ) {
     var methode by remember(paymentMethods) { mutableStateOf(paymentMethods.firstOrNull()) }
-    var dropdownOpen by remember { mutableStateOf(false) }
     var montantPaye by remember { mutableStateOf("0") }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.devis_create_invoice)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(
-                    stringResource(R.string.devis_invoice_total, MoneyUtils.format(total, currency)),
-                    color = MissaMuted,
-                    fontSize = 12.sp,
-                )
-                if (paymentMethods.isEmpty()) {
-                    Text(stringResource(R.string.devis_no_payment_methods), color = MissaMuted, fontSize = 12.sp)
-                }
-                Box {
-                    OutlinedButton(
-                        onClick = { dropdownOpen = true },
-                        enabled = paymentMethods.isNotEmpty(),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            methode ?: stringResource(R.string.devis_select_payment_method),
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Icon(painterResource(Iv.ArrowDropDown), contentDescription = null)
-                    }
-                    DropdownMenu(expanded = dropdownOpen, onDismissRequest = { dropdownOpen = false }) {
-                        paymentMethods.forEach { choix ->
-                            DropdownMenuItem(
-                                text = { Text(choix) },
-                                onClick = { methode = choix; dropdownOpen = false },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = montantPaye,
-                    onValueChange = { montantPaye = it.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(15) },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.devis_paid_now, currency)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                )
+    val paye = montantPaye.toDoubleOrNull()
+    val montantValide = paye != null && paye >= 0.0 && paye <= total + 0.005
+
+    MissaFormDialogue(
+        titre = stringResource(R.string.devis_create_invoice),
+        sousTitre = stringResource(R.string.devis_invoice_total, MoneyUtils.format(total, currency)),
+        icone = Iv.Description,
+        couleur = AppModule.VENTE.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.devis_create_invoice),
+        libelleAnnuler = stringResource(R.string.devis_cancel),
+        validerActif = methode != null && montantValide,
+        onValider = { onInvoice(methode, montantPaye) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_paiement), numero = 1) {
+            if (paymentMethods.isEmpty()) {
+                MissaFormErreur(stringResource(R.string.devis_no_payment_methods))
             }
-        },
-        confirmButton = {
-            TextButton(onClick = { onInvoice(methode, montantPaye) }, enabled = paymentMethods.isNotEmpty()) {
-                Text(stringResource(R.string.devis_create_invoice))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.devis_cancel)) }
-        },
-    )
+            MissaChoixPaiement(
+                moyens = paymentMethods,
+                selection = methode,
+                onSelection = { methode = it },
+                libelle = stringResource(R.string.devis_select_payment_method),
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 2) {
+            MissaChampTexte(
+                montantPaye, { montantPaye = it }, stringResource(R.string.devis_paid_now, currency),
+                icone = Iv.Payments, clavier = MissaClavier.DECIMAL, longueurMax = 15,
+                erreur = if (paye != null && !montantValide) stringResource(R.string.form_erreur_montant_max, MoneyUtils.format(total, currency)) else null,
+            )
+        }
+    }
 }

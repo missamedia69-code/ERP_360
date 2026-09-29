@@ -2013,4 +2013,6 @@
     <string name="cpt_statut_brouillon">مسودة</string>
     <string name="cpt_piece_ligne">%1$s · %2$s · مدين %3$s / دائن %4$s</string>
     <string name="cpt_valider_comptabiliser">اعتماد وترحيل</string>
+    <string name="form_valeur_invalide">قيمة غير صالحة</string>
+    <string name="form_erreur_montant_max">لا يمكن أن يتجاوز المبلغ %1$s</string>
 </resources>

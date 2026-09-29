@@ -51,7 +51,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.graphics.Color
 import com.missa.b360.R
+import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.theme.MissaInk
+import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
@@ -59,6 +64,7 @@ import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.data.entity.SiteEntity
 import com.missa.b360.core.domain.usecase.ClientValidation
 import com.missa.b360.core.util.Iso4217
+import com.missa.b360.ui.components.*
 
 /**
  * Formulaire client plein écran.
@@ -147,6 +153,8 @@ fun ClientFormDialog(
         )
     }
 
+    val formulaireValide = nomValide && telephoneValide && emailValide
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -154,101 +162,42 @@ fun ClientFormDialog(
             dismissOnClickOutside = false,
         ),
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = stringResource(
-                                    if (client == null) R.string.clients_nouveau else R.string.clients_modifier,
-                                ),
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontSize = 19.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                ),
-                                maxLines = 1,
-                            )
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = onDismiss) {
-                                Icon(
-                                    painter = painterResource(Iv.ArrowBack),
-                                    contentDescription = stringResource(R.string.ob_retour),
-                                )
-                            }
-                        },
-                        actions = {
-                            TextButton(
-                                onClick = ::sauvegarder,
-                                enabled = nomValide && telephoneValide && emailValide,
-                            ) {
-                                Text(
-                                    stringResource(R.string.clients_enregistrer),
-                                    fontWeight = FontWeight.SemiBold,
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                        ),
+        MissaFormulaireTheme(AppModule.CLIENTS.couleur) {
+            Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+                Column(Modifier.fillMaxSize()) {
+                    MissaTopAppBar(
+                        title = stringResource(if (client == null) R.string.clients_nouveau else R.string.clients_modifier),
+                        onBack = onDismiss,
+                        couleurFond = AppModule.CLIENTS.couleurPale,
                     )
-                },
-                containerColor = MaterialTheme.colorScheme.background,
-            ) { innerPadding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .verticalScroll(rememberScrollState())
-                        .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(18.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.clients_informations_principales),
-                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                        Text(
+                            text = stringResource(R.string.clients_informations_principales_aide),
+                            fontSize = 12.sp,
+                            color = MissaMuted,
+                        )
+                        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+                            MissaChampListe(
+                                libelle = stringResource(R.string.clients_type),
+                                options = ClientType.entries.map { it to stringResource(it.labelRes()) },
+                                selection = type,
+                                onSelection = { type = it },
+                                icone = if (type == ClientType.PARTICULIER || type == ClientType.PROSPECT) Iv.Person else Iv.Business,
                             )
-                            Text(
-                                text = stringResource(R.string.clients_informations_principales_aide),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            MissaChampTexte(
+                                nom, { nom = it }, stringResource(R.string.clients_nom),
+                                icone = Iv.PersonOutline, requis = true, longueurMax = ClientValidation.LONGUEUR_NOM_MAX,
+                                placeholder = stringResource(R.string.clients_nom_exemple),
+                                erreur = if (nom.isNotEmpty() && !nomValide) stringResource(R.string.clients_nom_invalide) else null,
                             )
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            ClientTypeField(
-                                type = type,
-                                onTypeSelected = { type = it },
-                            )
-                            OutlinedTextField(
-                                value = nom,
-                                onValueChange = { nom = it.take(ClientValidation.LONGUEUR_NOM_MAX) },
-                                label = { Text(stringResource(R.string.clients_nom)) },
-                                placeholder = { Text(stringResource(R.string.clients_nom_exemple)) },
-                                isError = nom.isNotEmpty() && !nomValide,
-                                supportingText = {
-                                    if (nom.isNotEmpty() && !nomValide) {
-                                        Text(stringResource(R.string.clients_nom_invalide))
-                                    }
-                                },
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+                        }
+                        MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
                             TelephoneFields(
                                 paysAvecIndicatif = paysAvecIndicatif,
                                 codePays = codePays,
@@ -260,85 +209,52 @@ fun ClientFormDialog(
                                 telephoneValide = telephoneValide,
                                 indicatifPresent = indicatif != null,
                             )
-                            OutlinedTextField(
-                                value = email,
-                                onValueChange = { email = it.take(ClientValidation.LONGUEUR_EMAIL_MAX) },
-                                label = { Text(stringResource(R.string.clients_email)) },
-                                placeholder = { Text(stringResource(R.string.clients_email_exemple)) },
-                                isError = email.isNotEmpty() && !emailValide,
-                                supportingText = {
-                                    if (email.isNotEmpty() && !emailValide) {
-                                        Text(stringResource(R.string.clients_email_invalide))
-                                    }
-                                },
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Email,
-                                    imeAction = ImeAction.Next,
-                                ),
-                                modifier = Modifier.fillMaxWidth(),
+                            MissaChampTexte(
+                                email, { email = it }, stringResource(R.string.clients_email),
+                                icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, longueurMax = ClientValidation.LONGUEUR_EMAIL_MAX,
+                                placeholder = stringResource(R.string.clients_email_exemple),
+                                erreur = if (email.isNotEmpty() && !emailValide) stringResource(R.string.clients_email_invalide) else null,
                             )
-                            ClientSelectionFields(
-                                categories = categories,
-                                catId = catId,
-                                onCategoryChange = { catId = it },
-                                sites = sites,
-                                siteId = siteId,
-                                onSiteChange = { siteId = it },
-                            )
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        }
+                        MissaFormSection(titre = stringResource(R.string.form_section_commercial), numero = 3) {
+                            MissaRangee {
+                                MissaChampListe<Long?>(
+                                    libelle = stringResource(R.string.clients_categorie_optionnelle),
+                                    options = listOf<Pair<Long?, String>>(null to stringResource(R.string.clients_aucune_categorie)) +
+                                        categories.map { it.id to it.nom },
+                                    selection = catId,
+                                    onSelection = { catId = it },
+                                    modifier = Modifier.weight(1f),
+                                    icone = Iv.Category,
+                                )
+                                MissaChampListe<Long?>(
+                                    libelle = stringResource(R.string.clients_site),
+                                    options = listOf<Pair<Long?, String>>(null to stringResource(R.string.clients_aucun_site)) +
+                                        sites.map { it.id to it.nom },
+                                    selection = siteId,
+                                    onSelection = { siteId = it },
+                                    modifier = Modifier.weight(1f),
+                                    icone = Iv.Store,
+                                )
+                            }
                             ClientReadOnlyFields(
                                 statut = stringResource(statutRes),
                                 devise = deviseEntreprise?.trim().takeUnless { it.isNullOrEmpty() } ?: "—",
                             )
                         }
                     }
+                    MissaFormPied(
+                        texte = stringResource(R.string.clients_enregistrer),
+                        onValider = ::sauvegarder,
+                        actif = formulaireValide,
+                        modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
+                    )
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ClientTypeField(
-    type: ClientType,
-    onTypeSelected: (ClientType) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            value = stringResource(type.labelRes()),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.clients_type)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp,
-        ) {
-            ClientType.entries.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(stringResource(item.labelRes())) },
-                    onClick = {
-                        onTypeSelected(item)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -457,8 +373,11 @@ private fun CountryCodeField(
         OutlinedTextField(
             value = value,
             onValueChange = onQueryChange,
-            label = { Text(stringResource(R.string.clients_indicatif_pays)) },
+            label = { Text(stringResource(R.string.clients_indicatif_pays), fontSize = 12.sp) },
             placeholder = { Text(stringResource(R.string.clients_rechercher_indicatif)) },
+            leadingIcon = { Icon(painterResource(Iv.Public), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
+            colors = missaChampCouleurs(),
+            shape = RoundedCornerShape(12.dp),
             singleLine = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
@@ -500,8 +419,11 @@ private fun TelephoneField(
     OutlinedTextField(
         value = tel,
         onValueChange = onTelChange,
-        label = { Text(stringResource(R.string.clients_telephone)) },
+        label = { Text(stringResource(R.string.clients_telephone) + " *", fontSize = 12.sp) },
         placeholder = { Text(stringResource(R.string.clients_telephone_exemple)) },
+        leadingIcon = { Icon(painterResource(Iv.Call), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
+        colors = missaChampCouleurs(),
+        shape = RoundedCornerShape(12.dp),
         isError = !indicatifPresent || tel.isNotEmpty() && !telephoneValide,
         supportingText = {
             when {
@@ -518,151 +440,8 @@ private fun TelephoneField(
     )
 }
 
-@Composable
-private fun ClientSelectionFields(
-    categories: List<CategoryClientEntity>,
-    catId: Long?,
-    onCategoryChange: (Long?) -> Unit,
-    sites: List<SiteEntity>,
-    siteId: Long?,
-    onSiteChange: (Long?) -> Unit,
-) {
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val horizontal = maxWidth >= 520.dp
-        if (horizontal) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                CategoryField(
-                    categories = categories,
-                    selectedId = catId,
-                    onSelected = onCategoryChange,
-                    modifier = Modifier.weight(1f),
-                )
-                SiteField(
-                    sites = sites,
-                    selectedId = siteId,
-                    onSelected = onSiteChange,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        } else {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                CategoryField(
-                    categories = categories,
-                    selectedId = catId,
-                    onSelected = onCategoryChange,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                SiteField(
-                    sites = sites,
-                    selectedId = siteId,
-                    onSelected = onSiteChange,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun CategoryField(
-    categories: List<CategoryClientEntity>,
-    selectedId: Long?,
-    onSelected: (Long?) -> Unit,
-    modifier: Modifier,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selected = categories.firstOrNull { it.id == selectedId }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier,
-    ) {
-        OutlinedTextField(
-            value = selected?.nom.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.clients_categorie_optionnelle)) },
-            placeholder = { Text(stringResource(R.string.clients_aucune_categorie)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.clients_aucune_categorie)) },
-                onClick = {
-                    onSelected(null)
-                    expanded = false
-                },
-            )
-            categories.forEach { category ->
-                DropdownMenuItem(
-                    text = { Text(category.nom) },
-                    onClick = {
-                        onSelected(category.id)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SiteField(
-    sites: List<SiteEntity>,
-    selectedId: Long?,
-    onSelected: (Long?) -> Unit,
-    modifier: Modifier,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val selected = sites.firstOrNull { it.id == selectedId }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        modifier = modifier,
-    ) {
-        OutlinedTextField(
-            value = selected?.nom.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.clients_site)) },
-            placeholder = { Text(stringResource(R.string.clients_aucun_site)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.clients_aucun_site)) },
-                onClick = {
-                    onSelected(null)
-                    expanded = false
-                },
-            )
-            sites.forEach { site ->
-                DropdownMenuItem(
-                    text = { Text(site.nom) },
-                    onClick = {
-                        onSelected(site.id)
-                        expanded = false
-                    },
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun ClientReadOnlyFields(statut: String, devise: String) {

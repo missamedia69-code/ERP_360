@@ -116,6 +116,7 @@ import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Currency
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 private enum class ClientView { LIST, DETAIL, FORM_INFO, FORM_CONTACTS, FORM_ADDRESSES, EDIT, HISTORY, ACCOUNT, SEARCH, DEACTIVATE }
 private enum class ClientDetailTab { INFO, CONTACTS, ADDRESSES, NOTES }
@@ -632,10 +633,7 @@ private fun ClientListScreen(
                 }
             }
             item {
-                OutlinedTextField(
-                    value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(), singleLine = true,
-                    leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_recherche), fontSize = 12.sp) },
-                )
+                MissaChampTexte(query, { query = it }, stringResource(R.string.clients_recherche), icone = Iv.Search)
             }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1000,28 +998,23 @@ private fun ClientInfoFormScreen(
         onPrimary = onNext,
     ) {
         LazyColumn(contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(11.dp), modifier = Modifier.fillMaxSize()) {
-            item {
-                Text(stringResource(R.string.clients_flow_general_information), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text(stringResource(R.string.clients_flow_required_hint), color = ClientMuted, fontSize = 10.sp)
-            }
+            item { MissaFormSectionTitre(stringResource(R.string.clients_flow_general_information), numero = 1, sousTitre = stringResource(R.string.clients_flow_required_hint)) }
             item { ClientTypeChoice(draft.type, onSelect = { onDraftChange(draft.copy(type = it)) }) }
             item {
-                OutlinedTextField(value = draft.name, onValueChange = { onDraftChange(draft.copy(name = it.take(ClientValidation.LONGUEUR_NOM_MAX))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_company_name)) }, isError = draft.name.isNotEmpty() && !ClientValidation.nomEstValide(draft.name), singleLine = true)
+                MissaChampTexte(draft.name, { onDraftChange(draft.copy(name = it.take(ClientValidation.LONGUEUR_NOM_MAX))) }, stringResource(R.string.clients_flow_company_name), icone = Iv.Business, erreur = if (draft.name.isNotEmpty() && !ClientValidation.nomEstValide(draft.name)) stringResource(R.string.form_valeur_invalide) else null)
             }
             item { ClientReadOnlyLine(R.string.clients_flow_client_code, stringResource(R.string.clients_flow_generated_on_save)) }
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_fiscalite), numero = 2) }
             item { ClientStringPicker(R.string.clients_flow_fiscal_id_type, listOf("NIF" to "NIF", "NIU" to "NIU", "NINEA" to "NINEA", "TVA" to "TVA", "AUTRE" to stringResource(R.string.clients_type_autre)), draft.fiscalIdType) { onDraftChange(draft.copy(fiscalIdType = it)) } }
             item {
-                OutlinedTextField(value = draft.nif, onValueChange = { onDraftChange(draft.copy(nif = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_nif)) }, singleLine = true)
+                MissaChampTexte(draft.nif, { onDraftChange(draft.copy(nif = it.take(80))) }, stringResource(R.string.clients_flow_nif), icone = Iv.Badge)
             }
-            item { OutlinedTextField(value = draft.numeroTva, onValueChange = { onDraftChange(draft.copy(numeroTva = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_vat_number)) }, singleLine = true) }
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    item { FilterChip(selected = draft.assujettiTva, onClick = { onDraftChange(draft.copy(assujettiTva = !draft.assujettiTva)) }, label = { Text(stringResource(R.string.clients_flow_vat_subject), fontSize = 10.sp) }) }
-                    item { FilterChip(selected = draft.exonereTva, onClick = { onDraftChange(draft.copy(exonereTva = !draft.exonereTva)) }, label = { Text(stringResource(R.string.clients_flow_vat_exempt), fontSize = 10.sp) }) }
-                }
-            }
-            if (draft.exonereTva) item { OutlinedTextField(value = draft.motifExoneration, onValueChange = { onDraftChange(draft.copy(motifExoneration = it.take(240))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_tax_exemption_reason)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.tauxTva, onValueChange = { onDraftChange(draft.copy(tauxTva = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_specific_vat_rate)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true) }
+            item { MissaChampTexte(draft.numeroTva, { onDraftChange(draft.copy(numeroTva = it.take(80))) }, stringResource(R.string.clients_flow_vat_number), icone = Iv.Badge) }
+            item { MissaCaseACocher(draft.assujettiTva, { onDraftChange(draft.copy(assujettiTva = it)) }, stringResource(R.string.clients_flow_vat_subject)) }
+            item { MissaCaseACocher(draft.exonereTva, { onDraftChange(draft.copy(exonereTva = it)) }, stringResource(R.string.clients_flow_vat_exempt)) }
+            if (draft.exonereTva) item { MissaChampTexte(draft.motifExoneration, { onDraftChange(draft.copy(motifExoneration = it.take(240))) }, stringResource(R.string.clients_flow_tax_exemption_reason), icone = Iv.Description) }
+            item { MissaChampTexte(draft.tauxTva, { onDraftChange(draft.copy(tauxTva = it.decimalInput())) }, stringResource(R.string.clients_flow_specific_vat_rate), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%") }
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_contact), numero = 3) }
             item {
                 ClientPhoneField(
                     countryCode = draft.countryCode ?: countryDefault,
@@ -1032,8 +1025,9 @@ private fun ClientInfoFormScreen(
                 )
             }
             item {
-                OutlinedTextField(value = draft.email, onValueChange = { onDraftChange(draft.copy(email = it.take(ClientValidation.LONGUEUR_EMAIL_MAX))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_email)) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), isError = draft.email.isNotEmpty() && !ClientValidation.emailEstValide(draft.email))
+                MissaChampTexte(draft.email, { onDraftChange(draft.copy(email = it.take(ClientValidation.LONGUEUR_EMAIL_MAX))) }, stringResource(R.string.clients_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, erreur = if (draft.email.isNotEmpty() && !ClientValidation.emailEstValide(draft.email)) stringResource(R.string.form_valeur_invalide) else null)
             }
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_commercial), numero = 4) }
             item { ClientSelectorField(R.string.clients_categorie_optionnelle, categories.map { it.id to it.nom }, draft.categoryId, { onDraftChange(draft.copy(categoryId = it)) }, stringResource(R.string.clients_aucune_categorie)) }
             item { ClientSelectorField(R.string.clients_site, sites.map { it.id to it.nom }, draft.siteId, { onDraftChange(draft.copy(siteId = it)) }, stringResource(R.string.clients_aucun_site)) }
         }
@@ -1042,28 +1036,28 @@ private fun ClientInfoFormScreen(
 
 @Composable
 private fun ClientTypeChoice(selected: ClientType, onSelect: (ClientType) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(stringResource(R.string.clients_type), color = ClientMuted, fontSize = 10.sp)
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            items(ClientType.entries, key = { it.name }) { type -> FilterChip(selected = type == selected, onClick = { onSelect(type) }, label = { Text(stringResource(type.labelRes()), fontSize = 10.sp) }) }
-        }
-    }
+    MissaChampListe(
+        libelle = stringResource(R.string.clients_type),
+        options = ClientType.entries.map { it to stringResource(it.labelRes()) },
+        selection = selected,
+        onSelection = onSelect,
+        icone = if (selected == ClientType.PARTICULIER || selected == ClientType.PROSPECT) Iv.Person else Iv.Business,
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, selectedId: Long?, onSelect: (Long?) -> Unit, emptyLabel: String) {
-    var expanded by remember { mutableStateOf(false) }
-    val selected = choices.firstOrNull { it.first == selectedId }?.second.orEmpty()
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }, modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(value = selected, onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable), label = { Text(stringResource(label)) }, placeholder = { Text(emptyLabel) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }, singleLine = true)
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp) {
-            androidx.compose.material3.DropdownMenuItem(text = { Text(emptyLabel) }, onClick = { onSelect(null); expanded = false })
-            choices.forEach { (id, name) -> androidx.compose.material3.DropdownMenuItem(text = { Text(name) }, onClick = { onSelect(id); expanded = false }) }
-        }
-    }
+    MissaChampListe<Long?>(
+        libelle = stringResource(label),
+        options = listOf<Pair<Long?, String>>(null to emptyLabel) + choices.map { (id, nom) -> id to nom },
+        selection = selectedId,
+        onSelection = onSelect,
+        icone = when (label) {
+            R.string.clients_site -> Iv.Store
+            R.string.clients_badge_optionnel -> Iv.Star
+            else -> Iv.Category
+        },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1075,7 +1069,7 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
     var pickerVisible by remember { mutableStateOf(false) }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         OutlinedButton(onClick = { pickerVisible = true }, modifier = Modifier.width(110.dp).height(56.dp)) { Text(selected?.indicatif ?: "…", fontSize = 13.sp); Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(16.dp)) }
-        OutlinedTextField(value = phoneLocal, onValueChange = onPhone, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_telephone)) }, singleLine = true, isError = isError || (countryCode == null && phoneLocal.isNotBlank()), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
+        MissaChampTexte(phoneLocal, onPhone, stringResource(R.string.clients_telephone), modifier = Modifier.weight(1f), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, erreur = if (isError || (countryCode == null && phoneLocal.isNotBlank())) stringResource(R.string.form_valeur_invalide) else null)
     }
     if (pickerVisible) {
         var query by rememberSaveable { mutableStateOf("") }
@@ -1083,7 +1077,7 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
         androidx.compose.material3.ModalBottomSheet(onDismissRequest = { pickerVisible = false }, containerColor = Color.White) {
             Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 22.dp)) {
                 Text(stringResource(R.string.clients_indicatif_pays), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_rechercher_indicatif)) }, singleLine = true)
+                MissaChampTexte(query, { query = it }, stringResource(R.string.clients_rechercher_indicatif), icone = Iv.Search)
                 LazyColumn(modifier = Modifier.height(330.dp)) { items(visible, key = { it.code }) { country -> Row(modifier = Modifier.fillMaxWidth().clickable { onCountryCode(country.code); pickerVisible = false }.padding(vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) { Text(country.indicatif, color = ClientBlue, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp)); Text("${country.nom} (${country.code})", color = ClientInk, fontSize = 12.sp); if (country.code == countryCode) { Spacer(Modifier.weight(1f)); Icon(painterResource(Iv.Check), null, tint = MissaInk) } } } }
             }
         }
@@ -1149,19 +1143,25 @@ private fun ClientContactDialog(contact: ClientContactEntity, onDismiss: () -> U
     var email by remember(contact.id, contact.nom) { mutableStateOf(contact.email.orEmpty()) }
     var primary by remember(contact.id, contact.nom) { mutableStateOf(contact.principal) }
     val valid = ClientValidation.nomEstValide(name) && (phone.isBlank() || ClientValidation.telephoneEstValide(phone)) && ClientValidation.emailEstValide(email)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.clients_flow_contact)) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(value = name, onValueChange = { name = it.take(120) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_nom)) }, singleLine = true)
-            OutlinedTextField(value = role, onValueChange = { role = it.take(120) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_role)) }, singleLine = true)
-            OutlinedTextField(value = phone, onValueChange = { phone = ClientValidation.filtrerTelephonePourSaisie(it).take(25) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_telephone)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone), singleLine = true)
-            OutlinedTextField(value = email, onValueChange = { email = it.take(254) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_email)) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), singleLine = true)
-            FilterChip(selected = primary, onClick = { primary = !primary }, label = { Text(stringResource(R.string.clients_flow_primary)) })
-        } },
-        confirmButton = { Button(onClick = { onSave(contact.copy(nom = name, fonction = role.ifBlank { null }, telephone = phone.ifBlank { null }, email = email.ifBlank { null }, principal = primary)) }, enabled = valid) { Text(stringResource(R.string.clients_enregistrer)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ops_cancel)) } },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.clients_flow_contact),
+        icone = Iv.PersonAdd,
+        couleur = AppModule.CLIENTS.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.clients_enregistrer),
+        validerActif = valid,
+        onValider = { onSave(contact.copy(nom = name.trim(), fonction = role.trim().ifBlank { null }, telephone = phone.ifBlank { null }, email = email.trim().ifBlank { null }, principal = primary)) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(name, { name = it.take(120) }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true)
+            MissaChampTexte(role, { role = it.take(120) }, stringResource(R.string.clients_flow_role), icone = Iv.Badge)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
+            MissaChampTexte(phone, { phone = ClientValidation.filtrerTelephonePourSaisie(it).take(25) }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+            MissaChampTexte(email, { email = it.take(254) }, stringResource(R.string.clients_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
+            MissaCaseACocher(primary, { primary = it }, stringResource(R.string.clients_flow_primary))
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1196,7 +1196,7 @@ private fun ClientAddressesFormScreen(
         LazyColumn(contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.clients_flow_addresses), modifier = Modifier.weight(1f), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    MissaFormSectionTitre(stringResource(R.string.clients_flow_addresses), numero = 1, modifier = Modifier.weight(1f))
                     OutlinedButton(onClick = { editing = ClientAddressEntity(clientId = 0, adresse = "", principale = addresses.isEmpty()) }) { Icon(painterResource(Iv.Add), null, modifier = Modifier.size(17.dp)); Text(stringResource(R.string.clients_flow_add_address), fontSize = 10.sp) }
                 }
             }
@@ -1209,26 +1209,25 @@ private fun ClientAddressesFormScreen(
                     }
                 }
             }
-            item { HorizontalDivider(color = ClientBorder) }
-            item { Text(stringResource(R.string.clients_flow_other_information), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+            item { MissaFormSectionTitre(stringResource(R.string.clients_flow_other_information), numero = 2) }
             item {
-                OutlinedTextField(value = draft.commercial, onValueChange = { onDraftChange(draft.copy(commercial = it.take(120))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_sales_rep)) }, singleLine = true)
+                MissaChampTexte(draft.commercial, { onDraftChange(draft.copy(commercial = it.take(120))) }, stringResource(R.string.clients_flow_sales_rep), icone = Iv.Badge)
             }
             item {
-                OutlinedTextField(value = draft.paymentDays, onValueChange = { onDraftChange(draft.copy(paymentDays = it.filter(Char::isDigit).take(3))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_payment_terms)) }, suffix = { Text(stringResource(R.string.clients_flow_days_short), fontSize = 10.sp) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), singleLine = true, isError = draft.paymentDays.isNotEmpty() && (terms == null || terms !in 0..365))
+                MissaChampTexte(draft.paymentDays, { onDraftChange(draft.copy(paymentDays = it.filter(Char::isDigit).take(3))) }, stringResource(R.string.clients_flow_payment_terms), clavier = MissaClavier.ENTIER, suffixe = stringResource(R.string.clients_flow_days_short), erreur = if (draft.paymentDays.isNotEmpty() && (terms == null || terms !in 0..365)) stringResource(R.string.form_valeur_invalide) else null)
             }
-            item { OutlinedTextField(value = draft.paymentDescription, onValueChange = { onDraftChange(draft.copy(paymentDescription = it.take(240))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_payment_description)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.tariffGrid, onValueChange = { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_tariff_grid)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.discount, onValueChange = { onDraftChange(draft.copy(discount = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_remise)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = discount != null && discount !in 0.0..100.0) }
-            item { OutlinedTextField(value = draft.maxDiscount, onValueChange = { onDraftChange(draft.copy(maxDiscount = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_max_discount)) }, suffix = { Text("%") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = maxDiscount != null && maxDiscount !in 0.0..100.0) }
-            item { OutlinedTextField(value = draft.creditLimit, onValueChange = { onDraftChange(draft.copy(creditLimit = it.decimalInput())) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_limite_credit)) }, suffix = { Text(devise, fontSize = 10.sp) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true, isError = credit != null && credit < 0) }
-            item { OutlinedTextField(value = draft.segment, onValueChange = { onDraftChange(draft.copy(segment = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_segment)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.salesChannel, onValueChange = { onDraftChange(draft.copy(salesChannel = it.take(80))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_sales_channel)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.territory, onValueChange = { onDraftChange(draft.copy(territory = it.take(120))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_territory)) }, singleLine = true) }
-            item { OutlinedTextField(value = draft.accountCode, onValueChange = { onDraftChange(draft.copy(accountCode = it.take(40))) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_account_code)) }, singleLine = true) }
+            item { MissaChampTexte(draft.paymentDescription, { onDraftChange(draft.copy(paymentDescription = it.take(240))) }, stringResource(R.string.clients_flow_payment_description), icone = Iv.Description) }
+            item { MissaChampTexte(draft.tariffGrid, { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, stringResource(R.string.clients_flow_tariff_grid), icone = Iv.Payments) }
+            item { MissaChampTexte(draft.discount, { onDraftChange(draft.copy(discount = it.decimalInput())) }, stringResource(R.string.clients_remise), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (discount != null && discount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null) }
+            item { MissaChampTexte(draft.maxDiscount, { onDraftChange(draft.copy(maxDiscount = it.decimalInput())) }, stringResource(R.string.clients_flow_max_discount), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (maxDiscount != null && maxDiscount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null) }
+            item { MissaChampTexte(draft.creditLimit, { onDraftChange(draft.copy(creditLimit = it.decimalInput())) }, stringResource(R.string.clients_limite_credit), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, suffixe = devise, erreur = if (credit != null && credit < 0) stringResource(R.string.form_valeur_invalide) else null) }
+            item { MissaChampTexte(draft.segment, { onDraftChange(draft.copy(segment = it.take(80))) }, stringResource(R.string.clients_flow_segment), icone = Iv.Category) }
+            item { MissaChampTexte(draft.salesChannel, { onDraftChange(draft.copy(salesChannel = it.take(80))) }, stringResource(R.string.clients_flow_sales_channel), icone = Iv.Category) }
+            item { MissaChampTexte(draft.territory, { onDraftChange(draft.copy(territory = it.take(120))) }, stringResource(R.string.clients_flow_territory), icone = Iv.Category) }
+            item { MissaChampTexte(draft.accountCode, { onDraftChange(draft.copy(accountCode = it.take(40))) }, stringResource(R.string.clients_flow_account_code), icone = Iv.Badge) }
             item { ClientSelectorField(R.string.clients_badge_optionnel, badges.map { it.id to "${it.nom} (${it.remisePct.decimalText()}%)" }, draft.badgeId, { onDraftChange(draft.copy(badgeId = it)) }, stringResource(R.string.clients_flow_no_badge)) }
             item { ClientReadOnlyLine(R.string.clients_devise, devise.ifBlank { "—" }) }
-            item { OutlinedTextField(value = draft.notes, onValueChange = { onDraftChange(draft.copy(notes = it.take(ClientValidation.LONGUEUR_NOTES_MAX))) }, modifier = Modifier.fillMaxWidth().height(125.dp), label = { Text(stringResource(R.string.clients_notes)) }, maxLines = 5) }
+            item { MissaChampTexte(draft.notes, { onDraftChange(draft.copy(notes = it.take(ClientValidation.LONGUEUR_NOTES_MAX))) }, stringResource(R.string.clients_notes), icone = Iv.Description, lignes = 4) }
         }
     }
     editing?.let { address ->
@@ -1254,23 +1253,26 @@ private fun ClientAddressDialog(address: ClientAddressEntity, onDismiss: () -> U
     var city by remember(address.id, address.adresse) { mutableStateOf(address.ville.orEmpty()) }
     var main by remember(address.id, address.adresse) { mutableStateOf(address.principale) }
     val valid = street.trim().length in 2..ClientValidation.LONGUEUR_ADRESSE_MAX && label.trim().length <= 60 && city.trim().length <= 100
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.clients_flow_address)) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(value = label, onValueChange = { label = it.take(60) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_address_label)) }, singleLine = true)
-            OutlinedTextField(value = street, onValueChange = { street = it.take(ClientValidation.LONGUEUR_ADRESSE_MAX) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_adresse)) }, minLines = 2)
-            OutlinedTextField(value = city, onValueChange = { city = it.take(100) }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_city)) }, singleLine = true)
-            FilterChip(selected = main, onClick = { main = !main }, label = { Text(stringResource(R.string.clients_flow_primary)) })
-        } },
-        confirmButton = { Button(onClick = { onSave(address.copy(libelle = label, adresse = street, ville = city.ifBlank { null }, principale = main)) }, enabled = valid) { Text(stringResource(R.string.clients_enregistrer)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.ops_cancel)) } },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.clients_flow_address),
+        icone = Iv.Place,
+        couleur = AppModule.CLIENTS.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.clients_enregistrer),
+        validerActif = valid,
+        onValider = { onSave(address.copy(libelle = label.trim(), adresse = street.trim(), ville = city.trim().ifBlank { null }, principale = main)) },
+    ) {
+        MissaChampTexte(label, { label = it.take(60) }, stringResource(R.string.clients_flow_address_label), icone = Iv.Edit)
+        MissaChampTexte(street, { street = it.take(ClientValidation.LONGUEUR_ADRESSE_MAX) }, stringResource(R.string.clients_adresse), icone = Iv.Place, requis = true, lignes = 2)
+        MissaChampTexte(city, { city = it.take(100) }, stringResource(R.string.clients_flow_city), icone = Iv.Place)
+        MissaCaseACocher(main, { main = it }, stringResource(R.string.clients_flow_primary))
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, primaryLabel: Int, enabled: Boolean, onPrimary: () -> Unit, content: @Composable () -> Unit) {
+    MissaFormulaireTheme(AppModule.CLIENTS.couleur) {
     Scaffold(
         containerColor = ClientBackground,
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
@@ -1282,15 +1284,14 @@ private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, pri
             )
         },
         bottomBar = {
-            Button(onClick = onPrimary, enabled = enabled, modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 10.dp).height(48.dp), shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientBlue)) {
-                Text(stringResource(primaryLabel), fontWeight = FontWeight.Bold); Spacer(Modifier.width(7.dp)); Text(if (primaryLabel == R.string.clients_enregistrer) "✓" else "→")
-            }
+            MissaFormPied(texte = stringResource(primaryLabel), onValider = onPrimary, actif = enabled)
         },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             step?.let { ClientProgress(it) }
             Box(Modifier.weight(1f)) { content() }
         }
+    }
     }
 }
 
@@ -1420,13 +1421,13 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
     }
     Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_search_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-            item { OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(), leadingIcon = { Icon(painterResource(Iv.Search), null) }, placeholder = { Text(stringResource(R.string.clients_recherche)) }, singleLine = true) }
+            item { MissaChampTexte(query, { query = it }, stringResource(R.string.clients_recherche), icone = Iv.Search) }
             item { Text(stringResource(R.string.clients_flow_filters), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
             item { ClientStringPicker(R.string.clients_statut, listOf("ALL" to stringResource(R.string.clients_flow_all_status), "ACTIVE" to stringResource(R.string.clients_actif), "INACTIVE" to stringResource(R.string.clients_inactif)), status) { status = it } }
             item { ClientSelectorField(R.string.clients_categories, categories.map { it.id to it.nom }, categoryId, { categoryId = it }, stringResource(R.string.clients_aucune_categorie)) }
-            item { OutlinedTextField(value = commercial, onValueChange = { commercial = it }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_sales_rep)) }, singleLine = true) }
-            item { OutlinedTextField(value = city, onValueChange = { city = it }, modifier = Modifier.fillMaxWidth(), label = { Text(stringResource(R.string.clients_flow_city)) }, singleLine = true) }
-            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { OutlinedTextField(value = since, onValueChange = { since = it.take(10) }, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_flow_from)) }, placeholder = { Text("JJ/MM/AAAA", fontSize = 9.sp) }, singleLine = true); OutlinedTextField(value = until, onValueChange = { until = it.take(10) }, modifier = Modifier.weight(1f), label = { Text(stringResource(R.string.clients_flow_to)) }, placeholder = { Text("JJ/MM/AAAA", fontSize = 9.sp) }, singleLine = true) } }
+            item { MissaChampTexte(commercial, { commercial = it }, stringResource(R.string.clients_flow_sales_rep), icone = Iv.Badge) }
+            item { MissaChampTexte(city, { city = it }, stringResource(R.string.clients_flow_city), icone = Iv.Place) }
+            item { MissaRangee { MissaChampDateTexte(since, { since = it }, stringResource(R.string.clients_flow_from), modifier = Modifier.weight(1f)); MissaChampDateTexte(until, { until = it }, stringResource(R.string.clients_flow_to), modifier = Modifier.weight(1f)) } }
             item { Text(stringResource(R.string.clients_flow_results, results.size), color = ClientMuted, fontSize = 11.sp) }
             items(results, key = { it.id }) { client ->
                 ClientListRow(
@@ -1443,16 +1444,15 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientStringPicker(label: Int, choices: List<Pair<String, String>>, selected: String, onSelect: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-        OutlinedTextField(value = choices.firstOrNull { it.first == selected }?.second.orEmpty(), onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable), label = { Text(stringResource(label)) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) }, singleLine = true)
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(14.dp),
-            tonalElevation = 6.dp) { choices.forEach { (id, text) -> androidx.compose.material3.DropdownMenuItem(text = { Text(text) }, onClick = { onSelect(id); expanded = false }) } }
-    }
+    MissaChampListe(
+        libelle = stringResource(label),
+        options = choices,
+        selection = selected,
+        onSelection = onSelect,
+        icone = if (label == R.string.clients_statut) Iv.CheckCircle else Iv.Badge,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

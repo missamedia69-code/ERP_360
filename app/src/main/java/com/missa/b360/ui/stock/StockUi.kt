@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.ui.icons.Iv
 import com.missa.b360.core.data.entity.ProductType
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
@@ -332,7 +333,7 @@ fun StockOnglets(onglets: List<String>, selection: Int, onSelection: (Int) -> Un
 /** Champ avec menu déroulant (article, site, catégorie…). */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
-/** Sélecteur simple (champ + menu) pour les formulaires stock. */
+/** Sélecteur simple (champ + menu) pour les formulaires stock — rendu par le kit MissaChampListe. */
 @Composable
 fun DropdownChamp(
     label: String,
@@ -342,64 +343,22 @@ fun DropdownChamp(
     modifier: Modifier = Modifier,
     onNouveau: (() -> Unit)? = null,
     nouveauLibelle: String? = null,
+    icone: Int? = null,
 ) {
     // Un sélecteur sans options et sans action d'ajout ne s'affiche pas.
     if (options.isEmpty() && onNouveau == null) return
-    var ouvert by remember { mutableStateOf(false) }
-    Box(modifier) {
-        OutlinedTextField(
-            value = valeur,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label, fontSize = 11.sp, color = MissaMuted) },
-            placeholder = if (options.isEmpty() && onNouveau != null) {
-                { Text("+ ${nouveauLibelle ?: label}", fontSize = 12.sp, color = MissaMuted) }
-            } else null,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            trailingIcon = {
-                Icon(painterResource(StockIv.ExpandMore), null, tint = MissaMuted, modifier = Modifier.size(20.dp))
-            },
-        )
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clickable {
-                    if (options.isEmpty() && onNouveau != null) {
-                        onNouveau()
-                    } else {
-                        ouvert = true
-                    }
-                },
-        )
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            if (onNouveau != null) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            "+ ${nouveauLibelle ?: label}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MissaInk,
-                        )
-                    },
-                    onClick = {
-                        ouvert = false
-                        onNouveau()
-                    },
-                )
-            }
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option, fontSize = 12.sp, color = MissaInk) },
-                    onClick = {
-                        ouvert = false
-                        onOption(option)
-                    },
-                )
-            }
-        }
-    }
+    val requis = label.trimEnd().endsWith("*")
+    val libelle = if (requis) label.trimEnd().removeSuffix("*").trimEnd() else label
+    com.missa.b360.ui.components.MissaChampListe(
+        libelle = libelle,
+        options = options.map { it to it },
+        selection = valeur.takeIf { it.isNotEmpty() },
+        onSelection = onOption,
+        modifier = modifier.fillMaxWidth(),
+        icone = icone ?: Iv.Category,
+        requis = requis,
+        actionNouveau = onNouveau?.let { (nouveauLibelle ?: libelle) to it },
+    )
 }
 
 /** Variante avec identifiants : options = id → libellé affiché. */
@@ -413,8 +372,10 @@ fun DropdownChamp(
     modifier: Modifier = Modifier,
     onNouveau: (() -> Unit)? = null,
     nouveauLibelle: String? = null,
+    icone: Int? = null,
 ) {
     DropdownChamp(
+        icone = icone,
         label = libelle,
         valeur = options.firstOrNull { it.first == selection }?.second ?: "",
         options = options.map { it.second },
@@ -423,4 +384,31 @@ fun DropdownChamp(
         onNouveau = onNouveau,
         nouveauLibelle = nouveauLibelle,
     )
+}
+
+/**
+ * Création rapide d'une catégorie d'article — composant unique partagé par le
+ * formulaire article, l'accueil Stock et l'écran Catégories (ex-copies #18/#19/#20).
+ */
+@Composable
+internal fun DialogueNouvelleCategorieStock(
+    onFermer: () -> Unit,
+    onCreer: (String) -> Unit,
+) {
+    var nom by remember { mutableStateOf("") }
+    com.missa.b360.ui.components.MissaFormDialogue(
+        titre = stringResource(R.string.st_nouvelle_categorie),
+        icone = Iv.Category,
+        couleur = com.missa.b360.ui.navigation.AppModule.STOCK.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.st_creer),
+        libelleAnnuler = stringResource(R.string.st_annuler),
+        validerActif = nom.isNotBlank(),
+        onValider = { onCreer(nom.trim()) },
+    ) {
+        com.missa.b360.ui.components.MissaChampTexte(
+            nom, { nom = it }, stringResource(R.string.st_nom_categorie),
+            icone = Iv.Category, requis = true, longueurMax = 80,
+        )
+    }
 }

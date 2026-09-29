@@ -2017,4 +2017,6 @@
     <string name="cpt_statut_brouillon">DRAFT</string>
     <string name="cpt_piece_ligne">%1$s · %2$s · Debit %3$s / Credit %4$s</string>
     <string name="cpt_valider_comptabiliser">Approve and post</string>
+    <string name="form_valeur_invalide">Invalid value</string>
+    <string name="form_erreur_montant_max">The amount cannot exceed %1$s</string>
 </resources>

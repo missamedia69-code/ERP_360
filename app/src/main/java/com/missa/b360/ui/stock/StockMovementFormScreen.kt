@@ -1,6 +1,7 @@
 package com.missa.b360.ui.stock
 
 import com.missa.b360.ui.navigation.AppModule
+import androidx.compose.foundation.layout.Arrangement
 
 import com.missa.b360.ui.theme.MissaInk
 
@@ -38,6 +39,8 @@ import com.missa.b360.core.data.entity.StockMovementType
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.core.data.dao.StockMovementView
+import com.missa.b360.ui.components.*
+import com.missa.b360.ui.icons.Iv
 
 /** Maquette 9 — transferts entre sites + historique ; validation via TransferStockUseCase. */
 @Composable
@@ -76,90 +79,87 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
         if (ok) onBack()
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-    ) {
+    val qteTransfert = quantite.toDoubleOrNull()
+    val transfertComplet = produitId != null && qteTransfert != null && qteTransfert > 0 &&
+        sourceId != null && destId != null && sourceId != destId
+
+    MissaFormulaireTheme(AppModule.STOCK.couleur) {
+    Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_transferts_stock), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             Row {
                 StockChip(stringResource(R.string.st_nouveau_transfert), actif = !modeHistorique) { modeHistorique = false }
                 Spacer(Modifier.width(6.dp))
                 StockChip(stringResource(R.string.st_historique), actif = modeHistorique) { modeHistorique = true }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(14.dp))
             if (modeHistorique) {
                 HistoriqueTransferts()
             } else {
                 val stockProduit = stockRows.filter { it.produitId == produitId }
-                DropdownChamp(
-                    libelle = stringResource(R.string.st_article),
-                    options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
-                    selection = produitId,
-                    onSelection = { produitId = it; if (sourceId == null) sourceId = produits.firstOrNull { p -> p.product.id == it }?.product?.siteId },
-                )
-                Spacer(Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = quantite,
-                    onValueChange = { quantite = it },
-                    label = { Text("${stringResource(R.string.st_quantite)} *", fontSize = 11.sp) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                )
-                Spacer(Modifier.height(10.dp))
-                DropdownChamp(
-                    libelle = "${stringResource(R.string.st_de)} *",
-                    options = sites.map { s ->
-                        val q = stockProduit.firstOrNull { it.siteId == s.id }?.quantite ?: 0.0
-                        s.id to "${s.nom} (${fmtQuantite(q)})"
-                    },
-                    selection = sourceId,
-                    onSelection = { sourceId = it },
-                )
-                Spacer(Modifier.height(10.dp))
-                DropdownChamp(
-                    libelle = "${stringResource(R.string.st_vers)} *",
-                    options = sites.filter { it.id != sourceId }.map { it.id to it.nom },
-                    selection = destId,
-                    onSelection = { destId = it },
-                )
-                Spacer(Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = observation,
-                    onValueChange = { observation = it },
-                    label = { Text(stringResource(R.string.st_observation), fontSize = 11.sp) },
-                    placeholder = { Text(stringResource(R.string.st_obs_placeholder), fontSize = 11.sp) },
-                    modifier = Modifier.fillMaxWidth().height(84.dp),
-                    shape = RoundedCornerShape(12.dp),
-                )
-                Spacer(Modifier.height(14.dp))
-                Button(
-                    onClick = {
-                        val q = quantite.toDoubleOrNull()
-                        if (produitId == null || q == null || q <= 0 || sourceId == null || destId == null || sourceId == destId) {
-                            Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
-                        } else {
-                            vm.transfer(
-                                produitId = produitId!!,
-                                siteSourceId = sourceId!!,
-                                siteDestId = destId!!,
-                                quantite = q,
-                                motif = texteTransfertMotif,
-                                commentaire = observation,
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                    enabled = !busy,
-                ) {
-                    Text(stringResource(R.string.st_valider_transfert), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                    MissaFormSection(titre = stringResource(R.string.form_section_article), numero = 1) {
+                        MissaChampListe(
+                            libelle = stringResource(R.string.st_article),
+                            options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
+                            selection = produitId,
+                            onSelection = { id ->
+                                produitId = id
+                                if (sourceId == null) sourceId = produits.firstOrNull { p -> p.product.id == id }?.product?.siteId
+                            },
+                            icone = Iv.Inventory2,
+                            requis = true,
+                        )
+                        MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true)
+                    }
+                    MissaFormSection(titre = stringResource(R.string.form_section_expedition), numero = 2) {
+                        MissaChampListe(
+                            libelle = stringResource(R.string.st_de),
+                            options = sites.map { site ->
+                                val q = stockProduit.firstOrNull { it.siteId == site.id }?.quantite ?: 0.0
+                                site.id to "${site.nom} (${fmtQuantite(q)})"
+                            },
+                            selection = sourceId,
+                            onSelection = { sourceId = it },
+                            icone = Iv.Warehouse,
+                            requis = true,
+                        )
+                        MissaChampListe(
+                            libelle = stringResource(R.string.st_vers),
+                            options = sites.filter { it.id != sourceId }.map { it.id to it.nom },
+                            selection = destId,
+                            onSelection = { destId = it },
+                            icone = Iv.LocalShipping,
+                            requis = true,
+                        )
+                        MissaChampTexte(observation, { observation = it }, stringResource(R.string.st_observation), icone = Iv.Description, placeholder = stringResource(R.string.st_obs_placeholder), lignes = 2)
+                    }
                 }
             }
             Spacer(Modifier.height(20.dp))
         }
+        if (!modeHistorique) {
+            MissaFormPied(
+                texte = stringResource(R.string.st_valider_transfert),
+                actif = transfertComplet,
+                enCours = busy,
+                onValider = {
+                    val q = qteTransfert
+                    if (transfertComplet && q != null) {
+                        vm.transfer(
+                            produitId = produitId!!,
+                            siteSourceId = sourceId!!,
+                            siteDestId = destId!!,
+                            quantite = q,
+                            motif = texteTransfertMotif,
+                            commentaire = observation,
+                        )
+                    }
+                },
+            )
+        }
+    }
     }
 }
 
@@ -221,68 +221,62 @@ fun StockMovementFormScreen(
         if (ok) onBack()
     }
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    val qte = quantite.toDoubleOrNull()
+    val mouvementComplet = produitId != null && qte != null && qte > 0
+
+    MissaFormulaireTheme(AppModule.STOCK.couleur) {
+    Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_nouveau_mouvement), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Spacer(Modifier.height(8.dp))
-            Row {
-                StockChip(stringResource(R.string.st_mv_entree), actif = type == StockMovementType.ENTREE) { type = StockMovementType.ENTREE }
-                Spacer(Modifier.width(6.dp))
-                StockChip(stringResource(R.string.st_mv_sortie), actif = type == StockMovementType.SORTIE) { type = StockMovementType.SORTIE }
-                Spacer(Modifier.width(6.dp))
-                StockChip(stringResource(R.string.st_mv_transfert), actif = false, onClick = onOpenTransfer)
+        Column(
+            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
+                MissaChoixTuiles(
+                    options = listOf(
+                        MissaTuile(StockMovementType.ENTREE, stringResource(R.string.st_mv_entree), Iv.TrendingUp),
+                        MissaTuile(StockMovementType.SORTIE, stringResource(R.string.st_mv_sortie), Iv.TrendingDown),
+                        // Le transfert ouvre son propre formulaire : ce n'est jamais une sélection.
+                        MissaTuile(StockMovementType.TRANSFERT_SORTIE, stringResource(R.string.st_mv_transfert), Iv.SwapHoriz),
+                    ),
+                    selection = type,
+                    onSelection = { choix -> if (choix == StockMovementType.TRANSFERT_SORTIE) onOpenTransfer() else type = choix },
+                    colonnes = 3,
+                )
             }
-            Spacer(Modifier.height(12.dp))
-            DropdownChamp(
-                libelle = stringResource(R.string.st_article),
-                options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
-                selection = produitId,
-                onSelection = { produitId = it },
-            )
-            Spacer(Modifier.height(10.dp))
-            OutlinedTextField(
-                value = quantite,
-                onValueChange = { quantite = it },
-                label = { Text("${stringResource(R.string.st_quantite)} *", fontSize = 11.sp) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-            )
-            Spacer(Modifier.height(10.dp))
-            OutlinedTextField(
-                value = motif,
-                onValueChange = { motif = it },
-                label = { Text(stringResource(R.string.st_motif), fontSize = 11.sp) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-            )
-            Spacer(Modifier.height(14.dp))
-            Button(
-                onClick = {
-                    val q = quantite.toDoubleOrNull()
-                    if (produitId == null || q == null || q <= 0) {
-                        Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
-                    } else {
-                        vm.record(
-                            produitId = produitId!!,
-                            type = type,
-                            quantite = q,
-                            motif = motif.ifBlank { if (type == StockMovementType.ENTREE) texteEntree else texteSortie },
-                            reference = "",
-                            commentaire = "",
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(46.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                enabled = !busy,
-            ) {
-                Text(stringResource(R.string.st_valider), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            MissaFormSection(titre = stringResource(R.string.form_section_article), numero = 2) {
+                MissaChampListe(
+                    libelle = stringResource(R.string.st_article),
+                    options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
+                    selection = produitId,
+                    onSelection = { produitId = it },
+                    icone = Iv.Inventory2,
+                    requis = true,
+                )
+                MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true)
+                MissaChampTexte(motif, { motif = it }, stringResource(R.string.st_motif), icone = Iv.Description)
             }
-            Spacer(Modifier.height(20.dp))
         }
+        MissaFormPied(
+            texte = stringResource(R.string.st_valider),
+            actif = mouvementComplet,
+            enCours = busy,
+            onValider = {
+                val q = qte
+                val id = produitId
+                if (id != null && q != null && q > 0) {
+                    vm.record(
+                        produitId = id,
+                        type = type,
+                        quantite = q,
+                        motif = motif.ifBlank { if (type == StockMovementType.ENTREE) texteEntree else texteSortie },
+                        reference = "",
+                        commentaire = "",
+                    )
+                }
+            },
+        )
+    }
     }
 }
 
