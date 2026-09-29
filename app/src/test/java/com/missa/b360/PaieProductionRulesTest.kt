@@ -77,8 +77,8 @@ class PaieRulesTest {
     }
 }
 
-/** Règles production (§Production) — agrégation des besoins par composant. */
-class ProductionRulesTest {
+/** Règles production (§Production) — agrégation des besoins par composant (cas limites). */
+class ProductionBesoinsRulesTest {
 
     private fun payload(vararg composants: ProductionComponent): ProductionRecordPayload =
         ProductionRecordPayload(
