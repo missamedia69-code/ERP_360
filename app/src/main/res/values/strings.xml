@@ -1913,4 +1913,7 @@
     <string name="tre_reference_deja_utilisee">Cette référence a déjà été enregistrée.</string>
     <string name="tre_solde_disponible">Solde réellement disponible</string>
     <string name="tre_solde_consolide">Solde consolidé (y compris comptes fermés) : %1$s</string>
+    <string name="form_note_locale">Données enregistrées uniquement sur cet appareil</string>
+    <string name="form_effacer">Effacer</string>
+    <string name="form_suivant">Suivant</string>
 </resources>

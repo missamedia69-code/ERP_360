@@ -1866,4 +1866,7 @@
     <string name="tre_reference_deja_utilisee">此参考号已被记录。</string>
     <string name="tre_solde_disponible">实际可用余额</string>
     <string name="tre_solde_consolide">综合余额（含已关闭账户）：%1$s</string>
+    <string name="form_note_locale">数据仅保存在本设备上</string>
+    <string name="form_effacer">清除</string>
+    <string name="form_suivant">下一步</string>
 </resources>

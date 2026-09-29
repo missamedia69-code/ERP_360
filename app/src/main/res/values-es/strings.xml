@@ -1866,4 +1866,7 @@
     <string name="tre_reference_deja_utilisee">Esta referencia ya se ha registrado.</string>
     <string name="tre_solde_disponible">Saldo realmente disponible</string>
     <string name="tre_solde_consolide">Saldo consolidado (incluye cuentas cerradas): %1$s</string>
+    <string name="form_note_locale">Datos guardados solo en este dispositivo</string>
+    <string name="form_effacer">Borrar</string>
+    <string name="form_suivant">Siguiente</string>
 </resources>

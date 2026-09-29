@@ -1866,4 +1866,7 @@
     <string name="tre_reference_deja_utilisee">تم تسجيل هذا المرجع مسبقًا.</string>
     <string name="tre_solde_disponible">الرصيد المتاح فعليًا</string>
     <string name="tre_solde_consolide">الرصيد الموحد (يشمل الحسابات المغلقة): %1$s</string>
+    <string name="form_note_locale">البيانات محفوظة على هذا الجهاز فقط</string>
+    <string name="form_effacer">مسح</string>
+    <string name="form_suivant">التالي</string>
 </resources>

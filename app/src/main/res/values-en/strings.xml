@@ -1870,4 +1870,7 @@
     <string name="tre_reference_deja_utilisee">This reference has already been recorded.</string>
     <string name="tre_solde_disponible">Actually available balance</string>
     <string name="tre_solde_consolide">Consolidated balance (including closed accounts): %1$s</string>
+    <string name="form_note_locale">Data stored only on this device</string>
+    <string name="form_effacer">Clear</string>
+    <string name="form_suivant">Next</string>
 </resources>
