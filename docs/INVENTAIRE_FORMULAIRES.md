@@ -20,6 +20,43 @@ Légende : ✅ conforme · ⚠️ écart mineur · ❌ écart bloquant par rappo
 
 **Résultat global :** 27 formulaires conformes sur les 5 règles, 14 avec seulement des écarts mineurs (⚠️), **19 avec au moins un ❌**. Parmi ces 19, 12 enfreignent une règle R1 à R4 (traduction, calendrier, bouton, liste) et 7 seulement la règle du clavier R5 (#17, #23, #42, #43, #57–#59).
 
+
+## Mise à jour — nouveau design des formulaires (phase 4)
+
+Les 60 formulaires utilisent maintenant le kit commun `ui/components/MissaFormulaire.kt`, inspiré de la maquette « GOOD UI/UX » :
+- en-tête (titre, sous-titre, icône) ;
+- sections numérotées ① ② ③ ;
+- champs pleine largeur avec icône noire en tête ;
+- champs courts deux par deux (`MissaRangee`) ;
+- choix exclusifs en tuiles (`MissaChoixTuiles`, `MissaChoixPaiement`) ;
+- cases à cocher claires ;
+- gros bouton principal à la couleur du module ;
+- mention « données enregistrées uniquement sur cet appareil ».
+
+| Lot | Formulaires | Commit |
+|---|---|---|
+| 1 | #2, #51–#60 (sites, projets, tâches, RH, qualité, maintenance, livraison) | `9b2311e` |
+| 2 | #37–#50 (trésorerie, comptabilité, production, services) | `c23af00` |
+| 3 | #3–#16, #18–#23 (clients, vente, devis et commandes, stock) | `4cdf5ff` |
+| 4 | #1, #17, #24–#36 (onboarding entreprise, fiche article, achats, fournisseurs) | `54c1267`, `a7a5f58` |
+
+Effets sur la grille de contrôle :
+- **R1** : les formulaires qui contrôlaient les champs seulement au clic (#15, #21, #22, #41, #46–#49…) ont maintenant un bouton grisé tant que les champs requis sont vides.
+- **R2** : toutes les dates passent par le calendrier du kit (`MissaChampDate`, `MissaChampDateTexte`, `MissaChampDateHeure`).
+- **R3** : toutes les listes passent par `MissaChampListe`.
+- **R5** : le clavier est choisi par `MissaClavier` (ENTIER, DECIMAL, TELEPHONE, EMAIL).
+- **Doublons supprimés** :
+  - les trois dialogues « Nouvelle catégorie » (#18–#20) sont remplacés par `DialogueNouvelleCategorieStock` ;
+  - `ChampDate`, `ChampDateAchat`, `ChampDateFour`, `DropdownChamp` et `Selecteur` sont redirigés vers le kit ;
+  - `ChampsCategorie` et `ChampsBadge`, qui n'étaient plus appelés, sont supprimés.
+- **Gardés volontairement hors du kit** :
+  - les champs de recherche seuls et les filtres de liste ;
+  - les dialogues de confirmation d'annulation (Achats, Projets, Livraison) ;
+  - le champ téléphone avec indicatif pays de la fiche client ;
+  - la recherche intégrée à `MissaSelecteur`.
+
+Les tableaux ci-dessous restent le relevé **avant** la phase 4.
+
 ---
 
 ## 1. Onboarding
