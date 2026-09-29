@@ -82,8 +82,8 @@ private fun LigneListeFormulaire(texte: String, fin: @Composable () -> Unit) {
         color = androidx.compose.ui.graphics.Color.White,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(texte, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MissaInk, modifier = Modifier.weight(1f).padding(vertical = 10.dp))
+        Row(Modifier.padding(start = 10.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(texte, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MissaInk, modifier = Modifier.weight(1f).padding(vertical = 7.dp))
             fin()
         }
     }
@@ -138,7 +138,7 @@ fun BadgesDialog(
                 LigneListeFormulaire("${badge.nom} (-${badge.remisePct}%)") {
                     Text(
                         stringResource(if (badge.actif) R.string.clients_actif else R.string.clients_inactif),
-                        fontSize = 11.sp, color = MissaMuted, modifier = Modifier.padding(end = 10.dp),
+                        fontSize = 11.sp, color = MissaMuted, modifier = Modifier.padding(end = 7.dp),
                     )
                 }
             }

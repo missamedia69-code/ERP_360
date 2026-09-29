@@ -52,7 +52,7 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_alertes_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             StockChip(stringResource(R.string.st_toutes), filtre == 0) { vm.setFiltre(0) }
@@ -64,16 +64,16 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 icon = StockIv.Notifications,
                 title = stringResource(R.string.st_ok),
                 description = stringResource(R.string.st_aucun_resultat),
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                modifier = Modifier.fillMaxWidth().padding(17.dp),
             )
         } else {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                item { Spacer(Modifier.height(10.dp)) }
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+                item { Spacer(Modifier.height(7.dp)) }
                 items(alertes, key = { it.product.id }) { ligne ->
                     CarteStock(onClick = { onNaviguer(Routes.stockDetail(ligne.product.id)) }) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(
-                                modifier = Modifier.size(34.dp),
+                                modifier = Modifier.size(28.dp),
                                 shape = RoundedCornerShape(10.dp),
                                 color = if (ligne.stock <= 0) Red80 else Color(0xFFFFF4E5),
                             ) {
@@ -86,7 +86,7 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                                     )
                                 }
                             }
-                            Spacer(Modifier.width(10.dp))
+                            Spacer(Modifier.width(7.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(ligne.nom, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 1)
                                 Text(
@@ -102,9 +102,9 @@ fun StockAlertesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                             BadgeNiveau(ligne)
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                 }
-                item { Spacer(Modifier.height(16.dp)) }
+                item { Spacer(Modifier.height(12.dp)) }
             }
         }
     }

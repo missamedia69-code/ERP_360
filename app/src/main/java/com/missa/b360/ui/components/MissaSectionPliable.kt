@@ -74,7 +74,7 @@ fun MissaSectionPliable(
         if (ouvrirDOffice) ouvert = true
     }
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         border = if (etiquetteEnErreur) BorderStroke(1.dp, Red40) else null,
         colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -84,7 +84,7 @@ fun MissaSectionPliable(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { ouvert = !ouvert }
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(color = BrandBlue.copy(alpha = 0.12f), shape = RoundedCornerShape(10.dp)) {
@@ -95,7 +95,7 @@ fun MissaSectionPliable(
                     modifier = Modifier.padding(6.dp).size(17.dp),
                 )
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = titre,
@@ -114,7 +114,7 @@ fun MissaSectionPliable(
                 }
             }
             if (etiquette != null) {
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Surface(
                     color = if (etiquetteEnErreur) Red80 else MissaSurface,
                     shape = RoundedCornerShape(7.dp),
@@ -138,12 +138,12 @@ fun MissaSectionPliable(
         AnimatedVisibility(visible = ouvert) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp),
                     content = contenu,
                 )
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(10.dp))
             }
         }
     }

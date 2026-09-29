@@ -70,7 +70,7 @@ import kotlinx.coroutines.delay
 internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
     // Style « maquette » partagé par tous les cartouches de l'écran.
     val carteConfig = OnbConfigCard
-    val rayonConfig = RoundedCornerShape(16.dp)
+    val rayonConfig = RoundedCornerShape(14.dp)
     OnbScaffold(
         titreRes = R.string.obn_config_titre,
         sousTitreRes = R.string.obn_config_sous,
@@ -79,7 +79,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             OnbFuseauLigne(
                 selection = viewModel.fuseau,
@@ -164,7 +164,7 @@ internal fun OnbConfigurationStep(viewModel: OnboardingViewModel) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 14.dp),
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
@@ -265,13 +265,13 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
     }
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         border = BorderStroke(1.dp, MissaBorder),
         colors = CardDefaults.cardColors(containerColor = MissaSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = painterResource(Iv.Restore),
@@ -279,7 +279,7 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
                     tint = MissaInk,
                     modifier = Modifier.size(20.dp),
                 )
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(7.dp))
                 Text(
                     text = stringResource(R.string.obn_restaurer_titre),
                     fontSize = 14.sp,
@@ -294,7 +294,7 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
                 lineHeight = 18.sp,
                 color = MissaMuted,
             )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
             // Bouton plein vert de la maquette (l'ancien OutlinedButton était
             // trop effacé pour l'action principale de la carte).
             Button(
@@ -308,8 +308,8 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
                     disabledContainerColor = OnbActionGreen.copy(alpha = 0.4f),
                 ),
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
+                    horizontal = 12.dp,
+                    vertical = 8.dp,
                 ),
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -327,14 +327,14 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
                 )
             }
             if (viewModel.restaurationEnCours) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
                     color = BrandBlue,
                 )
             }
             viewModel.restaurationMessageRes?.let { messageRes ->
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = stringResource(messageRes),
                     fontSize = 11.5.sp,
@@ -365,7 +365,7 @@ private fun OnbRestaurationCarte(viewModel: OnboardingViewModel) {
             title = {
                 Text(
                     text = stringResource(R.string.obn_restaurer_confirme_titre),
-                    fontSize = 15.sp,
+                    fontSize = 13.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = MissaInk,
                 )

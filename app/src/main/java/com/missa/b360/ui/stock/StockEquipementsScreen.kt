@@ -66,7 +66,7 @@ fun BadgeStatutEquipement(equipement: ProductEquipementEntity?) {
             fontSize = 9.5.sp,
             fontWeight = FontWeight.Bold,
             color = teinte,
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
         )
     }
 }
@@ -81,8 +81,8 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
 
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_immobilisations), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-            Spacer(Modifier.height(8.dp))
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+            Spacer(Modifier.height(6.dp))
             androidx.compose.material3.OutlinedTextField(
                 value = requete,
                 onValueChange = vm::chercher,
@@ -99,7 +99,7 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -109,8 +109,8 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 StockChip(stringResource(R.string.st_maintenance), actif = filtreStatut == 2) { vm.setStatut(2) }
                 StockChip(stringResource(R.string.st_hors_service), actif = filtreStatut == 3) { vm.setStatut(3) }
             }
-            Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(Modifier.height(7.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 StatTile(
                     icone = StockIv.CheckCircle,
                     teinte = MissaInk,
@@ -167,18 +167,18 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                 Spacer(Modifier.width(6.dp))
                 Text(stringResource(R.string.st_nouvel_equipement))
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             LazyColumn {
                 items(etat.lignes, key = { it.product.id }) { ligne ->
                     CarteStock(onClick = { onNavigate(Routes.stockDetail(ligne.product.id)) }) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+                            Surface(modifier = Modifier.size(36.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                                     Icon(painterResource(ligne.product.type.icone()), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                                 }
                             }
                             ProduitImage(photoPath = ligne.product.photoPath)
-                            Spacer(Modifier.width(11.dp))
+                            Spacer(Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(ligne.product.nom, fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 1)
                                 Text(
@@ -190,9 +190,9 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                             BadgeStatutEquipement(ligne.equipement)
                         }
                     }
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                 }
-                item { Spacer(Modifier.height(16.dp)) }
+                item { Spacer(Modifier.height(12.dp)) }
             }
         }
     }

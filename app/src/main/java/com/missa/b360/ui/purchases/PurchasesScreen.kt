@@ -260,7 +260,7 @@ private fun ListeAchats(
                 icon = Iv.CartArrowDown,
                 title = stringResource(R.string.ach_aucune),
                 description = stringResource(R.string.ach_aucune_desc),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(12.dp),
                 action = {
                     Button(
                         onClick = onNouvelleCommande,
@@ -271,12 +271,12 @@ private fun ListeAchats(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp),
             ) {
                 item {
-                    Surface(shape = RoundedCornerShape(18.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                        Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Surface(shape = RoundedCornerShape(16.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                        Column(Modifier.fillMaxWidth().padding(10.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     stringResource(R.string.module_achats),
@@ -319,9 +319,9 @@ private fun ListeAchats(
                 }
                 if (afficherCommandesEnAttente) {
                     item(key = "commandes-attente-banner") {
-                        Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF7E6)) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = Color(0xFFFFF7E6)) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
@@ -339,7 +339,7 @@ private fun ListeAchats(
                     }
                 }
                 item {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         Button(
                             onClick = onNouvelleCommande,
                             modifier = Modifier.weight(1f),
@@ -469,11 +469,11 @@ private fun CartePiece(
         TypePiece.Inconnu -> ""
     }
     Surface(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -509,7 +509,7 @@ private fun CartePiece(
                 )
             }
             if (ouvert) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 // Détail par type.
                 when (type) {
                     is TypePiece.Facture -> DetailFacture(type.payload, devise)
@@ -518,7 +518,7 @@ private fun CartePiece(
                     TypePiece.Inconnu -> Unit
                 }
                 // Actions par type et statut.
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 when {
                     brouillon -> when (type) {
                         is TypePiece.Facture -> BoutonAction(R.string.ach_reprendre, onReprendreFacture)
@@ -678,13 +678,13 @@ private fun BlocCatalogue(
     }
     filtres.take(30).forEach { produit ->
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
             modifier = Modifier.fillMaxWidth().clickable { onAjouter(produit) },
         ) {
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
@@ -848,8 +848,8 @@ private fun FormulaireAchat(
         )
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // Rattachement : la facture sur réception ne regénère aucun stock.
             if (ui.receptionReference != null) {
@@ -859,7 +859,7 @@ private fun FormulaireAchat(
                             stringResource(R.string.ach_facture_sur_reception) + " — " + ui.receptionReference,
                             fontSize = 11.sp,
                             color = MissaInk,
-                            modifier = Modifier.padding(10.dp),
+                            modifier = Modifier.padding(7.dp),
                         )
                     }
                 }
@@ -885,11 +885,11 @@ private fun FormulaireAchat(
                         modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     stringResource(R.string.ach_aucun_fournisseur),
@@ -957,7 +957,7 @@ private fun FormulaireAchat(
                     )
                 }
                 item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         OutlinedButton(
                             onClick = {
                                 pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
@@ -992,8 +992,8 @@ private fun FormulaireAchat(
                     }
                 }
                 item {
-                    Surface(shape = RoundedCornerShape(14.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
                             LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
                             if (tauxApplique > 0.0) {
                                 LigneSynthese(
@@ -1058,20 +1058,20 @@ private fun VignettePieceJointe(path: String, onSupprimer: () -> Unit) {
         if (!PieceJointeAchat.estPdf(path)) bitmap = PieceJointeAchat.charger(path)
     }
     Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (PieceJointeAchat.estPdf(path)) {
-                Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(28.dp))
+                Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(24.dp))
             } else {
                 bitmap?.let {
                     Image(
                         bitmap = it.asImageBitmap(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)),
+                        modifier = Modifier.size(34.dp).clip(RoundedCornerShape(8.dp)),
                     )
                 }
             }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 path.substringAfterLast('/'),
                 fontSize = 11.sp,
@@ -1079,7 +1079,7 @@ private fun VignettePieceJointe(path: String, onSupprimer: () -> Unit) {
                 maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
-            IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
+            IconButton(onClick = onSupprimer, modifier = Modifier.size(27.dp)) {
                 Icon(painterResource(Iv.Close), null, tint = MissaInk, modifier = Modifier.size(16.dp))
             }
         }
@@ -1099,17 +1099,17 @@ private fun LignePanier(
     onTrace: (lot: String, serie: String, peremption: Long?) -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onSupprimer, modifier = Modifier.size(27.dp)) {
                     Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
-                IconButton(onClick = onToggle, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onToggle, modifier = Modifier.size(27.dp)) {
                     Icon(
                         if (ouvert) painterResource(Iv.ExpandLess) else painterResource(Iv.ExpandMore),
                         null,
@@ -1122,14 +1122,14 @@ private fun LignePanier(
                 BadgeLiaisonFournisseur(liaison, ligne.unitPrice, devise)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("−", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("−", fontSize = 16.sp, color = MissaInk)
                 }
                 Text(fmtQuantite(ligne.quantity), fontSize = 13.sp, color = MissaInk)
-                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("+", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("+", fontSize = 16.sp, color = MissaInk)
                 }
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 var prixTexte by remember(ligne.id, ligne.unitPrice) {
                     mutableStateOf(ligne.unitPrice.toString())
                 }
@@ -1139,7 +1139,7 @@ private fun LignePanier(
                     }, stringResource(R.string.ach_prix_unitaire), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             }
             if (ouvert) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 ChampsTracabilite(
                     lotInitial = ligne.lot.orEmpty(),
                     serieInitiale = ligne.numeroSerie.orEmpty(),
@@ -1251,8 +1251,8 @@ private fun FormulaireCommande(
         )
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item { MissaFormSectionTitre(stringResource(R.string.ach_fournisseur), numero = 1) }
             item {
@@ -1275,11 +1275,11 @@ private fun FormulaireCommande(
                         modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     stringResource(R.string.ach_aucun_fournisseur),
@@ -1320,8 +1320,8 @@ private fun FormulaireCommande(
             }
             if (ui.lines.isNotEmpty()) {
                 item {
-                    Surface(shape = RoundedCornerShape(14.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
                             LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
                         }
                     }
@@ -1378,11 +1378,11 @@ private fun LigneCommande(
     onPrix: (Double) -> Unit,
     onSupprimer: () -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onSupprimer, modifier = Modifier.size(27.dp)) {
                     Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
             }
@@ -1390,14 +1390,14 @@ private fun LigneCommande(
                 BadgeLiaisonFournisseur(liaison, ligne.unitPrice, devise)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("−", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("−", fontSize = 16.sp, color = MissaInk)
                 }
                 Text(fmtQuantite(ligne.quantity), fontSize = 13.sp, color = MissaInk)
-                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("+", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("+", fontSize = 16.sp, color = MissaInk)
                 }
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 var prixTexte by remember(ligne.id, ligne.unitPrice) {
                     mutableStateOf(ligne.unitPrice.toString())
                 }
@@ -1441,12 +1441,12 @@ private fun FormulaireReception(
         )
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item {
                 Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         Text(ui.supplier?.nom.orEmpty(), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                         ui.commandeReference?.let {
                             Text(
@@ -1506,8 +1506,8 @@ private fun LigneReception(
     onToggle: () -> Unit,
     onMaj: (quantite: Double, lot: String, serie: String, peremption: Long?) -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(ligne.name, fontSize = 13.sp, color = MissaInk)
@@ -1519,7 +1519,7 @@ private fun LigneReception(
                         )
                     }
                 }
-                IconButton(onClick = onToggle, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onToggle, modifier = Modifier.size(27.dp)) {
                     Icon(
                         if (ouvert) painterResource(Iv.ExpandLess) else painterResource(Iv.ExpandMore),
                         null,
@@ -1537,7 +1537,7 @@ private fun LigneReception(
                     if (valeur >= 0.0) onMaj(valeur, ligne.lot.orEmpty(), ligne.numeroSerie.orEmpty(), ligne.datePeremption)
                 }, stringResource(R.string.ach_recue), clavier = MissaClavier.DECIMAL)
             if (ouvert) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 ChampsTracabilite(
                     lotInitial = ligne.lot.orEmpty(),
                     serieInitiale = ligne.numeroSerie.orEmpty(),
@@ -1656,12 +1656,12 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
         )
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item {
-                Surface(shape = RoundedCornerShape(18.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                Surface(shape = RoundedCornerShape(16.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         LigneSynthese(stringResource(R.string.ach_mois_courant), fmtValeur(depensesCourant, devise))
                         LigneSynthese(stringResource(R.string.ach_mois_precedent), fmtValeur(depensesPrecedent, devise))
                         LigneSynthese(
@@ -1687,13 +1687,13 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
             }
             items(top, key = { it.nom }) { ligne ->
                 Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(ligne.nom, fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
                         Text(
                             "${ligne.nombre} ×",
                             fontSize = 11.sp,
                             color = MissaMuted,
-                            modifier = Modifier.padding(end = 8.dp),
+                            modifier = Modifier.padding(end = 6.dp),
                         )
                         Text(fmtValeur(ligne.total, devise), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     }
@@ -1709,7 +1709,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
             }
             item {
                 Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         mois.forEach { point ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -1736,7 +1736,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
                                             .height(12.dp),
                                     ) {}
                                 }
-                                Spacer(Modifier.width(8.dp))
+                                Spacer(Modifier.width(6.dp))
                                 Text(
                                     fmtValeur(point.total, devise),
                                     fontSize = 10.sp,

@@ -83,16 +83,16 @@ fun LogistiqueScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // --- Carte Synthèse Logistique & Stock multi-sites ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = VertLogistique.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.log_titre_synthese),
                             fontSize = 11.sp,
@@ -101,11 +101,11 @@ fun LogistiqueScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(etat.valeurTotale, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.log_taux_service, String.format(Locale.ROOT, "%.1f%%", etat.livraisons.tauxService)),
@@ -174,7 +174,7 @@ fun LogistiqueScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileLogistique(
@@ -206,7 +206,7 @@ fun LogistiqueScreen(
                             icon = Iv.Warehouse,
                             title = stringResource(R.string.log_aucun_site),
                             description = stringResource(R.string.log_aucun_site_desc),
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(12.dp),
                         )
                     }
                 } else {
@@ -222,7 +222,7 @@ fun LogistiqueScreen(
                             icon = Iv.LocalShipping,
                             title = stringResource(R.string.log_aucun_transfert),
                             description = stringResource(R.string.log_aucun_transfert_desc),
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(12.dp),
                         )
                     }
                 } else {
@@ -249,7 +249,7 @@ private fun TuileLogistique(
         color = if (estActif) VertLogistique.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) VertLogistique else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -271,11 +271,11 @@ private fun CarteStockSite(
     devise: String,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(site.site.nom, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -321,11 +321,11 @@ private fun CarteTransfert(
     }
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(transfert.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))

@@ -246,7 +246,7 @@ fun DevisCommandeScreen(
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.devis_screen_title), onBack = onBack)
         Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -255,7 +255,7 @@ fun DevisCommandeScreen(
                 fontSize = 12.sp,
                 modifier = Modifier.weight(1f),
             )
-            Button(onClick = { afficherCreation = true }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
+            Button(onClick = { afficherCreation = true }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp)) {
                 Icon(painterResource(Iv.Add), contentDescription = null)
                 Spacer(Modifier.width(5.dp))
                 Text(stringResource(R.string.devis_new))
@@ -266,13 +266,13 @@ fun DevisCommandeScreen(
                 icon = Iv.Description,
                 title = stringResource(R.string.devis_screen_title),
                 description = stringResource(R.string.devis_empty),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(12.dp),
             )
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp),
             ) {
                 if (devis.isNotEmpty()) {
                     item(key = "devis-heading") {
@@ -360,14 +360,14 @@ private fun PieceCommercialeCard(
     val date = remember(record.createdAt) { DateUtils.formatDate(record.createdAt) }
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         color = androidx.compose.ui.graphics.Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(painterResource(icon), contentDescription = null, tint = TendrePositive)
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(record.reference, color = MissaInk, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                 Text(
                     MoneyUtils.format(payload?.total ?: record.amount ?: 0.0, currency),

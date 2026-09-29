@@ -270,11 +270,11 @@ fun ProductFormScreen(
             onBack = onBack,
             couleurFond = AppModule.STOCK.couleurPale,
         )
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            Spacer(Modifier.height(8.dp))
+        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+            Spacer(Modifier.height(6.dp))
             if (etape == 0) {
                 MissaFormSectionTitre(stringResource(R.string.st_type_article), numero = 1)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 when {
                     // Édition : le type est l'identité de l'article (sections, extension
                     // équipement, listes) — il ne se change pas.
@@ -285,12 +285,12 @@ fun ProductFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 MissaFormSectionTitre(stringResource(R.string.st_image_article), numero = 2)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
-                            .clip(RoundedCornerShape(14.dp))
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(12.dp))
                             .background(Blue90),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -303,10 +303,10 @@ fun ProductFormScreen(
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(28.dp))
+                            Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(24.dp))
                         }
                     }
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     Column {
                         Button(
                             onClick = {
@@ -318,7 +318,7 @@ fun ProductFormScreen(
                             },
                             shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                         ) {
                             Text(
                                 text = stringResource(
@@ -346,7 +346,7 @@ fun ProductFormScreen(
                 }
                 Spacer(Modifier.height(6.dp))
                 MissaFormSectionTitre(stringResource(R.string.st_infos_generales), numero = 3)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 MissaRangee {
                     Champ("${stringResource(R.string.st_nom_article)} *", nom, icone = Iv.Inventory2, modifier = Modifier.weight(1f)) { nom = it }
                     Champ(stringResource(R.string.st_reference), reference, icone = Iv.Description, modifier = Modifier.weight(1f)) { reference = it }
@@ -380,7 +380,7 @@ fun ProductFormScreen(
                         border = BorderStroke(1.dp, MissaBorder),
                         modifier = Modifier.fillMaxWidth().clickable { dialogueNouvelleCategorie = true },
                     ) {
-                        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.padding(7.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                             Text(
@@ -424,7 +424,7 @@ fun ProductFormScreen(
                 if (type == ProductType.DECHET_VALORISABLE || type == ProductType.DECHET_NON_VALORISABLE) {
                     Spacer(Modifier.height(6.dp))
                     MissaFormSectionTitre(stringResource(R.string.st_donnees_dechet), numero = 5)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     MissaRangee {
                         Champ(stringResource(R.string.st_type_dechet), dType, icone = Iv.Category, modifier = Modifier.weight(1f)) { dType = it }
                         Champ(stringResource(R.string.st_code_dechet), dCode, icone = Iv.Description, modifier = Modifier.weight(1f)) { dCode = it }
@@ -449,7 +449,7 @@ fun ProductFormScreen(
                 if (type == ProductType.EMBALLAGE) {
                     Spacer(Modifier.height(6.dp))
                     MissaFormSectionTitre(stringResource(R.string.st_donnees_emballage), numero = 5)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     MissaRangee {
                         Champ(stringResource(R.string.st_type_emballage), eType, icone = Iv.Category, modifier = Modifier.weight(1f)) { eType = it }
                         Champ(stringResource(R.string.st_matiere), eMatiere, icone = Iv.Category, modifier = Modifier.weight(1f)) { eMatiere = it }
@@ -473,7 +473,7 @@ fun ProductFormScreen(
                 if (type == ProductType.CONSIGNATION) {
                     Spacer(Modifier.height(6.dp))
                     MissaFormSectionTitre(stringResource(R.string.st_donnees_consignation), numero = 5)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     MissaRangee {
                         Champ(stringResource(R.string.st_proprietaire), cProprio, icone = Iv.Person, modifier = Modifier.weight(1f)) { cProprio = it }
                         Champ(stringResource(R.string.st_ref_contrat), cRef, icone = Iv.Description, modifier = Modifier.weight(1f)) { cRef = it }
@@ -489,17 +489,17 @@ fun ProductFormScreen(
                 if (type == ProductType.KIT) {
                     Spacer(Modifier.height(6.dp))
                     MissaFormSectionTitre(stringResource(R.string.st_donnees_kit), numero = 5)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                     Text(stringResource(R.string.st_methode_stock), fontSize = 11.sp, color = MissaMuted)
                     Spacer(Modifier.height(6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         StockChip(stringResource(R.string.st_kit_virtuel), actif = kMethode == "VIRTUEL") { kMethode = "VIRTUEL" }
                         StockChip(stringResource(R.string.st_kit_assemble), actif = kMethode == "ASSEMBLE") { kMethode = "ASSEMBLE" }
                     }
                     Spacer(Modifier.height(6.dp))
                     Text(stringResource(R.string.st_composants), fontSize = 11.sp, color = MissaMuted)
                     Spacer(Modifier.height(6.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         DropdownChamp(
                             libelle = stringResource(R.string.st_composants),
                             icone = Iv.Inventory2,
@@ -537,7 +537,7 @@ fun ProductFormScreen(
                                 modifier = Modifier.weight(1f),
                             )
                             Text(fmtQuantite(c.quantite), fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                            IconButton(onClick = { kComposants = kComposants.filterNot { it.composantId == c.composantId } }, modifier = Modifier.size(36.dp)) {
+                            IconButton(onClick = { kComposants = kComposants.filterNot { it.composantId == c.composantId } }, modifier = Modifier.size(30.dp)) {
                                 Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(14.dp))
                             }
                         }
@@ -551,7 +551,7 @@ fun ProductFormScreen(
                 )
             } else {
                 MissaFormSectionTitre(stringResource(R.string.st_prix_seuils), numero = 1)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 if (achetable) {
                     Champ(stringResource(R.string.st_prix_achat), prixAchat, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { prixAchat = it }
                     Spacer(Modifier.height(6.dp))
@@ -586,7 +586,7 @@ fun ProductFormScreen(
                     }
                     Spacer(Modifier.height(6.dp))
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     MissaBoutonSecondaire(
                         texte = "← ${stringResource(R.string.st_retour)}",
                         onClick = { etape = 0 },
@@ -693,7 +693,7 @@ fun ProductFormScreen(
                     )
                 }
             }
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
         }
     }
     }
@@ -763,11 +763,11 @@ private fun BadgeVerrouille(icone: Int, texte: String) {
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Text(texte, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
         }
     }
@@ -776,9 +776,9 @@ private fun BadgeVerrouille(icone: Int, texte: String) {
 @Composable
 private fun GrilleTypes(selection: ProductType, onSelection: (ProductType) -> Unit) {
     val lignes = TYPES_NOUVEL_ARTICLE.chunked(3)
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         lignes.forEach { ligne ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ligne.forEach { t ->
                     TuileType(t, t == selection, Modifier.weight(1f)) { onSelection(t) }
                 }
@@ -798,7 +798,7 @@ private fun TuileType(type: ProductType, actif: Boolean, modifier: Modifier = Mo
         onClick = onClick,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 4.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Icon(

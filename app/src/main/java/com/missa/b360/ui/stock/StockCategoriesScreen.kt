@@ -84,19 +84,19 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_categories_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
         ) {
-            item { Spacer(Modifier.height(8.dp)) }
+            item { Spacer(Modifier.height(6.dp)) }
             items(ProductType.entries.toList(), key = { it.name }) { type ->
                 val ligne = etat.categories.firstOrNull { it.type == type }
                 CarteStock(onClick = { onNaviguer(Routes.stockListe(type.name)) }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
+                        Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                                 Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(19.dp))
                             }
                         }
-                        Spacer(Modifier.width(11.dp))
+                        Spacer(Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = stringResource(type.libelleCatRes()),
@@ -125,7 +125,7 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
                         )
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
             }
             // Catégories créées par l'utilisateur.
             item {
@@ -134,38 +134,38 @@ fun StockCategoriesScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {})
             items(etat.categoriesLibres, key = { "libre_" + it.id }) { cat ->
                 CarteStock(onClick = { onNaviguer(Routes.stockListe(null, cat.id)) }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
+                        Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                                 Icon(painterResource(StockIv.Category), null, tint = MissaInk, modifier = Modifier.size(19.dp))
                             }
                         }
-                        Spacer(Modifier.width(11.dp))
+                        Spacer(Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = cat.nom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                             Text(text = stringResource(R.string.st_articles_count, cat.nombre), fontSize = 10.5.sp, color = MissaMuted)
                         }
-                        IconButton(onClick = { vm.supprimerCategorie(cat.id) }, modifier = Modifier.size(40.dp)) {
+                        IconButton(onClick = { vm.supprimerCategorie(cat.id) }, modifier = Modifier.size(34.dp)) {
                             Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                         }
                         Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
             }
             item {
                 CarteStock(onClick = { dialogueCategorie = true }) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(modifier = Modifier.size(38.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
+                        Surface(modifier = Modifier.size(32.dp), shape = RoundedCornerShape(11.dp), color = Blue90) {
                             androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                                 Icon(painterResource(StockIv.Add), null, tint = MissaInk, modifier = Modifier.size(19.dp))
                             }
                         }
-                        Spacer(Modifier.width(11.dp))
+                        Spacer(Modifier.width(8.dp))
                         Text(text = stringResource(R.string.st_nouvelle_categorie), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     }
                 }
             }
-            item { Spacer(Modifier.height(12.dp)) }
+            item { Spacer(Modifier.height(8.dp)) }
         }
     }
 }

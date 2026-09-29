@@ -126,14 +126,14 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(Red80)
                         .border(1.dp, Red20.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
                         .semantics(mergeDescendants = true) {
                             liveRegion = LiveRegionMode.Polite
                         }
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .padding(horizontal = 8.dp, vertical = 7.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
@@ -142,7 +142,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                         tint = Red20,
                         modifier = Modifier.size(17.dp),
                     )
-                    Spacer(Modifier.width(9.dp))
+                    Spacer(Modifier.width(6.dp))
                     Text(
                         text = stringResource(erreur),
                         color = Red20,
@@ -166,7 +166,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
             )
             OnbEssaiCarte(viewModel)
             OnbActivationCarte(viewModel)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
         }
 
         Surface(
@@ -180,7 +180,7 @@ internal fun OnbTermineStep(viewModel: OnboardingViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                        .padding(horizontal = 12.dp, vertical = 7.dp),
                 ) {
                     OnbBoutonAcceder(
                         actif = !viewModel.enregistrementEnCours,
@@ -203,7 +203,7 @@ private fun OnbTermineHero() {
                     colors = listOf(MissaSoftBlue, MissaCanvas),
                 ),
             )
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
     ) {
         // Halo discret : il reprend le bleu de marque sans remettre les
         // confettis multicolores au premier plan.
@@ -211,7 +211,7 @@ private fun OnbTermineHero() {
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .offset(x = 26.dp, y = (-34).dp)
-                .size(120.dp)
+                .size(102.dp)
                 .clip(CircleShape)
                 .background(BrandBlue.copy(alpha = 0.045f)),
         )
@@ -221,21 +221,21 @@ private fun OnbTermineHero() {
         ) {
             Box(
                 modifier = Modifier
-                    .size(58.dp)
-                    .shadow(5.dp, RoundedCornerShape(19.dp), spotColor = Green60.copy(alpha = 0.2f))
-                    .clip(RoundedCornerShape(19.dp))
+                    .size(48.dp)
+                    .shadow(5.dp, RoundedCornerShape(17.dp), spotColor = Green60.copy(alpha = 0.2f))
+                    .clip(RoundedCornerShape(17.dp))
                     .background(Green90)
-                    .border(1.dp, Green60.copy(alpha = 0.12f), RoundedCornerShape(19.dp)),
+                    .border(1.dp, Green60.copy(alpha = 0.12f), RoundedCornerShape(17.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(Iv.Check),
                     contentDescription = null,
                     tint = Green60,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(24.dp),
                 )
             }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             OnbTermineTitre()
             Spacer(Modifier.height(4.dp))
             Text(
@@ -245,7 +245,7 @@ private fun OnbTermineHero() {
                 color = MissaMuted,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = 12.dp),
             )
         }
     }
@@ -266,7 +266,7 @@ private fun OnbTermineTitre() {
     }
     Text(
         text = titre,
-        fontSize = 22.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
         color = MissaInk,
         textAlign = TextAlign.Center,
@@ -287,20 +287,20 @@ private fun OnbRecapCarte(
     modules: String,
     proprietaire: String,
 ) {
-    val forme = RoundedCornerShape(18.dp)
+    val forme = RoundedCornerShape(16.dp)
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .clip(forme)
             .background(MissaSurface)
             .border(1.dp, MissaBorder.copy(alpha = 0.65f), forme)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(30.dp)
                     .clip(RoundedCornerShape(11.dp))
                     .background(MissaSoftBlue),
                 contentAlignment = Alignment.Center,
@@ -312,7 +312,7 @@ private fun OnbRecapCarte(
                     modifier = Modifier.size(18.dp),
                 )
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Text(
                 text = stringResource(R.string.obn_recap),
                 fontSize = 13.5.sp,
@@ -323,9 +323,9 @@ private fun OnbRecapCarte(
             )
             Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(999.dp))
+                    .clip(RoundedCornerShape(997.dp))
                     .background(Green90)
-                    .padding(horizontal = 9.dp, vertical = 5.dp),
+                    .padding(horizontal = 6.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -343,7 +343,7 @@ private fun OnbRecapCarte(
                 )
             }
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(7.dp))
 
         OnbRecapLigne(R.string.obn_recap_entreprise, entreprise, Iv.Business)
         OnbRecapLigne(R.string.obn_recap_pays, pays, Iv.Person)
@@ -366,7 +366,7 @@ private fun OnbRecapCarte(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(MissaSoftBlue)
-                .padding(10.dp),
+                .padding(7.dp),
         ) {
             OnbRecapLigne(R.string.obn_recap_proprietaire, proprietaire, Iv.Security)
         }
@@ -375,9 +375,9 @@ private fun OnbRecapCarte(
 
 @Composable
 private fun OnbRecapSeparateur() {
-    Spacer(Modifier.height(7.dp))
+    Spacer(Modifier.height(5.dp))
     HorizontalDivider(color = MissaBorder.copy(alpha = 0.65f))
-    Spacer(Modifier.height(7.dp))
+    Spacer(Modifier.height(5.dp))
 }
 
 /** Une ligne du récapitulatif : libellé discret, valeur en premier plan. */
@@ -404,7 +404,7 @@ private fun OnbRecapLigne(labelRes: Int, valeur: String, icone: Int) {
                 modifier = Modifier.size(13.dp),
             )
         }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
             text = stringResource(labelRes),
             fontSize = 11.5.sp,
@@ -431,23 +431,23 @@ private fun OnbEssaiCarte(viewModel: OnboardingViewModel) {
     val echeance = viewModel.essaiExpireLe
     val packLabel = viewModel.profil?.let { stringResource(it.labelRes) }
     val actif = viewModel.licenceDejaActive
-    val forme = RoundedCornerShape(18.dp)
+    val forme = RoundedCornerShape(16.dp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .clip(forme)
             .background(MissaSurface)
             .border(1.dp, MissaBorder.copy(alpha = 0.65f), forme)
-            .padding(14.dp),
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(30.dp)
                         .clip(RoundedCornerShape(11.dp))
                         .background(if (actif) Green90 else MissaSoftBlue),
                     contentAlignment = Alignment.Center,
@@ -459,7 +459,7 @@ private fun OnbEssaiCarte(viewModel: OnboardingViewModel) {
                         modifier = Modifier.size(19.dp),
                     )
                 }
-                Spacer(Modifier.width(9.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(
                     text = stringResource(
                         if (actif) R.string.adm_licence_statut_actif else R.string.obn_essai_titre,
@@ -494,16 +494,16 @@ private fun OnbEssaiCarte(viewModel: OnboardingViewModel) {
                 maxLines = 2,
             )
         }
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Box(
             modifier = Modifier
                 .size(if (actif) 62.dp else 72.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(14.dp))
                 .background(if (actif) Green90 else MissaSoftBlue)
                 .border(
                     1.dp,
                     (if (actif) Green60 else BrandBlue).copy(alpha = 0.12f),
-                    RoundedCornerShape(16.dp),
+                    RoundedCornerShape(14.dp),
                 ),
             contentAlignment = Alignment.Center,
         ) {
@@ -518,7 +518,7 @@ private fun OnbEssaiCarte(viewModel: OnboardingViewModel) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "7",
-                        fontSize = 26.sp,
+                        fontSize = 23.5.sp,
                         fontWeight = FontWeight.Bold,
                         color = BrandBlue,
                     )
@@ -550,21 +550,21 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
         .ifEmpty { stringResource(R.string.obn_recap_entreprise) }
     val message = stringResource(R.string.obn_code_message, nomPourMessage)
     val echec = stringResource(R.string.obn_code_indispo)
-    val forme = RoundedCornerShape(18.dp)
+    val forme = RoundedCornerShape(16.dp)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .clip(forme)
             .background(MissaSurface)
             .border(1.dp, MissaBorder.copy(alpha = 0.65f), forme)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(30.dp)
                     .clip(RoundedCornerShape(11.dp))
                     .background(MissaSoftBlue),
                 contentAlignment = Alignment.Center,
@@ -576,7 +576,7 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                     modifier = Modifier.size(18.dp),
                 )
             }
-            Spacer(Modifier.width(9.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(R.string.obn_code_titre),
                 fontSize = 13.5.sp,
@@ -584,7 +584,7 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                 color = MissaInk,
             )
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(7.dp))
 
         when {
             viewModel.licenceDejaActive -> Row(
@@ -592,7 +592,7 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .background(Green90)
-                    .padding(horizontal = 11.dp, vertical = 9.dp),
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -601,7 +601,7 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                     tint = Green60,
                     modifier = Modifier.size(17.dp),
                 )
-                Spacer(Modifier.width(9.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.ob_licence_avantage_sans_carte),
                     fontSize = 11.5.sp,
@@ -613,7 +613,7 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
                     .background(Red80)
-                    .padding(horizontal = 11.dp, vertical = 9.dp),
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -622,14 +622,14 @@ private fun OnbActivationCarte(viewModel: OnboardingViewModel) {
                     tint = Red20,
                     modifier = Modifier.size(16.dp),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(
                     text = stringResource(R.string.obn_code_a_configurer),
                     fontSize = 11.sp,
                     color = Red20,
                 )
             }
-            else -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            else -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (whatsappOk) {
                     OnbActivationLigne(
                         icone = Iv.Chat,
@@ -678,17 +678,17 @@ private fun OnbActivationLigne(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(42.dp)
             .clip(forme)
             .background(MissaSurface)
             .border(1.dp, MissaBorder.copy(alpha = 0.75f), forme)
             .clickable(onClickLabel = libelle, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 11.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(30.dp)
+                .size(26.dp)
                 .clip(RoundedCornerShape(9.dp))
                 .background(couleur.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center,
@@ -700,7 +700,7 @@ private fun OnbActivationLigne(
                 modifier = Modifier.size(17.dp),
             )
         }
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Text(
             text = libelle,
             fontSize = 12.5.sp,
@@ -722,11 +722,11 @@ private fun OnbActivationLigne(
 @Composable
 private fun OnbBoutonAcceder(actif: Boolean, onClick: () -> Unit) {
     val libelle = stringResource(R.string.obn_acceder)
-    val forme = RoundedCornerShape(15.dp)
+    val forme = RoundedCornerShape(13.dp)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(54.dp)
+            .height(46.dp)
             .shadow(
                 elevation = if (actif) 4.dp else 0.dp,
                 shape = forme,
@@ -749,14 +749,14 @@ private fun OnbBoutonAcceder(actif: Boolean, onClick: () -> Unit) {
             tint = Color.White,
             modifier = Modifier.size(18.dp),
         )
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Text(
             text = libelle,
             color = Color.White,
-            fontSize = 15.sp,
+            fontSize = 13.5.sp,
             fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Icon(
             painter = painterResource(Iv.ArrowForward),
             contentDescription = null,

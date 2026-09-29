@@ -89,7 +89,7 @@ fun LazyListScope.sectionFonctionsModule(
                     text = aVenir.joinToString(" · ") { it.libelle },
                     fontSize = 11.5.sp,
                     color = MissaMuted,
-                    modifier = Modifier.padding(13.dp),
+                    modifier = Modifier.padding(10.dp),
                 )
             }
         }
@@ -105,7 +105,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 13.dp, vertical = 11.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -114,7 +114,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
                 tint = ProfileGreen,
                 modifier = Modifier.size(16.dp),
             )
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Text(
                 text = fonction.libelle,
                 fontSize = 12.5.sp,
@@ -144,7 +144,7 @@ private fun TitreSectionModule(titre: String) {
                 .size(width = 3.dp, height = 14.dp)
                 .background(BrandBlue, RoundedCornerShape(2.dp)),
         )
-        Spacer(Modifier.width(7.dp))
+        Spacer(Modifier.width(5.dp))
         Text(
             text = titre,
             fontSize = 13.sp,

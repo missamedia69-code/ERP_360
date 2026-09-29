@@ -105,13 +105,13 @@ fun MissaAppHeader(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(top = 8.dp, bottom = 8.dp),
+            .padding(top = 6.dp, bottom = 6.dp),
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
-            shape = RoundedCornerShape(22.dp),
+                .padding(horizontal = 8.dp),
+            shape = RoundedCornerShape(20.dp),
             color = Color.White,
             shadowElevation = 3.dp,
             tonalElevation = 0.dp,
@@ -120,14 +120,14 @@ fun MissaAppHeader(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(76.dp)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                    .height(64.dp)
+                    .padding(horizontal = 6.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Le menu possède sa propre cible tactile : le logo reste purement décoratif.
                 IconButton(
                     onClick = { if (isHome) onMenuClick() else onBackClick() },
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(40.dp),
                 ) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -148,21 +148,21 @@ fun MissaAppHeader(
                 }
                 Spacer(Modifier.width(5.dp))
                 MissaBrandMark(size = 40.dp)
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Box(
                     modifier = Modifier
                         .width(1.dp)
                         .height(38.dp)
                         .background(MissaBorder.copy(alpha = 0.55f)),
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
 
                 // Compartiment Droit : Entreprise cliente
                 Row(
                     modifier = Modifier
                         .weight(1f)
-                        .heightIn(min = 48.dp)
-                        .clip(RoundedCornerShape(14.dp))
+                        .heightIn(min = 40.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .clickable(onClick = onProfileClick)
                         .padding(horizontal = 4.dp, vertical = 2.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -224,7 +224,7 @@ fun MissaAppHeader(
                     }
                     Spacer(Modifier.width(6.dp))
                     Surface(
-                        modifier = Modifier.size(38.dp),
+                        modifier = Modifier.size(32.dp),
                         shape = RoundedCornerShape(12.dp),
                         color = Color(0xFFDCFCE7),
                         border = BorderStroke(1.dp, Color(0xFF86EFAC)),

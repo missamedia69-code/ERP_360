@@ -103,16 +103,16 @@ fun RhScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Carte Synthèse RH ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = RougeRh.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.rh_masse_salariale),
                             fontSize = 11.sp,
@@ -121,11 +121,11 @@ fun RhScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(masseSalariale, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.rh_effectif_actif, actifs.size),
@@ -147,7 +147,7 @@ fun RhScreen(
             item {
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Button(
                         onClick = { dialogueNouvelEmploye = true },
@@ -183,7 +183,7 @@ fun RhScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }
@@ -205,7 +205,7 @@ fun RhScreen(
                         icon = Iv.Person,
                         title = stringResource(R.string.rh_aucun_employe),
                         description = stringResource(R.string.rh_aucun_employe_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -265,11 +265,11 @@ private fun CarteEmploye(
     val estActif = employe.statut == EmployeeStatus.ACTIF.name
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -305,7 +305,7 @@ private fun CarteEmploye(
                 )
             }
             if (estActif) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     OutlinedButton(
                         onClick = onAbsence,
@@ -317,7 +317,7 @@ private fun CarteEmploye(
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp),
                     ) { Text(stringResource(R.string.rh_action_avance), fontSize = 10.5.sp, color = MissaInk) }
-                    IconButton(onClick = onDesactiver, modifier = Modifier.size(32.dp)) {
+                    IconButton(onClick = onDesactiver, modifier = Modifier.size(27.dp)) {
                         Icon(painterResource(Iv.Prohibit), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(16.dp))
                     }
                 }

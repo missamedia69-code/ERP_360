@@ -277,7 +277,7 @@ fun FicheEntrepriseDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(22.dp),
             color = Color.White,
             shadowElevation = 8.dp,
             tonalElevation = 0.dp,
@@ -286,26 +286,26 @@ fun FicheEntrepriseDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 600.dp),
+                    .heightIn(max = 510.dp),
             ) {
                 // En-tête : logo de l'utilisateur (jamais celui de MISSA), nom, fermeture.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 14.dp, end = 6.dp, top = 10.dp, bottom = 4.dp),
+                        .padding(start = 10.dp, end = 6.dp, top = 7.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     CompanyLogo(
                         logoUri = entreprise?.logoUri,
                         contentDescription = null,
                         fallbackIcon = Iv.Store,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(40.dp),
                         size = 48.dp,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         fallbackTint = TendrePositive,
                         fallbackBackground = Green90,
                     )
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.fiche_entreprise_titre),
@@ -315,7 +315,7 @@ fun FicheEntrepriseDialog(
                         Text(
                             text = nom,
                             color = MissaInk,
-                            fontSize = 15.sp,
+                            fontSize = 13.5.sp,
                             fontWeight = FontWeight.ExtraBold,
                             maxLines = 2,
                         )
@@ -325,7 +325,7 @@ fun FicheEntrepriseDialog(
                             fontSize = 10.sp,
                         )
                     }
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(40.dp)) {
+                    IconButton(onClick = onDismiss, modifier = Modifier.size(34.dp)) {
                         Icon(
                             painter = painterResource(Iv.Close),
                             contentDescription = null,
@@ -339,7 +339,7 @@ fun FicheEntrepriseDialog(
                     modifier = Modifier
                         .weight(1f, fill = false)
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 12.dp),
                 ) {
                     sections.forEach { section ->
                         SectionFiche(
@@ -353,12 +353,12 @@ fun FicheEntrepriseDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
                 ) {
                     OutlinedButton(
                         onClick = copierTout,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(
                             painter = painterResource(Iv.ContentCopy),
@@ -373,11 +373,11 @@ fun FicheEntrepriseDialog(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     OutlinedButton(
                         onClick = partager,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(
                             painter = painterResource(Iv.Share),
@@ -392,11 +392,11 @@ fun FicheEntrepriseDialog(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Button(
                         onClick = partagerPdf,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Icon(
@@ -476,7 +476,7 @@ private fun LigneFiche(
                 .size(5.dp)
                 .background(BrandBlue, CircleShape),
         )
-        Spacer(Modifier.width(7.dp))
+        Spacer(Modifier.width(5.dp))
         Text(
             text = buildAnnotatedString {
                 withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = MissaInk)) {

@@ -28,6 +28,11 @@ Un seul module Gradle (`app`). Cinq langues : `values` (fr), `values-en`, `value
   Échapper les apostrophes `\'` et les `%` littéraux `%%`.
 - **Pas de nouvelle dépendance** sans nécessité démontrée.
 - **Barre du bas** : flottante par ombre, hauteur réduite, cibles ≥ 48 dp, identique partout.
+- **Densité compacte (validée propriétaire)** sur toute l'application :
+  - jetons `MissaLayout` : marges écran 12 dp, écarts 8 dp, sections 12 dp, coins 12 dp ;
+  - barre de titre 52 dp ;
+  - formulaires via le kit `ui/components/MissaFormulaire.kt` : champs d'environ 44 dp avec le libellé au-dessus de la valeur, deux champs par rangée (`MissaRangee`), boutons 44 dp.
+  - Ne pas réintroduire d'espacements de 16 à 24 dp, ni de champs `OutlinedTextField` de 56 dp.
 
 ## Formulaires (spécification validée)
 

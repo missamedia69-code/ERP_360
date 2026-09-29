@@ -117,16 +117,16 @@ fun ReferentielsScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // --- Hero Synthèse Référentiels ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = GrisReferentiel.copy(alpha = 0.12f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.ref_titre_synthese),
                             fontSize = 11.sp,
@@ -135,11 +135,11 @@ fun ReferentielsScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.ref_norme_ohada),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.ref_familles_count, famillesTypes.size),
@@ -201,7 +201,7 @@ fun ReferentielsScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileReferentiel(
@@ -247,7 +247,7 @@ private fun TuileReferentiel(
         color = if (estActif) GrisReferentiel.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) GrisReferentiel else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -268,12 +268,12 @@ private fun CarteReferentiel(
     item: ItemReferentiel,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
+            Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {

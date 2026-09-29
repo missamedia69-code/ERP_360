@@ -58,13 +58,14 @@ import com.missa.b360.ui.theme.MissaSoftBlue
  * vers une interprétation différente de cette direction artistique.
  */
 object MissaLayout {
-    val screenHorizontal = 16.dp // Spec: 16dp marges
-    val screenVertical = 12.dp
-    val itemGap = 12.dp // Spec grille 4/8/12/16/20/24/32
-    val sectionGap = 16.dp
-    val fieldHeight = 52.dp
-    val actionHeight = 48.dp // Spec: zone tactile 48dp minimum
-    val cardRadius = 14.dp
+    // Densité compacte (validée propriétaire) : même grammaire que le kit de formulaires.
+    val screenHorizontal = 12.dp
+    val screenVertical = 8.dp
+    val itemGap = 8.dp // grille 4/6/8/12
+    val sectionGap = 12.dp
+    val fieldHeight = 44.dp
+    val actionHeight = 44.dp
+    val cardRadius = 12.dp
 }
 
 /**
@@ -105,14 +106,16 @@ fun MissaTopAppBar(
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
+        // Barre compacte : 52 dp au lieu des 64 dp Material.
+        expandedHeight = 52.dp,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MissaBrandMark(size = 40.dp)
-                Spacer(Modifier.width(8.dp))
+                MissaBrandMark(size = 30.dp)
+                Spacer(Modifier.width(6.dp))
                 Text(
                     text = title,
                     color = MissaInk,
-                    fontSize = 15.sp,
+                    fontSize = 13.5.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -121,12 +124,12 @@ fun MissaTopAppBar(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
                     Icon(
                         painter = painterResource(Iv.ArrowBack),
                         contentDescription = null,
                         tint = MissaInk,
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
@@ -157,8 +160,8 @@ fun MissaPanel(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
             content = content,
         )
     }
@@ -195,7 +198,7 @@ fun MissaSectionTitle(
             }
         }
         trailing?.let {
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             it()
         }
     }
@@ -212,12 +215,12 @@ fun MissaEmptyState(
 ) {
     MissaPanel(modifier = modifier, accent = MaterialTheme.colorScheme.primary) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+            verticalArrangement = Arrangement.spacedBy(5.dp),
         ) {
             Surface(
-                modifier = Modifier.size(42.dp),
+                modifier = Modifier.size(36.dp),
                 shape = CircleShape,
                 color = MissaSoftBlue,
             ) {
@@ -260,7 +263,7 @@ fun MissaMenuDeroulant(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         containerColor = Color.White,
         tonalElevation = 6.dp,
         modifier = modifier,

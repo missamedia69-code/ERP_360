@@ -130,11 +130,11 @@ internal fun OnbScaffold(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(horizontal = 10.dp, vertical = 4.dp),
+                .padding(horizontal = 7.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (onRetour != null) {
-                IconButton(onClick = onRetour, enabled = !viewModel.enregistrementEnCours, modifier = Modifier.size(40.dp)) {
+                IconButton(onClick = onRetour, enabled = !viewModel.enregistrementEnCours, modifier = Modifier.size(34.dp)) {
                     Icon(
                         painter = painterResource(Iv.ArrowBack),
                         contentDescription = stringResource(R.string.ob_retour),
@@ -143,19 +143,19 @@ internal fun OnbScaffold(
                     )
                 }
             } else {
-                Spacer(Modifier.size(40.dp))
+                Spacer(Modifier.size(34.dp))
             }
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 28.dp, vertical = 6.dp),
+                .padding(horizontal = 20.dp, vertical = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(titreRes),
                 color = MissaInk,
-                fontSize = 21.sp,
+                fontSize = 19.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -173,7 +173,7 @@ internal fun OnbScaffold(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(horizontal = 14.dp, vertical = 6.dp),
                 shape = RoundedCornerShape(10.dp),
                 color = com.missa.b360.ui.theme.Red80,
             ) {
@@ -181,7 +181,7 @@ internal fun OnbScaffold(
                     text = stringResource(erreurActuelle),
                     color = com.missa.b360.ui.theme.Red40,
                     fontSize = 12.5.sp,
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(7.dp),
                 )
             }
         }
@@ -196,8 +196,8 @@ internal fun OnbScaffold(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             content()
         }
@@ -214,15 +214,15 @@ internal fun OnbScaffold(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                    .padding(horizontal = 14.dp, vertical = 8.dp)
                     .navigationBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(7.dp),
+                        .padding(end = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     OnbDots(
@@ -238,7 +238,7 @@ internal fun OnbScaffold(
                             if (boutonPleineLargeur) Modifier.fillMaxWidth()
                             else Modifier.width(150.dp),
                         )
-                        .height(50.dp)
+                        .height(42.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .then(
                             if (boutonActive && !viewModel.enregistrementEnCours) {
@@ -266,7 +266,7 @@ internal fun OnbScaffold(
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 14.sp,
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Icon(
                         painter = painterResource(Iv.ArrowForward),
                         contentDescription = null,
@@ -308,7 +308,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
             )
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 30.dp),
+            .padding(horizontal = 21.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
@@ -319,15 +319,15 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
             Image(
                 painter = painterResource(R.drawable.logo_missa),
                 contentDescription = stringResource(R.string.app_name),
-                modifier = Modifier.size(280.dp),
+                modifier = Modifier.size(238.dp),
             )
-            Spacer(Modifier.height(30.dp))
+            Spacer(Modifier.height(21.dp))
             Text(
                 text = stringResource(R.string.obn_bienvenue_titre),
                 color = Color.White.copy(alpha = 0.78f),
-                fontSize = 15.sp,
+                fontSize = 13.5.sp,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.obn_bienvenue_sous),
                 color = Color.White.copy(alpha = 0.72f),
@@ -338,29 +338,29 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = 18.dp, bottom = 10.dp),
+            modifier = Modifier.padding(top = 12.dp, bottom = 7.dp),
         ) {
             OnbLanguesDrapeaux(
                 selection = viewModel.langue,
                 onSelect = viewModel::appliquerLangue,
             )
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
             Button(
                 onClick = viewModel::suivant,
                 modifier = Modifier
                     .width(250.dp)
-                    .height(52.dp),
+                    .height(44.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MissaLime),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp),
             ) {
                 Text(
                     text = stringResource(R.string.obn_commencer),
                     color = OnboardingHeroBlue,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
+                    fontSize = 13.5.sp,
                 )
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(7.dp))
                 Icon(
                     painter = painterResource(Iv.ArrowForward),
                     contentDescription = null,
@@ -368,8 +368,8 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
                     modifier = Modifier.size(18.dp),
                 )
             }
-            Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            Spacer(Modifier.height(7.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                 for (index in 0 until OnboardingStep.TERMINE.ordinal) {
                     Box(
                         modifier = Modifier
@@ -406,7 +406,7 @@ private fun OnbLanguesDrapeaux(
 ) {
     val courant = selection.substringBefore('-').lowercase()
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OnbLangues.forEach { (code, drapeau, labelRes) ->
@@ -435,7 +435,7 @@ private fun OnbLanguesDrapeaux(
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = drapeau, fontSize = 21.sp)
+                Text(text = drapeau, fontSize = 19.sp)
             }
         }
     }

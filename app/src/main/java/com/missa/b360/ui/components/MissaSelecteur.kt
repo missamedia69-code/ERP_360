@@ -116,7 +116,7 @@ fun MissaSelecteurLigne(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable { ouvert = true } else Modifier)
-            .padding(horizontal = 16.dp, vertical = paddingVertical),
+            .padding(horizontal = 12.dp, vertical = paddingVertical),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
@@ -185,14 +185,14 @@ fun MissaSelecteurBleu(
     var ouvert by remember { mutableStateOf(false) }
     val choisie = options.firstOrNull { it.cle == selectionCle }
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = BrandBlue,
         modifier = modifier
             .fillMaxWidth()
             .then(if (enabled) Modifier.clickable { ouvert = true } else Modifier),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 13.dp),
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icone != null) {
@@ -202,7 +202,7 @@ fun MissaSelecteurBleu(
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
-                Spacer(Modifier.width(12.dp))
+                Spacer(Modifier.width(8.dp))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -225,7 +225,7 @@ fun MissaSelecteurBleu(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                             )
                         }
-                        Spacer(Modifier.width(7.dp))
+                        Spacer(Modifier.width(5.dp))
                     }
                     Text(
                         text = choisie?.titre ?: placeholder,
@@ -298,7 +298,7 @@ fun MissaSelecteurDialogue(
     // La boîte respecte la géométrie de l'application (coins 20dp) plutôt que
     // le carré d'origine des dialogues Material : les listes s'intègrent mieux
     // aux cartes de l'interface.
-    MaterialTheme(shapes = Shapes(extraLarge = RoundedCornerShape(20.dp))) {
+    MaterialTheme(shapes = Shapes(extraLarge = RoundedCornerShape(18.dp))) {
     AlertDialog(
         onDismissRequest = onFermer,
         confirmButton = {
@@ -307,7 +307,7 @@ fun MissaSelecteurDialogue(
         title = {
             Text(
                 text = titre,
-                fontSize = 16.sp,
+                fontSize = 14.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = MissaInk,
             )
@@ -341,13 +341,13 @@ fun MissaSelecteurDialogue(
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(7.dp))
                 }
                 if (visibles.isEmpty()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 18.dp),
+                            .padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -357,7 +357,7 @@ fun MissaSelecteurDialogue(
                             tint = MissaMuted.copy(alpha = 0.7f),
                             modifier = Modifier.size(22.dp),
                         )
-                        Spacer(Modifier.width(10.dp))
+                        Spacer(Modifier.width(7.dp))
                         Text(
                             text = stringResource(R.string.selecteur_aucun),
                             fontSize = 13.sp,
@@ -369,7 +369,7 @@ fun MissaSelecteurDialogue(
                         state = etatListe,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 380.dp),
+                            .heightIn(max = 323.dp),
                     ) {
                         items(visibles, key = { it.cle }) { option ->
                             MissaOptionLigne(
@@ -407,7 +407,7 @@ private fun MissaOptionLigne(
                 RoundedCornerShape(10.dp),
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 9.dp),
+            .padding(horizontal = 7.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (option.badge != null) {
@@ -426,7 +426,7 @@ private fun MissaOptionLigne(
                     )
                 }
             }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(

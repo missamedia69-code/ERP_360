@@ -86,19 +86,19 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
     MissaFormulaireTheme(AppModule.STOCK.couleur) {
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_transferts_stock), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
-        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
-            Spacer(Modifier.height(8.dp))
+        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp)) {
+            Spacer(Modifier.height(6.dp))
             Row {
                 StockChip(stringResource(R.string.st_nouveau_transfert), actif = !modeHistorique) { modeHistorique = false }
                 Spacer(Modifier.width(6.dp))
                 StockChip(stringResource(R.string.st_historique), actif = modeHistorique) { modeHistorique = true }
             }
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
             if (modeHistorique) {
                 HistoriqueTransferts()
             } else {
                 val stockProduit = stockRows.filter { it.produitId == produitId }
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     MissaFormSection(titre = stringResource(R.string.form_section_article), numero = 1) {
                         MissaRangee {
                             MissaChampListe(
@@ -144,7 +144,7 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
                     }
                 }
             }
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
         }
         if (!modeHistorique) {
             MissaFormPied(
@@ -187,7 +187,7 @@ private fun HistoriqueTransferts() {
                     color = com.missa.b360.ui.theme.MissaMuted,
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
         }
     }
 }
@@ -235,8 +235,8 @@ fun StockMovementFormScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_nouveau_mouvement), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(
-            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
                 MissaChoixTuiles(

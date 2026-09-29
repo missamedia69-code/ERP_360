@@ -174,8 +174,8 @@ fun ClientFormDialog(
                         modifier = Modifier
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.clients_informations_principales_aide),
@@ -291,7 +291,7 @@ private fun TelephoneFields(
         val horizontal = maxWidth >= 520.dp
         if (horizontal) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 CountryCodeField(
@@ -322,7 +322,7 @@ private fun TelephoneFields(
                 )
             }
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 CountryCodeField(
                     value = if (indicatifOuvert) {
                         rechercheIndicatif
@@ -387,7 +387,7 @@ private fun CountryCodeField(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             tonalElevation = 6.dp,
         ) {
             if (paysFiltres.isEmpty()) {
@@ -442,7 +442,7 @@ private fun ClientReadOnlyFields(statut: String, devise: String) {
         val horizontal = maxWidth >= 520.dp
         if (horizontal) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 ReadOnlyClientValue(
@@ -457,7 +457,7 @@ private fun ClientReadOnlyFields(statut: String, devise: String) {
                 )
             }
         } else {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 ReadOnlyClientValue(
                     label = stringResource(R.string.clients_statut),
                     value = statut,
@@ -477,10 +477,10 @@ private fun ClientReadOnlyFields(statut: String, devise: String) {
 private fun ReadOnlyClientValue(label: String, value: String, modifier: Modifier) {
     Column(
         modifier = modifier
-            .heightIn(min = 58.dp)
+            .heightIn(min = 48.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.58f))
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.Center,
     ) {
         Text(

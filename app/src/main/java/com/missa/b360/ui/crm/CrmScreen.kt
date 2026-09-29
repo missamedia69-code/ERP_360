@@ -78,16 +78,16 @@ fun CrmScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // --- Carte Synthèse Portefeuille Commercial ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = MagentaCrm.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.crm_titre_synthese),
                             fontSize = 11.sp,
@@ -96,11 +96,11 @@ fun CrmScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(etat.chiffreAffaires, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.crm_panier_moyen, fmtValeur(etat.panierMoyen, devise)),
@@ -162,7 +162,7 @@ fun CrmScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileCrm(
@@ -207,7 +207,7 @@ fun CrmScreen(
                         icon = Iv.Group,
                         title = stringResource(R.string.crm_aucun_contact),
                         description = stringResource(R.string.crm_aucun_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -237,7 +237,7 @@ private fun TuileCrm(
         color = if (estActif) MagentaCrm.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) MagentaCrm else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -276,11 +276,11 @@ private fun CarteFicheCrm(
     }
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(fiche.client.nom, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -324,7 +324,7 @@ private fun CarteFicheCrm(
             } else {
                 Text(stringResource(R.string.crm_aucun_achat_encore), fontSize = 10.sp, color = MissaMuted)
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             Button(
                 onClick = onConsulter,
                 modifier = Modifier.fillMaxWidth(),

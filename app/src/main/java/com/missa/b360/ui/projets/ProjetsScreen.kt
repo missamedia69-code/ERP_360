@@ -110,16 +110,16 @@ fun ProjetsScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // --- Carte Synthèse Portefeuille Projets ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = IndigoProjets.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.prj_titre_synthese),
                             fontSize = 11.sp,
@@ -128,11 +128,11 @@ fun ProjetsScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(etat.budgetTotal, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.prj_avancement_moyen, String.format(Locale.ROOT, "%.0f%%", etat.avancementMoyen)),
@@ -194,7 +194,7 @@ fun ProjetsScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileProjets(
@@ -225,7 +225,7 @@ fun ProjetsScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }
@@ -261,7 +261,7 @@ fun ProjetsScreen(
                         icon = Iv.Workspaces,
                         title = stringResource(R.string.prj_aucun),
                         description = stringResource(R.string.prj_aucun_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -332,7 +332,7 @@ private fun TuileProjets(
         color = if (estActif) IndigoProjets.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) IndigoProjets else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -360,11 +360,11 @@ private fun CarteProjet(
     val estEnDerive = ProjetRules.derive(projet.payload) > 0.0
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(projet.record.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -427,7 +427,7 @@ private fun CarteProjet(
             }
 
             if (!projet.annule && projet.etat != EtatProjet.LIVRE) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (projet.etat == EtatProjet.EN_PREPARATION) {
                         Button(
@@ -449,7 +449,7 @@ private fun CarteProjet(
                     OutlinedButton(onClick = onActualiser) {
                         Text(stringResource(R.string.prj_avancement), fontSize = 11.sp, color = MissaInk)
                     }
-                    IconButton(onClick = onAnnuler, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onAnnuler, modifier = Modifier.size(30.dp)) {
                         Icon(painterResource(Iv.DeleteOutline), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(18.dp))
                     }
                 }

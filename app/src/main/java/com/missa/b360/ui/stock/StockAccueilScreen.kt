@@ -91,20 +91,20 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             .background(MissaCanvas)
             .windowInsetsPadding(WindowInsets.statusBars)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         // Header du module : bandeau légèrement teinté de la couleur Stock.
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(14.dp),
             color = AppModule.STOCK.couleurPale,
         ) {
-            Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                Text(text = stringResource(R.string.module_stock), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
+            Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp)) {
+                Text(text = stringResource(R.string.module_stock), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
                 Text(text = stringResource(R.string.st_sous_titre), fontSize = 11.5.sp, color = MissaMuted)
             }
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
 
         // Catégories en petits onglets matriciels : accès direct aux listes.
         StockSectionTitle(
@@ -141,7 +141,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             )
         }
         tuiles.chunked(4).forEach { ligneTuiles ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ligneTuiles.forEach { tuile ->
                     TuileCategorieMatrice(
                         icone = tuile.icone,
@@ -153,7 +153,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 }
                 repeat(4 - ligneTuiles.size) { Spacer(Modifier.weight(1f)) }
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
         }
         Spacer(Modifier.height(6.dp))
 
@@ -167,7 +167,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = fmtValeur(etat.valeur, etat.devise),
-                    fontSize = 24.sp,
+                    fontSize = 21.5.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = MissaInk,
                 )
@@ -186,7 +186,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                             fontSize = 10.5.sp,
                             color = if (t >= 0) Green60 else Red40,
                         )
-                        Spacer(Modifier.width(10.dp))
+                        Spacer(Modifier.width(7.dp))
                     }
                     Text(
                         text = stringResource(R.string.st_resume_hero, etat.nbArticles, etat.nbCategories),
@@ -194,7 +194,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         color = MissaMuted,
                     )
                 }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 Row {
                     TexteMetrique(
                         icone = StockIv.TrendingUp,
@@ -228,8 +228,8 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         onClick = { onNaviguer(Routes.STOCK_ALERTES) },
                     )
                 }
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Spacer(Modifier.height(7.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     Surface(
                         onClick = { onNaviguer(Routes.stockProductForm()) },
                         modifier = Modifier.weight(1f),
@@ -237,7 +237,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         color = MissaInk,
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 9.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -254,7 +254,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         border = BorderStroke(1.dp, MissaBorder),
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 9.dp),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -269,9 +269,9 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
 
         // Valeur par catégorie : les trois catégories les plus valorisées.
         if (etat.topCategories.isNotEmpty()) {
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
             StockSectionTitle(titre = stringResource(R.string.st_valeur_par_categorie))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 etat.topCategories.forEach { cat ->
                     val pct = if (etat.valeur > 0) round(cat.valeur / etat.valeur * 100).toInt() else 0
                     Surface(
@@ -281,7 +281,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         color = Color.White,
                         border = BorderStroke(1.dp, MissaBorder),
                     ) {
-                        Column(modifier = Modifier.padding(10.dp)) {
+                        Column(modifier = Modifier.padding(7.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(painterResource(cat.type.icone()), null, tint = MissaInk, modifier = Modifier.size(13.dp))
                                 Spacer(Modifier.width(5.dp))
@@ -317,16 +317,16 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         }
 
         // Activité : barres empilées entrées/sorties sur 6 mois.
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(10.dp))
         StockSectionTitle(titre = stringResource(R.string.st_activite_mois))
         CarteStock(onClick = { onNaviguer(Routes.STOCK_MOUVEMENTS) }) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     LegendePoint(Green60, stringResource(R.string.st_entrees))
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     LegendePoint(Red40, stringResource(R.string.st_sorties))
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 val maxTotal = max(0.0001, etat.activite.maxOfOrNull { it.entrees + it.sorties } ?: 0.0)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                     etat.activite.forEach { mois ->
@@ -335,7 +335,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Column(
-                                modifier = Modifier.height(96.dp).fillMaxWidth().clip(RoundedCornerShape(5.dp)),
+                                modifier = Modifier.height(82.dp).fillMaxWidth().clip(RoundedCornerShape(5.dp)),
                                 verticalArrangement = Arrangement.Bottom,
                             ) {
                                 val reste = maxTotal - (mois.entrees + mois.sorties)
@@ -365,7 +365,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         }
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.st_resume_jour, etat.entreesJour, etat.sortiesJour, etat.transfertsJour),
                     fontSize = 10.sp,
@@ -377,12 +377,12 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
         // Immobilisations : vue transverse équipements / matériel / pièces.
         CarteStock(onClick = { onNaviguer(Routes.STOCK_EQUIPEMENTS) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+                Surface(modifier = Modifier.size(36.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(painterResource(StockIv.Bank), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                     }
                 }
-                Spacer(Modifier.width(11.dp))
+                Spacer(Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.st_immobilisations), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(
@@ -395,16 +395,16 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         // Accès inventaire physique.
         CarteStock(onClick = { onNaviguer(Routes.STOCK_INVENTORY) }) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+                Surface(modifier = Modifier.size(36.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(painterResource(StockIv.ClipboardText), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                     }
                 }
-                Spacer(Modifier.width(11.dp))
+                Spacer(Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.st_inventaire_titre), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(
@@ -418,7 +418,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                 Icon(painterResource(StockIv.ChevronRight), null, tint = MissaInk, modifier = Modifier.size(20.dp))
             }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
     }
 }
 
@@ -470,11 +470,11 @@ private fun TuileCategorieMatrice(
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 9.dp, horizontal = 4.dp),
+            modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Surface(
-                modifier = Modifier.size(30.dp),
+                modifier = Modifier.size(26.dp),
                 shape = RoundedCornerShape(9.dp),
                 color = AppModule.STOCK.couleurDouce,
             ) {

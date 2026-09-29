@@ -121,16 +121,16 @@ fun TresorerieScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Carte Synthèse Trésorerie ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = VertTresorerie.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.tre_solde_disponible),
                             fontSize = 11.sp,
@@ -139,7 +139,7 @@ fun TresorerieScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(etat.soldeDisponible, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -148,8 +148,8 @@ fun TresorerieScreen(
                             fontSize = 10.sp,
                             color = MissaMuted,
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Spacer(Modifier.height(6.dp))
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             listOf(
                                 TypeCompteTresorerie.CAISSE,
                                 TypeCompteTresorerie.BANQUE,
@@ -161,7 +161,7 @@ fun TresorerieScreen(
                                 }
                             }
                         }
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
                                 Text(stringResource(R.string.tre_flux_entrees), fontSize = 10.sp, color = MissaMuted)
@@ -197,7 +197,7 @@ fun TresorerieScreen(
 
             // --- Actions Rapides ---
             item {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Button(
                         onClick = { dialogueMouvement = SensMouvement.IN },
                         modifier = Modifier.weight(1f),
@@ -245,20 +245,20 @@ fun TresorerieScreen(
 
             item {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     items(etat.comptes, key = { it.compte.id }) { soldeCompte ->
                         val estSelectionne = compteFiltre == soldeCompte.compte.id
                         Surface(
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = if (estSelectionne) VertTresorerie.copy(alpha = 0.2f) else Color.White,
                             border = BorderStroke(1.dp, if (estSelectionne) VertTresorerie else MissaBorder),
                             modifier = Modifier
                                 .width(170.dp)
                                 .clickable { vm.filtrerCompte(soldeCompte.compte.id) },
                         ) {
-                            Column(Modifier.padding(10.dp)) {
+                            Column(Modifier.padding(7.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         painterResource(
@@ -310,7 +310,7 @@ fun TresorerieScreen(
                         color = MissaInk,
                     )
                     if (compteFiltre != null) {
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(6.dp))
                         Surface(shape = RoundedCornerShape(8.dp), color = VertTresorerie.copy(alpha = 0.15f)) {
                             Text(
                                 etat.comptes.firstOrNull { it.compte.id == compteFiltre }?.compte?.nom ?: "",
@@ -329,7 +329,7 @@ fun TresorerieScreen(
                         icon = Iv.AccountBalance,
                         title = stringResource(R.string.tre_aucun_mouvement),
                         description = stringResource(R.string.tre_aucun_mouvement_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -341,7 +341,7 @@ fun TresorerieScreen(
         }
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
         )
     }
 
@@ -397,7 +397,7 @@ private fun CarteMouvement(mouvement: MouvementTresorerieEntity, devise: String)
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
+            Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -406,7 +406,7 @@ private fun CarteMouvement(mouvement: MouvementTresorerieEntity, devise: String)
                 tint = if (estEntree) Color(0xFF15803D) else Color(0xFFB91C1C),
                 modifier = Modifier.size(24.dp),
             )
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column(Modifier.weight(1f)) {
                 Text(mouvement.libelle, fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Text(

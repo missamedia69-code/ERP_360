@@ -147,7 +147,7 @@ private fun ListeVentes(
                 icon = Iv.ShoppingCart,
                 title = stringResource(R.string.module_vente),
                 description = stringResource(R.string.sales_empty_desc),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(12.dp),
                 action = {
                     Button(
                         onClick = onNouvelleVente,
@@ -158,12 +158,12 @@ private fun ListeVentes(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp),
             ) {
                 item {
-                    Surface(shape = RoundedCornerShape(18.dp), color = BleuVente.copy(alpha = 0.16f)) {
-                        Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Surface(shape = RoundedCornerShape(16.dp), color = BleuVente.copy(alpha = 0.16f)) {
+                        Column(Modifier.fillMaxWidth().padding(10.dp)) {
                             Text(
                                 stringResource(R.string.module_vente),
                                 fontSize = 12.sp,
@@ -184,9 +184,9 @@ private fun ListeVentes(
                 }
                 if (afficherRetards) {
                     item(key = "factures-en-retard-banner") {
-                        Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFF1E8)) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = Color(0xFFFFF1E8)) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
@@ -207,7 +207,7 @@ private fun ListeVentes(
                 item {
                     Row(
                         Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         TuileVente(
                             icone = Iv.ShoppingCart,
@@ -288,11 +288,11 @@ private fun CartePieceVente(
     val payload = remember(piece.notes) { SaleRecordCodec.decode(piece.notes) }
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(piece.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -363,8 +363,8 @@ private fun FormulaireVente(
         )
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item { MissaFormSectionTitre(stringResource(R.string.form_client), numero = 1) }
             item {
@@ -384,11 +384,11 @@ private fun FormulaireVente(
                         modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauClient = true },
                     ) {
                         Row(
-                            modifier = Modifier.padding(12.dp),
+                            modifier = Modifier.padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     stringResource(R.string.sales_aucun_client),
@@ -431,8 +431,8 @@ private fun FormulaireVente(
             }
             if (ui.lines.isNotEmpty()) {
                 item {
-                    Surface(shape = RoundedCornerShape(14.dp), color = BleuVente.copy(alpha = 0.12f)) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = BleuVente.copy(alpha = 0.12f)) {
+                        Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Text(stringResource(R.string.sales_subtotal), fontSize = 11.sp, color = MissaMuted)
                                 Text(fmtValeur(totals.subtotal, devise), fontSize = 12.sp, color = MissaInk)
@@ -595,13 +595,13 @@ private fun BlocCatalogueVente(
     }
     filtres.take(20).forEach { produit ->
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
             modifier = Modifier.fillMaxWidth().clickable { onAjouter(produit) },
         ) {
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
@@ -627,26 +627,26 @@ private fun LignePanierVente(
     onSupprimer: () -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
+                IconButton(onClick = onSupprimer, modifier = Modifier.size(27.dp)) {
                     Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("−", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(-1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("−", fontSize = 16.sp, color = MissaInk)
                 }
                 Text(fmtQuantite(ligne.quantity), fontSize = 13.sp, color = MissaInk)
-                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(36.dp)) {
-                    Text("+", fontSize = 18.sp, color = MissaInk)
+                IconButton(onClick = { onQuantite(1.0) }, modifier = Modifier.size(30.dp)) {
+                    Text("+", fontSize = 16.sp, color = MissaInk)
                 }
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(fmtValeur(ligne.unitPrice * ligne.quantity, devise), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MissaInk)
             }
         }
@@ -694,7 +694,7 @@ private fun TuileVente(
         color = if (estActif) BleuVente.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) BleuVente else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(

@@ -504,7 +504,7 @@ fun ClientsScreen(
 
         SnackbarHost(
             hostState = snackbar,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 74.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 52.dp),
         )
     }
 
@@ -586,7 +586,7 @@ private fun ClientListScreen(
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
+            CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_list_title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
                 actions = { IconButton(onClick = onSearch) { Icon(painterResource(Iv.Search), stringResource(R.string.clients_flow_search), tint = MissaInk) } },
@@ -595,15 +595,15 @@ private fun ClientListScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = PaddingValues(horizontal = 15.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(9.dp),
+            contentPadding = PaddingValues(horizontal = 11.dp, vertical = 7.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = onNew, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(7.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientBlue)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
+                    Button(onClick = onNew, modifier = Modifier.weight(1f).height(36.dp), shape = RoundedCornerShape(7.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientBlue)) {
                         Icon(painterResource(Iv.Add), null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.clients_nouveau), fontSize = 11.sp)
                     }
-                    OutlinedButton(onClick = onImport, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(7.dp)) {
+                    OutlinedButton(onClick = onImport, modifier = Modifier.weight(1f).height(36.dp), shape = RoundedCornerShape(7.dp)) {
                         Icon(painterResource(Iv.UploadSimple), null, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.clients_flow_import), fontSize = 11.sp)
                     }
                 }
@@ -627,7 +627,7 @@ private fun ClientListScreen(
                         if (overdueTotal > 0.0) item { FilterChip(selected = activeFilter == "OVERDUE", onClick = { onFilterChange("OVERDUE") }, label = { Text(stringResource(R.string.clients_flow_overdue, clientMoney(overdueTotal, devise)), fontSize = 9.sp) }) }
                         if (incompleteCount > 0) item { FilterChip(selected = activeFilter == "INCOMPLETE", onClick = { onFilterChange("INCOMPLETE") }, label = { Text(stringResource(R.string.clients_flow_incomplete, incompleteCount), fontSize = 9.sp) }) }
                         if (creditExceededCount + dueSoonCount == 0 && overdueTotal <= 0.0 && incompleteCount == 0) {
-                            item { Text(stringResource(R.string.clients_flow_nothing_to_process), color = ClientMuted, fontSize = 9.sp, modifier = Modifier.padding(vertical = 9.dp)) }
+                            item { Text(stringResource(R.string.clients_flow_nothing_to_process), color = ClientMuted, fontSize = 9.sp, modifier = Modifier.padding(vertical = 6.dp)) }
                         }
                     }
                 }
@@ -664,7 +664,7 @@ private fun ClientListScreen(
 
 @Composable
 private fun ClientStats(total: Int, active: Int, due: Double, devise: String) {
-    Row(horizontalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxWidth()) {
+    Row(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.fillMaxWidth()) {
         ClientStatCard(stringResource(R.string.clients_flow_total_clients), total.toString(), Modifier.weight(1f))
         ClientStatCard(stringResource(R.string.clients_flow_active_short), active.toString(), Modifier.weight(1f))
         ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(due, devise), Modifier.weight(1.35f))
@@ -674,7 +674,7 @@ private fun ClientStats(total: Int, active: Int, due: Double, devise: String) {
 @Composable
 private fun ClientStatCard(label: String, value: String, modifier: Modifier = Modifier) {
     Card(modifier = modifier, shape = RoundedCornerShape(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder)) {
-        Column(Modifier.padding(9.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Column(Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(label, color = ClientMuted, fontSize = 8.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(value, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
@@ -683,9 +683,9 @@ private fun ClientStatCard(label: String, value: String, modifier: Modifier = Mo
 
 @Composable
 private fun ClientEmptyList(onNew: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().padding(top = 20.dp), shape = RoundedCornerShape(15.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder)) {
-        Column(Modifier.padding(26.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Surface(modifier = Modifier.size(46.dp), shape = CircleShape, color = ClientBlueSoft) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(11.dp)) }
+    Card(modifier = Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(13.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder)) {
+        Column(Modifier.padding(18.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Surface(modifier = Modifier.size(38.dp), shape = CircleShape, color = ClientBlueSoft) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(8.dp)) }
             Text(stringResource(R.string.clients_flow_empty_title), color = ClientInk, fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.clients_flow_empty_description), color = ClientMuted, fontSize = 11.sp, textAlign = TextAlign.Center)
             TextButton(onClick = onNew) { Text(stringResource(R.string.clients_nouveau)) }
@@ -696,16 +696,16 @@ private fun ClientEmptyList(onNew: () -> Unit) {
 @Composable
 private fun ClientListRow(client: ClientEntity, category: CategoryClientEntity?, outstanding: Double, overdue: Double, devise: String, onOpen: () -> Unit, onRappel: () -> Unit) {
     Surface(modifier = Modifier.fillMaxWidth().clickable(onClick = onOpen), shape = RoundedCornerShape(11.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
-        Row(Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
-            ClientAvatar(client.nom, Modifier.size(34.dp))
-            Spacer(Modifier.width(9.dp))
+        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            ClientAvatar(client.nom, Modifier.size(28.dp))
+            Spacer(Modifier.width(6.dp))
             Column(Modifier.weight(1f)) {
                 Text(client.nom, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${client.code} · ${client.telephone}", color = ClientMuted, fontSize = 9.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 category?.let { Text(it.nom, color = ClientBlue, fontSize = 9.sp) }
             }
             if (overdue > 0) {
-                IconButton(onClick = onRappel, modifier = Modifier.size(30.dp)) {
+                IconButton(onClick = onRappel, modifier = Modifier.size(26.dp)) {
                     Icon(painterResource(Iv.Notifications), contentDescription = stringResource(R.string.rappel_bell_cd), tint = MissaInk, modifier = Modifier.size(18.dp))
                 }
             }
@@ -784,7 +784,7 @@ private fun ClientDetailScreen(
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
+            CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(R.string.clients_flow_detail_title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
                 actions = {
@@ -797,10 +797,10 @@ private fun ClientDetailScreen(
             )
         },
     ) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(horizontal = 15.dp, vertical = 9.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(horizontal = 11.dp, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    ClientAvatar(client.nom, Modifier.size(48.dp)); Spacer(Modifier.width(10.dp))
+                    ClientAvatar(client.nom, Modifier.size(40.dp)); Spacer(Modifier.width(7.dp))
                     Column(Modifier.weight(1f)) {
                         Text(client.nom, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         Text("${client.code} · ${stringResource(client.type.labelRes())}", color = ClientMuted, fontSize = 10.sp)
@@ -810,7 +810,7 @@ private fun ClientDetailScreen(
             }
             item { ClientDetailInfoCard(client, addresses, onHistory, onAccount, metrics, devise) }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
                     ClientMetricCard(stringResource(R.string.clients_flow_sales_total), clientMoney(metrics.salesTotal, devise), stringResource(R.string.clients_flow_history), onHistory, Modifier.weight(1f))
                     ClientMetricCard(stringResource(R.string.clients_flow_outstanding), clientMoney(metrics.outstanding, devise), stringResource(R.string.clients_flow_account), onAccount, Modifier.weight(1f))
                 }
@@ -832,7 +832,7 @@ private fun ClientDetailScreen(
 @Composable
 private fun ClientDetailInfoCard(client: ClientEntity, addresses: List<ClientAddressEntity>, onHistory: () -> Unit, onAccount: () -> Unit, metrics: ClientSalesMetrics, devise: String) {
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(stringResource(R.string.clients_flow_general_information), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
             ClientKeyValue(R.string.clients_telephone, client.telephone)
             ClientKeyValue(R.string.clients_email, client.email ?: "—")
@@ -860,7 +860,7 @@ private fun ClientKeyValue(label: Int, value: String) {
 @Composable
 private fun ClientMetricCard(title: String, amount: String, action: String, onAction: () -> Unit, modifier: Modifier) {
     Card(modifier = modifier, shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder)) {
-        Column(Modifier.padding(11.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(title, color = ClientMuted, fontSize = 9.sp)
             Text(amount, color = ClientBlue, fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
             TextButton(onClick = onAction, contentPadding = PaddingValues(0.dp)) { Text(action, fontSize = 9.sp) }
@@ -886,7 +886,7 @@ private fun ClientTab(current: ClientDetailTab, value: ClientDetailTab, label: S
 @Composable
 private fun ClientDetailAttributes(client: ClientEntity, category: CategoryClientEntity?, badge: BadgeLoyaltyEntity?, devise: String) {
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             ClientKeyValue(R.string.clients_type, stringResource(client.type.labelRes()))
             ClientKeyValue(R.string.clients_categories, category?.nom ?: "—")
             ClientKeyValue(R.string.clients_flow_fiscal_id_type, client.typeIdentifiantFiscal ?: "—")
@@ -913,10 +913,10 @@ private fun ClientDetailAttributes(client: ClientEntity, category: CategoryClien
 @Composable
 private fun ClientContactsSection(contacts: List<ClientContactEntity>, onManage: () -> Unit) {
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.clients_flow_contacts), modifier = Modifier.weight(1f), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                OutlinedButton(onClick = onManage, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp)); Text(stringResource(R.string.clients_flow_manage), fontSize = 9.sp) }
+                OutlinedButton(onClick = onManage, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) { Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp)); Text(stringResource(R.string.clients_flow_manage), fontSize = 9.sp) }
             }
             if (contacts.isEmpty()) Text(stringResource(R.string.clients_flow_no_contacts), color = ClientMuted, fontSize = 11.sp)
             contacts.forEachIndexed { index, contact ->
@@ -935,10 +935,10 @@ private fun ClientContactsSection(contacts: List<ClientContactEntity>, onManage:
 @Composable
 private fun ClientAddressesSection(addresses: List<ClientAddressEntity>, onManage: () -> Unit) {
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.clients_flow_addresses), modifier = Modifier.weight(1f), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                OutlinedButton(onClick = onManage, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp)); Text(stringResource(R.string.clients_flow_manage), fontSize = 9.sp) }
+                OutlinedButton(onClick = onManage, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) { Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp)); Text(stringResource(R.string.clients_flow_manage), fontSize = 9.sp) }
             }
             if (addresses.isEmpty()) Text(stringResource(R.string.clients_flow_no_addresses), color = ClientMuted, fontSize = 11.sp)
             addresses.forEachIndexed { index, address ->
@@ -957,7 +957,7 @@ private fun ClientAddressesSection(addresses: List<ClientAddressEntity>, onManag
 @Composable
 private fun ClientNotesSection(notes: String?, onEdit: () -> Unit) {
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Text(stringResource(R.string.clients_notes), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
             Text(notes?.takeIf { it.isNotBlank() } ?: stringResource(R.string.clients_flow_no_notes), color = ClientMuted, fontSize = 11.sp)
             TextButton(onClick = onEdit, contentPadding = PaddingValues(0.dp)) { Text(stringResource(R.string.clients_flow_edit), fontSize = 10.sp) }
@@ -997,7 +997,7 @@ private fun ClientInfoFormScreen(
         enabled = valid,
         onPrimary = onNext,
     ) {
-        LazyColumn(contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(11.dp), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxSize()) {
             item { MissaFormSectionTitre(stringResource(R.string.clients_flow_general_information), numero = 1, sousTitre = stringResource(R.string.clients_flow_required_hint)) }
             item { ClientTypeChoice(draft.type, onSelect = { onDraftChange(draft.copy(type = it)) }) }
             item {
@@ -1067,18 +1067,18 @@ private fun ClientPhoneField(countryCode: String?, phoneLocal: String, onCountry
     val countries = remember(locale) { Iso4217.paysAvecIndicatif(locale) }
     val selected = countries.firstOrNull { it.code == countryCode }
     var pickerVisible by remember { mutableStateOf(false) }
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        OutlinedButton(onClick = { pickerVisible = true }, modifier = Modifier.width(110.dp).height(56.dp)) { Text(selected?.indicatif ?: "…", fontSize = 13.sp); Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(16.dp)) }
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        OutlinedButton(onClick = { pickerVisible = true }, modifier = Modifier.width(110.dp).height(48.dp)) { Text(selected?.indicatif ?: "…", fontSize = 13.sp); Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(16.dp)) }
         MissaChampTexte(phoneLocal, onPhone, stringResource(R.string.clients_telephone), modifier = Modifier.weight(1f), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, erreur = if (isError || (countryCode == null && phoneLocal.isNotBlank())) stringResource(R.string.form_valeur_invalide) else null)
     }
     if (pickerVisible) {
         var query by rememberSaveable { mutableStateOf("") }
         val visible = countries.filter { query.isBlank() || it.nom.contains(query, true) || it.indicatif.contains(query) || it.code.contains(query, true) }
         androidx.compose.material3.ModalBottomSheet(onDismissRequest = { pickerVisible = false }, containerColor = Color.White) {
-            Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 22.dp)) {
-                Text(stringResource(R.string.clients_indicatif_pays), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+            Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 15.dp)) {
+                Text(stringResource(R.string.clients_indicatif_pays), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 15.5.sp)
                 MissaChampTexte(query, { query = it }, stringResource(R.string.clients_rechercher_indicatif), icone = Iv.Search)
-                LazyColumn(modifier = Modifier.height(330.dp)) { items(visible, key = { it.code }) { country -> Row(modifier = Modifier.fillMaxWidth().clickable { onCountryCode(country.code); pickerVisible = false }.padding(vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) { Text(country.indicatif, color = ClientBlue, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp)); Text("${country.nom} (${country.code})", color = ClientInk, fontSize = 12.sp); if (country.code == countryCode) { Spacer(Modifier.weight(1f)); Icon(painterResource(Iv.Check), null, tint = MissaInk) } } } }
+                LazyColumn(modifier = Modifier.height(280.dp)) { items(visible, key = { it.code }) { country -> Row(modifier = Modifier.fillMaxWidth().clickable { onCountryCode(country.code); pickerVisible = false }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Text(country.indicatif, color = ClientBlue, fontWeight = FontWeight.Bold, modifier = Modifier.width(58.dp)); Text("${country.nom} (${country.code})", color = ClientInk, fontSize = 12.sp); if (country.code == countryCode) { Spacer(Modifier.weight(1f)); Icon(painterResource(Iv.Check), null, tint = MissaInk) } } } }
             }
         }
     }
@@ -1096,7 +1096,7 @@ private fun ClientContactsFormScreen(contacts: MutableList<ClientContactEntity>,
         enabled = true,
         onPrimary = onNext,
     ) {
-        LazyColumn(contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxSize()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) { Text(stringResource(R.string.clients_flow_contacts), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp); Text(stringResource(R.string.clients_flow_contacts_hint), color = ClientMuted, fontSize = 10.sp) }
@@ -1106,9 +1106,9 @@ private fun ClientContactsFormScreen(contacts: MutableList<ClientContactEntity>,
             if (contacts.isEmpty()) item { ClientFormEmpty(R.string.clients_flow_no_contacts) }
             items(contacts, key = { it.id to it.nom }) { contact ->
                 Surface(modifier = Modifier.fillMaxWidth().clickable { editing = contact }, shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
-                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Row { Text(contact.nom, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 12.sp); if (contact.principal) { Spacer(Modifier.width(6.dp)); ClientPill(R.string.clients_flow_primary) } }; Text(listOfNotNull(contact.fonction, contact.telephone, contact.email).joinToString(" · "), color = ClientMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-                        IconButton(onClick = { contacts.remove(contact) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
+                        IconButton(onClick = { contacts.remove(contact) }, modifier = Modifier.size(24.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
                     }
                 }
             }
@@ -1132,7 +1132,7 @@ private fun ClientContactsFormScreen(contacts: MutableList<ClientContactEntity>,
 
 @Composable
 private fun ClientFormEmpty(label: Int) {
-    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = ClientBlueSoft) { Text(stringResource(label), color = ClientMuted, fontSize = 11.sp, modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center) }
+    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = ClientBlueSoft) { Text(stringResource(label), color = ClientMuted, fontSize = 11.sp, modifier = Modifier.padding(12.dp), textAlign = TextAlign.Center) }
 }
 
 @Composable
@@ -1197,7 +1197,7 @@ private fun ClientAddressesFormScreen(
         enabled = valid,
         onPrimary = onSave,
     ) {
-        LazyColumn(contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(7.dp), modifier = Modifier.fillMaxSize()) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     MissaFormSectionTitre(stringResource(R.string.clients_flow_addresses), numero = 1, modifier = Modifier.weight(1f))
@@ -1207,9 +1207,9 @@ private fun ClientAddressesFormScreen(
             if (addresses.isEmpty()) item { ClientFormEmpty(R.string.clients_flow_no_addresses) }
             items(addresses, key = { it.id to it.adresse }) { address ->
                 Surface(modifier = Modifier.fillMaxWidth().clickable { editing = address }, shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
-                    Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) { Row { Text(address.libelle.ifBlank { stringResource(R.string.clients_adresse) }, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 12.sp); if (address.principale) { Spacer(Modifier.width(6.dp)); ClientPill(R.string.clients_flow_primary) } }; Text(address.displayAddress(), color = ClientMuted, fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-                        IconButton(onClick = { addresses.remove(address) }, modifier = Modifier.size(28.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
+                        IconButton(onClick = { addresses.remove(address) }, modifier = Modifier.size(24.dp)) { Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.sales_remove_item), tint = MissaInk, modifier = Modifier.size(17.dp)) }
                     }
                 }
             }
@@ -1282,7 +1282,7 @@ private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, pri
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
+            CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), 
                 title = { ClientPageTitle(stringResource(title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back), tint = MissaInk) } },
             )
@@ -1302,7 +1302,7 @@ private fun ClientWizardScaffold(title: Int, step: Int?, onBack: () -> Unit, pri
 @Composable
 private fun ClientProgress(current: Int) {
     val labels = listOf(R.string.clients_flow_step_information, R.string.clients_flow_step_contacts, R.string.clients_flow_step_addresses)
-    Row(Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 31.dp, vertical = 9.dp)) {
+    Row(Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 22.dp, vertical = 6.dp)) {
         labels.forEachIndexed { index, label ->
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Surface(modifier = Modifier.size(18.dp), shape = CircleShape, color = if (index <= current) ClientBlue else ClientBorder) { Box(contentAlignment = Alignment.Center) { Text(if (index < current) "✓" else (index + 1).toString(), color = Color.White, fontSize = 10.sp) } }
@@ -1317,10 +1317,10 @@ private fun ClientProgress(current: Int) {
 private fun ClientHistoryScreen(client: ClientEntity, records: List<OperationRecordEntity>, devise: String, onBack: () -> Unit) {
     val total = records.filter { it.status == OperationStatus.VALIDATED.name }.sumOf { SaleRecordCodec.decode(it.notes)?.total ?: 0.0 }
     val due = records.filter { it.status == OperationStatus.VALIDATED.name }.sumOf { payloadOutstanding(it) }
-    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_sales_history)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_sales_history)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             item { ClientHistoryHeader(client) }
-            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) { ClientStatCard(stringResource(R.string.clients_flow_sales_total), clientMoney(total, devise), Modifier.weight(1f)); ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(due, devise), Modifier.weight(1f)) } }
+            item { Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) { ClientStatCard(stringResource(R.string.clients_flow_sales_total), clientMoney(total, devise), Modifier.weight(1f)); ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(due, devise), Modifier.weight(1f)) } }
             if (records.isEmpty()) item { ClientFormEmpty(R.string.clients_flow_no_sales) }
             items(records, key = { it.id }) { record -> ClientSaleRow(record, devise) }
         }
@@ -1329,14 +1329,14 @@ private fun ClientHistoryScreen(client: ClientEntity, records: List<OperationRec
 
 @Composable
 private fun ClientHistoryHeader(client: ClientEntity) {
-    Row(verticalAlignment = Alignment.CenterVertically) { ClientAvatar(client.nom, Modifier.size(35.dp)); Spacer(Modifier.width(8.dp)); Column { Text(client.nom, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp); Text("${client.code} · ${client.telephone}", color = ClientMuted, fontSize = 9.sp) } }
+    Row(verticalAlignment = Alignment.CenterVertically) { ClientAvatar(client.nom, Modifier.size(30.dp)); Spacer(Modifier.width(6.dp)); Column { Text(client.nom, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp); Text("${client.code} · ${client.telephone}", color = ClientMuted, fontSize = 9.sp) } }
 }
 
 @Composable
 private fun ClientSaleRow(record: OperationRecordEntity, devise: String) {
     val payload = SaleRecordCodec.decode(record.notes)
     Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
-        Row(Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Text(DateUtils.formatDate(record.createdAt), color = ClientMuted, fontSize = 9.sp); Text(record.reference, color = ClientBlue, fontWeight = FontWeight.SemiBold, fontSize = 10.sp); Text(if (record.status == OperationStatus.CANCELLED.name) stringResource(R.string.sales_cancelled) else stringResource(R.string.sales_validated), color = if (record.status == OperationStatus.CANCELLED.name) ClientRed else ClientGreen, fontSize = 9.sp) }
             Column(horizontalAlignment = Alignment.End) { Text(clientMoney(payload?.total ?: record.amount ?: 0.0, devise), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 10.sp); Text(stringResource(R.string.clients_flow_due_short, clientMoney(payloadOutstanding(record), devise)), color = ClientMuted, fontSize = 9.sp) }
         }
@@ -1353,12 +1353,12 @@ private fun ClientAccountScreen(client: ClientEntity, records: List<OperationRec
         containerColor = ClientBackground,
         // Insets gérés par l'échafaudage global + la barre du bas (voir AdminScaffold).
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_account_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) },
-        bottomBar = { OutlinedButton(onClick = onDownload, modifier = Modifier.fillMaxWidth().padding(15.dp).height(47.dp)) { Icon(painterResource(Iv.Download), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_flow_download_pdf)) } },
+        topBar = { CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_account_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) },
+        bottomBar = { OutlinedButton(onClick = onDownload, modifier = Modifier.fillMaxWidth().padding(11.dp).height(40.dp)) { Icon(painterResource(Iv.Download), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_flow_download_pdf)) } },
     ) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             item { ClientHistoryHeader(client) }
-            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) { ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(outstanding, devise), Modifier.weight(1f)); ClientStatCard(stringResource(R.string.clients_limite_credit), creditLimit?.let { clientMoney(it, devise) } ?: stringResource(R.string.clients_flow_unlimited), Modifier.weight(1f)) } }
+            item { Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) { ClientStatCard(stringResource(R.string.clients_flow_outstanding), clientMoney(outstanding, devise), Modifier.weight(1f)); ClientStatCard(stringResource(R.string.clients_limite_credit), creditLimit?.let { clientMoney(it, devise) } ?: stringResource(R.string.clients_flow_unlimited), Modifier.weight(1f)) } }
             item { ClientCreditGauge(outstanding, creditLimit, devise) }
             if (entries.isEmpty()) item { ClientFormEmpty(R.string.clients_flow_no_account_entries) }
             items(entries, key = { it.record.id }) { entry -> ClientAccountRow(entry, devise) }
@@ -1370,7 +1370,7 @@ private fun ClientAccountScreen(client: ClientEntity, records: List<OperationRec
 private fun ClientCreditGauge(outstanding: Double, limit: Double?, devise: String) {
     val ratio = if (limit != null && limit > 0) (outstanding / limit).coerceIn(0.0, 1.0) else 0.0
     Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             ClientKeyValue(R.string.clients_flow_credit_usage, if (limit == null) stringResource(R.string.clients_flow_unlimited) else "${(ratio * 100).toInt()} %")
             Surface(modifier = Modifier.fillMaxWidth().height(7.dp), shape = RoundedCornerShape(5.dp), color = ClientBorder) { Box(Modifier.fillMaxWidth(ratio.toFloat()).height(7.dp).background(if (ratio > .9) ClientRed else ClientGreen)) }
             Text(stringResource(R.string.clients_flow_outstanding_value, clientMoney(outstanding, devise)), color = ClientMuted, fontSize = 9.sp)
@@ -1396,7 +1396,7 @@ private fun List<OperationRecordEntity>.toAccountEntries(): List<AccountEntry> {
 @Composable
 private fun ClientAccountRow(entry: AccountEntry, devise: String) {
     Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) {
-        Row(Modifier.padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Text(DateUtils.formatDate(entry.record.createdAt), color = ClientMuted, fontSize = 9.sp); Text(entry.record.reference, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 10.sp) }
             Column(horizontalAlignment = Alignment.End) { Text(stringResource(R.string.clients_flow_debit_credit, clientMoney(entry.debit, devise), clientMoney(entry.credit, devise)), color = ClientMuted, fontSize = 9.sp); Text(clientMoney(entry.balance, devise), color = ClientBlue, fontWeight = FontWeight.Bold, fontSize = 10.sp) }
         }
@@ -1423,8 +1423,8 @@ private fun ClientSearchScreen(clients: List<ClientEntity>, categories: List<Cat
             (since.parseClientDate()?.let { dates >= it } ?: true) &&
             (until.parseClientDate()?.let { dates <= it + 86_399_999 } ?: true)
     }
-    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_search_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(15.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+    Scaffold(containerColor = ClientBackground, topBar = { CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_search_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }) { padding ->
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(11.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             item { MissaChampTexte(query, { query = it }, stringResource(R.string.clients_recherche), icone = Iv.Search) }
             item { Text(stringResource(R.string.clients_flow_filters), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
             item { ClientStringPicker(R.string.clients_statut, listOf("ALL" to stringResource(R.string.clients_flow_all_status), "ACTIVE" to stringResource(R.string.clients_actif), "INACTIVE" to stringResource(R.string.clients_inactif)), status) { status = it } }
@@ -1462,12 +1462,12 @@ private fun ClientStringPicker(label: Int, choices: List<Pair<String, String>>, 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClientDeactivateScreen(client: ClientEntity, outstanding: Double, devise: String, onBack: () -> Unit, onConfirm: () -> Unit) {
-    Scaffold(containerColor = com.missa.b360.ui.theme.Red80, topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_deactivate_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }, bottomBar = { Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth().padding(15.dp).height(48.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientRed)) { Icon(painterResource(Iv.Cancel), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_desactiver)) } }) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Surface(modifier = Modifier.size(76.dp), shape = CircleShape, color = ClientRed.copy(alpha = .12f)) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(18.dp)) }
-            Spacer(Modifier.height(16.dp)); Text(stringResource(R.string.clients_flow_deactivate_question), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 16.sp); Spacer(Modifier.height(7.dp)); Text(stringResource(R.string.clients_flow_deactivate_description, client.nom), color = ClientMuted, fontSize = 11.sp, textAlign = TextAlign.Center)
-            if (outstanding > 0) { Spacer(Modifier.height(12.dp)); Surface(shape = RoundedCornerShape(8.dp), color = ClientRed.copy(alpha = .08f), border = BorderStroke(1.dp, ClientRed.copy(alpha = .4f))) { Text(stringResource(R.string.clients_flow_deactivate_due, clientMoney(outstanding, devise)), color = ClientRed, fontSize = 10.sp, modifier = Modifier.padding(11.dp), textAlign = TextAlign.Center) } }
-            Spacer(Modifier.height(16.dp)); Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) { Text(stringResource(R.string.clients_flow_consequences), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 11.sp); Text(stringResource(R.string.clients_flow_consequence_1), color = ClientMuted, fontSize = 10.sp); Text(stringResource(R.string.clients_flow_consequence_2), color = ClientMuted, fontSize = 10.sp) } }
+    Scaffold(containerColor = com.missa.b360.ui.theme.Red80, topBar = { CenterAlignedTopAppBar(expandedHeight = 52.dp, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = AppModule.CLIENTS.couleurPale), title = { ClientPageTitle(stringResource(R.string.clients_flow_deactivate_title)) }, navigationIcon = { IconButton(onClick = onBack) { Icon(painterResource(Iv.ArrowBack), stringResource(R.string.clients_flow_back)) } }) }, bottomBar = { Button(onClick = onConfirm, modifier = Modifier.fillMaxWidth().padding(11.dp).height(40.dp), colors = ButtonDefaults.buttonColors(containerColor = ClientRed)) { Icon(painterResource(Iv.Cancel), null); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.clients_desactiver)) } }) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding).padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Surface(modifier = Modifier.size(64.dp), shape = CircleShape, color = ClientRed.copy(alpha = .12f)) { Icon(painterResource(Iv.PersonOutline), null, tint = MissaInk, modifier = Modifier.padding(12.dp)) }
+            Spacer(Modifier.height(12.dp)); Text(stringResource(R.string.clients_flow_deactivate_question), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.5.sp); Spacer(Modifier.height(5.dp)); Text(stringResource(R.string.clients_flow_deactivate_description, client.nom), color = ClientMuted, fontSize = 11.sp, textAlign = TextAlign.Center)
+            if (outstanding > 0) { Spacer(Modifier.height(8.dp)); Surface(shape = RoundedCornerShape(8.dp), color = ClientRed.copy(alpha = .08f), border = BorderStroke(1.dp, ClientRed.copy(alpha = .4f))) { Text(stringResource(R.string.clients_flow_deactivate_due, clientMoney(outstanding, devise)), color = ClientRed, fontSize = 10.sp, modifier = Modifier.padding(8.dp), textAlign = TextAlign.Center) } }
+            Spacer(Modifier.height(12.dp)); Card(shape = RoundedCornerShape(10.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, ClientBorder), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) { Text(stringResource(R.string.clients_flow_consequences), color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 11.sp); Text(stringResource(R.string.clients_flow_consequence_1), color = ClientMuted, fontSize = 10.sp); Text(stringResource(R.string.clients_flow_consequence_2), color = ClientMuted, fontSize = 10.sp) } }
         }
     }
 }
@@ -1476,14 +1476,14 @@ private fun ClientDeactivateScreen(client: ClientEntity, outstanding: Double, de
 private fun ClientPageTitle(title: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         MissaBrandMark(size = 22.dp)
-        Spacer(Modifier.width(7.dp))
+        Spacer(Modifier.width(5.dp))
         Text(title, color = ClientInk, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 private fun ClientReadOnlyLine(label: Int, value: String) {
-    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(9.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) { Row(Modifier.padding(11.dp)) { Text(stringResource(label), color = ClientMuted, fontSize = 10.sp, modifier = Modifier.weight(1f)); Text(value, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 10.sp) } }
+    Surface(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(9.dp), color = Color.White, border = BorderStroke(1.dp, ClientBorder)) { Row(Modifier.padding(8.dp)) { Text(stringResource(label), color = ClientMuted, fontSize = 10.sp, modifier = Modifier.weight(1f)); Text(value, color = ClientInk, fontWeight = FontWeight.SemiBold, fontSize = 10.sp) } }
 }
 
 private fun ClientEntity.isActive(): Boolean = active && statut == ClientStatus.ACTIF

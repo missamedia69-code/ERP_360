@@ -349,8 +349,8 @@ private fun HubFournisseurs(
         )
         LazyColumn(
             Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item {
                 MissaChampTexte(query, { query = it }, stringResource(R.string.four_rechercher), icone = Iv.Search)
@@ -362,7 +362,7 @@ private fun HubFournisseurs(
 
             // --- Indicateurs ---
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     IndicateurHub(
                         titre = stringResource(R.string.four_actifs),
                         valeur = hub.actifs.toString(),
@@ -378,7 +378,7 @@ private fun HubFournisseurs(
                 }
             }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     IndicateurHub(
                         titre = stringResource(R.string.four_a_payer),
                         valeur = fmtValeur(hub.soldeTotal, devise),
@@ -411,11 +411,11 @@ private fun HubFournisseurs(
             if (hub.comptesAVerifier > 0 || hub.documentsExpirants > 0 || hub.sansIdentifiantFiscal > 0) {
                 item {
                     Surface(
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         color = Color.White,
                         border = BorderStroke(1.dp, MissaBorder),
                     ) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
                             Text(
                                 stringResource(R.string.four_a_traiter),
                                 fontSize = 12.sp,
@@ -485,17 +485,17 @@ private fun IndicateurHub(
     onClick: () -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
         modifier = modifier.clickable(onClick = onClick),
     ) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Column {
                 Text(titre, fontSize = 10.sp, color = MissaMuted)
-                Text(valeur, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                Text(valeur, fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
             }
         }
     }
@@ -505,7 +505,7 @@ private fun IndicateurHub(
 private fun LigneATraiter(icone: Int, texte: String) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 3.dp)) {
         Icon(painterResource(icone), null, tint = Color(0xFFB45309), modifier = Modifier.size(16.dp))
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Text(texte, fontSize = 12.sp, color = MissaInk)
     }
 }
@@ -541,10 +541,10 @@ private fun ListeFournisseurs(
             },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
         )
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             val statuts = listOf<FournisseurStatus?>(
@@ -592,7 +592,7 @@ private fun ListeFournisseurs(
                 icon = Iv.Handshake,
                 title = stringResource(R.string.four_aucun),
                 description = stringResource(R.string.four_aucun_desc),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(12.dp),
                 action = {
                     Button(
                         onClick = onNouveau,
@@ -606,8 +606,8 @@ private fun ListeFournisseurs(
         } else {
             LazyColumn(
                 Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 items(liste, key = { it.id }) { fournisseur ->
                     CarteFournisseur(
@@ -628,19 +628,19 @@ private fun CarteFournisseur(
     onOuvrir: () -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
         modifier = Modifier.fillMaxWidth().clickable(onClick = onOuvrir),
     ) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
-                Modifier.size(38.dp).background(CouleurFournisseurs.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
+                Modifier.size(32.dp).background(CouleurFournisseurs.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(painterResource(Iv.Handshake), null, tint = MissaInk, modifier = Modifier.size(20.dp))
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column(Modifier.weight(1f)) {
                 Text(fournisseur.nom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Text(
@@ -666,7 +666,7 @@ private fun CarteFournisseur(
 private fun BadgeStatut(statut: FournisseurStatus) {
     val couleur = couleurStatut(statut)
     Box(
-        Modifier.background(couleur.copy(alpha = 0.14f), RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 3.dp),
+        Modifier.background(couleur.copy(alpha = 0.14f), RoundedCornerShape(8.dp)).padding(horizontal = 6.dp, vertical = 3.dp),
     ) {
         Text(libelleStatut(statut), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = couleur)
     }
@@ -711,26 +711,26 @@ private fun FicheFournisseurEcran(
             MissaEmptyState(
                 icon = Iv.Handshake,
                 title = stringResource(R.string.four_introuvable),
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(12.dp),
             )
             return@Column
         }
         LazyColumn(
             Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- En-tête ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = Color.White,
                     border = BorderStroke(1.dp, MissaBorder),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(fournisseur.nom, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                                Text(fournisseur.nom, fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                                 Text(
                                     "${fournisseur.code} · ${libelleType(fournisseur.type)} · ${fournisseur.pays}",
                                     fontSize = 11.sp,
@@ -770,7 +770,7 @@ private fun FicheFournisseurEcran(
                                 color = if (message?.startsWith("err_") == true) Color(0xFFB91C1C) else Color(0xFF15803D),
                             )
                         }
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         // Actions selon le statut — cycle de vie (spec §3).
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             when (fournisseur.statut) {
@@ -829,11 +829,11 @@ private fun FicheFournisseurEcran(
             // --- KPI (spec §6.10) ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = Color.White,
                     border = BorderStroke(1.dp, MissaBorder),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         LigneInfo(stringResource(R.string.four_kpi_achats), fmtValeur(fiche.montantAchete, devise))
                         LigneInfo(stringResource(R.string.four_kpi_commandes), fiche.nombreCommandes.toString())
                         LigneInfo(stringResource(R.string.four_kpi_solde), fmtValeur(fiche.solde, devise))
@@ -1011,7 +1011,7 @@ private fun FicheFournisseurEcran(
                             }
                             IconButton(
                                 onClick = { vm.delierArticleFiche(liaison.id) },
-                                modifier = Modifier.size(32.dp),
+                                modifier = Modifier.size(27.dp),
                             ) {
                                 Icon(
                                     painterResource(Iv.DeleteOutline),
@@ -1186,7 +1186,7 @@ private fun BoutonAction(label: String, modifier: Modifier = Modifier, onClick: 
         onClick = onClick,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs, contentColor = Color.White),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 7.dp, vertical = 6.dp),
     ) {
         Text(label, fontSize = 12.sp, color = Color.White)
     }
@@ -1209,17 +1209,17 @@ private fun SectionRepliable(
 ) {
     var ouvert by remember { mutableStateOf(false) }
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth().clickable { ouvert = !ouvert },
             ) {
                 Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(titre, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk, modifier = Modifier.weight(1f))
                 action?.invoke()
                 Icon(
@@ -1230,7 +1230,7 @@ private fun SectionRepliable(
                 )
             }
             if (ouvert) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 contenu()
             }
         }
@@ -1322,7 +1322,7 @@ private fun LigneDocument(
             androidx.compose.foundation.Image(
                 bitmap = vignette!!.asImageBitmap(),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp).background(MissaBorder, RoundedCornerShape(8.dp)),
+                modifier = Modifier.size(27.dp).background(MissaBorder, RoundedCornerShape(8.dp)),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )
         } else {
@@ -1333,7 +1333,7 @@ private fun LigneDocument(
                 modifier = Modifier.size(20.dp),
             )
         }
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 buildString {
@@ -1357,7 +1357,7 @@ private fun LigneDocument(
                 },
             )
         }
-        IconButton(onClick = onSupprimer, modifier = Modifier.size(32.dp)) {
+        IconButton(onClick = onSupprimer, modifier = Modifier.size(27.dp)) {
             Icon(
                 painterResource(Iv.DeleteOutline),
                 null,
@@ -1667,10 +1667,10 @@ private fun DialogueEvaluation(
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             (1..5).forEach { index ->
-                IconButton(onClick = { note = index }, modifier = Modifier.size(36.dp)) {
+                IconButton(onClick = { note = index }, modifier = Modifier.size(30.dp)) {
                     Text(
                         if (index <= note) "★" else "☆",
-                        fontSize = 22.sp,
+                        fontSize = 20.sp,
                         color = if (index <= note) Color(0xFFB45309) else MissaMuted,
                     )
                 }
@@ -1725,7 +1725,7 @@ private fun FormulaireFournisseur(
 
         // Progression
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -1734,14 +1734,14 @@ private fun FormulaireFournisseur(
                 fontWeight = FontWeight.Bold,
                 color = MissaInk,
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Text("— ${titresEtapes[form.etape - 1]}", fontSize = 12.sp, color = MissaMuted)
         }
 
         LazyColumn(
             Modifier.weight(1f),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             form.erreur?.let { cle ->
                 item {
@@ -1759,7 +1759,7 @@ private fun FormulaireFournisseur(
                         shape = RoundedCornerShape(12.dp),
                         color = Color(0xFFB91C1C).copy(alpha = 0.08f),
                     ) {
-                        Column(Modifier.fillMaxWidth().padding(10.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(7.dp)) {
                             Text(
                                 stringResource(R.string.four_dossier_incomplet),
                                 fontSize = 12.sp,
@@ -1795,7 +1795,7 @@ private fun FormulaireFournisseur(
                 secondaire = if (form.etape > 1) precedent else null,
             )
             form.enEditionId == null -> {
-                TextButton(onClick = vm::etapePrecedente, modifier = Modifier.padding(horizontal = 8.dp)) {
+                TextButton(onClick = vm::etapePrecedente, modifier = Modifier.padding(horizontal = 6.dp)) {
                     Text("← ${stringResource(R.string.four_precedent)}", fontSize = 12.sp, color = MissaInk)
                 }
                 MissaFormPied(
@@ -1833,7 +1833,7 @@ private fun FormulaireFournisseur(
                     shape = RoundedCornerShape(10.dp),
                     color = Color(0xFFD97706).copy(alpha = 0.08f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(6.dp)) {
                         Text("${fiche.nom} (${fiche.code})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                         motifs.forEach { motif ->
                             Text("• ${libelleMotifDoublon(motif)}", fontSize = 11.sp, color = Color(0xFFB45309))
@@ -1887,7 +1887,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
         }
     }
     item {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             SelecteurSimple(
                 icone = Iv.Public,
                 label = stringResource(R.string.four_pays) + " *",
@@ -1905,7 +1905,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
         }
     }
     item {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             MissaChampTexte(form.telephone, { valeur -> vm.updateForm { it.copy(telephone = valeur) } }, stringResource(R.string.four_telephone), modifier = Modifier.weight(1f), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
             MissaChampTexte(form.email, { valeur -> vm.updateForm { it.copy(email = valeur) } }, stringResource(R.string.four_email), modifier = Modifier.weight(1f), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
         }
@@ -1933,11 +1933,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
         var email by remember { mutableStateOf("") }
         var principal by remember { mutableStateOf(true) }
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
         ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (form.contacts.isEmpty()) {
                     Text(stringResource(R.string.four_aucun_contact), fontSize = 11.sp, color = MissaMuted)
                 }
@@ -1961,7 +1961,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
                         }
                         IconButton(
                             onClick = { vm.removeContactSaisi(index) },
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(27.dp),
                         ) {
                             Icon(
                                 painterResource(Iv.DeleteOutline),
@@ -2037,11 +2037,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
     }
     item {
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
         ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.four_assujetti_tva), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
                     Switch(
@@ -2090,14 +2090,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeAchats(
     }
     if (montreStock) {
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 MissaChampTexte(form.delaiMoyen, { valeur -> vm.updateForm { it.copy(delaiMoyen = valeur.filter { c -> c.isDigit() }) } }, stringResource(R.string.four_delai), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
                 MissaChampTexte(form.quantiteMin, { valeur -> vm.updateForm { it.copy(quantiteMin = valeur.filterMoneyInput()) } }, stringResource(R.string.four_qte_min), modifier = Modifier.weight(1f), icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL)
             }
         }
     }
     item {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             MissaChampTexte(form.montantMin, { valeur -> vm.updateForm { it.copy(montantMin = valeur.filterMoneyInput()) } }, stringResource(R.string.four_montant_min), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             if (montreStock) {
                 SelecteurSimple(
@@ -2121,7 +2121,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapePaiement(
         MissaChampTexte(form.conditionsPaiement, { valeur -> vm.updateForm { it.copy(conditionsPaiement = valeur) } }, stringResource(R.string.four_conditions), icone = Iv.Schedule, requis = true)
     }
     item {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             MissaChampTexte(form.joursEcheance, { valeur -> vm.updateForm { it.copy(joursEcheance = valeur.filter { c -> c.isDigit() }) } }, stringResource(R.string.four_jours_echeance), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
             SelecteurSimple(
                 icone = Iv.Payments,
@@ -2168,11 +2168,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
         }
 
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
         ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (form.documents.isEmpty()) {
                     Text(stringResource(R.string.four_aucun_document), fontSize = 11.sp, color = MissaMuted)
                 }
@@ -2202,7 +2202,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
                         }
                         IconButton(
                             onClick = { vm.removeDocumentSaisi(index) },
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(27.dp),
                         ) {
                             Icon(
                                 painterResource(Iv.DeleteOutline),
@@ -2225,7 +2225,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
                     )
                     MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge, modifier = Modifier.weight(1f))
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     ChampDateFour(
                         label = stringResource(R.string.four_date_expiration),
                         millis = expiration,
@@ -2300,11 +2300,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeValidation(
 ) {
     item {
         Surface(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             color = Color.White,
             border = BorderStroke(1.dp, MissaBorder),
         ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp)) {
+            Column(Modifier.fillMaxWidth().padding(8.dp)) {
                 Text(
                     stringResource(R.string.four_resume),
                     fontSize = 12.sp,

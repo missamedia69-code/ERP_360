@@ -741,11 +741,11 @@ private fun PlusDeModulesFeuille(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 18.dp, end = 18.dp, bottom = 24.dp),
+                .padding(start = 12.dp, end = 12.dp, bottom = 17.dp),
         ) {
             Text(
                 text = stringResource(R.string.more_modules),
-                fontSize = 19.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(4.dp))
@@ -754,7 +754,7 @@ private fun PlusDeModulesFeuille(
                 fontSize = 12.5.sp,
                 color = MissaMuted,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             modules.forEach { module ->
                 ListItem(
                     headlineContent = {
@@ -762,7 +762,7 @@ private fun PlusDeModulesFeuille(
                     },
                     leadingContent = {
                         Surface(
-                            modifier = Modifier.size(42.dp),
+                            modifier = Modifier.size(36.dp),
                             shape = RoundedCornerShape(12.dp),
                             color = module.couleurDouce,
                         ) {
@@ -770,7 +770,7 @@ private fun PlusDeModulesFeuille(
                                 painter = painterResource(module.icon),
                                 contentDescription = null,
                                 tint = MissaInk,
-                                modifier = Modifier.padding(10.dp),
+                                modifier = Modifier.padding(7.dp),
                             )
                         }
                     },

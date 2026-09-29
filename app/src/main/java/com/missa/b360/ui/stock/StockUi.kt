@@ -162,11 +162,11 @@ fun CarteStock(
         modifier = modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         color = MissaSurface,
         border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.6f)),
     ) {
-        Column(modifier = Modifier.padding(14.dp), content = content)
+        Column(modifier = Modifier.padding(10.dp), content = content)
     }
 }
 
@@ -174,7 +174,7 @@ fun CarteStock(
 @Composable
 fun StockSectionTitle(titre: String, action: String? = null, onAction: (() -> Unit)? = null) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -209,20 +209,20 @@ fun StatTile(
 ) {
     Surface(
         modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = MissaSurface,
         border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.6f)),
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = fond) {
+            Surface(modifier = Modifier.size(28.dp), shape = RoundedCornerShape(10.dp), color = fond) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(painterResource(icone), contentDescription = null, tint = teinte, modifier = Modifier.size(18.dp))
                 }
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column {
                 Text(text = valeur, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
                 Text(text = libelle, fontSize = 10.5.sp, color = MissaMuted)
@@ -236,7 +236,7 @@ fun StatTile(
 fun StockChip(texte: String, actif: Boolean, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(18.dp),
         color = if (actif) BrandBlue else MissaSurface,
         border = if (actif) null else BorderStroke(1.dp, MissaBorder.copy(alpha = 0.6f)),
     ) {
@@ -245,7 +245,7 @@ fun StockChip(texte: String, actif: Boolean, onClick: () -> Unit) {
             fontSize = 11.sp,
             fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
             color = if (actif) Color.White else MissaMuted,
-            modifier = Modifier.padding(horizontal = 13.dp, vertical = 7.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
         )
     }
 }
@@ -322,7 +322,7 @@ fun StockOnglets(onglets: List<String>, selection: Int, onSelection: (Int) -> Un
                     color = if (actif) Color.White else MissaMuted,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 6.dp),
                     textAlign = TextAlign.Center,
                 )
             }

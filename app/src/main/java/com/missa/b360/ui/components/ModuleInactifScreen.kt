@@ -48,13 +48,13 @@ fun ModuleInactifScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(17.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Surface(
-            modifier = Modifier.size(72.dp),
-            shape = RoundedCornerShape(18.dp),
+            modifier = Modifier.size(60.dp),
+            shape = RoundedCornerShape(16.dp),
             color = MissaSoftBlue,
         ) {
             Icon(
@@ -63,18 +63,18 @@ fun ModuleInactifScreen(
                 tint = BrandBlue,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(18.dp),
+                    .padding(12.dp),
             )
         }
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(14.dp))
         Text(
             text = stringResource(R.string.module_inactif_titre, stringResource(module.titleRes)),
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = MissaInk,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(7.dp))
         val profilLabel = activation.profil?.let { stringResource(ModulesPersonnalises.libelleRes(it)) }
             ?: stringResource(R.string.home_not_configured)
         Text(
@@ -94,7 +94,7 @@ fun ModuleInactifScreen(
             color = MissaMuted,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(17.dp))
         Button(
             onClick = onBack,
             shape = RoundedCornerShape(12.dp),
@@ -102,7 +102,7 @@ fun ModuleInactifScreen(
             Text(stringResource(R.string.module_inactif_retour))
         }
         if (onActiver != null) {
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             Button(
                 onClick = onActiver,
                 shape = RoundedCornerShape(12.dp),

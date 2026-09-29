@@ -107,7 +107,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
             onBack = onBack,
             couleurFond = AppModule.STOCK.couleurPale,
             actions = {
-                IconButton(onClick = { dialogueSuppression = true }, modifier = Modifier.size(48.dp)) {
+                IconButton(onClick = { dialogueSuppression = true }, modifier = Modifier.size(40.dp)) {
                     Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                 }
             },
@@ -120,14 +120,14 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 12.dp),
         ) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             // En-tête article.
             CarteStock {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val photo = rememberPhotoProduit(produit.photoPath)
-                    Surface(modifier = Modifier.size(56.dp), shape = RoundedCornerShape(14.dp), color = Blue90) {
+                    Surface(modifier = Modifier.size(48.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                         Box(contentAlignment = Alignment.Center) {
                             if (photo != null) {
                                 Image(
@@ -141,9 +141,9 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                             }
                         }
                     }
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(produit.nom, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
+                        Text(produit.nom, fontSize = 13.5.sp, fontWeight = FontWeight.ExtraBold, color = MissaInk)
                         Text(
                             text = produit.reference?.takeIf { it.isNotBlank() } ?: produit.code,
                             fontSize = 11.sp,
@@ -156,13 +156,13 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                                 fontSize = 9.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Green60,
-                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
                             )
                         }
                     }
                 }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             var onglet by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(0) }
             val equipement by vm.equipement.collectAsStateWithLifecycle()
             val estEquipement = TYPES_EQUIPEMENTS.contains(produit.type)
@@ -176,7 +176,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                     selection = onglet,
                     onSelection = { onglet = it },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 when (onglet) {
                     0 -> OngletGeneralEquipement(produit, equipement, categorieNom, etat.devise)
                     1 -> OngletMaintenance(equipement, vm)
@@ -184,11 +184,11 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                         if (etat.mouvements.isEmpty()) {
                             Text(stringResource(R.string.st_aucun_resultat), fontSize = 11.5.sp, color = MissaMuted)
                         } else {
-                            etat.mouvements.take(20).forEach { LigneMouvement(it) ; Spacer(Modifier.height(8.dp)) }
+                            etat.mouvements.take(20).forEach { LigneMouvement(it) ; Spacer(Modifier.height(6.dp)) }
                         }
                     }
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
                 Row {
                     val enMaint = equipement?.statut == com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE
                     Button(
@@ -198,8 +198,8 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                                 else com.missa.b360.core.data.entity.StatutEquipement.MAINTENANCE,
                             )
                         },
-                        modifier = Modifier.weight(1f).height(46.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(38.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Text(
@@ -208,11 +208,11 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                             fontWeight = FontWeight.Bold,
                         )
                     }
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Button(
                         onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
-                        modifier = Modifier.weight(1f).height(46.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(38.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                     ) {
                         Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(15.dp))
@@ -231,7 +231,7 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                     selection = onglet,
                     onSelection = { onglet = it },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 when (onglet) {
                     0 -> OngletGeneral(etat, produit, categorieNom)
                     1 -> OngletStock(etat, produit)
@@ -239,19 +239,19 @@ fun StockDetailScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}) {
                     else -> OngletFournisseur(etat)
                 }
                 SectionExtension(produit.type, vm)
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = { onNavigate("${Routes.STOCK_PRODUCT_FORM}?productId=${produit.id}") },
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
-                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth().height(38.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                 ) {
                     Icon(painterResource(StockIv.Edit), null, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(7.dp))
+                    Spacer(Modifier.width(5.dp))
                     Text(stringResource(R.string.st_modifier), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(14.dp))
         }
     }
 }
@@ -268,7 +268,7 @@ private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, 
     when (type) {
         com.missa.b360.core.data.entity.ProductType.DECHET_VALORISABLE,
         com.missa.b360.core.data.entity.ProductType.DECHET_NON_VALORISABLE -> dechet?.let { d ->
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             CarteStock {
                 Text(stringResource(R.string.st_donnees_dechet), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(6.dp))
@@ -284,7 +284,7 @@ private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, 
             }
         }
         com.missa.b360.core.data.entity.ProductType.EMBALLAGE -> emballage?.let { e ->
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             CarteStock {
                 Text(stringResource(R.string.st_donnees_emballage), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(6.dp))
@@ -296,7 +296,7 @@ private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, 
             }
         }
         com.missa.b360.core.data.entity.ProductType.CONSIGNATION -> consignation?.let { c ->
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             CarteStock {
                 Text(stringResource(R.string.st_donnees_consignation), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(6.dp))
@@ -308,7 +308,7 @@ private fun SectionExtension(type: com.missa.b360.core.data.entity.ProductType, 
             }
         }
         com.missa.b360.core.data.entity.ProductType.KIT -> kit?.let { k ->
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(8.dp))
             CarteStock {
                 Text(stringResource(R.string.st_donnees_kit), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 Spacer(Modifier.height(6.dp))
@@ -350,17 +350,17 @@ private fun OngletStock(
     // Stock réel, négatif compris : masquer un stock négatif cacherait une anomalie.
     val total = etat.stocks.sumOf { it.quantite }
     CarteStock {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             TuileStock(stringResource(R.string.st_disponible), fmtQuantite(total), MissaInk, Modifier.weight(1f))
             TuileStock(stringResource(R.string.st_minimum), fmtQuantite(produit.stockMin), ProfileOrange, Modifier.weight(1f))
         }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Spacer(Modifier.height(6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             TuileStock(stringResource(R.string.st_maximum), produit.stockMax?.let { fmtQuantite(it) } ?: "—", MissaInk, Modifier.weight(1f))
             TuileStock(stringResource(R.string.st_securite), fmtQuantite(produit.stockSecurite), Green60, Modifier.weight(1f))
         }
         if (etat.stocks.isNotEmpty()) {
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             etat.stocks.forEach { ligne ->
                 LigneInfo(
                     libelle = etat.sites.firstOrNull { it.id == ligne.siteId }?.nom ?: stringResource(R.string.st_site),
@@ -370,12 +370,12 @@ private fun OngletStock(
         }
         // Historique des mouvements, aussi pour les articles non équipement.
         if (etat.mouvements.isNotEmpty()) {
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(7.dp))
             Text(stringResource(R.string.st_historique), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
             Spacer(Modifier.height(6.dp))
             etat.mouvements.take(10).forEach { mv ->
                 LigneMouvement(mv)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
             }
         }
     }
@@ -385,12 +385,12 @@ private fun OngletStock(
 private fun TuileStock(libelle: String, valeur: String, teinte: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
     Surface(modifier = modifier, shape = RoundedCornerShape(10.dp), color = com.missa.b360.ui.theme.MissaCanvas) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            modifier = Modifier.fillMaxWidth().padding(7.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(libelle, fontSize = 10.sp, color = MissaMuted)
             Spacer(Modifier.height(2.dp))
-            Text(valeur, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = teinte)
+            Text(valeur, fontSize = 13.5.sp, fontWeight = FontWeight.ExtraBold, color = teinte)
         }
     }
 }
@@ -445,7 +445,7 @@ private fun OngletGeneralEquipement(
         LigneInfo(stringResource(R.string.st_responsable), equipement?.responsable)
         LigneInfo(stringResource(R.string.st_categorie), categorieNom)
     }
-    Spacer(Modifier.height(10.dp))
+    Spacer(Modifier.height(7.dp))
     CarteStock {
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -465,7 +465,7 @@ private fun OngletGeneralEquipement(
                     fontSize = 9.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (valide) Green60 else com.missa.b360.ui.theme.Red40,
-                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
                 )
             }
         }

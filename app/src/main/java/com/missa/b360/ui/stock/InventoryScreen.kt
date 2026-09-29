@@ -67,21 +67,21 @@ fun InventoryScreen(onBack: () -> Unit) {
 
         if (etat.session == null) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
+                modifier = Modifier.fillMaxSize().padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Surface(shape = RoundedCornerShape(20.dp), color = Blue90, modifier = Modifier.size(64.dp)) {
+                Surface(shape = RoundedCornerShape(18.dp), color = Blue90, modifier = Modifier.size(54.dp)) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(painterResource(StockIv.Unarchive), null, tint = MissaInk, modifier = Modifier.size(30.dp))
+                        Icon(painterResource(StockIv.Unarchive), null, tint = MissaInk, modifier = Modifier.size(26.dp))
                     }
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.st_aucun_inventaire), fontSize = 12.sp, color = MissaMuted, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(10.dp))
                 Button(
                     onClick = vm::demarrer,
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
                 ) {
                     Text(stringResource(R.string.st_demarrer_inventaire), fontSize = 12.5.sp, fontWeight = FontWeight.Bold)
@@ -90,16 +90,16 @@ fun InventoryScreen(onBack: () -> Unit) {
         } else {
             var onglet by remember { mutableStateOf(0) }
             var recherche by remember { mutableStateOf("") }
-            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                Spacer(Modifier.height(8.dp))
+            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+                Spacer(Modifier.height(6.dp))
                 CarteStock {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = RoundedCornerShape(12.dp), color = Green90, modifier = Modifier.size(42.dp)) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = Green90, modifier = Modifier.size(36.dp)) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(painterResource(StockIv.Inventory2), null, tint = MissaInk, modifier = Modifier.size(20.dp))
                             }
                         }
-                        Spacer(Modifier.width(11.dp))
+                        Spacer(Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(stringResource(R.string.st_inventaire_en_cours), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                             Text(
@@ -124,8 +124,8 @@ fun InventoryScreen(onBack: () -> Unit) {
                         }
                     }
                 }
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.height(7.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     StatTile(
                         icone = StockIv.CheckCircle,
                         teinte = MissaInk,
@@ -143,7 +143,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                         modifier = Modifier.weight(1f),
                     )
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 StockOnglets(
                     onglets = listOf(
                         stringResource(R.string.st_tab_general),
@@ -153,7 +153,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                     selection = onglet,
                     onSelection = { onglet = it },
                 )
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 if (onglet == 1) {
                     MissaChampTexte(
                         valeur = recherche,
@@ -161,7 +161,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                         libelle = stringResource(R.string.st_rechercher_article),
                         icone = Iv.Inventory2,
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                 }
                 val lignes = etat.lignes.filter {
                     when (onglet) {
@@ -188,7 +188,7 @@ fun InventoryScreen(onBack: () -> Unit) {
                                 )
                                 LigneInfo(stringResource(R.string.st_ecarts_detectes), etat.ecarts.size.toString())
                             }
-                            Spacer(Modifier.height(10.dp))
+                            Spacer(Modifier.height(7.dp))
                             Text(
                                 text = stringResource(R.string.st_ecarts_detectes),
                                 fontSize = 11.5.sp,
@@ -220,12 +220,12 @@ fun InventoryScreen(onBack: () -> Unit) {
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = if (ecart > 0) Green60 else Red40,
-                                                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
                                                 )
                                             }
                                         }
                                     }
-                                    Spacer(Modifier.height(8.dp))
+                                    Spacer(Modifier.height(6.dp))
                                 }
                             }
                         }
@@ -266,17 +266,17 @@ fun InventoryScreen(onBack: () -> Unit) {
                                     }
                                 }
                             }
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(6.dp))
                         }
                     }
-                    item { Spacer(Modifier.height(12.dp)) }
+                    item { Spacer(Modifier.height(8.dp)) }
                 }
                 MissaBoutonPrincipal(
                     texte = stringResource(R.string.st_cloturer),
                     onClick = { vm.cloturer(onBack) },
                     couleur = AppModule.STOCK.couleur,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
             }
         }
     }

@@ -52,17 +52,17 @@ internal fun ServiceFieldOverview(
     }
     val urgent = requests.count { it.priority == ServicePriority.URGENT.name && it.status == "OPEN" } +
         workOrders.count { it.priority == ServicePriority.URGENT.name && it.status !in setOf("CLOSED", "CANCELLED") }
-    Surface(shape = RoundedCornerShape(18.dp), color = ServicePink.copy(alpha = 0.09f)) {
-        Column(Modifier.fillMaxWidth().padding(14.dp)) {
+    Surface(shape = RoundedCornerShape(16.dp), color = ServicePink.copy(alpha = 0.09f)) {
+        Column(Modifier.fillMaxWidth().padding(10.dp)) {
             Text(stringResource(R.string.srvf_titre_terrain), fontSize = 11.sp, color = Color(0xFF6B7280), fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(8.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(Modifier.height(6.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 FieldKpi(stringResource(R.string.srvf_kpi_demandes), openRequests.toString(), Modifier.weight(1f))
                 FieldKpi(stringResource(R.string.srvf_kpi_ordres), activeOrders.toString(), Modifier.weight(1f))
                 FieldKpi(stringResource(R.string.srvf_kpi_urgents), urgent.toString(), Modifier.weight(1f), if (urgent > 0) Color(0xFFB91C1C) else ServicePink)
             }
-            Spacer(Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Button(
                     onClick = onNewRequest,
                     modifier = Modifier.weight(1f),
@@ -82,7 +82,7 @@ internal fun ServiceFieldOverview(
 @Composable
 private fun FieldKpi(label: String, value: String, modifier: Modifier = Modifier, color: Color = ServicePink) {
     Column(modifier) {
-        Text(value, color = color, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(value, color = color, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         Text(label, color = Color(0xFF6B7280), fontSize = 10.sp, lineHeight = 13.sp)
     }
 }
@@ -94,8 +94,8 @@ internal fun ServiceRequestCard(
     onConvert: () -> Unit,
 ) {
     val priorityColor = priorityColor(request.priority)
-    Surface(shape = RoundedCornerShape(14.dp), color = Color.White, tonalElevation = 1.dp) {
-        Column(Modifier.fillMaxWidth().padding(13.dp)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, tonalElevation = 1.dp) {
+        Column(Modifier.fillMaxWidth().padding(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(request.reference, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ServicePink, modifier = Modifier.weight(1f))
                 Text(stringResource(priorityLabelRes(request.priority)).uppercase(), fontSize = 10.sp, color = priorityColor, fontWeight = FontWeight.Bold)
@@ -107,7 +107,7 @@ internal fun ServiceRequestCard(
             if (ServiceWorkflowRules.isOverdue(request.resolutionDeadlineAt, System.currentTimeMillis(), request.status in setOf("RESOLVED", "CLOSED", "CANCELLED", "CONVERTED"))) {
                 Text(stringResource(R.string.srvf_sla_depasse), fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
             }
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(5.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("${stringResource(typeLabelRes(request.requestType))} · ${statusLabelRes(request.status)?.let { stringResource(it) } ?: request.status}", fontSize = 10.sp, color = Color(0xFF6B7280))
                 when (request.status) {
@@ -138,8 +138,8 @@ internal fun ServiceWorkOrderCard(
         ServiceWorkOrderStatus.CLOSED, ServiceWorkOrderStatus.READY_TO_BILL -> Color(0xFF475569)
         else -> ServicePink
     }
-    Surface(shape = RoundedCornerShape(14.dp), color = Color.White, tonalElevation = 1.dp) {
-        Column(Modifier.fillMaxWidth().padding(13.dp)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, tonalElevation = 1.dp) {
+        Column(Modifier.fillMaxWidth().padding(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(order.reference, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ServicePink, modifier = Modifier.weight(1f))
                 Text(stringResource(status.toLabelRes()), fontSize = 10.sp, color = statusColor, fontWeight = FontWeight.Bold)
@@ -167,7 +167,7 @@ internal fun ServiceWorkOrderCard(
                     fontWeight = FontWeight.SemiBold,
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 when (status) {
                     ServiceWorkOrderStatus.TO_PLAN -> Action(stringResource(R.string.srvf_planifier), onSchedule)

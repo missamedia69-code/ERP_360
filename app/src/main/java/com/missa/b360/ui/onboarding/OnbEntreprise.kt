@@ -196,7 +196,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             // --- 1. Identité (ou « Vous » pour le pack Personnel) ---
             OnbCompactCarte(
@@ -549,13 +549,13 @@ private fun OnbCompactCarte(
 ) {
     Surface(
         color = OnbConfigCard,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 8.dp, vertical = 7.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -699,8 +699,8 @@ private fun OnbPackRangee(
 ) {
     if (gauche == null && droite == null) return
     Row(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 7.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
     ) {
         OnbPackCellule(gauche, Modifier.weight(1f))
         OnbPackCellule(droite, Modifier.weight(1f))
@@ -795,13 +795,13 @@ private fun OnbLogoDirect(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 8.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (logoUri == null) {
                 Surface(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(34.dp)
                         .dashedBorder(1.2.dp, MissaBorder, 10.dp),
                     color = MissaSurface,
                 ) {
@@ -819,14 +819,14 @@ private fun OnbLogoDirect(
                     logoUri = logoUri,
                     contentDescription = stringResource(R.string.ob_logo_apercu),
                     fallbackIcon = Iv.Backup,
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(34.dp),
                     size = 40.dp,
                     shape = RoundedCornerShape(10.dp),
                     fallbackTint = BrandBlue,
                     fallbackBackground = BrandBlue.copy(alpha = 0.07f),
                 )
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.obn_logo_titre),
@@ -860,8 +860,8 @@ private fun OnbLogoDirect(
                     disabledContainerColor = OnbActionGreen.copy(alpha = 0.4f),
                 ),
                 contentPadding = PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 7.dp,
+                    horizontal = 8.dp,
+                    vertical = 5.dp,
                 ),
             ) {
                 Text(

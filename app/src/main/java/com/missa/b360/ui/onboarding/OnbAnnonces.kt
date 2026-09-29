@@ -82,12 +82,12 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     onClick = viewModel::precedent,
-                    modifier = Modifier.size(38.dp),
+                    modifier = Modifier.size(32.dp),
                 ) {
                     Icon(
                         painter = painterResource(Iv.ArrowBack),
@@ -106,7 +106,7 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
                             role = Role.Button,
                             onClick = viewModel::suivant,
                         )
-                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                        .padding(horizontal = 7.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -148,7 +148,7 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .padding(horizontal = 14.dp, vertical = 7.dp)
                     .navigationBarsPadding(),
             ) {
                 OnbAnnoncesBoutonCommencer(onClick = viewModel::suivant)
@@ -191,9 +191,9 @@ private fun OnbAnnoncesHero(langue: String) {
             modifier = Modifier
                 .align(if (rtl) Alignment.BottomEnd else Alignment.BottomStart)
                 .padding(
-                    start = if (rtl) 0.dp else 24.dp,
-                    end = if (rtl) 24.dp else 0.dp,
-                    bottom = 26.dp,
+                    start = if (rtl) 0.dp else 17.dp,
+                    end = if (rtl) 17.dp else 0.dp,
+                    bottom = 18.dp,
                 )
                 .fillMaxWidth(0.52f),
             horizontalAlignment = Alignment.Start,
@@ -247,22 +247,22 @@ private fun OnbAvantagesCarte() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .border(1.dp, Color(0xFFE4EBF6), RoundedCornerShape(24.dp))
+            .padding(horizontal = 14.dp, vertical = 7.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .border(1.dp, Color(0xFFE4EBF6), RoundedCornerShape(22.dp))
             .background(Color.White)
-            .padding(22.dp),
+            .padding(15.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .size(46.dp)
+                    .size(38.dp)
                     .shadow(
                         elevation = 7.dp,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(14.dp),
                         spotColor = Color(0xFF16A34A).copy(alpha = 0.4f),
                     )
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(14.dp))
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color(0xFF4ADE80), Color(0xFF16A34A)),
@@ -277,12 +277,12 @@ private fun OnbAvantagesCarte() {
                     modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(8.dp))
             Column {
                 Text(
                     text = stringResource(R.string.obn_avantages_titre),
                     color = MissaInk,
-                    fontSize = 16.5.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.height(4.dp))
@@ -294,7 +294,7 @@ private fun OnbAvantagesCarte() {
                 )
             }
         }
-        Spacer(Modifier.height(15.dp))
+        Spacer(Modifier.height(11.dp))
         // Filet de transition : les trois couleurs de marque en dégradé.
         Box(
             modifier = Modifier
@@ -307,7 +307,7 @@ private fun OnbAvantagesCarte() {
                     ),
                 ),
         )
-        Spacer(Modifier.height(14.dp))
+        Spacer(Modifier.height(10.dp))
         OnbAvantages.forEachIndexed { index, avantage ->
             OnbAvantageLigne(avantage)
             if (index < OnbAvantages.lastIndex) {
@@ -335,7 +335,7 @@ private fun OnbAvantageLigne(avantage: OnbAvantage) {
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(34.dp)
                 .shadow(
                     elevation = 5.dp,
                     shape = RoundedCornerShape(13.dp),
@@ -356,7 +356,7 @@ private fun OnbAvantageLigne(avantage: OnbAvantage) {
                 modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.width(11.dp))
+        Spacer(Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(avantage.titreRes),
@@ -382,15 +382,15 @@ private fun OnbEssaiBanniere() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .padding(horizontal = 14.dp, vertical = 6.dp)
+            .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFFEAF2FE))
-            .padding(14.dp),
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(38.dp)
+                .size(32.dp)
                 .clip(RoundedCornerShape(11.dp))
                 .background(Color(0xFFCFE1FC)),
             contentAlignment = Alignment.Center,
@@ -402,7 +402,7 @@ private fun OnbEssaiBanniere() {
                 modifier = Modifier.size(19.dp),
             )
         }
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.obn_essai_titre),
@@ -428,8 +428,8 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .height(44.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(
                 Brush.verticalGradient(
                     colors = listOf(Color(0xFF3E7BFA), BrandBlue),
@@ -442,10 +442,10 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
         Text(
             text = libelle,
             color = Color.White,
-            fontSize = 15.sp,
+            fontSize = 13.5.sp,
             fontWeight = FontWeight.Bold,
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(6.dp))
         Icon(
             painter = painterResource(Iv.ArrowForward),
             contentDescription = null,

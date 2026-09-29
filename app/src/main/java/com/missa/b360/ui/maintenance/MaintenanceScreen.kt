@@ -100,16 +100,16 @@ fun MaintenanceScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Carte Synthèse Maintenance ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = RougeMaintenance.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.mai_titre_synthese),
                             fontSize = 11.sp,
@@ -118,7 +118,7 @@ fun MaintenanceScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.mai_nb_equipements, etat.parc.size),
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -169,7 +169,7 @@ fun MaintenanceScreen(
                         icon = Iv.HammerWrench,
                         title = stringResource(R.string.mai_aucun_equipement),
                         description = stringResource(R.string.mai_aucun_equipement_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -214,11 +214,11 @@ private fun CarteEquipement(
     val enRetard = parc.enRetard
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(eq.nom, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
                 Surface(
@@ -243,7 +243,7 @@ private fun CarteEquipement(
                     color = MissaInk,
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             Button(
                 onClick = onIntervenir,
                 modifier = Modifier.fillMaxWidth(),

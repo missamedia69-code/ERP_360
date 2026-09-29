@@ -131,8 +131,8 @@ fun ServicesScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
                 ServiceFieldOverview(
@@ -149,7 +149,7 @@ fun ServicesScreen(
                         is ServiceFieldViewModel.Message.Error -> result.reason.toServicesError() to Color(0xFFB91C1C)
                     }
                     Surface(shape = RoundedCornerShape(10.dp), color = color.copy(alpha = 0.12f)) {
-                        Text(text, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = color, modifier = Modifier.fillMaxWidth().padding(10.dp))
+                        Text(text, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = color, modifier = Modifier.fillMaxWidth().padding(7.dp))
                     }
                 }
             }
@@ -185,10 +185,10 @@ fun ServicesScreen(
                 // --- Carte Synthèse Prestations ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = RoseServices.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.srv_titre_synthese),
                             fontSize = 11.sp,
@@ -197,11 +197,11 @@ fun ServicesScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             fmtValeur(etat.chiffreRealise, devise),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.srv_en_cours, etat.enCours),
@@ -259,7 +259,7 @@ fun ServicesScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileServices(
@@ -296,7 +296,7 @@ fun ServicesScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }
@@ -341,7 +341,7 @@ fun ServicesScreen(
                         icon = Iv.RequestQuote,
                         title = stringResource(R.string.srv_aucune),
                         description = stringResource(R.string.srv_aucune_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             }
@@ -466,7 +466,7 @@ private fun TuileServices(
         color = if (estActif) RoseServices.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) RoseServices else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -497,11 +497,11 @@ private fun CartePrestation(
     val estHoraire = PrestationRules.mode(prestation.payload.mode) == ModeFacturation.HORAIRE
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(prestation.record.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -549,7 +549,7 @@ private fun CartePrestation(
             Text(dateStr, fontSize = 10.sp, color = MissaMuted)
 
             if (!prestation.annulee) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     if (etapeSuivante != null) {
                         Button(
@@ -569,7 +569,7 @@ private fun CartePrestation(
                             Text(stringResource(R.string.srv_action_heures), fontSize = 11.sp, color = MissaInk)
                         }
                     }
-                    IconButton(onClick = onAnnuler, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onAnnuler, modifier = Modifier.size(30.dp)) {
                         Icon(painterResource(Iv.DeleteOutline), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(18.dp))
                     }
                 }

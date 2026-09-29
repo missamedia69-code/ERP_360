@@ -81,15 +81,15 @@ fun AdminReglagesScreen(
     ) {
         // En-tête explicatif
         Card(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = MissaSoftBlue),
             border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.3f)),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(Modifier.padding(14.dp)) {
+            Column(Modifier.padding(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(painterResource(Iv.Settings), contentDescription = null, tint = BrandBlue, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.activation_titre), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                 }
                 Spacer(Modifier.height(6.dp))
@@ -99,20 +99,20 @@ fun AdminReglagesScreen(
 
         // Profil actuel
         Card(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = MissaSurface),
             border = BorderStroke(1.dp, MissaBorder),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(Modifier.padding(14.dp)) {
+            Column(Modifier.padding(10.dp)) {
                 Text(stringResource(R.string.activation_profil_actuel), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = BrandBlue)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.weight(1f)) {
                         val profil = activation.profil
                         Text(
                             text = profil?.let { stringResource(ModulesPersonnalises.libelleRes(it)) } ?: stringResource(R.string.home_not_configured),
-                            fontSize = 15.sp,
+                            fontSize = 13.5.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -126,9 +126,9 @@ fun AdminReglagesScreen(
                         Text(stringResource(R.string.activation_changer_profil), fontSize = 12.sp)
                     }
                 }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 HorizontalDivider(color = MissaBorder)
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 // Palier — amélioré avec badges et descriptions d'impact
                 MissaSelecteurBleu(
                     label = stringResource(R.string.activation_palier),
@@ -146,14 +146,14 @@ fun AdminReglagesScreen(
                     placeholder = stringResource(R.string.obn_effectif_placeholder),
                     titreDialogue = stringResource(R.string.palier_choisir_titre),
                 )
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 // Vente sans stock
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(R.string.activation_vente_sans_stock), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MissaInk)
                         Text(stringResource(R.string.activation_vente_sans_stock_desc), fontSize = 11.sp, color = MissaMuted)
                     }
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(7.dp))
                     Switch(
                         checked = activation.venteSansStock,
                         onCheckedChange = { viewModel.basculerVenteSansStock() },
@@ -165,12 +165,12 @@ fun AdminReglagesScreen(
 
         // Modules actifs compteur
         Card(
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             border = BorderStroke(1.dp, MissaBorder),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Column(Modifier.padding(14.dp)) {
+            Column(Modifier.padding(10.dp)) {
                 Text(
                     text = stringResource(R.string.activation_modules_actifs, activation.modulesActifs.size),
                     fontSize = 13.sp,
@@ -219,12 +219,12 @@ fun AdminReglagesScreen(
         // Infos entreprise (ancien)
         if (entreprise.charge) {
             Card(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = MissaSurface),
                 border = BorderStroke(1.dp, MissaBorder),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(stringResource(R.string.activation_entreprise_info), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                     Text(stringResource(R.string.activation_entreprise_nom, entreprise.nom), fontSize = 12.sp, color = MissaInk)
                     Text(stringResource(R.string.activation_entreprise_devise, entreprise.devise), fontSize = 11.sp, color = MissaMuted)
@@ -264,12 +264,12 @@ private fun ActivationSectionModules(
 ) {
     var expanded by remember { mutableStateOf(true) }
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, MissaBorder),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(12.dp)) {
+        Column(Modifier.padding(8.dp)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -296,7 +296,7 @@ private fun ActivationSectionModules(
                 )
             }
             if (expanded) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 for (module in modules) {
                     ActivationModuleLigne(
                         module = module,
@@ -336,7 +336,7 @@ private fun ActivationModuleLigne(
             onCheckedChange = { if (!isVerrouille) onToggle() },
             enabled = !isVerrouille,
             colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(27.dp),
         )
         Spacer(Modifier.width(4.dp))
         Column(Modifier.weight(1f)) {
@@ -408,11 +408,11 @@ private fun ActivationChangerProfilDialogue(
 ) {
     AlertDialog(
         onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.activation_changer_profil), fontSize = 15.sp, fontWeight = FontWeight.Bold) },
+        title = { Text(stringResource(R.string.activation_changer_profil), fontSize = 13.5.sp, fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(stringResource(R.string.activation_confirmer_changement), fontSize = 12.sp, color = MissaMuted)
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 // Le pack Achat-Vente n'est plus proposé (supprimé de la
                 // matrice) : seules les installations AV existantes le
                 // conservent. Le reste du catalogue, dont le pack Personnel.
@@ -426,7 +426,7 @@ private fun ActivationChangerProfilDialogue(
                             .fillMaxWidth()
                             .clickable { onChoisir(profil) },
                     ) {
-                        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(Modifier.padding(7.dp), verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(stringResource(ModulesPersonnalises.libelleRes(profil)), fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = MissaInk)
                                 Text(profil.description, fontSize = 10.5.sp, color = MissaMuted)
@@ -485,7 +485,7 @@ private fun ActivationElementsDialogue(
                             border = BorderStroke(1.dp, if (isActif) BrandBlue.copy(alpha = 0.5f) else MissaBorder),
                             modifier = Modifier.clickable { onToggleElement(elem) },
                         ) {
-                            Row(Modifier.padding(horizontal = 8.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Row(Modifier.padding(horizontal = 6.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = isActif,
                                     onCheckedChange = { onToggleElement(elem) },

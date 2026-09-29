@@ -90,14 +90,14 @@ fun ComptabiliteScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Filtre Période ---
             item {
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     FilterChip(
                         selected = periode == ComptabiliteViewModel.Periode.MOIS,
@@ -130,7 +130,7 @@ fun ComptabiliteScreen(
                 Surface(shape = RoundedCornerShape(12.dp), color = GrisCompta.copy(alpha = 0.08f)) {
                     Text(
                         stringResource(R.string.cpt_avertissement_estimations),
-                        modifier = Modifier.padding(12.dp), fontSize = 11.sp, color = MissaMuted,
+                        modifier = Modifier.padding(8.dp), fontSize = 11.sp, color = MissaMuted,
                     )
                 }
             }
@@ -138,7 +138,7 @@ fun ComptabiliteScreen(
             item {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.cpt_registre_titre), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                        Text(stringResource(R.string.cpt_registre_titre), fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
                         Text(stringResource(R.string.cpt_registre_sous_titre), fontSize = 11.sp, color = MissaMuted)
                     }
                     if (registre.accounts.isNotEmpty()) {
@@ -150,8 +150,8 @@ fun ComptabiliteScreen(
             if (feedback != null) {
                 item {
                     Surface(shape = RoundedCornerShape(10.dp), color = GrisCompta.copy(alpha = 0.08f)) {
-                        Row(Modifier.fillMaxWidth().padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(feedback.orEmpty(), modifier = Modifier.weight(1f).padding(vertical = 9.dp), fontSize = 11.sp, color = MissaInk)
+                        Row(Modifier.fillMaxWidth().padding(start = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(feedback.orEmpty(), modifier = Modifier.weight(1f).padding(vertical = 6.dp), fontSize = 11.sp, color = MissaInk)
                             TextButton(onClick = vm::effacerFeedback) { Text("OK") }
                         }
                     }
@@ -160,8 +160,8 @@ fun ComptabiliteScreen(
 
             if (registre.accounts.isEmpty()) {
                 item {
-                    Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-                        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                        Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(stringResource(R.string.cpt_aucun_plan), fontWeight = FontWeight.SemiBold, color = MissaInk)
                             Text(stringResource(R.string.cpt_aucun_plan_desc), fontSize = 11.sp, color = MissaMuted)
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -184,10 +184,10 @@ fun ComptabiliteScreen(
             // --- Carte Compte de Résultat Simplifié ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = GrisCompta.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.cpt_resultat_net),
                             fontSize = 11.sp,
@@ -197,11 +197,11 @@ fun ComptabiliteScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 fmtValeur(resultatNet, devise),
-                                fontSize = 22.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (estBenefice) Color(0xFF15803D) else Color(0xFFB91C1C),
                             )
-                            Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(6.dp))
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = if (estBenefice) Color(0xFFDCFCE7) else Color(0xFFFEE2E2),
@@ -216,7 +216,7 @@ fun ComptabiliteScreen(
                             }
                         }
 
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(7.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
                                 Text(stringResource(R.string.cpt_total_produits), fontSize = 10.sp, color = MissaMuted)
@@ -244,11 +244,11 @@ fun ComptabiliteScreen(
             // --- Position Fiscale TVA ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = Color.White,
                     border = BorderStroke(1.dp, MissaBorder),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 stringResource(R.string.cpt_position_tva),
@@ -263,7 +263,7 @@ fun ComptabiliteScreen(
                                 color = MissaMuted,
                             )
                         }
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {
                                 Text(stringResource(R.string.cpt_tva_collectee), fontSize = 10.sp, color = MissaMuted)
@@ -307,7 +307,7 @@ fun ComptabiliteScreen(
                         icon = Iv.Calculator,
                         title = stringResource(R.string.cpt_aucun_journal),
                         description = stringResource(R.string.cpt_aucun_journal_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -464,7 +464,7 @@ private fun CartePieceComptable(voucher: AccountingVoucherEntity, devise: String
     val dateLabel = remember(voucher.accountingDate) { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(voucher.accountingDate)) }
     val posted = voucher.status == AccountingVoucherStatus.POSTED.name || voucher.status == AccountingVoucherStatus.REVERSED.name
     Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
-        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(voucher.reference, modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MissaInk)
                 Text(stringResource(if (posted) R.string.cpt_statut_comptabilisee else R.string.cpt_statut_brouillon), fontSize = 10.sp, color = if (posted) Color(0xFF15803D) else Color(0xFFB45309))
@@ -491,7 +491,7 @@ private fun CarteEcriture(ecriture: EcritureComptable, devise: String) {
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
+            Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {

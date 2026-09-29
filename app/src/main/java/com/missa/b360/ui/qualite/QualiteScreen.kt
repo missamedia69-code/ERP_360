@@ -97,16 +97,16 @@ fun QualiteScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Carte Synthèse Qualité ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = PourpreQualite.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.qua_titre_synthese),
                             fontSize = 11.sp,
@@ -115,7 +115,7 @@ fun QualiteScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.qua_ecarts_ouverts, etat.bilan.ouvertes),
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -166,7 +166,7 @@ fun QualiteScreen(
                         icon = Iv.QualityBadge,
                         title = stringResource(R.string.qua_aucun_ecart),
                         description = stringResource(R.string.qua_aucun_ecart_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -204,11 +204,11 @@ private fun CarteNonConformite(
     val estResolue = nc.statut == StatutNc.RESOLUE.name
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(nc.titre, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
                 Surface(
@@ -244,7 +244,7 @@ private fun CarteNonConformite(
                 }
             }
             if (!estResolue) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Button(
                     onClick = onAvancer,
                     modifier = Modifier.fillMaxWidth(),

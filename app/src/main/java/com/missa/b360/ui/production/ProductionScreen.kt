@@ -130,15 +130,15 @@ private fun ListeOrdres(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = VioletProduction.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.pro_titre_synthese),
                             fontSize = 11.sp,
@@ -147,7 +147,7 @@ private fun ListeOrdres(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.pro_ordres_termines, lances.size),
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -185,7 +185,7 @@ private fun ListeOrdres(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }
@@ -206,7 +206,7 @@ private fun ListeOrdres(
                         icon = Iv.Factory,
                         title = stringResource(R.string.pro_aucun_ordre),
                         description = stringResource(R.string.pro_aucun_ordre_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -227,11 +227,11 @@ private fun CarteOrdre(ordre: OperationRecordEntity, devise: String, onEdit: () 
     val estValide = ordre.status == OperationStatus.VALIDATED.name
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ordre.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -303,8 +303,8 @@ private fun FormulaireOrdreProduction(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // ① Produit fini et quantité
             item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 1) }
@@ -354,7 +354,7 @@ private fun FormulaireOrdreProduction(
                         stringResource(R.string.pro_aucun_composant),
                         fontSize = 11.sp,
                         color = MissaMuted,
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.padding(vertical = 6.dp),
                     )
                 }
             } else {
@@ -365,7 +365,7 @@ private fun FormulaireOrdreProduction(
                         border = BorderStroke(1.dp, MissaBorder),
                     ) {
                         Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             val available = composantsDispo.firstOrNull { it.product.id == comp.productId }?.total ?: 0.0
@@ -397,7 +397,7 @@ private fun FormulaireOrdreProduction(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }

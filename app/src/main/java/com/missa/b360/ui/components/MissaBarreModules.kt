@@ -76,11 +76,11 @@ fun MissaBarreModules(
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 4.dp),
+            .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = 4.dp),
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(26.dp),
+            shape = RoundedCornerShape(24.dp),
             color = moduleCourant?.couleurPale ?: Color.White,
             shadowElevation = 8.dp,
             tonalElevation = 0.dp,
@@ -140,7 +140,7 @@ private fun BarreOnglet(
     val teinte = if (actif) MissaInk else MissaMuted
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
             .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
             .padding(vertical = 1.dp),
@@ -151,9 +151,9 @@ private fun BarreOnglet(
             modifier = Modifier
                 .background(
                     color = if (actif) MissaInk.copy(alpha = 0.07f) else Color.Transparent,
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(14.dp),
                 )
-                .padding(horizontal = 14.dp, vertical = 3.dp),
+                .padding(horizontal = 10.dp, vertical = 3.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {

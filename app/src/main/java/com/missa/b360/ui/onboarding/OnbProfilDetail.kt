@@ -92,7 +92,7 @@ internal fun OnbProfilDetailDialogue(
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = BrandBlue.copy(alpha = 0.09f),
-                modifier = Modifier.size(44.dp),
+                modifier = Modifier.size(36.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
@@ -108,7 +108,7 @@ internal fun OnbProfilDetailDialogue(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(titreRes),
-                    fontSize = 16.sp,
+                    fontSize = 14.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = MissaInk,
                 )
@@ -139,7 +139,7 @@ internal fun OnbProfilDetailDialogue(
                         fontSize = 12.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = BrandBlue,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp),
                     )
                 }
                 Spacer(Modifier.height(4.dp))
@@ -158,7 +158,7 @@ internal fun OnbProfilDetailDialogue(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 340.dp),
+                        .heightIn(max = 289.dp),
                 ) {
                     if (personnel) {
                         item {
@@ -237,7 +237,7 @@ internal fun OnbProfilDetailDialogue(
 @Composable
 private fun OnbProfilDetailSection(titreRes: Int, nombre: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 2.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -268,7 +268,7 @@ private fun OnbProfilDetailModule(module: ModuleCode, fonctions: List<String>) {
                     .clip(CircleShape)
                     .background(BrandBlue),
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 text = stringResource(ModulesPersonnalises.libelleRes(module)),
                 fontSize = 13.sp,
@@ -299,7 +299,7 @@ private fun OnbProfilDetailModule(module: ModuleCode, fonctions: List<String>) {
                 text = libelles.joinToString(" · "),
                 fontSize = 11.5.sp,
                 color = MissaMuted,
-                modifier = Modifier.padding(start = 15.dp, top = 1.dp),
+                modifier = Modifier.padding(start = 11.dp, top = 1.dp),
             )
         }
     }
@@ -317,7 +317,7 @@ private fun OnbPersFonctionLigne(icone: Int, titreRes: Int, sousTitreRes: Int) {
         Surface(
             shape = RoundedCornerShape(9.dp),
             color = BrandBlue.copy(alpha = 0.09f),
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(26.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -328,7 +328,7 @@ private fun OnbPersFonctionLigne(icone: Int, titreRes: Int, sousTitreRes: Int) {
                 )
             }
         }
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(titreRes),

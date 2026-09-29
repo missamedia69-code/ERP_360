@@ -83,16 +83,16 @@ fun AdminSitesScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // --- Hero Synthèse Sites & Dépôts ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = BleuSites.copy(alpha = 0.16f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.sites_titre_synthese),
                             fontSize = 11.sp,
@@ -101,11 +101,11 @@ fun AdminSitesScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.sites_total_count, totalSites.size),
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(6.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(
                                 stringResource(R.string.sites_depots_count, depotsCount),
@@ -167,7 +167,7 @@ fun AdminSitesScreen(
 
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     tuiles.forEach { tuile ->
                         TuileSites(
@@ -198,7 +198,7 @@ fun AdminSitesScreen(
                         icon = Iv.Warehouse,
                         title = stringResource(R.string.sites_aucun),
                         description = stringResource(R.string.sites_aucun_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -256,7 +256,7 @@ private fun TuileSites(
         color = if (estActif) BleuSites.copy(alpha = 0.15f) else Color.White,
         border = BorderStroke(1.dp, if (estActif) BleuSites else MissaBorder),
         modifier = modifier
-            .height(82.dp)
+            .height(70.dp)
             .clickable(onClick = onClick),
     ) {
         Column(
@@ -278,12 +278,12 @@ private fun CarteSite(
     onSupprimer: () -> Unit,
 ) {
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
         Row(
-            Modifier.fillMaxWidth().padding(12.dp),
+            Modifier.fillMaxWidth().padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
@@ -309,7 +309,7 @@ private fun CarteSite(
                 }
             }
             if (!site.principal) {
-                IconButton(onClick = onSupprimer, modifier = Modifier.size(36.dp)) {
+                IconButton(onClick = onSupprimer, modifier = Modifier.size(30.dp)) {
                     Icon(painterResource(Iv.DeleteOutline), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(18.dp))
                 }
             }

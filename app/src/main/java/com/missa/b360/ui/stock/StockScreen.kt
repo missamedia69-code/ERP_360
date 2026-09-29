@@ -70,14 +70,14 @@ fun StockScreen(
                 onBack = onBack,
                 couleurFond = AppModule.STOCK.couleurPale,
             )
-            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-                Spacer(Modifier.height(8.dp))
+            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+                Spacer(Modifier.height(6.dp))
                 StockSearchField(
                     valeur = etat.requete,
                     onValeur = vm::chercher,
                     placeholderRes = R.string.st_rechercher_article,
                 )
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 // Chips : Tous + catégories utilisateur.
                 Row(
                     modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -96,7 +96,7 @@ fun StockScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(7.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -114,13 +114,13 @@ fun StockScreen(
                         color = MissaInk,
                     )
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 if (etat.articles.isEmpty()) {
                     MissaEmptyState(
                         icon = if (etat.requete.isBlank()) StockIv.Add else StockIv.Search,
                         title = stringResource(R.string.st_aucun_resultat),
                         description = if (etat.requete.isBlank()) stringResource(R.string.st_ajouter_premier) else null,
-                        modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 17.dp),
                         action = if (etat.requete.isBlank()) {
                             {
                                 Button(
@@ -149,9 +149,9 @@ fun StockScreen(
                             CarteArticle(ligne = ligne, devise = etat.devise) {
                                 onNavigate(Routes.stockDetail(ligne.product.id))
                             }
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(6.dp))
                         }
-                        item { Spacer(Modifier.height(72.dp)) }
+                        item { Spacer(Modifier.height(42.dp)) }
                     }
                 }
             }
@@ -168,8 +168,8 @@ fun StockScreen(
                         ),
                     )
                 },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp),
-                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 12.dp),
+                shape = RoundedCornerShape(14.dp),
                 containerColor = Green60,
                 contentColor = Color.White,
             ) {
@@ -183,13 +183,13 @@ fun StockScreen(
 private fun CarteArticle(ligne: ProductWithStock, devise: String, onClick: () -> Unit) {
     CarteStock(onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(44.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
+            Surface(modifier = Modifier.size(36.dp), shape = RoundedCornerShape(12.dp), color = Blue90) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(painterResource(ligne.product.type.icone()), null, tint = MissaInk, modifier = Modifier.size(21.dp))
                 }
             }
             ProduitImage(photoPath = ligne.product.photoPath)
-            Spacer(Modifier.width(11.dp))
+            Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(ligne.nom, fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 1)
                 Text(
@@ -228,7 +228,7 @@ fun BadgeNiveau(ligne: ProductWithStock) {
     }
     Surface(shape = RoundedCornerShape(8.dp), color = fond) {
         Row(
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (texteRes == R.string.st_stock_faible) {

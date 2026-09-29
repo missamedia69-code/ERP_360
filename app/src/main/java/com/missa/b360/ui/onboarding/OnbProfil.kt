@@ -134,7 +134,7 @@ internal fun OnbProfilStep(viewModel: OnboardingViewModel) {
         viewModel = viewModel,
         onRetour = viewModel::precedent,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             // --- Matrice des packs : petits carrés numérotés (1 = ASV … 6 = PERSO) ---
             Row(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -234,14 +234,14 @@ private fun OnbProfilCarre(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(44.dp)
+                .size(36.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(if (selected) BrandBlue else OnbConfigCard)
                 .clickable(onClick = onClick),
         ) {
             Text(
                 text = numero.toString(),
-                fontSize = 15.sp,
+                fontSize = 13.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (selected) Color.White else BrandBlue,
             )
@@ -272,7 +272,7 @@ private fun OnbDetailPackEntete(
         Surface(
             shape = RoundedCornerShape(10.dp),
             color = BrandBlue.copy(alpha = 0.12f),
-            modifier = Modifier.size(34.dp),
+            modifier = Modifier.size(28.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -283,7 +283,7 @@ private fun OnbDetailPackEntete(
                 )
             }
         }
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(titreRes),
@@ -301,7 +301,7 @@ private fun OnbDetailPackEntete(
             shape = CircleShape,
             color = OnbConfigCard,
             modifier = Modifier
-                .size(30.dp)
+                .size(26.dp)
                 .clip(CircleShape)
                 .clickable(onClick = onInfo),
         ) {
@@ -325,25 +325,25 @@ private fun OnbDetailPackEntete(
 @Composable
 private fun OnbPackPersonnel() {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Text(
                 text = stringResource(R.string.obn_pack_inclus),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = MissaInk,
             )
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(5.dp))
             OnbPackPersonnelLigne(Iv.TrendingUp, R.string.obn_pers_revenus, R.string.obn_pers_revenus_sous)
             OnbPackPersonnelLigne(Iv.CartArrowDown, R.string.obn_pers_depenses, R.string.obn_pers_depenses_sous)
             OnbPackPersonnelLigne(Iv.Savings, R.string.obn_pers_budgets, R.string.obn_pers_budgets_sous)
-            Spacer(Modifier.height(9.dp))
+            Spacer(Modifier.height(6.dp))
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.14f))
-            Spacer(Modifier.height(9.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(R.string.obn_pers_note),
                 fontSize = 11.sp,
@@ -365,7 +365,7 @@ private fun OnbPackPersonnelLigne(icone: Int, titreRes: Int, sousTitreRes: Int) 
         Surface(
             shape = RoundedCornerShape(9.dp),
             color = BrandBlue.copy(alpha = 0.12f),
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(26.dp),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
@@ -376,7 +376,7 @@ private fun OnbPackPersonnelLigne(icone: Int, titreRes: Int, sousTitreRes: Int) 
                 )
             }
         }
-        Spacer(Modifier.width(10.dp))
+        Spacer(Modifier.width(7.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(titreRes),
@@ -421,13 +421,13 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
     val selectionVide = profil == ProfilActivite.CUSTOM && metierChoisi.isEmpty()
 
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         border = if (selectionVide) BorderStroke(1.dp, Red40) else null,
         colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.obn_pack_inclus),
@@ -448,7 +448,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                 fontSize = 11.sp,
                 color = MissaMuted,
             )
-            Spacer(Modifier.height(7.dp))
+            Spacer(Modifier.height(5.dp))
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -468,7 +468,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
             }
 
             if (metierAjoutable.isEmpty() && supportAjoutable.isEmpty()) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.obn_pack_complet),
                     fontSize = 11.5.sp,
@@ -477,9 +477,9 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                 return@Column
             }
 
-            Spacer(Modifier.height(11.dp))
+            Spacer(Modifier.height(8.dp))
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.18f))
-            Spacer(Modifier.height(9.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = stringResource(R.string.obn_pack_ajouter),
                 fontSize = 13.sp,
@@ -521,14 +521,14 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                 }
             }
             if (viewModel.dependancesActives.isNotEmpty()) {
-                Spacer(Modifier.height(9.dp))
+                Spacer(Modifier.height(6.dp))
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(9.dp),
                     color = MissaSoftBlue,
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
@@ -537,7 +537,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                             tint = BrandBlue,
                             modifier = Modifier.size(15.dp),
                         )
-                        Spacer(Modifier.width(7.dp))
+                        Spacer(Modifier.width(5.dp))
                         Text(
                             text = stringResource(R.string.obn_regle_dor),
                             fontSize = 11.sp,
@@ -546,9 +546,9 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                     }
                 }
             }
-            Spacer(Modifier.height(9.dp))
+            Spacer(Modifier.height(6.dp))
             HorizontalDivider(color = BrandBlue.copy(alpha = 0.18f))
-            Spacer(Modifier.height(9.dp))
+            Spacer(Modifier.height(6.dp))
             // L'option « vente sans stock » n'a de sens que si l'utilisateur
             // compose lui-même ses modules (profil Personnalisé) et y a la
             // Vente active : dans un pack figé, la présence du Stock est
@@ -572,7 +572,7 @@ private fun OnbModulesDuPack(viewModel: OnboardingViewModel) {
                             color = MissaMuted,
                         )
                     }
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(7.dp))
                     Switch(
                         checked = viewModel.venteSansStock,
                         onCheckedChange = { viewModel.basculerVenteSansStock() },
@@ -613,7 +613,7 @@ private fun OnbModulePastille(module: ModuleCode) {
         border = BorderStroke(1.dp, BrandBlue.copy(alpha = 0.35f)),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 5.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
@@ -647,7 +647,7 @@ private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: ()
             checked = coche,
             onCheckedChange = { onBascule() },
             colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
-            modifier = Modifier.size(34.dp),
+            modifier = Modifier.size(28.dp),
         )
         Spacer(Modifier.width(6.dp))
         Column(modifier = Modifier.weight(1f)) {

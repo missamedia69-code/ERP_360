@@ -60,8 +60,8 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
     Column(modifier = Modifier.fillMaxSize()) {
         MissaTopAppBar(title = stringResource(R.string.st_mouvements_titre), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Surface(
                 onClick = { onNavigate(Routes.STOCK_MOVEMENT_FORM) },
@@ -75,7 +75,7 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 9.dp),
+                    modifier = Modifier.padding(vertical = 6.dp),
                 )
             }
             Surface(
@@ -90,12 +90,12 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
                     fontWeight = FontWeight.Bold,
                     color = BrandBlue,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 9.dp),
+                    modifier = Modifier.padding(vertical = 6.dp),
                 )
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             StockChip(stringResource(R.string.st_tous), filtre == 0) { vm.setFiltre(0) }
@@ -103,8 +103,8 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
             StockChip(stringResource(R.string.st_sorties), filtre == 2) { vm.setFiltre(2) }
             StockChip(stringResource(R.string.st_transferts), filtre == 3) { vm.setFiltre(3) }
         }
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-            item { Spacer(Modifier.height(10.dp)) }
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+            item { Spacer(Modifier.height(7.dp)) }
             groupes.forEach { groupe ->
                 item {
                     Text(
@@ -117,10 +117,10 @@ fun StockMouvementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {})
                 }
                 items(groupe.lignes, key = { it.id }) { mv ->
                     LigneMouvement(mv)
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
                 }
             }
-            item { Spacer(Modifier.height(16.dp)) }
+            item { Spacer(Modifier.height(12.dp)) }
         }
     }
 }
@@ -142,12 +142,12 @@ internal fun LigneMouvement(mv: StockMovementView) {
     val signe = if (mv.type == "SORTIE" || mv.type == "TRANSFERT_SORTIE") "-" else "+"
     CarteStock {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(34.dp), shape = RoundedCornerShape(10.dp), color = fond) {
+            Surface(modifier = Modifier.size(28.dp), shape = RoundedCornerShape(10.dp), color = fond) {
                 androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
                     Icon(painterResource(icone), null, tint = teinte, modifier = Modifier.size(16.dp))
                 }
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(7.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "$titreType · ${mv.motif}",

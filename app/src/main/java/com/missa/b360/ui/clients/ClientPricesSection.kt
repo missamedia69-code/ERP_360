@@ -58,10 +58,10 @@ internal fun ClientPricesSection(
 ) {
     var editorOpen by remember { mutableStateOf(false) }
     Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, MissaBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.clients_flow_negotiated_prices), modifier = Modifier.weight(1f), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                OutlinedButton(onClick = { editorOpen = true }, contentPadding = PaddingValues(horizontal = 7.dp, vertical = 0.dp)) {
+                OutlinedButton(onClick = { editorOpen = true }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) {
                     Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
                     Text(stringResource(R.string.clients_flow_add_price), fontSize = 9.sp)
@@ -76,7 +76,7 @@ internal fun ClientPricesSection(
                             Text(products.firstOrNull { it.id == price.produitId }?.nom ?: stringResource(R.string.clients_flow_unknown_product), color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                             Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 9.sp)
                         }
-                        IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(30.dp)) {
+                        IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(26.dp)) {
                             Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.clients_flow_remove_price), tint = MissaInk, modifier = Modifier.size(17.dp))
                         }
                     }

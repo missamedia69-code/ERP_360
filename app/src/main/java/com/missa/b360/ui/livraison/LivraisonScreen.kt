@@ -102,16 +102,16 @@ fun LivraisonScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // --- Carte Synthèse Livraisons ---
             item {
                 Surface(
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = BleuCielLivraison.copy(alpha = 0.2f),
                 ) {
-                    Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp)) {
                         Text(
                             stringResource(R.string.liv_titre_synthese),
                             fontSize = 11.sp,
@@ -120,7 +120,7 @@ fun LivraisonScreen(
                         Spacer(Modifier.height(2.dp))
                         Text(
                             stringResource(R.string.liv_en_cours, etat.enCours),
-                            fontSize = 18.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MissaInk,
                         )
@@ -198,7 +198,7 @@ fun LivraisonScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = couleur,
-                            modifier = Modifier.fillMaxWidth().padding(10.dp),
+                            modifier = Modifier.fillMaxWidth().padding(7.dp),
                         )
                     }
                 }
@@ -220,7 +220,7 @@ fun LivraisonScreen(
                         icon = Iv.LocalShipping,
                         title = stringResource(R.string.liv_aucun_bl),
                         description = stringResource(R.string.liv_aucun_bl_desc),
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(12.dp),
                     )
                 }
             } else {
@@ -277,11 +277,11 @@ private fun CarteBonLivraison(
     val etapeSuivante = com.missa.b360.core.domain.model.LivraisonRules.etapeSuivante(bon.etape)
 
     Surface(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         color = Color.White,
         border = BorderStroke(1.dp, MissaBorder),
     ) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(bon.record.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
                 Spacer(Modifier.weight(1f))
@@ -323,7 +323,7 @@ private fun CarteBonLivraison(
             Text(dateStr, fontSize = 10.sp, color = MissaMuted)
 
             if (!bon.annule && etapeSuivante != null) {
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Button(
                         onClick = onAvancer,
@@ -336,7 +336,7 @@ private fun CarteBonLivraison(
                             color = Color.White,
                         )
                     }
-                    IconButton(onClick = onAnnuler, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onAnnuler, modifier = Modifier.size(30.dp)) {
                         Icon(painterResource(Iv.DeleteOutline), null, tint = Color(0xFFB91C1C), modifier = Modifier.size(18.dp))
                     }
                 }
