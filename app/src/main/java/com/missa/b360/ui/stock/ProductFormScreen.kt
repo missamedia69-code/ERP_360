@@ -70,6 +70,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.MissaSurface
+import com.missa.b360.ui.components.*
 
 /** Maquette 11 — nouvel article : grille de types puis infos générales, prix & seuils. */
 @Composable
@@ -262,6 +263,7 @@ fun ProductFormScreen(
         }
     }
 
+    MissaFormulaireTheme(AppModule.STOCK.couleur) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         MissaTopAppBar(
             title = stringResource(if (productId == null) R.string.st_nouvel_article else R.string.st_modifier),
@@ -271,7 +273,7 @@ fun ProductFormScreen(
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Spacer(Modifier.height(8.dp))
             if (etape == 0) {
-                Text(stringResource(R.string.st_type_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                MissaFormSectionTitre(stringResource(R.string.st_type_article), numero = 1)
                 Spacer(Modifier.height(8.dp))
                 when {
                     // Édition : le type est l'identité de l'article (sections, extension
@@ -282,7 +284,7 @@ fun ProductFormScreen(
                     else -> GrilleTypes(type) { choisirType(it) }
                 }
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.st_image_article), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                MissaFormSectionTitre(stringResource(R.string.st_image_article), numero = 2)
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -343,13 +345,13 @@ fun ProductFormScreen(
                     }
                 }
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.st_infos_generales), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                MissaFormSectionTitre(stringResource(R.string.st_infos_generales), numero = 3)
                 Spacer(Modifier.height(8.dp))
-                Champ("${stringResource(R.string.st_nom_article)} *", nom) { nom = it }
+                Champ("${stringResource(R.string.st_nom_article)} *", nom, icone = Iv.Inventory2) { nom = it }
                 Spacer(Modifier.height(10.dp))
-                Champ(stringResource(R.string.st_reference), reference) { reference = it }
+                Champ(stringResource(R.string.st_reference), reference, icone = Iv.Description) { reference = it }
                 Spacer(Modifier.height(10.dp))
-                Champ(stringResource(R.string.st_code_barres), barcode) { barcode = it }
+                Champ(stringResource(R.string.st_code_barres), barcode, icone = Iv.Description, clavier = MissaClavier.MOT_CLE) { barcode = it }
                 Spacer(Modifier.height(10.dp))
                 when {
                     // Création déjà dans une catégorie utilisateur : pas de sélecteur.
@@ -389,24 +391,24 @@ fun ProductFormScreen(
                     }
                 }
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.st_regles), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                MissaFormSectionTitre(stringResource(R.string.st_regles), numero = 4)
                 Spacer(Modifier.height(4.dp))
                 Interrupteur(stringResource(R.string.st_vendable), vendable) { vendable = it }
                 Interrupteur(stringResource(R.string.st_achetable), achetable) { achetable = it }
                 Interrupteur(stringResource(R.string.st_stockable), stockable) { stockable = it }
                 Spacer(Modifier.height(10.dp))
-                Champ(stringResource(R.string.st_marque), marque) { marque = it }
+                Champ(stringResource(R.string.st_marque), marque, icone = Iv.Badge) { marque = it }
                 Spacer(Modifier.height(10.dp))
-                Champ("${stringResource(R.string.st_unite)} *", unite) { unite = it }
+                Champ("${stringResource(R.string.st_unite)} *", unite, icone = Iv.Straighten) { unite = it }
                 if (TYPES_EQUIPEMENTS.contains(type)) {
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_modele), modele) { modele = it }
+                    Champ(stringResource(R.string.st_modele), modele, icone = Iv.Category) { modele = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_num_serie), numeroSerie) { numeroSerie = it }
+                    Champ(stringResource(R.string.st_num_serie), numeroSerie, icone = Iv.Description) { numeroSerie = it }
                     Spacer(Modifier.height(10.dp))
                     ChampDate(stringResource(R.string.st_date_acquisition), dateAcquisition) { dateAcquisition = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_responsable), responsable) { responsable = it }
+                    Champ(stringResource(R.string.st_responsable), responsable, icone = Iv.Person) { responsable = it }
                     Spacer(Modifier.height(10.dp))
                     ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)}", garantieDebut) { garantieDebut = it }
                     Spacer(Modifier.height(10.dp))
@@ -414,63 +416,63 @@ fun ProductFormScreen(
                 }
                 if (type == ProductType.DECHET_VALORISABLE || type == ProductType.DECHET_NON_VALORISABLE) {
                     Spacer(Modifier.height(14.dp))
-                    Text(stringResource(R.string.st_donnees_dechet), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    MissaFormSectionTitre(stringResource(R.string.st_donnees_dechet), numero = 5)
                     Spacer(Modifier.height(8.dp))
-                    Champ(stringResource(R.string.st_type_dechet), dType) { dType = it }
+                    Champ(stringResource(R.string.st_type_dechet), dType, icone = Iv.Category) { dType = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_code_dechet), dCode) { dCode = it }
+                    Champ(stringResource(R.string.st_code_dechet), dCode, icone = Iv.Description) { dCode = it }
                     Interrupteur(stringResource(R.string.st_dangereux), dDangereux) { dDangereux = it }
-                    Champ(stringResource(R.string.st_origine_dechet), dOrigine) { dOrigine = it }
+                    Champ(stringResource(R.string.st_origine_dechet), dOrigine, icone = Iv.Place) { dOrigine = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_zone_stockage), dZone) { dZone = it }
+                    Champ(stringResource(R.string.st_zone_stockage), dZone, icone = Iv.Warehouse) { dZone = it }
                     Spacer(Modifier.height(10.dp))
                     if (type == ProductType.DECHET_NON_VALORISABLE) {
-                        Champ(stringResource(R.string.st_mode_elimination), dMode) { dMode = it }
+                        Champ(stringResource(R.string.st_mode_elimination), dMode, icone = Iv.Build) { dMode = it }
                         Spacer(Modifier.height(10.dp))
-                        Champ(stringResource(R.string.st_cout_elimination), dCout) { dCout = it }
+                        Champ(stringResource(R.string.st_cout_elimination), dCout, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { dCout = it }
                     } else {
-                        Champ(stringResource(R.string.st_filiere_recyclage), dFiliere) { dFiliere = it }
+                        Champ(stringResource(R.string.st_filiere_recyclage), dFiliere, icone = Iv.SwapHoriz) { dFiliere = it }
                     }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_prestataire), dPrestataire) { dPrestataire = it }
+                    Champ(stringResource(R.string.st_prestataire), dPrestataire, icone = Iv.Handshake) { dPrestataire = it }
                 }
                 if (type == ProductType.EMBALLAGE) {
                     Spacer(Modifier.height(14.dp))
-                    Text(stringResource(R.string.st_donnees_emballage), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    MissaFormSectionTitre(stringResource(R.string.st_donnees_emballage), numero = 5)
                     Spacer(Modifier.height(8.dp))
-                    Champ(stringResource(R.string.st_type_emballage), eType) { eType = it }
+                    Champ(stringResource(R.string.st_type_emballage), eType, icone = Iv.Category) { eType = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_matiere), eMatiere) { eMatiere = it }
+                    Champ(stringResource(R.string.st_matiere), eMatiere, icone = Iv.Category) { eMatiere = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_dimensions), eDims) { eDims = it }
+                    Champ(stringResource(R.string.st_dimensions), eDims, icone = Iv.Straighten) { eDims = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_poids_kg), ePoids) { ePoids = it }
+                    Champ(stringResource(R.string.st_poids_kg), ePoids, icone = Iv.Calculator, clavier = MissaClavier.DECIMAL) { ePoids = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_capacite), eCap) { eCap = it }
+                    Champ(stringResource(R.string.st_capacite), eCap, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL) { eCap = it }
                     Interrupteur(stringResource(R.string.st_reutilisable), eReutil) { eReutil = it }
                     Interrupteur(stringResource(R.string.st_consigne), eConsigne) { eConsigne = it }
                     if (eReutil) {
-                        Champ(stringResource(R.string.st_reutilisations_max), eMax) { eMax = it }
+                        Champ(stringResource(R.string.st_reutilisations_max), eMax, icone = Iv.Calculator, clavier = MissaClavier.ENTIER) { eMax = it }
                         Spacer(Modifier.height(10.dp))
                     }
                 }
                 if (type == ProductType.CONSIGNATION) {
                     Spacer(Modifier.height(14.dp))
-                    Text(stringResource(R.string.st_donnees_consignation), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    MissaFormSectionTitre(stringResource(R.string.st_donnees_consignation), numero = 5)
                     Spacer(Modifier.height(8.dp))
-                    Champ(stringResource(R.string.st_proprietaire), cProprio) { cProprio = it }
+                    Champ(stringResource(R.string.st_proprietaire), cProprio, icone = Iv.Person) { cProprio = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_ref_contrat), cRef) { cRef = it }
+                    Champ(stringResource(R.string.st_ref_contrat), cRef, icone = Iv.Description) { cRef = it }
                     Spacer(Modifier.height(10.dp))
                     ChampDate(stringResource(R.string.st_debut), cDebut) { cDebut = it }
                     Spacer(Modifier.height(10.dp))
                     ChampDate(stringResource(R.string.st_fin), cFin) { cFin = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_conditions_retour), cConditions) { cConditions = it }
+                    Champ(stringResource(R.string.st_conditions_retour), cConditions, icone = Iv.Description) { cConditions = it }
                 }
                 if (type == ProductType.KIT) {
                     Spacer(Modifier.height(14.dp))
-                    Text(stringResource(R.string.st_donnees_kit), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                    MissaFormSectionTitre(stringResource(R.string.st_donnees_kit), numero = 5)
                     Spacer(Modifier.height(8.dp))
                     Text(stringResource(R.string.st_methode_stock), fontSize = 11.sp, color = MissaMuted)
                     Spacer(Modifier.height(6.dp))
@@ -484,17 +486,18 @@ fun ProductFormScreen(
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         DropdownChamp(
                             libelle = stringResource(R.string.st_composants),
+                            icone = Iv.Inventory2,
                             options = produitsVm.filter { it.id != (productId ?: 0L) }.map { it.id to it.nom },
                             selection = kSelection,
                             onSelection = { kSelection = it },
                             modifier = Modifier.weight(1f),
                         )
-                        OutlinedTextField(
-                            value = kQuantite,
-                            onValueChange = { kQuantite = it },
-                            modifier = Modifier.width(70.dp),
-                            singleLine = true,
-                            shape = RoundedCornerShape(12.dp),
+                        MissaChampTexte(
+                            valeur = kQuantite,
+                            onValeur = { kQuantite = it },
+                            libelle = stringResource(R.string.st_quantite),
+                            modifier = Modifier.width(96.dp),
+                            clavier = MissaClavier.DECIMAL,
                         )
                         Button(
                             onClick = {
@@ -525,46 +528,38 @@ fun ProductFormScreen(
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                Button(
-                    onClick = {
-                        if (nom.isBlank() || unite.isBlank()) {
-                            Toast.makeText(contexte, texteChampsRequis, Toast.LENGTH_SHORT).show()
-                        } else {
-                            etape = 1
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(46.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                ) {
-                    Text("${stringResource(R.string.st_suivant)} →", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                }
+                MissaBoutonPrincipal(
+                    texte = "${stringResource(R.string.st_suivant)} →",
+                    enabled = nom.isNotBlank() && unite.isNotBlank(),
+                    onClick = { etape = 1 },
+                )
             } else {
-                Text(stringResource(R.string.st_prix_seuils), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                MissaFormSectionTitre(stringResource(R.string.st_prix_seuils), numero = 1)
                 Spacer(Modifier.height(8.dp))
                 if (achetable) {
-                    Champ(stringResource(R.string.st_prix_achat), prixAchat) { prixAchat = it }
+                    Champ(stringResource(R.string.st_prix_achat), prixAchat, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { prixAchat = it }
                     Spacer(Modifier.height(10.dp))
                 }
                 if (vendable) {
-                    Champ(stringResource(R.string.st_prix_vente), prixVente) { prixVente = it }
+                    Champ(stringResource(R.string.st_prix_vente), prixVente, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { prixVente = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ("${stringResource(R.string.st_remise_max)} (%)", remiseMax) { remiseMax = it }
+                    Champ(stringResource(R.string.st_remise_max), remiseMax, icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%") { remiseMax = it }
                     Spacer(Modifier.height(10.dp))
                 }
                 if (stockable) {
-                    Champ(stringResource(R.string.st_minimum), stockMin) { stockMin = it }
+                    Champ(stringResource(R.string.st_minimum), stockMin, icone = Iv.TrendingDown, clavier = MissaClavier.DECIMAL) { stockMin = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_maximum), stockMax) { stockMax = it }
+                    Champ(stringResource(R.string.st_maximum), stockMax, icone = Iv.TrendingUp, clavier = MissaClavier.DECIMAL) { stockMax = it }
                     Spacer(Modifier.height(10.dp))
-                    Champ(stringResource(R.string.st_securite), stockSecurite) { stockSecurite = it }
+                    Champ(stringResource(R.string.st_securite), stockSecurite, icone = Iv.Warning, clavier = MissaClavier.DECIMAL) { stockSecurite = it }
                     Spacer(Modifier.height(10.dp))
                 }
                 if (productId == null && stockable) {
-                    Champ(stringResource(R.string.st_stock_initial), stockInitial) { stockInitial = it }
+                    Champ(stringResource(R.string.st_stock_initial), stockInitial, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL) { stockInitial = it }
                     Spacer(Modifier.height(10.dp))
                     DropdownChamp(
                         libelle = stringResource(R.string.st_site_depot),
+                        icone = Iv.Warehouse,
                         options = sites.map { it.id to it.nom },
                         selection = siteId,
                         onSelection = { siteId = it },
@@ -572,15 +567,15 @@ fun ProductFormScreen(
                     Spacer(Modifier.height(16.dp))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(
+                    MissaBoutonSecondaire(
+                        texte = "← ${stringResource(R.string.st_retour)}",
                         onClick = { etape = 0 },
-                        modifier = Modifier.weight(1f).height(46.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MissaSurface, contentColor = MissaInk),
-                    ) {
-                        Text("← ${stringResource(R.string.st_retour)}", fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
-                    Button(
+                        modifier = Modifier.weight(1f),
+                    )
+                    MissaBoutonPrincipal(
+                        texte = stringResource(R.string.st_enregistrer),
+                        modifier = Modifier.weight(1f),
+                        enabled = nom.isNotBlank() && unite.isNotBlank(),
                         onClick = {
                         val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
                         val parse = { t: String -> runCatching { fmt.parse(t.trim())?.time }.getOrNull() }
@@ -675,17 +670,12 @@ fun ProductFormScreen(
                             composants = if (type == ProductType.KIT) kComposants else emptyList(),
                         )
                     },
-                    modifier = Modifier.weight(1f).height(46.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    enabled = nom.isNotBlank() && unite.isNotBlank(),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                ) {
-                        Text(stringResource(R.string.st_enregistrer), fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    }
+                    )
                 }
             }
             Spacer(Modifier.height(20.dp))
         }
+    }
     }
 
     if (dialogueNouvelleCategorie) {
@@ -712,66 +702,32 @@ private fun DialogueCreationCategorieRapide(
 
 /** Interrupteur libellé + switch (règles vendable/achetable/stockable). */
 @Composable
-private fun Interrupteur(libelle: String, actif: Boolean, onActif: (Boolean) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(libelle, fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-        Switch(checked = actif, onCheckedChange = onActif)
-    }
-}
+private fun Interrupteur(libelle: String, actif: Boolean, onActif: (Boolean) -> Unit) =
+    MissaInterrupteur(actif = actif, onChange = onActif, libelle = libelle)
 
-/** Champ de date en lecture seule ouvrant un petit calendrier (DatePicker). */
-@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+/** Champ de date (jj/mm/aaaa) ouvrant le calendrier du kit. */
 @Composable
-private fun ChampDate(libelle: String, valeur: String, onValeur: (String) -> Unit) {
-    var ouvert by remember { mutableStateOf(false) }
-    val fmt = java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-    Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = valeur,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            trailingIcon = {
-                Icon(painterResource(StockIv.Calendar), null, tint = MissaInk, modifier = Modifier.size(18.dp))
-            },
-        )
-        Box(modifier = Modifier.matchParentSize().clickable { ouvert = true })
-    }
-    if (ouvert) {
-        // +12 h : midi UTC = même jour civil dans tous les fuseaux (aller/retour).
-        val initial = runCatching { fmt.parse(valeur.trim())?.time }.getOrNull()
-        val etatDate = rememberDatePickerState(initialSelectedDateMillis = initial?.plus(43_200_000L))
-        DatePickerDialog(
-            onDismissRequest = { ouvert = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    etatDate.selectedDateMillis?.let { millis ->
-                        onValeur(fmt.format(java.util.Date(millis + 43_200_000L)))
-                    }
-                    ouvert = false
-                }) { Text(stringResource(R.string.st_ok)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { ouvert = false }) { Text(stringResource(R.string.st_annuler)) }
-            },
-        ) {
-            DatePicker(state = etatDate)
-        }
-    }
-}
+private fun ChampDate(libelle: String, valeur: String, onValeur: (String) -> Unit) =
+    MissaChampDateTexte(valeur = valeur, onValeur = onValeur, libelle = libelle)
 
 @Composable
-private fun Champ(libelle: String, valeur: String, onValeur: (String) -> Unit) {
-    OutlinedTextField(
-        value = valeur,
-        onValueChange = onValeur,
-        label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+private fun Champ(
+    libelle: String,
+    valeur: String,
+    icone: Int? = null,
+    clavier: MissaClavier = MissaClavier.TEXTE,
+    suffixe: String? = null,
+    onValeur: (String) -> Unit,
+) {
+    val requis = libelle.trimEnd().endsWith("*")
+    MissaChampTexte(
+        valeur = valeur,
+        onValeur = onValeur,
+        libelle = if (requis) libelle.trimEnd().removeSuffix("*").trimEnd() else libelle,
+        icone = icone,
+        clavier = clavier,
+        requis = requis,
+        suffixe = suffixe,
     )
 }
 

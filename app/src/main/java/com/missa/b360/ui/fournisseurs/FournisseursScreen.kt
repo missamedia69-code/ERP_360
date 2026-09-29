@@ -91,6 +91,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Marron caractéristique du module Fournisseurs — source unique : [AppModule.FOURNISSEURS]. */
 private val CouleurFournisseurs: Color get() = AppModule.FOURNISSEURS.couleur
@@ -352,18 +353,7 @@ private fun HubFournisseurs(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    label = { Text(stringResource(R.string.four_rechercher), fontSize = 12.sp, color = MissaMuted) },
-                    leadingIcon = {
-                        Icon(painterResource(Iv.Search), null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                )
+                MissaChampTexte(query, { query = it }, stringResource(R.string.four_rechercher), icone = Iv.Search)
                 Spacer(Modifier.height(4.dp))
                 TextButton(onClick = { onRechercher(query) }) {
                     Text(stringResource(R.string.four_lancer_recherche), fontSize = 12.sp, color = MissaInk)
@@ -1387,28 +1377,18 @@ private fun LigneDocument(
 @Composable
 private fun DialogueMotifBlocage(onConfirmer: (String) -> Unit, onAnnuler: () -> Unit) {
     var motif by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_bloquer)) },
-        text = {
-            OutlinedTextField(
-                value = motif,
-                onValueChange = { motif = it },
-                label = { Text(stringResource(R.string.four_motif), fontSize = 11.sp, color = MissaMuted) },
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmer(motif) },
-                enabled = motif.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB91C1C)),
-            ) { Text(stringResource(R.string.four_bloquer), color = Color.White) }
-        },
-        dismissButton = {
-            TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_bloquer),
+        icone = Iv.Warning,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.four_bloquer),
+        validerActif = motif.isNotBlank(),
+        onValider = { onConfirmer(motif) },
+    ) {
+        MissaChampTexte(motif, { motif = it }, stringResource(R.string.four_motif), icone = Iv.Description)
+
+    }
 }
 
 @Composable
@@ -1422,31 +1402,22 @@ private fun DialogueContact(
     var telephone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var principal by remember { mutableStateOf(true) }
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_ajouter_contact)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = nom, onValueChange = { nom = it }, label = { Text(stringResource(R.string.four_nom), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = prenom, onValueChange = { prenom = it }, label = { Text(stringResource(R.string.four_prenom), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = fonction, onValueChange = { fonction = it }, label = { Text(stringResource(R.string.four_fonction), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = telephone, onValueChange = { telephone = it }, label = { Text(stringResource(R.string.four_telephone), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text(stringResource(R.string.four_email), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_principal), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(checked = principal, onCheckedChange = { principal = it })
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmer(nom, prenom, fonction, telephone, email, principal) },
-                enabled = nom.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs),
-            ) { Text(stringResource(R.string.four_ajouter), color = Color.White) }
-        },
-        dismissButton = { TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) } },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_ajouter_contact),
+        icone = Iv.PersonAdd,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.four_ajouter),
+        validerActif = nom.isNotBlank(),
+        onValider = { onConfirmer(nom, prenom, fonction, telephone, email, principal) },
+    ) {
+        MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person)
+        MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person)
+        MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge)
+        MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+        MissaChampTexte(email, { email = it }, stringResource(R.string.four_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
+        MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_principal))
+    }
 }
 
 @Composable
@@ -1467,55 +1438,30 @@ private fun DialogueCompte(
     var principal by remember { mutableStateOf(false) }
     var operateurOuvert by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_ajouter_compte)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = titulaire, onValueChange = { titulaire = it }, label = { Text(stringResource(R.string.four_titulaire), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = banque, onValueChange = { banque = it }, label = { Text(stringResource(R.string.four_banque), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = numero, onValueChange = { numero = it }, label = { Text(stringResource(R.string.four_numero_compte), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = iban, onValueChange = { iban = it }, label = { Text(stringResource(R.string.four_iban), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(value = bic, onValueChange = { bic = it }, label = { Text(stringResource(R.string.four_bic), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                Box {
-                    OutlinedTextField(
-                        value = operateur,
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.four_operateur), fontSize = 11.sp) },
-                        trailingIcon = {
-                            Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk)
-                        },
-                        modifier = Modifier.fillMaxWidth().clickable { operateurOuvert = true },
-                    )
-                    MissaMenuDeroulant(expanded = operateurOuvert, onDismissRequest = { operateurOuvert = false }) {
-                        OPERATEURS_MOBILE.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option, fontSize = 12.sp) },
-                                onClick = {
-                                    operateur = option
-                                    operateurOuvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(value = numeroMobile, onValueChange = { numeroMobile = it }, label = { Text(stringResource(R.string.four_numero_mobile), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_compte_principal), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(checked = principal, onCheckedChange = { principal = it })
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmer(titulaire, banque, numero, iban, bic, operateur, numeroMobile, principal) },
-                enabled = titulaire.isNotBlank() && (numero.isNotBlank() || iban.isNotBlank() || numeroMobile.isNotBlank()),
-                colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs),
-            ) { Text(stringResource(R.string.four_ajouter), color = Color.White) }
-        },
-        dismissButton = { TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) } },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_ajouter_compte),
+        icone = Iv.Bank,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.four_ajouter),
+        validerActif = titulaire.isNotBlank() && (numero.isNotBlank() || iban.isNotBlank() || numeroMobile.isNotBlank()),
+        onValider = { onConfirmer(titulaire, banque, numero, iban, bic, operateur, numeroMobile, principal) },
+    ) {
+        MissaChampTexte(titulaire, { titulaire = it }, stringResource(R.string.four_titulaire), icone = Iv.Person)
+        MissaChampTexte(banque, { banque = it }, stringResource(R.string.four_banque), icone = Iv.Bank)
+        MissaChampTexte(numero, { numero = it }, stringResource(R.string.four_numero_compte), icone = Iv.Badge)
+        MissaChampTexte(iban, { iban = it }, stringResource(R.string.four_iban), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE)
+        MissaChampTexte(bic, { bic = it }, stringResource(R.string.four_bic), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE)
+        MissaChampListe(
+            libelle = stringResource(R.string.four_operateur),
+            options = OPERATEURS_MOBILE.map { option -> option to option },
+            selection = operateur,
+            onSelection = { option -> operateur = option },
+            icone = Iv.Smartphone,
+        )
+        MissaChampTexte(numeroMobile, { numeroMobile = it }, stringResource(R.string.four_numero_mobile), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+        MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_compte_principal))
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1546,82 +1492,62 @@ private fun DialogueDocument(
         }
     }
 
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_ajouter_document)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box {
-                    OutlinedTextField(
-                        value = libelleDocument(type),
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.four_type_document), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
-                    )
-                    MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
-                        FournisseurDocType.entries.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(libelleDocument(option), fontSize = 12.sp) },
-                                onClick = {
-                                    type = option
-                                    typeOuvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(value = reference, onValueChange = { reference = it }, label = { Text(stringResource(R.string.four_reference), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    ChampDateFour(
-                        label = stringResource(R.string.four_date_emission),
-                        millis = emission,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        cibleEmission = true
-                        pickerDate = true
-                    }
-                    ChampDateFour(
-                        label = stringResource(R.string.four_date_expiration),
-                        millis = expiration,
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        cibleEmission = false
-                        pickerDate = true
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    OutlinedButton(onClick = {
-                        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    }, modifier = Modifier.weight(1f)) {
-                        Icon(painterResource(Iv.Image), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text(stringResource(R.string.ach_photo), fontSize = 11.sp, color = MissaInk)
-                    }
-                    OutlinedButton(onClick = { pickPdf.launch(arrayOf("application/pdf")) }, modifier = Modifier.weight(1f)) {
-                        Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text(stringResource(R.string.ach_pdf), fontSize = 11.sp, color = MissaInk)
-                    }
-                }
-                if (chemin != null) {
-                    Text(
-                        stringResource(R.string.four_fichier_pret),
-                        fontSize = 11.sp,
-                        color = Color(0xFF15803D),
-                    )
-                }
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_ajouter_document),
+        icone = Iv.Description,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.four_ajouter),
+        onValider = { onConfirmer(type, reference, chemin, emission, expiration) },
+    ) {
+        MissaChampListe(
+            libelle = stringResource(R.string.four_type_document),
+            options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
+            selection = type,
+            onSelection = { option -> type = option },
+            icone = Iv.Description,
+        )
+        MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            ChampDateFour(
+                label = stringResource(R.string.four_date_emission),
+                millis = emission,
+                modifier = Modifier.weight(1f),
+            ) {
+                cibleEmission = true
+                pickerDate = true
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmer(type, reference, chemin, emission, expiration) },
-                colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs),
-            ) { Text(stringResource(R.string.four_ajouter), color = Color.White) }
-        },
-        dismissButton = { TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) } },
-    )
+            ChampDateFour(
+                label = stringResource(R.string.four_date_expiration),
+                millis = expiration,
+                modifier = Modifier.weight(1f),
+            ) {
+                cibleEmission = false
+                pickerDate = true
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            OutlinedButton(onClick = {
+                pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }, modifier = Modifier.weight(1f)) {
+                Icon(painterResource(Iv.Image), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(stringResource(R.string.ach_photo), fontSize = 11.sp, color = MissaInk)
+            }
+            OutlinedButton(onClick = { pickPdf.launch(arrayOf("application/pdf")) }, modifier = Modifier.weight(1f)) {
+                Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(4.dp))
+                Text(stringResource(R.string.ach_pdf), fontSize = 11.sp, color = MissaInk)
+            }
+        }
+        if (chemin != null) {
+            Text(
+                stringResource(R.string.four_fichier_pret),
+                fontSize = 11.sp,
+                color = Color(0xFF15803D),
+            )
+        }
+    }
 
     if (pickerDate) {
         val etat = rememberDatePickerState(initialSelectedDateMillis = if (cibleEmission) emission else expiration)
@@ -1645,16 +1571,10 @@ private fun DialogueDocument(
 
 @Composable
 private fun ChampDateFour(label: String, millis: Long?, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    OutlinedTextField(
-        value = fmtDate(millis),
-        onValueChange = { },
-        readOnly = true,
-        label = { Text(label, fontSize = 10.sp, color = MissaMuted) },
-        trailingIcon = {
-            Icon(painterResource(Iv.Calendar), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-        },
-        modifier = modifier.clickable(onClick = onClick),
-    )
+    Box(modifier) {
+        MissaChampTexte(fmtDate(millis), { }, label, icone = Iv.Calendar, lectureSeule = true)
+        Box(Modifier.matchParentSize().clickable(onClick = onClick))
+    }
 }
 
 @Composable
@@ -1674,66 +1594,14 @@ private fun DialogueArticle(
     var prefere by remember { mutableStateOf(false) }
     val candidats = produits.filter { it.id !in dejaLies }
 
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_lier_article)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box {
-                    OutlinedTextField(
-                        value = produits.firstOrNull { it.id == produitId }?.nom.orEmpty(),
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.four_produit), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        modifier = Modifier.fillMaxWidth().clickable { produitOuvert = true },
-                    )
-                    MissaMenuDeroulant(expanded = produitOuvert, onDismissRequest = { produitOuvert = false }) {
-                        candidats.forEach { produit ->
-                            DropdownMenuItem(
-                                text = { Text(produit.nom, fontSize = 12.sp) },
-                                onClick = {
-                                    produitId = produit.id
-                                    produitOuvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(value = reference, onValueChange = { reference = it }, label = { Text(stringResource(R.string.four_reference), fontSize = 11.sp) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(
-                    value = prix,
-                    onValueChange = { prix = it.filterMoneyInput() },
-                    label = { Text(stringResource(R.string.four_prix), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = delai,
-                    onValueChange = { delai = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.four_delai), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = quantiteMin,
-                    onValueChange = { quantiteMin = it.filterMoneyInput() },
-                    label = { Text(stringResource(R.string.four_qte_min), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_prefere), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(checked = prefere, onCheckedChange = { prefere = it })
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_lier_article),
+        icone = Iv.Inventory2,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.four_lier),
+        validerActif = produitId != null,
+        onValider = {
                     produitId?.let { id ->
                         onConfirmer(
                             id,
@@ -1745,12 +1613,20 @@ private fun DialogueArticle(
                         )
                     }
                 },
-                enabled = produitId != null,
-                colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs),
-            ) { Text(stringResource(R.string.four_lier), color = Color.White) }
-        },
-        dismissButton = { TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) } },
-    )
+    ) {
+        MissaChampListe(
+            libelle = stringResource(R.string.four_produit),
+            options = candidats.map { produit -> produit.id to produit.nom },
+            selection = produitId,
+            onSelection = { produit -> produitId = produit },
+            icone = Iv.Inventory2,
+        )
+        MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
+        MissaChampTexte(prix, { prix = it.filterMoneyInput() }, stringResource(R.string.four_prix), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        MissaChampTexte(delai, { delai = it.filter { c -> c.isDigit() } }, stringResource(R.string.four_delai), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
+        MissaChampTexte(quantiteMin, { quantiteMin = it.filterMoneyInput() }, stringResource(R.string.four_qte_min), icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL)
+        MissaCaseACocher(prefere, { prefere = it }, stringResource(R.string.four_prefere))
+    }
 }
 
 @Composable
@@ -1762,38 +1638,27 @@ private fun DialogueEvaluation(
 ) {
     var note by remember { mutableStateOf(noteInitiale.toInt().coerceIn(0, 5)) }
     var commentaire by remember { mutableStateOf(commentaireInitial) }
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.four_evaluer)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    (1..5).forEach { index ->
-                        IconButton(onClick = { note = index }, modifier = Modifier.size(36.dp)) {
-                            Text(
-                                if (index <= note) "★" else "☆",
-                                fontSize = 22.sp,
-                                color = if (index <= note) Color(0xFFB45309) else MissaMuted,
-                            )
-                        }
-                    }
+    MissaFormDialogue(
+        titre = stringResource(R.string.four_evaluer),
+        icone = Iv.Star,
+        couleur = CouleurFournisseurs,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.st_ok),
+        onValider = { onConfirmer(note.toDouble(), commentaire) },
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            (1..5).forEach { index ->
+                IconButton(onClick = { note = index }, modifier = Modifier.size(36.dp)) {
+                    Text(
+                        if (index <= note) "★" else "☆",
+                        fontSize = 22.sp,
+                        color = if (index <= note) Color(0xFFB45309) else MissaMuted,
+                    )
                 }
-                OutlinedTextField(
-                    value = commentaire,
-                    onValueChange = { commentaire = it },
-                    label = { Text(stringResource(R.string.four_commentaire), fontSize = 11.sp, color = MissaMuted) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
             }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onConfirmer(note.toDouble(), commentaire) },
-                colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs),
-            ) { Text(stringResource(R.string.st_ok), color = Color.White) }
-        },
-        dismissButton = { TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler)) } },
-    )
+        }
+        MissaChampTexte(commentaire, { commentaire = it }, stringResource(R.string.four_commentaire), icone = Iv.Description)
+    }
 }
 
 // ======================================================================
@@ -1827,6 +1692,7 @@ private fun FormulaireFournisseur(
         stringResource(R.string.four_etape_validation),
     )
 
+    MissaFormulaireTheme(CouleurFournisseurs) {
     Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
         MissaTopAppBar(
             title = if (form.enEditionId == null) {
@@ -1889,6 +1755,7 @@ private fun FormulaireFournisseur(
                 }
             }
 
+            item { MissaFormSectionTitre(titresEtapes[form.etape - 1], numero = form.etape) }
             when (form.etape) {
                 1 -> itemsEtapeIdentite(vm, form)
                 2 -> itemsEtapeContacts(vm, form)
@@ -1900,91 +1767,62 @@ private fun FormulaireFournisseur(
             }
         }
 
-        // Barre de navigation du formulaire
-        Surface(color = Color.White, shadowElevation = 8.dp) {
-            Row(
-                Modifier.fillMaxWidth().padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (form.etape > 1) {
-                    OutlinedButton(onClick = vm::etapePrecedente, modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.four_precedent), fontSize = 12.sp, color = MissaInk)
-                    }
+        // Barre de navigation du formulaire (pied du kit : bouton principal pleine largeur)
+        val precedent: Pair<String, () -> Unit> = stringResource(R.string.four_precedent) to { vm.etapePrecedente(); Unit }
+        when {
+            form.etape < 7 -> MissaFormPied(
+                texte = stringResource(R.string.four_continuer),
+                onValider = vm::etapeSuivante,
+                secondaire = if (form.etape > 1) precedent else null,
+            )
+            form.enEditionId == null -> {
+                TextButton(onClick = vm::etapePrecedente, modifier = Modifier.padding(horizontal = 8.dp)) {
+                    Text("← ${stringResource(R.string.four_precedent)}", fontSize = 12.sp, color = MissaInk)
                 }
-                if (form.etape < 7) {
-                    Button(
-                        onClick = vm::etapeSuivante,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs, contentColor = Color.White),
-                    ) {
-                        Text(stringResource(R.string.four_continuer), fontSize = 12.sp, color = Color.White)
-                    }
-                } else {
-                    if (form.enEditionId == null) {
-                        OutlinedButton(
-                            onClick = { vm.enregistrer(soumettre = false) },
-                            enabled = !form.busy,
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(stringResource(R.string.four_enregistrer_brouillon), fontSize = 11.sp, color = MissaInk)
-                        }
-                        Button(
-                            onClick = { vm.enregistrer(soumettre = true) },
-                            enabled = !form.busy,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs, contentColor = Color.White),
-                        ) {
-                            Text(stringResource(R.string.four_soumettre_validation), fontSize = 11.sp, color = Color.White)
-                        }
-                    } else {
-                        Button(
-                            onClick = vm::modifierFiche,
-                            enabled = !form.busy,
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs, contentColor = Color.White),
-                        ) {
-                            Text(stringResource(R.string.four_enregistrer), fontSize = 12.sp, color = Color.White)
+                MissaFormPied(
+                    texte = stringResource(R.string.four_soumettre_validation),
+                    onValider = { vm.enregistrer(soumettre = true) },
+                    actif = !form.busy,
+                    enCours = form.busy,
+                    secondaire = Pair<String, () -> Unit>(stringResource(R.string.four_enregistrer_brouillon), { vm.enregistrer(soumettre = false) }),
+                    secondaireActif = !form.busy,
+                )
+            }
+            else -> MissaFormPied(
+                texte = stringResource(R.string.four_enregistrer),
+                onValider = vm::modifierFiche,
+                actif = !form.busy,
+                enCours = form.busy,
+                secondaire = precedent,
+            )
+        }
+    }
+    }
+
+    // Dialogue anti-doublon (spec §1)
+    form.doublons?.let { doublons ->
+        MissaFormDialogue(
+            titre = stringResource(R.string.four_doublons_titre),
+            couleur = CouleurFournisseurs,
+            onFermer = vm::annulerDoublon,
+            libelleValider = stringResource(R.string.four_enregistrer_quand_meme),
+            onValider = vm::confirmerDoublon,
+        ) {
+            Text(stringResource(R.string.four_doublons_desc), fontSize = 12.sp, color = MissaInk)
+            doublons.forEach { (fiche, motifs) ->
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFFD97706).copy(alpha = 0.08f),
+                ) {
+                    Column(Modifier.fillMaxWidth().padding(8.dp)) {
+                        Text("${fiche.nom} (${fiche.code})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                        motifs.forEach { motif ->
+                            Text("• ${libelleMotifDoublon(motif)}", fontSize = 11.sp, color = Color(0xFFB45309))
                         }
                     }
                 }
             }
         }
-    }
-
-    // Dialogue anti-doublon (spec §1)
-    form.doublons?.let { doublons ->
-        AlertDialog(
-            onDismissRequest = vm::annulerDoublon,
-            title = { Text(stringResource(R.string.four_doublons_titre)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.four_doublons_desc), fontSize = 12.sp, color = MissaInk)
-                    doublons.forEach { (fiche, motifs) ->
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFD97706).copy(alpha = 0.08f),
-                        ) {
-                            Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                                Text("${fiche.nom} (${fiche.code})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                                motifs.forEach { motif ->
-                                    Text("• ${libelleMotifDoublon(motif)}", fontSize = 11.sp, color = Color(0xFFB45309))
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = vm::confirmerDoublon,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB45309)),
-                ) { Text(stringResource(R.string.four_enregistrer_quand_meme), fontSize = 11.sp, color = Color.White) }
-            },
-            dismissButton = {
-                TextButton(onClick = vm::annulerDoublon) { Text(stringResource(R.string.st_annuler)) }
-            },
-        )
     }
 }
 
@@ -1994,30 +1832,19 @@ private fun SelecteurSimple(
     valeur: String,
     options: List<String>,
     modifier: Modifier = Modifier,
+    icone: Int? = Iv.Category,
     onChoix: (String) -> Unit,
 ) {
-    var ouvert by remember { mutableStateOf(false) }
-    Box(modifier) {
-        OutlinedTextField(
-            value = valeur,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(label, fontSize = 11.sp) },
-            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-            modifier = Modifier.fillMaxWidth().clickable { ouvert = true },
-        )
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option, fontSize = 12.sp) },
-                    onClick = {
-                        onChoix(option)
-                        ouvert = false
-                    },
-                )
-            }
-        }
-    }
+    val requis = label.trimEnd().endsWith("*")
+    MissaChampListe(
+        libelle = if (requis) label.trimEnd().removeSuffix("*").trimEnd() else label,
+        requis = requis,
+        options = options.map { it to it },
+        selection = valeur.takeIf { it.isNotEmpty() },
+        onSelection = onChoix,
+        modifier = modifier,
+        icone = icone,
+    )
 }
 
 private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
@@ -2026,55 +1853,31 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
 ) {
     item {
         var typeOuvert by remember { mutableStateOf(false) }
-        Box {
-            OutlinedTextField(
-                value = libelleType(form.type),
-                onValueChange = { },
-                readOnly = true,
-                label = { Text(stringResource(R.string.four_type_fournisseur), fontSize = 11.sp) },
-                trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
-            )
-            MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
-                TypeFournisseur.entries.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(libelleType(option), fontSize = 12.sp) },
-                        onClick = {
-                            vm.updateForm { it.copy(type = option) }
-                            typeOuvert = false
-                        },
-                    )
-                }
-            }
-        }
-    }
-    item {
-        OutlinedTextField(
-            value = form.nom,
-            onValueChange = { valeur -> vm.updateForm { it.copy(nom = valeur) } },
-            label = { Text(stringResource(R.string.four_raison_sociale) + " *", fontSize = 11.sp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+        MissaChampListe(
+            libelle = stringResource(R.string.four_type_fournisseur),
+            options = TypeFournisseur.entries.map { option -> option to libelleType(option) },
+            selection = form.type,
+            onSelection = { option -> vm.updateForm { it.copy(type = option) } },
+            icone = Iv.Category,
         )
     }
     item {
-        OutlinedTextField(
-            value = form.nomCommercial,
-            onValueChange = { valeur -> vm.updateForm { it.copy(nomCommercial = valeur) } },
-            label = { Text(stringResource(R.string.four_nom_commercial), fontSize = 11.sp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.nom, { valeur -> vm.updateForm { it.copy(nom = valeur) } }, stringResource(R.string.four_raison_sociale), icone = Iv.Business, requis = true)
+    }
+    item {
+        MissaChampTexte(form.nomCommercial, { valeur -> vm.updateForm { it.copy(nomCommercial = valeur) } }, stringResource(R.string.four_nom_commercial), icone = Iv.Business)
     }
     item {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SelecteurSimple(
+                icone = Iv.Public,
                 label = stringResource(R.string.four_pays) + " *",
                 valeur = form.pays,
                 options = PAYS,
                 modifier = Modifier.weight(1f),
             ) { choix -> vm.updateForm { it.copy(pays = choix) } }
             SelecteurSimple(
+                icone = Iv.Payments,
                 label = stringResource(R.string.four_devise),
                 valeur = form.devise,
                 options = DEVISES,
@@ -2084,48 +1887,18 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
     }
     item {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = form.telephone,
-                onValueChange = { valeur -> vm.updateForm { it.copy(telephone = valeur) } },
-                label = { Text(stringResource(R.string.four_telephone) + " *", fontSize = 11.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-            )
-            OutlinedTextField(
-                value = form.email,
-                onValueChange = { valeur -> vm.updateForm { it.copy(email = valeur) } },
-                label = { Text(stringResource(R.string.four_email), fontSize = 11.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-            )
+            MissaChampTexte(form.telephone, { valeur -> vm.updateForm { it.copy(telephone = valeur) } }, stringResource(R.string.four_telephone), modifier = Modifier.weight(1f), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
+            MissaChampTexte(form.email, { valeur -> vm.updateForm { it.copy(email = valeur) } }, stringResource(R.string.four_email), modifier = Modifier.weight(1f), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
         }
     }
     item {
-        OutlinedTextField(
-            value = form.adresse,
-            onValueChange = { valeur -> vm.updateForm { it.copy(adresse = valeur) } },
-            label = { Text(stringResource(R.string.four_adresse), fontSize = 11.sp) },
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.adresse, { valeur -> vm.updateForm { it.copy(adresse = valeur) } }, stringResource(R.string.four_adresse), icone = Iv.Place)
     }
     item {
-        OutlinedTextField(
-            value = form.siteWeb,
-            onValueChange = { valeur -> vm.updateForm { it.copy(siteWeb = valeur) } },
-            label = { Text(stringResource(R.string.four_site_web), fontSize = 11.sp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.siteWeb, { valeur -> vm.updateForm { it.copy(siteWeb = valeur) } }, stringResource(R.string.four_site_web), icone = Iv.Public)
     }
     item {
-        OutlinedTextField(
-            value = form.description,
-            onValueChange = { valeur -> vm.updateForm { it.copy(description = valeur) } },
-            label = { Text(stringResource(R.string.four_description), fontSize = 11.sp) },
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.description, { valeur -> vm.updateForm { it.copy(description = valeur) } }, stringResource(R.string.four_description), icone = Iv.Description)
     }
 }
 
@@ -2182,47 +1955,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
                 }
                 HorizontalDivider(color = MissaBorder)
                 Text(stringResource(R.string.four_ajouter_contact), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text(stringResource(R.string.four_nom), fontSize = 11.sp) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = prenom,
-                    onValueChange = { prenom = it },
-                    label = { Text(stringResource(R.string.four_prenom), fontSize = 11.sp) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = fonction,
-                    onValueChange = { fonction = it },
-                    label = { Text(stringResource(R.string.four_fonction), fontSize = 11.sp) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = telephone,
-                    onValueChange = { telephone = it },
-                    label = { Text(stringResource(R.string.four_telephone), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(stringResource(R.string.four_email), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_principal), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(checked = principal, onCheckedChange = { principal = it })
-                }
+                MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person)
+                MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person)
+                MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge)
+                MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+                MissaChampTexte(email, { email = it }, stringResource(R.string.four_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
+                MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_principal))
                 Button(
                     onClick = {
                         vm.addContactSaisi(
@@ -2266,31 +2004,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
                 color = MissaMuted,
             )
         } else if (requis != null) {
-            OutlinedTextField(
-                value = form.identifiantFiscal,
-                onValueChange = { valeur -> vm.updateForm { it.copy(identifiantFiscal = valeur) } },
-                label = { Text("$requis *", fontSize = 11.sp) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            MissaChampTexte(form.identifiantFiscal, { valeur -> vm.updateForm { it.copy(identifiantFiscal = valeur) } }, requis, icone = Iv.Badge, requis = true)
         } else {
-            OutlinedTextField(
-                value = form.identifiantFiscal,
-                onValueChange = { valeur -> vm.updateForm { it.copy(identifiantFiscal = valeur) } },
-                label = { Text(stringResource(R.string.four_identifiant), fontSize = 11.sp) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            MissaChampTexte(form.identifiantFiscal, { valeur -> vm.updateForm { it.copy(identifiantFiscal = valeur) } }, stringResource(R.string.four_identifiant), icone = Iv.Badge)
         }
     }
     item {
-        OutlinedTextField(
-            value = form.rccm,
-            onValueChange = { valeur -> vm.updateForm { it.copy(rccm = valeur) } },
-            label = { Text(stringResource(R.string.four_rccm), fontSize = 11.sp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.rccm, { valeur -> vm.updateForm { it.copy(rccm = valeur) } }, stringResource(R.string.four_rccm), icone = Iv.Badge)
     }
     item {
         Surface(
@@ -2307,13 +2027,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
                     )
                 }
                 if (form.assujettiTva) {
-                    OutlinedTextField(
-                        value = form.numTva,
-                        onValueChange = { valeur -> vm.updateForm { it.copy(numTva = valeur) } },
-                        label = { Text(stringResource(R.string.four_num_tva), fontSize = 11.sp) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    MissaChampTexte(form.numTva, { valeur -> vm.updateForm { it.copy(numTva = valeur) } }, stringResource(R.string.four_num_tva), icone = Iv.Badge)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.four_exonere), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
@@ -2323,14 +2037,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
                     )
                 }
                 if (!form.exonere) {
-                    OutlinedTextField(
-                        value = form.tauxRetenue,
-                        onValueChange = { valeur -> vm.updateForm { it.copy(tauxRetenue = valeur.filterMoneyInput()) } },
-                        label = { Text(stringResource(R.string.four_taux_retenue), fontSize = 11.sp) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    MissaChampTexte(form.tauxRetenue, { valeur -> vm.updateForm { it.copy(tauxRetenue = valeur.filterMoneyInput()) } }, stringResource(R.string.four_taux_retenue), icone = Iv.Percent, clavier = MissaClavier.DECIMAL)
                 }
             }
         }
@@ -2352,56 +2059,26 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeAchats(
         TypeFournisseur.COLLECTEUR_DECHETS,
     )
     item {
-        OutlinedTextField(
-            value = form.categoriesFournies,
-            onValueChange = { valeur -> vm.updateForm { it.copy(categoriesFournies = valeur) } },
-            label = {
-                Text(
-                    if (form.type == TypeFournisseur.COLLECTEUR_DECHETS) {
+        MissaChampTexte(form.categoriesFournies, { valeur -> vm.updateForm { it.copy(categoriesFournies = valeur) } }, if (form.type == TypeFournisseur.COLLECTEUR_DECHETS) {
                         stringResource(R.string.four_types_dechets)
                     } else {
                         stringResource(R.string.four_categories)
-                    },
-                    fontSize = 11.sp,
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-        )
+                    }, icone = Iv.Category)
     }
     if (montreStock) {
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = form.delaiMoyen,
-                    onValueChange = { valeur -> vm.updateForm { it.copy(delaiMoyen = valeur.filter { c -> c.isDigit() }) } },
-                    label = { Text(stringResource(R.string.four_delai), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                )
-                OutlinedTextField(
-                    value = form.quantiteMin,
-                    onValueChange = { valeur -> vm.updateForm { it.copy(quantiteMin = valeur.filterMoneyInput()) } },
-                    label = { Text(stringResource(R.string.four_qte_min), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.weight(1f),
-                )
+                MissaChampTexte(form.delaiMoyen, { valeur -> vm.updateForm { it.copy(delaiMoyen = valeur.filter { c -> c.isDigit() }) } }, stringResource(R.string.four_delai), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
+                MissaChampTexte(form.quantiteMin, { valeur -> vm.updateForm { it.copy(quantiteMin = valeur.filterMoneyInput()) } }, stringResource(R.string.four_qte_min), modifier = Modifier.weight(1f), icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL)
             }
         }
     }
     item {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = form.montantMin,
-                onValueChange = { valeur -> vm.updateForm { it.copy(montantMin = valeur.filterMoneyInput()) } },
-                label = { Text(stringResource(R.string.four_montant_min), fontSize = 11.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-            )
+            MissaChampTexte(form.montantMin, { valeur -> vm.updateForm { it.copy(montantMin = valeur.filterMoneyInput()) } }, stringResource(R.string.four_montant_min), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             if (montreStock) {
                 SelecteurSimple(
+                    icone = Iv.LocalShipping,
                     label = stringResource(R.string.four_incoterm),
                     valeur = form.incoterm.ifBlank { "—" },
                     options = INCOTERMS,
@@ -2418,25 +2095,13 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapePaiement(
     modes: List<String>,
 ) {
     item {
-        OutlinedTextField(
-            value = form.conditionsPaiement,
-            onValueChange = { valeur -> vm.updateForm { it.copy(conditionsPaiement = valeur) } },
-            label = { Text(stringResource(R.string.four_conditions) + " *", fontSize = 11.sp) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        MissaChampTexte(form.conditionsPaiement, { valeur -> vm.updateForm { it.copy(conditionsPaiement = valeur) } }, stringResource(R.string.four_conditions), icone = Iv.Schedule, requis = true)
     }
     item {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = form.joursEcheance,
-                onValueChange = { valeur -> vm.updateForm { it.copy(joursEcheance = valeur.filter { c -> c.isDigit() }) } },
-                label = { Text(stringResource(R.string.four_jours_echeance), fontSize = 11.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier.weight(1f),
-            )
+            MissaChampTexte(form.joursEcheance, { valeur -> vm.updateForm { it.copy(joursEcheance = valeur.filter { c -> c.isDigit() }) } }, stringResource(R.string.four_jours_echeance), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
             SelecteurSimple(
+                icone = Iv.Payments,
                 label = stringResource(R.string.four_mode_prefere),
                 valeur = form.modePaiementPrefere.ifBlank { "—" },
                 options = modes,
@@ -2526,34 +2191,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
                     }
                 }
                 HorizontalDivider(color = MissaBorder)
-                Box {
-                    OutlinedTextField(
-                        value = libelleDocument(type),
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.four_type_document), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        modifier = Modifier.fillMaxWidth().clickable { typeOuvert = true },
-                    )
-                    MissaMenuDeroulant(expanded = typeOuvert, onDismissRequest = { typeOuvert = false }) {
-                        FournisseurDocType.entries.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(libelleDocument(option), fontSize = 12.sp) },
-                                onClick = {
-                                    type = option
-                                    typeOuvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = reference,
-                    onValueChange = { reference = it },
-                    label = { Text(stringResource(R.string.four_reference), fontSize = 11.sp) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                MissaChampListe(
+                    libelle = stringResource(R.string.four_type_document),
+                    options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
+                    selection = type,
+                    onSelection = { option -> type = option },
+                    icone = Iv.Description,
                 )
+                MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChampDateFour(
                         label = stringResource(R.string.four_date_expiration),
