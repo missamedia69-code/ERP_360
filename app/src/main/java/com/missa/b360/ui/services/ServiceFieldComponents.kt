@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.missa.b360.R
 import com.missa.b360.core.data.entity.ServiceRequestEntity
 import com.missa.b360.core.data.entity.ServiceReportEntity
 import com.missa.b360.core.data.entity.ServiceWorkOrderEntity
@@ -52,12 +54,12 @@ internal fun ServiceFieldOverview(
         workOrders.count { it.priority == ServicePriority.URGENT.name && it.status !in setOf("CLOSED", "CANCELLED") }
     Surface(shape = RoundedCornerShape(18.dp), color = ServicePink.copy(alpha = 0.09f)) {
         Column(Modifier.fillMaxWidth().padding(14.dp)) {
-            Text("INTERVENTIONS TERRAIN", fontSize = 11.sp, color = Color(0xFF6B7280), fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.srvf_titre_terrain), fontSize = 11.sp, color = Color(0xFF6B7280), fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FieldKpi("Demandes à traiter", openRequests.toString(), Modifier.weight(1f))
-                FieldKpi("Ordres actifs", activeOrders.toString(), Modifier.weight(1f))
-                FieldKpi("Urgents", urgent.toString(), Modifier.weight(1f), if (urgent > 0) Color(0xFFB91C1C) else ServicePink)
+                FieldKpi(stringResource(R.string.srvf_kpi_demandes), openRequests.toString(), Modifier.weight(1f))
+                FieldKpi(stringResource(R.string.srvf_kpi_ordres), activeOrders.toString(), Modifier.weight(1f))
+                FieldKpi(stringResource(R.string.srvf_kpi_urgents), urgent.toString(), Modifier.weight(1f), if (urgent > 0) Color(0xFFB91C1C) else ServicePink)
             }
             Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -66,12 +68,12 @@ internal fun ServiceFieldOverview(
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = ServicePink),
-                ) { Text("+ Demande client") }
+                ) { Text("+ " + stringResource(R.string.srvf_demande_client)) }
                 OutlinedButton(
                     onClick = onNewOrder,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                ) { Text("+ Ordre direct", color = ServicePink) }
+                ) { Text("+ " + stringResource(R.string.srvf_ordre_direct), color = ServicePink) }
             }
         }
     }
@@ -96,21 +98,21 @@ internal fun ServiceRequestCard(
         Column(Modifier.fillMaxWidth().padding(13.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(request.reference, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ServicePink, modifier = Modifier.weight(1f))
-                Text(request.priority.toPriorityLabel(), fontSize = 10.sp, color = priorityColor, fontWeight = FontWeight.Bold)
+                Text(stringResource(priorityLabelRes(request.priority)).uppercase(), fontSize = 10.sp, color = priorityColor, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(3.dp))
             Text(request.customerName, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1F2937))
             Text(request.description, fontSize = 12.sp, color = Color(0xFF4B5563), lineHeight = 17.sp)
             if (!request.address.isNullOrBlank()) Text(request.address, fontSize = 11.sp, color = Color(0xFF6B7280))
             if (ServiceWorkflowRules.isOverdue(request.resolutionDeadlineAt, System.currentTimeMillis(), request.status in setOf("RESOLVED", "CLOSED", "CANCELLED", "CONVERTED"))) {
-                Text("SLA de résolution dépassé", fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.srvf_sla_depasse), fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(7.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("${request.requestType.toTypeLabel()} · ${request.status.toStatusLabel()}", fontSize = 10.sp, color = Color(0xFF6B7280))
+                Text("${stringResource(typeLabelRes(request.requestType))} · ${statusLabelRes(request.status)?.let { stringResource(it) } ?: request.status}", fontSize = 10.sp, color = Color(0xFF6B7280))
                 when (request.status) {
-                    "OPEN" -> OutlinedButton(onClick = onQualify, shape = RoundedCornerShape(10.dp)) { Text("Qualifier", color = ServicePink, fontSize = 11.sp) }
-                    "QUALIFIED" -> OutlinedButton(onClick = onConvert, shape = RoundedCornerShape(10.dp)) { Text("Créer l'ordre", color = ServicePink, fontSize = 11.sp) }
+                    "OPEN" -> OutlinedButton(onClick = onQualify, shape = RoundedCornerShape(10.dp)) { Text(stringResource(R.string.srvf_qualifier), color = ServicePink, fontSize = 11.sp) }
+                    "QUALIFIED" -> OutlinedButton(onClick = onConvert, shape = RoundedCornerShape(10.dp)) { Text(stringResource(R.string.srvf_creer_ordre), color = ServicePink, fontSize = 11.sp) }
                 }
             }
         }
@@ -140,26 +142,26 @@ internal fun ServiceWorkOrderCard(
         Column(Modifier.fillMaxWidth().padding(13.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(order.reference, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ServicePink, modifier = Modifier.weight(1f))
-                Text(status.toLabel(), fontSize = 10.sp, color = statusColor, fontWeight = FontWeight.Bold)
+                Text(stringResource(status.toLabelRes()), fontSize = 10.sp, color = statusColor, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(3.dp))
             Text(order.customerName, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF1F2937))
             Text(order.description, fontSize = 12.sp, color = Color(0xFF4B5563), lineHeight = 17.sp)
             val schedule = order.plannedStartAt?.let { dateFormat.format(Date(it)) }
             Text(
-                listOfNotNull(schedule, technicianName?.let { "Technicien·ne : $it" }, order.address).joinToString(" · ").ifBlank { "À planifier" },
+                listOfNotNull(schedule, technicianName?.let { stringResource(R.string.srvf_technicien_x, it) }, order.address).joinToString(" · ").ifBlank { stringResource(R.string.srvf_st_a_planifier) },
                 fontSize = 10.sp,
                 color = Color(0xFF6B7280),
             )
             if (ServiceWorkflowRules.isOverdue(order.resolutionDeadlineAt, System.currentTimeMillis(), status in setOf(ServiceWorkOrderStatus.READY_TO_BILL, ServiceWorkOrderStatus.CLOSED, ServiceWorkOrderStatus.CANCELLED))) {
-                Text("SLA de résolution dépassé", fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.srvf_sla_depasse), fontSize = 10.sp, color = Color(0xFFB91C1C), fontWeight = FontWeight.Bold)
             }
             if (status == ServiceWorkOrderStatus.AWAITING_VALIDATION && report != null) {
                 Spacer(Modifier.height(6.dp))
-                Text("Diagnostic : ${report.diagnosis}", fontSize = 11.sp, color = Color(0xFF374151))
-                Text("Travaux : ${report.workPerformed}", fontSize = 11.sp, color = Color(0xFF374151))
+                Text(stringResource(R.string.srvf_diagnostic_x, report.diagnosis), fontSize = 11.sp, color = Color(0xFF374151))
+                Text(stringResource(R.string.srvf_travaux_x, report.workPerformed), fontSize = 11.sp, color = Color(0xFF374151))
                 Text(
-                    if (report.customerSignatureUri.isNullOrBlank()) "Signature client manquante" else "Signé par ${report.customerSignerName.orEmpty()}",
+                    if (report.customerSignatureUri.isNullOrBlank()) stringResource(R.string.srvf_signature_manquante) else stringResource(R.string.srvf_signe_par, report.customerSignerName.orEmpty()),
                     fontSize = 10.sp,
                     color = if (report.customerSignatureUri.isNullOrBlank()) Color(0xFFB91C1C) else Color(0xFF15803D),
                     fontWeight = FontWeight.SemiBold,
@@ -168,20 +170,20 @@ internal fun ServiceWorkOrderCard(
             Spacer(Modifier.height(8.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 when (status) {
-                    ServiceWorkOrderStatus.TO_PLAN -> Action("Planifier", onSchedule)
+                    ServiceWorkOrderStatus.TO_PLAN -> Action(stringResource(R.string.srvf_planifier), onSchedule)
                     ServiceWorkOrderStatus.SCHEDULED -> {
-                        Action("En route", { onTransition(ServiceWorkOrderStatus.EN_ROUTE) })
-                        Action("Démarrer", { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
+                        Action(stringResource(R.string.srvf_st_en_route), { onTransition(ServiceWorkOrderStatus.EN_ROUTE) })
+                        Action(stringResource(R.string.srvf_demarrer), { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
                     }
-                    ServiceWorkOrderStatus.EN_ROUTE -> Action("Démarrer", { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
+                    ServiceWorkOrderStatus.EN_ROUTE -> Action(stringResource(R.string.srvf_demarrer), { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
                     ServiceWorkOrderStatus.IN_PROGRESS -> {
-                        Action("Temps", onTimesheet)
-                        Action("Rapport", onReport)
+                        Action(stringResource(R.string.srvf_temps), onTimesheet)
+                        Action(stringResource(R.string.srvf_rapport), onReport)
                     }
                     ServiceWorkOrderStatus.WAITING_CUSTOMER,
                     ServiceWorkOrderStatus.WAITING_PARTS,
-                    ServiceWorkOrderStatus.WAITING_SUPPLIER -> Action("Reprendre", { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
-                    ServiceWorkOrderStatus.AWAITING_VALIDATION -> Action("Valider le rapport", onApprove)
+                    ServiceWorkOrderStatus.WAITING_SUPPLIER -> Action(stringResource(R.string.srvf_reprendre), { onTransition(ServiceWorkOrderStatus.IN_PROGRESS) })
+                    ServiceWorkOrderStatus.AWAITING_VALIDATION -> Action(stringResource(R.string.srvf_valider_rapport), onApprove)
                     else -> Unit
                 }
             }
@@ -198,19 +200,38 @@ private fun RowScope.Action(label: String, onClick: () -> Unit) {
 
 private val dateFormat get() = SimpleDateFormat("dd/MM HH:mm", Locale.getDefault())
 private fun priorityColor(value: String) = if (value == "URGENT") Color(0xFFB91C1C) else if (value == "HIGH") Color(0xFFD97706) else ServicePink
-private fun String.toPriorityLabel() = when (this) { "URGENT" -> "URGENT"; "HIGH" -> "HAUTE"; "LOW" -> "BASSE"; else -> "NORMALE" }
-private fun String.toTypeLabel() = when (this) { "BREAKDOWN" -> "Panne"; "MAINTENANCE" -> "Maintenance"; "INSTALLATION" -> "Installation"; "WARRANTY" -> "Garantie"; "CUSTOMER_QUERY" -> "Demande client"; else -> "Autre" }
-private fun String.toStatusLabel() = when (this) { "OPEN" -> "Ouverte"; "QUALIFIED" -> "Qualifiée"; "QUOTE_REQUIRED" -> "Devis requis"; "CONVERTED" -> "Convertie"; "CLOSED" -> "Clôturée"; else -> this }
-private fun ServiceWorkOrderStatus.toLabel() = when (this) {
-    ServiceWorkOrderStatus.TO_PLAN -> "À planifier"
-    ServiceWorkOrderStatus.SCHEDULED -> "Planifiée"
-    ServiceWorkOrderStatus.EN_ROUTE -> "En route"
-    ServiceWorkOrderStatus.IN_PROGRESS -> "En cours"
-    ServiceWorkOrderStatus.WAITING_CUSTOMER -> "Attente client"
-    ServiceWorkOrderStatus.WAITING_PARTS -> "Attente pièces"
-    ServiceWorkOrderStatus.WAITING_SUPPLIER -> "Attente fournisseur"
-    ServiceWorkOrderStatus.AWAITING_VALIDATION -> "À valider"
-    ServiceWorkOrderStatus.READY_TO_BILL -> "Prête à facturer"
-    ServiceWorkOrderStatus.CLOSED -> "Clôturée"
-    ServiceWorkOrderStatus.CANCELLED -> "Annulée"
+internal fun priorityLabelRes(value: String): Int = when (value) {
+    "URGENT" -> R.string.srvf_prio_urgente
+    "HIGH" -> R.string.srvf_prio_haute
+    "LOW" -> R.string.srvf_prio_basse
+    else -> R.string.srvf_prio_normale
+}
+internal fun typeLabelRes(value: String): Int = when (value) {
+    "BREAKDOWN" -> R.string.srvf_type_panne
+    "MAINTENANCE" -> R.string.srvf_type_maintenance
+    "INSTALLATION" -> R.string.srvf_type_installation
+    "WARRANTY" -> R.string.srvf_type_garantie
+    "CUSTOMER_QUERY" -> R.string.srvf_type_demande
+    else -> R.string.srvf_type_autre
+}
+private fun statusLabelRes(value: String): Int? = when (value) {
+    "OPEN" -> R.string.srvf_dem_ouverte
+    "QUALIFIED" -> R.string.srvf_dem_qualifiee
+    "QUOTE_REQUIRED" -> R.string.srvf_dem_devis
+    "CONVERTED" -> R.string.srvf_dem_convertie
+    "CLOSED" -> R.string.srvf_st_cloturee
+    else -> null
+}
+private fun ServiceWorkOrderStatus.toLabelRes(): Int = when (this) {
+    ServiceWorkOrderStatus.TO_PLAN -> R.string.srvf_st_a_planifier
+    ServiceWorkOrderStatus.SCHEDULED -> R.string.srvf_st_planifiee
+    ServiceWorkOrderStatus.EN_ROUTE -> R.string.srvf_st_en_route
+    ServiceWorkOrderStatus.IN_PROGRESS -> R.string.srvf_st_en_cours
+    ServiceWorkOrderStatus.WAITING_CUSTOMER -> R.string.srvf_st_attente_client
+    ServiceWorkOrderStatus.WAITING_PARTS -> R.string.srvf_st_attente_pieces
+    ServiceWorkOrderStatus.WAITING_SUPPLIER -> R.string.srvf_st_attente_fournisseur
+    ServiceWorkOrderStatus.AWAITING_VALIDATION -> R.string.srvf_st_a_valider
+    ServiceWorkOrderStatus.READY_TO_BILL -> R.string.srvf_st_a_facturer
+    ServiceWorkOrderStatus.CLOSED -> R.string.srvf_st_cloturee
+    ServiceWorkOrderStatus.CANCELLED -> R.string.srvf_st_annulee
 }

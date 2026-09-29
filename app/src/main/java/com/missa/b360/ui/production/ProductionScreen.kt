@@ -63,6 +63,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Violet caractéristique du module Production — source unique : [AppModule.PRODUCTION]. */
 private val VioletProduction: Color get() = AppModule.PRODUCTION.couleur
@@ -287,7 +288,12 @@ private fun FormulaireOrdreProduction(
     val enregistrement by vm.enregistrement.collectAsStateWithLifecycle()
 
     var dialogueComposant by remember { mutableStateOf(false) }
+    // Texte saisi conservé tel quel (sinon impossible d'effacer le champ pour retaper).
+    var quantiteTexte by remember(ui.editingOrderId) { mutableStateOf(
+            ui.quantiteAProduire.let { q -> if (q % 1.0 == 0.0) q.toLong().toString() else q.toString() },
+        ) }
 
+    MissaFormulaireTheme(AppModule.PRODUCTION.couleur) {
     Column(Modifier.fillMaxSize()) {
         MissaTopAppBar(
             title = stringResource(if (ui.editingOrderId == null) R.string.pro_nouvel_ordre else R.string.pro_modifier_ordre),
@@ -300,35 +306,38 @@ private fun FormulaireOrdreProduction(
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // Choix du produit fini
+            // ① Produit fini et quantité
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 1) }
             item {
-                SelecteurProduitFini(
-                    selected = ui.selectedProduct,
-                    options = fabricables,
-                    onSelect = vm::selectFabricable,
+                MissaChampListe(
+                    libelle = stringResource(R.string.pro_produit_a_fabriquer),
+                    options = fabricables.map { it to it.nom },
+                    selection = ui.selectedProduct,
+                    onSelection = vm::selectFabricable,
+                    icone = Iv.Inventory2,
+                    requis = true,
+                )
+            }
+            item {
+                MissaChampTexte(
+                    valeur = quantiteTexte,
+                    onValeur = { saisie ->
+                        quantiteTexte = saisie
+                        saisie.toDoubleOrNull()?.let(vm::setQuantiteAProduire)
+                    },
+                    libelle = stringResource(R.string.pro_quantite_a_fabriquer),
+                    icone = Iv.LineWeight,
+                    clavier = MissaClavier.DECIMAL,
+                    requis = true,
                 )
             }
 
-            // Quantité à fabriquer
-            item {
-                OutlinedTextField(
-                    value = ui.quantiteAProduire.toString(),
-                    onValueChange = { s -> s.toDoubleOrNull()?.let(vm::setQuantiteAProduire) },
-                    label = { Text(stringResource(R.string.pro_quantite_a_fabriquer), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            // Nomenclature (BOM)
+            // ② Nomenclature (BOM)
             item {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
+                    MissaFormSectionTitre(
                         stringResource(R.string.pro_titre_nomenclature),
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MissaInk,
+                        numero = 2,
                         modifier = Modifier.weight(1f),
                     )
                     TextButton(onClick = { dialogueComposant = true }) {
@@ -394,24 +403,17 @@ private fun FormulaireOrdreProduction(
         }
 
         // Barre de lancement
-        Surface(shadowElevation = 8.dp, color = Color.White) {
-            Row(
-                Modifier.fillMaxWidth().padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                OutlinedButton(
-                    onClick = { vm.lancerOrdre(draft = true) },
-                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty() && !enregistrement,
-                    modifier = Modifier.weight(1f),
-                ) { Text(stringResource(R.string.ach_brouillon), color = MissaInk) }
-                Button(
-                    onClick = { vm.lancerOrdre(draft = false) },
-                    enabled = ui.selectedProduct != null && ui.composants.isNotEmpty() && !enregistrement,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = VioletProduction, contentColor = Color.White),
-                ) { Text(stringResource(R.string.pro_lancer_fabrication), color = Color.White) }
-            }
-        }
+        val ordreComplet = ui.selectedProduct != null && ui.composants.isNotEmpty() &&
+            (quantiteTexte.toDoubleOrNull() ?: 0.0) > 0.0
+        MissaFormPied(
+            texte = stringResource(R.string.pro_lancer_fabrication),
+            onValider = { vm.lancerOrdre(draft = false) },
+            actif = ordreComplet,
+            enCours = enregistrement,
+            secondaire = stringResource(R.string.ach_brouillon) to { vm.lancerOrdre(draft = true) },
+            secondaireActif = ordreComplet,
+        )
+    }
     }
 
     if (dialogueComposant) {
@@ -426,37 +428,6 @@ private fun FormulaireOrdreProduction(
     }
 }
 
-@Composable
-private fun SelecteurProduitFini(
-    selected: ProductWithStock?,
-    options: List<ProductWithStock>,
-    onSelect: (ProductWithStock) -> Unit,
-) {
-    var ouvert by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = selected?.nom ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.pro_produit_a_fabriquer), fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(Modifier.matchParentSize().clickable { ouvert = true })
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            options.forEach { prod ->
-                DropdownMenuItem(
-                    text = { Text(prod.nom, color = MissaInk) },
-                    onClick = {
-                        onSelect(prod)
-                        ouvert = false
-                    },
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun DialogueAjoutComposant(
@@ -466,59 +437,26 @@ private fun DialogueAjoutComposant(
 ) {
     var selectionne by remember { mutableStateOf(options.firstOrNull()) }
     var quantite by remember { mutableStateOf("1") }
-    var ouvert by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.pro_ajouter_composant), fontSize = 15.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = selectionne?.nom ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.pro_choisir_matiere), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-                        options.forEach { opt ->
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.pro_composant_stock_total, opt.nom, fmtQuantite(opt.total)), color = MissaInk) },
-                                onClick = {
-                                    selectionne = opt
-                                    ouvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = quantite,
-                    onValueChange = { quantite = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.pro_quantite_requise), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+    MissaFormDialogue(
+        titre = stringResource(R.string.pro_ajouter_composant),
+        icone = Iv.Inventory2,
+        couleur = AppModule.PRODUCTION.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = selectionne != null && (quantite.toDoubleOrNull() ?: 0.0) > 0.0,
+        onValider = {
+            selectionne?.let { prod -> onAjouter(prod, quantite.toDoubleOrNull() ?: 1.0) }
         },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    selectionne?.let { prod ->
-                        val q = quantite.toDoubleOrNull() ?: 1.0
-                        onAjouter(prod, q)
-                    }
-                },
-                enabled = selectionne != null && (quantite.toDoubleOrNull() ?: 0.0) > 0.0,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    ) {
+        MissaChampListe(
+            libelle = stringResource(R.string.pro_choisir_matiere),
+            options = options.map { it to stringResource(R.string.pro_composant_stock_total, it.nom, fmtQuantite(it.total)) },
+            selection = selectionne,
+            onSelection = { selectionne = it },
+            icone = Iv.Inventory2,
+            requis = true,
+        )
+        MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.pro_quantite_requise), icone = Iv.LineWeight, clavier = MissaClavier.DECIMAL, requis = true)
+    }
 }

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.missa.b360.R
+import com.missa.b360.core.util.Iso4217
 import com.missa.b360.core.domain.model.EcritureComptable
 import com.missa.b360.core.domain.model.RubriqueComptable
 import com.missa.b360.core.data.entity.AccountingAccountEntity
@@ -57,6 +58,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Palette ardoise du module Comptabilité — source unique : [AppModule.COMPTABILITE]. */
 private val GrisCompta: Color get() = AppModule.COMPTABILITE.couleur
@@ -127,7 +129,7 @@ fun ComptabiliteScreen(
             item {
                 Surface(shape = RoundedCornerShape(12.dp), color = GrisCompta.copy(alpha = 0.08f)) {
                     Text(
-                        "Les indicateurs ci-dessous sont des estimations issues des opérations métier. Ils ne sont pas des états financiers certifiés ni une déclaration fiscale.",
+                        stringResource(R.string.cpt_avertissement_estimations),
                         modifier = Modifier.padding(12.dp), fontSize = 11.sp, color = MissaMuted,
                     )
                 }
@@ -136,11 +138,11 @@ fun ComptabiliteScreen(
             item {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Registre comptable", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                        Text("Pièces persistées · débit = crédit · auditables", fontSize = 11.sp, color = MissaMuted)
+                        Text(stringResource(R.string.cpt_registre_titre), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                        Text(stringResource(R.string.cpt_registre_sous_titre), fontSize = 11.sp, color = MissaMuted)
                     }
                     if (registre.accounts.isNotEmpty()) {
-                        Button(onClick = { showCreateVoucher = true }) { Text("Nouvelle OD") }
+                        Button(onClick = { showCreateVoucher = true }) { Text(stringResource(R.string.cpt_nouvelle_od)) }
                     }
                 }
             }
@@ -160,18 +162,18 @@ fun ComptabiliteScreen(
                 item {
                     Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
                         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("Aucun plan comptable initialisé", fontWeight = FontWeight.SemiBold, color = MissaInk)
-                            Text("Le socle proposé est un point de départ à compléter selon le pays et le régime applicables. Il ne vaut pas certification SYSCOHADA.", fontSize = 11.sp, color = MissaMuted)
+                            Text(stringResource(R.string.cpt_aucun_plan), fontWeight = FontWeight.SemiBold, color = MissaInk)
+                            Text(stringResource(R.string.cpt_aucun_plan_desc), fontSize = 11.sp, color = MissaMuted)
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Button(onClick = { showProfileConfiguration = true }, modifier = Modifier.fillMaxWidth()) { Text("Configurer pays et régime") }
-                                Button(onClick = { vm.initialiserPlan() }, modifier = Modifier.fillMaxWidth()) { Text("Initialiser le socle SYSCOHADA") }
+                                Button(onClick = { showProfileConfiguration = true }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.cpt_configurer_profil)) }
+                                Button(onClick = { vm.initialiserPlan() }, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.cpt_initialiser_socle)) }
                             }
                         }
                     }
                 }
             } else {
                 if (registre.vouchers.isEmpty()) {
-                    item { Text("Aucune pièce comptable pour l'instant.", fontSize = 12.sp, color = MissaMuted) }
+                    item { Text(stringResource(R.string.cpt_aucune_piece), fontSize = 12.sp, color = MissaMuted) }
                 } else {
                     items(registre.vouchers, key = { "ledger-${it.id}" }) { voucher ->
                         CartePieceComptable(voucher, devise, onPost = { vm.comptabiliser(voucher.id) })
@@ -256,7 +258,7 @@ fun ComptabiliteScreen(
                                 modifier = Modifier.weight(1f),
                             )
                             Text(
-                                "Taux : ${synthese.tauxTva} %",
+                                stringResource(R.string.cpt_taux_x, synthese.tauxTva.toString()),
                                 fontSize = 11.sp,
                                 color = MissaMuted,
                             )
@@ -351,28 +353,48 @@ private fun AccountingProfileDialog(
 ) {
     var country by remember(countryInitial) { mutableStateOf(countryInitial) }
     var regime by remember(regimeInitial) { mutableStateOf(regimeInitial) }
-    var month by remember(exerciceInitial) { mutableStateOf(exerciceInitial.toString()) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Profil comptable") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Référentiel : SYSCOHADA révisé (socle de départ)", fontSize = 12.sp, color = MissaMuted)
-                OutlinedTextField(
-                    value = country,
-                    onValueChange = { country = it.uppercase().take(2) },
-                    label = { Text("Code pays ISO (2 lettres)") }, singleLine = true,
-                )
-                OutlinedTextField(value = regime, onValueChange = { regime = it.take(80) }, label = { Text("Régime fiscal (libellé)") }, singleLine = true)
-                OutlinedTextField(value = month, onValueChange = { month = it.filter { character -> character.isDigit() }.take(2) }, label = { Text("Mois de début d'exercice (1–12)") }, singleLine = true)
-                Text("Le pays/régime est enregistré pour la configuration. Les règles et déclarations fiscales nationales restent à valider séparément.", fontSize = 10.sp, color = MissaMuted)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { month.toIntOrNull()?.let { onSave(country, regime, it) } }) { Text("Enregistrer") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } },
-    )
+    var month by remember(exerciceInitial) { mutableStateOf(exerciceInitial.coerceIn(1, 12)) }
+    val locale = Locale.getDefault()
+    val pays = remember(locale) { Iso4217.paysDisponibles(locale) }
+    // Noms de mois fournis par le système, donc déjà traduits dans la langue active.
+    val mois = remember(locale) {
+        java.text.DateFormatSymbols.getInstance(locale).months.take(12)
+            .mapIndexed { i, nom -> (i + 1) to nom.replaceFirstChar { it.titlecase(locale) } }
+    }
+
+    MissaFormDialogue(
+        titre = stringResource(R.string.cpt_profil_titre),
+        sousTitre = stringResource(R.string.cpt_profil_referentiel),
+        icone = Iv.Calculator,
+        couleur = AppModule.COMPTABILITE.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = country.length == 2,
+        onValider = { onSave(country, regime.trim(), month) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_fiscalite), numero = 1) {
+            MissaChampListe(
+                libelle = stringResource(R.string.cpt_profil_pays),
+                options = pays.map { it.code to it.nom },
+                selection = country,
+                onSelection = { country = it },
+                icone = Iv.Public,
+                requis = true,
+            )
+            MissaChampTexte(regime, { regime = it }, stringResource(R.string.cpt_profil_regime), icone = Iv.Gavel, longueurMax = 80)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_periode), numero = 2) {
+            MissaChampListe(
+                libelle = stringResource(R.string.cpt_profil_mois),
+                options = mois,
+                selection = month,
+                onSelection = { month = it },
+                icone = Iv.Calendar,
+                requis = true,
+                aide = stringResource(R.string.cpt_profil_avertissement),
+            )
+        }
+    }
 }
 
 @Composable
@@ -386,46 +408,44 @@ private fun NouvelleEcritureDialog(
     var amountText by remember { mutableStateOf("") }
     var debitId by remember(accounts) { mutableStateOf(accounts.firstOrNull { it.postable && it.active }?.id ?: 0L) }
     var creditId by remember(accounts) { mutableStateOf(accounts.firstOrNull { it.postable && it.active && it.id != debitId }?.id ?: 0L) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Nouvelle pièce OD") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Libellé") }, singleLine = true)
-                AccountPicker("Compte débité", accounts.filter { it.active && it.postable }, debitId) { debitId = it }
-                AccountPicker("Compte crédité", accounts.filter { it.active && it.postable }, creditId) { creditId = it }
-                OutlinedTextField(value = amountText, onValueChange = { amountText = it.replace(',', '.') }, label = { Text("Montant ($devise)") }, singleLine = true)
-                Text("La pièce reste en brouillon jusqu'à sa validation par un utilisateur autorisé.", fontSize = 11.sp, color = MissaMuted)
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                val amount = amountText.toDoubleOrNull()
-                if (amount != null && debitId > 0 && creditId > 0) onCreate(description, debitId, creditId, amount)
-            }) { Text("Créer le brouillon") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annuler") } },
-    )
-}
+    val comptes = accounts.filter { it.active && it.postable }.map { it.id to "${it.code} — ${it.name}" }
+    val montant = amountText.toDoubleOrNull() ?: 0.0
+    val comptesDistincts = debitId > 0 && creditId > 0 && debitId != creditId
 
-@Composable
-private fun AccountPicker(label: String, accounts: List<AccountingAccountEntity>, selectedId: Long, onSelect: (Long) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    val selected = accounts.firstOrNull { it.id == selectedId }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = selected?.let { "${it.code} — ${it.name}" } ?: "Choisir un compte",
-            onValueChange = {}, readOnly = true, label = { Text(label) }, singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(Modifier.matchParentSize().clickable { expanded = true })
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            accounts.forEach { account ->
-                DropdownMenuItem(
-                    text = { Text("${account.code} — ${account.name}") },
-                    onClick = { onSelect(account.id); expanded = false },
-                )
-            }
+    MissaFormDialogue(
+        titre = stringResource(R.string.cpt_od_titre),
+        sousTitre = stringResource(R.string.cpt_od_brouillon_note),
+        icone = Iv.Description,
+        couleur = AppModule.COMPTABILITE.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.cpt_od_creer),
+        validerActif = description.isNotBlank() && montant > 0.0 && comptesDistincts,
+        onValider = { onCreate(description.trim(), debitId, creditId, montant) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 1) {
+            MissaChampTexte(description, { description = it }, stringResource(R.string.cpt_od_libelle), icone = Iv.Description, requis = true)
+            MissaChampTexte(amountText, { amountText = it }, stringResource(R.string.cpt_od_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_comptes), numero = 2) {
+            MissaChampListe(
+                libelle = stringResource(R.string.cpt_od_debit),
+                options = comptes,
+                selection = debitId.takeIf { it > 0 },
+                onSelection = { debitId = it },
+                icone = Iv.TrendingUp,
+                requis = true,
+                placeholder = stringResource(R.string.cpt_od_choisir_compte),
+            )
+            MissaChampListe(
+                libelle = stringResource(R.string.cpt_od_credit),
+                options = comptes,
+                selection = creditId.takeIf { it > 0 },
+                onSelection = { creditId = it },
+                icone = Iv.TrendingDown,
+                requis = true,
+                placeholder = stringResource(R.string.cpt_od_choisir_compte),
+                erreur = if (debitId > 0 && debitId == creditId) stringResource(R.string.cpt_od_erreur_meme_compte) else null,
+            )
         }
     }
 }
@@ -438,12 +458,12 @@ private fun CartePieceComptable(voucher: AccountingVoucherEntity, devise: String
         Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(voucher.reference, modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MissaInk)
-                Text(if (posted) "COMPTABILISÉE" else "BROUILLON", fontSize = 10.sp, color = if (posted) Color(0xFF15803D) else Color(0xFFB45309))
+                Text(stringResource(if (posted) R.string.cpt_statut_comptabilisee else R.string.cpt_statut_brouillon), fontSize = 10.sp, color = if (posted) Color(0xFF15803D) else Color(0xFFB45309))
             }
             Text(voucher.description, fontSize = 12.sp, color = MissaInk)
-            Text("$dateLabel · ${voucher.sourceModule ?: "—"} · Débit ${fmtValeur(voucher.totalDebit, devise)} / Crédit ${fmtValeur(voucher.totalCredit, devise)}", fontSize = 10.sp, color = MissaMuted)
+            Text(stringResource(R.string.cpt_piece_ligne, dateLabel, voucher.sourceModule ?: "—", fmtValeur(voucher.totalDebit, devise), fmtValeur(voucher.totalCredit, devise)), fontSize = 10.sp, color = MissaMuted)
             if (voucher.status == AccountingVoucherStatus.DRAFT.name || voucher.status == AccountingVoucherStatus.TO_VALIDATE.name) {
-                Button(onClick = onPost) { Text("Valider et comptabiliser") }
+                Button(onClick = onPost) { Text(stringResource(R.string.cpt_valider_comptabiliser)) }
             }
         }
     }

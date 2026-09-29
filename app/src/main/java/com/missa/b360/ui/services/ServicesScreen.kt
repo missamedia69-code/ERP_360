@@ -66,6 +66,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Rose fuchsia caractéristique du module Services — source unique : [AppModule.SERVICES]. */
 private val RoseServices: Color get() = AppModule.SERVICES.couleur
@@ -591,86 +592,54 @@ private fun DialogueNouvellePrestation(
     var heures by remember { mutableStateOf("1") }
     var intervenant by remember { mutableStateOf("") }
     var lieu by remember { mutableStateOf("") }
-    var ouvert by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.srv_nouvelle_prestation), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = clientChoisi?.nom ?: stringResource(R.string.sales_select_client),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.clients_flow_contact), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-                        clients.forEach { cl ->
-                            DropdownMenuItem(
-                                text = { Text(cl.nom, color = MissaInk) },
-                                onClick = {
-                                    clientChoisi = cl
-                                    ouvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = intitule,
-                    onValueChange = { intitule = it },
-                    label = { Text(stringResource(R.string.srv_champ_intitule), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    ModeFacturation.entries.forEach { m ->
-                        FilterChip(
-                            selected = mode == m,
-                            onClick = { mode = m },
-                            label = { Text(stringResource(m.libelleRes), fontSize = 11.sp) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = RoseServices.copy(alpha = 0.2f)),
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = tarif,
-                    onValueChange = { tarif = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(if (mode == ModeFacturation.FORFAIT) R.string.srv_champ_forfait else R.string.srv_champ_tarif_horaire), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
+    MissaFormDialogue(
+        titre = stringResource(R.string.srv_nouvelle_prestation),
+        icone = Iv.RequestQuote,
+        couleur = AppModule.SERVICES.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = intitule.isNotBlank() && (tarif.toDoubleOrNull() ?: 0.0) > 0.0,
+        enCours = enCours,
+        onValider = { onValider(clientChoisi, intitule.trim(), mode, tarif, heures, intervenant.trim(), lieu.trim()) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampListe(
+                libelle = stringResource(R.string.form_client),
+                options = clients.map { it to it.nom },
+                selection = clientChoisi,
+                onSelection = { clientChoisi = it },
+                icone = Iv.Person,
+                placeholder = stringResource(R.string.sales_select_client),
+            )
+            MissaChampTexte(intitule, { intitule = it }, stringResource(R.string.srv_champ_intitule), icone = Iv.RequestQuote, requis = true)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_prix), numero = 2) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(ModeFacturation.FORFAIT, stringResource(ModeFacturation.FORFAIT.libelleRes), Iv.Payments),
+                    MissaTuile(ModeFacturation.HORAIRE, stringResource(ModeFacturation.HORAIRE.libelleRes), Iv.Schedule),
+                ),
+                selection = mode,
+                onSelection = { mode = it },
+                colonnes = 2,
+            )
+            MissaRangee {
+                MissaChampTexte(
+                    tarif, { tarif = it },
+                    stringResource(if (mode == ModeFacturation.FORFAIT) R.string.srv_champ_forfait else R.string.srv_champ_tarif_horaire),
+                    modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true,
                 )
                 if (mode == ModeFacturation.HORAIRE) {
-                    OutlinedTextField(
-                        value = heures,
-                        onValueChange = { heures = it.filter { c -> c.isDigit() || c == '.' } },
-                        label = { Text(stringResource(R.string.srv_champ_heures_prevues), fontSize = 11.sp) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    MissaChampTexte(heures, { heures = it }, stringResource(R.string.srv_champ_heures_prevues), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.DECIMAL)
                 }
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(clientChoisi, intitule, mode, tarif, heures, intervenant, lieu) },
-                enabled = intitule.isNotBlank() && (tarif.toDoubleOrNull() ?: 0.0) > 0.0 && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_planification), numero = 3) {
+            MissaChampTexte(intervenant, { intervenant = it }, stringResource(R.string.form_intervenant), icone = Iv.Person)
+            MissaChampTexte(lieu, { lieu = it }, stringResource(R.string.form_lieu), icone = Iv.Place)
+        }
+    }
 }
 
 @Composable
@@ -681,28 +650,15 @@ private fun DialogueAjusterHeures(
 ) {
     var heures by remember { mutableStateOf(prestation.payload.heures.toString()) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.srv_titre_ajuster_heures), fontSize = 15.sp) },
-        text = {
-            OutlinedTextField(
-                value = heures,
-                onValueChange = { heures = it.filter { c -> c.isDigit() || c == '.' } },
-                label = { Text(stringResource(R.string.srv_champ_heures_passees), fontSize = 11.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true,
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth(),
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(heures) },
-                enabled = (heures.toDoubleOrNull() ?: 0.0) >= 0.0,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.srv_titre_ajuster_heures),
+        icone = Iv.Schedule,
+        couleur = AppModule.SERVICES.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = heures.toDoubleOrNull() != null,
+        onValider = { onValider(heures) },
+    ) {
+        MissaChampTexte(heures, { heures = it }, stringResource(R.string.srv_champ_heures_passees), icone = Iv.Schedule, clavier = MissaClavier.DECIMAL, requis = true)
+    }
 }

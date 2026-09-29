@@ -1,42 +1,13 @@
 package com.missa.b360.ui.tresorerie
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.CategorieTresorerie
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
@@ -45,11 +16,20 @@ import com.missa.b360.core.data.entity.TypeCompteTresorerie
 import com.missa.b360.core.domain.model.SoldeCompte
 import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.util.MoneyUtils
-import com.missa.b360.ui.components.MissaOption
-import com.missa.b360.ui.components.MissaSelecteurBleu
+import com.missa.b360.ui.components.*
 import com.missa.b360.ui.icons.Iv
-import com.missa.b360.ui.theme.MissaInk
-import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.navigation.AppModule
+
+private fun iconeType(type: TypeCompteTresorerie): Int = when (type) {
+    TypeCompteTresorerie.CAISSE -> Iv.Savings
+    TypeCompteTresorerie.BANQUE -> Iv.Bank
+    TypeCompteTresorerie.MOBILE_MONEY -> Iv.Smartphone
+    TypeCompteTresorerie.CHEQUE_A_ENCAISSER -> Iv.RequestQuote
+    TypeCompteTresorerie.CHEQUE_A_PAYER -> Iv.Description
+    TypeCompteTresorerie.COMPTE_TRANSIT -> Iv.SwapHoriz
+    TypeCompteTresorerie.PORTEFEUILLE_NUMERIQUE -> Iv.Payments
+    TypeCompteTresorerie.AUTRE -> Iv.MoreHoriz
+}
 
 /** Création d'un compte de trésorerie. */
 @Composable
@@ -65,77 +45,40 @@ internal fun TreCompteDialogue(
     var soldeInitial by remember { mutableStateOf("") }
     val nomValide = TresorerieRules.libelleValide(nom)
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.tre_nouveau_compte), fontSize = 16.sp) },
-        text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(9.dp),
-            ) {
-                TreChamps(
-                    valeur = nom,
-                    onValeur = { nom = it },
-                    labelRes = R.string.tre_champ_nom,
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    TypeCompteTresorerie.entries.toList().chunked(2).forEach { range ->
-                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            range.forEach { candidat ->
-                                FilterChip(
-                                    selected = type == candidat,
-                                    onClick = { type = candidat },
-                                    label = {
-                                        Text(
-                                            stringResource(TresorerieRules.libelleType(candidat)),
-                                            fontSize = 10.sp,
-                                            maxLines = 1,
-                                        )
-                                    },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = Color(0xFF1E3A8A).copy(alpha = 0.15f),
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                }
-                // Établissement et numéro n'ont de sens que hors espèces.
-                if (type != TypeCompteTresorerie.CAISSE) {
-                    TreChamps(
-                        valeur = etablissement,
-                        onValeur = { etablissement = it },
-                        labelRes = R.string.tre_champ_etablissement,
-                    )
-                    TreChamps(
-                        valeur = numero,
-                        onValeur = { numero = it },
-                        labelRes = R.string.tre_champ_numero,
-                    )
-                }
-                TreChamps(
-                    valeur = soldeInitial,
-                    onValeur = { soldeInitial = it },
-                    labelRes = R.string.tre_champ_solde_initial,
-                    numerique = true,
-                )
-                Text(
-                    text = stringResource(R.string.tre_solde_initial_aide),
-                    fontSize = 10.5.sp,
-                    color = MissaMuted,
-                )
+    MissaFormDialogue(
+        titre = stringResource(R.string.tre_nouveau_compte),
+        icone = Iv.Bank,
+        couleur = AppModule.TRESORERIE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nomValide,
+        enCours = enCours,
+        onValider = { onValider(nom.trim(), type, etablissement.trim(), numero.trim(), soldeInitial) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
+            MissaChoixTuiles(
+                options = TypeCompteTresorerie.entries.map {
+                    MissaTuile(it, stringResource(TresorerieRules.libelleType(it)), iconeType(it))
+                },
+                selection = type,
+                onSelection = { type = it },
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 2) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.tre_champ_nom), icone = iconeType(type), requis = true)
+            // Établissement et numéro n'ont de sens que hors espèces.
+            if (type != TypeCompteTresorerie.CAISSE) {
+                MissaChampTexte(etablissement, { etablissement = it }, stringResource(R.string.tre_champ_etablissement), icone = Iv.AccountBalance)
+                MissaChampTexte(numero, { numero = it }, stringResource(R.string.tre_champ_numero), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE)
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(nom, type, etablissement, numero, soldeInitial) },
-                enabled = nomValide && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 3) {
+            MissaChampTexte(
+                soldeInitial, { soldeInitial = it }, stringResource(R.string.tre_champ_solde_initial),
+                icone = Iv.Payments, clavier = MissaClavier.DECIMAL, aide = stringResource(R.string.tre_solde_initial_aide),
+            )
+        }
+    }
 }
 
 /** Encaissement ou décaissement sur un compte. */
@@ -185,134 +128,57 @@ internal fun TreMouvementDialogue(
         TresorerieRules.libelleValide(libelle) &&
         compteId != 0L
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = {
-            Text(
-                stringResource(
-                    if (sens == SensMouvement.IN) {
-                        R.string.tre_encaissement
-                    } else {
-                        R.string.tre_decaissement
-                    },
+    MissaFormDialogue(
+        titre = stringResource(if (sens == SensMouvement.IN) R.string.tre_encaissement else R.string.tre_decaissement),
+        icone = if (sens == SensMouvement.IN) Iv.TrendingUp else Iv.TrendingDown,
+        couleur = AppModule.TRESORERIE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = saisieValide,
+        enCours = enCours,
+        onValider = { onValider(compteId, sens, montant, libelle.trim(), categorie, tiers.trim(), "", reference.trim()) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(SensMouvement.IN, stringResource(R.string.tre_sens_entree), Iv.TrendingUp),
+                    MissaTuile(SensMouvement.OUT, stringResource(R.string.tre_sens_sortie), Iv.TrendingDown),
                 ),
-                fontSize = 16.sp,
+                selection = sens,
+                onSelection = { sens = it },
+                colonnes = 2,
             )
-        },
-        text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(9.dp),
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    SensMouvement.entries.forEach { candidat ->
-                        FilterChip(
-                            selected = sens == candidat,
-                            onClick = { sens = candidat },
-                            label = {
-                                Text(
-                                    stringResource(
-                                        if (candidat == SensMouvement.IN) {
-                                            R.string.tre_sens_entree
-                                        } else {
-                                            R.string.tre_sens_sortie
-                                        },
-                                    ),
-                                    fontSize = 11.5.sp,
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF1E3A8A).copy(alpha = 0.15f),
-                            ),
-                        )
-                    }
-                }
-                MissaSelecteurBleu(
-                    label = stringResource(R.string.tre_champ_compte),
-                    options = comptes.map {
-                        MissaOption(
-                            cle = it.id.toString(),
-                            titre = it.nom,
-                            sousTitre = it.etablissement,
-                            badge = stringResource(
-                                TresorerieRules.libelleType(TresorerieRules.typeCompte(it.type)),
-                            ),
-                        )
-                    },
-                    selectionCle = compteId.takeIf { it != 0L }?.toString(),
-                    onSelection = { compteId = it.toLongOrNull() ?: 0L },
-                )
-                if (comptes.isEmpty() && onNouveauCompte != null) {
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = Color(0xFF1E3A8A).copy(alpha = 0.12f),
-                        modifier = Modifier.fillMaxWidth().clickable { onNouveauCompte() },
-                    ) {
-                        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.tre_aucun_compte),
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MissaInk,
-                                )
-                                Text(
-                                    stringResource(R.string.tre_creer_compte_invite),
-                                    fontSize = 10.sp,
-                                    color = MissaInk.copy(alpha = 0.8f),
-                                )
-                            }
-                        }
-                    }
-                }
-                TreChamps(
-                    valeur = montant,
-                    onValeur = { montant = it },
-                    labelRes = R.string.tre_champ_montant,
-                    numerique = true,
-                )
-                TreChamps(
-                    valeur = libelle,
-                    onValeur = { libelle = it },
-                    labelRes = R.string.tre_champ_libelle,
-                )
-                MissaSelecteurBleu(
-                    label = stringResource(R.string.tre_champ_categorie),
-                    options = categories.map {
-                        MissaOption(
-                            cle = it.name,
-                            titre = stringResource(TresorerieRules.libelleCategorie(it)),
-                        )
-                    },
-                    selectionCle = categorie.name,
-                    onSelection = { cle -> categorie = TresorerieRules.categorie(cle) },
-                )
-                TreChamps(
-                    valeur = tiers,
-                    onValeur = { tiers = it },
-                    labelRes = R.string.tre_champ_tiers,
-                )
-                TreChamps(
-                    valeur = reference,
-                    onValeur = { reference = it },
-                    labelRes = R.string.tre_champ_reference,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onValider(compteId, sens, montant, libelle, categorie, tiers, "", reference)
+            MissaChampListe(
+                libelle = stringResource(R.string.tre_champ_compte),
+                options = comptes.map { compte ->
+                    compte.id to "${compte.nom} · ${stringResource(TresorerieRules.libelleType(TresorerieRules.typeCompte(compte.type)))}"
                 },
-                enabled = saisieValide && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+                selection = compteId.takeIf { it != 0L },
+                onSelection = { compteId = it },
+                icone = Iv.Bank,
+                requis = true,
+                aide = if (comptes.isEmpty()) stringResource(R.string.tre_creer_compte_invite) else null,
+                actionNouveau = onNouveauCompte?.let { stringResource(R.string.tre_nouveau_compte) to it },
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 2) {
+            MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true)
+            MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true)
+            MissaChampListe(
+                libelle = stringResource(R.string.tre_champ_categorie),
+                options = categories.map { it to stringResource(TresorerieRules.libelleCategorie(it)) },
+                selection = categorie,
+                onSelection = { categorie = it },
+                icone = Iv.Category,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 3) {
+            MissaRangee {
+                MissaChampTexte(tiers, { tiers = it }, stringResource(R.string.tre_champ_tiers), modifier = Modifier.weight(1f), icone = Iv.Person)
+                MissaChampTexte(reference, { reference = it }, stringResource(R.string.tre_champ_reference), modifier = Modifier.weight(1f), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE)
+            }
+        }
+    }
 }
 
 /** Virement interne entre deux comptes. */
@@ -336,85 +202,42 @@ internal fun TreVirementDialogue(
         TresorerieRules.libelleValide(libelle)
 
     fun options(exclu: Long) = comptes.filter { it.id != exclu }.map { compte ->
-        MissaOption(
-            cle = compte.id.toString(),
-            titre = compte.nom,
-            badge = soldes.firstOrNull { it.compte.id == compte.id }
-                ?.let { MoneyUtils.format(it.solde, devise) },
-        )
+        val solde = soldes.firstOrNull { it.compte.id == compte.id }?.let { MoneyUtils.format(it.solde, devise) }
+        compte.id to (if (solde != null) "${compte.nom} · $solde" else compte.nom)
     }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.tre_virement), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                MissaSelecteurBleu(
-                    label = stringResource(R.string.tre_champ_source),
-                    options = options(destinationId),
-                    selectionCle = sourceId.takeIf { it != 0L }?.toString(),
-                    onSelection = { sourceId = it.toLongOrNull() ?: 0L },
-                )
-                MissaSelecteurBleu(
-                    label = stringResource(R.string.tre_champ_destination),
-                    options = options(sourceId),
-                    selectionCle = destinationId.takeIf { it != 0L }?.toString(),
-                    onSelection = { destinationId = it.toLongOrNull() ?: 0L },
-                )
-                TreChamps(
-                    valeur = montant,
-                    onValeur = { montant = it },
-                    labelRes = R.string.tre_champ_montant,
-                    numerique = true,
-                )
-                TreChamps(
-                    valeur = libelle,
-                    onValeur = { libelle = it },
-                    labelRes = R.string.tre_champ_libelle,
-                )
-                Text(
-                    text = stringResource(R.string.tre_virement_aide),
-                    fontSize = 10.5.sp,
-                    color = MissaMuted,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(sourceId, destinationId, montant, libelle) },
-                enabled = valide && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
-}
-
-/** Champ de saisie compact commun aux trois dialogues. */
-@Composable
-private fun TreChamps(
-    valeur: String,
-    onValeur: (String) -> Unit,
-    labelRes: Int,
-    numerique: Boolean = false,
-) {
-    OutlinedTextField(
-        value = valeur,
-        onValueChange = { saisie ->
-            // Sur un champ monétaire, seuls chiffres et séparateur décimal passent :
-            // filtrer à la frappe évite un message d'erreur après coup.
-            onValeur(
-                if (numerique) saisie.filter { it.isDigit() || it == ',' || it == '.' } else saisie,
+    MissaFormDialogue(
+        titre = stringResource(R.string.tre_virement),
+        sousTitre = stringResource(R.string.tre_virement_aide),
+        icone = Iv.SwapHoriz,
+        couleur = AppModule.TRESORERIE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = valide,
+        enCours = enCours,
+        onValider = { onValider(sourceId, destinationId, montant, libelle.trim()) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_comptes), numero = 1) {
+            MissaChampListe(
+                libelle = stringResource(R.string.tre_champ_source),
+                options = options(destinationId),
+                selection = sourceId.takeIf { it != 0L },
+                onSelection = { sourceId = it },
+                icone = Iv.TrendingDown,
+                requis = true,
             )
-        },
-        label = { Text(stringResource(labelRes), fontSize = 12.sp) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = if (numerique) KeyboardType.Decimal else KeyboardType.Text,
-        ),
-        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.fillMaxWidth(),
-    )
+            MissaChampListe(
+                libelle = stringResource(R.string.tre_champ_destination),
+                options = options(sourceId),
+                selection = destinationId.takeIf { it != 0L },
+                onSelection = { destinationId = it },
+                icone = Iv.TrendingUp,
+                requis = true,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 2) {
+            MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise)
+            MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true)
+        }
+    }
 }
