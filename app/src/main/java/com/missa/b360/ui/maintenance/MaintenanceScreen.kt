@@ -63,6 +63,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Rouge brique caractéristique du module Maintenance — source unique : [AppModule.MAINTENANCE]. */
 private val RougeMaintenance: Color get() = AppModule.MAINTENANCE.couleur
@@ -265,49 +266,38 @@ private fun DialogueNouvelEquipement(
     var code by remember { mutableStateOf("") }
     var periodicite by remember { mutableStateOf("30") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.mai_ajouter_equipement), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text(stringResource(R.string.mai_champ_nom), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TypeEquipement.entries.take(3).forEach { t ->
-                        FilterChip(
-                            selected = type == t,
-                            onClick = { type = t },
-                            label = { Text(t.name, fontSize = 10.sp) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = RougeMaintenance.copy(alpha = 0.2f)),
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = periodicite,
-                    onValueChange = { periodicite = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.mai_champ_periodicite_jours), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(nom, type, code, periodicite) },
-                enabled = nom.isNotBlank() && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.mai_ajouter_equipement),
+        icone = Iv.HammerWrench,
+        couleur = AppModule.MAINTENANCE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nom.isNotBlank() && (periodicite.toIntOrNull() ?: 0) > 0,
+        enCours = enCours,
+        onValider = { onValider(nom.trim(), type, code.trim(), periodicite) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.mai_champ_nom), icone = Iv.Build, requis = true)
+            MissaChampTexte(code, { code = it }, stringResource(R.string.form_code_inventaire), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 2) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(TypeEquipement.MACHINE, stringResource(R.string.mai_type_machine), Iv.Factory),
+                    MissaTuile(TypeEquipement.VEHICULE, stringResource(R.string.mai_type_vehicule), Iv.LocalShipping),
+                    MissaTuile(TypeEquipement.INSTALLATION, stringResource(R.string.mai_type_installation), Iv.Construction),
+                    MissaTuile(TypeEquipement.OUTILLAGE, stringResource(R.string.mai_type_outillage), Iv.HammerWrench),
+                    MissaTuile(TypeEquipement.INFORMATIQUE, stringResource(R.string.mai_type_informatique), Iv.Smartphone),
+                ),
+                selection = type,
+                onSelection = { type = it },
+                colonnes = 3,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_planification), numero = 3) {
+            MissaChampTexte(periodicite, { periodicite = it }, stringResource(R.string.mai_champ_periodicite_jours), icone = Iv.Schedule, clavier = MissaClavier.ENTIER, requis = true)
+        }
+    }
 }
 
 @Composable
@@ -323,46 +313,34 @@ private fun DialogueIntervention(
     var duree by remember { mutableStateOf("1") }
     var technicien by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text("${stringResource(R.string.mai_intervention_sur)} ${equipement.nom}", fontSize = 15.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    TypeIntervention.entries.forEach { t ->
-                        FilterChip(
-                            selected = type == t,
-                            onClick = { type = t },
-                            label = { Text(t.name, fontSize = 11.sp) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = RougeMaintenance.copy(alpha = 0.2f)),
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.mai_champ_description_travaux), fontSize = 11.sp) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = cout,
-                    onValueChange = { cout = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.mai_champ_cout_pieces), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+    MissaFormDialogue(
+        titre = "${stringResource(R.string.mai_intervention_sur)} ${equipement.nom}",
+        icone = Iv.Build,
+        couleur = AppModule.MAINTENANCE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = description.isNotBlank(),
+        enCours = enCours,
+        onValider = { onValider(type, description.trim(), cout, duree, technicien.trim()) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(TypeIntervention.PREVENTIVE, stringResource(R.string.mai_type_preventive), Iv.Calendar),
+                    MissaTuile(TypeIntervention.CORRECTIVE, stringResource(R.string.mai_type_corrective), Iv.Build),
+                ),
+                selection = type,
+                onSelection = { type = it },
+                colonnes = 2,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 2) {
+            MissaChampTexte(description, { description = it }, stringResource(R.string.mai_champ_description_travaux), icone = Iv.Description, requis = true, lignes = 3)
+            MissaChampTexte(technicien, { technicien = it }, stringResource(R.string.form_technicien), icone = Iv.Person)
+            MissaRangee {
+                MissaChampTexte(duree, { duree = it }, stringResource(R.string.form_duree_heures), modifier = Modifier.weight(1f), icone = Iv.Schedule, clavier = MissaClavier.DECIMAL)
+                MissaChampTexte(cout, { cout = it }, stringResource(R.string.mai_champ_cout_pieces), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(type, description, cout, duree, technicien) },
-                enabled = description.isNotBlank() && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+        }
+    }
 }

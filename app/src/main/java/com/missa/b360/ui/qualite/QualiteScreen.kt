@@ -62,6 +62,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Pourpre caractéristique du module Qualité — source unique : [AppModule.QUALITE]. */
 private val PourpreQualite: Color get() = AppModule.QUALITE.couleur
@@ -273,54 +274,45 @@ private fun DialogueNouvelleNc(
     var responsable by remember { mutableStateOf("") }
     var cout by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.qua_declarer_ecart), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = titre,
-                    onValueChange = { titre = it },
-                    label = { Text(stringResource(R.string.qua_champ_titre), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    GraviteNc.entries.forEach { g ->
-                        FilterChip(
-                            selected = gravite == g,
-                            onClick = { gravite = g },
-                            label = { Text(g.name, fontSize = 10.5.sp) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = PourpreQualite.copy(alpha = 0.2f)),
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.qua_champ_description), fontSize = 11.sp) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = cout,
-                    onValueChange = { cout = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.qua_champ_cout_estime), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(titre, gravite, origine, description, responsable, cout) },
-                enabled = titre.isNotBlank() && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.qua_declarer_ecart),
+        icone = Iv.QualityBadge,
+        couleur = AppModule.QUALITE.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = titre.isNotBlank(),
+        enCours = enCours,
+        onValider = { onValider(titre.trim(), gravite, origine, description.trim(), responsable.trim(), cout) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(titre, { titre = it }, stringResource(R.string.qua_champ_titre), icone = Iv.Warning, requis = true)
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(GraviteNc.MINEURE, stringResource(R.string.qua_gravite_mineure), Iv.Info),
+                    MissaTuile(GraviteNc.MAJEURE, stringResource(R.string.qua_gravite_majeure), Iv.Warning),
+                    MissaTuile(GraviteNc.CRITIQUE, stringResource(R.string.qua_gravite_critique), Iv.Prohibit),
+                ),
+                selection = gravite,
+                onSelection = { gravite = it },
+                colonnes = 3,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_origine), numero = 2) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile(OrigineNc.PRODUCTION, stringResource(R.string.qua_origine_production), Iv.Factory),
+                    MissaTuile(OrigineNc.RECEPTION, stringResource(R.string.qua_origine_reception), Iv.LocalShipping),
+                    MissaTuile(OrigineNc.CLIENT, stringResource(R.string.qua_origine_client), Iv.Person),
+                    MissaTuile(OrigineNc.INTERNE, stringResource(R.string.qua_origine_interne), Iv.Business),
+                ),
+                selection = origine,
+                onSelection = { origine = it },
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 3) {
+            MissaChampTexte(description, { description = it }, stringResource(R.string.qua_champ_description), icone = Iv.Description, lignes = 3)
+            MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.form_responsable), icone = Iv.Person)
+            MissaChampTexte(cout, { cout = it }, stringResource(R.string.qua_champ_cout_estime), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        }
+    }
 }

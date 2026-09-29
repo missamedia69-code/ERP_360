@@ -47,6 +47,7 @@ import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.components.*
 
 private val BleuSites: Color get() = AppModule.LOGISTIQUE.couleur
 
@@ -322,52 +323,36 @@ private fun DialogueNouveauSite(
     onValider: (String, String?, String, Boolean) -> Unit,
 ) {
     var nom by remember { mutableStateOf("") }
+    // Valeurs persistées telles quelles (le filtre du registre compare "Boutique" / "Entrepôt").
     var type by remember { mutableStateOf("Boutique") }
     var adresse by remember { mutableStateOf("") }
     var principal by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.sites_nouveau_site), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text(stringResource(R.string.sites_champ_nom), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = type,
-                    onValueChange = { type = it },
-                    label = { Text(stringResource(R.string.sites_champ_type), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = adresse,
-                    onValueChange = { adresse = it },
-                    label = { Text(stringResource(R.string.sites_champ_adresse), fontSize = 11.sp) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = principal, onCheckedChange = { principal = it })
-                    Text(stringResource(R.string.sites_champ_principal), fontSize = 12.sp, color = MissaInk)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(nom, adresse, type, principal) },
-                enabled = nom.isNotBlank(),
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.sites_nouveau_site),
+        sousTitre = stringResource(R.string.sites_form_sous_titre),
+        icone = Iv.Store,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nom.isNotBlank(),
+        onValider = { onValider(nom.trim(), adresse.trim().ifBlank { null }, type, principal) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.sites_champ_nom), icone = Iv.Store, requis = true)
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile("Boutique", stringResource(R.string.form_site_boutique), Iv.Storefront),
+                    MissaTuile("Entrepôt", stringResource(R.string.form_site_entrepot), Iv.Warehouse),
+                    MissaTuile("Usine", stringResource(R.string.form_site_usine), Iv.Factory),
+                    MissaTuile("Bureau", stringResource(R.string.form_site_bureau), Iv.Business),
+                ),
+                selection = type,
+                onSelection = { type = it },
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_localisation), numero = 2) {
+            MissaChampTexte(adresse, { adresse = it }, stringResource(R.string.sites_champ_adresse), icone = Iv.Place, lignes = 2)
+            MissaCaseACocher(principal, { principal = it }, stringResource(R.string.sites_champ_principal))
+        }
+    }
 }

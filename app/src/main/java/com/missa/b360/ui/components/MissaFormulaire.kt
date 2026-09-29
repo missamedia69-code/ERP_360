@@ -531,7 +531,7 @@ fun <T> MissaChoixTuiles(
                         modifier = Modifier.weight(1f).heightIn(min = if (tuile.icone != null) 64.dp else 48.dp),
                     ) {
                         Column(
-                            Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
+                            Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {

@@ -61,6 +61,7 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Indigo caractéristique du module Projets — source unique : [AppModule.PROJETS]. */
 private val IndigoProjets: Color get() = AppModule.PROJETS.couleur
@@ -468,73 +469,33 @@ private fun DialogueNouveauProjet(
     var nom by remember { mutableStateOf("") }
     var responsable by remember { mutableStateOf("") }
     var budget by remember { mutableStateOf("") }
-    var ouvert by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.prj_nouveau_projet), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = clientChoisi?.nom ?: stringResource(R.string.sales_select_client),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.clients_flow_contact), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-                        clients.forEach { cl ->
-                            DropdownMenuItem(
-                                text = { Text(cl.nom, color = MissaInk) },
-                                onClick = {
-                                    clientChoisi = cl
-                                    ouvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text(stringResource(R.string.prj_champ_nom), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = responsable,
-                    onValueChange = { responsable = it },
-                    label = { Text(stringResource(R.string.prj_champ_responsable), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = budget,
-                    onValueChange = { budget = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.prj_champ_budget), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(clientChoisi, nom, responsable, budget) },
-                enabled = nom.isNotBlank() && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.prj_nouveau_projet),
+        icone = Iv.Workspaces,
+        couleur = AppModule.PROJETS.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nom.isNotBlank(),
+        enCours = enCours,
+        onValider = { onValider(clientChoisi, nom.trim(), responsable.trim(), budget) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.prj_champ_nom), icone = Iv.Workspaces, requis = true)
+            MissaChampListe(
+                libelle = stringResource(R.string.form_client),
+                options = clients.map { it to it.nom },
+                selection = clientChoisi,
+                onSelection = { clientChoisi = it },
+                icone = Iv.Person,
+                placeholder = stringResource(R.string.sales_select_client),
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_pilotage), numero = 2) {
+            MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.prj_champ_responsable), icone = Iv.Badge)
+            MissaChampTexte(budget, { budget = it }, stringResource(R.string.prj_champ_budget), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        }
+    }
 }
 
 @Composable
@@ -545,39 +506,24 @@ private fun DialogueActualiserProjet(
 ) {
     var avancement by remember { mutableStateOf(projet.payload.avancement.toString()) }
     var consomme by remember { mutableStateOf(projet.payload.consomme.toString()) }
+    val avancementValide = avancement.toIntOrNull()?.let { it in 0..100 } == true
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.prj_titre_actualiser), fontSize = 15.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = avancement,
-                    onValueChange = { avancement = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.prj_champ_avancement_pourcent), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = consomme,
-                    onValueChange = { consomme = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.prj_champ_consomme_reel), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(avancement, consomme) },
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.prj_titre_actualiser),
+        icone = Iv.TrendingUp,
+        couleur = AppModule.PROJETS.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = avancementValide,
+        onValider = { onValider(avancement, consomme) },
+    ) {
+        MissaRangee {
+            MissaChampTexte(
+                avancement, { avancement = it.take(3) }, stringResource(R.string.prj_champ_avancement_pourcent),
+                modifier = Modifier.weight(1f), icone = Iv.Percent, clavier = MissaClavier.ENTIER, requis = true,
+                erreur = if (avancement.isNotEmpty() && !avancementValide) stringResource(R.string.form_erreur_pourcentage) else null,
+            )
+            MissaChampTexte(consomme, { consomme = it }, stringResource(R.string.prj_champ_consomme_reel), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        }
+    }
 }

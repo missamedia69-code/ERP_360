@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.missa.b360.R
+import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.core.data.entity.TaskEntity
 import com.missa.b360.core.data.entity.TaskStatus
 import com.missa.b360.ui.components.MissaEmptyState
@@ -50,6 +51,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Teinte violette spécifique au module Tâches. */
 private val VioletTasks: Color = Color(0xFF7C3AED)
@@ -323,36 +325,16 @@ private fun DialogueNouvelleTask(
     var titre by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.tasks_nouvelle_tache), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = titre,
-                    onValueChange = { titre = it },
-                    label = { Text(stringResource(R.string.tasks_champ_titre), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = notes,
-                    onValueChange = { notes = it },
-                    label = { Text(stringResource(R.string.tasks_champ_notes), fontSize = 11.sp) },
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(titre, notes) },
-                enabled = titre.isNotBlank(),
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.tasks_nouvelle_tache),
+        icone = Iv.Checklist,
+        couleur = AppModule.PROJETS.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = titre.isNotBlank(),
+        onValider = { onValider(titre.trim(), notes.trim().ifBlank { null }) },
+    ) {
+        MissaChampTexte(titre, { titre = it }, stringResource(R.string.tasks_champ_titre), icone = Iv.Checklist, requis = true)
+        MissaChampTexte(notes, { notes = it }, stringResource(R.string.tasks_champ_notes), icone = Iv.Description, lignes = 3)
+    }
 }

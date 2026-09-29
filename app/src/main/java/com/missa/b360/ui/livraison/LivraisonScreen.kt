@@ -64,6 +64,7 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Bleu ciel caractéristique du module Livraison — source unique : [AppModule.LIVRAISON]. */
 private val BleuCielLivraison: Color get() = AppModule.LIVRAISON.couleur
@@ -353,86 +354,43 @@ private fun DialogueNouveauBL(
 ) {
     var clientChoisi by remember { mutableStateOf<ClientEntity?>(clients.firstOrNull()) }
     var nomLibre by remember { mutableStateOf("") }
-    var adresse by remember { mutableStateOf("") }
+    var adresse by remember { mutableStateOf(clients.firstOrNull()?.adresse.orEmpty()) }
     var transporteur by remember { mutableStateOf("") }
     var colis by remember { mutableStateOf("1") }
     var refOrigine by remember { mutableStateOf("") }
-    var ouvert by remember { mutableStateOf(false) }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.liv_nouveau_bl), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = clientChoisi?.nom ?: stringResource(R.string.sales_select_client),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.clients_flow_contact), fontSize = 11.sp) },
-                        trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Box(Modifier.matchParentSize().clickable { ouvert = true })
-                    MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-                        clients.forEach { cl ->
-                            DropdownMenuItem(
-                                text = { Text(cl.nom, color = MissaInk) },
-                                onClick = {
-                                    clientChoisi = cl
-                                    adresse = cl.adresse.orEmpty()
-                                    ouvert = false
-                                },
-                            )
-                        }
-                    }
-                }
-                if (clientChoisi == null) {
-                    OutlinedTextField(
-                        value = nomLibre,
-                        onValueChange = { nomLibre = it },
-                        label = { Text(stringResource(R.string.clients_flow_company_name), fontSize = 11.sp) },
-                        singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-                OutlinedTextField(
-                    value = adresse,
-                    onValueChange = { adresse = it },
-                    label = { Text(stringResource(R.string.clients_flow_address), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = transporteur,
-                    onValueChange = { transporteur = it },
-                    label = { Text(stringResource(R.string.liv_champ_transporteur), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = colis,
-                    onValueChange = { colis = it.filter { c -> c.isDigit() } },
-                    label = { Text(stringResource(R.string.liv_champ_nb_colis), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+    MissaFormDialogue(
+        titre = stringResource(R.string.liv_nouveau_bl),
+        icone = Iv.LocalShipping,
+        couleur = AppModule.LIVRAISON.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = clientChoisi != null || nomLibre.isNotBlank(),
+        enCours = enCours,
+        onValider = { onValider(clientChoisi, nomLibre.trim(), adresse.trim(), transporteur.trim(), colis, refOrigine.trim()) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_destinataire), numero = 1) {
+            // null = client de passage : on saisit alors son nom librement.
+            MissaChampListe<ClientEntity?>(
+                libelle = stringResource(R.string.form_client),
+                options = listOf<Pair<ClientEntity?, String>>(null to stringResource(R.string.form_client_passage)) + clients.map { it to it.nom },
+                selection = clientChoisi,
+                onSelection = { cl ->
+                    clientChoisi = cl
+                    if (cl != null) adresse = cl.adresse.orEmpty()
+                },
+                icone = Iv.Person,
+            )
+            if (clientChoisi == null) {
+                MissaChampTexte(nomLibre, { nomLibre = it }, stringResource(R.string.clients_flow_company_name), icone = Iv.Business, requis = true)
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(clientChoisi, nomLibre, adresse, transporteur, colis, refOrigine) },
-                enabled = (clientChoisi != null || nomLibre.isNotBlank()) && !enCours,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+            MissaChampTexte(adresse, { adresse = it }, stringResource(R.string.clients_flow_address), icone = Iv.Place, lignes = 2)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_expedition), numero = 2) {
+            MissaRangee {
+                MissaChampTexte(transporteur, { transporteur = it }, stringResource(R.string.liv_champ_transporteur), modifier = Modifier.weight(1.4f), icone = Iv.LocalShipping)
+                MissaChampTexte(colis, { colis = it }, stringResource(R.string.liv_champ_nb_colis), modifier = Modifier.weight(1f), icone = Iv.Inventory2, clavier = MissaClavier.ENTIER)
+            }
+        }
+    }
 }

@@ -59,6 +59,7 @@ import com.missa.b360.ui.stock.fmtValeur
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.components.*
 
 /** Rouge rubis caractéristique du module RH — source unique : [AppModule.RH]. */
 private val RougeRh: Color get() = AppModule.RH.couleur
@@ -334,63 +335,31 @@ private fun DialogueNouvelEmploye(
     var telephone by remember { mutableStateOf("") }
     var poste by remember { mutableStateOf("") }
     var salaire by remember { mutableStateOf("") }
-    var jours by remember { mutableStateOf("26") }
+    val jours = "26"
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.rh_nouveau_titre), fontSize = 16.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it },
-                    label = { Text(stringResource(R.string.rh_champ_nom), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = telephone,
-                    onValueChange = { telephone = it },
-                    label = { Text(stringResource(R.string.rh_champ_tel), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = poste,
-                    onValueChange = { poste = it },
-                    label = { Text(stringResource(R.string.rh_champ_poste), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = salaire,
-                    onValueChange = { salaire = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.rh_champ_salaire), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+    MissaFormDialogue(
+        titre = stringResource(R.string.rh_nouveau_titre),
+        sousTitre = stringResource(R.string.rh_form_sous_titre),
+        icone = Iv.PersonAdd,
+        couleur = AppModule.RH.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = nom.isNotBlank() && telephone.isNotBlank(),
+        onValider = {
+            val s = salaire.toDoubleOrNull() ?: 0.0
+            val j = jours.toDoubleOrNull() ?: 26.0
+            onValider(nom.trim(), telephone.trim(), poste.trim().ifBlank { null }, s, j)
         },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val s = salaire.toDoubleOrNull() ?: 0.0
-                    val j = jours.toDoubleOrNull() ?: 26.0
-                    onValider(nom, telephone, poste.ifBlank { null }, s, j)
-                },
-                enabled = nom.isNotBlank() && telephone.isNotBlank(),
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.rh_champ_nom), icone = Iv.Person, requis = true)
+            MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.rh_champ_tel), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_contrat), numero = 2) {
+            MissaChampTexte(poste, { poste = it }, stringResource(R.string.rh_champ_poste), icone = Iv.Badge)
+            MissaChampTexte(salaire, { salaire = it }, stringResource(R.string.rh_champ_salaire), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        }
+    }
 }
 
 @Composable
@@ -403,50 +372,32 @@ private fun DialogueAbsence(
     var duree by remember { mutableStateOf("1") }
     var motif by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.rh_declarer_absence, employe.nom), fontSize = 15.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf("CONGE", "MALADIE", "AUTRE").forEach { t ->
-                        FilterChip(
-                            selected = type == t,
-                            onClick = { type = t },
-                            label = { Text(t, fontSize = 11.sp) },
-                            colors = FilterChipDefaults.filterChipColors(selectedContainerColor = RougeRh.copy(alpha = 0.2f)),
-                        )
-                    }
-                }
-                OutlinedTextField(
-                    value = duree,
-                    onValueChange = { duree = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.rh_champ_duree_jours), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = motif,
-                    onValueChange = { motif = it },
-                    label = { Text(stringResource(R.string.rh_champ_motif), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(type, duree.toDoubleOrNull() ?: 1.0, motif.ifBlank { null }) },
-                enabled = (duree.toDoubleOrNull() ?: 0.0) > 0.0,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.rh_declarer_absence, employe.nom),
+        icone = Iv.Calendar,
+        couleur = AppModule.RH.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = (duree.toDoubleOrNull() ?: 0.0) > 0.0,
+        onValider = { onValider(type, duree.toDoubleOrNull() ?: 1.0, motif.trim().ifBlank { null }) },
+    ) {
+        MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
+            MissaChoixTuiles(
+                options = listOf(
+                    MissaTuile("CONGE", stringResource(R.string.form_abs_conge), Iv.Calendar),
+                    MissaTuile("MALADIE", stringResource(R.string.form_abs_maladie), Iv.Warning),
+                    MissaTuile("AUTRE", stringResource(R.string.form_abs_autre), Iv.MoreHoriz),
+                ),
+                selection = type,
+                onSelection = { type = it },
+                colonnes = 3,
+            )
+        }
+        MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 2) {
+            MissaChampTexte(duree, { duree = it }, stringResource(R.string.rh_champ_duree_jours), icone = Iv.Schedule, clavier = MissaClavier.DECIMAL, requis = true)
+            MissaChampTexte(motif, { motif = it }, stringResource(R.string.rh_champ_motif), icone = Iv.Description, lignes = 2)
+        }
+    }
 }
 
 @Composable
@@ -459,38 +410,16 @@ private fun DialogueAvance(
     var montant by remember { mutableStateOf("") }
     var motif by remember { mutableStateOf("") }
 
-    AlertDialog(
-        onDismissRequest = onFermer,
-        title = { Text(stringResource(R.string.rh_verser_avance, employe.nom), fontSize = 15.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = montant,
-                    onValueChange = { montant = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text(stringResource(R.string.rh_champ_montant_avance), fontSize = 11.sp) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = motif,
-                    onValueChange = { motif = it },
-                    label = { Text(stringResource(R.string.rh_champ_motif), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onValider(montant.toDoubleOrNull() ?: 0.0, motif.ifBlank { null }) },
-                enabled = (montant.toDoubleOrNull() ?: 0.0) > 0.0,
-            ) { Text(stringResource(R.string.ops_save)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onFermer) { Text(stringResource(R.string.ops_cancel)) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.rh_verser_avance, employe.nom),
+        icone = Iv.Payments,
+        couleur = AppModule.RH.couleur,
+        onFermer = onFermer,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = (montant.toDoubleOrNull() ?: 0.0) > 0.0,
+        onValider = { onValider(montant.toDoubleOrNull() ?: 0.0, motif.trim().ifBlank { null }) },
+    ) {
+        MissaChampTexte(montant, { montant = it }, stringResource(R.string.rh_champ_montant_avance), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise)
+        MissaChampTexte(motif, { motif = it }, stringResource(R.string.rh_champ_motif), icone = Iv.Description, lignes = 2)
+    }
 }
