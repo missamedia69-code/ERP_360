@@ -248,7 +248,6 @@ fun MissaChampTexte(
         }
     }
 }
-}
 
 /** Hauteur d'un champ compact (libellé au-dessus + valeur) — structure matricielle. */
 private val HauteurChamp = 44.dp
