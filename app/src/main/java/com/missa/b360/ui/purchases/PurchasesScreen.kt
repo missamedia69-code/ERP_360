@@ -92,6 +92,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.missa.b360.ui.components.*
 
 /** Jaune caractéristique du module Achats — source unique : [AppModule.ACHATS]. */
 private val JauneAchats: Color get() = AppModule.ACHATS.couleur
@@ -671,15 +672,7 @@ private fun BlocCatalogue(
     onAjouter: (ProductWithStock) -> Unit,
 ) {
     var recherche by remember { mutableStateOf("") }
-    OutlinedTextField(
-        value = recherche,
-        onValueChange = { recherche = it },
-        label = { Text(stringResource(R.string.ach_rechercher), fontSize = 11.sp, color = MissaMuted) },
-        leadingIcon = { Icon(painterResource(Iv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
-    )
+    MissaChampTexte(recherche, { recherche = it }, stringResource(R.string.ach_rechercher), icone = Iv.Search)
     val filtres = produits.filter {
         recherche.isBlank() || it.product.nom.contains(recherche.trim(), ignoreCase = true)
     }
@@ -719,7 +712,7 @@ private fun BlocCatalogue(
     }
 }
 
-/** Sélecteur déroulant simple — avec option d'ajout direct in-situ si disponible. */
+/** Sélecteur déroulant simple — rendu par MissaChampListe, avec ajout direct in-situ si disponible. */
 @Composable
 private fun Selecteur(
     libelle: String,
@@ -728,61 +721,20 @@ private fun Selecteur(
     onChoix: (Int) -> Unit,
     onNouveau: (() -> Unit)? = null,
     nouveauLibelle: String? = null,
+    icone: Int? = Iv.Category,
+    requis: Boolean = false,
 ) {
-    var ouvert by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = valeur.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaInk) },
-            placeholder = if (options.isEmpty() && onNouveau != null) {
-                { Text("+ ${nouveauLibelle ?: libelle}", fontSize = 12.sp, color = MissaMuted) }
-            } else null,
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(
-            Modifier
-                .matchParentSize()
-                .clickable {
-                    if (options.isEmpty() && onNouveau != null) {
-                        onNouveau()
-                    } else {
-                        ouvert = true
-                    }
-                },
-        )
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            if (onNouveau != null) {
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            "+ ${nouveauLibelle ?: libelle}",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MissaInk,
-                        )
-                    },
-                    onClick = {
-                        ouvert = false
-                        onNouveau()
-                    },
-                )
-            }
-            options.forEachIndexed { index, option ->
-                DropdownMenuItem(
-                    text = { Text(option, fontSize = 13.sp, color = MissaInk) },
-                    onClick = {
-                        ouvert = false
-                        onChoix(index)
-                    },
-                )
-            }
-        }
-    }
+    MissaChampListe(
+        libelle = libelle,
+        options = options.mapIndexed { index, option -> index to option },
+        selection = options.indexOf(valeur).takeIf { it >= 0 },
+        onSelection = onChoix,
+        icone = icone,
+        requis = requis,
+        // Valeur hors liste (ex. « taux par défaut ») : affichée comme indication.
+        placeholder = valeur?.takeIf { it !in options },
+        actionNouveau = onNouveau?.let { (nouveauLibelle ?: libelle) to it },
+    )
 }
 
 /** Boîte de dialogue de création rapide d'un fournisseur sans quitter le flux d'achat. */
@@ -801,121 +753,34 @@ private fun DialogueCreationFournisseurRapide(
     val telValide = telephone.trim().isNotBlank()
     val valide = nomValide && telValide
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(22.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.ach_nouveau_fournisseur_rapide),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MissaInk,
-                )
+    MissaFormDialogue(
+        titre = stringResource(R.string.ach_nouveau_fournisseur_rapide),
+        icone = Iv.Handshake,
+        couleur = AppModule.ACHATS.couleur,
+        onFermer = onDismiss,
+        libelleValider = stringResource(R.string.ops_save),
+        validerActif = valide,
+        onValider = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
+    ) {
+        MissaChampTexte(nom, { nom = it.take(120) }, stringResource(R.string.fournisseurs_nom), icone = Iv.Handshake, requis = true)
+        MissaChampTexte(telephone, { telephone = it.take(25) }, stringResource(R.string.fournisseurs_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
+        MissaChampTexte(email, { email = it.take(100) }, stringResource(R.string.ach_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
+        MissaChampTexte(adresse, { adresse = it.take(150) }, stringResource(R.string.ach_adresse_optionnelle), icone = Iv.Place)
+        erreur?.let { code ->
+            val message = when (code) {
+                "doublon" -> stringResource(R.string.ach_erreur_fournisseur_doublon)
+                "licence" -> stringResource(R.string.ach_erreur_lecture_seule)
+                else -> stringResource(R.string.ach_erreur)
             }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = nom,
-                    onValueChange = { nom = it.take(120) },
-                    label = { Text(stringResource(R.string.fournisseurs_nom) + " *", fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = telephone,
-                    onValueChange = { telephone = it.take(25) },
-                    label = { Text(stringResource(R.string.fournisseurs_telephone) + " *", fontSize = 11.sp) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it.take(100) },
-                    label = { Text(stringResource(R.string.ach_email_optionnel), fontSize = 11.sp) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                OutlinedTextField(
-                    value = adresse,
-                    onValueChange = { adresse = it.take(150) },
-                    label = { Text(stringResource(R.string.ach_adresse_optionnelle), fontSize = 11.sp) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                erreur?.let { code ->
-                    val message = when (code) {
-                        "doublon" -> stringResource(R.string.ach_erreur_fournisseur_doublon)
-                        "licence" -> stringResource(R.string.ach_erreur_lecture_seule)
-                        else -> stringResource(R.string.ach_erreur)
-                    }
-                    Text(message, color = Color(0xFFB91C1C), fontSize = 12.sp)
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
-                enabled = valide,
-                colors = ButtonDefaults.buttonColors(containerColor = JauneAchats, contentColor = MissaInk),
-                shape = RoundedCornerShape(8.dp),
-            ) {
-                Text(stringResource(R.string.ops_save), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.ops_cancel), color = MissaInk)
-            }
-        },
-    )
-}
-
-/** Champ de date en lecture seule ouvrant un petit calendrier (±12 h, aller/retour). */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ChampDateAchat(libelle: String, valeur: Long?, onDate: (Long?) -> Unit) {
-    var ouvert by remember { mutableStateOf(false) }
-    val fmt = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = valeur?.let { fmt.format(Date(it)) }.orEmpty(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(libelle, fontSize = 11.sp, color = MissaMuted) },
-            trailingIcon = { Icon(painterResource(Iv.Calendar), null, tint = MissaInk, modifier = Modifier.size(18.dp)) },
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(Modifier.matchParentSize().clickable { ouvert = true })
-    }
-    if (ouvert) {
-        val etatDate = rememberDatePickerState(initialSelectedDateMillis = valeur?.plus(43_200_000L))
-        DatePickerDialog(
-            onDismissRequest = { ouvert = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    etatDate.selectedDateMillis?.let { millis -> onDate(millis + 43_200_000L) }
-                    ouvert = false
-                }) { Text(stringResource(R.string.st_ok)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { ouvert = false }) { Text(stringResource(R.string.st_annuler)) }
-            },
-        ) {
-            DatePicker(state = etatDate)
+            Text(message, color = Color(0xFFB91C1C), fontSize = 12.sp)
         }
     }
 }
+
+/** Champ de date ouvrant le calendrier du kit. */
+@Composable
+private fun ChampDateAchat(libelle: String, valeur: Long?, onDate: (Long?) -> Unit) =
+    MissaChampDate(valeur = valeur, onValeur = onDate, libelle = libelle)
 
 // ---------------------------------------------------------------------------
 // Formulaire — facture fournisseur
@@ -993,9 +858,12 @@ private fun FormulaireAchat(
                     }
                 }
             }
+            item { MissaFormSectionTitre(stringResource(R.string.ach_fournisseur), numero = 1) }
             item {
                 Selecteur(
                     libelle = stringResource(R.string.ach_fournisseur),
+                    icone = Iv.Handshake,
+                    requis = true,
                     valeur = ui.supplier?.nom,
                     options = fournisseurs.map { it.nom },
                     onChoix = { index -> vm.selectSupplier(fournisseurs[index]) },
@@ -1035,6 +903,7 @@ private fun FormulaireAchat(
                 }
             }
 
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
             item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProduct) }
 
             if (ui.lines.isNotEmpty()) {
@@ -1057,6 +926,7 @@ private fun FormulaireAchat(
             }
 
             if (ui.lines.isNotEmpty()) {
+                item { MissaFormSectionTitre(stringResource(R.string.form_section_paiement), numero = 3) }
                 // --- TVA : taux choisi par facture ---
                 item {
                     val optionsTaxe = taxes.map { "${it.nom} (${it.taux} %)" }
@@ -1065,6 +935,7 @@ private fun FormulaireAchat(
                         ?: "${stringResource(R.string.ach_taux_defaut)} ($tauxDefaut %)"
                     Selecteur(
                         libelle = stringResource(R.string.ach_tva),
+                        icone = Iv.Percent,
                         valeur = libelleActuel,
                         options = optionsTaxe,
                         onChoix = { index -> vm.setTaxTaux(taxes[index].taux) },
@@ -1101,32 +972,18 @@ private fun FormulaireAchat(
                     VignettePieceJointe(path = chemin, onSupprimer = { vm.removeAttachment(chemin) })
                 }
                 item {
-                    Selecteur(
+                    MissaChoixPaiement(
+                        moyens = modes,
+                        selection = modePaiement.ifBlank { null },
+                        onSelection = { modePaiement = it },
                         libelle = stringResource(R.string.ach_mode_paiement),
-                        valeur = modePaiement.ifBlank { null },
-                        options = modes,
-                        onChoix = { index -> modePaiement = modes[index] },
                     )
                 }
                 item {
-                    OutlinedTextField(
-                        value = ui.paidInput,
-                        onValueChange = vm::updatePaid,
-                        label = { Text(stringResource(R.string.ach_montant_regle), fontSize = 11.sp, color = MissaMuted) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    MissaChampTexte(ui.paidInput, vm::updatePaid, stringResource(R.string.ach_montant_regle), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
                 }
                 item {
-                    OutlinedTextField(
-                        value = ui.note,
-                        onValueChange = vm::updateNote,
-                        label = { Text(stringResource(R.string.ach_note), fontSize = 11.sp, color = MissaMuted) },
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    MissaChampTexte(ui.note, vm::updateNote, stringResource(R.string.ach_note), icone = Iv.Description)
                 }
                 item {
                     Surface(shape = RoundedCornerShape(14.dp), color = JauneAchats.copy(alpha = 0.26f)) {
@@ -1270,18 +1127,10 @@ private fun LignePanier(
                 var prixTexte by remember(ligne.id, ligne.unitPrice) {
                     mutableStateOf(ligne.unitPrice.toString())
                 }
-                OutlinedTextField(
-                    value = prixTexte,
-                    onValueChange = { brut ->
+                MissaChampTexte(prixTexte, { brut ->
                         prixTexte = brut.filterMoneyInput()
                         prixTexte.toDoubleOrNull()?.let(onPrix)
-                    },
-                    label = { Text(stringResource(R.string.ach_prix_unitaire), fontSize = 11.sp, color = MissaMuted) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f),
-                )
+                    }, stringResource(R.string.ach_prix_unitaire), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             }
             if (ouvert) {
                 Spacer(Modifier.height(8.dp))
@@ -1334,29 +1183,15 @@ private fun ChampsTracabilite(
     var lot by remember(lotInitial) { mutableStateOf(lotInitial) }
     var serie by remember(serieInitiale) { mutableStateOf(serieInitiale) }
     var date by remember(peremption) { mutableStateOf(peremption) }
-    OutlinedTextField(
-        value = lot,
-        onValueChange = {
+    MissaChampTexte(lot, {
             lot = it
             onTrace(lot, serie, date)
-        },
-        label = { Text(stringResource(R.string.ach_lot), fontSize = 11.sp, color = MissaMuted) },
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
-    )
+        }, stringResource(R.string.ach_lot), icone = Iv.Badge)
     Spacer(Modifier.height(6.dp))
-    OutlinedTextField(
-        value = serie,
-        onValueChange = {
+    MissaChampTexte(serie, {
             serie = it
             onTrace(lot, serie, date)
-        },
-        label = { Text(stringResource(R.string.ach_numero_serie), fontSize = 11.sp, color = MissaMuted) },
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
-    )
+        }, stringResource(R.string.ach_numero_serie), icone = Iv.Badge)
     Spacer(Modifier.height(6.dp))
     ChampDateAchat(
         libelle = stringResource(R.string.ach_peremption),
@@ -1408,9 +1243,12 @@ private fun FormulaireCommande(
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            item { MissaFormSectionTitre(stringResource(R.string.ach_fournisseur), numero = 1) }
             item {
                 Selecteur(
                     libelle = stringResource(R.string.ach_fournisseur),
+                    icone = Iv.Handshake,
+                    requis = true,
                     valeur = ui.supplier?.nom,
                     options = fournisseurs.map { it.nom },
                     onChoix = { index -> vm.selectSupplierCommande(fournisseurs[index]) },
@@ -1449,6 +1287,7 @@ private fun FormulaireCommande(
                     }
                 }
             }
+            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
             item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProductCommande) }
             if (ui.lines.isNotEmpty()) {
                 item {
@@ -1466,13 +1305,7 @@ private fun FormulaireCommande(
                 )
             }
             item {
-                OutlinedTextField(
-                    value = ui.note,
-                    onValueChange = vm::updateNoteCommande,
-                    label = { Text(stringResource(R.string.ach_note), fontSize = 11.sp, color = MissaMuted) },
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                MissaChampTexte(ui.note, vm::updateNoteCommande, stringResource(R.string.ach_note), icone = Iv.Description)
             }
             if (ui.lines.isNotEmpty()) {
                 item {
@@ -1557,18 +1390,10 @@ private fun LigneCommande(
                 var prixTexte by remember(ligne.id, ligne.unitPrice) {
                     mutableStateOf(ligne.unitPrice.toString())
                 }
-                OutlinedTextField(
-                    value = prixTexte,
-                    onValueChange = { brut ->
+                MissaChampTexte(prixTexte, { brut ->
                         prixTexte = brut.filterMoneyInput()
                         prixTexte.toDoubleOrNull()?.let(onPrix)
-                    },
-                    label = { Text(stringResource(R.string.ach_prix_unitaire), fontSize = 11.sp, color = MissaMuted) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f),
-                )
+                    }, stringResource(R.string.ach_prix_unitaire), modifier = Modifier.weight(1f), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
             }
         }
     }
@@ -1633,16 +1458,10 @@ private fun FormulaireReception(
                 )
             }
             item {
-                OutlinedTextField(
-                    value = note,
-                    onValueChange = {
+                MissaChampTexte(note, {
                         note = it
                         vm.updateNoteReception(it)
-                    },
-                    label = { Text(stringResource(R.string.ach_note), fontSize = 11.sp, color = MissaMuted) },
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                    }, stringResource(R.string.ach_note), icone = Iv.Description)
             }
         }
         BarreActions(
@@ -1701,19 +1520,11 @@ private fun LigneReception(
             var quantiteTexte by remember(ligne.productId, ligne.quantiteRecue) {
                 mutableStateOf(ligne.quantiteRecue.let { if (it == 0.0) "" else it.toString() })
             }
-            OutlinedTextField(
-                value = quantiteTexte,
-                onValueChange = { brut ->
+            MissaChampTexte(quantiteTexte, { brut ->
                     quantiteTexte = brut.filterMoneyInput()
                     val valeur = quantiteTexte.toDoubleOrNull() ?: 0.0
                     if (valeur >= 0.0) onMaj(valeur, ligne.lot.orEmpty(), ligne.numeroSerie.orEmpty(), ligne.datePeremption)
-                },
-                label = { Text(stringResource(R.string.ach_recue), fontSize = 11.sp, color = MissaMuted) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-            )
+                }, stringResource(R.string.ach_recue), clavier = MissaClavier.DECIMAL)
             if (ouvert) {
                 Spacer(Modifier.height(8.dp))
                 ChampsTracabilite(
@@ -1746,41 +1557,28 @@ private fun DialogueReglement(
     var mode by remember { mutableStateOf(modes.firstOrNull().orEmpty()) }
     LaunchedEffect(modes) { if (mode.isBlank()) mode = modes.firstOrNull().orEmpty() }
 
-    AlertDialog(
-        onDismissRequest = onAnnuler,
-        title = { Text(stringResource(R.string.ach_regler) + " — " + piece.reference, color = MissaInk, fontSize = 14.sp) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    stringResource(R.string.ach_reste_a_regler) + " : " + fmtValeur(reste, devise),
-                    fontSize = 12.sp,
-                    color = MissaInk,
-                )
-                OutlinedTextField(
-                    value = montant,
-                    onValueChange = { montant = it.filterMoneyInput() },
-                    label = { Text(stringResource(R.string.ach_montant), fontSize = 11.sp, color = MissaMuted) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                )
-                Selecteur(
-                    libelle = stringResource(R.string.ach_mode_paiement),
-                    valeur = mode.ifBlank { null },
-                    options = modes,
-                    onChoix = { index -> mode = modes[index] },
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirmer(montant, mode) },
-                enabled = (montant.toDoubleOrNull() ?: 0.0) in 0.01..reste + 0.005 && mode.isNotBlank(),
-            ) { Text(stringResource(R.string.ach_confirmer), color = MissaInk) }
-        },
-        dismissButton = {
-            TextButton(onClick = onAnnuler) { Text(stringResource(R.string.st_annuler), color = MissaInk) }
-        },
-    )
+    MissaFormDialogue(
+        titre = stringResource(R.string.ach_regler) + " — " + piece.reference,
+        icone = Iv.Payments,
+        couleur = AppModule.ACHATS.couleur,
+        onFermer = onAnnuler,
+        libelleValider = stringResource(R.string.ach_confirmer),
+        validerActif = (montant.toDoubleOrNull() ?: 0.0) in 0.01..reste + 0.005 && mode.isNotBlank(),
+        onValider = { onConfirmer(montant, mode) },
+    ) {
+        Text(
+            stringResource(R.string.ach_reste_a_regler) + " : " + fmtValeur(reste, devise),
+            fontSize = 12.sp,
+            color = MissaInk,
+        )
+        MissaChampTexte(montant, { montant = it.filterMoneyInput() }, stringResource(R.string.ach_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+        MissaChoixPaiement(
+            moyens = modes,
+            selection = mode.ifBlank { null },
+            onSelection = { mode = it },
+            libelle = stringResource(R.string.ach_mode_paiement),
+        )
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1957,24 +1755,15 @@ private fun BarreActions(
     onDroite: () -> Unit,
     erreur: String?,
 ) {
-    Surface(color = Color.White, shadowElevation = 8.dp) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            if (!erreur.isNullOrBlank()) {
-                Text(erreur, fontSize = 11.sp, color = Color(0xFFB91C1C), modifier = Modifier.padding(bottom = 6.dp))
-            }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(
-                    onClick = onGauche,
-                    enabled = gaucheActive && !busy,
-                    modifier = Modifier.weight(1f),
-                ) { Text(libelleGauche, color = MissaInk) }
-                Button(
-                    onClick = onDroite,
-                    enabled = droiteActive,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = JauneAchats, contentColor = MissaInk),
-                ) { Text(libelleDroite, color = MissaInk) }
-            }
-        }
+    MissaFormulaireTheme(AppModule.ACHATS.couleur) {
+        MissaFormPied(
+            texte = libelleDroite,
+            onValider = onDroite,
+            actif = droiteActive,
+            enCours = busy,
+            secondaire = libelleGauche to onGauche,
+            secondaireActif = gaucheActive && !busy,
+            erreur = erreur?.takeIf { it.isNotBlank() },
+        )
     }
 }

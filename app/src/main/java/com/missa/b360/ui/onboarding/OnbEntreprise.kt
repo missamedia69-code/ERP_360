@@ -75,6 +75,7 @@ import com.missa.b360.ui.theme.MissaSurface
 import com.missa.b360.ui.theme.OnbActionGreen
 import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.theme.Red40
+import com.missa.b360.ui.components.*
 
 private val IMAGE_MIME_TYPES = arrayOf("image/png", "image/jpeg", "image/webp")
 
@@ -199,6 +200,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
         ) {
             // --- 1. Identité (ou « Vous » pour le pack Personnel) ---
             OnbCompactCarte(
+                numero = 1,
                 titreRes = if (personnel) {
                     R.string.obn_section_personnelle
                 } else {
@@ -262,6 +264,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
 
             // --- 2. Localisation : le pays pilote tout le pack fiscal ---
             OnbCompactCarte(
+                numero = 2,
                 titreRes = R.string.obn_entreprise_localisation,
                 icone = Iv.Public,
                 etiquette = aCompleter.takeIf { viewModel.pays.isBlank() },
@@ -411,6 +414,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
             // --- 3. Coordonnées : reprises sur les documents commerciaux ---
             // (et identifiants légaux, quand le pays en attend)
             OnbCompactCarte(
+                numero = 3,
                 titreRes = R.string.obn_section_coordonnees,
                 icone = Iv.Call,
                 etiquette = if (emailValide && emailSecoursValide) facultatif else aCompleter,
@@ -538,6 +542,7 @@ internal fun OnbEntrepriseStep(viewModel: OnboardingViewModel) {
 private fun OnbCompactCarte(
     titreRes: Int,
     icone: Int,
+    numero: Int? = null,
     etiquette: String?,
     etiquetteEnErreur: Boolean = false,
     contenu: @Composable ColumnScope.() -> Unit,
@@ -554,20 +559,10 @@ private fun OnbCompactCarte(
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(icone),
-                    contentDescription = null,
-                    tint = BrandBlue,
-                    modifier = Modifier.size(14.dp),
-                )
-                Spacer(Modifier.width(6.dp))
-                Text(
-                    text = stringResource(titreRes),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MissaInk,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                MissaFormSectionTitre(
+                    titre = stringResource(titreRes),
+                    numero = numero,
+                    icone = if (numero == null) icone else null,
                     modifier = Modifier.weight(1f),
                 )
                 if (etiquette != null) {
@@ -616,37 +611,25 @@ private fun OnbChampTexte(
     lignesMin: Int = 1,
     active: Boolean = true,
 ) {
-    OutlinedTextField(
-        value = valeur,
-        onValueChange = onValeur,
-        label = { Text(label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(icone),
-                contentDescription = null,
-                tint = if (erreur) Red40 else BrandBlue,
-                modifier = Modifier.size(18.dp),
-            )
-        },
-        placeholder = placeholder?.let { { Text(it, fontSize = 13.sp, color = MissaMuted) } },
-        singleLine = lignesMin == 1,
-        minLines = lignesMin,
-        isError = erreur,
-        colors = OnbCouleursChampBlanc(),
-        enabled = active,
-        keyboardOptions = KeyboardOptions(keyboardType = clavier),
-        supportingText = aide?.let {
-            {
-                Text(
-                    text = it,
-                    fontSize = 11.sp,
-                    color = if (erreur && !aideNeutre) Red40 else MissaMuted,
-                )
-            }
-        },
-        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-        shape = RoundedCornerShape(10.dp),
+    // Rendu par le kit commun (icône noire, contour à la couleur du formulaire).
+    MissaChampTexte(
+        valeur = valeur,
+        onValeur = onValeur,
+        libelle = label,
         modifier = modifier.fillMaxWidth(),
+        icone = icone,
+        clavier = when (clavier) {
+            KeyboardType.Phone -> MissaClavier.TELEPHONE
+            KeyboardType.Email -> MissaClavier.EMAIL
+            KeyboardType.Decimal -> MissaClavier.DECIMAL
+            KeyboardType.Number -> MissaClavier.ENTIER
+            else -> MissaClavier.TEXTE
+        },
+        placeholder = placeholder,
+        aide = aide.takeIf { !erreur },
+        erreur = if (erreur) aide ?: stringResource(R.string.form_valeur_invalide) else null,
+        lignes = lignesMin,
+        enabled = active,
     )
 }
 
