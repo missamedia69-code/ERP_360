@@ -1153,12 +1153,16 @@ private fun ClientContactDialog(contact: ClientContactEntity, onDismiss: () -> U
         onValider = { onSave(contact.copy(nom = name.trim(), fonction = role.trim().ifBlank { null }, telephone = phone.ifBlank { null }, email = email.trim().ifBlank { null }, principal = primary)) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampTexte(name, { name = it.take(120) }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true)
-            MissaChampTexte(role, { role = it.take(120) }, stringResource(R.string.clients_flow_role), icone = Iv.Badge)
+            MissaRangee {
+                MissaChampTexte(name, { name = it.take(120) }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true, modifier = Modifier.weight(1f))
+                MissaChampTexte(role, { role = it.take(120) }, stringResource(R.string.clients_flow_role), icone = Iv.Badge, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
-            MissaChampTexte(phone, { phone = ClientValidation.filtrerTelephonePourSaisie(it).take(25) }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
-            MissaChampTexte(email, { email = it.take(254) }, stringResource(R.string.clients_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
+            MissaRangee {
+                MissaChampTexte(phone, { phone = ClientValidation.filtrerTelephonePourSaisie(it).take(25) }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, modifier = Modifier.weight(1f))
+                MissaChampTexte(email, { email = it.take(254) }, stringResource(R.string.clients_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, modifier = Modifier.weight(1f))
+            }
             MissaCaseACocher(primary, { primary = it }, stringResource(R.string.clients_flow_primary))
         }
     }
@@ -1211,10 +1215,10 @@ private fun ClientAddressesFormScreen(
             }
             item { MissaFormSectionTitre(stringResource(R.string.clients_flow_other_information), numero = 2) }
             item {
-                MissaChampTexte(draft.commercial, { onDraftChange(draft.copy(commercial = it.take(120))) }, stringResource(R.string.clients_flow_sales_rep), icone = Iv.Badge)
-            }
-            item {
-                MissaChampTexte(draft.paymentDays, { onDraftChange(draft.copy(paymentDays = it.filter(Char::isDigit).take(3))) }, stringResource(R.string.clients_flow_payment_terms), clavier = MissaClavier.ENTIER, suffixe = stringResource(R.string.clients_flow_days_short), erreur = if (draft.paymentDays.isNotEmpty() && (terms == null || terms !in 0..365)) stringResource(R.string.form_valeur_invalide) else null)
+                MissaRangee {
+                    MissaChampTexte(draft.commercial, { onDraftChange(draft.copy(commercial = it.take(120))) }, stringResource(R.string.clients_flow_sales_rep), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.paymentDays, { onDraftChange(draft.copy(paymentDays = it.filter(Char::isDigit).take(3))) }, stringResource(R.string.clients_flow_payment_terms), clavier = MissaClavier.ENTIER, suffixe = stringResource(R.string.clients_flow_days_short), erreur = if (draft.paymentDays.isNotEmpty() && (terms == null || terms !in 0..365)) stringResource(R.string.form_valeur_invalide) else null, modifier = Modifier.weight(1f))
+                }
             }
             item { MissaChampTexte(draft.paymentDescription, { onDraftChange(draft.copy(paymentDescription = it.take(240))) }, stringResource(R.string.clients_flow_payment_description), icone = Iv.Description) }
             item { MissaChampTexte(draft.tariffGrid, { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, stringResource(R.string.clients_flow_tariff_grid), icone = Iv.Payments) }

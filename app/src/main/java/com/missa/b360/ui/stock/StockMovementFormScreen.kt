@@ -98,41 +98,48 @@ fun StockTransferFormScreen(onBack: () -> Unit) {
                 HistoriqueTransferts()
             } else {
                 val stockProduit = stockRows.filter { it.produitId == produitId }
-                Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     MissaFormSection(titre = stringResource(R.string.form_section_article), numero = 1) {
-                        MissaChampListe(
-                            libelle = stringResource(R.string.st_article),
-                            options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
-                            selection = produitId,
-                            onSelection = { id ->
-                                produitId = id
-                                if (sourceId == null) sourceId = produits.firstOrNull { p -> p.product.id == id }?.product?.siteId
-                            },
-                            icone = Iv.Inventory2,
-                            requis = true,
-                        )
-                        MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true)
+                        MissaRangee {
+                            MissaChampListe(
+                                libelle = stringResource(R.string.st_article),
+                                options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
+                                selection = produitId,
+                                onSelection = { id ->
+                                    produitId = id
+                                    if (sourceId == null) sourceId = produits.firstOrNull { p -> p.product.id == id }?.product?.siteId
+                                },
+                                icone = Iv.Inventory2,
+                                requis = true,
+                                modifier = Modifier.weight(1f),
+                            )
+                            MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true, modifier = Modifier.weight(1f))
+                        }
                     }
                     MissaFormSection(titre = stringResource(R.string.form_section_expedition), numero = 2) {
-                        MissaChampListe(
-                            libelle = stringResource(R.string.st_de),
-                            options = sites.map { site ->
-                                val q = stockProduit.firstOrNull { it.siteId == site.id }?.quantite ?: 0.0
-                                site.id to "${site.nom} (${fmtQuantite(q)})"
-                            },
-                            selection = sourceId,
-                            onSelection = { sourceId = it },
-                            icone = Iv.Warehouse,
-                            requis = true,
-                        )
-                        MissaChampListe(
-                            libelle = stringResource(R.string.st_vers),
-                            options = sites.filter { it.id != sourceId }.map { it.id to it.nom },
-                            selection = destId,
-                            onSelection = { destId = it },
-                            icone = Iv.LocalShipping,
-                            requis = true,
-                        )
+                        MissaRangee {
+                            MissaChampListe(
+                                libelle = stringResource(R.string.st_de),
+                                options = sites.map { site ->
+                                    val q = stockProduit.firstOrNull { it.siteId == site.id }?.quantite ?: 0.0
+                                    site.id to "${site.nom} (${fmtQuantite(q)})"
+                                },
+                                selection = sourceId,
+                                onSelection = { sourceId = it },
+                                icone = Iv.Warehouse,
+                                requis = true,
+                                modifier = Modifier.weight(1f),
+                            )
+                            MissaChampListe(
+                                libelle = stringResource(R.string.st_vers),
+                                options = sites.filter { it.id != sourceId }.map { it.id to it.nom },
+                                selection = destId,
+                                onSelection = { destId = it },
+                                icone = Iv.LocalShipping,
+                                requis = true,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                         MissaChampTexte(observation, { observation = it }, stringResource(R.string.st_observation), icone = Iv.Description, placeholder = stringResource(R.string.st_obs_placeholder), lignes = 2)
                     }
                 }
@@ -229,7 +236,7 @@ fun StockMovementFormScreen(
         MissaTopAppBar(title = stringResource(R.string.st_nouveau_mouvement), onBack = onBack, couleurFond = AppModule.STOCK.couleurPale)
         Column(
             modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 1) {
                 MissaChoixTuiles(
@@ -245,15 +252,18 @@ fun StockMovementFormScreen(
                 )
             }
             MissaFormSection(titre = stringResource(R.string.form_section_article), numero = 2) {
-                MissaChampListe(
-                    libelle = stringResource(R.string.st_article),
-                    options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
-                    selection = produitId,
-                    onSelection = { produitId = it },
-                    icone = Iv.Inventory2,
-                    requis = true,
-                )
-                MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true)
+                MissaRangee {
+                    MissaChampListe(
+                        libelle = stringResource(R.string.st_article),
+                        options = produits.map { it.product.id to "${it.nom} (${fmtQuantite(it.stock)})" },
+                        selection = produitId,
+                        onSelection = { produitId = it },
+                        icone = Iv.Inventory2,
+                        requis = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.st_quantite), icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, requis = true, modifier = Modifier.weight(1f))
+                }
                 MissaChampTexte(motif, { motif = it }, stringResource(R.string.st_motif), icone = Iv.Description)
             }
         }

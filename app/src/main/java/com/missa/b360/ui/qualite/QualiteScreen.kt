@@ -311,8 +311,10 @@ private fun DialogueNouvelleNc(
         }
         MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 3) {
             MissaChampTexte(description, { description = it }, stringResource(R.string.qua_champ_description), icone = Iv.Description, lignes = 3)
-            MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.form_responsable), icone = Iv.Person)
-            MissaChampTexte(cout, { cout = it }, stringResource(R.string.qua_champ_cout_estime), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+            MissaRangee {
+                MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.form_responsable), icone = Iv.Person, modifier = Modifier.weight(1f))
+                MissaChampTexte(cout, { cout = it }, stringResource(R.string.qua_champ_cout_estime), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

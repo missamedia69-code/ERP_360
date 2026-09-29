@@ -723,8 +723,10 @@ private fun Selecteur(
     nouveauLibelle: String? = null,
     icone: Int? = Iv.Category,
     requis: Boolean = false,
+    modifier: Modifier = Modifier.fillMaxWidth(),
 ) {
     MissaChampListe(
+        modifier = modifier,
         libelle = libelle,
         options = options.mapIndexed { index, option -> index to option },
         selection = options.indexOf(valeur).takeIf { it >= 0 },
@@ -762,10 +764,14 @@ private fun DialogueCreationFournisseurRapide(
         validerActif = valide,
         onValider = { onValider(nom, telephone, email.ifBlank { null }, adresse.ifBlank { null }) },
     ) {
-        MissaChampTexte(nom, { nom = it.take(120) }, stringResource(R.string.fournisseurs_nom), icone = Iv.Handshake, requis = true)
-        MissaChampTexte(telephone, { telephone = it.take(25) }, stringResource(R.string.fournisseurs_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
-        MissaChampTexte(email, { email = it.take(100) }, stringResource(R.string.ach_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
-        MissaChampTexte(adresse, { adresse = it.take(150) }, stringResource(R.string.ach_adresse_optionnelle), icone = Iv.Place)
+        MissaRangee {
+            MissaChampTexte(nom, { nom = it.take(120) }, stringResource(R.string.fournisseurs_nom), icone = Iv.Handshake, requis = true, modifier = Modifier.weight(1f))
+            MissaChampTexte(telephone, { telephone = it.take(25) }, stringResource(R.string.fournisseurs_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true, modifier = Modifier.weight(1f))
+        }
+        MissaRangee {
+            MissaChampTexte(email, { email = it.take(100) }, stringResource(R.string.ach_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, modifier = Modifier.weight(1f))
+            MissaChampTexte(adresse, { adresse = it.take(150) }, stringResource(R.string.ach_adresse_optionnelle), icone = Iv.Place, modifier = Modifier.weight(1f))
+        }
         erreur?.let { code ->
             val message = when (code) {
                 "doublon" -> stringResource(R.string.ach_erreur_fournisseur_doublon)
@@ -980,10 +986,10 @@ private fun FormulaireAchat(
                     )
                 }
                 item {
-                    MissaChampTexte(ui.paidInput, vm::updatePaid, stringResource(R.string.ach_montant_regle), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
-                }
-                item {
-                    MissaChampTexte(ui.note, vm::updateNote, stringResource(R.string.ach_note), icone = Iv.Description)
+                    MissaRangee {
+                        MissaChampTexte(ui.paidInput, vm::updatePaid, stringResource(R.string.ach_montant_regle), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+                        MissaChampTexte(ui.note, vm::updateNote, stringResource(R.string.ach_note), icone = Iv.Description, modifier = Modifier.weight(1f))
+                    }
                 }
                 item {
                     Surface(shape = RoundedCornerShape(14.dp), color = JauneAchats.copy(alpha = 0.26f)) {
@@ -1183,15 +1189,20 @@ private fun ChampsTracabilite(
     var lot by remember(lotInitial) { mutableStateOf(lotInitial) }
     var serie by remember(serieInitiale) { mutableStateOf(serieInitiale) }
     var date by remember(peremption) { mutableStateOf(peremption) }
-    MissaChampTexte(lot, {
-            lot = it
-            onTrace(lot, serie, date)
-        }, stringResource(R.string.ach_lot), icone = Iv.Badge)
-    Spacer(Modifier.height(6.dp))
-    MissaChampTexte(serie, {
-            serie = it
-            onTrace(lot, serie, date)
-        }, stringResource(R.string.ach_numero_serie), icone = Iv.Badge)
+    MissaRangee {
+        MissaChampTexte(lot, {
+                lot = it
+                onTrace(lot, serie, date)
+            }, stringResource(R.string.ach_lot), icone = Iv.Badge,
+                modifier = Modifier.weight(1f),
+        )
+        MissaChampTexte(serie, {
+                serie = it
+                onTrace(lot, serie, date)
+            }, stringResource(R.string.ach_numero_serie), icone = Iv.Badge,
+                modifier = Modifier.weight(1f),
+        )
+    }
     Spacer(Modifier.height(6.dp))
     ChampDateAchat(
         libelle = stringResource(R.string.ach_peremption),

@@ -176,11 +176,14 @@ internal fun ServiceScheduleDialog(
             )
         }
         MissaFormSection(titre = stringResource(R.string.form_section_planification), numero = 2) {
-            MissaChampDateHeure(start, { start = it }, stringResource(R.string.srvf_debut), requis = true)
-            MissaChampDateHeure(
-                end, { end = it }, stringResource(R.string.srvf_fin), requis = true,
-                erreur = if (start != null && end != null && !ordreValide) stringResource(R.string.srvf_erreur_fin) else null,
-            )
+            MissaRangee {
+                MissaChampDateHeure(start, { start = it }, stringResource(R.string.srvf_debut), requis = true, modifier = Modifier.weight(1f))
+                MissaChampDateHeure(
+                    end, { end = it }, stringResource(R.string.srvf_fin), requis = true,
+                    erreur = if (start != null && end != null && !ordreValide) stringResource(R.string.srvf_erreur_fin) else null,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }

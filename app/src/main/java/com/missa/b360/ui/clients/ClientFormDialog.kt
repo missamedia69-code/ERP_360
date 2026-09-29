@@ -175,7 +175,7 @@ fun ClientFormDialog(
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
                             .padding(horizontal = 16.dp, vertical = 14.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.clients_informations_principales_aide),
@@ -183,19 +183,23 @@ fun ClientFormDialog(
                             color = MissaMuted,
                         )
                         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-                            MissaChampListe(
-                                libelle = stringResource(R.string.clients_type),
-                                options = ClientType.entries.map { it to stringResource(it.labelRes()) },
-                                selection = type,
-                                onSelection = { type = it },
-                                icone = if (type == ClientType.PARTICULIER || type == ClientType.PROSPECT) Iv.Person else Iv.Business,
-                            )
-                            MissaChampTexte(
-                                nom, { nom = it }, stringResource(R.string.clients_nom),
-                                icone = Iv.PersonOutline, requis = true, longueurMax = ClientValidation.LONGUEUR_NOM_MAX,
-                                placeholder = stringResource(R.string.clients_nom_exemple),
-                                erreur = if (nom.isNotEmpty() && !nomValide) stringResource(R.string.clients_nom_invalide) else null,
-                            )
+                            MissaRangee {
+                                MissaChampListe(
+                                    libelle = stringResource(R.string.clients_type),
+                                    options = ClientType.entries.map { it to stringResource(it.labelRes()) },
+                                    selection = type,
+                                    onSelection = { type = it },
+                                    icone = if (type == ClientType.PARTICULIER || type == ClientType.PROSPECT) Iv.Person else Iv.Business,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                MissaChampTexte(
+                                    nom, { nom = it }, stringResource(R.string.clients_nom),
+                                    icone = Iv.PersonOutline, requis = true, longueurMax = ClientValidation.LONGUEUR_NOM_MAX,
+                                    placeholder = stringResource(R.string.clients_nom_exemple),
+                                    erreur = if (nom.isNotEmpty() && !nomValide) stringResource(R.string.clients_nom_invalide) else null,
+                                    modifier = Modifier.weight(1f),
+                                )
+                            }
                         }
                         MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
                             TelephoneFields(
@@ -370,16 +374,12 @@ private fun CountryCodeField(
         onExpandedChange = onExpandedChange,
         modifier = modifier,
     ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onQueryChange,
-            label = { Text(stringResource(R.string.clients_indicatif_pays), fontSize = 12.sp) },
-            placeholder = { Text(stringResource(R.string.clients_rechercher_indicatif)) },
-            leadingIcon = { Icon(painterResource(Iv.Public), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
-            colors = missaChampCouleurs(),
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        MissaChampTexte(
+            valeur = value,
+            onValeur = onQueryChange,
+            libelle = stringResource(R.string.clients_indicatif_pays),
+            icone = Iv.Public,
+            placeholder = stringResource(R.string.clients_rechercher_indicatif),
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
@@ -416,27 +416,20 @@ private fun TelephoneField(
     indicatifPresent: Boolean,
     modifier: Modifier,
 ) {
-    OutlinedTextField(
-        value = tel,
-        onValueChange = onTelChange,
-        label = { Text(stringResource(R.string.clients_telephone) + " *", fontSize = 12.sp) },
-        placeholder = { Text(stringResource(R.string.clients_telephone_exemple)) },
-        leadingIcon = { Icon(painterResource(Iv.Call), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
-        colors = missaChampCouleurs(),
-        shape = RoundedCornerShape(12.dp),
-        isError = !indicatifPresent || tel.isNotEmpty() && !telephoneValide,
-        supportingText = {
-            when {
-                !indicatifPresent -> Text(stringResource(R.string.clients_indicatif_obligatoire))
-                tel.isNotEmpty() && !telephoneValide -> Text(stringResource(R.string.clients_telephone_invalide))
-            }
-        },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Phone,
-            imeAction = ImeAction.Next,
-        ),
+    MissaChampTexte(
+        valeur = tel,
+        onValeur = onTelChange,
+        libelle = stringResource(R.string.clients_telephone),
         modifier = modifier,
+        icone = Iv.Call,
+        clavier = MissaClavier.TELEPHONE,
+        requis = true,
+        placeholder = stringResource(R.string.clients_telephone_exemple),
+        erreur = when {
+            !indicatifPresent -> stringResource(R.string.clients_indicatif_obligatoire)
+            tel.isNotEmpty() && !telephoneValide -> stringResource(R.string.clients_telephone_invalide)
+            else -> null
+        },
     )
 }
 

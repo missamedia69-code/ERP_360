@@ -113,15 +113,18 @@ private fun ClientPriceDialog(
         validerActif = productId != null && price != null,
         onValider = { productId?.let { id -> price?.let { onSave(id, it) } } },
     ) {
-        MissaChampListe(
-            libelle = stringResource(R.string.clients_flow_product),
-            options = sellable.map { it.id to "${it.code} · ${it.nom}" },
-            selection = productId,
-            onSelection = { productId = it },
-            icone = Iv.Inventory2,
-            requis = true,
-            placeholder = stringResource(R.string.clients_flow_choose_product),
-        )
-        MissaChampTexte(priceInput, { priceInput = it }, stringResource(R.string.clients_flow_negotiated_price), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise, longueurMax = 14)
+        MissaRangee {
+            MissaChampListe(
+                libelle = stringResource(R.string.clients_flow_product),
+                options = sellable.map { it.id to "${it.code} · ${it.nom}" },
+                selection = productId,
+                onSelection = { productId = it },
+                icone = Iv.Inventory2,
+                requis = true,
+                placeholder = stringResource(R.string.clients_flow_choose_product),
+                modifier = Modifier.weight(1f),
+            )
+            MissaChampTexte(priceInput, { priceInput = it }, stringResource(R.string.clients_flow_negotiated_price), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise, longueurMax = 14, modifier = Modifier.weight(1f))
+        }
     }
 }

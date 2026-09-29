@@ -352,12 +352,16 @@ private fun DialogueNouvelEmploye(
         },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampTexte(nom, { nom = it }, stringResource(R.string.rh_champ_nom), icone = Iv.Person, requis = true)
-            MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.rh_champ_tel), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true)
+            MissaRangee {
+                MissaChampTexte(nom, { nom = it }, stringResource(R.string.rh_champ_nom), icone = Iv.Person, requis = true, modifier = Modifier.weight(1f))
+                MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.rh_champ_tel), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_contrat), numero = 2) {
-            MissaChampTexte(poste, { poste = it }, stringResource(R.string.rh_champ_poste), icone = Iv.Badge)
-            MissaChampTexte(salaire, { salaire = it }, stringResource(R.string.rh_champ_salaire), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+            MissaRangee {
+                MissaChampTexte(poste, { poste = it }, stringResource(R.string.rh_champ_poste), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                MissaChampTexte(salaire, { salaire = it }, stringResource(R.string.rh_champ_salaire), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

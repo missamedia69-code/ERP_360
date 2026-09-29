@@ -481,19 +481,24 @@ private fun DialogueNouveauProjet(
         onValider = { onValider(clientChoisi, nom.trim(), responsable.trim(), budget) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampTexte(nom, { nom = it }, stringResource(R.string.prj_champ_nom), icone = Iv.Workspaces, requis = true)
-            MissaChampListe(
-                libelle = stringResource(R.string.form_client),
-                options = clients.map { it to it.nom },
-                selection = clientChoisi,
-                onSelection = { clientChoisi = it },
-                icone = Iv.Person,
-                placeholder = stringResource(R.string.sales_select_client),
-            )
+            MissaRangee {
+                MissaChampTexte(nom, { nom = it }, stringResource(R.string.prj_champ_nom), icone = Iv.Workspaces, requis = true, modifier = Modifier.weight(1f))
+                MissaChampListe(
+                    libelle = stringResource(R.string.form_client),
+                    options = clients.map { it to it.nom },
+                    selection = clientChoisi,
+                    onSelection = { clientChoisi = it },
+                    icone = Iv.Person,
+                    placeholder = stringResource(R.string.sales_select_client),
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_pilotage), numero = 2) {
-            MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.prj_champ_responsable), icone = Iv.Badge)
-            MissaChampTexte(budget, { budget = it }, stringResource(R.string.prj_champ_budget), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
+            MissaRangee {
+                MissaChampTexte(responsable, { responsable = it }, stringResource(R.string.prj_champ_responsable), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                MissaChampTexte(budget, { budget = it }, stringResource(R.string.prj_champ_budget), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

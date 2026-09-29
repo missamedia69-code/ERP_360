@@ -373,15 +373,18 @@ private fun AccountingProfileDialog(
         onValider = { onSave(country, regime.trim(), month) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_fiscalite), numero = 1) {
-            MissaChampListe(
-                libelle = stringResource(R.string.cpt_profil_pays),
-                options = pays.map { it.code to it.nom },
-                selection = country,
-                onSelection = { country = it },
-                icone = Iv.Public,
-                requis = true,
-            )
-            MissaChampTexte(regime, { regime = it }, stringResource(R.string.cpt_profil_regime), icone = Iv.Gavel, longueurMax = 80)
+            MissaRangee {
+                MissaChampListe(
+                    libelle = stringResource(R.string.cpt_profil_pays),
+                    options = pays.map { it.code to it.nom },
+                    selection = country,
+                    onSelection = { country = it },
+                    icone = Iv.Public,
+                    requis = true,
+                    modifier = Modifier.weight(1f),
+                )
+                MissaChampTexte(regime, { regime = it }, stringResource(R.string.cpt_profil_regime), icone = Iv.Gavel, longueurMax = 80, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_periode), numero = 2) {
             MissaChampListe(
@@ -423,29 +426,35 @@ private fun NouvelleEcritureDialog(
         onValider = { onCreate(description.trim(), debitId, creditId, montant) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 1) {
-            MissaChampTexte(description, { description = it }, stringResource(R.string.cpt_od_libelle), icone = Iv.Description, requis = true)
-            MissaChampTexte(amountText, { amountText = it }, stringResource(R.string.cpt_od_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise)
+            MissaRangee {
+                MissaChampTexte(description, { description = it }, stringResource(R.string.cpt_od_libelle), icone = Iv.Description, requis = true, modifier = Modifier.weight(1f))
+                MissaChampTexte(amountText, { amountText = it }, stringResource(R.string.cpt_od_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_comptes), numero = 2) {
-            MissaChampListe(
-                libelle = stringResource(R.string.cpt_od_debit),
-                options = comptes,
-                selection = debitId.takeIf { it > 0 },
-                onSelection = { debitId = it },
-                icone = Iv.TrendingUp,
-                requis = true,
-                placeholder = stringResource(R.string.cpt_od_choisir_compte),
-            )
-            MissaChampListe(
-                libelle = stringResource(R.string.cpt_od_credit),
-                options = comptes,
-                selection = creditId.takeIf { it > 0 },
-                onSelection = { creditId = it },
-                icone = Iv.TrendingDown,
-                requis = true,
-                placeholder = stringResource(R.string.cpt_od_choisir_compte),
-                erreur = if (debitId > 0 && debitId == creditId) stringResource(R.string.cpt_od_erreur_meme_compte) else null,
-            )
+            MissaRangee {
+                MissaChampListe(
+                    libelle = stringResource(R.string.cpt_od_debit),
+                    options = comptes,
+                    selection = debitId.takeIf { it > 0 },
+                    onSelection = { debitId = it },
+                    icone = Iv.TrendingUp,
+                    requis = true,
+                    placeholder = stringResource(R.string.cpt_od_choisir_compte),
+                    modifier = Modifier.weight(1f),
+                )
+                MissaChampListe(
+                    libelle = stringResource(R.string.cpt_od_credit),
+                    options = comptes,
+                    selection = creditId.takeIf { it > 0 },
+                    onSelection = { creditId = it },
+                    icone = Iv.TrendingDown,
+                    requis = true,
+                    placeholder = stringResource(R.string.cpt_od_choisir_compte),
+                    erreur = if (debitId > 0 && debitId == creditId) stringResource(R.string.cpt_od_erreur_meme_compte) else null,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
     }
 }

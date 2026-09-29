@@ -277,8 +277,10 @@ private fun DialogueNouvelEquipement(
         onValider = { onValider(nom.trim(), type, code.trim(), periodicite) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampTexte(nom, { nom = it }, stringResource(R.string.mai_champ_nom), icone = Iv.Build, requis = true)
-            MissaChampTexte(code, { code = it }, stringResource(R.string.form_code_inventaire), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE)
+            MissaRangee {
+                MissaChampTexte(nom, { nom = it }, stringResource(R.string.mai_champ_nom), icone = Iv.Build, requis = true, modifier = Modifier.weight(1f))
+                MissaChampTexte(code, { code = it }, stringResource(R.string.form_code_inventaire), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_type), numero = 2) {
             MissaChoixTuiles(

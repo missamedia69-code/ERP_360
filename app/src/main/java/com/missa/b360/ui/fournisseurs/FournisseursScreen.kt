@@ -1411,10 +1411,14 @@ private fun DialogueContact(
         validerActif = nom.isNotBlank(),
         onValider = { onConfirmer(nom, prenom, fonction, telephone, email, principal) },
     ) {
-        MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person)
-        MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person)
-        MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge)
-        MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+        MissaRangee {
+            MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person, modifier = Modifier.weight(1f))
+            MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person, modifier = Modifier.weight(1f))
+        }
+        MissaRangee {
+            MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge, modifier = Modifier.weight(1f))
+            MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, modifier = Modifier.weight(1f))
+        }
         MissaChampTexte(email, { email = it }, stringResource(R.string.four_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
         MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_principal))
     }
@@ -1447,18 +1451,25 @@ private fun DialogueCompte(
         validerActif = titulaire.isNotBlank() && (numero.isNotBlank() || iban.isNotBlank() || numeroMobile.isNotBlank()),
         onValider = { onConfirmer(titulaire, banque, numero, iban, bic, operateur, numeroMobile, principal) },
     ) {
-        MissaChampTexte(titulaire, { titulaire = it }, stringResource(R.string.four_titulaire), icone = Iv.Person)
-        MissaChampTexte(banque, { banque = it }, stringResource(R.string.four_banque), icone = Iv.Bank)
-        MissaChampTexte(numero, { numero = it }, stringResource(R.string.four_numero_compte), icone = Iv.Badge)
-        MissaChampTexte(iban, { iban = it }, stringResource(R.string.four_iban), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE)
-        MissaChampTexte(bic, { bic = it }, stringResource(R.string.four_bic), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE)
-        MissaChampListe(
-            libelle = stringResource(R.string.four_operateur),
-            options = OPERATEURS_MOBILE.map { option -> option to option },
-            selection = operateur,
-            onSelection = { option -> operateur = option },
-            icone = Iv.Smartphone,
-        )
+        MissaRangee {
+            MissaChampTexte(titulaire, { titulaire = it }, stringResource(R.string.four_titulaire), icone = Iv.Person, modifier = Modifier.weight(1f))
+            MissaChampTexte(banque, { banque = it }, stringResource(R.string.four_banque), icone = Iv.Bank, modifier = Modifier.weight(1f))
+        }
+        MissaRangee {
+            MissaChampTexte(numero, { numero = it }, stringResource(R.string.four_numero_compte), icone = Iv.Badge, modifier = Modifier.weight(1f))
+            MissaChampTexte(iban, { iban = it }, stringResource(R.string.four_iban), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE, modifier = Modifier.weight(1f))
+        }
+        MissaRangee {
+            MissaChampTexte(bic, { bic = it }, stringResource(R.string.four_bic), icone = Iv.Bank, clavier = MissaClavier.MOT_CLE, modifier = Modifier.weight(1f))
+            MissaChampListe(
+                libelle = stringResource(R.string.four_operateur),
+                options = OPERATEURS_MOBILE.map { option -> option to option },
+                selection = operateur,
+                onSelection = { option -> operateur = option },
+                icone = Iv.Smartphone,
+                modifier = Modifier.weight(1f),
+            )
+        }
         MissaChampTexte(numeroMobile, { numeroMobile = it }, stringResource(R.string.four_numero_mobile), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
         MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_compte_principal))
     }
@@ -1500,14 +1511,17 @@ private fun DialogueDocument(
         libelleValider = stringResource(R.string.four_ajouter),
         onValider = { onConfirmer(type, reference, chemin, emission, expiration) },
     ) {
-        MissaChampListe(
-            libelle = stringResource(R.string.four_type_document),
-            options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
-            selection = type,
-            onSelection = { option -> type = option },
-            icone = Iv.Description,
-        )
-        MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
+        MissaRangee {
+            MissaChampListe(
+                libelle = stringResource(R.string.four_type_document),
+                options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
+                selection = type,
+                onSelection = { option -> type = option },
+                icone = Iv.Description,
+                modifier = Modifier.weight(1f),
+            )
+            MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge, modifier = Modifier.weight(1f))
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             ChampDateFour(
                 label = stringResource(R.string.four_date_emission),
@@ -1614,16 +1628,21 @@ private fun DialogueArticle(
                     }
                 },
     ) {
-        MissaChampListe(
-            libelle = stringResource(R.string.four_produit),
-            options = candidats.map { produit -> produit.id to produit.nom },
-            selection = produitId,
-            onSelection = { produit -> produitId = produit },
-            icone = Iv.Inventory2,
-        )
-        MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
-        MissaChampTexte(prix, { prix = it.filterMoneyInput() }, stringResource(R.string.four_prix), icone = Iv.Payments, clavier = MissaClavier.DECIMAL)
-        MissaChampTexte(delai, { delai = it.filter { c -> c.isDigit() } }, stringResource(R.string.four_delai), icone = Iv.Schedule, clavier = MissaClavier.ENTIER)
+        MissaRangee {
+            MissaChampListe(
+                libelle = stringResource(R.string.four_produit),
+                options = candidats.map { produit -> produit.id to produit.nom },
+                selection = produitId,
+                onSelection = { produit -> produitId = produit },
+                icone = Iv.Inventory2,
+                modifier = Modifier.weight(1f),
+            )
+            MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge, modifier = Modifier.weight(1f))
+        }
+        MissaRangee {
+            MissaChampTexte(prix, { prix = it.filterMoneyInput() }, stringResource(R.string.four_prix), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+            MissaChampTexte(delai, { delai = it.filter { c -> c.isDigit() } }, stringResource(R.string.four_delai), icone = Iv.Schedule, clavier = MissaClavier.ENTIER, modifier = Modifier.weight(1f))
+        }
         MissaChampTexte(quantiteMin, { quantiteMin = it.filterMoneyInput() }, stringResource(R.string.four_qte_min), icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL)
         MissaCaseACocher(prefere, { prefere = it }, stringResource(R.string.four_prefere))
     }
@@ -1862,10 +1881,10 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
         )
     }
     item {
-        MissaChampTexte(form.nom, { valeur -> vm.updateForm { it.copy(nom = valeur) } }, stringResource(R.string.four_raison_sociale), icone = Iv.Business, requis = true)
-    }
-    item {
-        MissaChampTexte(form.nomCommercial, { valeur -> vm.updateForm { it.copy(nomCommercial = valeur) } }, stringResource(R.string.four_nom_commercial), icone = Iv.Business)
+        MissaRangee {
+            MissaChampTexte(form.nom, { valeur -> vm.updateForm { it.copy(nom = valeur) } }, stringResource(R.string.four_raison_sociale), icone = Iv.Business, requis = true, modifier = Modifier.weight(1f))
+            MissaChampTexte(form.nomCommercial, { valeur -> vm.updateForm { it.copy(nomCommercial = valeur) } }, stringResource(R.string.four_nom_commercial), icone = Iv.Business, modifier = Modifier.weight(1f))
+        }
     }
     item {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1892,10 +1911,10 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeIdentite(
         }
     }
     item {
-        MissaChampTexte(form.adresse, { valeur -> vm.updateForm { it.copy(adresse = valeur) } }, stringResource(R.string.four_adresse), icone = Iv.Place)
-    }
-    item {
-        MissaChampTexte(form.siteWeb, { valeur -> vm.updateForm { it.copy(siteWeb = valeur) } }, stringResource(R.string.four_site_web), icone = Iv.Public)
+        MissaRangee {
+            MissaChampTexte(form.adresse, { valeur -> vm.updateForm { it.copy(adresse = valeur) } }, stringResource(R.string.four_adresse), icone = Iv.Place, modifier = Modifier.weight(1f))
+            MissaChampTexte(form.siteWeb, { valeur -> vm.updateForm { it.copy(siteWeb = valeur) } }, stringResource(R.string.four_site_web), icone = Iv.Public, modifier = Modifier.weight(1f))
+        }
     }
     item {
         MissaChampTexte(form.description, { valeur -> vm.updateForm { it.copy(description = valeur) } }, stringResource(R.string.four_description), icone = Iv.Description)
@@ -1955,10 +1974,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
                 }
                 HorizontalDivider(color = MissaBorder)
                 Text(stringResource(R.string.four_ajouter_contact), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person)
-                MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person)
-                MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge)
-                MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE)
+                MissaRangee {
+                    MissaChampTexte(nom, { nom = it }, stringResource(R.string.four_nom), icone = Iv.Person, modifier = Modifier.weight(1f))
+                    MissaChampTexte(prenom, { prenom = it }, stringResource(R.string.four_prenom), icone = Iv.Person, modifier = Modifier.weight(1f))
+                }
+                MissaRangee {
+                    MissaChampTexte(fonction, { fonction = it }, stringResource(R.string.four_fonction), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                    MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.four_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, modifier = Modifier.weight(1f))
+                }
                 MissaChampTexte(email, { email = it }, stringResource(R.string.four_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL)
                 MissaCaseACocher(principal, { principal = it }, stringResource(R.string.four_principal))
                 Button(
@@ -2191,14 +2214,17 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
                     }
                 }
                 HorizontalDivider(color = MissaBorder)
-                MissaChampListe(
-                    libelle = stringResource(R.string.four_type_document),
-                    options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
-                    selection = type,
-                    onSelection = { option -> type = option },
-                    icone = Iv.Description,
-                )
-                MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge)
+                MissaRangee {
+                    MissaChampListe(
+                        libelle = stringResource(R.string.four_type_document),
+                        options = FournisseurDocType.entries.map { option -> option to libelleDocument(option) },
+                        selection = type,
+                        onSelection = { option -> type = option },
+                        icone = Iv.Description,
+                        modifier = Modifier.weight(1f),
+                    )
+                    MissaChampTexte(reference, { reference = it }, stringResource(R.string.four_reference), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChampDateFour(
                         label = stringResource(R.string.four_date_expiration),

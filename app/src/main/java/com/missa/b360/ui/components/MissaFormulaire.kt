@@ -2,6 +2,18 @@ package com.missa.b360.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -181,41 +193,137 @@ fun MissaChampTexte(
     suffixe: String? = null,
     longueurMax: Int? = null,
 ) {
-    OutlinedTextField(
-        value = valeur,
-        onValueChange = { saisie ->
-            val filtre = filtrerSaisie(clavier, saisie)
-            onValeur(if (longueurMax != null) filtre.take(longueurMax) else filtre)
-        },
-        label = { Text(libelleAvecRequis(libelle, requis), fontSize = 12.sp) },
-        placeholder = placeholder?.let { texte -> { Text(texte, fontSize = 13.sp, color = MissaMuted) } },
-        leadingIcon = icone?.let { res ->
-            { Icon(painterResource(res), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp)) }
-        },
-        suffix = suffixe?.let { texte -> { Text(texte, fontSize = 12.sp, color = MissaMuted) } },
-        supportingText = (erreur ?: aide)?.let { texte -> { Text(texte, fontSize = 11.sp) } },
-        isError = erreur != null,
-        singleLine = lignes <= 1,
-        minLines = if (lignes <= 1) 1 else lignes,
-        maxLines = if (lignes <= 1) 1 else lignes + 3,
+    val interaction = remember { MutableInteractionSource() }
+    val focus by interaction.collectIsFocusedAsState()
+    val focusRequester = remember { FocusRequester() }
+    CadreChamp(
+        libelle = libelle,
+        requis = requis,
+        icone = icone,
+        erreur = erreur,
+        aide = aide,
         enabled = enabled,
-        readOnly = lectureSeule,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = when (clavier) {
-                MissaClavier.ENTIER -> KeyboardType.Number
-                MissaClavier.DECIMAL -> KeyboardType.Decimal
-                MissaClavier.TELEPHONE -> KeyboardType.Phone
-                MissaClavier.EMAIL -> KeyboardType.Email
-                MissaClavier.MOT_CLE -> KeyboardType.Ascii
-                MissaClavier.TEXTE -> KeyboardType.Text
-            },
-            capitalization = if (clavier == MissaClavier.TEXTE) KeyboardCapitalization.Sentences else KeyboardCapitalization.None,
-        ),
-        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-        shape = RoundedCornerShape(12.dp),
-        colors = missaChampCouleurs(),
-        modifier = modifier,
-    )
+        actif = focus,
+        suffixe = suffixe,
+        modifier = modifier.clickable(
+            enabled = enabled && !lectureSeule,
+            indication = null,
+            interactionSource = remember { MutableInteractionSource() },
+        ) { focusRequester.requestFocus() },
+    ) {
+        Box(contentAlignment = Alignment.CenterStart) {
+            if (valeur.isEmpty() && placeholder != null) {
+                Text(placeholder, style = StyleValeur, color = MissaMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            BasicTextField(
+                value = valeur,
+                onValueChange = { saisie ->
+                    val filtre = filtrerSaisie(clavier, saisie)
+                    onValeur(if (longueurMax != null) filtre.take(longueurMax) else filtre)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .semantics { contentDescription = libelle },
+                enabled = enabled,
+                readOnly = lectureSeule,
+                textStyle = StyleValeur.copy(color = if (enabled) MissaInk else MissaMuted),
+                singleLine = lignes <= 1,
+                minLines = if (lignes <= 1) 1 else lignes,
+                maxLines = if (lignes <= 1) 1 else lignes + 3,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = when (clavier) {
+                        MissaClavier.ENTIER -> KeyboardType.Number
+                        MissaClavier.DECIMAL -> KeyboardType.Decimal
+                        MissaClavier.TELEPHONE -> KeyboardType.Phone
+                        MissaClavier.EMAIL -> KeyboardType.Email
+                        MissaClavier.MOT_CLE -> KeyboardType.Ascii
+                        MissaClavier.TEXTE -> KeyboardType.Text
+                    },
+                    capitalization = if (clavier == MissaClavier.TEXTE) KeyboardCapitalization.Sentences else KeyboardCapitalization.None,
+                ),
+                interactionSource = interaction,
+                cursorBrush = SolidColor(MissaInk),
+            )
+        }
+    }
+}
+}
+
+/** Hauteur d'un champ compact (libellé au-dessus + valeur) — structure matricielle. */
+private val HauteurChamp = 44.dp
+private val FormeChamp = RoundedCornerShape(10.dp)
+private val StyleValeur = TextStyle(fontSize = 13.sp, lineHeight = 17.sp)
+
+/**
+ * Cadre commun à tous les champs du kit : icône noire, petit libellé TOUJOURS visible
+ * au-dessus de la valeur (pas de libellé flottant qui réclame de la hauteur), suffixe
+ * et icône de fin facultatifs. ~44 dp de haut contre 56 dp pour un OutlinedTextField.
+ */
+@Composable
+private fun CadreChamp(
+    libelle: String,
+    requis: Boolean,
+    icone: Int?,
+    erreur: String?,
+    aide: String?,
+    enabled: Boolean,
+    actif: Boolean,
+    modifier: Modifier,
+    suffixe: String? = null,
+    iconeFin: Int? = null,
+    contenu: @Composable () -> Unit,
+) {
+    val couleur = LocalCouleurFormulaire.current
+    val bord = when {
+        erreur != null -> Red20
+        actif -> couleur
+        else -> MissaBorder
+    }
+    Column(modifier) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = HauteurChamp)
+                .background(if (enabled) Color.White else Color(0xFFF4F6FA), FormeChamp)
+                .border(if (actif || erreur != null) 1.5.dp else 1.dp, bord, FormeChamp)
+                .padding(horizontal = 10.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (icone != null) {
+                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(
+                    libelleAvecRequis(libelle, requis),
+                    fontSize = 10.sp,
+                    lineHeight = 12.sp,
+                    color = if (erreur != null) Red20 else MissaMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                contenu()
+            }
+            if (suffixe != null) {
+                Spacer(Modifier.width(4.dp))
+                Text(suffixe, fontSize = 12.sp, color = MissaMuted)
+            }
+            if (iconeFin != null) {
+                Spacer(Modifier.width(6.dp))
+                Icon(painterResource(iconeFin), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+            }
+        }
+        (erreur ?: aide)?.let { texte ->
+            Text(
+                texte,
+                fontSize = 10.5.sp,
+                lineHeight = 13.sp,
+                color = if (erreur != null) Red20 else MissaMuted,
+                modifier = Modifier.padding(start = 10.dp, top = 2.dp),
+            )
+        }
+    }
 }
 
 /** Champ non éditable qui ouvre un sélecteur (liste, calendrier…) au toucher. */
@@ -231,35 +339,29 @@ private fun ChampCliquable(
     aide: String?,
     erreur: String?,
     modifier: Modifier,
+    actif: Boolean = false,
     onClick: () -> Unit,
 ) {
-    Box(modifier) {
-        OutlinedTextField(
-            value = valeur,
-            onValueChange = {},
-            readOnly = true,
-            enabled = enabled,
-            label = { Text(libelleAvecRequis(libelle, requis), fontSize = 12.sp) },
-            placeholder = placeholder?.let { texte -> { Text(texte, fontSize = 13.sp, color = MissaMuted) } },
-            leadingIcon = icone?.let { res ->
-                { Icon(painterResource(res), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp)) }
-            },
-            trailingIcon = {
-                Icon(painterResource(iconeFin), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
-            },
-            supportingText = (erreur ?: aide)?.let { texte -> { Text(texte, fontSize = 11.sp) } },
-            isError = erreur != null,
-            singleLine = true,
-            textStyle = LocalTextStyle.current.copy(fontSize = 14.sp),
-            shape = RoundedCornerShape(12.dp),
-            colors = missaChampCouleurs(),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(
-            Modifier
-                .matchParentSize()
-                .padding(bottom = if (erreur != null || aide != null) 20.dp else 0.dp)
-                .clickable(enabled = enabled, onClick = onClick),
+    CadreChamp(
+        libelle = libelle,
+        requis = requis,
+        icone = icone,
+        erreur = erreur,
+        aide = aide,
+        enabled = enabled,
+        actif = actif,
+        iconeFin = iconeFin,
+        modifier = modifier
+            .semantics { contentDescription = libelle }
+            .clickable(enabled = enabled, onClick = onClick),
+    ) {
+        Text(
+            // Espace insécable si vide : la ligne garde sa hauteur (grille régulière).
+            valeur.ifEmpty { placeholder ?: "\u00A0" },
+            style = StyleValeur,
+            color = if (valeur.isEmpty()) MissaMuted else MissaInk,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
@@ -296,6 +398,7 @@ fun <T> MissaChampListe(
             placeholder = placeholder,
             aide = aide,
             erreur = erreur,
+            actif = ouvert,
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 if (options.isEmpty() && actionNouveau != null) actionNouveau.second() else ouvert = true
@@ -517,27 +620,27 @@ fun <T> MissaChoixTuiles(
 ) {
     val couleur = LocalCouleurFormulaire.current
     val parLigne = colonnes.coerceAtLeast(1)
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         options.chunked(parLigne).forEach { ligne ->
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 ligne.forEach { tuile ->
                     val active = tuile.valeur == selection
                     Surface(
                         onClick = { onSelection(tuile.valeur) },
                         enabled = enabled,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(10.dp),
                         color = if (active) couleur.copy(alpha = 0.12f).compositeOver(Color.White) else Color.White,
                         border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) couleur else MissaBorder),
-                        modifier = Modifier.weight(1f).heightIn(min = if (tuile.icone != null) 64.dp else 48.dp),
+                        modifier = Modifier.weight(1f).heightIn(min = if (tuile.icone != null) 50.dp else 38.dp),
                     ) {
                         Column(
-                            Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp),
+                            Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 5.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                         ) {
                             tuile.icone?.let {
-                                Icon(painterResource(it), contentDescription = null, tint = MissaInk, modifier = Modifier.size(22.dp))
-                                Spacer(Modifier.size(4.dp))
+                                Icon(painterResource(it), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.size(2.dp))
                             }
                             Text(
                                 tuile.libelle,
@@ -569,19 +672,22 @@ fun MissaCaseACocher(
     val couleur = LocalCouleurFormulaire.current
     Row(
         modifier
-            .heightIn(min = 48.dp)
+            .heightIn(min = 36.dp)
             .clickable(enabled = enabled) { onChange(!coche) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
         Checkbox(
             checked = coche,
             onCheckedChange = onChange,
             enabled = enabled,
             colors = CheckboxDefaults.colors(checkedColor = couleur, checkmarkColor = couleur.contenuLisible(), uncheckedColor = MissaMuted),
         )
+        }
+        Spacer(Modifier.width(4.dp))
         Column(Modifier.weight(1f)) {
-            Text(libelle, fontSize = 13.sp, color = MissaInk)
-            aide?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
+            Text(libelle, fontSize = 12.5.sp, lineHeight = 15.sp, color = MissaInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            aide?.let { Text(it, fontSize = 10.5.sp, color = MissaMuted) }
         }
     }
 }
@@ -596,17 +702,20 @@ fun MissaInterrupteur(
     enabled: Boolean = true,
 ) {
     val couleur = LocalCouleurFormulaire.current
-    Row(modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier.heightIn(min = 36.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            Text(libelle, fontSize = 13.sp, color = MissaInk, fontWeight = FontWeight.Medium)
-            aide?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
+            Text(libelle, fontSize = 12.5.sp, lineHeight = 15.sp, color = MissaInk, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            aide?.let { Text(it, fontSize = 10.5.sp, color = MissaMuted) }
         }
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
         Switch(
             checked = actif,
             onCheckedChange = onChange,
             enabled = enabled,
             colors = SwitchDefaults.colors(checkedTrackColor = couleur, checkedThumbColor = couleur.contenuLisible()),
+            modifier = Modifier.scale(0.8f),
         )
+        }
     }
 }
 
@@ -624,20 +733,20 @@ fun MissaFormSectionTitre(
     icone: Int? = null,
 ) {
     val couleur = LocalCouleurFormulaire.current
-    Row(modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
         when {
             numero != null -> Box(
-                Modifier.size(24.dp).background(couleur, CircleShape),
+                Modifier.size(20.dp).background(couleur, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("$numero", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = couleur.contenuLisible())
+                Text("$numero", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = couleur.contenuLisible())
             }
-            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp))
+            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
         }
-        if (numero != null || icone != null) Spacer(Modifier.width(10.dp))
+        if (numero != null || icone != null) Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text(titre, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            sousTitre?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
+            Text(titre, fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            sousTitre?.let { Text(it, fontSize = 10.5.sp, color = MissaMuted) }
         }
     }
 }
@@ -652,7 +761,7 @@ fun MissaFormSection(
     icone: Int? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MissaFormSectionTitre(titre = titre, numero = numero, sousTitre = sousTitre, icone = icone)
         content()
     }
@@ -664,7 +773,7 @@ fun MissaRangee(
     modifier: Modifier = Modifier.fillMaxWidth(),
     content: @Composable RowScope.() -> Unit,
 ) {
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top, content = content)
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top, content = content)
 }
 
 /** Bouton principal pleine largeur, couleur du module ; grisé tant que le formulaire est incomplet. */
@@ -688,13 +797,13 @@ fun MissaBoutonPrincipal(
             disabledContainerColor = Color(0xFFE3E8F1),
             disabledContentColor = MissaMuted,
         ),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        modifier = modifier.heightIn(min = 52.dp),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
+        modifier = modifier.heightIn(min = 44.dp),
     ) {
         if (enCours) {
             CircularProgressIndicator(color = contenu, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
         } else {
-            Text(texte, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(texte, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
@@ -712,10 +821,10 @@ fun MissaBoutonSecondaire(
         enabled = enabled,
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, MissaBorder),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp),
-        modifier = modifier.heightIn(min = 52.dp),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp),
+        modifier = modifier.heightIn(min = 44.dp),
     ) {
-        Text(texte, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MissaInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(texte, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = MissaInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -723,9 +832,9 @@ fun MissaBoutonSecondaire(
 @Composable
 fun MissaNoteSecurite(modifier: Modifier = Modifier.fillMaxWidth()) {
     Row(modifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        Icon(painterResource(Iv.Lock), contentDescription = null, tint = MissaInk, modifier = Modifier.size(13.dp))
-        Spacer(Modifier.width(6.dp))
-        Text(stringResource(R.string.form_note_locale), fontSize = 11.sp, color = MissaMuted)
+        Icon(painterResource(Iv.Lock), contentDescription = null, tint = MissaInk, modifier = Modifier.size(11.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(stringResource(R.string.form_note_locale), fontSize = 10.sp, color = MissaMuted)
     }
 }
 
@@ -734,7 +843,7 @@ fun MissaNoteSecurite(modifier: Modifier = Modifier.fillMaxWidth()) {
 fun MissaFormErreur(message: String?, modifier: Modifier = Modifier.fillMaxWidth()) {
     if (message.isNullOrBlank()) return
     Surface(color = Color(0xFFFFEEF0), shape = RoundedCornerShape(10.dp), modifier = modifier) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(Iv.Warning), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
             Text(message, fontSize = 12.sp, color = Red20)
@@ -758,10 +867,10 @@ fun MissaFormPied(
     erreur: String? = null,
 ) {
     Surface(color = Color.White, shadowElevation = 10.dp, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             MissaFormErreur(erreur)
             if (secondaire != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     MissaBoutonSecondaire(secondaire.first, secondaire.second, Modifier.weight(1f), enabled = secondaireActif && !enCours)
                     MissaBoutonPrincipal(texte, onValider, Modifier.weight(1f), enabled = actif, enCours = enCours)
                 }
@@ -797,27 +906,27 @@ fun MissaFormDialogue(
     Dialog(onDismissRequest = onFermer, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         MissaFormulaireTheme(couleur) {
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = Color.White,
-                modifier = Modifier.fillMaxWidth(0.94f).widthIn(max = 560.dp),
+                modifier = Modifier.fillMaxWidth(0.95f).widthIn(max = 560.dp),
             ) {
                 Column {
                     Row(
-                        Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 16.dp, bottom = 12.dp),
+                        Modifier.fillMaxWidth().padding(start = 14.dp, end = 4.dp, top = 8.dp, bottom = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (icone != null) {
                             Box(
-                                Modifier.size(40.dp).background(couleur.copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
+                                Modifier.size(30.dp).background(couleur.copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
                             }
-                            Spacer(Modifier.width(12.dp))
+                            Spacer(Modifier.width(10.dp))
                         }
                         Column(Modifier.weight(1f)) {
-                            Text(titre, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            sousTitre?.let { Text(it, fontSize = 12.sp, color = MissaMuted) }
+                            Text(titre, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MissaInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            sousTitre?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
                         }
                         IconButton(onClick = onFermer) {
                             Icon(painterResource(Iv.Close), contentDescription = stringResource(R.string.st_annuler), tint = MissaInk, modifier = Modifier.size(20.dp))
@@ -828,18 +937,19 @@ fun MissaFormDialogue(
                         Modifier
                             .weight(1f, fill = false)
                             .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         content = content,
                     )
                     Column(
-                        Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 14.dp),
+                        Modifier.fillMaxWidth().padding(start = 14.dp, end = 14.dp, bottom = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        MissaFormErreur(erreur, Modifier.fillMaxWidth().padding(bottom = 6.dp))
-                        MissaBoutonPrincipal(libelleValider, onValider, enabled = validerActif, enCours = enCours)
-                        TextButton(onClick = onFermer, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                            Text(libelleAnnuler ?: stringResource(R.string.st_annuler), color = MissaMuted, fontSize = 14.sp)
+                        MissaFormErreur(erreur, Modifier.fillMaxWidth().padding(bottom = 4.dp))
+                        // Annuler + Valider sur une seule rangée : une ligne de gagnée.
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            MissaBoutonSecondaire(libelleAnnuler ?: stringResource(R.string.st_annuler), onFermer, Modifier.weight(1f))
+                            MissaBoutonPrincipal(libelleValider, onValider, Modifier.weight(1.6f), enabled = validerActif, enCours = enCours)
                         }
                         MissaNoteSecurite()
                     }

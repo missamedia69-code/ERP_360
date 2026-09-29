@@ -427,8 +427,10 @@ private fun DevisCreationDialog(
             )
         }
         MissaFormSection(titre = stringResource(R.string.form_section_details), numero = 2) {
-            MissaChampTexte(designation, { designation = it }, stringResource(R.string.devis_line_label), icone = Iv.Description, requis = true, longueurMax = 120)
-            MissaChampTexte(prix, { prix = it }, stringResource(R.string.devis_total, devise), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, longueurMax = 15)
+            MissaRangee {
+                MissaChampTexte(designation, { designation = it }, stringResource(R.string.devis_line_label), icone = Iv.Description, requis = true, longueurMax = 120, modifier = Modifier.weight(1f))
+                MissaChampTexte(prix, { prix = it }, stringResource(R.string.devis_total, devise), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, longueurMax = 15, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

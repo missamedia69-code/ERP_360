@@ -519,65 +519,22 @@ private fun SelecteurClient(
     onOpenClientCreate: () -> Unit,
     onSelectCashCustomer: () -> Unit,
 ) {
-    var ouvert by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = selectedClient?.nom ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(stringResource(R.string.sales_select_client) + " *", fontSize = 12.sp) },
-            leadingIcon = { Icon(painterResource(Iv.Person), null, tint = MissaInk, modifier = Modifier.size(20.dp)) },
-            trailingIcon = { Icon(painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore), null, tint = MissaInk) },
-            colors = missaChampCouleurs(),
-            placeholder = if (clients.isEmpty()) {
-                { Text(stringResource(R.string.sales_select_client), fontSize = 12.sp, color = MissaMuted) }
-            } else null,
-            shape = RoundedCornerShape(12.dp),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Box(
-            Modifier.matchParentSize().clickable { ouvert = true },
-        )
-        MissaMenuDeroulant(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.sales_cash_customer), fontWeight = FontWeight.SemiBold, color = BleuVente) },
-                onClick = { onSelectCashCustomer(); ouvert = false },
-            )
-            DropdownMenuItem(
-                text = { Text("+ " + stringResource(R.string.clients_nouveau_client), fontWeight = FontWeight.Bold, color = BleuVente) },
-                onClick = {
-                    ouvert = false
-                    onOpenClientCreate()
-                },
-            )
-            clients.forEach { client ->
-                val choisie = client.id == selectedClient?.id
-                DropdownMenuItem(
-                    leadingIcon = if (choisie) {
-                        {
-                            Icon(
-                                painter = painterResource(Iv.Check),
-                                contentDescription = null,
-                                tint = BrandBlue,
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
-                    } else null,
-                    text = {
-                        Text(
-                            text = client.nom,
-                            color = if (choisie) BrandBlue else MissaInk,
-                            fontWeight = if (choisie) FontWeight.SemiBold else FontWeight.Normal,
-                        )
-                    },
-                    onClick = {
-                        onSelect(client)
-                        ouvert = false
-                    },
-                )
-            }
-        }
-    }
+    // Clé -1 = « client comptant » (pas de fiche) ; le client choisi hors liste
+    // (ex. client comptant) s'affiche en indication.
+    val comptant = stringResource(R.string.sales_cash_customer)
+    val options = listOf(-1L to comptant) + clients.map { it.id to it.nom }
+    MissaChampListe(
+        libelle = stringResource(R.string.sales_select_client),
+        options = options,
+        selection = selectedClient?.id?.takeIf { id -> clients.any { it.id == id } },
+        onSelection = { id ->
+            if (id == -1L) onSelectCashCustomer() else clients.firstOrNull { it.id == id }?.let(onSelect)
+        },
+        icone = Iv.Person,
+        requis = true,
+        placeholder = selectedClient?.nom ?: stringResource(R.string.sales_select_client),
+        actionNouveau = stringResource(R.string.clients_nouveau_client) to onOpenClientCreate,
+    )
 }
 
 /** Boîte de dialogue de création rapide d'un client in-situ sans abandonner le panier vente. */
@@ -603,12 +560,16 @@ private fun DialogueCreationClientRapide(
         onValider = { onValider(nom.trim(), telephone.trim(), email.trim().ifBlank { null }, adresse.trim().ifBlank { null }) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampTexte(nom, { nom = it }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true, longueurMax = 120)
-            MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true, longueurMax = 25)
+            MissaRangee {
+                MissaChampTexte(nom, { nom = it }, stringResource(R.string.clients_nom), icone = Iv.Person, requis = true, longueurMax = 120, modifier = Modifier.weight(1f))
+                MissaChampTexte(telephone, { telephone = it }, stringResource(R.string.clients_telephone), icone = Iv.Call, clavier = MissaClavier.TELEPHONE, requis = true, longueurMax = 25, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_contact), numero = 2) {
-            MissaChampTexte(email, { email = it }, stringResource(R.string.sales_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, longueurMax = 100)
-            MissaChampTexte(adresse, { adresse = it }, stringResource(R.string.sales_adresse_optionnelle), icone = Iv.Place, longueurMax = 150)
+            MissaRangee {
+                MissaChampTexte(email, { email = it }, stringResource(R.string.sales_email_optionnel), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, longueurMax = 100, modifier = Modifier.weight(1f))
+                MissaChampTexte(adresse, { adresse = it }, stringResource(R.string.sales_adresse_optionnelle), icone = Iv.Place, longueurMax = 150, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

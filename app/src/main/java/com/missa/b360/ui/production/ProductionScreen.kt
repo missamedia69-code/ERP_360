@@ -309,27 +309,29 @@ private fun FormulaireOrdreProduction(
             // ① Produit fini et quantité
             item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 1) }
             item {
-                MissaChampListe(
-                    libelle = stringResource(R.string.pro_produit_a_fabriquer),
-                    options = fabricables.map { it to it.nom },
-                    selection = ui.selectedProduct,
-                    onSelection = vm::selectFabricable,
-                    icone = Iv.Inventory2,
-                    requis = true,
-                )
-            }
-            item {
-                MissaChampTexte(
-                    valeur = quantiteTexte,
-                    onValeur = { saisie ->
-                        quantiteTexte = saisie
-                        saisie.toDoubleOrNull()?.let(vm::setQuantiteAProduire)
-                    },
-                    libelle = stringResource(R.string.pro_quantite_a_fabriquer),
-                    icone = Iv.LineWeight,
-                    clavier = MissaClavier.DECIMAL,
-                    requis = true,
-                )
+                MissaRangee {
+                    MissaChampListe(
+                        libelle = stringResource(R.string.pro_produit_a_fabriquer),
+                        options = fabricables.map { it to it.nom },
+                        selection = ui.selectedProduct,
+                        onSelection = vm::selectFabricable,
+                        icone = Iv.Inventory2,
+                        requis = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                    MissaChampTexte(
+                        valeur = quantiteTexte,
+                        onValeur = { saisie ->
+                            quantiteTexte = saisie
+                            saisie.toDoubleOrNull()?.let(vm::setQuantiteAProduire)
+                        },
+                        libelle = stringResource(R.string.pro_quantite_a_fabriquer),
+                        icone = Iv.LineWeight,
+                        clavier = MissaClavier.DECIMAL,
+                        requis = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
 
             // ② Nomenclature (BOM)
@@ -449,14 +451,17 @@ private fun DialogueAjoutComposant(
             selectionne?.let { prod -> onAjouter(prod, quantite.toDoubleOrNull() ?: 1.0) }
         },
     ) {
-        MissaChampListe(
-            libelle = stringResource(R.string.pro_choisir_matiere),
-            options = options.map { it to stringResource(R.string.pro_composant_stock_total, it.nom, fmtQuantite(it.total)) },
-            selection = selectionne,
-            onSelection = { selectionne = it },
-            icone = Iv.Inventory2,
-            requis = true,
-        )
-        MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.pro_quantite_requise), icone = Iv.LineWeight, clavier = MissaClavier.DECIMAL, requis = true)
+        MissaRangee {
+            MissaChampListe(
+                libelle = stringResource(R.string.pro_choisir_matiere),
+                options = options.map { it to stringResource(R.string.pro_composant_stock_total, it.nom, fmtQuantite(it.total)) },
+                selection = selectionne,
+                onSelection = { selectionne = it },
+                icone = Iv.Inventory2,
+                requis = true,
+                modifier = Modifier.weight(1f),
+            )
+            MissaChampTexte(quantite, { quantite = it }, stringResource(R.string.pro_quantite_requise), icone = Iv.LineWeight, clavier = MissaClavier.DECIMAL, requis = true, modifier = Modifier.weight(1f))
+        }
     }
 }

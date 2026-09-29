@@ -604,15 +604,18 @@ private fun DialogueNouvellePrestation(
         onValider = { onValider(clientChoisi, intitule.trim(), mode, tarif, heures, intervenant.trim(), lieu.trim()) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_identite), numero = 1) {
-            MissaChampListe(
-                libelle = stringResource(R.string.form_client),
-                options = clients.map { it to it.nom },
-                selection = clientChoisi,
-                onSelection = { clientChoisi = it },
-                icone = Iv.Person,
-                placeholder = stringResource(R.string.sales_select_client),
-            )
-            MissaChampTexte(intitule, { intitule = it }, stringResource(R.string.srv_champ_intitule), icone = Iv.RequestQuote, requis = true)
+            MissaRangee {
+                MissaChampListe(
+                    libelle = stringResource(R.string.form_client),
+                    options = clients.map { it to it.nom },
+                    selection = clientChoisi,
+                    onSelection = { clientChoisi = it },
+                    icone = Iv.Person,
+                    placeholder = stringResource(R.string.sales_select_client),
+                    modifier = Modifier.weight(1f),
+                )
+                MissaChampTexte(intitule, { intitule = it }, stringResource(R.string.srv_champ_intitule), icone = Iv.RequestQuote, requis = true, modifier = Modifier.weight(1f))
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_prix), numero = 2) {
             MissaChoixTuiles(
@@ -636,8 +639,10 @@ private fun DialogueNouvellePrestation(
             }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_planification), numero = 3) {
-            MissaChampTexte(intervenant, { intervenant = it }, stringResource(R.string.form_intervenant), icone = Iv.Person)
-            MissaChampTexte(lieu, { lieu = it }, stringResource(R.string.form_lieu), icone = Iv.Place)
+            MissaRangee {
+                MissaChampTexte(intervenant, { intervenant = it }, stringResource(R.string.form_intervenant), icone = Iv.Person, modifier = Modifier.weight(1f))
+                MissaChampTexte(lieu, { lieu = it }, stringResource(R.string.form_lieu), icone = Iv.Place, modifier = Modifier.weight(1f))
+            }
         }
     }
 }

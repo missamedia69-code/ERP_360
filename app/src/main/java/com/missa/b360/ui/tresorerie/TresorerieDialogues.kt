@@ -68,8 +68,10 @@ internal fun TreCompteDialogue(
             MissaChampTexte(nom, { nom = it }, stringResource(R.string.tre_champ_nom), icone = iconeType(type), requis = true)
             // Établissement et numéro n'ont de sens que hors espèces.
             if (type != TypeCompteTresorerie.CAISSE) {
-                MissaChampTexte(etablissement, { etablissement = it }, stringResource(R.string.tre_champ_etablissement), icone = Iv.AccountBalance)
-                MissaChampTexte(numero, { numero = it }, stringResource(R.string.tre_champ_numero), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE)
+                MissaRangee {
+                    MissaChampTexte(etablissement, { etablissement = it }, stringResource(R.string.tre_champ_etablissement), icone = Iv.AccountBalance, modifier = Modifier.weight(1f))
+                    MissaChampTexte(numero, { numero = it }, stringResource(R.string.tre_champ_numero), icone = Iv.Badge, clavier = MissaClavier.MOT_CLE, modifier = Modifier.weight(1f))
+                }
             }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 3) {
@@ -162,8 +164,10 @@ internal fun TreMouvementDialogue(
             )
         }
         MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 2) {
-            MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true)
-            MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true)
+            MissaRangee {
+                MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, modifier = Modifier.weight(1f))
+                MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true, modifier = Modifier.weight(1f))
+            }
             MissaChampListe(
                 libelle = stringResource(R.string.tre_champ_categorie),
                 options = categories.map { it to stringResource(TresorerieRules.libelleCategorie(it)) },
@@ -218,26 +222,32 @@ internal fun TreVirementDialogue(
         onValider = { onValider(sourceId, destinationId, montant, libelle.trim()) },
     ) {
         MissaFormSection(titre = stringResource(R.string.form_section_comptes), numero = 1) {
-            MissaChampListe(
-                libelle = stringResource(R.string.tre_champ_source),
-                options = options(destinationId),
-                selection = sourceId.takeIf { it != 0L },
-                onSelection = { sourceId = it },
-                icone = Iv.TrendingDown,
-                requis = true,
-            )
-            MissaChampListe(
-                libelle = stringResource(R.string.tre_champ_destination),
-                options = options(sourceId),
-                selection = destinationId.takeIf { it != 0L },
-                onSelection = { destinationId = it },
-                icone = Iv.TrendingUp,
-                requis = true,
-            )
+            MissaRangee {
+                MissaChampListe(
+                    libelle = stringResource(R.string.tre_champ_source),
+                    options = options(destinationId),
+                    selection = sourceId.takeIf { it != 0L },
+                    onSelection = { sourceId = it },
+                    icone = Iv.TrendingDown,
+                    requis = true,
+                    modifier = Modifier.weight(1f),
+                )
+                MissaChampListe(
+                    libelle = stringResource(R.string.tre_champ_destination),
+                    options = options(sourceId),
+                    selection = destinationId.takeIf { it != 0L },
+                    onSelection = { destinationId = it },
+                    icone = Iv.TrendingUp,
+                    requis = true,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
         MissaFormSection(titre = stringResource(R.string.form_section_montants), numero = 2) {
-            MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise)
-            MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true)
+            MissaRangee {
+                MissaChampTexte(montant, { montant = it }, stringResource(R.string.tre_champ_montant), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, requis = true, suffixe = devise, modifier = Modifier.weight(1f))
+                MissaChampTexte(libelle, { libelle = it }, stringResource(R.string.tre_champ_libelle), icone = Iv.Description, requis = true, modifier = Modifier.weight(1f))
+            }
         }
     }
 }
