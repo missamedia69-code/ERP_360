@@ -29,20 +29,24 @@ Les micro-entreprises, artisans, commerçants, industriels et PME en Afrique sub
 ### 2.1 Stack Technologique
 * **Langage :** Kotlin 100% (Coroutines, StateFlow, Flow réactifs).
 * **UI / Rendu :** Jetpack Compose, Material 3 adapté, Charte propriétaire MISSA UI (Flat monochrome + contrastes vifs).
-* **Persistance locale :** Room Database (SQLite), version courante : 17.
+* **Persistance locale :** Room Database (SQLite), version courante : 21 (migrations 1→21, 67 tables).
 * **Injection de dépendances :** Dagger Hilt.
 * **Architecture applicative :** Clean Architecture (Data → Domain / Use Cases → Presentation / ViewModel / Compose).
 * **Internationalisation :** 5 locales complètes (`values`, `values-en`, `values-es`, `values-zh`, `values-ar`).
 
 ### 2.2 Principes de Conception Non Négociables
-1. **Couleurs Sémantiques Fixes :**
+1. **Couleurs des modules** (source de vérité : `AppModule` dans `ui/navigation/ModuleRegistry.kt`,
+   verrouillée par `ModuleRegistryTest` ; la palette initiale jaune/marron/vert/orange a été
+   remplacée par décision du propriétaire) :
    * Vente : Bleu Royal (`0xFF2563EB`)
    * Stock : Gris Neutre (`0xFF6B7280`)
-   * Achats : Jaune Ambré (`0xFFFACC15`)
-   * Fournisseurs : Marron Terre / Cuir (`0xFF92400E`)
-   * Finances / Trésorerie / Comptabilité : Vert Monétaire (`0xFF16A34A`)
-   * Production : Orange Industriel (`0xFFF97316`)
+   * Achats et Fournisseurs : Orange (`0xFFF28A16`, fond pâle `0xFFFFF2E2`)
+   * Trésorerie : Bleu nuit (`0xFF1E3A8A`)
+   * Finances / Comptabilité : Ardoise (`0xFF475569`)
+   * Production : Violet (`0xFF8B5CF6`)
    * Clients : Violet Doux (`0xFF8B5CF6`)
+   * Services : Rose (`0xFFDB2777`) · Projets : Indigo (`0xFF6366F1`) · CRM : Magenta (`0xFFC026D3`) · Reporting : Cyan foncé (`0xFF0E7490`)
+   * Montants : dépense = rouge, gain = vert (`0xFF16A34A`)
    * RH : Rouge Rubis (`0xFFE11D48`)
    * Livraison : Bleu Ciel (`0xFF38BDF8`)
    * Maintenance : Rouge Brique (`0xFFB91C1C`)
@@ -288,11 +292,11 @@ Contrôle d'accès et intégrité de la solution.
 
 | Phase | Modules / Périmètre | État actuel |
 |---|---|---|
-| **Socle V1** | Architecture Clean, Room v17, CI/CD GitHub Actions, Design System, Onboarding | **Livré (Vert)** |
+| **Socle V1** | Architecture Clean, Room (v21 au 29/09/2026), CI/CD GitHub Actions, Design System, Onboarding | **Livré (Vert)** |
 | **Phase 1** | Référentiel Stock (STK) complet, Matrice des catégories, Valorisation CMUP | **Livré (Vert)** |
 | **Phase 2** | Référentiel Fournisseurs (FRN) complet, Cycle 6 statuts, Anti-doublons, Formulaire 7 étapes | **Livré (Vert)** |
-| **Phase 3** | Achats (ACH) : Bons de commande, Bons de réception, Facturation, Déductions TVA | **En cours d'ajustement UI** |
-| **Phase 4** | Clients (CLI) & Ventes directes / Facturation (VEN) | **Prochaine étape** |
-| **Phase 5** | Trésorerie multi-caisses (TRE) & Règlements clients/fournisseurs | Planifié |
-| **Phase 6** | Comptabilité automatique SYSCOHADA (CPT) & États financiers | Planifié |
-| **Phase 7** | Production (PRO), RH & Paie, Logistique, Qualité, Maintenance | Planifié |
+| **Phase 3** | Achats (ACH) : Bons de commande, Bons de réception, Facturation, Déductions TVA | **Livré (Vert)** |
+| **Phase 4** | Clients (CLI) & Ventes directes / Facturation (VEN) | **Partiel** (retours/avoirs à faire) |
+| **Phase 5** | Trésorerie multi-caisses (TRE) & Règlements clients/fournisseurs | **Écran réel** (comptes, mouvements, rapprochement) |
+| **Phase 6** | Comptabilité automatique SYSCOHADA (CPT) & États financiers | **Socle livré** (partie double, journaux, périodes, règles) — raccordement des modules et états à venir |
+| **Phase 7** | Production (PRO), RH & Paie, Logistique, Qualité, Maintenance | **Premier palier** (écrans réels, limites dans `docs/ARCHITECTURE_*.md`) |

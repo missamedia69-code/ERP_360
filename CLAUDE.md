@@ -12,8 +12,14 @@ Un seul module Gradle (`app`). Cinq langues : `values` (fr), `values-en`, `value
   le header et le fond de la barre du bas. « Achats » = `Iv.CartArrowDown`.
 - **Couleur de module** : source unique `AppModule.couleur` (ui/navigation). Déclinaisons :
   `couleurPale` alpha 0.45, `couleurDouce` alpha 0.26 (ne pas revenir à 14/12 %).
-- **Couleurs sémantiques** : dépense = rouge, gains/argent/compta = vert, production = orange,
-  achats = jaune, vente = bleu, stock = gris.
+- **Couleurs sémantiques** (montants/indicateurs) : dépense = rouge, gains/argent = vert.
+- **Palette des modules** (source de vérité = `AppModule` dans `ModuleRegistry.kt`, verrouillée par
+  `ModuleRegistryTest`) : Vente bleu `#2563EB` · Stock gris `#6B7280` · Clients violet `#8B5CF6` ·
+  Achats **et** Fournisseurs orange `#F28A16` (fond pâle fixe `#FFF2E2`) · Production violet `#8B5CF6` ·
+  Trésorerie bleu nuit `#1E3A8A` · Comptabilité/Finances ardoise `#475569` · Services `#DB2777` ·
+  Projets `#6366F1` · RH `#E11D48` · Livraison `#38BDF8` · CRM `#C026D3` · Qualité `#7C3AED` ·
+  Maintenance `#B91C1C` · Logistique `#65A30D` · Reporting `#0E7490`. Changer une teinte = modifier
+  `AppModule` **et** le test, avec validation du propriétaire.
 - **Convention C7 — jamais de suppression physique** : statuts (ARCHIVE, DESACTIVE…) ou
   annulation par **contre-passation** (pièces et mouvements inverses). Seule exception :
   retrait d'un document joint fournisseur (tracé dans l'audit).
@@ -48,8 +54,10 @@ app/src/main/java/com/missa/b360/
   `AchatCommandeRules`, `ProduitRules`) : sans Android, testées en JVM.
 - **Numérotation** : `SequenceManager.next(DocType.X)` — préfixes : `FA` facture vente,
   `FFR` facture fournisseur, `BC` bon de commande, `RE` réception, `FRN` fournisseur, etc.
-- **Room** : migrations SQL obligatoires dans `AppDatabase` (version courante **17**),
-  enregistrées dans `di/DatabaseModule`. `@Insert(onConflict = REPLACE)` — pas de `@Upsert`.
+- **Room** : migrations SQL obligatoires dans `AppDatabase` (version courante **21**, chaîne
+  `MIGRATION_1_2` → `MIGRATION_20_21`, **67 tables**), enregistrées dans `di/DatabaseModule`.
+  Les schémas exportés (`app/schemas/`) sont commités automatiquement par la CI après un build vert
+  (versions 8–11 et 13–20 jamais exportées : perdues). `@Insert(onConflict = REPLACE)` — pas de `@Upsert`.
   Enums persistés en TEXT (Room ≥ 2.6, support natif). Les colonnes ajoutées par migration
   doivent avoir un `DEFAULT` et correspondre exactement au schéma attendu par Room.
 - Les `StateFlow` exposés aux écrans passent par `stateIn(viewModelScope, WhileSubscribed(5s), …)`.
@@ -73,6 +81,8 @@ app/src/main/java/com/missa/b360/
 - CI GitHub Actions (`.github/workflows/android.yml`) : parité des traductions → compilation →
   tests → APK en artefact **et** dans la release fixe `apk-latest`
   (https://github.com/missamedia69-code/ERP_360/releases/download/apk-latest/app-debug.apk).
+- **Catalogue honnête** : `DestinationsFonctions` ne route une fonctionnalité que si elle ouvre un
+  écran réel (garde-fou `DestinationsFonctionsTest`) — jamais vers un `PlaceholderScreen`.
 - **Ne jamais annoncer une fonctionnalité terminée sans CI verte** (ou build local vert).
   En cas de CI rouge sans accès aux logs : la page du run affiche les annotations fichier:ligne.
 
@@ -87,11 +97,16 @@ app/src/main/java/com/missa/b360/
 - Propriété injectée et fonction du ViewModel homonymes → ambiguïté : suffixer la propriété
   (`saveCommandeAchat`, `changerStatutUseCase`…).
 - `matchParentSize` = BoxScope uniquement.
+- **Deux classes de test homonymes** dans le même package (`com.missa.b360`) = « Redeclaration » :
+  `compileDebugUnitTestKotlin` échoue alors que `assembleDebug` passe (cas vécu avec
+  `ProductionRulesTest`). Un nom de classe de test unique par fichier.
+- Journaux CI inaccessibles : `gh api repos/<owner>/<repo>/check-runs/<job-id>/annotations` donne
+  les erreurs fichier:ligne (le téléchargement des logs/artefacts peut échouer).
 
 ## Organisation du travail
 
-- La branche `arena/01a0d29b-erp-360` est pilotée par l'agent Arena (sessions de spécification
-  par module). Pour du travail local : créer une branche dédiée depuis la pointe à jour et
+- Les branches `arena/*` sont pilotées par l'agent Arena (une branche par session de
+  spécification ; la CI tourne aussi sur `arena/**`). Pour du travail local : créer une branche dédiée depuis la pointe à jour et
   fusionner par PR — ne jamais éditer en parallèle les mêmes fichiers sur deux agents
   (conflits de fusion garantis, ex. `strings.xml`).
 - Chaque module se fait par phases : maquette/spec → validation → implémentation complète

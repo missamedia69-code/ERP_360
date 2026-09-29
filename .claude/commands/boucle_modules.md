@@ -14,9 +14,10 @@ Cette commande guide l'implémentation complète, rigoureuse et autonome d'un mo
 
 ## Étape 3 : Données & Persistance (Room)
 1. Si de nouvelles tables ou colonnes sont nécessaires :
-   - Mettre à jour `AppDatabase.kt` (incrémenter la version, ex: 17 -> 18).
+   - Mettre à jour `AppDatabase.kt` (incrémenter la version, ex: 21 -> 22).
    - Suivre scrupuleusement la checklist dans `.claude/commands/migration.md`.
-   - Créer le `Migration_X_Y.kt` et l'enregistrer dans `DatabaseMigrations.kt`.
+   - Déclarer `MIGRATION_X_Y` dans le `companion object` de `AppDatabase.kt` et l'enregistrer
+     dans `di/DatabaseModule.kt` (`addMigrations(…)`).
 
 ## Étape 4 : Interface Utilisateur (Compose)
 1. Implémenter l'interface complète dans `ui/<nom_module>/` :

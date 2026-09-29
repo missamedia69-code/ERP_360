@@ -25,36 +25,39 @@ d'activité**. Implémentation du cahier de charge **E9**.
 > **restauration** se fait depuis la carte « Restaurer une sauvegarde » de la configuration
 > d'onboarding (`BackupManager`, plafond de version lu sur la base réellement ouverte).
 
-> **Branche de travail : `arena/01a0d35d-erp-360`** — issue de `main` (`e40dd3f`). Le socle est
-> stable (base **v17**, chaîne de migrations 1→17) et la CI est verte : parité des traductions,
-> clés `R.string` manquantes, `assembleDebug`, `testDebugUnitTest`, APK publié. Les écrans encore
-> en placeholder sont listés explicitement dans le tableau des modules — aucun module n'est
-> annoncé terminé à tort.
+> **Travail par branches `arena/*`** (une par session d'agent, CI sur `arena/**`), fusion vers
+> `main` par PR. Socle : base Room **v21** (chaîne de migrations 1→21, 67 tables). La CI vérifie
+> la parité des traductions, les clés `R.string` manquantes, `assembleDebug` et
+> `testDebugUnitTest`, puis publie l'APK. Les écrans encore en placeholder sont listés
+> explicitement dans le tableau des modules — aucun module n'est annoncé terminé à tort.
 >
-> Le travail inachevé reste hors de la ligne de travail : c'est le cas des écrans **Devis →
-> Commande** (spec §20) et **Retours de vente / avoirs** (spec §22), dont les règles métier,
-> codecs et tests JVM sont déjà livrés en main, mais dont les écrans sont encore des placeholders.
+> **Devis → Commande** (spec §20) a désormais un écran réel (`DevisCommandeScreen`) ;
+> **Retours de vente / avoirs** (spec §22) : règles métier, codecs et tests JVM livrés, écran
+> encore placeholder (`ReturnSaleScreen`).
 
 ---
 
-## 🧩 Modules — état au 24/09/2026
+## 🧩 Modules — état au 29/09/2026
 
 | Module | Barre | État | Description |
 |---|:---:|:---:|---|
 | **Accueil** | 🏠 | ✅ **Réel** | Tableau de bord (4 KPI avec popup courbe 14 j · 8 actions rapides épinglables · résumé · activités) — référence `HomeScreen.kt`, logo entreprise en filigrane (`CompanyLogo`) |
-| **Vente** | ✅ | 🟡 **Partiel** | Vente directe + historique + CA réels (`SalesScreen`, 782 l., sélection/création client rapide, contrôle de stock) ; **Devis → commande** (spec §20) et **retours/avoirs** (spec §22) : règles + tests livrés, écrans encore placeholders |
+| **Vente** | ✅ | 🟡 **Partiel** | Vente directe + historique + CA réels (`SalesScreen`, sélection/création client rapide, contrôle de stock) ; **Devis → commande** (spec §20) : écran réel `DevisCommandeScreen` ; **retours/avoirs** (spec §22) : règles + tests livrés, écran encore placeholder |
 | **Stock** | ✅ | ✅ **Réel** | Hub (`StockAccueilScreen` : valeur, tendances, entrées/sorties 30 j, alertes) + produits, groupes d'articles transverse, mouvements, transferts, inventaires, catégories, équipements, détail — **Phase E livrée** |
-| **Clients** | ✅ | ✅ **Réel** | `ClientFlowScreen` (1 434 l.) : fiches NIF, contacts multiples, adresses, fidélité, catégories/prix — `ClientsScreen` câblé dans `AppNavHost` |
+| **Clients** | ✅ | ✅ **Réel** | `ClientFlowScreen` : fiches NIF, contacts multiples, adresses, fidélité, catégories/prix — `ClientsScreen` câblé dans `AppNavHost` |
 | **Finances** | ✅ | 🟡 **Partiel** | Encaissements/dépenses et comptabilité : écrans **Trésorerie** et **Comptabilité** réels ; liste d'opérations générique encore en placeholder |
-| **Achats** | ➕ | ✅ **Réel** | `PurchasesScreen` (1 900 l.) : commandes → réceptions → factures → règlements (chaîne `ACH→STK`, contre-passation), reporting — **Phase F livrée** |
-| **Fournisseurs** | ➕ | ✅ **Réel** | `FournisseursScreen` (2 622 l.) : cycle `BROUILLON → A_VALIDER → ACTIF → … → ARCHIVE`, contacts, comptes bancaires, documents |
-| **Livraison · Logistique · Production · Services · RH · Projets · Comptabilité · Trésorerie · CRM · Qualité · Maintenance · Reporting · Tâches** | ➕ | ✅ **Réels** | Écrans réels (listes + formulaires + `ViewModel` branchés aux UseCases/Room) — profondeur par fonction suivie par `DestinationsFonctions` |
+| **Achats** | ➕ | ✅ **Réel** | `PurchasesScreen` : commandes → réceptions → factures → règlements (chaîne `ACH→STK`, contre-passation), reporting — **Phase F livrée** |
+| **Fournisseurs** | ➕ | ✅ **Réel** | `FournisseursScreen` : cycle `BROUILLON → A_VALIDER → ACTIF → … → ARCHIVE`, contacts, comptes bancaires, documents |
+| **Livraison · Logistique · Production · Services · RH · Projets · Comptabilité · Trésorerie · CRM · Qualité · Maintenance · Reporting · Tâches** | ➕ | ✅ **Réels** | Écrans réels (listes + formulaires + `ViewModel` branchés aux UseCases/Room) — profondeur par fonction suivie par `DestinationsFonctions`. Limites documentées : `docs/ARCHITECTURE_COMPTABILITE.md` (grand livre, balance, raccordement des modules à venir), `docs/ARCHITECTURE_PRODUCTION.md` (lot complet unique, pas de nomenclatures/réservations), `docs/ARCHITECTURE_SERVICES.md` (pas de facturation ni de consommation de stock), `docs/ARCHITECTURE_STOCK.md` |
 | **Notifications** | 🔔 | ⏳ Placeholder | `NotificationsScreen` (cloche du header, compteur d'activités inclus) |
 | **9.1 Administration** | ☰ | 🟡 **Partiel** | **Réglages** (activation de profil, palier, modules personnalisés), **Sites** multi-site, **Référentiels** (moyens de paiement, taxes, unités) réels ; **Licence, Sauvegarde, Journal, Utilisateurs, À propos** = placeholders |
 
 **Honnêteté du catalogue** : `ModuleSousElements` répertorie **132 fonctionnalités** sur les
-14 modules ; `DestinationsFonctions` n'en marque **85 comme disponibles** (une fonction n'est
+14 modules ; `DestinationsFonctions` n'en marque **78 comme disponibles** (une fonction n'est
 disponible que si elle ouvre un écran qui fonctionne). Les autres s'affichent comme *prévu*.
+Retirés le 29/09/2026 car ils ouvraient un placeholder ou une fonction non livrée : Retours
+clients, Avoirs clients, Grand livre, Balance, Lots / Séries, Réservations de stock, Facturation
+des prestations, Déclarations de production (garde-fou `DestinationsFonctionsTest`).
 
 Navigation **RA-22** : menu ☰, cloche 🔔, barre du bas à **5 emplacements** — Accueil, **3 modules
 du profil** (épinglables ; ordre d'usine `VEN → ACH → STK → TRE → CPT → PRO → SER → PRJ → LOG →
@@ -88,11 +91,11 @@ CRM → RH → QUA → MAI → REP`, plafondé par `AppModule.MAX_ONGLETS = 3`) 
 5 langues intégrales, y compris **arabe RTL** : Français (défaut) · English · Español · العربية · 中文.
 Changement à chaud (per-app language). Deux garde-fous en CI :
 
-* `python3 .github/scripts/verifier_traductions.py` — parité des cinq `strings.xml` : **1 622 clés
-  chacune** au 24/09/2026 (clé absente, clé surnuméraire, doublon, apostrophe non échappée ou
+* `python3 .github/scripts/verifier_traductions.py` — parité des cinq `strings.xml` : **1 822 clés
+  chacune** au 29/09/2026 (clé absente, clé surnuméraire, doublon, apostrophe non échappée ou
   paramètre `%1$s` divergent font échouer la CI) ;
 * `python3 .github/scripts/verifier_cles_manquantes.py` — toute clé `R.string` référencée dans le
-  code doit exister (**1 597 référencées, toutes présentes**).
+  code doit exister (**1 776 référencées, toutes présentes**).
 
 ---
 
@@ -133,7 +136,7 @@ utilisation : demander « applique le skill `<nom>` » à l'agent dans la sessio
 | Langage / build | **Kotlin 2.3** · AGP 9.4 · Gradle 9.6 (Kotlin DSL, version catalog) |
 | UI | **Jetpack Compose** + **Material 3** (BOM `2025.09.01`) — `MissaDesign` (`MissaCanvas` `#F8F9FD`, `MissaPanel` 14dp/bord `#CBD5E8`, `MissaTopAppBar` blanche), splash vidéo one-shot |
 | Architecture | **MVVM + Clean** : `ui/` → `domain/usecase/` → `data/` |
-| Persistance | **Room 2.8.4 (KSP)** — **53 tables**, base **v17**, migrations **1→17** |
+| Persistance | **Room 2.8.4 (KSP)** — **67 tables**, base **v21**, migrations **1→21** (schémas exportés commités par la CI) |
 | Réglages | **DataStore** + verrous d'amont + `VENTE_SANS_STOCK` |
 | Injection | **Hilt 2.60.1** |
 | Tâches de fond | **WorkManager** — purge du journal selon la rétention choisie (30 j / 90 j / 12 mois, défaut **12 mois**) + **sauvegarde locale AUTO quotidienne** (redoublée au démarrage) |
@@ -149,30 +152,30 @@ app/src/main/java/com/missa/b360/
 ├── MissaApp.kt · MainActivity.kt    # Hilt, WorkManager (purge journal + sauvegarde AUTO)
 ├── core/backup/        # BackupManager — export local, restauration (plafond de version
 │                       #   lu sur la base réellement ouverte — RestaurationRules)
-├── core/data/          # db (Room v17 · 53 tables · migrations 1→17) · dao (35 @Dao) ·
-│                       #   entity (53 @Entity) · datastore (+ VENTE_SANS_STOCK) · repository
+├── core/data/          # db (Room v21 · 67 tables · migrations 1→21) · dao (37 @Dao) ·
+│                       #   entity (67 @Entity) · datastore (+ VENTE_SANS_STOCK) · repository
 ├── core/domain/model/  # ModulesSocle (avecDependances), Configuration (14 modules, 7 profils,
 │                       #   ModuleSousElements : 132 fonctionnalités), DependancesModules /
 │                       #   ValidationProfil (règle d'or + validation), ReglesGroupesArticles
 │                       #   (groupes transverses), OptionsProfil, règles pures métier (…Rules)
-├── core/domain/usecase/ # 30 UseCases
+├── core/domain/usecase/ # 34 fichiers · ~110 UseCases (dont ProductionStockUseCase, contrat Stock)
 ├── core/journal/       # JournalManager (rétention 30 j / 90 j / 365 j, défaut 365)
 ├── core/security/      # PinHasher (PBKDF2 120 000 it.), PinManager (PIN 4–6, jamais en clair)
 ├── core/util/          # SequenceManager (FA/FFR/BC/RE/FRN…), Iso4217, Fuseaux, PDF…
 ├── ui/onboarding/      # bienvenue (langue) → configuration (formats, rétention, sauvegardes,
 │                       #   fuseau, restauration) → profil (ASV/APSV en tête) → entreprise →
 │                       #   PIN (+ PinLockScreen) → terminé (+ carte licence)
-├── ui/home/            # HomeScreen.kt — référence visuelle (1 777 l.)
+├── ui/home/            # HomeScreen.kt — référence visuelle
 ├── ui/screens/         # SplashVideoScreen — intro vidéo one-shot (res/raw/splash_intro.mp4)
 ├── ui/components/      # MissaDesign · MissaAppScaffold (+ MissaAppHeader) · MissaBarreModules ·
 │                       #   PlaceholderScreen (Scaffold + MissaTopAppBar + MissaEmptyState) ·
 │                       #   CompanyLogo · illustrations 3D
-├── ui/clients/         # ✅ ClientFlowScreen (1 434 l.) + dialogues + ClientsViewModel — câblé
+├── ui/clients/         # ✅ ClientFlowScreen + dialogues + ClientsViewModel — câblé
 ├── ui/stock/           # ✅ hub + produits + mouvements + transferts + inventaires + alertes…
-├── ui/sales/           # 🟡 SalesScreen réel (vente directe + historique) ; DevisCommande /
-│                       #   ReturnSales = placeholders (SalesFlowScreen non câblé)
-├── ui/purchases/       # ✅ PurchasesScreen (1 900 l.) — chaîne achat complète
-├── ui/fournisseurs/    # ✅ FournisseursScreen (2 622 l.)
+├── ui/sales/           # 🟡 SalesScreen réel (vente directe + historique) · DevisCommande réel ;
+│                       #   ReturnSale = placeholder (SalesFlowScreen non câblé)
+├── ui/purchases/       # ✅ PurchasesScreen — chaîne achat complète
+├── ui/fournisseurs/    # ✅ FournisseursScreen
 ├── ui/<livraison|logistique|production|services|rh|projets|comptabilite|tresorerie|
 │   crm|qualite|maintenance|operations(Reporting)|tasks>/   # ✅ écrans réels par module
 ├── ui/admin/           # 🟡 Reglages · Sites · Referentiels réels ; Licence · Sauvegarde ·
@@ -245,4 +248,32 @@ sur `ProductType` via `ProduitRules`) :
 | Phase | Contenu | État |
 |---|---|---|
 | **A — Socle** | Gradle, Hilt, Room, DataStore, PIN, Licence, Journal, Séquences, Nav | ✅ |
-| **B — Onboarding** | bienvenue/langue → configuration → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK +
+| **B — Onboarding** | bienvenue/langue → configuration → profil ASV/APSV → entreprise → PIN → licence | ✅ (flux ACH→STK + option vente sans stock) |
+| **C — Clients** | fiches, contacts, adresses, fidélité, catégories et prix | ✅ |
+| **D — Vente** | vente directe, historique, devis → commande | 🟡 retours/avoirs à faire |
+| **E — Stock** | hub, produits, groupes d'articles, mouvements, transferts, inventaires | ✅ |
+| **F — Achats / Fournisseurs** | commandes → réceptions → factures → règlements, cycle fournisseur | ✅ |
+| **G — Comptabilité** | registre en partie double, journaux, périodes, règles d'imputation (v19–v20) | 🟡 modules non raccordés, pas de grand livre/balance |
+| **H — Production** | OF en lot complet, sorties/entrées déléguées au Stock | 🟡 pas de nomenclatures/réservations |
+| **I — Services** | demandes → ordres → planification → rapport → validation (v21) | 🟡 pas de facturation ni de pièces |
+| **J — Administration** | réglages, sites, référentiels | 🟡 licence, sauvegarde, journal, utilisateurs, à propos = placeholders |
+| **K — Notifications** | cloche du header | ⏳ placeholder |
+
+---
+
+## 🧪 Tests et vérification
+
+```bash
+python3 .github/scripts/verifier_traductions.py    # parité des 5 langues
+python3 .github/scripts/verifier_cles_manquantes.py # clés R.string référencées
+./gradlew assembleDebug testDebugUnitTest            # compilation + ~425 tests JVM (47 fichiers)
+```
+
+APK de débogage à jour (release fixe) :
+https://github.com/missamedia69-code/ERP_360/releases/download/apk-latest/app-debug.apk
+
+---
+
+## 📄 Licence
+
+Apache 2.0 — voir [LICENSE](LICENSE).

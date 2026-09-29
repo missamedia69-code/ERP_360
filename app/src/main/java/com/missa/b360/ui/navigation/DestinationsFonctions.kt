@@ -29,6 +29,14 @@ data class FonctionModule(
  */
 object DestinationsFonctions {
 
+    /*
+     * Volontairement absents (présentés « prévus ») tant que l'écran n'existe pas :
+     * Retours clients / Avoirs clients (ReturnSaleScreen = placeholder), Grand livre et
+     * Balance (docs/ARCHITECTURE_COMPTABILITE.md), Lots / Séries et Réservations de stock
+     * (docs/ARCHITECTURE_STOCK.md), Facturation des prestations (SER ne facture pas,
+     * docs/ARCHITECTURE_SERVICES.md), Déclarations de production (lot complet unique,
+     * docs/ARCHITECTURE_PRODUCTION.md). Garde-fou : DestinationsFonctionsTest.
+     */
     private val routes: Map<String, String> = mapOf(
         // --- Achats ---
         "Fournisseurs" to AppModule.FOURNISSEURS.route,
@@ -43,7 +51,6 @@ object DestinationsFonctions {
         "Commandes clients" to Routes.DEVIS_COMMANDE,
         "Livraisons" to AppModule.LIVRAISON.route,
         "Factures clients" to AppModule.VENTE.route,
-        "Retours clients" to Routes.SALES_RETURN,
         "Relances clients" to AppModule.CRM.route,
 
         // --- Stock ---
@@ -60,13 +67,11 @@ object DestinationsFonctions {
 
         // --- Production ---
         "Ordres de fabrication" to AppModule.PRODUCTION.route,
-        "Déclarations de production" to AppModule.PRODUCTION.route,
 
         // --- Services ---
         "Interventions" to AppModule.SERVICES.route,
         "Demandes d'intervention" to AppModule.SERVICES.route,
         "Planning des interventions" to AppModule.SERVICES.route,
-        "Facturation des prestations" to AppModule.SERVICES.route,
 
         // --- Projets ---
         "Projets" to AppModule.PROJETS.route,
@@ -83,7 +88,6 @@ object DestinationsFonctions {
         // --- Comptabilité ---
         "Journaux comptables" to AppModule.COMPTABILITE.route,
         "Écritures comptables" to AppModule.COMPTABILITE.route,
-        "Grand livre" to AppModule.COMPTABILITE.route,
         "Compte de résultat" to AppModule.COMPTABILITE.route,
         "TVA" to AppModule.COMPTABILITE.route,
         "Plan comptable" to Routes.ADMIN_REFERENTIELS,
@@ -127,16 +131,12 @@ object DestinationsFonctions {
         "Rentabilité projet" to AppModule.PROJETS.route,
         "Suivi des temps" to AppModule.PROJETS.route,
         "Planning projet" to AppModule.PROJETS.route,
-        "Balance" to AppModule.COMPTABILITE.route,
         "Coûts de production" to AppModule.PRODUCTION.route,
         "Consommations matières" to AppModule.PRODUCTION.route,
         "Contrats de service" to AppModule.SERVICES.route,
         "Catalogue de prestations" to AppModule.SERVICES.route,
-        "Avoirs clients" to Routes.SALES_RETURN,
         "Contrôle qualité entrée" to AppModule.QUALITE.route,
         "Avoirs fournisseurs" to AppModule.ACHATS.route,
-        "Lots / Séries" to AppModule.STOCK.route,
-        "Réservations de stock" to AppModule.STOCK.route,
 
         // --- Reporting ---
         "Tableaux de bord" to AppModule.REPORTING.route,

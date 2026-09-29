@@ -52,12 +52,12 @@ jobs:
           java-version: '21'
 
       - name: SDK Android
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: 'platforms;android-36 build-tools;36.0.0'
 
       - name: Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Rendre le wrapper exécutable
         run: chmod +x ./gradlew
@@ -74,13 +74,30 @@ jobs:
           set -o pipefail
           ./gradlew --no-daemon --stacktrace testDebugUnitTest 2>&1 | tee tests.log
 
+      # Room exporte le schéma de la version courante dans app/schemas (KSP) à chaque
+      # compilation, mais ces fichiers n'étaient jamais commités : les versions 8–11 et
+      # 13–20 sont perdues. On les renvoie désormais sur la branche automatiquement
+      # (un push fait avec GITHUB_TOKEN ne relance pas la CI ; [skip ci] par sécurité).
+      - name: Commiter les schémas Room exportés
+        if: success() && github.event_name == 'push'
+        run: |
+          if [ -n "$(git status --porcelain -- app/schemas)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+            git add app/schemas
+            git commit -m "chore(room): export des schémas Room [skip ci]"
+            git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}" || echo "::warning::Schémas Room non poussés (branche avancée entre-temps) — ils le seront au prochain run."
+          else
+            echo "Schémas Room déjà à jour."
+          fi
+
       - name: Récapituler les échecs
         if: failure()
         run: python3 .github/scripts/annoter_echecs.py build.log tests.log
 
       - name: APK de débogage
         if: success()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: erp360-debug-apk
           path: app/build/outputs/apk/debug/*.apk
@@ -91,7 +108,7 @@ jobs:
       # stable pour installer l'application sans passer par les artefacts CI.
       - name: Publier l'APK (release apk-latest)
         if: success() && github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: apk-latest
           name: APK de débogage — dernière version
@@ -103,7 +120,7 @@ jobs:
 
       - name: Rapports de test (en cas d'échec)
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: rapports-tests
           path: |

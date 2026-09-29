@@ -15,3 +15,6 @@ Checklist stricte (une colonne mal alignée = crash au démarrage, pas à la com
 3. Enregistrer la migration dans `di/DatabaseModule.kt` (`addMigrations(…)`) + providers `@Provides` des nouveaux DAO.
 4. Reconvertir les données si nécessaire (ex. `UPDATE … SET statut='X' WHERE statut='Y'`).
 5. Vérifier : `./gradlew assembleDebug testDebugUnitTest`, puis si possible lancer l'app sur émulateur depuis une installation existante (c'est la migration qui s'exécute au premier lancement).
+6. Le schéma JSON de la nouvelle version (`app/schemas/…AppDatabase/<N>.json`) est généré par KSP à la
+   compilation : le commiter s'il a été produit localement ; sinon la CI le commite automatiquement
+   sur la branche après un build vert (`chore(room): export des schémas Room`) — penser à `git pull`.
