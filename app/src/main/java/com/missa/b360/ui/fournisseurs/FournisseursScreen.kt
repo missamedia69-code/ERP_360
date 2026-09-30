@@ -40,7 +40,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -2042,23 +2041,19 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
             border = BorderStroke(1.dp, MissaBorder),
         ) {
             Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_assujetti_tva), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(
-                        checked = form.assujettiTva,
-                        onCheckedChange = { valeur -> vm.updateForm { it.copy(assujettiTva = valeur) } },
-                    )
-                }
+                MissaInterrupteur(
+                    actif = form.assujettiTva,
+                    onChange = { valeur -> vm.updateForm { it.copy(assujettiTva = valeur) } },
+                    libelle = stringResource(R.string.four_assujetti_tva),
+                )
                 if (form.assujettiTva) {
                     MissaChampTexte(form.numTva, { valeur -> vm.updateForm { it.copy(numTva = valeur) } }, stringResource(R.string.four_num_tva), icone = Iv.Badge)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.four_exonere), fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
-                    Switch(
-                        checked = form.exonere,
-                        onCheckedChange = { valeur -> vm.updateForm { it.copy(exonere = valeur) } },
-                    )
-                }
+                MissaInterrupteur(
+                    actif = form.exonere,
+                    onChange = { valeur -> vm.updateForm { it.copy(exonere = valeur) } },
+                    libelle = stringResource(R.string.four_exonere),
+                )
                 if (!form.exonere) {
                     MissaChampTexte(form.tauxRetenue, { valeur -> vm.updateForm { it.copy(tauxRetenue = valeur.filterMoneyInput()) } }, stringResource(R.string.four_taux_retenue), icone = Iv.Percent, clavier = MissaClavier.DECIMAL)
                 }
