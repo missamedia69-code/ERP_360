@@ -173,7 +173,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_vente,
         icon = Iv.ShoppingCart,
         tint = MissaInk,
-        bg = Color(0xFFEFF6FF),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.VENTE)),
         module = ModuleCode.VEN,
     ),
@@ -182,7 +182,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_achat,
         icon = Iv.CartArrowDown,
         tint = MissaInk,
-        bg = Color(0xFFFEF3C7),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.ACHAT)),
         module = ModuleCode.ACH,
     ),
@@ -191,7 +191,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_client,
         icon = Iv.PersonAdd,
         tint = MissaInk,
-        bg = Color(0xFFF3E8FF),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.CLIENT)),
         module = ModuleCode.VEN,
     ),
@@ -200,7 +200,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_fournisseur,
         icon = Iv.Handshake,
         tint = MissaInk,
-        bg = Color(0xFFFCE7F3),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FOURNISSEUR)),
         module = ModuleCode.ACH,
     ),
@@ -209,7 +209,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_produit,
         icon = Iv.Inventory2,
         tint = MissaInk,
-        bg = Color(0xFFCCFBF1),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.PRODUIT)),
         module = ModuleCode.STK,
     ),
@@ -218,7 +218,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_livraison,
         icon = Iv.LocalShipping,
         tint = MissaInk,
-        bg = Color(0xFFE0E7FF),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.LIVRAISON)),
         module = ModuleCode.LOG,
     ),
@@ -227,7 +227,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_devis,
         icon = Iv.Description,
         tint = MissaInk,
-        bg = Color(0xFFDCFCE7),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.DEVIS)),
         module = ModuleCode.VEN,
     ),
@@ -236,7 +236,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         labelRes = R.string.home_plus_facture,
         icon = Iv.RequestQuote,
         tint = MissaInk,
-        bg = Color(0xFFFFE4E6),
+        bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FACTURE)),
         module = ModuleCode.VEN,
     ),
@@ -340,7 +340,7 @@ private fun HomeDashboard(
                         .fillMaxWidth()
                         .background(
                             androidx.compose.ui.graphics.Brush.linearGradient(
-                                listOf(Color(0xFF101C43), Color(0xFF183E91), Color(0xFF1554E8)),
+                                listOf(Color(0xFF101C43), Color(0xFF172653), Color(0xFF101C43)),
                             ),
                         )
                         .padding(horizontal = 12.dp, vertical = 12.dp),
@@ -395,7 +395,7 @@ private fun HomeDashboard(
                                     modifier = Modifier.align(Alignment.TopEnd),
                                     shape = CircleShape,
                                     color = Color(0xFFFF5C63),
-                                    border = BorderStroke(1.5.dp, Color(0xFF183E91)),
+                                    border = BorderStroke(1.5.dp, MissaInk),
                                 ) {
                                     Text(
                                         text = notificationCount.coerceAtMost(99).toString(),
@@ -465,12 +465,12 @@ private fun HomeDashboard(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_ventes_du_jour), formatMontantSansDecimales(state.ventes, currency), stringResource(R.string.home_sales_count, state.ventesCount), state.tendanceVentes, Iv.ShoppingCart, Color(0xFFE8F1FF), HomeBlue, R.drawable.home_dashboard_sales, { kpiEnVue = 0 })
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_achats_du_jour), formatMontantSansDecimales(state.achats, currency), stringResource(R.string.home_purchases_count, state.achatsCount), state.tendanceAchats, Iv.CartArrowDown, Color(0xFFFFF3DB), Color(0xFFB66A00), R.drawable.home_dashboard_purchases, { kpiEnVue = 1 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_ventes_du_jour), formatMontantSansDecimales(state.ventes, currency), stringResource(R.string.home_sales_count, state.ventesCount), state.tendanceVentes, Iv.ShoppingCart, MissaSoftBlue, MissaInk, R.drawable.home_dashboard_sales, { kpiEnVue = 0 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_achats_du_jour), formatMontantSansDecimales(state.achats, currency), stringResource(R.string.home_purchases_count, state.achatsCount), state.tendanceAchats, Iv.CartArrowDown, MissaSoftBlue, MissaInk, R.drawable.home_dashboard_purchases, { kpiEnVue = 1 })
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_tresorerie_card), formatMontantSansDecimales(state.tresorerie, currency), stringResource(R.string.home_solde_disponible), state.tendanceTresorerie, Iv.Bank, Color(0xFFE5F7F0), Color(0xFF16845C), R.drawable.home_dashboard_treasury, { kpiEnVue = 2 })
-                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_clients_card), state.nombreClients.toString(), stringResource(R.string.home_total_label), state.tendanceClients, Iv.People, Color(0xFFF1EBFF), Color(0xFF7046B8), R.drawable.home_dashboard_clients, { kpiEnVue = 3 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_tresorerie_card), formatMontantSansDecimales(state.tresorerie, currency), stringResource(R.string.home_solde_disponible), state.tendanceTresorerie, Iv.Bank, MissaSoftBlue, MissaInk, R.drawable.home_dashboard_treasury, { kpiEnVue = 2 })
+                    AccueilKpiCard(Modifier.weight(1f), stringResource(R.string.home_clients_card), state.nombreClients.toString(), stringResource(R.string.home_total_label), state.tendanceClients, Iv.People, MissaSoftBlue, MissaInk, R.drawable.home_dashboard_clients, { kpiEnVue = 3 })
                 }
             }
         }
@@ -508,7 +508,7 @@ private fun HomeDashboard(
             Surface(
                 modifier = Modifier.fillMaxWidth().clickable(onClick = onSupport),
                 shape = RoundedCornerShape(13.dp),
-                color = Color(0xFFEAF2FF),
+                color = MissaSoftBlue,
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
@@ -776,8 +776,8 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                         tendance = if (estAujourdhui) state.tendanceVentes else null,
                     )
                     AccueilResumeCell(
-                        modifier = Modifier.weight(1f), icon = Iv.CartArrowDown, iconTint = Color(0xFFB66A00),
-                        iconBg = Color(0xFFFFF3DB), titre = stringResource(R.string.home_achats_label),
+                        modifier = Modifier.weight(1f), icon = Iv.CartArrowDown, iconTint = MissaInk,
+                        iconBg = MissaSoftBlue, titre = stringResource(R.string.home_achats_label),
                         valeur = formatMontantSansDecimales(state.resumeAchats, currency),
                         sousTitre = stringResource(R.string.home_purchases_count, state.resumeAchatsCount),
                         tendance = if (estAujourdhui) state.tendanceAchats else null,
@@ -785,15 +785,15 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     AccueilResumeCell(
-                        modifier = Modifier.weight(1f), icon = Iv.SwapHoriz, iconTint = Color(0xFF16845C),
-                        iconBg = Color(0xFFE5F7F0), titre = stringResource(R.string.home_mouvements_stock_label),
+                        modifier = Modifier.weight(1f), icon = Iv.SwapHoriz, iconTint = MissaInk,
+                        iconBg = MissaSoftBlue, titre = stringResource(R.string.home_mouvements_stock_label),
                         valeur = state.resumeMouvements.toString(),
                         sousTitre = if (state.rupturesStock > 0) stringResource(R.string.home_produits_rupture, state.rupturesStock) else stringResource(R.string.home_operations_label),
                         tendance = null,
                     )
                     AccueilResumeCell(
-                        modifier = Modifier.weight(1f), icon = Iv.Percent, iconTint = Color(0xFF7046B8),
-                        iconBg = Color(0xFFF1EBFF), titre = stringResource(R.string.home_marge_brute_label),
+                        modifier = Modifier.weight(1f), icon = Iv.Percent, iconTint = MissaInk,
+                        iconBg = MissaSoftBlue, titre = stringResource(R.string.home_marge_brute_label),
                         valeur = formatMontantSansDecimales(state.resumeMarge, currency),
                         sousTitre = String.format(java.util.Locale.ROOT, "%.1f%%", margePct),
                         tendance = if (estAujourdhui) state.tendanceMarge else null,
