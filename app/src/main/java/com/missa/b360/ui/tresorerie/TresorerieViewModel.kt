@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -77,11 +78,16 @@ class TresorerieViewModel @Inject constructor(
 
     val devise: StateFlow<String> = getEnterprise.observer()
         .map { it?.devise ?: Iso4217.DEVISE_REPLI }
+        .catch { emit(Iso4217.DEVISE_REPLI) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
+    /** Empêche une donnée locale ancienne ou illisible de fermer l'application. */
+    private val comptesSurs = tresorerie.observerComptes().catch { emit(emptyList()) }
+    private val mouvementsSurs = tresorerie.observerMouvements().catch { emit(emptyList()) }
+
     val etat: StateFlow<EtatTresorerie> = combine(
-        tresorerie.observerComptes(),
-        tresorerie.observerMouvements(),
+        comptesSurs,
+        mouvementsSurs,
         _compteFiltre,
     ) { comptes, mouvements, filtre ->
         val debutMois = debutDuMois()

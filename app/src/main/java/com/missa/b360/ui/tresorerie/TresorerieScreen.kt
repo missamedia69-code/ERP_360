@@ -199,7 +199,10 @@ fun TresorerieScreen(
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Button(
-                        onClick = { dialogueMouvement = SensMouvement.IN },
+                        onClick = {
+                            if (etat.comptes.none { it.compte.actif }) dialogueNouveauCompte = true
+                            else dialogueMouvement = SensMouvement.IN
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = VertTresorerie, contentColor = Color.White),
                     ) {
@@ -208,7 +211,10 @@ fun TresorerieScreen(
                         Text(stringResource(R.string.tre_sens_entree), fontSize = 11.sp, color = Color.White)
                     }
                     Button(
-                        onClick = { dialogueMouvement = SensMouvement.OUT },
+                        onClick = {
+                            if (etat.comptes.none { it.compte.actif }) dialogueNouveauCompte = true
+                            else dialogueMouvement = SensMouvement.OUT
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB91C1C), contentColor = Color.White),
                     ) {
@@ -219,6 +225,7 @@ fun TresorerieScreen(
                     OutlinedButton(
                         onClick = { dialogueVirement = true },
                         modifier = Modifier.weight(1f),
+                        enabled = etat.comptes.count { it.compte.actif } >= 2,
                     ) {
                         Icon(painterResource(Iv.CompareArrows), null, tint = MissaInk, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))

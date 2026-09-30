@@ -140,7 +140,6 @@ private fun BarreOnglet(
             modifier = if (actif) {
                 Modifier
                     .clip(forme)
-                    .clickable(onClick = element.onClick)
                     .padding(horizontal = 12.dp, vertical = 10.dp)
             } else {
                 Modifier.padding(10.dp)
