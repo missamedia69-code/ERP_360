@@ -111,7 +111,10 @@ import com.missa.b360.ui.tresorerie.TresorerieScreen
 
 /** Hôte de navigation de l'application (RA-22 + démarrage Phase B). */
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    notificationRoute: String? = null,
+    onNotificationRouteConsumed: () -> Unit = {},
+) {
     val startup: StartupViewModel = hiltViewModel()
     val state by startup.state.collectAsState()
 
@@ -124,13 +127,19 @@ fun AppNavHost() {
         StartupState.Chargement -> Box(Modifier.fillMaxSize())
         StartupState.Onboarding -> OnboardingScreen(onFinished = startup::evaluer)
         StartupState.VerrouPin -> PinLockScreen(onUnlocked = startup::deverrouiller)
-        StartupState.Pret -> MainNavHost()
+        StartupState.Pret -> MainNavHost(notificationRoute, onNotificationRouteConsumed)
     }
 }
 
 @Composable
-private fun MainNavHost() {
+private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed: () -> Unit) {
     val navController = rememberNavController()
+    androidx.compose.runtime.LaunchedEffect(notificationRoute) {
+        notificationRoute?.takeIf { it.isNotBlank() }?.let { route ->
+            navController.naviguerVers(route)
+            onNotificationRouteConsumed()
+        }
+    }
     val accueilViewModel: HomeViewModel = hiltViewModel()
     val activation by accueilViewModel.activation.collectAsState()
     val modulesEpingles by accueilViewModel.modulesEpingles.collectAsState()
@@ -245,7 +254,10 @@ private fun MainNavHost() {
             )
         }
         composable(Routes.NOTIFICATIONS) {
-            NotificationsScreen(onBack = { navController.popBackStack() })
+            NotificationsScreen(
+                onBack = { navController.popBackStack() },
+                onNaviguer = { route -> navController.naviguerVers(route) },
+            )
         }
 
         // Administration

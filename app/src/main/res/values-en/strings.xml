@@ -2024,4 +2024,7 @@
     <string name="lock_bio_action">Use fingerprint</string>
     <string name="lock_bio_failed">Fingerprint not recognized. Try again.</string>
     <string name="lock_bio_cancel">Cancel</string>
+    <string name="notifications_tout_lire">Mark all as read</string>
+    <string name="notifications_vide_titre">No notifications</string>
+    <string name="notifications_vide_description">Important alerts and events will appear here.</string>
 </resources>

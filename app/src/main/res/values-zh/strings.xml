@@ -2020,4 +2020,7 @@
     <string name="lock_bio_action">使用指纹</string>
     <string name="lock_bio_failed">无法识别指纹，请重试。</string>
     <string name="lock_bio_cancel">取消</string>
+    <string name="notifications_tout_lire">全部标为已读</string>
+    <string name="notifications_vide_titre">暂无通知</string>
+    <string name="notifications_vide_description">重要提醒和事件将在这里显示。</string>
 </resources>

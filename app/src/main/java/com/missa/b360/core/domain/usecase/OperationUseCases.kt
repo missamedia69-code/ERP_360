@@ -11,6 +11,7 @@ import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
+import com.missa.b360.core.notifications.AppNotifier
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -25,6 +26,7 @@ class OperationUseCases @Inject constructor(
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
     private val activationRepository: ProfilActivationRepository,
+    private val appNotifier: AppNotifier,
 ) {
     data class CreateParams(
         val module: OperationModule,
@@ -110,6 +112,11 @@ class OperationUseCases @Inject constructor(
             action = "CREATION_PIECE",
             details = "${params.module.name} $reference — $title",
         )
+        appNotifier.notifier(
+            type = params.module.name,
+            titre = "Document créé",
+            message = "$reference — $title",
+        )
         return CreateResult.Success(id, reference)
     }
 
@@ -164,6 +171,11 @@ class OperationUseCases @Inject constructor(
             module = record.module,
             action = "STATUT_PIECE",
             details = "${record.reference} → ${status.name}",
+        )
+        appNotifier.notifier(
+            type = record.module,
+            titre = "Statut mis à jour",
+            message = "${record.reference} — ${status.name.replace('_', ' ')}",
         )
         return true
     }

@@ -222,4 +222,7 @@ interface NotificationDao {
 
     @Query("UPDATE notifications SET lue = 1")
     suspend fun marquerToutesLues()
+
+    @Query("SELECT COUNT(*) FROM notifications WHERE type = :type AND message = :message AND date >= :depuis")
+    suspend fun compterRecentes(type: String, message: String, depuis: Long): Int
 }

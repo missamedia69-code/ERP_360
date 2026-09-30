@@ -1,7 +1,14 @@
 package com.missa.b360
 
+import android.Manifest
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.missa.b360.core.data.datastore.SettingsStore
@@ -21,9 +28,20 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsStore: SettingsStore
 
+    private var notificationRoute by mutableStateOf<String?>(null)
+    private val permissionNotifications = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* Les notifications internes restent actives même en cas de refus. */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        notificationRoute = intent.getStringExtra(com.missa.b360.core.notifications.NotificationRoutes.EXTRA_ROUTE)
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
         // Ne plus bloquer le thread principal : charge en arrière-plan
         lifecycleScope.launch {
             applyStoredLocaleAsync()
@@ -31,9 +49,18 @@ class MainActivity : AppCompatActivity() {
         }
         setContent {
             Erp360Theme {
-                AppNavHost()
+                AppNavHost(
+                    notificationRoute = notificationRoute,
+                    onNotificationRouteConsumed = { notificationRoute = null },
+                )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationRoute = intent.getStringExtra(com.missa.b360.core.notifications.NotificationRoutes.EXTRA_ROUTE)
     }
 
     private suspend fun applyStoredLocaleAsync() {

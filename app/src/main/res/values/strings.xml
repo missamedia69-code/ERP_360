@@ -2067,4 +2067,7 @@
     <string name="lock_bio_action">Utiliser l’empreinte</string>
     <string name="lock_bio_failed">Empreinte non reconnue. Réessayez.</string>
     <string name="lock_bio_cancel">Annuler</string>
+    <string name="notifications_tout_lire">Tout marquer comme lu</string>
+    <string name="notifications_vide_titre">Aucune notification</string>
+    <string name="notifications_vide_description">Les alertes et événements importants apparaîtront ici.</string>
 </resources>

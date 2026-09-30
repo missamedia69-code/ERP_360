@@ -18,6 +18,7 @@ import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
+import com.missa.b360.core.notifications.AppNotifier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -74,6 +75,7 @@ class RecordStockMovementUseCase @Inject constructor(
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
     private val activationRepository: ProfilActivationRepository,
+    private val appNotifier: AppNotifier,
 ) {
     suspend operator fun invoke(
         produitId: Long,
@@ -108,7 +110,7 @@ class RecordStockMovementUseCase @Inject constructor(
         if (produit == null || !produit.active) return StockMovementResult.ProduitIntrouvable
         val motifNormalise = motif.trim().ifBlank { "AUTRE" }
 
-        return database.withTransaction {
+        val resultat = database.withTransaction {
             // Relecture juste avant commit : le stock affiché peut avoir changé (§43).
             val siteId = produit.siteId
                 ?: stockDao.siteAvecPlusDeStock(produitId)
@@ -144,6 +146,14 @@ class RecordStockMovementUseCase @Inject constructor(
             )
             StockMovementResult.Succes(avant, apres)
         }
+        if (resultat is StockMovementResult.Succes && resultat.stockApres <= produit.stockMin) {
+            appNotifier.notifier(
+                type = "STOCK_ALERTE",
+                titre = "Stock critique",
+                message = "${produit.code} — ${produit.nom} : ${resultat.stockApres}",
+            )
+        }
+        return resultat
     }
 }
 

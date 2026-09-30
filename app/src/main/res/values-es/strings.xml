@@ -2020,4 +2020,7 @@
     <string name="lock_bio_action">Usar huella digital</string>
     <string name="lock_bio_failed">Huella no reconocida. Inténtelo de nuevo.</string>
     <string name="lock_bio_cancel">Cancelar</string>
+    <string name="notifications_tout_lire">Marcar todo como leído</string>
+    <string name="notifications_vide_titre">Sin notificaciones</string>
+    <string name="notifications_vide_description">Las alertas y eventos importantes aparecerán aquí.</string>
 </resources>

@@ -2020,4 +2020,7 @@
     <string name="lock_bio_action">استخدام بصمة الإصبع</string>
     <string name="lock_bio_failed">لم يتم التعرف على البصمة. حاول مجددًا.</string>
     <string name="lock_bio_cancel">إلغاء</string>
+    <string name="notifications_tout_lire">تحديد الكل كمقروء</string>
+    <string name="notifications_vide_titre">لا توجد إشعارات</string>
+    <string name="notifications_vide_description">ستظهر التنبيهات والأحداث المهمة هنا.</string>
 </resources>
