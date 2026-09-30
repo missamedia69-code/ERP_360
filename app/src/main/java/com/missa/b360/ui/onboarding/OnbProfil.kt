@@ -645,7 +645,7 @@ private fun OnbModuleAjoutable(module: ModuleCode, coche: Boolean, onBascule: ()
     ) {
         Checkbox(
             checked = coche,
-            onCheckedChange = { onBascule() },
+            onCheckedChange = null, // la ligne entière gère le clic
             colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
             modifier = Modifier.size(28.dp),
         )

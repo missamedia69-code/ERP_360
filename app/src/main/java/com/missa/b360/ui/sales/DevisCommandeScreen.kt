@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,10 @@ import com.missa.b360.core.domain.model.SaleCalculator
 import com.missa.b360.core.domain.model.SaleLine
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.SaleRecordPayload
+import com.missa.b360.core.documents.CommercialDocumentFactory
+import com.missa.b360.core.documents.DocumentSharing
+import com.missa.b360.core.documents.DocumentType
+import com.missa.b360.core.documents.ProfessionalDocumentPdf
 import com.missa.b360.core.domain.usecase.CommercialTarget
 import com.missa.b360.core.domain.usecase.ConvertDevisToOrderUseCase
 import com.missa.b360.core.domain.usecase.ConvertOrderToSaleUseCase
@@ -79,6 +84,8 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.theme.TendrePositive
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -108,7 +115,9 @@ class DevisCommandeViewModel @Inject constructor(
     val tauxTaxe: StateFlow<Double> = observeTaxes()
         .map { taxes -> taxes.firstOrNull { it.parDefaut }?.taux ?: taxes.firstOrNull()?.taux ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
-    val devise: StateFlow<String> = getEnterprise.observer()
+    val entreprise = getEnterprise.observer()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val devise: StateFlow<String> = entreprise
         .map { it?.devise ?: Iso4217.DEVISE_REPLI }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
     val devis: StateFlow<List<OperationRecordEntity>> = operations.observe(OperationModule.DEVIS)
@@ -225,10 +234,30 @@ fun DevisCommandeScreen(
     val clients by viewModel.clients.collectAsState()
     val moyensPaiement by viewModel.moyensPaiement.collectAsState()
     val devise by viewModel.devise.collectAsState()
+    val entreprise by viewModel.entreprise.collectAsState()
     val feedback by viewModel.feedback.collectAsState()
     var afficherCreation by remember { mutableStateOf(openCreate) }
     var commandeAFacturer by remember { mutableStateOf<OperationRecordEntity?>(null) }
     val contexte = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val erreurDocument = stringResource(R.string.doc_generation_erreur)
+    fun partagerDocument(record: OperationRecordEntity, type: DocumentType) {
+        val societe = entreprise ?: run {
+            Toast.makeText(contexte, erreurDocument, Toast.LENGTH_LONG).show()
+            return
+        }
+        scope.launch {
+            val resultat = withContext(Dispatchers.IO) {
+                runCatching {
+                    val donnees = CommercialDocumentFactory.depuisVente(record, societe, type)
+                        ?: error("Données commerciales invalides")
+                    ProfessionalDocumentPdf.generer(contexte, donnees)
+                }
+            }
+            resultat.onSuccess { DocumentSharing.partager(contexte, it.fichier, record.reference) }
+                .onFailure { Toast.makeText(contexte, erreurDocument, Toast.LENGTH_LONG).show() }
+        }
+    }
     val commandesDejaCreees = remember(commandes) {
         commandes.mapNotNull { SaleRecordCodec.decode(it.notes)?.sourceRecordId }.toSet()
     }
@@ -294,6 +323,7 @@ fun DevisCommandeScreen(
                                 else -> null
                             },
                             onAction = { viewModel.convertirEnCommande(record.id) },
+                            onPdf = { partagerDocument(record, DocumentType.DEVIS) },
                         )
                     }
                 }
@@ -317,6 +347,7 @@ fun DevisCommandeScreen(
                                 else -> null
                             },
                             onAction = { commandeAFacturer = record },
+                            onPdf = { partagerDocument(record, DocumentType.BON_COMMANDE_CLIENT) },
                         )
                     }
                 }
@@ -355,6 +386,7 @@ private fun PieceCommercialeCard(
     actionLabel: String?,
     statusLabel: String?,
     onAction: () -> Unit,
+    onPdf: () -> Unit,
 ) {
     val payload = remember(record.notes) { SaleRecordCodec.decode(record.notes) }
     val date = remember(record.createdAt) { DateUtils.formatDate(record.createdAt) }
@@ -384,9 +416,14 @@ private fun PieceCommercialeCard(
             if (statusLabel != null) {
                 Text(statusLabel, color = TendrePositive, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             }
-            if (actionLabel != null) {
-                OutlinedButton(onClick = onAction, modifier = Modifier.fillMaxWidth()) {
-                    Text(actionLabel)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                OutlinedButton(onClick = onPdf, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.doc_partager_pdf))
+                }
+                if (actionLabel != null) {
+                    Button(onClick = onAction, modifier = Modifier.weight(1f)) {
+                        Text(actionLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
                 }
             }
         }

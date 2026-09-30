@@ -328,12 +328,13 @@ private fun ActivationModuleLigne(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
+            .clickable(enabled = !isVerrouille) { onToggle() }
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
             checked = isActif,
-            onCheckedChange = { if (!isVerrouille) onToggle() },
+            onCheckedChange = null, // la ligne entière gère le clic
             enabled = !isVerrouille,
             colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
             modifier = Modifier.size(27.dp),
@@ -488,7 +489,7 @@ private fun ActivationElementsDialogue(
                             Row(Modifier.padding(horizontal = 6.dp, vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = isActif,
-                                    onCheckedChange = { onToggleElement(elem) },
+                                    onCheckedChange = null, // la tuile entière gère le clic
                                     modifier = Modifier.size(18.dp),
                                     colors = CheckboxDefaults.colors(checkedColor = BrandBlue),
                                 )

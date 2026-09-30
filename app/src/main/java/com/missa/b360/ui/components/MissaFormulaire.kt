@@ -199,7 +199,9 @@ fun MissaChampTexte(
         libelle = libelle,
         requis = requis,
         icone = icone,
-        erreur = erreur,
+        // Ne pas afficher une erreur pendant que l’utilisateur est encore en train
+        // de compléter une valeur intermédiaire (ex. « 12. » ou une adresse e-mail).
+        erreur = erreur?.takeUnless { focus },
         aide = aide,
         enabled = enabled,
         actif = focus,
@@ -678,13 +680,14 @@ fun MissaCaseACocher(
             .clickable(enabled = enabled) { onChange(!coche) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
-        Checkbox(
-            checked = coche,
-            onCheckedChange = onChange,
-            enabled = enabled,
-            colors = CheckboxDefaults.colors(checkedColor = couleur, checkmarkColor = couleur.contenuLisible(), uncheckedColor = MissaMuted),
-        )
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 32.dp) {
+            Checkbox(
+                checked = coche,
+                onCheckedChange = null, // la ligne entière est l'unique cible : aucun double basculement
+                enabled = enabled,
+                modifier = Modifier.size(24.dp),
+                colors = CheckboxDefaults.colors(checkedColor = couleur, checkmarkColor = couleur.contenuLisible(), uncheckedColor = MissaMuted),
+            )
         }
         Spacer(Modifier.width(4.dp))
         Column(Modifier.weight(1f)) {

@@ -1561,9 +1561,8 @@ private fun HomePersonnaliserDialogue(
                     ) {
                         Checkbox(
                             checked = coche,
-                            onCheckedChange = {
-                                if (coche) choixActions.remove(def.key) else choixActions.add(def.key)
-                            },
+                            onCheckedChange = null, // la ligne entière gère le clic
+
                         )
                         Spacer(Modifier.width(4.dp))
                         Surface(modifier = Modifier.size(24.dp), shape = RoundedCornerShape(7.dp), color = def.bg) {
