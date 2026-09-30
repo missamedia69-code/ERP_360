@@ -24,7 +24,7 @@ object SyncPolicy {
 
     /** 5 s, 10 s, 20 s… plafonné à 6 h, avec valeur sûre pour tout compteur. */
     fun delaiNouvelEssai(tentatives: Int): Long {
-        val exposant = tentatives.coerceIn(0, 12)
+        val exposant = tentatives.coerceIn(0, 20)
         return min(5_000L * (1L shl exposant), DELAI_MAX_MS)
     }
 
