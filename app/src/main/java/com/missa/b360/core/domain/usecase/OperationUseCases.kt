@@ -13,6 +13,10 @@ import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
 import com.missa.b360.core.notifications.AppNotifier
+import com.missa.b360.core.data.entity.SyncOperation
+import com.missa.b360.core.sync.SyncEngine
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -28,6 +32,8 @@ class OperationUseCases @Inject constructor(
     private val journalManager: JournalManager,
     private val activationRepository: ProfilActivationRepository,
     private val appNotifier: AppNotifier,
+    private val syncEngine: SyncEngine,
+    private val getEnterprise: GetEnterpriseUseCase,
 ) {
     data class CreateParams(
         val module: OperationModule,
@@ -118,6 +124,20 @@ class OperationUseCases @Inject constructor(
             titreRes = R.string.notification_document_cree,
             message = "$reference — $title",
         )
+        val entrepriseId = getEnterprise()?.id?.toString() ?: "local"
+        syncEngine.enregistrerModification(
+            entrepriseId = entrepriseId,
+            aggregateType = "operation_record",
+            aggregateId = id.toString(),
+            operation = SyncOperation.CREER,
+            revision = System.currentTimeMillis(),
+            payloadJson = buildJsonObject {
+                put("id", id); put("module", params.module.name); put("reference", reference)
+                put("title", title); put("status", OperationStatus.DRAFT.name)
+                params.amount?.let { put("amount", it) }
+                params.quantity?.let { put("quantity", it) }
+            }.toString(),
+        )
         return CreateResult.Success(id, reference)
     }
 
@@ -159,6 +179,20 @@ class OperationUseCases @Inject constructor(
             action = "MODIFICATION_BROUILLON",
             details = "${params.module.name} ${existing.reference} — $title",
         )
+        syncEngine.enregistrerModification(
+            entrepriseId = getEnterprise()?.id?.toString() ?: "local",
+            aggregateType = "operation_record",
+            aggregateId = existing.id.toString(),
+            operation = SyncOperation.MODIFIER,
+            revision = System.currentTimeMillis(),
+            payloadJson = buildJsonObject {
+                put("id", existing.id); put("module", params.module.name)
+                put("reference", existing.reference); put("title", title)
+                put("status", OperationStatus.DRAFT.name)
+                params.amount?.let { put("amount", it) }
+                params.quantity?.let { put("quantity", it) }
+            }.toString(),
+        )
         return UpdateDraftResult.Success(existing.id, existing.reference)
     }
 
@@ -177,6 +211,17 @@ class OperationUseCases @Inject constructor(
             type = record.module,
             titreRes = R.string.notification_statut_modifie,
             message = "${record.reference} — ${status.name.replace('_', ' ')}",
+        )
+        syncEngine.enregistrerModification(
+            entrepriseId = getEnterprise()?.id?.toString() ?: "local",
+            aggregateType = "operation_record",
+            aggregateId = record.id.toString(),
+            operation = if (status == OperationStatus.CANCELLED) SyncOperation.CONTRE_PASSER else SyncOperation.MODIFIER,
+            revision = System.currentTimeMillis(),
+            payloadJson = buildJsonObject {
+                put("id", record.id); put("module", record.module); put("reference", record.reference)
+                put("status", status.name)
+            }.toString(),
         )
         return true
     }

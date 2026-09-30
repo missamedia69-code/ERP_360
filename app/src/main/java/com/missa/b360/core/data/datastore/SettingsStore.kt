@@ -62,6 +62,8 @@ class SettingsStore @Inject constructor(
         const val PIN_LOCK_UNTIL = "pin_lock_until"
         const val PIN_HASH = "pin_hash"
         const val CURRENT_USER_ID = "current_user_id"
+        /** Identité stable de cet appareil pour le futur relais local-first. */
+        const val SYNC_DEVICE_ID = "sync_device_id"
     }
 
     fun lockedKeys() = setOf(

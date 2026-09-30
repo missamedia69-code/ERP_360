@@ -37,6 +37,7 @@ import com.missa.b360.core.data.dao.RoleDao
 import com.missa.b360.core.data.dao.SequenceDao
 import com.missa.b360.core.data.dao.SettingDao
 import com.missa.b360.core.data.dao.SiteDao
+import com.missa.b360.core.data.dao.SyncDao
 import com.missa.b360.core.data.dao.ServiceWorkflowDao
 import com.missa.b360.core.data.dao.TaxDao
 import com.missa.b360.core.data.dao.UserDao
@@ -106,6 +107,10 @@ import com.missa.b360.core.data.entity.ServiceTimesheetEntity
 import com.missa.b360.core.data.entity.ServiceReportEntity
 import com.missa.b360.core.data.entity.ServiceAttachmentEntity
 import com.missa.b360.core.data.entity.TaskEntity
+import com.missa.b360.core.data.entity.SyncDeviceEntity
+import com.missa.b360.core.data.entity.SyncOutboxEntity
+import com.missa.b360.core.data.entity.SyncInboxEntity
+import com.missa.b360.core.data.entity.SyncConflictEntity
 import com.missa.b360.core.data.entity.TaxEntity
 import com.missa.b360.core.data.entity.UserEntity
 
@@ -182,8 +187,12 @@ import com.missa.b360.core.data.entity.UserEntity
         ServiceTimesheetEntity::class,
         ServiceReportEntity::class,
         ServiceAttachmentEntity::class,
+        SyncDeviceEntity::class,
+        SyncOutboxEntity::class,
+        SyncInboxEntity::class,
+        SyncConflictEntity::class,
     ],
-    version = 21,
+    version = 22,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -224,6 +233,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun equipementDao(): EquipementDao
     abstract fun interventionDao(): InterventionDao
     abstract fun groupeArticleDao(): GroupeArticleDao
+    abstract fun syncDao(): SyncDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -574,6 +584,22 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_immutable` BEFORE UPDATE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') AND ((OLD.`status` = 'REVERSED' AND NEW.`status` != 'REVERSED') OR (OLD.`status` = 'POSTED' AND NEW.`status` NOT IN ('POSTED', 'REVERSED')) OR OLD.`id` IS NOT NEW.`id` OR OLD.`journalId` IS NOT NEW.`journalId` OR OLD.`reference` IS NOT NEW.`reference` OR OLD.`accountingDate` IS NOT NEW.`accountingDate` OR OLD.`documentDate` IS NOT NEW.`documentDate` OR OLD.`sourceModule` IS NOT NEW.`sourceModule` OR OLD.`sourceDocumentType` IS NOT NEW.`sourceDocumentType` OR OLD.`sourceDocumentId` IS NOT NEW.`sourceDocumentId` OR OLD.`sourceKey` IS NOT NEW.`sourceKey` OR OLD.`description` IS NOT NEW.`description` OR OLD.`currencyCode` IS NOT NEW.`currencyCode` OR OLD.`exchangeRate` IS NOT NEW.`exchangeRate` OR OLD.`totalDebit` IS NOT NEW.`totalDebit` OR OLD.`totalCredit` IS NOT NEW.`totalCredit` OR OLD.`createdBy` IS NOT NEW.`createdBy` OR OLD.`validatedBy` IS NOT NEW.`validatedBy` OR OLD.`postedAt` IS NOT NEW.`postedAt` OR OLD.`reversedVoucherId` IS NOT NEW.`reversedVoucherId` OR OLD.`createdAt` IS NOT NEW.`createdAt`) BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers are immutable'); END")
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_vouchers_no_delete` BEFORE DELETE ON `accounting_vouchers` WHEN OLD.`status` IN ('POSTED', 'REVERSED') BEGIN SELECT RAISE(ABORT, 'Posted accounting vouchers cannot be deleted'); END")
                 db.execSQL("CREATE TRIGGER IF NOT EXISTS `accounting_account_identity_immutable_when_used` BEFORE UPDATE OF `code`, `standard`, `name` ON `accounting_accounts` WHEN EXISTS (SELECT 1 FROM `accounting_entry_lines` l JOIN `accounting_vouchers` v ON v.`id` = l.`voucherId` WHERE l.`accountId` = OLD.`id` AND v.`status` IN ('POSTED', 'REVERSED')) BEGIN SELECT RAISE(ABORT, 'Used accounting account codes are immutable'); END")
+            }
+        }
+
+        val MIGRATION_21_22 = object : Migration(21, 22) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `sync_devices` (`deviceId` TEXT NOT NULL, `nom` TEXT NOT NULL, `publicKey` TEXT NOT NULL DEFAULT '', `actif` INTEGER NOT NULL DEFAULT 1, `creeLe` INTEGER NOT NULL DEFAULT 0, `vuLe` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`deviceId`))")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_sync_devices_deviceId` ON `sync_devices` (`deviceId`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `sync_outbox` (`eventId` TEXT NOT NULL, `deviceId` TEXT NOT NULL, `entrepriseId` TEXT NOT NULL, `aggregateType` TEXT NOT NULL, `aggregateId` TEXT NOT NULL, `operation` TEXT NOT NULL, `payload` TEXT NOT NULL, `revision` INTEGER NOT NULL DEFAULT 0, `creeLe` INTEGER NOT NULL DEFAULT 0, `statut` TEXT NOT NULL DEFAULT 'EN_ATTENTE', `tentatives` INTEGER NOT NULL DEFAULT 0, `prochaineTentative` INTEGER NOT NULL DEFAULT 0, `derniereErreur` TEXT, PRIMARY KEY(`eventId`))")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_outbox_statut` ON `sync_outbox` (`statut`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_outbox_prochaineTentative` ON `sync_outbox` (`prochaineTentative`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_outbox_aggregateType_aggregateId` ON `sync_outbox` (`aggregateType`, `aggregateId`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `sync_inbox` (`eventId` TEXT NOT NULL, `deviceIdSource` TEXT NOT NULL, `aggregateType` TEXT NOT NULL, `aggregateId` TEXT NOT NULL, `revision` INTEGER NOT NULL DEFAULT 0, `recuLe` INTEGER NOT NULL DEFAULT 0, `appliqueLe` INTEGER, PRIMARY KEY(`eventId`))")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_inbox_recuLe` ON `sync_inbox` (`recuLe`)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS `sync_conflicts` (`conflictId` TEXT NOT NULL, `eventIdDistant` TEXT NOT NULL, `aggregateType` TEXT NOT NULL, `aggregateId` TEXT NOT NULL, `revisionLocale` INTEGER NOT NULL DEFAULT 0, `revisionDistante` INTEGER NOT NULL DEFAULT 0, `payloadLocal` TEXT NOT NULL, `payloadDistant` TEXT NOT NULL, `detecteLe` INTEGER NOT NULL DEFAULT 0, `resolu` INTEGER NOT NULL DEFAULT 0, `resolution` TEXT, `resoluLe` INTEGER, PRIMARY KEY(`conflictId`))")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_conflicts_resolu` ON `sync_conflicts` (`resolu`)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_sync_conflicts_aggregateType_aggregateId` ON `sync_conflicts` (`aggregateType`, `aggregateId`)")
             }
         }
 
