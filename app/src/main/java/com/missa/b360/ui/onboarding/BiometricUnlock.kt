@@ -14,10 +14,10 @@ import java.util.concurrent.Executor
 
 /** Disponibilité réelle d'une empreinte enregistrée, sans ajouter de dépendance au projet. */
 @Suppress("DEPRECATION")
-internal fun empreinteDisponible(context: Context): Boolean {
-    val manager = context.getSystemService(FingerprintManager::class.java) ?: return false
-    return manager.isHardwareDetected && manager.hasEnrolledFingerprints()
-}
+internal fun empreinteDisponible(context: Context): Boolean = runCatching {
+    val manager = context.getSystemService(FingerprintManager::class.java) ?: return@runCatching false
+    manager.isHardwareDetected && manager.hasEnrolledFingerprints()
+}.getOrDefault(false)
 
 /**
  * Lance l'API système : BiometricPrompt à partir d'Android 9, API empreinte historique
@@ -39,11 +39,16 @@ internal fun DemandeEmpreinte(
         val signal = CancellationSignal()
         val activity = context.trouverActivity()
         if (activity != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                lancerPromptModerne(activity, signal, titre, sousTitre, annuler, onSucces, onEchec)
-            } else {
-                lancerEmpreinteHistorique(context, signal, onSucces, onEchec)
-            }
+            // Certains constructeurs annoncent un capteur indisponible au moment précis
+            // de l'appel (capteur occupé, profil professionnel verrouillé). Ce cas ne
+            // doit jamais fermer l'application : le PIN reste immédiatement utilisable.
+            runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    lancerPromptModerne(activity, signal, titre, sousTitre, annuler, onSucces, onEchec)
+                } else {
+                    lancerEmpreinteHistorique(context, signal, onSucces, onEchec)
+                }
+            }.onFailure { onEchec() }
         }
         onDispose { signal.cancel() }
     }
