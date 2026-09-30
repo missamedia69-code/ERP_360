@@ -51,12 +51,15 @@ class SyncEngine @Inject constructor(
         val id = existant ?: UUID.randomUUID().toString().also {
             settings.set(SettingsStore.Keys.SYNC_DEVICE_ID, it)
         }
-        return dao.appareil(id) ?: SyncDeviceEntity(
+        dao.appareil(id)?.let { return it }
+        val nouveau = SyncDeviceEntity(
             deviceId = id,
             nom = listOf(Build.MANUFACTURER, Build.MODEL).filter { it.isNotBlank() }.joinToString(" ").ifBlank { "Android" },
             creeLe = System.currentTimeMillis(),
             vuLe = System.currentTimeMillis(),
-        ).also(dao::insererAppareil)
+        )
+        dao.insererAppareil(nouveau)
+        return nouveau
     }
 
     suspend fun enregistrerModification(
