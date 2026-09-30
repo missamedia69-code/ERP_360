@@ -50,6 +50,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -205,6 +206,9 @@ private fun MainNavHost() {
             )
         },
     ) {
+    // La navigation est superposée au contenu : l'espace autour de la pilule reste
+    // réellement transparent et laisse voir la page, au lieu d'occuper un bandeau.
+    Box(Modifier.fillMaxSize()) {
     Scaffold(
         containerColor = com.missa.b360.ui.theme.MissaCanvas,
         topBar = {
@@ -223,17 +227,7 @@ private fun MainNavHost() {
                 )
             }
         },
-        bottomBar = {
-            if (afficherBarre) {
-                MissaBarreModules(
-                    modules = AppModule.barreBas(activation, modulesEpingles),
-                    routeCourante = routeCourante,
-                    onAccueil = { navController.naviguerVers(Routes.HOME) },
-                    onModule = { navController.naviguerVers(it.route) },
-                    onPlus = { plusDeModules = true },
-                )
-            }
-        },
+        // Pas de bottomBar Scaffold : elle réserverait un bandeau opaque sous la pilule.
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
     ) { padding ->
     // Spec: Content entre Header 64dp et BottomNav 80dp, scrollable seul, respecte WindowInsets
@@ -642,6 +636,23 @@ private fun MainNavHost() {
             GuardedModule(AppModule.REPORTING, activation, navController) {
                 ReportingScreen(onBack = { navController.popBackStack() })
             }
+        }
+    }
+    }
+
+    if (afficherBarre) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(),
+        ) {
+            MissaBarreModules(
+                modules = AppModule.barreBas(activation, modulesEpingles),
+                routeCourante = routeCourante,
+                onAccueil = { navController.naviguerVers(Routes.HOME) },
+                onModule = { navController.naviguerVers(it.route) },
+                onPlus = { plusDeModules = true },
+            )
         }
     }
     }
