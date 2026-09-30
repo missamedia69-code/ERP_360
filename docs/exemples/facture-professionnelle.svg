@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1754" viewBox="0 0 1240 1754">
+  <rect width="1240" height="1754" fill="#f5f7fb"/>
+  <rect x="55" y="45" width="1130" height="1660" rx="18" fill="white"/>
+  <rect x="55" y="45" width="1130" height="18" rx="9" fill="#111c36"/>
+
+  <!-- Identité entreprise cliente -->
+  <rect x="95" y="105" width="118" height="118" rx="26" fill="#111c36"/>
+  <circle cx="154" cy="148" r="29" fill="#36c5a3"/>
+  <path d="M126 188 L154 158 L183 188" fill="none" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="238" y="145" font-family="Arial, sans-serif" font-size="35" font-weight="700" fill="#111c36">KAMER DISTRIBUTION SARL</text>
+  <text x="238" y="183" font-family="Arial, sans-serif" font-size="18" fill="#64748b">Distribution • Commerce • Services</text>
+  <text x="238" y="216" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Douala, Cameroun  ·  +237 6 99 00 00 00  ·  contact@kamer-distribution.cm</text>
+
+  <!-- Titre -->
+  <text x="1145" y="130" text-anchor="end" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="3" fill="#36a98f">FACTURE</text>
+  <text x="1145" y="176" text-anchor="end" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#111c36">FAC-2026-0042</text>
+  <rect x="966" y="197" width="179" height="34" rx="17" fill="#dff8f1"/>
+  <text x="1055" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#147d68">PAYÉE</text>
+
+  <line x1="95" y1="276" x2="1145" y2="276" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Destinataire et métadonnées -->
+  <text x="95" y="328" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2" fill="#64748b">FACTURÉ À</text>
+  <text x="95" y="374" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="#111c36">Horizon Bâtiments SA</text>
+  <text x="95" y="408" font-family="Arial, sans-serif" font-size="17" fill="#64748b">BP 1245, Bonanjo — Douala</text>
+  <text x="95" y="438" font-family="Arial, sans-serif" font-size="17" fill="#64748b">NIU : M012345678901A</text>
+
+  <rect x="720" y="305" width="425" height="157" rx="13" fill="#f7f9fc"/>
+  <text x="750" y="343" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Date d’émission</text>
+  <text x="1115" y="343" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#111c36">30 septembre 2026</text>
+  <text x="750" y="385" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Date d’échéance</text>
+  <text x="1115" y="385" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#111c36">15 octobre 2026</text>
+  <text x="750" y="427" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Référence commande</text>
+  <text x="1115" y="427" text-anchor="end" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#111c36">CMD-2026-0118</text>
+
+  <!-- Tableau -->
+  <rect x="95" y="520" width="1050" height="58" rx="10" fill="#111c36"/>
+  <text x="120" y="557" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="white">DÉSIGNATION</text>
+  <text x="737" y="557" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="white">QTÉ</text>
+  <text x="875" y="557" text-anchor="end" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="white">PRIX UNIT.</text>
+  <text x="1000" y="557" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="white">TVA</text>
+  <text x="1120" y="557" text-anchor="end" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="white">TOTAL HT</text>
+
+  <g font-family="Arial, sans-serif">
+    <text x="120" y="630" font-size="18" font-weight="700" fill="#111c36">Ordinateur portable professionnel</text>
+    <text x="120" y="657" font-size="14" fill="#64748b">Core i7 · 16 Go RAM · SSD 512 Go · Garantie 24 mois</text>
+    <text x="737" y="640" text-anchor="middle" font-size="17" fill="#111c36">2</text>
+    <text x="875" y="640" text-anchor="end" font-size="17" fill="#111c36">650 000</text>
+    <text x="1000" y="640" text-anchor="middle" font-size="17" fill="#111c36">19,25 %</text>
+    <text x="1120" y="640" text-anchor="end" font-size="17" font-weight="700" fill="#111c36">1 300 000</text>
+    <line x1="95" y1="690" x2="1145" y2="690" stroke="#e8edf4"/>
+
+    <text x="120" y="744" font-size="18" font-weight="700" fill="#111c36">Installation et configuration</text>
+    <text x="120" y="771" font-size="14" fill="#64748b">Paramétrage, sécurisation et transfert initial</text>
+    <text x="737" y="754" text-anchor="middle" font-size="17" fill="#111c36">2</text>
+    <text x="875" y="754" text-anchor="end" font-size="17" fill="#111c36">75 000</text>
+    <text x="1000" y="754" text-anchor="middle" font-size="17" fill="#111c36">19,25 %</text>
+    <text x="1120" y="754" text-anchor="end" font-size="17" font-weight="700" fill="#111c36">150 000</text>
+    <line x1="95" y1="804" x2="1145" y2="804" stroke="#e8edf4"/>
+
+    <text x="120" y="858" font-size="18" font-weight="700" fill="#111c36">Livraison express</text>
+    <text x="120" y="885" font-size="14" fill="#64748b">Douala — Bonanjo</text>
+    <text x="737" y="868" text-anchor="middle" font-size="17" fill="#111c36">1</text>
+    <text x="875" y="868" text-anchor="end" font-size="17" fill="#111c36">25 000</text>
+    <text x="1000" y="868" text-anchor="middle" font-size="17" fill="#111c36">19,25 %</text>
+    <text x="1120" y="868" text-anchor="end" font-size="17" font-weight="700" fill="#111c36">25 000</text>
+  </g>
+
+  <!-- Notes -->
+  <rect x="95" y="980" width="560" height="205" rx="14" fill="#f7f9fc"/>
+  <text x="125" y="1025" font-family="Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="1" fill="#111c36">CONDITIONS ET NOTES</text>
+  <text x="125" y="1065" font-family="Arial, sans-serif" font-size="15" fill="#64748b">• Paiement par virement bancaire ou Mobile Money.</text>
+  <text x="125" y="1100" font-family="Arial, sans-serif" font-size="15" fill="#64748b">• Merci d’indiquer la référence de la facture.</text>
+  <text x="125" y="1135" font-family="Arial, sans-serif" font-size="15" fill="#64748b">• Les marchandises restent couvertes par la garantie indiquée.</text>
+
+  <!-- Totaux -->
+  <text x="760" y="1018" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Sous-total HT</text>
+  <text x="1125" y="1018" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#111c36">1 475 000 FCFA</text>
+  <text x="760" y="1062" font-family="Arial, sans-serif" font-size="16" fill="#64748b">TVA (19,25 %)</text>
+  <text x="1125" y="1062" text-anchor="end" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#111c36">283 938 FCFA</text>
+  <line x1="760" y1="1093" x2="1125" y2="1093" stroke="#dce3ed" stroke-width="2"/>
+  <rect x="730" y="1117" width="415" height="92" rx="14" fill="#111c36"/>
+  <text x="760" y="1154" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#9cabc3">TOTAL TTC</text>
+  <text x="1120" y="1183" text-anchor="end" font-family="Arial, sans-serif" font-size="29" font-weight="700" fill="white">1 758 938 FCFA</text>
+
+  <!-- Paiement -->
+  <text x="95" y="1286" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2" fill="#64748b">INFORMATIONS DE PAIEMENT</text>
+  <rect x="95" y="1310" width="1050" height="116" rx="14" fill="#f7f9fc" stroke="#e5eaf1"/>
+  <text x="125" y="1355" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Banque</text>
+  <text x="125" y="1392" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#111c36">Afriland First Bank</text>
+  <text x="460" y="1355" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Titulaire</text>
+  <text x="460" y="1392" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#111c36">Kamer Distribution SARL</text>
+  <text x="850" y="1355" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Compte</text>
+  <text x="850" y="1392" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#111c36">10005 00001 12345678901 42</text>
+
+  <!-- Mentions légales et pied -->
+  <text x="620" y="1510" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Kamer Distribution SARL · RCCM RC/DLA/2024/B/0000 · NIU M012345678901A</text>
+  <text x="620" y="1540" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Capital social : 5 000 000 FCFA · Siège social : Douala, Cameroun</text>
+  <line x1="95" y1="1590" x2="1145" y2="1590" stroke="#e2e8f0"/>
+  <text x="95" y="1635" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">Document généré le 30/09/2026 à 14:32 · Page 1/1</text>
+  <text x="1145" y="1635" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#94a3b8">Propulsé par Missa Business 360</text>
+</svg>

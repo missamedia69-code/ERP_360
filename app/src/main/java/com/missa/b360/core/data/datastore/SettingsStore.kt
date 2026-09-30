@@ -64,6 +64,12 @@ class SettingsStore @Inject constructor(
         const val CURRENT_USER_ID = "current_user_id"
         /** Identité stable de cet appareil pour le futur relais local-first. */
         const val SYNC_DEVICE_ID = "sync_device_id"
+        const val DOC_COULEUR_PRINCIPALE = "doc_couleur_principale"
+        const val DOC_COULEUR_ACCENT = "doc_couleur_accent"
+        const val DOC_AFFICHER_LOGO = "doc_afficher_logo"
+        const val DOC_MENTION_MISSA = "doc_mention_missa"
+        const val DOC_TEXTE_MISSA = "doc_texte_missa"
+        const val DOC_MONTANT_LETTRES = "doc_montant_lettres"
     }
 
     fun lockedKeys() = setOf(
