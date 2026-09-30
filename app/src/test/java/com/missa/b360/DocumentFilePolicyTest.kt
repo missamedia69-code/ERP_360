@@ -6,11 +6,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import java.io.File
+import kotlin.io.path.createTempDirectory
 
 class DocumentFilePolicyTest {
     @Test
     fun `un fichier absent ou vide nest jamais partage`() {
-        val dossier = createTempDir()
+        val dossier = createTempDirectory("document-partage-").toFile()
         assertEquals(DocumentSharing.ErreurPartage.FICHIER_ABSENT, DocumentFilePolicy.erreur(File(dossier, "absent.pdf")))
         val vide = File(dossier, "vide.pdf").apply { writeBytes(byteArrayOf()) }
         assertEquals(DocumentSharing.ErreurPartage.FICHIER_VIDE, DocumentFilePolicy.erreur(vide))
@@ -19,7 +20,7 @@ class DocumentFilePolicyTest {
 
     @Test
     fun `extension et signature PDF sont toutes deux controlees`() {
-        val dossier = createTempDir()
+        val dossier = createTempDirectory("document-partage-").toFile()
         val faux = File(dossier, "faux.pdf").apply { writeText("contenu non pdf") }
         val mauvaiseExtension = File(dossier, "document.txt").apply { writeText("%PDF-1.4") }
         val correct = File(dossier, "document.pdf").apply { writeText("%PDF-1.4\ncontenu") }
