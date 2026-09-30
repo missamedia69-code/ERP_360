@@ -8,15 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -86,7 +85,7 @@ fun MissaBarreModules(
             .height(68.dp),
     ) {
         val largeurPx = with(LocalDensity.current) { maxWidth.toPx() }
-        Canvas(Modifier.matchParentSize()) {
+        Canvas(Modifier.fillMaxSize()) {
             val top = 18.dp.toPx()
             val centre = size.width * positionAnimee / icones.size
             val demiEncoche = 38.dp.toPx()
