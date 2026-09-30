@@ -1,51 +1,50 @@
 package com.missa.b360.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
-import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
-import com.missa.b360.ui.theme.MissaMuted
-import kotlin.math.roundToInt
 
 val LocalBarreNavigation = compositionLocalOf { mutableStateOf(true) }
 
-/** Barre blanche à encoche mobile. L'onglet actif flotte dans une bulle au-dessus de la barre. */
+/**
+ * Navigation « pilule » : l'onglet actif devient un cartouche sombre avec son libellé,
+ * tandis que les autres destinations restent des icônes noires compactes.
+ */
 @Composable
 fun MissaBarreModules(
     modules: List<AppModule>,
@@ -61,120 +60,122 @@ fun MissaBarreModules(
         else -> AppModule.entries.firstOrNull { it.route == racine }
     }
     val visibles = modules.take(AppModule.MAX_ONGLETS)
-    val icones = buildList {
-        add(Iv.Home to R.string.nav_accueil)
-        visibles.forEach { add(it.icon to if (it == AppModule.TRESORERIE) R.string.module_finances else it.titleRes) }
-        add(Iv.MoreHoriz to R.string.home_more_short)
+    val elements = buildList {
+        add(BarreElement(Iv.Home, R.string.nav_accueil, onAccueil))
+        visibles.forEach { module ->
+            add(
+                BarreElement(
+                    icone = module.icon,
+                    libelle = if (module == AppModule.TRESORERIE) R.string.module_finances else module.titleRes,
+                    onClick = { onModule(module) },
+                ),
+            )
+        }
+        add(BarreElement(Iv.MoreHoriz, R.string.home_more_short, onPlus))
     }
     val indexActif = when {
         racine == Routes.HOME -> 0
-        moduleCourant != null && visibles.contains(moduleCourant) -> visibles.indexOf(moduleCourant) + 1
+        moduleCourant in visibles -> visibles.indexOf(moduleCourant) + 1
         else -> -1
     }
-    val positionCible = if (indexActif >= 0) indexActif + .5f else .5f
-    val positionAnimee by animateFloatAsState(
-        targetValue = positionCible,
-        animationSpec = spring(dampingRatio = .72f, stiffness = 420f),
-        label = "encocheNavigation",
-    )
 
-    BoxWithConstraints(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .height(68.dp),
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        val largeurPx = with(LocalDensity.current) { maxWidth.toPx() }
-        Canvas(Modifier.fillMaxSize()) {
-            val top = 18.dp.toPx()
-            val centre = size.width * positionAnimee / icones.size
-            val demiEncoche = 38.dp.toPx()
-            val profondeur = 25.dp.toPx()
-            val p = Path().apply {
-                moveTo(0f, top)
-                lineTo(centre - demiEncoche, top)
-                cubicTo(
-                    centre - 23.dp.toPx(), top,
-                    centre - 27.dp.toPx(), top + profondeur,
-                    centre, top + profondeur,
-                )
-                cubicTo(
-                    centre + 27.dp.toPx(), top + profondeur,
-                    centre + 23.dp.toPx(), top,
-                    centre + demiEncoche, top,
-                )
-                lineTo(size.width, top)
-                lineTo(size.width, size.height)
-                lineTo(0f, size.height)
-                close()
-            }
-            drawPath(p, Color.White)
-            drawPath(p, MissaBorder.copy(alpha = .45f), style = Stroke(1.dp.toPx()))
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(68.dp),
-            verticalAlignment = Alignment.Bottom,
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            color = Color.White,
+            shadowElevation = 7.dp,
+            tonalElevation = 0.dp,
         ) {
-            icones.forEachIndexed { index, (icone, libelle) ->
-                val actif = index == indexActif
-                val clic = when (index) {
-                    0 -> onAccueil
-                    icones.lastIndex -> onPlus
-                    else -> ({ onModule(visibles[index - 1]) })
-                }
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp)
-                        .clickable(onClick = clic)
-                        .sizeIn(minWidth = 48.dp, minHeight = 48.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    if (!actif) {
-                        Icon(
-                            painter = painterResource(icone),
-                            contentDescription = stringResource(libelle),
-                            tint = MissaMuted.copy(alpha = .48f),
-                            modifier = Modifier.size(23.dp),
-                        )
-                    }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+                    .padding(horizontal = 7.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                elements.forEachIndexed { index, element ->
+                    BarreOnglet(
+                        element = element,
+                        actif = index == indexActif,
+                        modifier = if (index == indexActif) Modifier.weight(1.55f) else Modifier.weight(1f),
+                    )
                 }
             }
         }
+    }
+}
 
-        if (indexActif >= 0) {
+private data class BarreElement(
+    val icone: Int,
+    val libelle: Int,
+    val onClick: () -> Unit,
+)
+
+@Composable
+private fun BarreOnglet(
+    element: BarreElement,
+    actif: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val forme = RoundedCornerShape(16.dp)
+    Box(
+        modifier = modifier
+            .height(46.dp)
+            .animateContentSize(animationSpec = spring(dampingRatio = .8f, stiffness = 500f))
+            .clip(forme)
+            .clickable(onClick = element.onClick)
+            .sizeIn(minWidth = 48.dp, minHeight = 48.dp)
+            .then(if (actif) Modifier.padding(horizontal = 3.dp) else Modifier),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            modifier = if (actif) {
+                Modifier
+                    .clip(forme)
+                    .clickable(onClick = element.onClick)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
+            } else {
+                Modifier.padding(10.dp)
+            },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
             Surface(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset {
-                        IntOffset(
-                            x = (largeurPx * positionAnimee / icones.size - 28.dp.toPx()).roundToInt(),
-                            y = 0,
+                color = if (actif) MissaInk else Color.Transparent,
+                shape = forme,
+            ) {
+                Row(
+                    modifier = Modifier.padding(
+                        horizontal = if (actif) 10.dp else 0.dp,
+                        vertical = if (actif) 7.dp else 0.dp,
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(element.icone),
+                        contentDescription = stringResource(element.libelle),
+                        tint = if (actif) Color.White else MissaInk,
+                        modifier = Modifier.size(22.dp),
+                    )
+                    if (actif) {
+                        Spacer(Modifier.width(7.dp))
+                        Text(
+                            text = stringResource(element.libelle),
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    .size(56.dp)
-                    .clickable {
-                        when (indexActif) {
-                            0 -> onAccueil()
-                            icones.lastIndex -> onPlus()
-                            else -> onModule(visibles[indexActif - 1])
-                        }
-                    },
-                shape = CircleShape,
-                color = Color.White,
-                shadowElevation = 9.dp,
-                tonalElevation = 0.dp,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        painter = painterResource(icones[indexActif].first),
-                        contentDescription = stringResource(icones[indexActif].second),
-                        tint = MissaInk,
-                        modifier = Modifier.size(25.dp),
-                    )
                 }
             }
         }
