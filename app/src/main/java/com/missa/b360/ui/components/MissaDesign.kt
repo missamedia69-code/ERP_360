@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
+import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -105,17 +106,21 @@ fun MissaTopAppBar(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
-        modifier = modifier,
-        // Barre compacte : 52 dp au lieu des 64 dp Material.
-        expandedHeight = 52.dp,
+        modifier = modifier.padding(horizontal = 8.dp),
+        expandedHeight = 58.dp,
         title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                MissaBrandMark(size = 30.dp)
-                Spacer(Modifier.width(6.dp))
+            // Design n°2 validé : cartouche sombre arrondi, compact et très lisible.
+            Surface(
+                shape = RoundedCornerShape(18.dp),
+                color = MissaInk,
+                tonalElevation = 0.dp,
+                shadowElevation = 3.dp,
+            ) {
                 Text(
                     text = title,
-                    color = MissaInk,
-                    fontSize = 13.5.sp,
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 11.dp),
+                    color = Color.White,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -124,20 +129,31 @@ fun MissaTopAppBar(
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(40.dp)) {
-                    Icon(
-                        painter = painterResource(Iv.ArrowBack),
-                        contentDescription = null,
-                        tint = MissaInk,
-                        modifier = Modifier.size(20.dp),
-                    )
+                Surface(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape),
+                    shape = CircleShape,
+                    color = BrandBlue,
+                    shadowElevation = 4.dp,
+                    onClick = onBack,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(Iv.ArrowBack),
+                            contentDescription = null,
+                            // Charte projet : les pictogrammes restent noirs.
+                            tint = MissaInk,
+                            modifier = Modifier.size(21.dp),
+                        )
+                    }
                 }
             }
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = couleurFond,
-            titleContentColor = MissaInk,
+            titleContentColor = Color.White,
             navigationIconContentColor = MissaInk,
             actionIconContentColor = MissaInk,
         ),
