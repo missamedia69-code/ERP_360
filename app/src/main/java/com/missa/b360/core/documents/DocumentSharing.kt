@@ -169,7 +169,7 @@ object DocumentFilePolicy {
         .replace(Regex("[^A-Za-z0-9À-ÿ._ -]"), "-")
         .replace(Regex("\\s+"), " ")
         .take(80)
-        .ifBlank { "Document" }
+        .let { nom -> if (nom.any(Char::isLetterOrDigit)) nom else "Document" }
 }
 
 private class PdfFilePrintAdapter(private val fichier: File, private val titre: String) : PrintDocumentAdapter() {
