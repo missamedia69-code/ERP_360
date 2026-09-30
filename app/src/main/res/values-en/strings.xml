@@ -2019,4 +2019,9 @@
     <string name="cpt_valider_comptabiliser">Approve and post</string>
     <string name="form_valeur_invalide">Invalid value</string>
     <string name="form_erreur_montant_max">The amount cannot exceed %1$s</string>
+    <string name="lock_bio_title">Biometric unlock</string>
+    <string name="lock_bio_subtitle">Place your finger on the sensor</string>
+    <string name="lock_bio_action">Use fingerprint</string>
+    <string name="lock_bio_failed">Fingerprint not recognized. Try again.</string>
+    <string name="lock_bio_cancel">Cancel</string>
 </resources>

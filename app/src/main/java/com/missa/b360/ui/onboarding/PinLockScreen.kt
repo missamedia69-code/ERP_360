@@ -31,7 +31,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -104,6 +109,11 @@ class PinLockViewModel @Inject constructor(
         _state.value = _state.value.copy(erreur = false, essaisRestants = null)
     }
 
+    /** Une authentification validée par Android déverrouille sans exposer ni relire le PIN. */
+    fun deverrouillerAvecEmpreinte() {
+        if (saisieAutorisee()) deverrouille.value = true
+    }
+
     fun verifier() {
         if (!saisieAutorisee() || saisie.value.length != PIN_LONGUEUR) return
         val pin = saisie.value
@@ -156,6 +166,23 @@ fun PinLockScreen(
     val saisie by viewModel.saisie.collectAsState()
     val deverrouille by viewModel.deverrouille.collectAsState()
     val descriptionEffacer = stringResource(R.string.obn_pin_effacer)
+    val contexte = LocalContext.current
+    val biometrieDisponible = remember(contexte) { empreinteDisponible(contexte) }
+    var demandeBiometrique by remember { mutableIntStateOf(if (biometrieDisponible) 1 else 0) }
+    var echecBiometrique by remember { mutableStateOf(false) }
+    val bioTitre = stringResource(R.string.lock_bio_title)
+    val bioSousTitre = stringResource(R.string.lock_bio_subtitle)
+    val bioAnnuler = stringResource(R.string.lock_bio_cancel)
+
+    DemandeEmpreinte(
+        declencheur = demandeBiometrique,
+        active = biometrieDisponible && state.bloqueJusquA == null && !deverrouille,
+        titre = bioTitre,
+        sousTitre = bioSousTitre,
+        annuler = bioAnnuler,
+        onSucces = viewModel::deverrouillerAvecEmpreinte,
+        onEchec = { echecBiometrique = true },
+    )
 
     LaunchedEffect(deverrouille) {
         if (deverrouille) onUnlocked()
@@ -184,7 +211,18 @@ fun PinLockScreen(
                 LockBrandHeader()
                 Spacer(Modifier.height(14.dp))
                 LockPinCard(state = state, saisie = saisie)
-                Spacer(Modifier.height(12.dp))
+                if (biometrieDisponible) {
+                    Spacer(Modifier.height(10.dp))
+                    BiometricAction(
+                        erreur = echecBiometrique,
+                        active = state.bloqueJusquA == null && !state.verificationEnCours,
+                        onClick = {
+                            echecBiometrique = false
+                            demandeBiometrique++
+                        },
+                    )
+                }
+                Spacer(Modifier.height(10.dp))
                 Keypad(
                     saisie = saisie,
                     interactionActive = state.bloqueJusquA == null && !state.verificationEnCours,
@@ -309,10 +347,10 @@ private fun LockPinSlot(
     }
     Box(
         modifier = Modifier
-            .size(width = 48.dp, height = 52.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .size(16.dp)
+            .clip(CircleShape)
             .background(fond)
-            .border(1.5.dp, bord, RoundedCornerShape(14.dp)),
+            .border(1.5.dp, bord, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         if (filled) {
@@ -387,6 +425,38 @@ private fun LockVerificationStatus() {
     }
 }
 
+/** Action biométrique visible uniquement quand une empreinte est réellement enregistrée. */
+@Composable
+private fun BiometricAction(erreur: Boolean, active: Boolean, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Surface(
+            onClick = onClick,
+            enabled = active,
+            modifier = Modifier.size(70.dp),
+            shape = CircleShape,
+            color = if (erreur) Red80 else MissaSoftBlue,
+            border = BorderStroke(1.dp, if (erreur) Red20 else MissaBorder),
+            shadowElevation = 3.dp,
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(Iv.Fingerprint),
+                    contentDescription = stringResource(R.string.lock_bio_action),
+                    tint = if (erreur) Red20 else MissaInk,
+                    modifier = Modifier.size(40.dp),
+                )
+            }
+        }
+        Spacer(Modifier.height(5.dp))
+        Text(
+            text = stringResource(if (erreur) R.string.lock_bio_failed else R.string.lock_bio_action),
+            color = if (erreur) Red20 else MissaMuted,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+        )
+    }
+}
+
 /** Pavé numérique centré, quatre rangées, le 0 sur sa colonne centrale. */
 @Composable
 private fun Keypad(
@@ -403,7 +473,7 @@ private fun Keypad(
             .widthIn(max = 340.dp)
             .fillMaxWidth(),
         shape = forme,
-        color = MissaSoftBlue,
+        color = MissaSurface,
         border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.65f)),
         shadowElevation = 2.dp,
     ) {
@@ -414,12 +484,12 @@ private fun Keypad(
             listOf("123", "456", "789").forEach { ligne ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     ligne.forEach { chiffre ->
                         KeypadTouche(
                             actif = chiffresCompatibles,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier,
                             onClick = { onDigit(chiffre) },
                         ) {
                             Text(
@@ -434,12 +504,12 @@ private fun Keypad(
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(9.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.size(56.dp))
                 KeypadTouche(
                     actif = chiffresCompatibles,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier,
                     onClick = { onDigit('0') },
                 ) {
                     Text(
@@ -452,7 +522,6 @@ private fun Keypad(
                 KeypadTouche(
                     actif = interactionActive && saisie.isNotEmpty(),
                     modifier = Modifier
-                        .weight(1f)
                         .semantics { contentDescription = descriptionEffacer },
                     onClick = onErase,
                 ) {
@@ -479,7 +548,7 @@ private fun KeypadTouche(
     Surface(
         onClick = onClick,
         enabled = actif,
-        shape = RoundedCornerShape(15.dp),
+        shape = CircleShape,
         color = MissaSurface,
         border = BorderStroke(
             1.dp,
@@ -487,7 +556,7 @@ private fun KeypadTouche(
         ),
         shadowElevation = if (actif) 1.dp else 0.dp,
         modifier = modifier
-            .height(56.dp)
+            .size(56.dp)
             .alpha(if (actif) 1f else 0.45f),
     ) {
         Box(

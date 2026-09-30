@@ -2015,4 +2015,9 @@
     <string name="cpt_valider_comptabiliser">اعتماد وترحيل</string>
     <string name="form_valeur_invalide">قيمة غير صالحة</string>
     <string name="form_erreur_montant_max">لا يمكن أن يتجاوز المبلغ %1$s</string>
+    <string name="lock_bio_title">فتح القفل بالبصمة</string>
+    <string name="lock_bio_subtitle">ضع إصبعك على المستشعر</string>
+    <string name="lock_bio_action">استخدام بصمة الإصبع</string>
+    <string name="lock_bio_failed">لم يتم التعرف على البصمة. حاول مجددًا.</string>
+    <string name="lock_bio_cancel">إلغاء</string>
 </resources>

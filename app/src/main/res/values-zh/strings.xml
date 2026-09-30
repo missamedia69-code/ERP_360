@@ -2015,4 +2015,9 @@
     <string name="cpt_valider_comptabiliser">审核并过账</string>
     <string name="form_valeur_invalide">无效的值</string>
     <string name="form_erreur_montant_max">金额不能超过 %1$s</string>
+    <string name="lock_bio_title">生物识别解锁</string>
+    <string name="lock_bio_subtitle">请将手指放在传感器上</string>
+    <string name="lock_bio_action">使用指纹</string>
+    <string name="lock_bio_failed">无法识别指纹，请重试。</string>
+    <string name="lock_bio_cancel">取消</string>
 </resources>

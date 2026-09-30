@@ -51,6 +51,7 @@ object Iv {
     val LineWeight = R.drawable.ph_factory
     val LocalShipping = R.drawable.ph_truck
     val Lock = R.drawable.ph_lock
+    val Fingerprint = R.drawable.ph_fingerprint
     val MailOutline = R.drawable.ph_envelope
     val Menu = R.drawable.ph_list
     val MoreHoriz = R.drawable.ph_dots_three

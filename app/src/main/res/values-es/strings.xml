@@ -2015,4 +2015,9 @@
     <string name="cpt_valider_comptabiliser">Validar y contabilizar</string>
     <string name="form_valeur_invalide">Valor no válido</string>
     <string name="form_erreur_montant_max">El importe no puede superar %1$s</string>
+    <string name="lock_bio_title">Desbloqueo biométrico</string>
+    <string name="lock_bio_subtitle">Coloque el dedo en el sensor</string>
+    <string name="lock_bio_action">Usar huella digital</string>
+    <string name="lock_bio_failed">Huella no reconocida. Inténtelo de nuevo.</string>
+    <string name="lock_bio_cancel">Cancelar</string>
 </resources>

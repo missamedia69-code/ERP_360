@@ -2062,4 +2062,9 @@
     <string name="cpt_valider_comptabiliser">Valider et comptabiliser</string>
     <string name="form_valeur_invalide">Valeur invalide</string>
     <string name="form_erreur_montant_max">Le montant ne peut pas dépasser %1$s</string>
+    <string name="lock_bio_title">Déverrouillage biométrique</string>
+    <string name="lock_bio_subtitle">Posez votre doigt sur le capteur</string>
+    <string name="lock_bio_action">Utiliser l’empreinte</string>
+    <string name="lock_bio_failed">Empreinte non reconnue. Réessayez.</string>
+    <string name="lock_bio_cancel">Annuler</string>
 </resources>
