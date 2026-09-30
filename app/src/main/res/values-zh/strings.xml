@@ -2023,4 +2023,7 @@
     <string name="notifications_tout_lire">全部标为已读</string>
     <string name="notifications_vide_titre">暂无通知</string>
     <string name="notifications_vide_description">重要提醒和事件将在这里显示。</string>
+    <string name="notification_document_cree">文档已创建</string>
+    <string name="notification_statut_modifie">状态已更新</string>
+    <string name="notification_stock_critique">库存告急</string>
 </resources>

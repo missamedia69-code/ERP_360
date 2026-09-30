@@ -1,5 +1,6 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
+import com.missa.b360.R
 
 import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.ProductDao
@@ -149,7 +150,7 @@ class RecordStockMovementUseCase @Inject constructor(
         if (resultat is StockMovementResult.Succes && resultat.stockApres <= produit.stockMin) {
             appNotifier.notifier(
                 type = "STOCK_ALERTE",
-                titre = "Stock critique",
+                titreRes = R.string.notification_stock_critique,
                 message = "${produit.code} — ${produit.nom} : ${resultat.stockApres}",
             )
         }

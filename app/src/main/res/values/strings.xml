@@ -2070,4 +2070,7 @@
     <string name="notifications_tout_lire">Tout marquer comme lu</string>
     <string name="notifications_vide_titre">Aucune notification</string>
     <string name="notifications_vide_description">Les alertes et événements importants apparaîtront ici.</string>
+    <string name="notification_document_cree">Document créé</string>
+    <string name="notification_statut_modifie">Statut mis à jour</string>
+    <string name="notification_stock_critique">Stock critique</string>
 </resources>

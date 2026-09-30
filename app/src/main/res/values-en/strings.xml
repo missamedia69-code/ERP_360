@@ -2027,4 +2027,7 @@
     <string name="notifications_tout_lire">Mark all as read</string>
     <string name="notifications_vide_titre">No notifications</string>
     <string name="notifications_vide_description">Important alerts and events will appear here.</string>
+    <string name="notification_document_cree">Document created</string>
+    <string name="notification_statut_modifie">Status updated</string>
+    <string name="notification_stock_critique">Critical stock</string>
 </resources>

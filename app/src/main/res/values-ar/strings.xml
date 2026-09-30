@@ -2023,4 +2023,7 @@
     <string name="notifications_tout_lire">تحديد الكل كمقروء</string>
     <string name="notifications_vide_titre">لا توجد إشعارات</string>
     <string name="notifications_vide_description">ستظهر التنبيهات والأحداث المهمة هنا.</string>
+    <string name="notification_document_cree">تم إنشاء المستند</string>
+    <string name="notification_statut_modifie">تم تحديث الحالة</string>
+    <string name="notification_stock_critique">مخزون حرج</string>
 </resources>

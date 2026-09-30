@@ -1,5 +1,6 @@
 package com.missa.b360.core.domain.usecase
 
+import com.missa.b360.R
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.entity.OperationDirection
 import com.missa.b360.core.data.entity.OperationModule
@@ -114,7 +115,7 @@ class OperationUseCases @Inject constructor(
         )
         appNotifier.notifier(
             type = params.module.name,
-            titre = "Document créé",
+            titreRes = R.string.notification_document_cree,
             message = "$reference — $title",
         )
         return CreateResult.Success(id, reference)
@@ -174,7 +175,7 @@ class OperationUseCases @Inject constructor(
         )
         appNotifier.notifier(
             type = record.module,
-            titre = "Statut mis à jour",
+            titreRes = R.string.notification_statut_modifie,
             message = "${record.reference} — ${status.name.replace('_', ' ')}",
         )
         return true

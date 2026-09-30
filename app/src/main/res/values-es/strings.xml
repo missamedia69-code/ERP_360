@@ -2023,4 +2023,7 @@
     <string name="notifications_tout_lire">Marcar todo como leído</string>
     <string name="notifications_vide_titre">Sin notificaciones</string>
     <string name="notifications_vide_description">Las alertas y eventos importantes aparecerán aquí.</string>
+    <string name="notification_document_cree">Documento creado</string>
+    <string name="notification_statut_modifie">Estado actualizado</string>
+    <string name="notification_stock_critique">Stock crítico</string>
 </resources>

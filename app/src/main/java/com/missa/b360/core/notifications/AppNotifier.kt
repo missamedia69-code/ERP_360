@@ -26,6 +26,19 @@ object NotificationRoutes {
     const val EXTRA_ROUTE = "notification_route"
 
     fun pourType(type: String): String = when {
+        type == "ACH" -> AppModule.ACHATS.route
+        type == "VEN" -> AppModule.VENTE.route
+        type == "STK" -> AppModule.STOCK.route
+        type == "PRO" -> AppModule.PRODUCTION.route
+        type == "SER" -> AppModule.SERVICES.route
+        type == "PRJ" -> AppModule.PROJETS.route
+        type == "CPT" || type == "FINANCES" -> AppModule.COMPTABILITE.route
+        type == "TRE" -> AppModule.TRESORERIE.route
+        type == "CRM" -> AppModule.CRM.route
+        type == "QUA" -> AppModule.QUALITE.route
+        type == "MAI" -> AppModule.MAINTENANCE.route
+        type == "LOG" -> AppModule.LOGISTIQUE.route
+        type == "REP" -> AppModule.REPORTING.route
         type.startsWith("STOCK") || type == "INVENTAIRE" -> AppModule.STOCK.route
         type.startsWith("VENTE") || type.startsWith("CLIENT") -> AppModule.VENTE.route
         type.startsWith("ACHAT") || type.startsWith("RECEPTION") || type.startsWith("RETOUR_ACHAT") -> AppModule.ACHATS.route
@@ -70,6 +83,9 @@ class AppNotifier @Inject constructor(
             )
         }
     }
+
+    suspend fun notifier(type: String, titreRes: Int, message: String, date: Long = System.currentTimeMillis()) =
+        notifier(type, context.getString(titreRes), message, date)
 
     suspend fun notifier(type: String, titre: String, message: String, date: Long = System.currentTimeMillis()) {
         // Anti-bruit : une même alerte émise plusieurs fois par une chaîne transactionnelle
