@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Chemins exposés par le FileProvider : uniquement le sous-dossier cache des fiches PDF. -->
+<!-- Exposition en lecture seule via URI temporaire ; jamais de chemin de fichier brut. -->
 <paths>
     <cache-path name="fiches_pdf" path="fiches_pdf/" />
+    <cache-path name="documents_pdf" path="documents_pdf/" />
 </paths>
