@@ -244,7 +244,7 @@ internal fun OnbScaffold(
                             if (boutonActive && !viewModel.enregistrementEnCours) {
                                 Modifier.background(
                                     Brush.verticalGradient(
-                                        colors = listOf(Color(0xFF3E7BFA), BrandBlue),
+                                        colors = listOf(Color(0xFF172653), BrandBlue),
                                     ),
                                 )
                             } else {
@@ -303,7 +303,7 @@ private fun WelcomeStep(viewModel: OnboardingViewModel) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF2A3BDD), OnboardingHeroBlue, Color(0xFF131C8F)),
+                    colors = listOf(Color(0xFF172653), OnboardingHeroBlue, Color(0xFF0B1433)),
                 ),
             )
             .statusBarsPadding()

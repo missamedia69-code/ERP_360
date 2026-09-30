@@ -10,16 +10,14 @@ Un seul module Gradle (`app`). Cinq langues : `values` (fr), `values-en`, `value
   **Jamais** `androidx.compose.material.icons.*`, jamais de conversion SVG→ImageVector maison.
 - **Toutes les icônes en NOIR** (`tint = MissaInk`). La couleur du module colore uniquement
   le header et le fond de la barre du bas. « Achats » = `Iv.CartArrowDown`.
-- **Couleur de module** : source unique `AppModule.couleur` (ui/navigation). Déclinaisons :
-  `couleurPale` alpha 0.45, `couleurDouce` alpha 0.26 (ne pas revenir à 14/12 %).
-- **Couleurs sémantiques** (montants/indicateurs) : dépense = rouge, gains/argent = vert.
-- **Palette des modules** (source de vérité = `AppModule` dans `ModuleRegistry.kt`, verrouillée par
-  `ModuleRegistryTest`) : Vente bleu `#2563EB` · Stock gris `#6B7280` · Clients violet `#8B5CF6` ·
-  Achats **et** Fournisseurs orange `#F28A16` (fond pâle fixe `#FFF2E2`) · Production violet `#8B5CF6` ·
-  Trésorerie bleu nuit `#1E3A8A` · Comptabilité/Finances ardoise `#475569` · Services `#DB2777` ·
-  Projets `#6366F1` · RH `#E11D48` · Livraison `#38BDF8` · CRM `#C026D3` · Qualité `#7C3AED` ·
-  Maintenance `#B91C1C` · Logistique `#65A30D` · Reporting `#0E7490`. Changer une teinte = modifier
-  `AppModule` **et** le test, avec validation du propriétaire.
+- **Palette globale monochrome (validée propriétaire)** : tous les modules et l’onboarding utilisent
+  le bleu nuit Stock `MissaInk` (`#101C43`) sur `MissaCanvas` (`#F8F9FD`), cartes blanches,
+  bordures gris-bleu `MissaBorder` (`#CBD5E8`) et surfaces pâles `#F1F3F7`.
+  `AppModule.couleur` reste la source unique et vaut actuellement `MissaInk` pour chaque module ;
+  `couleurPale` est une dilution à 10 % et `couleurDouce` à 26 %. Les futures différenciations
+  colorées doivent être locales, explicites et validées, jamais réintroduites globalement.
+- **Couleurs sémantiques uniquement** : dépense/erreur = rouge, gain/succès = vert, avertissement =
+  orange. Elles ne servent jamais à identifier un module.
 - **Convention C7 — jamais de suppression physique** : statuts (ARCHIVE, DESACTIVE…) ou
   annulation par **contre-passation** (pièces et mouvements inverses). Seule exception :
   retrait d'un document joint fournisseur (tracé dans l'audit).

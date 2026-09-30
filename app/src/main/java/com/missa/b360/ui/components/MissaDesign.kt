@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.ui.theme.BrandBlue
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -134,7 +133,7 @@ fun MissaTopAppBar(
                         .size(44.dp)
                         .clip(CircleShape),
                     shape = CircleShape,
-                    color = BrandBlue,
+                    color = MissaBorder,
                     shadowElevation = 4.dp,
                     onClick = onBack,
                 ) {

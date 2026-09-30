@@ -5,6 +5,7 @@ import com.missa.b360.R
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import androidx.compose.ui.graphics.Color
+import com.missa.b360.ui.theme.MissaInk
 import androidx.compose.ui.graphics.compositeOver
 
 /**
@@ -43,24 +44,24 @@ enum class AppModule(
      */
     val couleur: Color,
 ) {
-    VENTE("module_vente", R.string.module_vente, Iv.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1, couleur = Color(0xFF2563EB)), 
-    STOCK("module_stock", R.string.module_stock, Iv.Inventory2, ModuleCode.STK, prioriteBarre = 2, couleur = Color(0xFF6B7280)), 
-    CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7, couleur = Color(0xFF8B5CF6)),
-    FINANCES("module_finances", R.string.module_finances, Iv.TrendingUp, ModuleCode.CPT, couleur = Color(0xFF475569)),
-    ACHATS("module_achats", R.string.module_achats, Iv.CartArrowDown, ModuleCode.ACH, couleur = Color(0xFFF28A16)),
-    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH, couleur = Color(0xFFF28A16)),
-    LIVRAISON("module_livraison", R.string.module_livraison, Iv.LocalShipping, ModuleCode.LOG, prioriteBarre = 8, couleur = Color(0xFF38BDF8)), 
-    PRODUCTION("module_production", R.string.module_production, Iv.LineWeight, ModuleCode.PRO, prioriteBarre = 6, couleur = Color(0xFF8B5CF6)),
-    SERVICES("module_services", R.string.module_services, Iv.RequestQuote, ModuleCode.SER, prioriteBarre = 4, couleur = Color(0xFFDB2777)), 
-    RH("module_rh", R.string.module_rh, Iv.Person, ModuleCode.RH, prioriteBarre = 9, couleur = Color(0xFFE11D48)), 
-    PROJETS("module_projets", R.string.module_projets, Iv.Workspaces, ModuleCode.PRJ, prioriteBarre = 5, couleur = Color(0xFF6366F1)), 
-    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Iv.Calculator, ModuleCode.CPT, couleur = Color(0xFF475569)),
-    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Iv.Bank, ModuleCode.TRE, prioriteBarre = 3, couleur = Color(0xFF1E3A8A)),
-    CRM("module_crm", R.string.module_crm, Iv.Campaign, ModuleCode.CRM, couleur = Color(0xFFC026D3)), 
-    QUALITE("module_qualite", R.string.module_qualite, Iv.QualityBadge, ModuleCode.QUA, couleur = Color(0xFF7C3AED)), 
-    MAINTENANCE("module_maintenance", R.string.module_maintenance, Iv.HammerWrench, ModuleCode.MAI, couleur = Color(0xFFB91C1C)), 
-    LOGISTIQUE("module_logistique", R.string.module_logistique, Iv.Warehouse, ModuleCode.LOG, couleur = Color(0xFF65A30D)), 
-    REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP, couleur = Color(0xFF0E7490)), 
+    VENTE("module_vente", R.string.module_vente, Iv.ShoppingCart, ModuleCode.VEN, prioriteBarre = 1, couleur = MissaInk),
+    STOCK("module_stock", R.string.module_stock, Iv.Inventory2, ModuleCode.STK, prioriteBarre = 2, couleur = MissaInk),
+    CLIENTS("module_clients", R.string.module_clients, Iv.Group, ModuleCode.VEN, prioriteBarre = 7, couleur = MissaInk),
+    FINANCES("module_finances", R.string.module_finances, Iv.TrendingUp, ModuleCode.CPT, couleur = MissaInk),
+    ACHATS("module_achats", R.string.module_achats, Iv.CartArrowDown, ModuleCode.ACH, couleur = MissaInk),
+    FOURNISSEURS("module_fournisseurs", R.string.module_fournisseurs, Iv.Handshake, ModuleCode.ACH, couleur = MissaInk),
+    LIVRAISON("module_livraison", R.string.module_livraison, Iv.LocalShipping, ModuleCode.LOG, prioriteBarre = 8, couleur = MissaInk),
+    PRODUCTION("module_production", R.string.module_production, Iv.LineWeight, ModuleCode.PRO, prioriteBarre = 6, couleur = MissaInk),
+    SERVICES("module_services", R.string.module_services, Iv.RequestQuote, ModuleCode.SER, prioriteBarre = 4, couleur = MissaInk),
+    RH("module_rh", R.string.module_rh, Iv.Person, ModuleCode.RH, prioriteBarre = 9, couleur = MissaInk),
+    PROJETS("module_projets", R.string.module_projets, Iv.Workspaces, ModuleCode.PRJ, prioriteBarre = 5, couleur = MissaInk),
+    COMPTABILITE("module_comptabilite", R.string.module_comptabilite, Iv.Calculator, ModuleCode.CPT, couleur = MissaInk),
+    TRESORERIE("module_tresorerie", R.string.module_tresorerie, Iv.Bank, ModuleCode.TRE, prioriteBarre = 3, couleur = MissaInk),
+    CRM("module_crm", R.string.module_crm, Iv.Campaign, ModuleCode.CRM, couleur = MissaInk),
+    QUALITE("module_qualite", R.string.module_qualite, Iv.QualityBadge, ModuleCode.QUA, couleur = MissaInk),
+    MAINTENANCE("module_maintenance", R.string.module_maintenance, Iv.HammerWrench, ModuleCode.MAI, couleur = MissaInk),
+    LOGISTIQUE("module_logistique", R.string.module_logistique, Iv.Warehouse, ModuleCode.LOG, couleur = MissaInk),
+    REPORTING("module_reporting", R.string.module_reporting, Iv.Analytics, ModuleCode.REP, couleur = MissaInk),
     ;
 
     /** Fond vif dérivé de [couleur] pour les pastilles et vignettes. */
@@ -69,11 +70,7 @@ enum class AppModule(
 
     /** Fond vif opaque (teinte du module fondue dans le blanc) : headers et barre du bas. */
     val couleurPale: Color
-        get() = if (this == ACHATS || this == FOURNISSEURS) {
-            Color(0xFFFFF2E2)
-        } else {
-            couleur.copy(alpha = 0.45f).compositeOver(Color.White)
-        }
+        get() = couleur.copy(alpha = 0.10f).compositeOver(Color.White)
 
     companion object {
 

@@ -1,5 +1,7 @@
 package com.missa.b360.ui.services
 
+import com.missa.b360.ui.theme.MissaInk
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,7 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val ServicePink = Color(0xFFDB2777)
+private val ServicePink = MissaInk
 
 @Composable
 internal fun ServiceFieldOverview(

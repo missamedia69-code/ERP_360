@@ -74,7 +74,7 @@ internal fun OnbAnnonces(viewModel: OnboardingViewModel) {
                 .fillMaxWidth()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF0C48DB), Color(0xFF165AE4)),
+                        colors = listOf(Color(0xFF101C43), Color(0xFF172653)),
                     ),
                 ),
         ) {
@@ -228,12 +228,12 @@ private data class OnbAvantage(
 )
 
 private val OnbAvantages = listOf(
-    OnbAvantage(Iv.ShoppingCart, Color(0xFF7CB0FF), Color(0xFF2563EB), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
-    OnbAvantage(Iv.Inventory2, Color(0xFF57D98A), Color(0xFF16A34A), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
-    OnbAvantage(Iv.Group, Color(0xFFB09CFF), Color(0xFF7C3AED), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
-    OnbAvantage(Iv.Description, Color(0xFF7CB0FF), Color(0xFF2563EB), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
-    OnbAvantage(Iv.Chat, Color(0xFF57D98A), Color(0xFF22C55E), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
-    OnbAvantage(Iv.Security, Color(0xFFB09CFF), Color(0xFF7C3AED), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
+    OnbAvantage(Iv.ShoppingCart, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_ventes_titre, R.string.obn_av_ventes_desc),
+    OnbAvantage(Iv.Inventory2, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_stock_titre, R.string.obn_av_stock_desc),
+    OnbAvantage(Iv.Group, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_clients_titre, R.string.obn_av_clients_desc),
+    OnbAvantage(Iv.Description, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_documents_titre, R.string.obn_av_documents_desc),
+    OnbAvantage(Iv.Chat, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_commun_titre, R.string.obn_av_commun_desc),
+    OnbAvantage(Iv.Security, Color(0xFFD8DCE6), Color(0xFF101C43), R.string.obn_av_securite_titre, R.string.obn_av_securite_desc),
 )
 
 /**
@@ -260,12 +260,12 @@ private fun OnbAvantagesCarte() {
                     .shadow(
                         elevation = 7.dp,
                         shape = RoundedCornerShape(14.dp),
-                        spotColor = Color(0xFF16A34A).copy(alpha = 0.4f),
+                        spotColor = Color(0xFF101C43).copy(alpha = 0.4f),
                     )
                     .clip(RoundedCornerShape(14.dp))
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color(0xFF4ADE80), Color(0xFF16A34A)),
+                            colors = listOf(Color(0xFFD8DCE6), Color(0xFF101C43)),
                         ),
                     ),
                 contentAlignment = Alignment.Center,
@@ -303,7 +303,7 @@ private fun OnbAvantagesCarte() {
                 .clip(RoundedCornerShape(1.5.dp))
                 .background(
                     Brush.horizontalGradient(
-                        colors = listOf(BrandBlue, Color(0xFF22C55E), Color(0xFF7C3AED)),
+                        colors = listOf(BrandBlue, Color(0xFF101C43), Color(0xFF101C43)),
                     ),
                 ),
         )
@@ -432,7 +432,7 @@ private fun OnbAnnoncesBoutonCommencer(onClick: () -> Unit) {
             .clip(RoundedCornerShape(12.dp))
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3E7BFA), BrandBlue),
+                    colors = listOf(Color(0xFF172653), BrandBlue),
                 ),
             )
             .clickable(onClickLabel = libelle, role = Role.Button, onClick = onClick),

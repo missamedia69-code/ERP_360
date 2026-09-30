@@ -54,7 +54,7 @@ import java.util.Locale
 import com.missa.b360.ui.components.*
 
 /** Teinte violette spécifique au module Tâches. */
-private val VioletTasks: Color = Color(0xFF7C3AED)
+private val VioletTasks: Color = MissaInk
 
 private data class TuileMatriceSpec(
     val icone: Int,

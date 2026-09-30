@@ -2,12 +2,12 @@ package com.missa.b360.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/** Palette de référence Missa Business 360 : cobalt, vert signature et surfaces lumineuses. */
-val BrandBlue = Color(0xFF1554E8)
-val Blue90 = Color(0xFFF0F5FF)
-val Blue80 = Color(0xFFB9D0FF)
+/** Palette monochrome validée : bleu nuit du module Stock et surfaces lumineuses. */
+val BrandBlue = Color(0xFF101C43)
+val Blue90 = Color(0xFFF1F3F7)
+val Blue80 = Color(0xFFD8DCE6)
 val Blue60 = BrandBlue
-val Blue40 = Color(0xFF0847C9)
+val Blue40 = Color(0xFF172653)
 val Blue20 = Color(0xFF101C43)
 
 // Vert signature utilisé pour les confirmations, montants positifs et le « 360 » de la marque.
@@ -15,15 +15,15 @@ val Green90 = Color(0xFFEAF8EF)
 val Green60 = Color(0xFF16803C)
 val Green40 = Color(0xFF126B32)
 
-// Accents réservés aux regroupements métier ; ils restent assourdis afin de ne pas concurrencer le bleu.
-val ProfileGreen = Color(0xFF20934A)
+// Accents historiques rabattus sur le bleu nuit ; les futures différenciations seront ajoutées localement.
+val ProfileGreen = Color(0xFF101C43)
 val ProfileCommerceBlue = BrandBlue
-val ProfilePurple = Color(0xFF7047E8)
-val ProfileOrange = Color(0xFFF28A16)
+val ProfilePurple = Color(0xFF101C43)
+val ProfileOrange = Color(0xFF101C43)
 /** Teal des produits finis et des familles « stock » dans les carrefours. */
-val ProfileTeal = Color(0xFF0E9AA7)
+val ProfileTeal = Color(0xFF101C43)
 /** Violet soutenu des familles techniques (machines, équipements, chimie). */
-val ProfileViolet = Color(0xFF8B5CF6)
+val ProfileViolet = Color(0xFF101C43)
 /** Vert de la tendance positive, plus vif que le vert de marque. */
 val TendrePositive = Color(0xFF16A34A)
 
@@ -35,7 +35,7 @@ val Red80 = Color(0xFFFFE8EA)
 // Neutres de la direction artistique mobile : grand fond clair, cartes blanches, traits fins.
 val MissaCanvas = Color(0xFFF8F9FD)
 val MissaSurface = Color(0xFFFFFFFF)
-val MissaSoftBlue = Color(0xFFF0F5FF)
+val MissaSoftBlue = Color(0xFFF1F3F7)
 val MissaInk = Color(0xFF101C43)
 val MissaMuted = Color(0xFF65718F)
 /**
@@ -49,12 +49,12 @@ val MissaBorder = Color(0xFFCBD5E8)
 val MissaLime = Color(0xFFB6E52B)
 
 // Écrans d'onboarding « maquette » : bleu roi d'accueil et fond vert clair du récapitulatif.
-val OnboardingHeroBlue = Color(0xFF1E2EC8)
-val OnboardingHeroGreen = Color(0xFFEFF8F1)
+val OnboardingHeroBlue = Color(0xFF101C43)
+val OnboardingHeroGreen = Color(0xFFF1F3F7)
 /** Cartes de paramètres de la configuration initiale (maquette : bleu clair plein). */
-val OnbConfigCard = Color(0xFFE2F0FE)
+val OnbConfigCard = Color(0xFFF1F3F7)
 /** Bouton d'action vert vif de l'onboarding (maquette : « Choisir un fichier… »). */
-val OnbActionGreen = Color(0xFF22C55E)
+val OnbActionGreen = Color(0xFF101C43)
 
 // Alias de compatibilité des écrans d'onboarding.
 val OnboardingPrimary = BrandBlue
