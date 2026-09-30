@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
@@ -618,7 +617,10 @@ fun <T> MissaChoixTuiles(
     enabled: Boolean = true,
 ) {
     val couleur = LocalCouleurFormulaire.current
-    val parLigne = colonnes.coerceAtLeast(1)
+    // Les longs libellés ne sont jamais écrasés dans une grille de 3–4 colonnes :
+    // deux colonnes gardent le bouton proche de son texte et lisible en traduction.
+    val libelleLong = options.any { it.libelle.length > 14 || it.libelle.count { c -> c == ' ' } >= 2 }
+    val parLigne = (if (libelleLong) minOf(colonnes, 2) else colonnes).coerceAtLeast(1)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         options.chunked(parLigne).forEach { ligne ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -671,7 +673,8 @@ fun MissaCaseACocher(
     val couleur = LocalCouleurFormulaire.current
     Row(
         modifier
-            .heightIn(min = 36.dp)
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .clickable(enabled = enabled) { onChange(!coche) },
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -701,20 +704,25 @@ fun MissaInterrupteur(
     enabled: Boolean = true,
 ) {
     val couleur = LocalCouleurFormulaire.current
-    Row(modifier.heightIn(min = 36.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(enabled = enabled) { onChange(!actif) }
+            .padding(horizontal = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Column(Modifier.weight(1f)) {
             Text(libelle, fontSize = 12.5.sp, lineHeight = 15.sp, color = MissaInk, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
             aide?.let { Text(it, fontSize = 10.5.sp, color = MissaMuted) }
         }
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 36.dp) {
+        Spacer(Modifier.width(10.dp))
         Switch(
             checked = actif,
-            onCheckedChange = onChange,
+            onCheckedChange = null, // la ligne entière est la cible tactile, sans double déclenchement
             enabled = enabled,
             colors = SwitchDefaults.colors(checkedTrackColor = couleur, checkedThumbColor = couleur.contenuLisible()),
-            modifier = Modifier.scale(0.8f),
         )
-        }
     }
 }
 

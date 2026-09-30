@@ -94,9 +94,8 @@ fun MissaSelecteurLigne(
     titreDialogue: String = label,
     indiceRecherche: String? = null,
     avecRecherche: Boolean = options.size >= 8,
-    /** Hauteur intérieure du cadre : 14 dp par défaut, resserable (10 dp sur
-     * l'écran entreprise) pour épouser la hauteur des champs de saisie. */
-    paddingVertical: Dp = 14.dp,
+    /** Hauteur compacte alignée sur les autres champs de la matrice. */
+    paddingVertical: Dp = 8.dp,
     couleurCarte: Color = MissaSurface,
     bordureCarte: BorderStroke? = BorderStroke(1.dp, MissaBorder),
     rayonCarte: RoundedCornerShape = RoundedCornerShape(12.dp),

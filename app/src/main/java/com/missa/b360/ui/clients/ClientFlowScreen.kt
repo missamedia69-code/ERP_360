@@ -1008,11 +1008,17 @@ private fun ClientInfoFormScreen(
             item { MissaFormSectionTitre(stringResource(R.string.form_section_fiscalite), numero = 2) }
             item { ClientStringPicker(R.string.clients_flow_fiscal_id_type, listOf("NIF" to "NIF", "NIU" to "NIU", "NINEA" to "NINEA", "TVA" to "TVA", "AUTRE" to stringResource(R.string.clients_type_autre)), draft.fiscalIdType) { onDraftChange(draft.copy(fiscalIdType = it)) } }
             item {
-                MissaChampTexte(draft.nif, { onDraftChange(draft.copy(nif = it.take(80))) }, stringResource(R.string.clients_flow_nif), icone = Iv.Badge)
+                MissaRangee {
+                    MissaChampTexte(draft.nif, { onDraftChange(draft.copy(nif = it.take(80))) }, stringResource(R.string.clients_flow_nif), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.numeroTva, { onDraftChange(draft.copy(numeroTva = it.take(80))) }, stringResource(R.string.clients_flow_vat_number), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                }
             }
-            item { MissaChampTexte(draft.numeroTva, { onDraftChange(draft.copy(numeroTva = it.take(80))) }, stringResource(R.string.clients_flow_vat_number), icone = Iv.Badge) }
-            item { MissaCaseACocher(draft.assujettiTva, { onDraftChange(draft.copy(assujettiTva = it)) }, stringResource(R.string.clients_flow_vat_subject)) }
-            item { MissaCaseACocher(draft.exonereTva, { onDraftChange(draft.copy(exonereTva = it)) }, stringResource(R.string.clients_flow_vat_exempt)) }
+            item {
+                MissaRangee {
+                    MissaCaseACocher(draft.assujettiTva, { onDraftChange(draft.copy(assujettiTva = it)) }, stringResource(R.string.clients_flow_vat_subject), modifier = Modifier.weight(1f))
+                    MissaCaseACocher(draft.exonereTva, { onDraftChange(draft.copy(exonereTva = it)) }, stringResource(R.string.clients_flow_vat_exempt), modifier = Modifier.weight(1f))
+                }
+            }
             if (draft.exonereTva) item { MissaChampTexte(draft.motifExoneration, { onDraftChange(draft.copy(motifExoneration = it.take(240))) }, stringResource(R.string.clients_flow_tax_exemption_reason), icone = Iv.Description) }
             item { MissaChampTexte(draft.tauxTva, { onDraftChange(draft.copy(tauxTva = it.decimalInput())) }, stringResource(R.string.clients_flow_specific_vat_rate), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%") }
             item { MissaFormSectionTitre(stringResource(R.string.form_section_contact), numero = 3) }
@@ -1029,8 +1035,12 @@ private fun ClientInfoFormScreen(
                 MissaChampTexte(draft.email, { onDraftChange(draft.copy(email = it.take(ClientValidation.LONGUEUR_EMAIL_MAX))) }, stringResource(R.string.clients_email), icone = Iv.MailOutline, clavier = MissaClavier.EMAIL, erreur = if (draft.email.isNotEmpty() && !ClientValidation.emailEstValide(draft.email)) stringResource(R.string.form_valeur_invalide) else null)
             }
             item { MissaFormSectionTitre(stringResource(R.string.form_section_commercial), numero = 4) }
-            item { ClientSelectorField(R.string.clients_categorie_optionnelle, categories.map { it.id to it.nom }, draft.categoryId, { onDraftChange(draft.copy(categoryId = it)) }, stringResource(R.string.clients_aucune_categorie)) }
-            item { ClientSelectorField(R.string.clients_site, sites.map { it.id to it.nom }, draft.siteId, { onDraftChange(draft.copy(siteId = it)) }, stringResource(R.string.clients_aucun_site)) }
+            item {
+                MissaRangee {
+                    ClientSelectorField(R.string.clients_categorie_optionnelle, categories.map { it.id to it.nom }, draft.categoryId, { onDraftChange(draft.copy(categoryId = it)) }, stringResource(R.string.clients_aucune_categorie), Modifier.weight(1f))
+                    ClientSelectorField(R.string.clients_site, sites.map { it.id to it.nom }, draft.siteId, { onDraftChange(draft.copy(siteId = it)) }, stringResource(R.string.clients_aucun_site), Modifier.weight(1f))
+                }
+            }
         }
     }
 }
@@ -1047,12 +1057,13 @@ private fun ClientTypeChoice(selected: ClientType, onSelect: (ClientType) -> Uni
 }
 
 @Composable
-internal fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, selectedId: Long?, onSelect: (Long?) -> Unit, emptyLabel: String) {
+internal fun ClientSelectorField(label: Int, choices: List<Pair<Long, String>>, selectedId: Long?, onSelect: (Long?) -> Unit, emptyLabel: String, modifier: Modifier = Modifier.fillMaxWidth()) {
     MissaChampListe<Long?>(
         libelle = stringResource(label),
         options = listOf<Pair<Long?, String>>(null to emptyLabel) + choices.map { (id, nom) -> id to nom },
         selection = selectedId,
         onSelection = onSelect,
+        modifier = modifier,
         icone = when (label) {
             R.string.clients_site -> Iv.Store
             R.string.clients_badge_optionnel -> Iv.Star
@@ -1222,14 +1233,30 @@ private fun ClientAddressesFormScreen(
                 }
             }
             item { MissaChampTexte(draft.paymentDescription, { onDraftChange(draft.copy(paymentDescription = it.take(240))) }, stringResource(R.string.clients_flow_payment_description), icone = Iv.Description) }
-            item { MissaChampTexte(draft.tariffGrid, { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, stringResource(R.string.clients_flow_tariff_grid), icone = Iv.Payments) }
-            item { MissaChampTexte(draft.discount, { onDraftChange(draft.copy(discount = it.decimalInput())) }, stringResource(R.string.clients_remise), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (discount != null && discount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null) }
-            item { MissaChampTexte(draft.maxDiscount, { onDraftChange(draft.copy(maxDiscount = it.decimalInput())) }, stringResource(R.string.clients_flow_max_discount), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (maxDiscount != null && maxDiscount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null) }
-            item { MissaChampTexte(draft.creditLimit, { onDraftChange(draft.copy(creditLimit = it.decimalInput())) }, stringResource(R.string.clients_limite_credit), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, suffixe = devise, erreur = if (credit != null && credit < 0) stringResource(R.string.form_valeur_invalide) else null) }
-            item { MissaChampTexte(draft.segment, { onDraftChange(draft.copy(segment = it.take(80))) }, stringResource(R.string.clients_flow_segment), icone = Iv.Category) }
-            item { MissaChampTexte(draft.salesChannel, { onDraftChange(draft.copy(salesChannel = it.take(80))) }, stringResource(R.string.clients_flow_sales_channel), icone = Iv.Category) }
-            item { MissaChampTexte(draft.territory, { onDraftChange(draft.copy(territory = it.take(120))) }, stringResource(R.string.clients_flow_territory), icone = Iv.Category) }
-            item { MissaChampTexte(draft.accountCode, { onDraftChange(draft.copy(accountCode = it.take(40))) }, stringResource(R.string.clients_flow_account_code), icone = Iv.Badge) }
+            item {
+                MissaRangee {
+                    MissaChampTexte(draft.tariffGrid, { onDraftChange(draft.copy(tariffGrid = it.take(80))) }, stringResource(R.string.clients_flow_tariff_grid), icone = Iv.Payments, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.creditLimit, { onDraftChange(draft.copy(creditLimit = it.decimalInput())) }, stringResource(R.string.clients_limite_credit), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, suffixe = devise, erreur = if (credit != null && credit < 0) stringResource(R.string.form_valeur_invalide) else null, modifier = Modifier.weight(1f))
+                }
+            }
+            item {
+                MissaRangee {
+                    MissaChampTexte(draft.discount, { onDraftChange(draft.copy(discount = it.decimalInput())) }, stringResource(R.string.clients_remise), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (discount != null && discount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.maxDiscount, { onDraftChange(draft.copy(maxDiscount = it.decimalInput())) }, stringResource(R.string.clients_flow_max_discount), icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", erreur = if (maxDiscount != null && maxDiscount !in 0.0..100.0) stringResource(R.string.form_valeur_invalide) else null, modifier = Modifier.weight(1f))
+                }
+            }
+            item {
+                MissaRangee {
+                    MissaChampTexte(draft.segment, { onDraftChange(draft.copy(segment = it.take(80))) }, stringResource(R.string.clients_flow_segment), icone = Iv.Category, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.salesChannel, { onDraftChange(draft.copy(salesChannel = it.take(80))) }, stringResource(R.string.clients_flow_sales_channel), icone = Iv.Category, modifier = Modifier.weight(1f))
+                }
+            }
+            item {
+                MissaRangee {
+                    MissaChampTexte(draft.territory, { onDraftChange(draft.copy(territory = it.take(120))) }, stringResource(R.string.clients_flow_territory), icone = Iv.Category, modifier = Modifier.weight(1f))
+                    MissaChampTexte(draft.accountCode, { onDraftChange(draft.copy(accountCode = it.take(40))) }, stringResource(R.string.clients_flow_account_code), icone = Iv.Badge, modifier = Modifier.weight(1f))
+                }
+            }
             item { ClientSelectorField(R.string.clients_badge_optionnel, badges.map { it.id to "${it.nom} (${it.remisePct.decimalText()}%)" }, draft.badgeId, { onDraftChange(draft.copy(badgeId = it)) }, stringResource(R.string.clients_flow_no_badge)) }
             item { ClientReadOnlyLine(R.string.clients_devise, devise.ifBlank { "—" }) }
             item { MissaChampTexte(draft.notes, { onDraftChange(draft.copy(notes = it.take(ClientValidation.LONGUEUR_NOTES_MAX))) }, stringResource(R.string.clients_notes), icone = Iv.Description, lignes = 4) }
@@ -1267,9 +1294,11 @@ private fun ClientAddressDialog(address: ClientAddressEntity, onDismiss: () -> U
         validerActif = valid,
         onValider = { onSave(address.copy(libelle = label.trim(), adresse = street.trim(), ville = city.trim().ifBlank { null }, principale = main)) },
     ) {
-        MissaChampTexte(label, { label = it.take(60) }, stringResource(R.string.clients_flow_address_label), icone = Iv.Edit)
+        MissaRangee {
+            MissaChampTexte(label, { label = it.take(60) }, stringResource(R.string.clients_flow_address_label), icone = Iv.Edit, modifier = Modifier.weight(1f))
+            MissaChampTexte(city, { city = it.take(100) }, stringResource(R.string.clients_flow_city), icone = Iv.Place, modifier = Modifier.weight(1f))
+        }
         MissaChampTexte(street, { street = it.take(ClientValidation.LONGUEUR_ADRESSE_MAX) }, stringResource(R.string.clients_adresse), icone = Iv.Place, requis = true, lignes = 2)
-        MissaChampTexte(city, { city = it.take(100) }, stringResource(R.string.clients_flow_city), icone = Iv.Place)
         MissaCaseACocher(main, { main = it }, stringResource(R.string.clients_flow_primary))
     }
 }
