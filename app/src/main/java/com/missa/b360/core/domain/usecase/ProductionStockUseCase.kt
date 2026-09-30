@@ -80,7 +80,7 @@ class ProductionStockUseCase @Inject constructor(
             materials.any { it.productId <= 0 || it.productId == finishedProductId || !it.quantity.isFinite() || it.quantity <= 0.0 }
         ) return ProductionStockResult.Invalid
         val currentActivation = activation.getActivation()
-        if (currentActivation.modulesActifs.isNotEmpty() && !currentActivation.isModuleActif(ModuleCode.STK)) {
+        if (currentActivation.profil != null && !currentActivation.isModuleActif(ModuleCode.STK)) {
             return ProductionStockResult.ModuleInactive
         }
         if (licence.isReadOnly()) return ProductionStockResult.ReadOnly

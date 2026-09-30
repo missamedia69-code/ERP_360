@@ -148,10 +148,12 @@ class ActivationViewModel @Inject constructor(
         viewModelScope.launch {
             val act = activation.value
             if (act.profil == null) return@launch
-            val actuels = act.elementsPersonnalises[module].orEmpty().toMutableSet()
+            // Au premier changement, partir des fonctions effectivement affichées.
+            // Partir d'un ensemble personnalisé vide faisait qu'un premier clic sur
+            // une fonction active l'ajoutait au lieu de la désactiver.
+            val actuels = (act.elementsPersonnalises[module]
+                ?: act.elementsActifsPour(module)).toMutableSet()
             if (element in actuels) actuels.remove(element) else actuels.add(element)
-            // Si on retire tout et que le module est du pack, on garde au moins les défauts ?
-            // On persiste tel quel, le calcul fera union avec défauts
             activationRepository.mettreAJourElements(module, actuels)
             _message.value = "ok"
         }

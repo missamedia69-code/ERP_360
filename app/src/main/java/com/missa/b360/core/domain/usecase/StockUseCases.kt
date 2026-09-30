@@ -100,7 +100,7 @@ class RecordStockMovementUseCase @Inject constructor(
         }
         // Activation profil : Stock doit être actif
         val activation = activationRepository.getActivation()
-        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+        if (activation.profil != null && !activation.isModuleActif(ModuleCode.STK)) {
             return StockMovementResult.ModuleInactif
         }
         if (licenceManager.isReadOnly()) return StockMovementResult.LectureSeule
@@ -439,7 +439,7 @@ class StockService @Inject constructor(
 
     private suspend fun stockModuleActif(): Boolean {
         val activation = activationRepository.getActivation()
-        return activation.modulesActifs.isEmpty() || activation.isModuleActif(ModuleCode.STK)
+        return activation.profil == null || activation.isModuleActif(ModuleCode.STK)
     }
 
     /** Compensation fidèle aux sites des sorties d'origine (pas au site produit actuel). */
@@ -519,7 +519,7 @@ class TransferStockUseCase @Inject constructor(
             return Result.Invalid
         }
         val activation = activationRepository.getActivation()
-        if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(ModuleCode.STK)) {
+        if (activation.profil != null && !activation.isModuleActif(ModuleCode.STK)) {
             return Result.ModuleInactif
         }
         if (licenceManager.isReadOnly()) return Result.LectureSeule

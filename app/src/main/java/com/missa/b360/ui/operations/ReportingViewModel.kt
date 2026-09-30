@@ -42,7 +42,7 @@ class ReportingViewModel @Inject constructor(
      */
     val modulesActifs: StateFlow<List<ModuleCode>> =
         activation.map { act ->
-            if (act.modulesActifs.isEmpty()) ModuleCode.entries.toList() else act.modulesActifs.toList()
+            if (act.profil == null) ModuleCode.entries.toList() else act.modulesActifs.toList()
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),

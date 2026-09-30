@@ -128,7 +128,7 @@ fun ModuleGuard(
     onActiver: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    if (activation.modulesActifs.isEmpty() || activation.isModuleActif(module.moduleCode)) {
+    if (activation.profil == null || activation.isModuleActif(module.moduleCode)) {
         content()
     } else {
         ModuleInactifScreen(

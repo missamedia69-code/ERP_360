@@ -77,7 +77,7 @@ class OperationUseCases @Inject constructor(
         val moduleCode = params.module.toModuleCode()
         if (moduleCode != null) {
             val activation = activationRepository.getActivation()
-            if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(moduleCode)) {
+            if (activation.profil != null && !activation.isModuleActif(moduleCode)) {
                 return CreateResult.ModuleInactif
             }
         }
@@ -122,7 +122,7 @@ class OperationUseCases @Inject constructor(
         val moduleCode = params.module.toModuleCode()
         if (moduleCode != null) {
             val activation = activationRepository.getActivation()
-            if (activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(moduleCode)) {
+            if (activation.profil != null && !activation.isModuleActif(moduleCode)) {
                 return UpdateDraftResult.ModuleInactif
             }
         }

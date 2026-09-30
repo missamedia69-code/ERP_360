@@ -91,7 +91,9 @@ enum class AppModule(
 
         /** Version qui prend l'activation effective du profil (nouveau système) */
         fun visibles(activation: ActivationProfil): List<AppModule> =
-            if (activation.modulesActifs.isEmpty()) entries.toList()
+            // Seule l'absence de profil signifie « ancienne configuration inconnue ».
+            // Un profil connu avec zéro module (PERSONNEL ou CUSTOM vide) doit rester vide.
+            if (activation.profil == null) entries.toList()
             else entries.filter { it.moduleCode in activation.modulesActifs }
 
         /** Vérifie si un module est actif selon l'activation */
@@ -121,10 +123,11 @@ enum class AppModule(
         }
 
         fun barreBas(activation: ActivationProfil, epingles: List<String> = emptyList()): List<AppModule> {
-            if (activation.modulesActifs.isEmpty()) {
+            if (activation.profil == null) {
                 return barreBas(emptyList(), epingles)
             }
             val visibles = visibles(activation)
+            if (visibles.isEmpty()) return emptyList()
             // Si l'utilisateur a épinglé (via profil auto), on respecte même SANS_BARRE
             if (epingles.isNotEmpty()) {
                 val choisis = epingles.mapNotNull { nom -> visibles.firstOrNull { it.name == nom } }
@@ -200,7 +203,7 @@ enum class AppModule(
             visibles(actifs).filter { it !in SANS_BARRE }
 
         fun epinglables(activation: ActivationProfil): List<AppModule> =
-            epinglables(activation.modulesActifs.toList())
+            visibles(activation).filter { it !in SANS_BARRE }
 
         /** Nombre maximal d'onglets, l'accueil et « Plus » occupant déjà deux places. */
         const val MAX_ONGLETS = 3

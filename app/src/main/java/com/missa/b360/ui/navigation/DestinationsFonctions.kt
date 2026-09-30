@@ -153,15 +153,12 @@ object DestinationsFonctions {
 
     /** Version filtrée par l'activation effective du profil */
     fun pour(module: ModuleCode, activation: ActivationProfil): List<FonctionModule> {
-        val actifs = activation.elementsActifsPour(module)
-        // Si activation vide ou module non actif, on retourne tout le catalogue (compatibilité)
-        // Mais si activation a des éléments définis, on filtre
-        val source = if (actifs.isEmpty() && activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(module)) {
-            emptyList()
-        } else if (actifs.isNotEmpty()) {
-            actifs.toList()
-        } else {
-            ModuleSousElements.elements[module].orEmpty()
+        val source = when {
+            // Installation antérieure sans profil : compatibilité avec le catalogue complet.
+            activation.profil == null -> ModuleSousElements.elements[module].orEmpty()
+            !activation.isModuleActif(module) -> emptyList()
+            // Pour un profil connu, l'ensemble calculé est la source exacte, y compris vide.
+            else -> activation.elementsActifsPour(module).toList()
         }
         return source.map { libelle ->
             FonctionModule(libelle = libelle, route = routes[libelle])

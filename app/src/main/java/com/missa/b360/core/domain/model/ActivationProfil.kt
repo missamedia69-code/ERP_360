@@ -135,8 +135,7 @@ data class ActivationProfil(
                 val elementsEffectifs: Set<String> = when (profil) {
                     ProfilActivite.FULL -> ModuleSousElements.pourModule(module).toSet()
                     ProfilActivite.CUSTOM -> {
-                        val custom = elementsPersonnalises[module]
-                        if (custom != null && custom.isNotEmpty()) custom
+                        if (elementsPersonnalises.containsKey(module)) elementsPersonnalises[module].orEmpty()
                         else ModuleSousElements.pourModule(module).toSet()
                     }
                     else -> {
@@ -149,23 +148,16 @@ data class ActivationProfil(
                             } else {
                                 defaut.toSet()
                             }
-                            val custom = elementsPersonnalises[module]
-                            if (custom != null && custom.isNotEmpty()) {
-                                // Union : défaut + custom (permet d'ajouter des éléments hors pack)
-                                // Si l'utilisateur veut restreindre, il peut passer par une map qui remplace totalement
-                                // On considère que si custom est présent, on fait union sauf si le module est hors pack initial
-                                // Pour permettre la suppression, on utilise custom comme override si le module est dans CUSTOM list?
-                                // Ici : union pour les modules du pack, override pour les modules ajoutés
-                                // On distingue : si module est dans le pack de base, union, sinon override
-                                val estDansPack = module in (ProfilConfiguration.modulesPourProfil(profil))
-                                if (estDansPack) defautSet + custom else custom
+                            // La présence de la clé est un remplacement exact, pas une union :
+                            // décocher une fonction du pack doit réellement la retirer partout.
+                            if (elementsPersonnalises.containsKey(module)) {
+                                elementsPersonnalises[module].orEmpty()
                             } else {
                                 defautSet
                             }
                         } else {
                             // Module ajouté par l'utilisateur hors profil
-                            val custom = elementsPersonnalises[module]
-                            if (custom != null && custom.isNotEmpty()) custom
+                            if (elementsPersonnalises.containsKey(module)) elementsPersonnalises[module].orEmpty()
                             else ModuleSousElements.pourModule(module).toSet()
                         }
                     }

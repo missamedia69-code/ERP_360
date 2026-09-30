@@ -166,6 +166,10 @@ class HomeViewModel @Inject constructor(
         activation.map { it.modulesActifs.toList() }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val elementsActifs: StateFlow<Map<ModuleCode, Set<String>>> =
+        activation.map { it.elementsParModule }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
     private val baseState = combine(
         getEnterprise.observer(),
         users.observerUtilisateurs(),
@@ -252,7 +256,7 @@ class HomeViewModel @Inject constructor(
 
         val maintenant = System.currentTimeMillis()
         // Filtre les opérations par modules actifs si activation définie
-        val recordsFiltres = if (act.modulesActifs.isEmpty()) records else records.filter { rec ->
+        val recordsFiltres = if (act.profil == null) records else records.filter { rec ->
             val code = when (rec.module) {
                 OperationModule.VENTE.name -> ModuleCode.VEN
                 OperationModule.ACHATS.name -> ModuleCode.ACH

@@ -164,6 +164,7 @@ private data class AccueilActionDef(
     val bg: Color,
     val route: String,
     val module: ModuleCode,
+    val fonction: String,
 )
 
 @Composable
@@ -176,6 +177,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.VENTE)),
         module = ModuleCode.VEN,
+        fonction = "Factures clients",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.ACHAT,
@@ -185,6 +187,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.ACHAT)),
         module = ModuleCode.ACH,
+        fonction = "Commandes fournisseurs",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.CLIENT,
@@ -194,6 +197,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.CLIENT)),
         module = ModuleCode.VEN,
+        fonction = "Clients",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.FOURNISSEUR,
@@ -203,6 +207,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FOURNISSEUR)),
         module = ModuleCode.ACH,
+        fonction = "Fournisseurs",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.PRODUIT,
@@ -212,6 +217,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.PRODUIT)),
         module = ModuleCode.STK,
+        fonction = "Articles",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.LIVRAISON,
@@ -221,6 +227,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.LIVRAISON)),
         module = ModuleCode.LOG,
+        fonction = "Expéditions",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.DEVIS,
@@ -230,6 +237,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.DEVIS)),
         module = ModuleCode.VEN,
+        fonction = "Devis",
     ),
     AccueilActionDef(
         key = AccueilActionKeys.FACTURE,
@@ -239,6 +247,7 @@ private fun rememberAccueilActionDefs(): List<AccueilActionDef> = listOf(
         bg = MissaSoftBlue,
         route = requireNotNull(HomeNavigation.quickAction(AccueilActionKeys.FACTURE)),
         module = ModuleCode.VEN,
+        fonction = "Factures clients",
     ),
 )
 
@@ -255,6 +264,7 @@ fun HomeScreen(
     val nonLues by viewModel.notificationsNonLues.collectAsState(initial = 0)
     val uiState by viewModel.uiState.collectAsState()
     val modulesActifs by viewModel.modulesActifs.collectAsState()
+    val elementsActifs by viewModel.elementsActifs.collectAsState()
     val actionsEpingles by viewModel.actionsRapidesEpingles.collectAsState()
     var showPersonnaliser by remember { mutableStateOf(false) }
 
@@ -266,6 +276,7 @@ fun HomeScreen(
         HomeDashboard(
             state = uiState,
             modulesActifs = modulesActifs,
+            elementsActifs = elementsActifs,
             actionsRapidesSelection = actionsEpingles,
             onPersonnaliser = { showPersonnaliser = true },
             modifier = Modifier.fillMaxSize(),
@@ -280,6 +291,8 @@ fun HomeScreen(
     if (showPersonnaliser) {
         HomePersonnaliserDialogue(
             actionsSelection = actionsEpingles,
+            modulesActifs = modulesActifs,
+            elementsActifs = elementsActifs,
             onFermer = { showPersonnaliser = false },
             onValider = { choixActions ->
                 viewModel.epinglerActionsRapides(choixActions)
@@ -295,6 +308,7 @@ fun HomeScreen(
 private fun HomeDashboard(
     state: HomeUiState,
     modulesActifs: List<ModuleCode>,
+    elementsActifs: Map<ModuleCode, Set<String>>,
     actionsRapidesSelection: List<String>,
     onPersonnaliser: () -> Unit,
     modifier: Modifier,
@@ -491,7 +505,7 @@ private fun HomeDashboard(
                     }
                 }
                 Spacer(Modifier.height(4.dp))
-                AccueilActionsGrid(modulesActifs, actionsRapidesSelection, onNavigate)
+                AccueilActionsGrid(modulesActifs, elementsActifs, actionsRapidesSelection, onNavigate)
             }
         }
         item {
@@ -628,6 +642,7 @@ private fun AccueilKpiCard(
 @Composable
 private fun AccueilActionsGrid(
     modulesActifs: List<ModuleCode>,
+    elementsActifs: Map<ModuleCode, Set<String>>,
     actionsSelection: List<String>,
     onNavigate: (String) -> Unit,
 ) {
@@ -635,7 +650,8 @@ private fun AccueilActionsGrid(
     // 1) filtre par modules actifs (comportement existant)
     // 2) filtre par sélection utilisateur : vide = tout afficher (usine)
     val visibles = defs
-        .filter { modulesActifs.isEmpty() || it.module in modulesActifs }
+        .filter { it.module in modulesActifs }
+        .filter { it.fonction in elementsActifs[it.module].orEmpty() }
         .filter { actionsSelection.isEmpty() || it.key in actionsSelection }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1503,14 +1519,20 @@ private fun HomeSupportBouton(
 @Composable
 private fun HomePersonnaliserDialogue(
     actionsSelection: List<String>,
+    modulesActifs: List<ModuleCode>,
+    elementsActifs: Map<ModuleCode, Set<String>>,
     onFermer: () -> Unit,
     onValider: (List<String>) -> Unit,
 ) {
     // Si actionsSelection vide (usine = tout afficher), on pré-coche tout pour que l'utilisateur voie l'état effectif.
-    val defs = rememberAccueilActionDefs()
+    val defs = rememberAccueilActionDefs().filter {
+        it.module in modulesActifs && it.fonction in elementsActifs[it.module].orEmpty()
+    }
+    val clesDisponibles = defs.map { it.key }.toSet()
     val choixActions = remember {
         mutableStateListOf<String>().apply {
-            if (actionsSelection.isEmpty()) addAll(AccueilActionKeys.ALL) else addAll(actionsSelection)
+            if (actionsSelection.isEmpty()) addAll(clesDisponibles)
+            else addAll(actionsSelection.filter { it in clesDisponibles })
         }
     }
     AlertDialog(
@@ -1562,7 +1584,7 @@ private fun HomePersonnaliserDialogue(
         confirmButton = {
             TextButton(onClick = {
                 // Si toutes les actions sont cochées, on enregistre vide = usine (tout afficher).
-                val actionsAEnregistrer = if (choixActions.size == AccueilActionKeys.ALL.size) emptyList() else choixActions.toList()
+                val actionsAEnregistrer = if (choixActions.size == clesDisponibles.size) emptyList() else choixActions.toList()
                 onValider(actionsAEnregistrer)
             }) {
                 Text(stringResource(R.string.ops_save))

@@ -619,7 +619,7 @@ private fun MainNavHost() {
                     OperationModule.FINANCES -> AppModule.FINANCES
                     else -> null
                 }
-                if (appModule != null && activation.modulesActifs.isNotEmpty() && !activation.isModuleActif(appModule.moduleCode)) {
+                if (appModule != null && activation.profil != null && !activation.isModuleActif(appModule.moduleCode)) {
                     ModuleInactifScreen(module = appModule, activation = activation, onBack = { navController.popBackStack() }, onActiver = { navController.naviguerVers(Routes.ADMIN_REGLAGES) })
                 } else {
                     OperationFormScreen(
@@ -693,7 +693,7 @@ private fun GuardedModule(
     navController: NavController,
     content: @Composable () -> Unit,
 ) {
-    if (activation.modulesActifs.isEmpty() || activation.isModuleActif(appModule.moduleCode)) {
+    if (activation.profil == null || activation.isModuleActif(appModule.moduleCode)) {
         content()
     } else {
         ModuleInactifScreen(

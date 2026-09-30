@@ -1,7 +1,9 @@
 package com.missa.b360
 
 import androidx.compose.ui.graphics.Color
+import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
+import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.ui.navigation.AppModule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -13,6 +15,14 @@ class ModuleRegistryTest {
     @Test
     fun `une configuration inconnue montre tous les modules`() {
         assertEquals(AppModule.entries.size, AppModule.visibles(emptyList()).size)
+    }
+
+    @Test
+    fun `un profil connu vide ne montre pas tous les modules`() {
+        val personnel = ActivationProfil.VIDE.copy(profil = ProfilActivite.PERSONNEL)
+        assertTrue(AppModule.visibles(personnel).isEmpty())
+        assertTrue(AppModule.barreBas(personnel).isEmpty())
+        assertTrue(AppModule.secondaires(personnel).isEmpty())
     }
 
     @Test

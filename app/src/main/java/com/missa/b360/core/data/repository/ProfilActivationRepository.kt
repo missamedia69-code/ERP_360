@@ -71,7 +71,11 @@ class ProfilActivationRepository @Inject constructor(
 
             // Rétrocompatibilité : MODULES_ACTIFS contient tous les modules (métier + support)
             val tousActifs = ModulesPersonnalises.deserialiser(modulesActifsStr)
-            val metierPersonnalises = ModulesSocle.filtrerMetier(tousActifs).toSet()
+            // MODULES_ACTIFS est un ancien champ qui contient l'état effectif complet.
+            // On ne doit pas confondre le cœur du pack avec des ajouts manuels, sinon
+            // ses modules survivent à tort au prochain changement de pack.
+            val coeurDuPack = ModulesSocle.metierActifs(profil, emptySet(), venteSansStock).toSet()
+            val metierPersonnalises = ModulesSocle.filtrerMetier(tousActifs).toSet() - coeurDuPack
 
             // MODULES_SUPPORT contient les extras support (ajouts volontaires)
             val extrasSupport = ModulesPersonnalises.deserialiser(modulesSupportStr)
@@ -106,7 +110,8 @@ class ProfilActivationRepository @Inject constructor(
         val venteSansStock = venteSansStockStr == "true"
 
         val tousActifs = ModulesPersonnalises.deserialiser(modulesActifsStr)
-        val metierPersonnalises = ModulesSocle.filtrerMetier(tousActifs).toSet()
+        val coeurDuPack = ModulesSocle.metierActifs(profil, emptySet(), venteSansStock).toSet()
+        val metierPersonnalises = ModulesSocle.filtrerMetier(tousActifs).toSet() - coeurDuPack
         val extrasSupport = ModulesPersonnalises.deserialiser(modulesSupportStr)
             .let { ModulesSocle.filtrerSupport(it) }
             .toSet()
@@ -140,11 +145,18 @@ class ProfilActivationRepository @Inject constructor(
         val actuel = getActivation()
 
         val nouveauProfil = profil
+        val changementDePack = actuel.profil != null && actuel.profil != profil
         val nouveauPalier = palier ?: actuel.palier
         val nouveauVenteSansStock = venteSansStock ?: actuel.venteSansStock
-        val nouveauxMetierPerso = modulesPersonnalises ?: actuel.modulesPersonnalises
-        val nouveauxExtras = extrasSupport ?: actuel.extrasSupport
-        val nouveauxElements = elementsPersonnalises ?: actuel.elementsPersonnalises
+        // Un changement de pack repart exactement de la configuration du nouveau pack.
+        // Sans cela, les modules et fonctions de l'ancien profil devenaient des ajouts
+        // « personnalisés » et restaient affichés indéfiniment.
+        val nouveauxMetierPerso = modulesPersonnalises
+            ?: if (changementDePack) emptySet() else actuel.modulesPersonnalises
+        val nouveauxExtras = extrasSupport
+            ?: if (changementDePack) emptySet() else actuel.extrasSupport
+        val nouveauxElements = elementsPersonnalises
+            ?: if (changementDePack) emptyMap() else actuel.elementsPersonnalises
 
         // Calcule la nouvelle activation effective
         val nouvelleActivation = ActivationProfil.calculer(
@@ -324,11 +336,9 @@ class ProfilActivationRepository @Inject constructor(
         val actuel = getActivation()
         if (actuel.profil == null) return
         val nouvelleMap = actuel.elementsPersonnalises.toMutableMap()
-        if (elements.isEmpty()) {
-            nouvelleMap.remove(module)
-        } else {
-            nouvelleMap[module] = elements
-        }
+        // Une clé vide signifie explicitement « aucune fonction » ; supprimer la clé
+        // rétablirait silencieusement toutes les fonctions par défaut du pack.
+        nouvelleMap[module] = elements
         mettreAJourProfil(
             profil = actuel.profil,
             palier = actuel.palier,
