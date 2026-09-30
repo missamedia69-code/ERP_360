@@ -49,19 +49,11 @@ class ModuleRegistryTest {
     }
 
     @Test
-    fun `achats respecte la palette achats fournisseurs`() {
-        assertEquals(Color(0xFFF28A16), AppModule.ACHATS.couleur)
-        assertEquals(Color(0xFFFFF2E2), AppModule.ACHATS.couleurPale)
-        assertEquals(Color(0xFFF28A16), AppModule.FOURNISSEURS.couleur)
-        assertEquals(Color(0xFFFFF2E2), AppModule.FOURNISSEURS.couleurPale)
-        assertEquals(Color(0xFF1E3A8A), AppModule.TRESORERIE.couleur)
-        assertEquals(Color(0xFF475569), AppModule.COMPTABILITE.couleur)
-        assertEquals(Color(0xFF475569), AppModule.FINANCES.couleur)
-    }
-
-    @Test
-    fun `production respecte son violet identitaire`() {
-        assertEquals(Color(0xFF8B5CF6), AppModule.PRODUCTION.couleur)
+    fun `tous les modules respectent la palette bleu nuit Stock`() {
+        val bleuNuitStock = Color(0xFF101C43)
+        AppModule.entries.forEach { module ->
+            assertEquals("Couleur inattendue pour ${module.name}", bleuNuitStock, module.couleur)
+        }
     }
 
     @Test
