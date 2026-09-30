@@ -2026,4 +2026,6 @@
     <string name="notification_document_cree">تم إنشاء المستند</string>
     <string name="notification_statut_modifie">تم تحديث الحالة</string>
     <string name="notification_stock_critique">مخزون حرج</string>
+    <string name="doc_partager_pdf">مشاركة ملف PDF</string>
+    <string name="doc_generation_erreur">تعذر إنشاء هذا المستند. تحقق من بيانات الشركة.</string>
 </resources>

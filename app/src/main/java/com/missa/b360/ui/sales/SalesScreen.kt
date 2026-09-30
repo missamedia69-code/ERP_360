@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,10 @@ import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleLine
+import com.missa.b360.core.documents.CommercialDocumentFactory
+import com.missa.b360.core.documents.DocumentSharing
+import com.missa.b360.core.documents.DocumentType
+import com.missa.b360.core.documents.ProfessionalDocumentPdf
 import com.missa.b360.core.domain.model.SaleRecordCodec
 import com.missa.b360.core.domain.model.RappelsRules
 import com.missa.b360.ui.components.MissaEmptyState
@@ -72,6 +77,10 @@ import com.missa.b360.ui.theme.MissaMuted
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.widget.Toast
 import com.missa.b360.ui.components.*
 
 /** Bleu royal caractéristique du module Vente — source unique : [AppModule.VENTE]. */
@@ -126,6 +135,10 @@ private fun ListeVentes(
     val pieces by vm.history.collectAsStateWithLifecycle(initialValue = emptyList())
     val clients by vm.clients.collectAsStateWithLifecycle(initialValue = emptyList())
     val devise by vm.devise.collectAsStateWithLifecycle()
+    val entreprise by vm.entreprise.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val erreurPdf = stringResource(R.string.doc_generation_erreur)
 
     val validees = pieces.filter { it.status == OperationStatus.VALIDATED.name }
     val caTotal = validees.sumOf { it.amount ?: 0.0 }
@@ -269,6 +282,24 @@ private fun ListeVentes(
                         onReprendre = {
                             if (vm.loadDraft(piece, clients)) onOuvrirFacture()
                         },
+                        onPartagerPdf = entreprise?.let { societe ->
+                            {
+                                scope.launch {
+                                    val resultat = withContext(Dispatchers.IO) {
+                                        runCatching {
+                                            val donnees = CommercialDocumentFactory.depuisVente(
+                                                piece = piece,
+                                                entreprise = societe,
+                                                type = DocumentType.FACTURE_CLIENT,
+                                            ) ?: error("Payload de vente invalide")
+                                            ProfessionalDocumentPdf.generer(context, donnees)
+                                        }
+                                    }
+                                    resultat.onSuccess { DocumentSharing.partager(context, it.fichier, piece.reference) }
+                                        .onFailure { Toast.makeText(context, erreurPdf, Toast.LENGTH_LONG).show() }
+                                }
+                            }
+                        },
                     )
                 }
             }
@@ -281,6 +312,7 @@ private fun CartePieceVente(
     piece: OperationRecordEntity,
     devise: String,
     onReprendre: () -> Unit,
+    onPartagerPdf: (() -> Unit)?,
 ) {
     val dateStr = remember(piece.createdAt) {
         SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date(piece.createdAt))
@@ -312,6 +344,11 @@ private fun CartePieceVente(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = BleuVente, contentColor = Color.White),
                 ) { Text(stringResource(R.string.ach_reprendre), fontSize = 11.sp) }
+            } else if (onPartagerPdf != null) {
+                Spacer(Modifier.height(4.dp))
+                TextButton(onClick = onPartagerPdf, modifier = Modifier.align(Alignment.End)) {
+                    Text(stringResource(R.string.doc_partager_pdf), fontSize = 11.sp, color = BleuVente)
+                }
             }
             // Une facture validée est immuable ; sa correction passe par un avoir, jamais par une annulation directe.
         }

@@ -2073,4 +2073,6 @@
     <string name="notification_document_cree">Document créé</string>
     <string name="notification_statut_modifie">Statut mis à jour</string>
     <string name="notification_stock_critique">Stock critique</string>
+    <string name="doc_partager_pdf">Partager le PDF</string>
+    <string name="doc_generation_erreur">Impossible de générer ce document. Vérifiez les données de l’entreprise.</string>
 </resources>

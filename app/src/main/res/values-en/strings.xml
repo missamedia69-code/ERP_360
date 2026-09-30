@@ -2030,4 +2030,6 @@
     <string name="notification_document_cree">Document created</string>
     <string name="notification_statut_modifie">Status updated</string>
     <string name="notification_stock_critique">Critical stock</string>
+    <string name="doc_partager_pdf">Share PDF</string>
+    <string name="doc_generation_erreur">Unable to generate this document. Check the company information.</string>
 </resources>

@@ -2026,4 +2026,6 @@
     <string name="notification_document_cree">Documento creado</string>
     <string name="notification_statut_modifie">Estado actualizado</string>
     <string name="notification_stock_critique">Stock crítico</string>
+    <string name="doc_partager_pdf">Compartir PDF</string>
+    <string name="doc_generation_erreur">No se pudo generar este documento. Verifique los datos de la empresa.</string>
 </resources>

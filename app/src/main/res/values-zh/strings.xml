@@ -2026,4 +2026,6 @@
     <string name="notification_document_cree">文档已创建</string>
     <string name="notification_statut_modifie">状态已更新</string>
     <string name="notification_stock_critique">库存告急</string>
+    <string name="doc_partager_pdf">分享 PDF</string>
+    <string name="doc_generation_erreur">无法生成此文档。请检查企业信息。</string>
 </resources>
