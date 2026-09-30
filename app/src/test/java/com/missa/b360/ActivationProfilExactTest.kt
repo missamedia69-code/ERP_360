@@ -7,6 +7,7 @@ import com.missa.b360.core.domain.model.ModulesSocle
 import com.missa.b360.core.domain.model.PalierTaille
 import com.missa.b360.core.domain.model.ProfilActivite
 import com.missa.b360.core.domain.model.ProfilConfiguration
+import com.missa.b360.ui.navigation.DestinationsFonctions
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -81,6 +82,19 @@ class ActivationProfilExactTest {
         )
         assertTrue(aucuneVente.elementsActifsPour(ModuleCode.VEN).isEmpty())
         assertTrue(aucuneVente.isModuleActif(ModuleCode.VEN))
+    }
+
+    @Test
+    fun `le catalogue affiche seulement les fonctions selectionnees`() {
+        val actif = activation(
+            ProfilActivite.ASV,
+            elements = mapOf(ModuleCode.VEN to setOf("Clients", "Devis")),
+        )
+        assertEquals(
+            setOf("Clients", "Devis"),
+            DestinationsFonctions.pour(ModuleCode.VEN, actif).map { it.libelle }.toSet(),
+        )
+        assertTrue(DestinationsFonctions.pour(ModuleCode.PRO, actif).isEmpty())
     }
 
     @Test
