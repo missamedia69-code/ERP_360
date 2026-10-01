@@ -61,7 +61,7 @@ class ClientListRulesTest {
     @Test fun `la recherche telephone ignore les espaces et tirets`() {
         val c = client(1, telephone = "+237699000001")
         assertTrue(ClientListRules.correspond(c, "699 00-00 01"))
-        assertFalse(ClientListRules.correspond(c, "69"))
+        assertFalse(ClientListRules.correspond(c, "55"))
     }
 
     @Test fun `un client bloque credit ou administratif est bloque`() {

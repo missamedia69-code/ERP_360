@@ -17,7 +17,6 @@ import com.missa.b360.core.domain.model.ClientListFilter
 import com.missa.b360.core.domain.model.ClientListItem
 import com.missa.b360.core.domain.model.ClientListRules
 import com.missa.b360.core.domain.model.ClientListSort
-import com.missa.b360.core.domain.usecase.ClientBalanceUseCase
 import com.missa.b360.core.domain.usecase.ClientDefaultsUseCase
 import com.missa.b360.core.domain.usecase.ObserveAllClientsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +58,6 @@ class ClientListViewModel @Inject constructor(
     balanceDao: ClientBalanceDao,
     followupDao: ClientFollowupDao,
     private val defaults: ClientDefaultsUseCase,
-    private val clientBalance: ClientBalanceUseCase,
 ) : ViewModel() {
 
     private class Donnees(
@@ -89,8 +87,6 @@ class ClientListViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 devise.value = defaults().devise
-                // Premier lancement après la migration : les comptes manquants sont reconstruits.
-                clientBalance.assurerInitialisation()
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {

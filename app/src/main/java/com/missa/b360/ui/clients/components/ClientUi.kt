@@ -103,18 +103,20 @@ internal fun RiskBadge(risque: RiskLevel, modifier: Modifier = Modifier) {
     }
 }
 
+internal fun ClientStatus.libelle(): Int = when (this) {
+    ClientStatus.BROUILLON -> R.string.clients_status_draft
+    ClientStatus.A_COMPLETER -> R.string.clients_status_complete
+    ClientStatus.ACTIF -> R.string.clients_actif
+    ClientStatus.SOUS_SURVEILLANCE -> R.string.clients_status_watch
+    ClientStatus.BLOQUE_CREDIT -> R.string.clients_status_credit_block
+    ClientStatus.BLOQUE_ADMINISTRATIF -> R.string.clients_status_admin_block
+    ClientStatus.INACTIF, ClientStatus.DESACTIVE -> R.string.clients_inactif
+    ClientStatus.ARCHIVE -> R.string.clients_status_archived
+}
+
 @Composable
 internal fun ClientStatusChip(statut: ClientStatus, modifier: Modifier = Modifier) {
-    val libelle = when (statut) {
-        ClientStatus.BROUILLON -> R.string.clients_status_draft
-        ClientStatus.A_COMPLETER -> R.string.clients_status_complete
-        ClientStatus.ACTIF -> R.string.clients_actif
-        ClientStatus.SOUS_SURVEILLANCE -> R.string.clients_status_watch
-        ClientStatus.BLOQUE_CREDIT -> R.string.clients_status_credit_block
-        ClientStatus.BLOQUE_ADMINISTRATIF -> R.string.clients_status_admin_block
-        ClientStatus.INACTIF, ClientStatus.DESACTIVE -> R.string.clients_inactif
-        ClientStatus.ARCHIVE -> R.string.clients_status_archived
-    }
+    val libelle = statut.libelle()
     val couleur = when (statut) {
         ClientStatus.ACTIF -> RisqueCouleurs.Normal
         ClientStatus.SOUS_SURVEILLANCE -> RisqueCouleurs.Attention
@@ -205,3 +207,6 @@ internal fun LigneInfo(libelle: String, valeur: String, modifier: Modifier = Mod
         Text(valeur, color = MissaInk, fontSize = 14.sp, textAlign = TextAlign.End, modifier = Modifier.weight(0.55f))
     }
 }
+
+internal fun clientDate(millis: Long): String =
+    java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(millis))
