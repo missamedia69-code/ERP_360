@@ -2,6 +2,9 @@ package com.missa.b360.core.domain.model
 
 import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.ClientFollowupEntity
+import com.missa.b360.core.data.entity.FollowupStatus
+import com.missa.b360.core.data.entity.FollowupType
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.ClientType
 
@@ -85,6 +88,40 @@ object ClientListRules {
         ClientListFilter.SANS_ACHAT_90J -> sansAchat90j(item, now)
         ClientListFilter.NOUVEAUX -> estNouveau(item.client, now)
         ClientListFilter.INCOMPLETS -> estIncomplet(item.client)
+    }
+
+    /**
+     * Lignes de la liste : un client, son compte (`client_balances`) et l'indicateur « à relancer »,
+     * calculé avec la dernière relance et la promesse ouverte de chacun.
+     */
+    fun construireItems(
+        clients: List<ClientEntity>,
+        comptes: Map<Long, ClientBalanceEntity>,
+        suivis: List<ClientFollowupEntity>,
+        now: Long,
+    ): List<ClientListItem> {
+        val derniereRelance = HashMap<Long, Long>()
+        val promesseOuverte = HashMap<Long, Long>()
+        for (suivi in suivis) {
+            if (suivi.type == FollowupType.RELANCE) {
+                derniereRelance.merge(suivi.clientId, suivi.createdAt) { a, b -> maxOf(a, b) }
+            } else if (suivi.type == FollowupType.PROMESSE && suivi.statut == FollowupStatus.OUVERT) {
+                suivi.promesseDate?.let { promesseOuverte.merge(suivi.clientId, it) { a, b -> maxOf(a, b) } }
+            }
+        }
+        return clients.map { client ->
+            val compte = comptes[client.id]
+            ClientListItem(
+                client = client,
+                balance = compte,
+                aRelancer = ClientFollowupRules.aRelancer(
+                    enRetard = compte?.enRetard ?: 0.0,
+                    promesseOuverteJusquA = promesseOuverte[client.id],
+                    derniereRelanceAt = derniereRelance[client.id],
+                    now = now,
+                ),
+            )
+        }
     }
 
     fun filtrer(items: List<ClientListItem>, requete: String, filtre: ClientListFilter, now: Long): List<ClientListItem> =

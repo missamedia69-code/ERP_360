@@ -9,9 +9,6 @@ import com.missa.b360.core.data.dao.ClientFollowupDao
 import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientFollowupEntity
-import com.missa.b360.core.data.entity.FollowupStatus
-import com.missa.b360.core.data.entity.FollowupType
-import com.missa.b360.core.domain.model.ClientFollowupRules
 import com.missa.b360.core.domain.model.ClientListCounters
 import com.missa.b360.core.domain.model.ClientListFilter
 import com.missa.b360.core.domain.model.ClientListItem
@@ -126,28 +123,7 @@ class ClientListViewModel @Inject constructor(
     ): ClientListUiState {
         if (d == null) return ClientListUiState(chargement = false, erreur = true, requete = q, filtre = f, tri = t, devise = dev)
         val now = System.currentTimeMillis()
-        val derniereRelance = HashMap<Long, Long>()
-        val promesseOuverte = HashMap<Long, Long>()
-        for (suivi in d.suivis) {
-            if (suivi.type == FollowupType.RELANCE) {
-                derniereRelance.merge(suivi.clientId, suivi.createdAt) { a, b -> maxOf(a, b) }
-            } else if (suivi.type == FollowupType.PROMESSE && suivi.statut == FollowupStatus.OUVERT) {
-                suivi.promesseDate?.let { promesseOuverte.merge(suivi.clientId, it) { a, b -> maxOf(a, b) } }
-            }
-        }
-        val items = d.clients.map { client ->
-            val compte = d.comptes[client.id]
-            ClientListItem(
-                client = client,
-                balance = compte,
-                aRelancer = ClientFollowupRules.aRelancer(
-                    enRetard = compte?.enRetard ?: 0.0,
-                    promesseOuverteJusquA = promesseOuverte[client.id],
-                    derniereRelanceAt = derniereRelance[client.id],
-                    now = now,
-                ),
-            )
-        }
+        val items = ClientListRules.construireItems(d.clients, d.comptes, d.suivis, now)
         return ClientListUiState(
             chargement = false,
             lignes = ClientListRules.trier(ClientListRules.filtrer(items, q, f, now), t),
