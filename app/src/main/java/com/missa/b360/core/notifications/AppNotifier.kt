@@ -15,6 +15,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.dao.NotificationDao
 import com.missa.b360.core.data.entity.NotificationEntity
 import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.navigation.Routes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,8 @@ object NotificationRoutes {
         type == "CPT" || type == "FINANCES" -> AppModule.COMPTABILITE.route
         type == "TRE" -> AppModule.TRESORERIE.route
         type == "CRM" -> AppModule.CRM.route
+        type == "CLIENT_PROMESSE" -> ClientRoutes.RELANCES
+        type == "CLIENT_LIMITE" -> AppModule.CLIENTS.route
         type == "QUA" -> AppModule.QUALITE.route
         type == "MAI" -> AppModule.MAINTENANCE.route
         type == "LOG" -> AppModule.LOGISTIQUE.route

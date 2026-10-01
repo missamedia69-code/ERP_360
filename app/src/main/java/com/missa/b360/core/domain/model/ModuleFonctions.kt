@@ -31,6 +31,7 @@ object ModuleFonctions {
         "Avoirs clients" to R.string.fonc_avoirs_clients,
         "Retours clients" to R.string.fonc_retours_clients,
         "Relances clients" to R.string.fonc_relances_clients,
+        "Balance âgée" to R.string.fonc_balance_agee,
         "Contrats clients" to R.string.fonc_contrats_clients,
         "Conditions de paiement" to R.string.fonc_conditions_de_paiement,
         "Articles" to R.string.fonc_articles,

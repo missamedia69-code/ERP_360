@@ -3,6 +3,8 @@ package com.missa.b360.ui.sales
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.util.toMoneyOrNull
 import com.missa.b360.core.data.entity.OperationRecordEntity
 import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.domain.model.SaleLine
@@ -114,6 +117,7 @@ fun SalesScreen(
             },
             onOuvrirFacture = { ecran = EcranVente.FACTURE },
             openOverdue = openOverdue,
+            onOuvrirClient = { id -> onNavigate(com.missa.b360.ui.clients.ClientRoutes.fiche(id)) },
         )
         EcranVente.FACTURE -> FormulaireVente(
             vm = vm,
@@ -131,6 +135,7 @@ private fun ListeVentes(
     onNouvelleVente: () -> Unit,
     onOuvrirFacture: () -> Unit,
     openOverdue: Boolean,
+    onOuvrirClient: (Long) -> Unit,
 ) {
     val pieces by vm.history.collectAsStateWithLifecycle(initialValue = emptyList())
     val clients by vm.clients.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -279,6 +284,7 @@ private fun ListeVentes(
                     CartePieceVente(
                         piece = piece,
                         devise = devise,
+                        onOuvrirClient = onOuvrirClient,
                         onReprendre = {
                             if (vm.loadDraft(piece, clients)) onOuvrirFacture()
                         },
@@ -311,6 +317,7 @@ private fun ListeVentes(
 private fun CartePieceVente(
     piece: OperationRecordEntity,
     devise: String,
+    onOuvrirClient: (Long) -> Unit,
     onReprendre: () -> Unit,
     onPartagerPdf: (() -> Unit)?,
 ) {
@@ -332,7 +339,13 @@ private fun CartePieceVente(
             }
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(payload?.clientName ?: piece.counterpart.orEmpty(), fontSize = 12.sp, color = MissaInk)
+                val clientId = payload?.clientId ?: 0L
+                Text(
+                    payload?.clientName ?: piece.counterpart.orEmpty(),
+                    fontSize = 12.sp,
+                    color = if (clientId > 0L) BleuVente else MissaInk,
+                    modifier = if (clientId > 0L) Modifier.heightIn(min = 48.dp).clickable { onOuvrirClient(clientId) }.wrapContentHeight(Alignment.CenterVertically) else Modifier,
+                )
                 Spacer(Modifier.weight(1f))
                 Text(fmtValeur(piece.amount ?: 0.0, devise), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = MissaInk)
             }
@@ -390,6 +403,7 @@ private fun FormulaireVente(
     LaunchedEffect(modes) { if (modePaiement.isBlank()) modePaiement = modes.firstOrNull().orEmpty() }
 
     val totals = ui.totals(taxRate)
+    val soldeClient by vm.clientBalance.collectAsStateWithLifecycle()
 
     MissaFormulaireTheme(AppModule.VENTE.couleur) {
     Column(Modifier.fillMaxSize()) {
@@ -412,6 +426,18 @@ private fun FormulaireVente(
                     onOpenClientCreate = { dialogueNouveauClient = true },
                     onSelectCashCustomer = { vm.selectCashClient(context.getString(R.string.sales_cash_customer)) },
                 )
+            }
+            val clientChoisi = ui.selectedClient
+            if (clientChoisi != null && clientChoisi.id > 0L) {
+                item {
+                    com.missa.b360.ui.clients.components.ClientCreditBanner(
+                        client = clientChoisi,
+                        balance = soldeClient,
+                        montantVente = totals.total,
+                        montantRegle = (ui.paidInput.toMoneyOrNull() ?: totals.total).coerceIn(0.0, totals.total),
+                        devise = devise.orEmpty(),
+                    )
+                }
             }
             if (clients.isEmpty()) {
                 item {

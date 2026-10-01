@@ -10,7 +10,9 @@ import com.missa.b360.core.data.entity.FollowupStatus
 import com.missa.b360.core.data.entity.FollowupType
 import com.missa.b360.core.domain.model.ClientFollowupRules
 import com.missa.b360.core.domain.model.PromiseCheck
+import com.missa.b360.R
 import com.missa.b360.core.licensing.LicenceManager
+import com.missa.b360.core.notifications.AppNotifier
 import com.missa.b360.core.permissions.PermissionChecker
 import java.util.Calendar
 import javax.inject.Inject
@@ -26,6 +28,7 @@ class ClientFollowupUseCase @Inject constructor(
     private val balanceDao: ClientBalanceDao,
     private val licenceManager: LicenceManager,
     private val permissionGate: ClientPermissionGate,
+    private val appNotifier: AppNotifier,
 ) {
     sealed class Result {
         data class Succes(val id: Long) : Result()
@@ -100,6 +103,15 @@ class ClientFollowupUseCase @Inject constructor(
             if (statut != promesse.statut) {
                 followupDao.update(promesse.copy(statut = statut))
                 modifiees++
+                if (statut == FollowupStatus.NON_TENU) {
+                    val nom = clientDao.getById(promesse.clientId)?.nom.orEmpty()
+                    appNotifier.notifier(
+                        type = "CLIENT_PROMESSE",
+                        titreRes = R.string.cli_notif_promesse_titre,
+                        message = "$nom — ${montant.toLong()}",
+                        date = now,
+                    )
+                }
             }
         }
         return modifiees

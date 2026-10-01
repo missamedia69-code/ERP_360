@@ -9,7 +9,9 @@ import com.missa.b360.core.data.db.AppDatabase
 import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientPaymentEntity
+import com.missa.b360.R
 import com.missa.b360.core.domain.model.ClientBalanceRules
+import com.missa.b360.core.notifications.AppNotifier
 import com.missa.b360.core.domain.model.ClientBalanceSnapshot
 import com.missa.b360.core.domain.model.ClientLedgerItem
 import com.missa.b360.core.domain.model.ClientPaymentItem
@@ -28,6 +30,7 @@ class ClientBalanceUseCase @Inject constructor(
     private val balanceDao: ClientBalanceDao,
     private val paymentDao: ClientPaymentDao,
     private val database: AppDatabase,
+    private val appNotifier: AppNotifier,
 ) {
     /** Recalcule le compte d'un client existant ; sans effet pour une fiche absente (clé étrangère). */
     suspend fun recalculer(clientId: Long, now: Long = System.currentTimeMillis()): ClientBalanceEntity? {
@@ -35,8 +38,17 @@ class ClientBalanceUseCase @Inject constructor(
         val client = clientDao.getById(clientId) ?: return null
         val ledger = ClientBalanceRules.ledgerParClient(operationDao.getVentesValideesPourClient(clientId))[clientId].orEmpty()
         val paiements = paymentDao.getByClient(clientId).map { it.enItem() }
+        val avant = balanceDao.get(clientId)?.encours ?: 0.0
         val compte = construire(client, ledger, paiements, now)
         balanceDao.upsert(compte)
+        if (limiteFranchie(client.limiteCredit, avant, compte.encours)) {
+            appNotifier.notifier(
+                type = "CLIENT_LIMITE",
+                titreRes = R.string.cli_notif_limite_titre,
+                message = "${client.code} — ${client.nom}",
+                date = now,
+            )
+        }
         return compte
     }
 
@@ -75,6 +87,12 @@ class ClientBalanceUseCase @Inject constructor(
         now: Long,
     ): ClientBalanceEntity = ClientBalanceRules.calculer(ledger, paiements, client.conditionPaiementJours, now)
         .enEntite(client.id, now)
+
+    /** Vrai quand l'encours passe de sous la limite à la limite atteinte ou dépassée (une seule alerte par franchissement). */
+    private fun limiteFranchie(limite: Double?, avant: Double, apres: Double): Boolean {
+        if (limite == null || !limite.isFinite() || limite <= 0.0) return false
+        return avant < limite && apres >= limite
+    }
 
     private fun ClientPaymentEntity.enItem() = ClientPaymentItem(montant = montant, invoiceRecordId = invoiceRecordId)
 

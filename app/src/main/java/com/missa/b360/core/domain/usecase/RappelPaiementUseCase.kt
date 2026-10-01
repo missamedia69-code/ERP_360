@@ -1,6 +1,7 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.ClientBalanceDao
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.OperationRecordDao
 import com.missa.b360.core.data.db.AppDatabase
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class RappelPaiementUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val clientDao: ClientDao,
+    private val balanceDao: ClientBalanceDao,
     private val database: AppDatabase,
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
@@ -35,33 +37,15 @@ class RappelPaiementUseCase @Inject constructor(
         data object AucunSolde : Result()
     }
 
-    /** Solde dû par le client — même règle que l'écran Ventes (`outstandingBalance`). */
-    suspend fun soldeClient(clientId: Long): Double = operationDao.getByModule(OperationModule.VENTE.name)
-        .asSequence()
-        .filter { it.status == OperationStatus.VALIDATED.name }
-        .mapNotNull { SaleRecordCodec.decode(it.notes) }
-        .filter { it.clientId == clientId }
-        .sumOf {
-            val partiel = (it.total - it.paidAmount).coerceAtLeast(0.0)
-            if (it.sourceRecordId != null) -partiel else partiel
-        }
+    /** Solde dû par le client : encours de `client_balances`, la source de la liste, de la fiche et du compte. */
+    suspend fun soldeClient(clientId: Long): Double = balanceDao.get(clientId)?.encours ?: 0.0
 
     suspend operator fun invoke(clientId: Long, now: Long = System.currentTimeMillis()): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         val client = clientDao.getById(clientId) ?: return Result.ClientIntrouvable
 
         return database.withTransaction {
-            // Solde client : factures validées − payé, moins les avoirs (même règle
-            // que l'écran Ventes — `outstandingBalance`).
-            val solde = operationDao.getByModule(OperationModule.VENTE.name)
-                .asSequence()
-                .filter { it.status == OperationStatus.VALIDATED.name }
-                .mapNotNull { SaleRecordCodec.decode(it.notes) }
-                .filter { it.clientId == clientId }
-                .sumOf {
-                    val partiel = (it.total - it.paidAmount).coerceAtLeast(0.0)
-                    if (it.sourceRecordId != null) -partiel else partiel
-                }
+            val solde = soldeClient(clientId)
             if (solde <= 0.001) return@withTransaction Result.AucunSolde
 
             val reference = sequenceManager.next(DocType.RAPPEL)

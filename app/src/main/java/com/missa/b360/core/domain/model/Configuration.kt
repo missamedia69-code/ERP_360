@@ -37,7 +37,7 @@ object ModuleSousElements {
         ),
         ModuleCode.VEN to listOf(
             "Clients", "Prospects", "Devis", "Commandes clients", "Livraisons",
-            "Factures clients", "Avoirs clients", "Retours clients", "Relances clients",
+            "Factures clients", "Avoirs clients", "Retours clients", "Relances clients", "Balance âgée",
             "Contrats clients", "Conditions de paiement"
         ),
         ModuleCode.STK to listOf(

@@ -2,6 +2,8 @@ package com.missa.b360.ui.sales
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.missa.b360.core.data.dao.ClientBalanceDao
+import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.PriceClientEntity
@@ -41,6 +43,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -107,6 +112,7 @@ class SalesViewModel @Inject constructor(
     private val checkSaleStock: CheckSaleStockUseCase,
     private val createClient: CreateClientUseCase,
     private val clientProfile: ClientProfileUseCase,
+    private val clientBalances: ClientBalanceDao,
 ) : ViewModel() {
 
     sealed interface SaveResult {
@@ -128,6 +134,13 @@ class SalesViewModel @Inject constructor(
     val uiState: StateFlow<SalesUiState> = _uiState
 
     val clients: Flow<List<ClientEntity>> = observeClients()
+
+    /** Compte (`client_balances`) du client sélectionné : source unique de l'encours affiché en vente. */
+    val clientBalance: StateFlow<ClientBalanceEntity?> = _uiState
+        .map { it.selectedClient?.id ?: 0L }
+        .distinctUntilChanged()
+        .flatMapLatest { id -> if (id > 0L) clientBalances.observe(id) else flowOf(null) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     private val standardTaxRate: StateFlow<Double> = observeTaxes()
         .map { taxes -> taxes.firstOrNull { it.parDefaut }?.taux ?: taxes.firstOrNull()?.taux ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)

@@ -2235,4 +2235,20 @@
     <string name="cli_filtre_en_retard">المتأخرون في الدفع فقط</string>
     <string name="cli_filtre_reinitialiser">إعادة التعيين</string>
     <string name="cli_filtre_appliquer">عرض العملاء</string>
+    <string name="cli_notif_promesse_titre">وعد بالدفع لم يُنفَّذ</string>
+    <string name="cli_notif_limite_titre">تم بلوغ حد الائتمان</string>
+    <string name="cli_raison_bloque_credit">العميل محظور للائتمان: يمكن فقط البيع المدفوع بالكامل.</string>
+    <string name="cli_raison_bloque_admin">العميل محظور إداريًا: لا يمكن البيع.</string>
+    <string name="cli_raison_inactif">العميل غير نشط أو مؤرشف: أعد تفعيل البطاقة للبيع.</string>
+    <string name="cli_raison_fiche_incomplete">البطاقة غير مكتملة: لا يمكن منح ائتمان قبل التفعيل.</string>
+    <string name="cli_raison_surveillance">العميل تحت المراقبة.</string>
+    <string name="cli_raison_limite_atteinte">تم بلوغ حد الائتمان أو تجاوزه.</string>
+    <string name="cli_raison_limite_proche">اقتراب من حد الائتمان.</string>
+    <string name="cli_raison_limite_depassee">هذا البيع يتجاوز حد الائتمان.</string>
+    <string name="cli_raison_retard_critique">تأخر في السداد أكثر من 60 يومًا.</string>
+    <string name="cli_raison_retard_modere">تأخر في السداد أكثر من 30 يومًا.</string>
+    <string name="cli_raison_montant_invalide">مبلغ البيع غير صالح.</string>
+    <string name="cli_banniere_encours">الرصيد المستحق: %1$s</string>
+    <string name="cli_banniere_limite">الحد: %1$s</string>
+    <string name="fonc_balance_agee">أعمار الديون</string>
 </resources>

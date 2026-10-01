@@ -2235,4 +2235,20 @@
     <string name="cli_filtre_en_retard">Solo con pagos vencidos</string>
     <string name="cli_filtre_reinitialiser">Restablecer</string>
     <string name="cli_filtre_appliquer">Ver clientes</string>
+    <string name="cli_notif_promesse_titre">Promesa de pago incumplida</string>
+    <string name="cli_notif_limite_titre">Límite de crédito alcanzado</string>
+    <string name="cli_raison_bloque_credit">Cliente bloqueado a crédito: solo es posible una venta totalmente pagada.</string>
+    <string name="cli_raison_bloque_admin">Cliente bloqueado administrativamente: no es posible vender.</string>
+    <string name="cli_raison_inactif">Cliente inactivo o archivado: reactive la ficha para vender.</string>
+    <string name="cli_raison_fiche_incomplete">Ficha por completar: el crédito solo es posible tras activarla.</string>
+    <string name="cli_raison_surveillance">Cliente bajo vigilancia.</string>
+    <string name="cli_raison_limite_atteinte">Límite de crédito alcanzado o superado.</string>
+    <string name="cli_raison_limite_proche">Límite de crédito casi alcanzado.</string>
+    <string name="cli_raison_limite_depassee">Esta venta supera el límite de crédito.</string>
+    <string name="cli_raison_retard_critique">Pago atrasado más de 60 días.</string>
+    <string name="cli_raison_retard_modere">Pago atrasado más de 30 días.</string>
+    <string name="cli_raison_montant_invalide">Importe de venta no válido.</string>
+    <string name="cli_banniere_encours">Saldo pendiente: %1$s</string>
+    <string name="cli_banniere_limite">Límite: %1$s</string>
+    <string name="fonc_balance_agee">Antigüedad de saldos</string>
 </resources>

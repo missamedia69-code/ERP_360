@@ -2235,4 +2235,20 @@
     <string name="cli_filtre_en_retard">仅显示逾期客户</string>
     <string name="cli_filtre_reinitialiser">重置</string>
     <string name="cli_filtre_appliquer">显示客户</string>
+    <string name="cli_notif_promesse_titre">付款承诺未兑现</string>
+    <string name="cli_notif_limite_titre">已达信用额度</string>
+    <string name="cli_raison_bloque_credit">客户被禁止赊账：仅可进行全额付款的销售。</string>
+    <string name="cli_raison_bloque_admin">客户被行政冻结：无法销售。</string>
+    <string name="cli_raison_inactif">客户已停用或归档：请先重新启用档案再销售。</string>
+    <string name="cli_raison_fiche_incomplete">档案待完善：激活后才能赊账。</string>
+    <string name="cli_raison_surveillance">客户处于重点关注状态。</string>
+    <string name="cli_raison_limite_atteinte">已达到或超过信用额度。</string>
+    <string name="cli_raison_limite_proche">即将达到信用额度。</string>
+    <string name="cli_raison_limite_depassee">本次销售将超出信用额度。</string>
+    <string name="cli_raison_retard_critique">付款逾期超过 60 天。</string>
+    <string name="cli_raison_retard_modere">付款逾期超过 30 天。</string>
+    <string name="cli_raison_montant_invalide">销售金额无效。</string>
+    <string name="cli_banniere_encours">欠款：%1$s</string>
+    <string name="cli_banniere_limite">额度：%1$s</string>
+    <string name="fonc_balance_agee">账龄分析</string>
 </resources>

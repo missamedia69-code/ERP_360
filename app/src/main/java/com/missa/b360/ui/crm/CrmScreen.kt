@@ -39,6 +39,7 @@ import com.missa.b360.core.domain.model.SegmentClient
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
+import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.stock.fmtValeur
 import com.missa.b360.ui.theme.MissaBorder
@@ -215,7 +216,7 @@ fun CrmScreen(
                     CarteFicheCrm(
                         fiche = fiche,
                         devise = devise,
-                        onConsulter = { onNaviguer(AppModule.CLIENTS.route) },
+                        onConsulter = { onNaviguer(ClientRoutes.fiche(fiche.client.id)) },
                     )
                 }
             }

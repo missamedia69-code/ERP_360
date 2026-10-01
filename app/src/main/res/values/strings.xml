@@ -2282,4 +2282,20 @@
     <string name="cli_filtre_en_retard">En retard de paiement seulement</string>
     <string name="cli_filtre_reinitialiser">Réinitialiser</string>
     <string name="cli_filtre_appliquer">Afficher les clients</string>
+    <string name="cli_notif_promesse_titre">Promesse de paiement non tenue</string>
+    <string name="cli_notif_limite_titre">Limite de crédit atteinte</string>
+    <string name="cli_raison_bloque_credit">Client bloqué pour le crédit : seule une vente entièrement réglée est possible.</string>
+    <string name="cli_raison_bloque_admin">Client bloqué administrativement : aucune vente possible.</string>
+    <string name="cli_raison_inactif">Client inactif ou archivé : réactivez la fiche pour vendre.</string>
+    <string name="cli_raison_fiche_incomplete">Fiche à compléter : un crédit n\'est possible qu\'après activation.</string>
+    <string name="cli_raison_surveillance">Client sous surveillance.</string>
+    <string name="cli_raison_limite_atteinte">Limite de crédit atteinte ou dépassée.</string>
+    <string name="cli_raison_limite_proche">Limite de crédit presque atteinte.</string>
+    <string name="cli_raison_limite_depassee">Cette vente dépasse la limite de crédit.</string>
+    <string name="cli_raison_retard_critique">Retard de paiement de plus de 60 jours.</string>
+    <string name="cli_raison_retard_modere">Retard de paiement de plus de 30 jours.</string>
+    <string name="cli_raison_montant_invalide">Montant de la vente invalide.</string>
+    <string name="cli_banniere_encours">Encours : %1$s</string>
+    <string name="cli_banniere_limite">Limite : %1$s</string>
+    <string name="fonc_balance_agee">Balance âgée</string>
 </resources>

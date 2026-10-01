@@ -2239,4 +2239,20 @@
     <string name="cli_filtre_en_retard">Overdue only</string>
     <string name="cli_filtre_reinitialiser">Reset</string>
     <string name="cli_filtre_appliquer">Show clients</string>
+    <string name="cli_notif_promesse_titre">Payment promise broken</string>
+    <string name="cli_notif_limite_titre">Credit limit reached</string>
+    <string name="cli_raison_bloque_credit">Client blocked for credit: only a fully paid sale is possible.</string>
+    <string name="cli_raison_bloque_admin">Client administratively blocked: no sale possible.</string>
+    <string name="cli_raison_inactif">Inactive or archived client: reactivate the record to sell.</string>
+    <string name="cli_raison_fiche_incomplete">Incomplete record: credit is only possible once activated.</string>
+    <string name="cli_raison_surveillance">Client under watch.</string>
+    <string name="cli_raison_limite_atteinte">Credit limit reached or exceeded.</string>
+    <string name="cli_raison_limite_proche">Credit limit almost reached.</string>
+    <string name="cli_raison_limite_depassee">This sale exceeds the credit limit.</string>
+    <string name="cli_raison_retard_critique">Payment overdue by more than 60 days.</string>
+    <string name="cli_raison_retard_modere">Payment overdue by more than 30 days.</string>
+    <string name="cli_raison_montant_invalide">Invalid sale amount.</string>
+    <string name="cli_banniere_encours">Outstanding: %1$s</string>
+    <string name="cli_banniere_limite">Limit: %1$s</string>
+    <string name="fonc_balance_agee">Aged balance</string>
 </resources>

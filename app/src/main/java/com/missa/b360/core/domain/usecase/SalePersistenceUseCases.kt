@@ -1,6 +1,7 @@
 package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
+import com.missa.b360.core.data.dao.ClientBalanceDao
 import com.missa.b360.core.data.dao.ClientDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -56,6 +57,7 @@ class SaveSaleUseCase @Inject constructor(
     private val journalManager: JournalManager,
     private val checkCreditLimit: CheckCreditLimitUseCase,
     private val clientBalance: ClientBalanceUseCase,
+    private val clientBalanceDao: ClientBalanceDao,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -173,17 +175,8 @@ class SaveSaleUseCase @Inject constructor(
             val nouvelleCreance = (totals.total - payload.paidAmount).coerceAtLeast(0.0)
             val limiteCredit = client?.limiteCredit
             if (nouvelleCreance > QUANTITE_EPSILON && limiteCredit != null) {
-                // Solde dérivé des ventes validées et avoirs, en cohérence avec la fiche client.
-                val soldeActuel = operationDao.getByModule(OperationModule.VENTE.name)
-                    .asSequence()
-                    .filter { it.status == OperationStatus.VALIDATED.name }
-                    .mapNotNull { SaleRecordCodec.decode(it.notes) }
-                    .filter { it.clientId == client.id }
-                    .sumOf { payloadVente ->
-                        val restant = (payloadVente.total - payloadVente.paidAmount).coerceAtLeast(0.0)
-                        if (payloadVente.sourceRecordId != null) -restant else restant
-                    }
-                    .coerceAtLeast(0.0)
+                // Encours lu dans `client_balances` : même source que la liste, la fiche et le compte.
+                val soldeActuel = (clientBalanceDao.get(client.id)?.encours ?: 0.0).coerceAtLeast(0.0)
                 val verdictCredit = checkCreditLimit(
                     soldeActuel = soldeActuel,
                     montantNouvelleVente = nouvelleCreance,
