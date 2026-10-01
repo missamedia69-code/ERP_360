@@ -2275,4 +2275,11 @@
     <string name="cli_tranche_61_90">61 à 90 jours de retard</string>
     <string name="cli_tranche_non_echu">Non échu</string>
     <string name="cli_tranche_plus_90">Plus de 90 jours de retard</string>
+    <string name="cli_filtres_titre">Filtres</string>
+    <string name="cli_filtre_statut">Statut</string>
+    <string name="cli_filtre_type">Type de client</string>
+    <string name="cli_filtre_avec_encours">Avec encours seulement</string>
+    <string name="cli_filtre_en_retard">En retard de paiement seulement</string>
+    <string name="cli_filtre_reinitialiser">Réinitialiser</string>
+    <string name="cli_filtre_appliquer">Afficher les clients</string>
 </resources>

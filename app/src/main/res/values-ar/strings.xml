@@ -2228,4 +2228,11 @@
     <string name="cli_tranche_61_90">تأخير من 61 إلى 90 يومًا</string>
     <string name="cli_tranche_non_echu">غير مستحق</string>
     <string name="cli_tranche_plus_90">تأخير أكثر من 90 يومًا</string>
+    <string name="cli_filtres_titre">عوامل التصفية</string>
+    <string name="cli_filtre_statut">الحالة</string>
+    <string name="cli_filtre_type">نوع العميل</string>
+    <string name="cli_filtre_avec_encours">الذين لديهم رصيد مستحق فقط</string>
+    <string name="cli_filtre_en_retard">المتأخرون في الدفع فقط</string>
+    <string name="cli_filtre_reinitialiser">إعادة التعيين</string>
+    <string name="cli_filtre_appliquer">عرض العملاء</string>
 </resources>

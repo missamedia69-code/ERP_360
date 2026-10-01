@@ -16,6 +16,7 @@ import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.data.entity.FollowupChannel
 import com.missa.b360.core.data.entity.FollowupType
 import com.missa.b360.core.data.entity.PriceClientEntity
+import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.domain.model.CreditAssessment
 import com.missa.b360.core.domain.model.CreditInput
 import com.missa.b360.core.domain.model.CreditPolicy
@@ -24,6 +25,8 @@ import com.missa.b360.core.domain.usecase.ChangerStatutClientUseCase
 import com.missa.b360.core.domain.usecase.ClientDefaultsUseCase
 import com.missa.b360.core.domain.usecase.ClientFollowupUseCase
 import com.missa.b360.core.domain.usecase.ClientLifecycleRules
+import com.missa.b360.core.domain.usecase.ClientPriceUseCases
+import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.domain.usecase.ClientProfileUseCase
 import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.clients.components.ClientNotice
@@ -73,6 +76,8 @@ class ClientDetailViewModel @Inject constructor(
     private val activer: ActiverClientUseCase,
     private val statutUseCase: ChangerStatutClientUseCase,
     private val followups: ClientFollowupUseCase,
+    private val clientPrices: ClientPriceUseCases,
+    observeProducts: ObserveProductsUseCase,
 ) : ViewModel() {
 
     private class Fiche(
@@ -115,6 +120,11 @@ class ClientDetailViewModel @Inject constructor(
 
     val etat: StateFlow<ClientDetailUiState> = combine(fiche, local) { f, l -> construire(f, l) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ClientDetailUiState())
+
+    /** Catalogue lu seulement quand l'onglet Conditions l'affiche (prix négociés). */
+    val produits: StateFlow<List<ProductEntity>> = observeProducts()
+        .catch { emit(emptyList()) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     init {
         viewModelScope.launch {
@@ -199,6 +209,23 @@ class ClientDetailViewModel @Inject constructor(
             } catch (_: Exception) {
                 ClientNotice.ERREUR
             }
+        }
+    }
+
+    fun definirPrix(produitId: Long, prix: Double) = modifierPrix { clientPrices.definir(clientId, produitId, prix) }
+
+    fun retirerPrix(produitId: Long) = modifierPrix { clientPrices.supprimer(clientId, produitId) }
+
+    private fun modifierPrix(action: suspend () -> Boolean) {
+        viewModelScope.launch {
+            val ok = try {
+                action()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                false
+            }
+            if (!ok) notice.value = ClientNotice.ERREUR
         }
     }
 

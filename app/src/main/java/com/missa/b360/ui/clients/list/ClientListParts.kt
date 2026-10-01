@@ -17,6 +17,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -200,5 +206,51 @@ internal fun ClientListRow(ligne: ClientListItem, devise: String, onClick: () ->
                 }
             }
         }
+    }
+}
+
+/**
+ * Ligne glissante : vers la droite on appelle, vers la gauche on écrit sur WhatsApp. La ligne
+ * revient toujours à sa place ; le toucher simple ouvre la fiche.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ClientSwipeRow(
+    ligne: ClientListItem,
+    devise: String,
+    onClick: () -> Unit,
+    onAppeler: () -> Unit,
+    onWhatsApp: () -> Unit,
+) {
+    val etat = rememberSwipeToDismissBoxState(
+        confirmValueChange = { valeur ->
+            when (valeur) {
+                SwipeToDismissBoxValue.StartToEnd -> onAppeler()
+                SwipeToDismissBoxValue.EndToStart -> onWhatsApp()
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+            false
+        },
+    )
+    SwipeToDismissBox(
+        state = etat,
+        modifier = Modifier.fillMaxWidth(),
+        backgroundContent = {
+            val appel = etat.dismissDirection == SwipeToDismissBoxValue.StartToEnd
+            Row(
+                Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
+                    .background(if (appel) RisqueCouleurs.Normal else Color(0xFF128C7E)).padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = if (appel) Arrangement.Start else Arrangement.End,
+            ) {
+                Icon(
+                    painterResource(if (appel) Iv.Call else Iv.Chat),
+                    contentDescription = stringResource(if (appel) R.string.cli_appeler else R.string.cli_whatsapp),
+                    tint = Color.White, modifier = Modifier.size(28.dp),
+                )
+            }
+        },
+    ) {
+        ClientListRow(ligne, devise, onClick)
     }
 }

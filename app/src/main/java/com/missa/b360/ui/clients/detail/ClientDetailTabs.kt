@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.ProductEntity
+import com.missa.b360.ui.clients.components.ClientPricesCard
 import com.missa.b360.ui.clients.components.ClientFollowupRow
 import com.missa.b360.ui.clients.components.LigneInfo
 import com.missa.b360.ui.clients.components.clientMoney
@@ -61,6 +63,9 @@ internal fun LazyListScope.ongletClient(
     onVoirCompte: () -> Unit,
     onNote: () -> Unit,
     onAppelerContact: (String) -> Unit,
+    produits: List<ProductEntity>,
+    onPrixDefini: (Long, Double) -> Unit,
+    onPrixRetire: (Long) -> Unit,
 ) {
     when (etat.onglet) {
         ClientTab.ACTIVITE -> {
@@ -129,8 +134,9 @@ internal fun LazyListScope.ongletClient(
                 }
             }
         }
-        ClientTab.CONDITIONS -> item {
-            CarteClient {
+        ClientTab.CONDITIONS -> {
+            item {
+                CarteClient {
                 LigneInfo(stringResource(R.string.cli_cond_delai), stringResource(R.string.cli_jours, client.conditionPaiementJours))
                 LigneInfo(
                     stringResource(R.string.clients_limite_credit),
@@ -140,8 +146,9 @@ internal fun LazyListScope.ongletClient(
                 client.nif?.takeIf { it.isNotBlank() }?.let { LigneInfo(stringResource(R.string.cli_cond_nif), it) }
                 client.commercial?.takeIf { it.isNotBlank() }?.let { LigneInfo(stringResource(R.string.cli_cond_commercial), it) }
                 client.conditionsPaiement?.takeIf { it.isNotBlank() }?.let { LigneInfo(stringResource(R.string.cli_cond_conditions), it) }
-                LigneInfo(stringResource(R.string.cli_cond_prix_negocies), etat.prix.size.toString())
+                }
             }
+            item { ClientPricesCard(etat.prix, produits, etat.devise, onPrixDefini, onPrixRetire) }
         }
         ClientTab.NOTES -> {
             item {

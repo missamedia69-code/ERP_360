@@ -2228,4 +2228,11 @@
     <string name="cli_tranche_61_90">逾期 61 至 90 天</string>
     <string name="cli_tranche_non_echu">未到期</string>
     <string name="cli_tranche_plus_90">逾期超过 90 天</string>
+    <string name="cli_filtres_titre">筛选</string>
+    <string name="cli_filtre_statut">状态</string>
+    <string name="cli_filtre_type">客户类型</string>
+    <string name="cli_filtre_avec_encours">仅显示有欠款的客户</string>
+    <string name="cli_filtre_en_retard">仅显示逾期客户</string>
+    <string name="cli_filtre_reinitialiser">重置</string>
+    <string name="cli_filtre_appliquer">显示客户</string>
 </resources>

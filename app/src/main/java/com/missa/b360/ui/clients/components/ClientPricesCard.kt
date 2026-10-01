@@ -1,4 +1,4 @@
-package com.missa.b360.ui.clients
+package com.missa.b360.ui.clients.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,39 +50,46 @@ import com.missa.b360.ui.theme.MissaMuted
 import com.missa.b360.ui.stock.fmtValeur
 import com.missa.b360.ui.components.*
 
+/** Prix négociés d'un client : lecture à 14 sp minimum, cibles de 48 dp, ajout par feuille de dialogue. */
 @Composable
-internal fun ClientPricesSection(
+internal fun ClientPricesCard(
     prices: List<PriceClientEntity>,
     products: List<ProductEntity>,
     devise: String,
     onSave: (Long, Double) -> Unit,
     onDelete: (Long) -> Unit,
 ) {
-    var editorOpen by remember { mutableStateOf(false) }
-    Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), border = BorderStroke(1.dp, MissaBorder), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.clients_flow_negotiated_prices), modifier = Modifier.weight(1f), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                OutlinedButton(onClick = { editorOpen = true }, contentPadding = PaddingValues(horizontal = 5.dp, vertical = 0.dp)) {
-                    Icon(painterResource(Iv.Add), null, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text(stringResource(R.string.clients_flow_add_price), fontSize = 9.sp)
-                }
-            }
+    var editorOpen by rememberSaveable { mutableStateOf(false) }
+    Card(
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, MissaBorder),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.clients_flow_negotiated_prices), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             if (prices.isEmpty()) {
-                Text(stringResource(R.string.clients_flow_no_prices), color = MissaMuted, fontSize = 10.sp)
+                Text(stringResource(R.string.clients_flow_no_prices), color = MissaMuted, fontSize = 14.sp)
             } else {
                 prices.forEach { price ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(products.firstOrNull { it.id == price.produitId }?.nom ?: stringResource(R.string.clients_flow_unknown_product), color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-                            Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 9.sp)
+                            Text(
+                                products.firstOrNull { it.id == price.produitId }?.nom ?: stringResource(R.string.clients_flow_unknown_product),
+                                color = MissaInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 14.sp)
                         }
-                        IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(26.dp)) {
-                            Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.clients_flow_remove_price), tint = MissaInk, modifier = Modifier.size(17.dp))
+                        IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(48.dp)) {
+                            Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.clients_flow_remove_price), tint = MissaInk)
                         }
                     }
                 }
+            }
+            OutlinedButton(onClick = { editorOpen = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Icon(painterResource(Iv.Add), null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(stringResource(R.string.clients_flow_add_price))
             }
         }
     }
@@ -101,7 +110,7 @@ private fun ClientPriceDialog(
 ) {
     var productId by remember { mutableStateOf<Long?>(products.firstOrNull { it.active && it.vendable }?.id) }
     var priceInput by remember { mutableStateOf("") }
-    val price = priceInput.trim().toDoubleOrNull()?.takeIf { it.isFinite() && it > 0.0 }
+    val price = priceInput.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() && it > 0.0 }
     val sellable = products.filter { it.active && it.vendable }
 
     MissaFormDialogue(

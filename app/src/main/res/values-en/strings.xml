@@ -2232,4 +2232,11 @@
     <string name="cli_tranche_61_90">61 to 90 days overdue</string>
     <string name="cli_tranche_non_echu">Not yet due</string>
     <string name="cli_tranche_plus_90">Over 90 days overdue</string>
+    <string name="cli_filtres_titre">Filters</string>
+    <string name="cli_filtre_statut">Status</string>
+    <string name="cli_filtre_type">Client type</string>
+    <string name="cli_filtre_avec_encours">With outstanding balance only</string>
+    <string name="cli_filtre_en_retard">Overdue only</string>
+    <string name="cli_filtre_reinitialiser">Reset</string>
+    <string name="cli_filtre_appliquer">Show clients</string>
 </resources>

@@ -2228,4 +2228,11 @@
     <string name="cli_tranche_61_90">61 a 90 días de retraso</string>
     <string name="cli_tranche_non_echu">No vencido</string>
     <string name="cli_tranche_plus_90">Más de 90 días de retraso</string>
+    <string name="cli_filtres_titre">Filtros</string>
+    <string name="cli_filtre_statut">Estado</string>
+    <string name="cli_filtre_type">Tipo de cliente</string>
+    <string name="cli_filtre_avec_encours">Solo con saldo pendiente</string>
+    <string name="cli_filtre_en_retard">Solo con pagos vencidos</string>
+    <string name="cli_filtre_reinitialiser">Restablecer</string>
+    <string name="cli_filtre_appliquer">Ver clientes</string>
 </resources>

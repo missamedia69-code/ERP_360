@@ -67,6 +67,7 @@ fun ClientDetailScreen(
     var statutDemande by rememberSaveable { mutableStateOf<String?>(null) }
     var menuOuvert by rememberSaveable { mutableStateOf(false) }
     val client = etat.client
+    val produits = if (etat.onglet == ClientTab.CONDITIONS) viewModel.produits.collectAsState().value else emptyList()
 
     ClientNoticeEffect(etat.notice, hote, viewModel::noticeLue)
 
@@ -148,6 +149,9 @@ fun ClientDetailScreen(
                     onVoirCompte = { onCompte(client.id) },
                     onNote = { noteOuverte = true },
                     onAppelerContact = { contexte.appeler(it) },
+                    produits = produits,
+                    onPrixDefini = viewModel::definirPrix,
+                    onPrixRetire = viewModel::retirerPrix,
                 )
             }
         }

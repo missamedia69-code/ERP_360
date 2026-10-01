@@ -9,6 +9,9 @@ import com.missa.b360.core.data.dao.ClientFollowupDao
 import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ClientFollowupEntity
+import com.missa.b360.core.data.entity.ClientStatus
+import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.domain.model.ClientAdvancedFilter
 import com.missa.b360.core.domain.model.ClientListCounters
 import com.missa.b360.core.domain.model.ClientListFilter
 import com.missa.b360.core.domain.model.ClientListItem
@@ -40,6 +43,7 @@ data class ClientListUiState(
     val requete: String = "",
     val filtre: ClientListFilter = ClientListFilter.TOUS,
     val tri: ClientListSort = ClientListSort.ENCOURS,
+    val avance: ClientAdvancedFilter = ClientAdvancedFilter(),
     val devise: String = "",
     val encoursTotal: Double = 0.0,
     val enRetardTotal: Double = 0.0,
@@ -63,10 +67,13 @@ class ClientListViewModel @Inject constructor(
         val suivis: List<ClientFollowupEntity>,
     )
 
+    private class Criteres(val requete: String, val filtre: ClientListFilter, val tri: ClientListSort, val avance: ClientAdvancedFilter)
+
     // Recherche, puce et tri survivent à l'arrêt du processus via SavedStateHandle.
     private val requete = MutableStateFlow(savedState.get<String>(CLE_REQUETE).orEmpty())
     private val filtre = MutableStateFlow(lire(CLE_FILTRE, ClientListFilter.TOUS))
     private val tri = MutableStateFlow(lire(CLE_TRI, ClientListSort.ENCOURS))
+    private val avance = MutableStateFlow(lireAvance())
     private val devise = MutableStateFlow("")
     private val nouvelEssai = MutableStateFlow(0)
 
@@ -76,8 +83,10 @@ class ClientListViewModel @Inject constructor(
         }.map<Donnees, Donnees?> { it }.catch { emit(null) }
     }
 
-    val etat: StateFlow<ClientListUiState> = combine(donnees, requete, filtre, tri, devise) { d, q, f, t, dev ->
-        construire(d, q, f, t, dev)
+    private val criteres: Flow<Criteres> = combine(requete, filtre, tri, avance) { q, f, t, a -> Criteres(q, f, t, a) }
+
+    val etat: StateFlow<ClientListUiState> = combine(donnees, criteres, devise) { d, c, dev ->
+        construire(d, c.requete, c.filtre, c.tri, c.avance, dev)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ClientListUiState())
 
     init {
@@ -110,6 +119,11 @@ class ClientListViewModel @Inject constructor(
         savedState[CLE_TRI] = valeur.name
     }
 
+    fun changerAvance(valeur: ClientAdvancedFilter) {
+        avance.value = valeur
+        savedState[CLE_AVANCE] = encoderAvance(valeur)
+    }
+
     fun reessayer() {
         nouvelEssai.value += 1
     }
@@ -119,23 +133,40 @@ class ClientListViewModel @Inject constructor(
         q: String,
         f: ClientListFilter,
         t: ClientListSort,
+        a: ClientAdvancedFilter,
         dev: String,
     ): ClientListUiState {
-        if (d == null) return ClientListUiState(chargement = false, erreur = true, requete = q, filtre = f, tri = t, devise = dev)
+        if (d == null) return ClientListUiState(chargement = false, erreur = true, requete = q, filtre = f, tri = t, avance = a, devise = dev)
         val now = System.currentTimeMillis()
         val items = ClientListRules.construireItems(d.clients, d.comptes, d.suivis, now)
         return ClientListUiState(
             chargement = false,
-            lignes = ClientListRules.trier(ClientListRules.filtrer(items, q, f, now), t),
+            lignes = ClientListRules.trier(ClientListRules.filtrer(items, q, f, now, a), t),
             compteurs = ClientListRules.compteurs(items, now),
             requete = q,
             filtre = f,
             tri = t,
+            avance = a,
             devise = dev,
             encoursTotal = items.sumOf { it.encours },
             enRetardTotal = items.sumOf { it.enRetard },
         )
     }
+
+    private fun lireAvance(): ClientAdvancedFilter {
+        val morceaux = savedState.get<String>(CLE_AVANCE)?.split('|') ?: return ClientAdvancedFilter()
+        if (morceaux.size != 4) return ClientAdvancedFilter()
+        return ClientAdvancedFilter(
+            statuts = morceaux[0].split(',').mapNotNull { nom -> ClientStatus.entries.firstOrNull { it.name == nom } }.toSet(),
+            types = morceaux[1].split(',').mapNotNull { nom -> ClientType.entries.firstOrNull { it.name == nom } }.toSet(),
+            avecEncours = morceaux[2] == "1",
+            enRetard = morceaux[3] == "1",
+        )
+    }
+
+    private fun encoderAvance(a: ClientAdvancedFilter): String =
+        a.statuts.joinToString(",") { it.name } + "|" + a.types.joinToString(",") { it.name } + "|" +
+            (if (a.avecEncours) "1" else "0") + "|" + (if (a.enRetard) "1" else "0")
 
     private inline fun <reified E : Enum<E>> lire(cle: String, defaut: E): E =
         savedState.get<String>(cle)?.let { nom -> enumValues<E>().firstOrNull { it.name == nom } } ?: defaut
@@ -144,5 +175,6 @@ class ClientListViewModel @Inject constructor(
         const val CLE_REQUETE = "requete"
         const val CLE_FILTRE = "filtre"
         const val CLE_TRI = "tri"
+        const val CLE_AVANCE = "avance"
     }
 }

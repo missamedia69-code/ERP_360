@@ -23,6 +23,24 @@ data class ClientListItem(
     val enRetard: Double get() = balance?.enRetard ?: 0.0
 }
 
+/** Filtres de la feuille « Filtres » : vides par défaut, cumulables avec la puce et la recherche. */
+data class ClientAdvancedFilter(
+    val statuts: Set<ClientStatus> = emptySet(),
+    val types: Set<ClientType> = emptySet(),
+    val avecEncours: Boolean = false,
+    val enRetard: Boolean = false,
+) {
+    /** Nombre de critères actifs (pastille du bouton). */
+    val actifs: Int get() = (if (statuts.isEmpty()) 0 else 1) + (if (types.isEmpty()) 0 else 1) +
+        (if (avecEncours) 1 else 0) + (if (enRetard) 1 else 0)
+
+    fun accepte(item: ClientListItem): Boolean =
+        (statuts.isEmpty() || item.client.statut in statuts) &&
+            (types.isEmpty() || item.client.type in types) &&
+            (!avecEncours || item.encours > 0.0) &&
+            (!enRetard || item.enRetard > 0.0)
+}
+
 data class ClientListCounters(
     val total: Int = 0,
     val aRelancer: Int = 0,
@@ -124,8 +142,14 @@ object ClientListRules {
         }
     }
 
-    fun filtrer(items: List<ClientListItem>, requete: String, filtre: ClientListFilter, now: Long): List<ClientListItem> =
-        items.filter { correspond(it.client, requete) && appartient(it, filtre, now) }
+    fun filtrer(
+        items: List<ClientListItem>,
+        requete: String,
+        filtre: ClientListFilter,
+        now: Long,
+        avance: ClientAdvancedFilter = ClientAdvancedFilter(),
+    ): List<ClientListItem> =
+        items.filter { correspond(it.client, requete) && appartient(it, filtre, now) && avance.accepte(it) }
 
     fun trier(items: List<ClientListItem>, tri: ClientListSort): List<ClientListItem> {
         val parNom = compareBy<ClientListItem, String>(String.CASE_INSENSITIVE_ORDER) { it.client.nom }

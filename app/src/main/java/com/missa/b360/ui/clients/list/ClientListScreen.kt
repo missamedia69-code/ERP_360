@@ -12,6 +12,15 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import com.missa.b360.core.domain.model.ClientAdvancedFilter
+import com.missa.b360.ui.clients.components.appeler
+import com.missa.b360.ui.clients.components.ouvrirWhatsApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +56,7 @@ fun ClientListScreen(
     viewModel: ClientListViewModel = hiltViewModel(),
 ) {
     val etat by viewModel.etat.collectAsState()
+    val contexte = LocalContext.current
     // `clients?create=true` (Accueil) ouvre la feuille de création une seule fois par entrée de pile.
     var creationConsommee by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(ouvrirCreation) {
@@ -65,6 +75,9 @@ fun ClientListScreen(
         onRequete = viewModel::changerRequete,
         onFiltre = viewModel::changerFiltre,
         onTri = viewModel::changerTri,
+        onAvance = viewModel::changerAvance,
+        onAppeler = { telephone -> contexte.appeler(telephone) },
+        onWhatsApp = { telephone -> contexte.ouvrirWhatsApp(telephone) },
         onReessayer = viewModel::reessayer,
     )
 }
@@ -81,8 +94,12 @@ internal fun ClientListContent(
     onRequete: (String) -> Unit,
     onFiltre: (com.missa.b360.core.domain.model.ClientListFilter) -> Unit,
     onTri: (com.missa.b360.core.domain.model.ClientListSort) -> Unit,
+    onAvance: (ClientAdvancedFilter) -> Unit,
+    onAppeler: (String) -> Unit,
+    onWhatsApp: (String) -> Unit,
     onReessayer: () -> Unit,
 ) {
+    var filtresOuverts by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         containerColor = MissaCanvas,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -118,12 +135,19 @@ internal fun ClientListContent(
             ) {
                 item { ClientListSummary(etat) }
                 item {
-                    MissaChampTexte(
-                        valeur = etat.requete,
-                        onValeur = onRequete,
-                        libelle = stringResource(R.string.clients_recherche),
-                        icone = Iv.Search,
-                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        MissaChampTexte(
+                            valeur = etat.requete,
+                            onValeur = onRequete,
+                            libelle = stringResource(R.string.clients_recherche),
+                            icone = Iv.Search,
+                            modifier = Modifier.weight(1f),
+                        )
+                        OutlinedButton(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 52.dp)) {
+                            val actifs = etat.avance.actifs
+                            Text(stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else "")
+                        }
+                    }
                 }
                 item { ClientFilterChips(etat, onFiltre) }
                 item { ClientSortChips(etat.tri, onTri) }
@@ -143,10 +167,19 @@ internal fun ClientListContent(
                         )
                     }
                     else -> items(etat.lignes, key = { it.client.id }) { ligne ->
-                        ClientListRow(ligne, etat.devise, onClick = { onOuvrirClient(ligne.client.id) })
+                        ClientSwipeRow(
+                            ligne = ligne,
+                            devise = etat.devise,
+                            onClick = { onOuvrirClient(ligne.client.id) },
+                            onAppeler = { onAppeler(ligne.client.telephone) },
+                            onWhatsApp = { onWhatsApp(ligne.client.telephone) },
+                        )
                     }
                 }
             }
         }
+    }
+    if (filtresOuverts) {
+        ClientFilterSheet(etat.avance, onAvance, onClose = { filtresOuverts = false })
     }
 }
