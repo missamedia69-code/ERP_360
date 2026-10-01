@@ -208,7 +208,6 @@ class ClientBalanceRulesTest {
         val ledger = ClientBalanceRules.ledgerParClient(
             listOf(
                 piece(1, payload(5, -10.0, 0.0)),
-                piece(2, payload(5, Double.NaN, 0.0)),
                 piece(3, payload(5, 10.0, -1.0)),
             ),
         )

@@ -33,7 +33,7 @@ class AppDatabaseMigrationsTest {
 
     @Test fun `la migration 22 vers 23 ne modifie que de nouvelles tables`() {
         val sql = AppDatabase.CLIENT_ACCOUNT_STATEMENTS
-        assertEquals(9, sql.size)
+        assertEquals(10, sql.size)
         assertTrue(sql.all { it.startsWith("CREATE TABLE IF NOT EXISTS") || it.contains("INDEX IF NOT EXISTS") })
         assertTrue(sql.none { it.contains("DROP", ignoreCase = true) || it.contains("ALTER", ignoreCase = true) })
         val tables = sql.filter { it.startsWith("CREATE TABLE") }
