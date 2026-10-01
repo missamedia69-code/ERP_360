@@ -1,7 +1,7 @@
 package com.missa.b360
 
 import com.missa.b360.core.domain.model.ClientFollowupRules
-import com.missa.b360.core.domain.model.FollowupStatus
+import com.missa.b360.core.data.entity.FollowupStatus
 import com.missa.b360.core.domain.model.PromiseCheck
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

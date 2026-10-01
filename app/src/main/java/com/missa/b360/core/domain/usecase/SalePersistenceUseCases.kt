@@ -55,6 +55,7 @@ class SaveSaleUseCase @Inject constructor(
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
     private val checkCreditLimit: CheckCreditLimitUseCase,
+    private val clientBalance: ClientBalanceUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -297,6 +298,9 @@ class SaveSaleUseCase @Inject constructor(
                     ),
                 )
             }
+
+            // Le compte client est écrit dans la même transaction que la pièce de vente.
+            if (payload.clientId > 0L) clientBalance.recalculer(payload.clientId, now)
 
             journalManager.log(
                 "VENTE",

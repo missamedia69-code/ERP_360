@@ -41,7 +41,7 @@ object ClientMetricsRules {
         var outstanding: Double,
     )
 
-    private fun valides(items: List<ClientLedgerItem>): List<ClientLedgerItem> = items.filter {
+    internal fun valides(items: List<ClientLedgerItem>): List<ClientLedgerItem> = items.filter {
         it.total.isFinite() && it.total >= 0.0 && it.paid.isFinite() && it.paid >= 0.0 &&
             it.paid <= it.total + EPSILON
     }

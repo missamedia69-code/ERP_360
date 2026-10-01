@@ -1,13 +1,6 @@
 package com.missa.b360.core.domain.model
 
-/** Nature d'une entrée du journal de suivi client (jamais supprimée). */
-enum class FollowupType { RELANCE, APPEL, PROMESSE, NOTE }
-
-/** Canal d'une relance ou d'un appel. */
-enum class FollowupChannel { WHATSAPP, SMS, APPEL, EMAIL, VISITE, AUTRE }
-
-/** Cycle d'une entrée de suivi ; `TENU`, `NON_TENU` et `CLOS` sont définitifs. */
-enum class FollowupStatus { OUVERT, TENU, NON_TENU, CLOS }
+import com.missa.b360.core.data.entity.FollowupStatus
 
 /** Résultat du contrôle d'une promesse de paiement saisie. */
 enum class PromiseCheck { VALIDE, MONTANT_INVALIDE, MONTANT_SUPERIEUR_ENCOURS, DATE_INVALIDE }

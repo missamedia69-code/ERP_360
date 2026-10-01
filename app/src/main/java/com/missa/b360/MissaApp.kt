@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.missa.b360.core.workers.ClientBalanceWorker
 import com.missa.b360.core.workers.JournalPurgeWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -31,6 +34,22 @@ class MissaApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         scheduleJournalPurge()
+        scheduleClientBalances()
+    }
+
+    /** Comptes clients : reconstruction au démarrage (après migration) puis rafraîchissement quotidien. */
+    private fun scheduleClientBalances() {
+        val workManager = WorkManager.getInstance(this)
+        workManager.enqueueUniqueWork(
+            ClientBalanceWorker.WORK_NAME_DEMARRAGE,
+            ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequestBuilder<ClientBalanceWorker>().build(),
+        )
+        workManager.enqueueUniquePeriodicWork(
+            ClientBalanceWorker.WORK_NAME_QUOTIDIEN,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<ClientBalanceWorker>(1, TimeUnit.DAYS).build(),
+        )
     }
 
     /** Purge automatique du journal : entrées de plus de 12 mois supprimées (RA-18). */

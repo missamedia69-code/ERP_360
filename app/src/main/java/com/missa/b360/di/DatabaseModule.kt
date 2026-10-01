@@ -5,7 +5,10 @@ import androidx.room.Room
 import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.AccountingDao
 import com.missa.b360.core.data.dao.BackupDao
+import com.missa.b360.core.data.dao.ClientBalanceDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.ClientFollowupDao
+import com.missa.b360.core.data.dao.ClientPaymentDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EquipementDao
 import com.missa.b360.core.data.dao.GroupeArticleDao
@@ -55,12 +58,13 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "missa_b360.db")
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4,
-                AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7,
-                AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9, AppDatabase.MIGRATION_9_10, AppDatabase.MIGRATION_10_11, AppDatabase.MIGRATION_11_12, AppDatabase.MIGRATION_12_13, AppDatabase.MIGRATION_13_14, AppDatabase.MIGRATION_14_15, AppDatabase.MIGRATION_15_16, AppDatabase.MIGRATION_16_17, AppDatabase.MIGRATION_17_18, AppDatabase.MIGRATION_18_19, AppDatabase.MIGRATION_19_20, AppDatabase.MIGRATION_20_21, AppDatabase.MIGRATION_21_22)
+            .addMigrations(*AppDatabase.ALL_MIGRATIONS)
             .build()
 
     @Provides fun provideSyncDao(db: AppDatabase): SyncDao = db.syncDao()
+    @Provides fun provideClientBalanceDao(db: AppDatabase): ClientBalanceDao = db.clientBalanceDao()
+    @Provides fun provideClientFollowupDao(db: AppDatabase): ClientFollowupDao = db.clientFollowupDao()
+    @Provides fun provideClientPaymentDao(db: AppDatabase): ClientPaymentDao = db.clientPaymentDao()
     @Provides fun provideGroupeArticleDao(db: AppDatabase): GroupeArticleDao = db.groupeArticleDao()
     @Provides fun provideNonConformiteDao(db: AppDatabase): NonConformiteDao = db.nonConformiteDao()
     @Provides fun provideEquipementDao(db: AppDatabase): EquipementDao = db.equipementDao()

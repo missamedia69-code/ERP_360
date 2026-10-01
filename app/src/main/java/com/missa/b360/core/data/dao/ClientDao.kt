@@ -33,6 +33,10 @@ interface ClientDao {
     @Query("SELECT * FROM clients WHERE id = :id")
     suspend fun getById(id: Long): ClientEntity?
 
+    /** Tous les clients, tous statuts : reconstruction des comptes. */
+    @Query("SELECT * FROM clients")
+    suspend fun getAll(): List<ClientEntity>
+
     @Query("SELECT * FROM clients WHERE code = :code LIMIT 1")
     suspend fun getByCode(code: String): ClientEntity?
 

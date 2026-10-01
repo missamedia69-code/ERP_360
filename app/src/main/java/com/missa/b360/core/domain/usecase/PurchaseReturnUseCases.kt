@@ -368,6 +368,7 @@ class ReturnSaleUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val clientBalance: ClientBalanceUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -464,6 +465,9 @@ class ReturnSaleUseCase @Inject constructor(
                     createdAt = now,
                 ),
             )
+
+            // L'avoir réduit l'encours : compte client mis à jour dans la même transaction.
+            if (original.clientId > 0L) clientBalance.recalculer(original.clientId, now)
 
             journalManager.log(
                 "VENTE",
