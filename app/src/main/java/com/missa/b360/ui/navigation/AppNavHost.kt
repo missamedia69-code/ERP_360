@@ -456,10 +456,11 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
         }
         // Vente
         composable(
-            route = "${AppModule.VENTE.route}?create={create}&overdue={overdue}",
+            route = "${AppModule.VENTE.route}?create={create}&overdue={overdue}&clientId={clientId}",
             arguments = listOf(
                 navArgument("create") { type = NavType.BoolType; defaultValue = false },
                 navArgument("overdue") { type = NavType.BoolType; defaultValue = false },
+                navArgument("clientId") { type = NavType.LongType; defaultValue = 0L },
             ),
         ) { entry ->
             GuardedModule(AppModule.VENTE, activation, navController) {
@@ -468,6 +469,7 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
                     onOpenClientCreate = { navController.navigate("${AppModule.CLIENTS.route}?create=true") },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                     openOverdue = entry.arguments?.getBoolean("overdue") == true,
+                    clientIdInitial = entry.arguments?.getLong("clientId") ?: 0L,
                 )
             }
         }

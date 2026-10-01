@@ -97,8 +97,12 @@ fun SalesScreen(
     onOpenClientCreate: () -> Unit = {},
     openCreate: Boolean = false,
     openOverdue: Boolean = false,
+    clientIdInitial: Long = 0L,
 ) {
     val vm: SalesViewModel = hiltViewModel()
+    LaunchedEffect(clientIdInitial) {
+        if (clientIdInitial > 0L) vm.preselectionnerClient(clientIdInitial)
+    }
     var ecran by remember { mutableStateOf(if (openCreate) EcranVente.FACTURE else EcranVente.LISTE) }
     val saveResult by vm.saveResult.collectAsStateWithLifecycle()
 

@@ -189,6 +189,14 @@ class SalesViewModel @Inject constructor(
         refreshClientPrices(client.id)
     }
 
+    /** Présélection depuis la fiche client (« Vendre ») : sans effet si le client n'est plus vendable. */
+    fun preselectionnerClient(clientId: Long) {
+        viewModelScope.launch {
+            val client = clients.first().firstOrNull { it.id == clientId } ?: return@launch
+            selectClient(client)
+        }
+    }
+
     /** Vente anonyme/comptoir : client temporaire, jamais inséré dans CLIENTS et sans crédit. */
     fun selectCashClient(displayName: String) {
         _uiState.value = _uiState.value.copy(

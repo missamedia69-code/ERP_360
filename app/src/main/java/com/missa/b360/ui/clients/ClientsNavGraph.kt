@@ -53,7 +53,7 @@ fun NavGraphBuilder.clientsGraph(
                 onModifier = { id -> navController.navigate(ClientRoutes.edition(id)) { launchSingleTop = true } },
                 onCompte = { id -> navController.navigate(ClientRoutes.compte(id)) },
                 onActivite = { id -> navController.navigate(ClientRoutes.activite(id)) },
-                onVendre = { navController.navigate("${AppModule.VENTE.route}?create=true") },
+                onVendre = { id -> navController.navigate("${AppModule.VENTE.route}?create=true&clientId=$id") },
             )
         }
     }
