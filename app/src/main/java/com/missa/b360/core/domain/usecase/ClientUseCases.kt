@@ -394,6 +394,55 @@ object ClientLifecycleRules {
             (!informationsFiscalesRequises(client.type) ||
                 (!client.nif.isNullOrBlank() && !client.adresse.isNullOrBlank()))
 
+    /**
+     * Table explicite des changements de statut autorisés (source unique, testée).
+     * `DESACTIVE` n'existe que pour lire d'anciens enregistrements : on peut en sortir, pas y entrer.
+     * `ARCHIVE` n'est jamais une suppression : on peut restaurer un client archivé en `INACTIF`.
+     */
+    val transitions: Map<ClientStatus, Set<ClientStatus>> = mapOf(
+        ClientStatus.BROUILLON to setOf(ClientStatus.A_COMPLETER, ClientStatus.ACTIF, ClientStatus.ARCHIVE),
+        ClientStatus.A_COMPLETER to setOf(ClientStatus.ACTIF, ClientStatus.INACTIF, ClientStatus.ARCHIVE),
+        ClientStatus.ACTIF to setOf(
+            ClientStatus.SOUS_SURVEILLANCE, ClientStatus.BLOQUE_CREDIT,
+            ClientStatus.BLOQUE_ADMINISTRATIF, ClientStatus.INACTIF,
+        ),
+        ClientStatus.SOUS_SURVEILLANCE to setOf(
+            ClientStatus.ACTIF, ClientStatus.BLOQUE_CREDIT,
+            ClientStatus.BLOQUE_ADMINISTRATIF, ClientStatus.INACTIF,
+        ),
+        ClientStatus.BLOQUE_CREDIT to setOf(
+            ClientStatus.ACTIF, ClientStatus.SOUS_SURVEILLANCE,
+            ClientStatus.BLOQUE_ADMINISTRATIF, ClientStatus.INACTIF,
+        ),
+        ClientStatus.BLOQUE_ADMINISTRATIF to setOf(
+            ClientStatus.ACTIF, ClientStatus.SOUS_SURVEILLANCE,
+            ClientStatus.BLOQUE_CREDIT, ClientStatus.INACTIF,
+        ),
+        ClientStatus.INACTIF to setOf(ClientStatus.ACTIF, ClientStatus.ARCHIVE),
+        ClientStatus.DESACTIVE to setOf(ClientStatus.ACTIF, ClientStatus.INACTIF, ClientStatus.ARCHIVE),
+        ClientStatus.ARCHIVE to setOf(ClientStatus.INACTIF),
+    )
+
+    fun transitionsDepuis(statut: ClientStatus): Set<ClientStatus> = transitions[statut].orEmpty()
+
+    /** Les passages vers un blocage, l'inactivité ou l'archive exigent une confirmation explicite. */
+    fun confirmationRequise(vers: ClientStatus): Boolean = vers in setOf(
+        ClientStatus.BLOQUE_CREDIT, ClientStatus.BLOQUE_ADMINISTRATIF,
+        ClientStatus.INACTIF, ClientStatus.ARCHIVE,
+    )
+
+    /**
+     * Le changement est-il permis pour ce client ? Table de transitions, puis conditions de fond :
+     * une réactivation depuis un état non opérationnel passe par [peutActiver].
+     */
+    fun peutTransiter(client: ClientEntity, vers: ClientStatus): Boolean {
+        if (vers !in transitionsDepuis(client.statut)) return false
+        val reactivation = vers == ClientStatus.ACTIF && client.statut in setOf(
+            ClientStatus.BROUILLON, ClientStatus.A_COMPLETER, ClientStatus.INACTIF, ClientStatus.DESACTIVE,
+        )
+        return !reactivation || peutActiver(client)
+    }
+
     /** Les brouillons et comptes bloqués crédit ne peuvent porter une créance. */
     fun venteAutorisee(client: ClientEntity, montant: Double, regle: Double): Boolean {
         if (!montant.isFinite() || montant <= 0.0 || !regle.isFinite() || regle < 0.0 || regle > montant + 1e-9) return false
