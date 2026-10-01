@@ -66,7 +66,7 @@ administration (licence, sauvegarde, journal, utilisateurs, à propos) et
 | Langage / build | Kotlin 2.3, AGP 9.4, Gradle 9.6 (Kotlin DSL, version catalog) |
 | Interface | Jetpack Compose, Material 3, navigation Compose |
 | Architecture | MVVM + Clean : `ui` → `domain/usecase` → `data` |
-| Persistance | Room 2.8 (KSP), base v22, 71 entités, migrations 1→22, schémas exportés dans `app/schemas` |
+| Persistance | Room 2.8 (KSP), base v23, 74 entités, migrations 1→23, schémas exportés dans `app/schemas` |
 | Réglages | DataStore |
 | Injection | Hilt |
 | Tâches de fond | WorkManager (purge du journal, sauvegarde locale quotidienne) |

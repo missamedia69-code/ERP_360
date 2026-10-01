@@ -57,8 +57,8 @@ app/src/main/java/com/missa/b360/
   `AchatCommandeRules`, `ProduitRules`) : sans Android, testées en JVM.
 - **Numérotation** : `SequenceManager.next(DocType.X)` — préfixes : `FA` facture vente,
   `FFR` facture fournisseur, `BC` bon de commande, `RE` réception, `FRN` fournisseur, etc.
-- **Room** : migrations SQL obligatoires dans `AppDatabase` (version courante **22**, chaîne
-  `MIGRATION_1_2` → `MIGRATION_21_22`, **71 entités**), enregistrées dans `di/DatabaseModule`.
+- **Room** : migrations SQL obligatoires dans `AppDatabase` (version courante **23**, chaîne
+  `MIGRATION_1_2` → `MIGRATION_22_23`, **74 entités**), enregistrées dans `di/DatabaseModule`.
   Les schémas exportés (`app/schemas/`) sont commités automatiquement par la CI après un build vert
   (versions 8–11 et 13–20 jamais exportées : perdues). `@Insert(onConflict = REPLACE)` — pas de `@Upsert`.
   Enums persistés en TEXT (Room ≥ 2.6, support natif). Les colonnes ajoutées par migration
@@ -66,6 +66,29 @@ app/src/main/java/com/missa/b360/
 - Les `StateFlow` exposés aux écrans passent par `stateIn(viewModelScope, WhileSubscribed(5s), …)`.
 - Pièces d'achat = `operation_records` (module `ACHATS`) avec payload JSON dans `notes`
   (`PurchaseRecordCodec`, `CommandeAchatCodec`, `ReceptionCodec`).
+
+## Module Clients
+
+- **Dossiers** `ui/clients/` : `list/`, `detail/`, `form/`, `account/`, `activity/`, `followups/`,
+  `csvimport/` (jamais `import` : mot-clé Kotlin), `components/`. Un écran = un `ViewModel` + un `UiState`
+  immuable ; aucun fichier > 400 lignes. Routes dans `ClientRoutes` (état de navigation dans la pile,
+  jamais dans une variable locale) ; `clients?create=true` reste l'entrée de l'Accueil.
+- **Règles pures** (`core/domain/model`) : `CreditPolicy` (risque NORMAL/ATTENTION/ELEVE/BLOQUE et verdict
+  `canSell` ALLOW/WARN/BLOCK avec motif), `AgedBalanceRules` (5 tranches), `ClientMetricsRules`,
+  `ClientLifecycleRules` (table de transitions de statut), `ClientFollowupRules`, `ClientBalanceRules`.
+  Le risque seul ne bloque jamais une vente ; un blocage est une action manuelle confirmée.
+- **Source unique des montants** : `client_balances`, recalculée dans la même transaction par
+  `ClientBalanceUseCase` à chaque vente, encaissement (`client_payments`), avoir ou annulation ;
+  `reconstruireTout()` et `ClientBalanceWorker` rattrapent les écarts. Liste, fiche, compte et Ventes lisent
+  cette table ; ne jamais recalculer un encours dans un écran.
+- **Jamais de suppression physique** : désactiver/archiver (statut). `client_followups` et `client_payments`
+  ne sont jamais supprimées ; une erreur d'encaissement se corrige par une contre-passation.
+- **Interface** : la couleur porte le risque mais toujours avec une icône (cadenas pour BLOQUE) ; cibles
+  ≥ 48 dp ; pas de tableau à défilement horizontal ; icônes `Iv` ; montants dans la devise de l'entreprise.
+- **Intégrations** : Ventes affiche `ClientCreditBanner` (risque + verdict) et lit l'encours de
+  `client_balances` ; notifications `CLIENT_PROMESSE` (→ relances) et `CLIENT_LIMITE` (→ liste) ; le rappel
+  « factures en retard » de l'Accueil ouvre `clients/relances` ; le catalogue expose « Relances clients » et
+  « Balance âgée ».
 
 ## Chaîne d'achat (modules Achats + Fournisseurs)
 
