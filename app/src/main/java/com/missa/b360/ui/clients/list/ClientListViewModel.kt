@@ -22,6 +22,7 @@ import com.missa.b360.core.domain.usecase.ObserveAllClientsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -87,7 +89,7 @@ class ClientListViewModel @Inject constructor(
 
     val etat: StateFlow<ClientListUiState> = combine(donnees, criteres, devise) { d, c, dev ->
         construire(d, c.requete, c.filtre, c.tri, c.avance, dev)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ClientListUiState())
+    }.flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ClientListUiState())
 
     init {
         viewModelScope.launch {
