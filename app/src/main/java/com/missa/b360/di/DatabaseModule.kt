@@ -79,6 +79,7 @@ object DatabaseModule {
     @Provides fun provideJournalDao(db: AppDatabase): JournalDao = db.journalDao()
     @Provides fun provideNotificationDao(db: AppDatabase): NotificationDao = db.notificationDao()
     @Provides fun provideClientDao(db: AppDatabase): ClientDao = db.clientDao()
+    @Provides fun provideClientRepository(clientDao: ClientDao): ClientRepository = ClientRepositoryImpl(clientDao)
     @Provides fun provideFournisseurDao(db: AppDatabase): FournisseurDao = db.fournisseurDao()
     @Provides fun provideFournisseurContactDao(db: AppDatabase): FournisseurContactDao =
         db.fournisseurContactDao()

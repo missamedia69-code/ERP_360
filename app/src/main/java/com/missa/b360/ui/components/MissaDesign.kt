@@ -66,6 +66,17 @@ object MissaLayout {
     val cardRadius = 14.dp
 }
 
+/** Espacements cohérents basés sur la grille 4 dp. */
+object Spacing {
+    val xxxSmall = 4.dp
+    val xxSmall = 8.dp
+    val xSmall = 12.dp
+    val small = 16.dp
+    val medium = 24.dp
+    val large = 32.dp
+    val xLarge = 48.dp
+}
+
 /** Petit logo de marque utilisable dans les en-têtes sans alourdir les écrans métier. */
 @Composable
 fun MissaBrandMark(
@@ -80,7 +91,7 @@ fun MissaBrandMark(
     ) {
         Image(
             painter = painterResource(R.drawable.logo_missa),
-            contentDescription = null,
+            contentDescription = stringResource(R.string.app_name),
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().clip(CircleShape),
         )
@@ -108,24 +119,21 @@ fun MissaTopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 MissaBrandMark(size = 40.dp)
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(Spacing.xxSmall))
                 Text(
                     text = title,
-                    color = MissaInk,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         },
         navigationIcon = {
             if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                IconButton(onClick = onBack, modifier = Modifier.size(Spacing.actionHeight)) {
                     Icon(
                         painter = painterResource(Iv.ArrowBack),
-                        contentDescription = null,
-                        tint = MissaInk,
+                        contentDescription = stringResource(R.string.back_button),
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -134,9 +142,9 @@ fun MissaTopAppBar(
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = couleurFond,
-            titleContentColor = MissaInk,
-            navigationIconContentColor = MissaInk,
-            actionIconContentColor = MissaInk,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
         ),
         windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
     )
@@ -152,13 +160,13 @@ fun MissaPanel(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(MissaLayout.cardRadius),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, accent?.copy(alpha = .30f) ?: MissaBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier.padding(Spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xSmall),
             content = content,
         )
     }
@@ -180,22 +188,21 @@ fun MissaSectionTitle(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
-                color = MissaInk,
-                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             subtitle?.takeIf { it.isNotBlank() }?.let {
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(Spacing.xxxSmall))
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MissaMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
         }
         trailing?.let {
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(Spacing.xxSmall))
             it()
         }
     }
@@ -212,30 +219,29 @@ fun MissaEmptyState(
 ) {
     MissaPanel(modifier = modifier, accent = MaterialTheme.colorScheme.primary) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.xxSmall),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(7.dp),
+            verticalArrangement = Arrangement.spacedBy(Spacing.xxSmall),
         ) {
             Surface(
-                modifier = Modifier.size(42.dp),
+                modifier = Modifier.size(Spacing.xLarge), // 42.dp -> 48.dp? Let's use xLarge (48.dp) for consistency
                 shape = CircleShape,
                 color = MissaSoftBlue,
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(21.dp))
+                    Icon(painterResource(icon), contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(Spacing.xLarge))
                 }
             }
             Text(
                 text = title,
-                color = MissaInk,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
             description?.takeIf { it.isNotBlank() }?.let {
                 Text(
                     text = it,
-                    color = MissaMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                 )
