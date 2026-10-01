@@ -89,6 +89,13 @@ object ClientBalanceRules {
         return items.mapIndexed { i, item -> if (i in concernees) item.copy(paid = paye[i]) else item }
     }
 
+    /** Factures encore ouvertes après imputation des encaissements et des avoirs (base du compte et des relances). */
+    fun facturesOuvertes(
+        items: List<ClientLedgerItem>,
+        paiements: List<ClientPaymentItem>,
+        paymentDays: Int,
+    ): List<ClientOpenInvoice> = ClientMetricsRules.openInvoices(appliquerPaiements(items, paiements), paymentDays)
+
     fun calculer(
         items: List<ClientLedgerItem>,
         paiements: List<ClientPaymentItem>,

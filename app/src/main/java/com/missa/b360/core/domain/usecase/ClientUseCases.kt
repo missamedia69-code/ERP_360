@@ -286,8 +286,13 @@ class CreateClientUseCase @Inject constructor(
         notes: String? = null,
         profile: ClientProfileInput = ClientProfileInput(),
         doublonConfirme: Boolean = false,
+        /** BROUILLON (fiche complète à activer) ou A_COMPLETER (création rapide nom + téléphone). */
+        statutInitial: ClientStatus = ClientStatus.BROUILLON,
         now: Long = System.currentTimeMillis(),
     ): Result {
+        if (statutInitial != ClientStatus.BROUILLON && statutInitial != ClientStatus.A_COMPLETER) {
+            return Result.DonneesInvalides
+        }
         val nomNormalise = ClientValidation.normaliseNom(nom)
         val telephoneNormalise = ClientValidation.normaliseTelephone(telephone)
         if (licenceManager.isReadOnly()) return Result.LicenceExpiree
@@ -350,7 +355,7 @@ class CreateClientUseCase @Inject constructor(
                 badgeId = badgeId,
                 notes = ClientValidation.normaliseTexte(notes),
                 // Création toujours non transactionnelle : l'activation est un acte séparé.
-                statut = ClientStatus.BROUILLON,
+                statut = statutInitial,
                 prospect = type == ClientType.PROSPECT,
                 createdAt = now,
                 active = false,

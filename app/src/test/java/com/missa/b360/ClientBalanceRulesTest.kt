@@ -213,4 +213,14 @@ class ClientBalanceRulesTest {
         )
         assertTrue(ledger.isEmpty())
     }
+
+    @Test fun `les factures ouvertes tiennent compte des paiements et des avoirs`() {
+        val ouvertes = ClientBalanceRules.facturesOuvertes(
+            listOf(facture(1, 100.0, 0.0, 60), facture(2, 100.0, 0.0, 10), avoir(3, 20.0, source = 2, joursAvant = 5)),
+            listOf(ClientPaymentItem(130.0)),
+            30,
+        )
+        assertEquals(listOf<Long?>(2L), ouvertes.map { it.recordId })
+        assertEquals(50.0, ouvertes.single().outstanding, 1e-9)
+    }
 }
