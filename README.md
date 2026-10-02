@@ -24,6 +24,10 @@ restent sur le téléphone : aucune connexion n'est nécessaire au quotidien.
 - **Sécurité locale** : code PIN (PBKDF2), déverrouillage biométrique, sauvegarde Google exclue,
   sauvegarde locale automatique.
 - **Documents professionnels** : génération et partage de PDF (factures, fiches).
+- **Clients et crédit** : liste (recherche, puces, filtres), fiche 360, compte avec balance âgée,
+  relances et promesses de paiement, import CSV, relevé PDF. Au comptoir, la vente affiche le risque du
+  client et un verdict de crédit (autoriser / avertir / bloquer). Les montants viennent d'une seule table
+  (`client_balances`), recalculée à chaque vente, encaissement ou avoir.
 
 ## Modules
 
