@@ -5,10 +5,11 @@ package com.missa.b360.ui.clients
  * navigation (retour système, rotation et restauration après arrêt du processus inclus), jamais
  * dans une variable locale.
  *
- * `clients?create=true` reste l'entrée de l'Accueil : elle ouvre la liste puis la feuille de création.
+ * `module_clients?create=true` reste l'entrée de l'Accueil : elle ouvre la liste puis la feuille de création.
  */
 object ClientRoutes {
-    const val RACINE = "clients"
+    /** Identique à `AppModule.CLIENTS.route` (barre de modules, Accueil, Ventes, notifications) : garde-fou `ClientRoutesTest`. */
+    const val RACINE = "module_clients"
     const val ARG_ID = "id"
     const val ARG_CREATE = "create"
 

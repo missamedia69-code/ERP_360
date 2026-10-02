@@ -56,7 +56,7 @@ fun MissaBarreModules(
     val racine = routeCourante?.substringBefore('?')
     val moduleCourant = when {
         racine == AppModule.STOCK.route || racine?.startsWith("stock") == true -> AppModule.STOCK
-        racine == AppModule.CLIENTS.route || racine?.startsWith("clients") == true -> AppModule.CLIENTS
+        racine == AppModule.CLIENTS.route || racine?.startsWith("module_clients") == true -> AppModule.CLIENTS
         else -> AppModule.entries.firstOrNull { it.route == racine }
     }
     val visibles = modules.take(AppModule.MAX_ONGLETS)

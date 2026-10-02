@@ -16,11 +16,11 @@ class ClientNotificationRoutesTest {
     }
 
     @Test fun `les routes du module Clients portent l identifiant`() {
-        assertEquals("clients/42", ClientRoutes.fiche(42))
-        assertEquals("clients/42/compte", ClientRoutes.compte(42))
-        assertEquals("clients/42/activite", ClientRoutes.activite(42))
-        assertEquals("clients/42/edit", ClientRoutes.edition(42))
-        assertEquals("clients/relances", ClientRoutes.RELANCES)
-        assertEquals("clients?create=true", ClientRoutes.liste(creer = true))
+        assertEquals("module_clients/42", ClientRoutes.fiche(42))
+        assertEquals("module_clients/42/compte", ClientRoutes.compte(42))
+        assertEquals("module_clients/42/activite", ClientRoutes.activite(42))
+        assertEquals("module_clients/42/edit", ClientRoutes.edition(42))
+        assertEquals("module_clients/relances", ClientRoutes.RELANCES)
+        assertEquals("module_clients?create=true", ClientRoutes.liste(creer = true))
     }
 }

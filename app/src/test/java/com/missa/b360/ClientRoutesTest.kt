@@ -7,27 +7,27 @@ import org.junit.Test
 
 class ClientRoutesTest {
     @Test fun `les routes du brief sont exposees`() {
-        assertEquals("clients", ClientRoutes.RACINE)
-        assertEquals("clients/{id}", ClientRoutes.FICHE)
-        assertEquals("clients/{id}/compte", ClientRoutes.COMPTE)
-        assertEquals("clients/{id}/activite", ClientRoutes.ACTIVITE)
-        assertEquals("clients/relances", ClientRoutes.RELANCES)
-        assertEquals("clients/import", ClientRoutes.IMPORT)
-        assertEquals("clients/new", ClientRoutes.NOUVEAU)
-        assertEquals("clients/{id}/edit", ClientRoutes.EDITION)
+        assertEquals("module_clients", ClientRoutes.RACINE)
+        assertEquals("module_clients/{id}", ClientRoutes.FICHE)
+        assertEquals("module_clients/{id}/compte", ClientRoutes.COMPTE)
+        assertEquals("module_clients/{id}/activite", ClientRoutes.ACTIVITE)
+        assertEquals("module_clients/relances", ClientRoutes.RELANCES)
+        assertEquals("module_clients/import", ClientRoutes.IMPORT)
+        assertEquals("module_clients/new", ClientRoutes.NOUVEAU)
+        assertEquals("module_clients/{id}/edit", ClientRoutes.EDITION)
     }
 
     @Test fun `la route historique de l accueil est conservee`() {
-        assertEquals("clients?create=true", ClientRoutes.liste(creer = true))
-        assertEquals("clients", ClientRoutes.liste())
-        assertEquals("clients?create={create}", ClientRoutes.LISTE)
+        assertEquals("module_clients?create=true", ClientRoutes.liste(creer = true))
+        assertEquals("module_clients", ClientRoutes.liste())
+        assertEquals("module_clients?create={create}", ClientRoutes.LISTE)
     }
 
     @Test fun `les routes avec identifiant sont construites sans accolade`() {
-        assertEquals("clients/42", ClientRoutes.fiche(42))
-        assertEquals("clients/42/compte", ClientRoutes.compte(42))
-        assertEquals("clients/42/activite", ClientRoutes.activite(42))
-        assertEquals("clients/42/edit", ClientRoutes.edition(42))
+        assertEquals("module_clients/42", ClientRoutes.fiche(42))
+        assertEquals("module_clients/42/compte", ClientRoutes.compte(42))
+        assertEquals("module_clients/42/activite", ClientRoutes.activite(42))
+        assertEquals("module_clients/42/edit", ClientRoutes.edition(42))
         listOf(ClientRoutes.fiche(1), ClientRoutes.compte(1), ClientRoutes.activite(1), ClientRoutes.edition(1))
             .forEach { assertTrue(it, !it.contains('{')) }
     }
