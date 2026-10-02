@@ -761,7 +761,7 @@ fun MissaFormSectionTitre(
     }
 }
 
-/** Section complète : titre numéroté + contenu espacé de 12 dp. */
+/** Section complète : carte grise numérotée de l'écran de référence (titre, pastille, champs blancs). */
 @Composable
 fun MissaFormSection(
     titre: String,
@@ -771,10 +771,14 @@ fun MissaFormSection(
     icone: Int? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MissaFormSectionTitre(titre = titre, numero = numero, sousTitre = sousTitre, icone = icone)
-        content()
-    }
+    MissaCarteSection(
+        titre = titre,
+        modifier = modifier,
+        numero = numero,
+        icone = icone,
+        sousTitre = sousTitre,
+        contenu = content,
+    )
 }
 
 /** Deux (ou trois) champs courts côte à côte ; les enfants prennent `Modifier.weight(1f)`. */
@@ -804,11 +808,11 @@ fun MissaBoutonPrincipal(
         colors = ButtonDefaults.buttonColors(
             containerColor = couleur,
             contentColor = contenu,
-            disabledContainerColor = Color(0xFFE3E8F1),
-            disabledContentColor = MissaMuted,
+            disabledContainerColor = couleur.copy(alpha = 0.35f),
+            disabledContentColor = contenu.copy(alpha = 0.9f),
         ),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-        modifier = modifier.heightIn(min = 44.dp),
+        modifier = modifier.heightIn(min = 48.dp),
     ) {
         if (enCours) {
             CircularProgressIndicator(color = contenu, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
@@ -876,7 +880,7 @@ fun MissaFormPied(
     secondaireActif: Boolean = true,
     erreur: String? = null,
 ) {
-    Surface(color = Color.White, shadowElevation = 10.dp, modifier = modifier) {
+    Surface(color = Color.White, shadowElevation = 4.dp, modifier = modifier) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             MissaFormErreur(erreur)
             if (secondaire != null) {

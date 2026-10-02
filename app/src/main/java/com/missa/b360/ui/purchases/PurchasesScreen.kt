@@ -1,5 +1,6 @@
 package com.missa.b360.ui.purchases
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -470,8 +471,7 @@ private fun CartePiece(
     }
     Surface(
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -679,8 +679,7 @@ private fun BlocCatalogue(
     filtres.take(30).forEach { produit ->
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
             modifier = Modifier.fillMaxWidth().clickable { onAjouter(produit) },
         ) {
             Row(
@@ -1057,7 +1056,7 @@ private fun VignettePieceJointe(path: String, onSupprimer: () -> Unit) {
     LaunchedEffect(path) {
         if (!PieceJointeAchat.estPdf(path)) bitmap = PieceJointeAchat.charger(path)
     }
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Row(Modifier.fillMaxWidth().padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (PieceJointeAchat.estPdf(path)) {
                 Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(24.dp))
@@ -1100,8 +1099,7 @@ private fun LignePanier(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1378,7 +1376,7 @@ private fun LigneCommande(
     onPrix: (Double) -> Unit,
     onSupprimer: () -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
@@ -1506,7 +1504,7 @@ private fun LigneReception(
     onToggle: () -> Unit,
     onMaj: (quantite: Double, lot: String, serie: String, peremption: Long?) -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -1686,7 +1684,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
                 }
             }
             items(top, key = { it.nom }) { ligne ->
-                Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
                     Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(ligne.nom, fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
                         Text(
@@ -1708,7 +1706,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
                 )
             }
             item {
-                Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
                     Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         mois.forEach { point ->
                             Row(verticalAlignment = Alignment.CenterVertically) {

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.admin
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -100,8 +101,7 @@ fun AdminReglagesScreen(
         // Profil actuel
         Card(
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = MissaSurface),
-            border = BorderStroke(1.dp, MissaBorder),
+            colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(10.dp)) {
@@ -166,8 +166,7 @@ fun AdminReglagesScreen(
         // Modules actifs compteur
         Card(
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            border = BorderStroke(1.dp, MissaBorder),
+            colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(10.dp)) {
@@ -220,8 +219,7 @@ fun AdminReglagesScreen(
         if (entreprise.charge) {
             Card(
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MissaSurface),
-                border = BorderStroke(1.dp, MissaBorder),
+                colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -265,8 +263,7 @@ private fun ActivationSectionModules(
     var expanded by remember { mutableStateOf(true) }
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(8.dp)) {

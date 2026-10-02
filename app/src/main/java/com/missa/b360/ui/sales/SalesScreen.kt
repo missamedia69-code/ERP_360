@@ -1,5 +1,6 @@
 package com.missa.b360.ui.sales
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -332,8 +333,7 @@ private fun CartePieceVente(
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -663,8 +663,7 @@ private fun BlocCatalogueVente(
     filtres.take(20).forEach { produit ->
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
             modifier = Modifier.fillMaxWidth().clickable { onAjouter(produit) },
         ) {
             Row(
@@ -695,8 +694,7 @@ private fun LignePanierVente(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

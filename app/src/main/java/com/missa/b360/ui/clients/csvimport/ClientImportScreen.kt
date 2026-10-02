@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.csvimport
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -161,8 +162,7 @@ fun ClientImportScreen(
 private fun Carte(contenu: @Composable () -> Unit) {
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { contenu() }
@@ -185,8 +185,7 @@ private fun Attente(message: String, avancement: Float?) {
 private fun LigneErreur(erreur: ClientImportIssue) {
     Card(
         shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(10.dp)) {

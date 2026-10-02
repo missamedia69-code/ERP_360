@@ -1,5 +1,6 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.runtime.setValue
 
 import androidx.compose.runtime.remember
@@ -278,8 +279,7 @@ fun StockAccueilScreen(onBack: () -> Unit, onNaviguer: (String) -> Unit = {}) {
                         onClick = { onNaviguer(Routes.stockListe(cat.type.name)) },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, MissaBorder),
+                        color = OnbConfigCard,
                     ) {
                         Column(modifier = Modifier.padding(7.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -466,8 +466,7 @@ private fun TuileCategorieMatrice(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(
             modifier = Modifier.padding(vertical = 6.dp, horizontal = 4.dp),

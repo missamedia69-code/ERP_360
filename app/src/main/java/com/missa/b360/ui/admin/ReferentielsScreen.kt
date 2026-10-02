@@ -1,5 +1,6 @@
 package com.missa.b360.ui.admin
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -269,8 +270,7 @@ private fun CarteReferentiel(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Row(
             Modifier.fillMaxWidth().padding(8.dp),

@@ -33,6 +33,7 @@ fun MissaCarteSection(
     modifier: Modifier = Modifier,
     numero: Int? = null,
     icone: Int? = null,
+    sousTitre: String? = null,
     etiquette: String? = null,
     etiquetteEnErreur: Boolean = false,
     contenu: @Composable ColumnScope.() -> Unit,
@@ -52,6 +53,7 @@ fun MissaCarteSection(
                 MissaFormSectionTitre(
                     titre = titre,
                     numero = numero,
+                    sousTitre = sousTitre,
                     icone = if (numero == null) icone else null,
                     modifier = Modifier.weight(1f),
                 )

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.account
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,8 +51,7 @@ internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
     val maximum = AgingBucket.entries.maxOf { balance.montant(it) }.takeIf { it > 0.0 } ?: 1.0
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -85,8 +85,7 @@ internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
 internal fun OpenInvoiceRow(facture: ClientOpenInvoiceLine, devise: String, onEncaisser: () -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

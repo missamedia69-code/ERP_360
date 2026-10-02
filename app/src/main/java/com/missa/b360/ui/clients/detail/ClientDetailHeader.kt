@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.detail
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,8 +49,7 @@ internal fun ClientDetailHeader(etat: ClientDetailUiState) {
     val risque = evaluation?.risque ?: RiskLevel.NORMAL
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -126,8 +126,7 @@ internal fun ClientDetailActions(
 private fun ActionClient(icone: Int, libelle: Int, onClick: () -> Unit, modifier: Modifier) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = modifier.heightIn(min = 64.dp).clickable(onClick = onClick),
     ) {
         Column(

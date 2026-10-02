@@ -1,5 +1,6 @@
 package com.missa.b360.ui.fournisseurs
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import android.graphics.Bitmap
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -411,8 +412,7 @@ private fun HubFournisseurs(
                 item {
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, MissaBorder),
+                        color = OnbConfigCard,
                     ) {
                         Column(Modifier.fillMaxWidth().padding(8.dp)) {
                             Text(
@@ -485,8 +485,7 @@ private fun IndicateurHub(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
         modifier = modifier.clickable(onClick = onClick),
     ) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -628,8 +627,7 @@ private fun CarteFournisseur(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
         modifier = Modifier.fillMaxWidth().clickable(onClick = onOuvrir),
     ) {
         Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -723,8 +721,7 @@ private fun FicheFournisseurEcran(
             item {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, MissaBorder),
+                    color = OnbConfigCard,
                 ) {
                     Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -829,8 +826,7 @@ private fun FicheFournisseurEcran(
             item {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, MissaBorder),
+                    color = OnbConfigCard,
                 ) {
                     Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         LigneInfo(stringResource(R.string.four_kpi_achats), fmtValeur(fiche.montantAchete, devise))
@@ -1209,8 +1205,7 @@ private fun SectionRepliable(
     var ouvert by remember { mutableStateOf(false) }
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(
@@ -1933,8 +1928,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeContacts(
         var principal by remember { mutableStateOf(true) }
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
         ) {
             Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (form.contacts.isEmpty()) {
@@ -2037,8 +2031,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeFiscalite(
     item {
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
         ) {
             Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 MissaInterrupteur(
@@ -2164,8 +2157,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeDocuments(
 
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
         ) {
             Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 if (form.documents.isEmpty()) {
@@ -2296,8 +2288,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.itemsEtapeValidation(
     item {
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
         ) {
             Column(Modifier.fillMaxWidth().padding(8.dp)) {
                 Text(

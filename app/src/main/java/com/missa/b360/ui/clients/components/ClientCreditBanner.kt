@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -79,7 +80,7 @@ internal fun ClientCreditBanner(
     val couleur = risque.couleur()
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         border = BorderStroke(1.dp, couleur),
         modifier = modifier.fillMaxWidth(),
     ) {

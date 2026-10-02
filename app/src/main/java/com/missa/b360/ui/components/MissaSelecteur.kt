@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
@@ -108,7 +109,7 @@ fun MissaSelecteurLigne(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = rayonCarte,
-        color = if (enabled) couleurCarte else MissaCanvas,
+        color = if (enabled) couleurCarte else OnbConfigCard,
         border = bordureCarte,
     ) {
     Row(

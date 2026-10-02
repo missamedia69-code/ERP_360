@@ -1,5 +1,6 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.navigation.AppModule
 
 import android.widget.Toast
@@ -759,8 +760,7 @@ private fun BadgeVerrouille(icone: Int, texte: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = MissaSurface,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 7.dp),

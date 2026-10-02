@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -73,8 +74,7 @@ internal fun FollowupStatus.couleur(): Color = when (this) {
 internal fun ClientFollowupRow(suivi: ClientFollowupEntity, devise: String, modifier: Modifier = Modifier) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {

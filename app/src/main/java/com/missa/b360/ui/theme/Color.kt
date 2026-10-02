@@ -33,7 +33,8 @@ val Red40 = Color(0xFFEC5A67)
 val Red80 = Color(0xFFFFE8EA)
 
 // Neutres de la direction artistique mobile : grand fond clair, cartes blanches, traits fins.
-val MissaCanvas = Color(0xFFF8F9FD)
+/** Fond des écrans : blanc, comme l'écran de référence « Informations sur votre entreprise ». */
+val MissaCanvas = Color(0xFFFFFFFF)
 val MissaSurface = Color(0xFFFFFFFF)
 val MissaSoftBlue = Color(0xFFF1F3F7)
 val MissaInk = Color(0xFF101C43)
