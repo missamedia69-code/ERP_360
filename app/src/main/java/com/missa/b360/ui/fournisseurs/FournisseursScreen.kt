@@ -341,7 +341,7 @@ private fun HubFournisseurs(
     val devise by vm.devise.collectAsStateWithLifecycle()
     var query by remember { mutableStateOf("") }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
+    Column(Modifier.fillMaxSize().background(Color.White)) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -524,7 +524,7 @@ private fun ListeFournisseurs(
     val recherche by vm.recherche.collectAsStateWithLifecycle()
     val devise by vm.devise.collectAsStateWithLifecycle()
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
+    Column(Modifier.fillMaxSize().background(Color.White)) {
         MissaTopAppBar(
             title = stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -699,7 +699,7 @@ private fun FicheFournisseurEcran(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
+    Column(Modifier.fillMaxSize().background(Color.White)) {
         MissaTopAppBar(
             title = fournisseur?.nom ?: stringResource(R.string.module_fournisseurs),
             onBack = onBack,
@@ -1707,7 +1707,7 @@ private fun FormulaireFournisseur(
     )
 
     MissaFormulaireTheme(CouleurFournisseurs) {
-    Column(Modifier.fillMaxSize().background(Color(0xFFFFF2E2))) {
+    Column(Modifier.fillMaxSize().background(Color.White)) {
         MissaTopAppBar(
             title = if (form.enEditionId == null) {
                 stringResource(R.string.four_nouveau)
@@ -1733,9 +1733,14 @@ private fun FormulaireFournisseur(
             Text("— ${titresEtapes[form.etape - 1]}", fontSize = 12.sp, color = MissaMuted)
         }
 
+        Surface(
+            color = com.missa.b360.ui.theme.OnbConfigCard,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
         LazyColumn(
-            Modifier.weight(1f),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+            Modifier.fillMaxSize(),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             form.erreur?.let { cle ->
@@ -1779,6 +1784,7 @@ private fun FormulaireFournisseur(
                 6 -> itemsEtapeDocuments(vm, form)
                 7 -> itemsEtapeValidation(vm, form, deviseEntreprise)
             }
+        }
         }
 
         // Barre de navigation du formulaire (pied du kit : bouton principal pleine largeur)

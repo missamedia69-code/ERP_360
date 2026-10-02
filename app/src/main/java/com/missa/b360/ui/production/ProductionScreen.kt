@@ -307,8 +307,8 @@ private fun FormulaireOrdreProduction(
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
             // ① Produit fini et quantité
-            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 1) }
             item {
+              MissaCarteSection(titre = stringResource(R.string.form_section_article), numero = 1) {
                 MissaRangee {
                     MissaChampListe(
                         libelle = stringResource(R.string.pro_produit_a_fabriquer),
@@ -332,57 +332,56 @@ private fun FormulaireOrdreProduction(
                         modifier = Modifier.weight(1f),
                     )
                 }
+              }
             }
 
             // ② Nomenclature (BOM)
             item {
+              MissaCarteSection(titre = stringResource(R.string.pro_titre_nomenclature), numero = 2) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    MissaFormSectionTitre(
-                        stringResource(R.string.pro_titre_nomenclature),
-                        numero = 2,
-                        modifier = Modifier.weight(1f),
-                    )
+                    Spacer(Modifier.weight(1f))
                     TextButton(onClick = { dialogueComposant = true }) {
                         Text("+ " + stringResource(R.string.pro_ajouter_composant), fontSize = 11.sp, color = VioletProduction)
                     }
                 }
-            }
 
-            if (ui.composants.isEmpty()) {
-                item {
+                if (ui.composants.isEmpty()) {
                     Text(
                         stringResource(R.string.pro_aucun_composant),
                         fontSize = 11.sp,
                         color = MissaMuted,
                         modifier = Modifier.padding(vertical = 6.dp),
                     )
-                }
-            } else {
-                items(ui.composants, key = { it.productId }) { comp ->
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = Color.White,
-                        border = BorderStroke(1.dp, MissaBorder),
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val available = composantsDispo.firstOrNull { it.product.id == comp.productId }?.total ?: 0.0
-                            Column(Modifier.weight(1f)) {
-                                Text(comp.nom, fontSize = 12.sp, color = MissaInk)
-                                Text(
-                                    stringResource(R.string.pro_disponibilite_ligne, fmtQuantite(comp.quantite), fmtQuantite(available)),
-                                    fontSize = 10.sp,
-                                    color = if (available >= comp.quantite) Color(0xFF15803D) else Color(0xFFB91C1C),
-                                )
-                            }
-                            IconButton(onClick = { vm.removeComposant(comp.productId) }) {
-                                Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                } else {
+                    ui.composants.forEach { comp ->
+                        androidx.compose.runtime.key(comp.productId) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color.White,
+                                border = BorderStroke(1.dp, MissaBorder),
+                            ) {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    val available = composantsDispo.firstOrNull { it.product.id == comp.productId }?.total ?: 0.0
+                                    Column(Modifier.weight(1f)) {
+                                        Text(comp.nom, fontSize = 12.sp, color = MissaInk)
+                                        Text(
+                                            stringResource(R.string.pro_disponibilite_ligne, fmtQuantite(comp.quantite), fmtQuantite(available)),
+                                            fontSize = 10.sp,
+                                            color = if (available >= comp.quantite) Color(0xFF15803D) else Color(0xFFB91C1C),
+                                        )
+                                    }
+                                    IconButton(onClick = { vm.removeComposant(comp.productId) }) {
+                                        Icon(painterResource(Iv.DeleteOutline), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                    }
+                                }
                             }
                         }
                     }
                 }
+              }
             }
 
             message?.let { msg ->

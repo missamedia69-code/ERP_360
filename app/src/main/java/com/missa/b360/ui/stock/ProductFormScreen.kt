@@ -272,321 +272,309 @@ fun ProductFormScreen(
             couleurFond = AppModule.STOCK.couleurPale,
         )
         Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-            Spacer(Modifier.height(6.dp))
             if (etape == 0) {
-                MissaFormSectionTitre(stringResource(R.string.st_type_article), numero = 1)
-                Spacer(Modifier.height(6.dp))
-                when {
-                    // Édition : le type est l'identité de l'article (sections, extension
-                    // équipement, listes) — il ne se change pas.
-                    productId != null && edit == null -> Unit // chargement en cours
-                    productId != null || initialType != null ->
-                        BadgeVerrouille(type.icone(), stringResource(type.libelleTypeRes()))
-                    else -> GrilleTypes(type) { choisirType(it) }
-                }
-                Spacer(Modifier.height(6.dp))
-                MissaFormSectionTitre(stringResource(R.string.st_image_article), numero = 2)
-                Spacer(Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Blue90),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        val image = apercu
-                        if (image != null && !supprimerImage) {
-                            Image(
-                                bitmap = image.asImageBitmap(),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        } else {
-                            Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(24.dp))
-                        }
+                MissaCarteSection(titre = stringResource(R.string.st_type_article), numero = 1) {
+                    when {
+                        // Édition : le type est l'identité de l'article (sections, extension
+                        // équipement, listes) — il ne se change pas.
+                        productId != null && edit == null -> Unit // chargement en cours
+                        productId != null || initialType != null ->
+                            BadgeVerrouille(type.icone(), stringResource(type.libelleTypeRes()))
+                        else -> GrilleTypes(type) { choisirType(it) }
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Column {
-                        Button(
-                            onClick = {
-                                pickImage.launch(
-                                    androidx.activity.result.PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly,
-                                    ),
-                                )
-                            },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                }
+                Spacer(Modifier.height(8.dp))
+                MissaCarteSection(titre = stringResource(R.string.st_image_article), numero = 2) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(60.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Blue90),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            Text(
-                                text = stringResource(
-                                    if (apercu != null || aUneImage) R.string.st_modifier_image else R.string.st_ajouter_image,
-                                ),
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            val image = apercu
+                            if (image != null && !supprimerImage) {
+                                Image(
+                                    bitmap = image.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            } else {
+                                Icon(painterResource(type.icone()), null, tint = MissaInk, modifier = Modifier.size(24.dp))
+                            }
                         }
-                        if ((apercu != null || aUneImage) && !supprimerImage) {
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                text = stringResource(R.string.st_supprimer_image),
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Red40,
-                                modifier = Modifier.clickable {
-                                    supprimerImage = true
-                                    imageUri = null
-                                    apercu = null
+                        Spacer(Modifier.width(8.dp))
+                        Column {
+                            Button(
+                                onClick = {
+                                    pickImage.launch(
+                                        androidx.activity.result.PickVisualMediaRequest(
+                                            ActivityResultContracts.PickVisualMedia.ImageOnly,
+                                        ),
+                                    )
                                 },
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.height(6.dp))
-                MissaFormSectionTitre(stringResource(R.string.st_infos_generales), numero = 3)
-                Spacer(Modifier.height(6.dp))
-                MissaRangee {
-                    Champ("${stringResource(R.string.st_nom_article)} *", nom, icone = Iv.Inventory2, modifier = Modifier.weight(1f)) { nom = it }
-                    Champ(stringResource(R.string.st_reference), reference, icone = Iv.Description, modifier = Modifier.weight(1f)) { reference = it }
-                }
-                Spacer(Modifier.height(6.dp))
-                Champ(stringResource(R.string.st_code_barres), barcode, icone = Iv.Description, clavier = MissaClavier.MOT_CLE) { barcode = it }
-                Spacer(Modifier.height(6.dp))
-                when {
-                    // Création déjà dans une catégorie utilisateur : pas de sélecteur.
-                    productId == null && initialCategorieId != null ->
-                        BadgeVerrouille(
-                            StockIv.Category,
-                            categories.firstOrNull { it.id == initialCategorieId }?.nom
-                                ?: stringResource(R.string.st_categorie),
-                        )
-                    else -> DropdownChamp(
-                        libelle = stringResource(R.string.st_categorie),
-                        options = categories.map { it.id to it.nom },
-                        selection = categorieId,
-                        onSelection = { categorieId = it },
-                        placeholder = stringResource(R.string.st_categorie),
-                        onNouveau = { dialogueNouvelleCategorie = true },
-                        nouveauLibelle = stringResource(R.string.st_nouvelle_categorie_rapide),
-                    )
-                }
-                if (productId == null && initialCategorieId == null && categories.isEmpty()) {
-                    Spacer(Modifier.height(6.dp))
-                    Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MissaSurface,
-                        border = BorderStroke(1.dp, MissaBorder),
-                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouvelleCategorie = true },
-                    ) {
-                        Row(Modifier.padding(7.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text(
-                                stringResource(R.string.st_creer_categorie_invite),
-                                fontSize = 11.sp,
-                                color = MissaInk,
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.height(6.dp))
-                MissaFormSectionTitre(stringResource(R.string.st_regles), numero = 4)
-                Spacer(Modifier.height(4.dp))
-                MissaRangee {
-                    Interrupteur(stringResource(R.string.st_vendable), vendable, modifier = Modifier.weight(1f)) { vendable = it }
-                    Interrupteur(stringResource(R.string.st_achetable), achetable, modifier = Modifier.weight(1f)) { achetable = it }
-                }
-                Interrupteur(stringResource(R.string.st_stockable), stockable) { stockable = it }
-                Spacer(Modifier.height(6.dp))
-                MissaRangee {
-                    Champ(stringResource(R.string.st_marque), marque, icone = Iv.Badge, modifier = Modifier.weight(1f)) { marque = it }
-                    Champ("${stringResource(R.string.st_unite)} *", unite, icone = Iv.Straighten, modifier = Modifier.weight(1f)) { unite = it }
-                }
-                if (TYPES_EQUIPEMENTS.contains(type)) {
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_modele), modele, icone = Iv.Category, modifier = Modifier.weight(1f)) { modele = it }
-                        Champ(stringResource(R.string.st_num_serie), numeroSerie, icone = Iv.Description, modifier = Modifier.weight(1f)) { numeroSerie = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        ChampDate(stringResource(R.string.st_date_acquisition), dateAcquisition, modifier = Modifier.weight(1f)) { dateAcquisition = it }
-                        Champ(stringResource(R.string.st_responsable), responsable, icone = Iv.Person, modifier = Modifier.weight(1f)) { responsable = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)}", garantieDebut, modifier = Modifier.weight(1f)) { garantieDebut = it }
-                        ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_fin)}", garantieFin, modifier = Modifier.weight(1f)) { garantieFin = it }
-                    }
-                }
-                if (type == ProductType.DECHET_VALORISABLE || type == ProductType.DECHET_NON_VALORISABLE) {
-                    Spacer(Modifier.height(6.dp))
-                    MissaFormSectionTitre(stringResource(R.string.st_donnees_dechet), numero = 5)
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_type_dechet), dType, icone = Iv.Category, modifier = Modifier.weight(1f)) { dType = it }
-                        Champ(stringResource(R.string.st_code_dechet), dCode, icone = Iv.Description, modifier = Modifier.weight(1f)) { dCode = it }
-                    }
-                    Interrupteur(stringResource(R.string.st_dangereux), dDangereux) { dDangereux = it }
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_origine_dechet), dOrigine, icone = Iv.Place, modifier = Modifier.weight(1f)) { dOrigine = it }
-                        Champ(stringResource(R.string.st_zone_stockage), dZone, icone = Iv.Warehouse, modifier = Modifier.weight(1f)) { dZone = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    if (type == ProductType.DECHET_NON_VALORISABLE) {
-                        MissaRangee {
-                            Champ(stringResource(R.string.st_mode_elimination), dMode, icone = Iv.Build, modifier = Modifier.weight(1f)) { dMode = it }
-                            Champ(stringResource(R.string.st_cout_elimination), dCout, icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { dCout = it }
-                        }
-                    } else {
-                        Champ(stringResource(R.string.st_filiere_recyclage), dFiliere, icone = Iv.SwapHoriz) { dFiliere = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Champ(stringResource(R.string.st_prestataire), dPrestataire, icone = Iv.Handshake) { dPrestataire = it }
-                }
-                if (type == ProductType.EMBALLAGE) {
-                    Spacer(Modifier.height(6.dp))
-                    MissaFormSectionTitre(stringResource(R.string.st_donnees_emballage), numero = 5)
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_type_emballage), eType, icone = Iv.Category, modifier = Modifier.weight(1f)) { eType = it }
-                        Champ(stringResource(R.string.st_matiere), eMatiere, icone = Iv.Category, modifier = Modifier.weight(1f)) { eMatiere = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_dimensions), eDims, icone = Iv.Straighten, modifier = Modifier.weight(1f)) { eDims = it }
-                        Champ(stringResource(R.string.st_poids_kg), ePoids, icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { ePoids = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Champ(stringResource(R.string.st_capacite), eCap, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL) { eCap = it }
-                    MissaRangee {
-                        Interrupteur(stringResource(R.string.st_reutilisable), eReutil, modifier = Modifier.weight(1f)) { eReutil = it }
-                        Interrupteur(stringResource(R.string.st_consigne), eConsigne, modifier = Modifier.weight(1f)) { eConsigne = it }
-                    }
-                    if (eReutil) {
-                        Champ(stringResource(R.string.st_reutilisations_max), eMax, icone = Iv.Calculator, clavier = MissaClavier.ENTIER) { eMax = it }
-                        Spacer(Modifier.height(6.dp))
-                    }
-                }
-                if (type == ProductType.CONSIGNATION) {
-                    Spacer(Modifier.height(6.dp))
-                    MissaFormSectionTitre(stringResource(R.string.st_donnees_consignation), numero = 5)
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_proprietaire), cProprio, icone = Iv.Person, modifier = Modifier.weight(1f)) { cProprio = it }
-                        Champ(stringResource(R.string.st_ref_contrat), cRef, icone = Iv.Description, modifier = Modifier.weight(1f)) { cRef = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    MissaRangee {
-                        ChampDate(stringResource(R.string.st_debut), cDebut, modifier = Modifier.weight(1f)) { cDebut = it }
-                        ChampDate(stringResource(R.string.st_fin), cFin, modifier = Modifier.weight(1f)) { cFin = it }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Champ(stringResource(R.string.st_conditions_retour), cConditions, icone = Iv.Description) { cConditions = it }
-                }
-                if (type == ProductType.KIT) {
-                    Spacer(Modifier.height(6.dp))
-                    MissaFormSectionTitre(stringResource(R.string.st_donnees_kit), numero = 5)
-                    Spacer(Modifier.height(6.dp))
-                    Text(stringResource(R.string.st_methode_stock), fontSize = 11.sp, color = MissaMuted)
-                    Spacer(Modifier.height(6.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        StockChip(stringResource(R.string.st_kit_virtuel), actif = kMethode == "VIRTUEL") { kMethode = "VIRTUEL" }
-                        StockChip(stringResource(R.string.st_kit_assemble), actif = kMethode == "ASSEMBLE") { kMethode = "ASSEMBLE" }
-                    }
-                    Spacer(Modifier.height(6.dp))
-                    Text(stringResource(R.string.st_composants), fontSize = 11.sp, color = MissaMuted)
-                    Spacer(Modifier.height(6.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        DropdownChamp(
-                            libelle = stringResource(R.string.st_composants),
-                            icone = Iv.Inventory2,
-                            options = produitsVm.filter { it.id != (productId ?: 0L) }.map { it.id to it.nom },
-                            selection = kSelection,
-                            onSelection = { kSelection = it },
-                            modifier = Modifier.weight(1f),
-                        )
-                        MissaChampTexte(
-                            valeur = kQuantite,
-                            onValeur = { kQuantite = it },
-                            libelle = stringResource(R.string.st_quantite),
-                            modifier = Modifier.width(96.dp),
-                            clavier = MissaClavier.DECIMAL,
-                        )
-                        Button(
-                            onClick = {
-                                val sel = kSelection ?: return@Button
-                                val q = kQuantite.toDoubleOrNull() ?: return@Button
-                                if (q <= 0) return@Button
-                                kComposants = kComposants.filterNot { it.composantId == sel } +
-                                    com.missa.b360.core.data.entity.KitComposantEntity(kitId = 0L, composantId = sel, quantite = q)
-                                kSelection = null
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
-                        ) { Text("+", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
-                    }
-                    kComposants.forEach { c ->
-                        Spacer(Modifier.height(6.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = produitsVm.firstOrNull { it.id == c.composantId }?.nom ?: "#${c.composantId}",
-                                fontSize = 11.5.sp,
-                                color = MissaInk,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Text(fmtQuantite(c.quantite), fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                            IconButton(onClick = { kComposants = kComposants.filterNot { it.composantId == c.composantId } }, modifier = Modifier.size(30.dp)) {
-                                Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(14.dp))
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(
+                                        if (apercu != null || aUneImage) R.string.st_modifier_image else R.string.st_ajouter_image,
+                                    ),
+                                    fontSize = 11.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            if ((apercu != null || aUneImage) && !supprimerImage) {
+                                Spacer(Modifier.height(6.dp))
+                                Text(
+                                    text = stringResource(R.string.st_supprimer_image),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Red40,
+                                    modifier = Modifier.clickable {
+                                        supprimerImage = true
+                                        imageUri = null
+                                        apercu = null
+                                    },
+                                )
                             }
                         }
                     }
                 }
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
+                MissaCarteSection(titre = stringResource(R.string.st_infos_generales), numero = 3) {
+                    MissaRangee {
+                        Champ("${stringResource(R.string.st_nom_article)} *", nom, icone = Iv.Inventory2, modifier = Modifier.weight(1f)) { nom = it }
+                        Champ(stringResource(R.string.st_reference), reference, icone = Iv.Description, modifier = Modifier.weight(1f)) { reference = it }
+                    }
+                    Champ(stringResource(R.string.st_code_barres), barcode, icone = Iv.Description, clavier = MissaClavier.MOT_CLE) { barcode = it }
+                    when {
+                        // Création déjà dans une catégorie utilisateur : pas de sélecteur.
+                        productId == null && initialCategorieId != null ->
+                            BadgeVerrouille(
+                                StockIv.Category,
+                                categories.firstOrNull { it.id == initialCategorieId }?.nom
+                                    ?: stringResource(R.string.st_categorie),
+                            )
+                        else -> DropdownChamp(
+                            libelle = stringResource(R.string.st_categorie),
+                            options = categories.map { it.id to it.nom },
+                            selection = categorieId,
+                            onSelection = { categorieId = it },
+                            placeholder = stringResource(R.string.st_categorie),
+                            onNouveau = { dialogueNouvelleCategorie = true },
+                            nouveauLibelle = stringResource(R.string.st_nouvelle_categorie_rapide),
+                        )
+                    }
+                    if (productId == null && initialCategorieId == null && categories.isEmpty()) {
+                        Spacer(Modifier.height(6.dp))
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = MissaSurface,
+                            border = BorderStroke(1.dp, MissaBorder),
+                            modifier = Modifier.fillMaxWidth().clickable { dialogueNouvelleCategorie = true },
+                        ) {
+                            Row(Modifier.padding(7.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(
+                                    stringResource(R.string.st_creer_categorie_invite),
+                                    fontSize = 11.sp,
+                                    color = MissaInk,
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                MissaCarteSection(titre = stringResource(R.string.st_regles), numero = 4) {
+                    MissaRangee {
+                        Interrupteur(stringResource(R.string.st_vendable), vendable, modifier = Modifier.weight(1f)) { vendable = it }
+                        Interrupteur(stringResource(R.string.st_achetable), achetable, modifier = Modifier.weight(1f)) { achetable = it }
+                    }
+                    Interrupteur(stringResource(R.string.st_stockable), stockable) { stockable = it }
+                    MissaRangee {
+                        Champ(stringResource(R.string.st_marque), marque, icone = Iv.Badge, modifier = Modifier.weight(1f)) { marque = it }
+                        Champ("${stringResource(R.string.st_unite)} *", unite, icone = Iv.Straighten, modifier = Modifier.weight(1f)) { unite = it }
+                    }
+                    if (TYPES_EQUIPEMENTS.contains(type)) {
+                        Spacer(Modifier.height(6.dp))
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_modele), modele, icone = Iv.Category, modifier = Modifier.weight(1f)) { modele = it }
+                            Champ(stringResource(R.string.st_num_serie), numeroSerie, icone = Iv.Description, modifier = Modifier.weight(1f)) { numeroSerie = it }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        MissaRangee {
+                            ChampDate(stringResource(R.string.st_date_acquisition), dateAcquisition, modifier = Modifier.weight(1f)) { dateAcquisition = it }
+                            Champ(stringResource(R.string.st_responsable), responsable, icone = Iv.Person, modifier = Modifier.weight(1f)) { responsable = it }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        MissaRangee {
+                            ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_debut)}", garantieDebut, modifier = Modifier.weight(1f)) { garantieDebut = it }
+                            ChampDate("${stringResource(R.string.st_garantie)} — ${stringResource(R.string.st_fin)}", garantieFin, modifier = Modifier.weight(1f)) { garantieFin = it }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                if (type == ProductType.DECHET_VALORISABLE || type == ProductType.DECHET_NON_VALORISABLE) {
+                    MissaCarteSection(titre = stringResource(R.string.st_donnees_dechet), numero = 5) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_type_dechet), dType, icone = Iv.Category, modifier = Modifier.weight(1f)) { dType = it }
+                            Champ(stringResource(R.string.st_code_dechet), dCode, icone = Iv.Description, modifier = Modifier.weight(1f)) { dCode = it }
+                        }
+                        Interrupteur(stringResource(R.string.st_dangereux), dDangereux) { dDangereux = it }
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_origine_dechet), dOrigine, icone = Iv.Place, modifier = Modifier.weight(1f)) { dOrigine = it }
+                            Champ(stringResource(R.string.st_zone_stockage), dZone, icone = Iv.Warehouse, modifier = Modifier.weight(1f)) { dZone = it }
+                        }
+                        if (type == ProductType.DECHET_NON_VALORISABLE) {
+                            MissaRangee {
+                                Champ(stringResource(R.string.st_mode_elimination), dMode, icone = Iv.Build, modifier = Modifier.weight(1f)) { dMode = it }
+                                Champ(stringResource(R.string.st_cout_elimination), dCout, icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { dCout = it }
+                            }
+                        } else {
+                            Champ(stringResource(R.string.st_filiere_recyclage), dFiliere, icone = Iv.SwapHoriz) { dFiliere = it }
+                        }
+                        Champ(stringResource(R.string.st_prestataire), dPrestataire, icone = Iv.Handshake) { dPrestataire = it }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                if (type == ProductType.EMBALLAGE) {
+                    MissaCarteSection(titre = stringResource(R.string.st_donnees_emballage), numero = 5) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_type_emballage), eType, icone = Iv.Category, modifier = Modifier.weight(1f)) { eType = it }
+                            Champ(stringResource(R.string.st_matiere), eMatiere, icone = Iv.Category, modifier = Modifier.weight(1f)) { eMatiere = it }
+                        }
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_dimensions), eDims, icone = Iv.Straighten, modifier = Modifier.weight(1f)) { eDims = it }
+                            Champ(stringResource(R.string.st_poids_kg), ePoids, icone = Iv.Calculator, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { ePoids = it }
+                        }
+                        Champ(stringResource(R.string.st_capacite), eCap, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL) { eCap = it }
+                        MissaRangee {
+                            Interrupteur(stringResource(R.string.st_reutilisable), eReutil, modifier = Modifier.weight(1f)) { eReutil = it }
+                            Interrupteur(stringResource(R.string.st_consigne), eConsigne, modifier = Modifier.weight(1f)) { eConsigne = it }
+                        }
+                        if (eReutil) {
+                            Champ(stringResource(R.string.st_reutilisations_max), eMax, icone = Iv.Calculator, clavier = MissaClavier.ENTIER) { eMax = it }
+                            Spacer(Modifier.height(6.dp))
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                if (type == ProductType.CONSIGNATION) {
+                    MissaCarteSection(titre = stringResource(R.string.st_donnees_consignation), numero = 5) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_proprietaire), cProprio, icone = Iv.Person, modifier = Modifier.weight(1f)) { cProprio = it }
+                            Champ(stringResource(R.string.st_ref_contrat), cRef, icone = Iv.Description, modifier = Modifier.weight(1f)) { cRef = it }
+                        }
+                        MissaRangee {
+                            ChampDate(stringResource(R.string.st_debut), cDebut, modifier = Modifier.weight(1f)) { cDebut = it }
+                            ChampDate(stringResource(R.string.st_fin), cFin, modifier = Modifier.weight(1f)) { cFin = it }
+                        }
+                        Champ(stringResource(R.string.st_conditions_retour), cConditions, icone = Iv.Description) { cConditions = it }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+                if (type == ProductType.KIT) {
+                    MissaCarteSection(titre = stringResource(R.string.st_donnees_kit), numero = 5) {
+                        Text(stringResource(R.string.st_methode_stock), fontSize = 11.sp, color = MissaMuted)
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            StockChip(stringResource(R.string.st_kit_virtuel), actif = kMethode == "VIRTUEL") { kMethode = "VIRTUEL" }
+                            StockChip(stringResource(R.string.st_kit_assemble), actif = kMethode == "ASSEMBLE") { kMethode = "ASSEMBLE" }
+                        }
+                        Text(stringResource(R.string.st_composants), fontSize = 11.sp, color = MissaMuted)
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            DropdownChamp(
+                                libelle = stringResource(R.string.st_composants),
+                                icone = Iv.Inventory2,
+                                options = produitsVm.filter { it.id != (productId ?: 0L) }.map { it.id to it.nom },
+                                selection = kSelection,
+                                onSelection = { kSelection = it },
+                                modifier = Modifier.weight(1f),
+                            )
+                            MissaChampTexte(
+                                valeur = kQuantite,
+                                onValeur = { kQuantite = it },
+                                libelle = stringResource(R.string.st_quantite),
+                                modifier = Modifier.width(96.dp),
+                                clavier = MissaClavier.DECIMAL,
+                            )
+                            Button(
+                                onClick = {
+                                    val sel = kSelection ?: return@Button
+                                    val q = kQuantite.toDoubleOrNull() ?: return@Button
+                                    if (q <= 0) return@Button
+                                    kComposants = kComposants.filterNot { it.composantId == sel } +
+                                        com.missa.b360.core.data.entity.KitComposantEntity(kitId = 0L, composantId = sel, quantite = q)
+                                    kSelection = null
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = BrandBlue),
+                            ) { Text("+", fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                        }
+                        kComposants.forEach { c ->
+                            Spacer(Modifier.height(6.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = produitsVm.firstOrNull { it.id == c.composantId }?.nom ?: "#${c.composantId}",
+                                    fontSize = 11.5.sp,
+                                    color = MissaInk,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                Text(fmtQuantite(c.quantite), fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                                IconButton(onClick = { kComposants = kComposants.filterNot { it.composantId == c.composantId } }, modifier = Modifier.size(30.dp)) {
+                                    Icon(painterResource(StockIv.Trash), null, tint = MissaInk, modifier = Modifier.size(14.dp))
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
                 MissaBoutonPrincipal(
                     texte = "${stringResource(R.string.st_suivant)} →",
                     enabled = nom.isNotBlank() && unite.isNotBlank(),
                     onClick = { etape = 1 },
                 )
             } else {
-                MissaFormSectionTitre(stringResource(R.string.st_prix_seuils), numero = 1)
-                Spacer(Modifier.height(6.dp))
-                if (achetable) {
-                    Champ(stringResource(R.string.st_prix_achat), prixAchat, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { prixAchat = it }
-                    Spacer(Modifier.height(6.dp))
-                }
-                if (vendable) {
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_prix_vente), prixVente, icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { prixVente = it }
-                        Champ(stringResource(R.string.st_remise_max), remiseMax, icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", modifier = Modifier.weight(1f)) { remiseMax = it }
+                MissaCarteSection(titre = stringResource(R.string.st_prix_seuils), numero = 1) {
+                    if (achetable) {
+                        Champ(stringResource(R.string.st_prix_achat), prixAchat, icone = Iv.Payments, clavier = MissaClavier.DECIMAL) { prixAchat = it }
+                        Spacer(Modifier.height(6.dp))
                     }
-                    Spacer(Modifier.height(6.dp))
-                }
-                if (stockable) {
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_minimum), stockMin, icone = Iv.TrendingDown, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockMin = it }
-                        Champ(stringResource(R.string.st_maximum), stockMax, icone = Iv.TrendingUp, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockMax = it }
+                    if (vendable) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_prix_vente), prixVente, icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { prixVente = it }
+                            Champ(stringResource(R.string.st_remise_max), remiseMax, icone = Iv.Percent, clavier = MissaClavier.DECIMAL, suffixe = "%", modifier = Modifier.weight(1f)) { remiseMax = it }
+                        }
+                        Spacer(Modifier.height(6.dp))
                     }
-                    Spacer(Modifier.height(6.dp))
-                    Champ(stringResource(R.string.st_securite), stockSecurite, icone = Iv.Warning, clavier = MissaClavier.DECIMAL) { stockSecurite = it }
-                    Spacer(Modifier.height(6.dp))
-                }
-                if (productId == null && stockable) {
-                    MissaRangee {
-                        Champ(stringResource(R.string.st_stock_initial), stockInitial, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockInitial = it }
-                        DropdownChamp(
-                            libelle = stringResource(R.string.st_site_depot),
-                            icone = Iv.Warehouse,
-                            options = sites.map { it.id to it.nom },
-                            selection = siteId,
-                            onSelection = { siteId = it },
-                            modifier = Modifier.weight(1f),
-                        )
+                    if (stockable) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_minimum), stockMin, icone = Iv.TrendingDown, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockMin = it }
+                            Champ(stringResource(R.string.st_maximum), stockMax, icone = Iv.TrendingUp, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockMax = it }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Champ(stringResource(R.string.st_securite), stockSecurite, icone = Iv.Warning, clavier = MissaClavier.DECIMAL) { stockSecurite = it }
+                        Spacer(Modifier.height(6.dp))
                     }
-                    Spacer(Modifier.height(6.dp))
+                    if (productId == null && stockable) {
+                        MissaRangee {
+                            Champ(stringResource(R.string.st_stock_initial), stockInitial, icone = Iv.Inventory2, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f)) { stockInitial = it }
+                            DropdownChamp(
+                                libelle = stringResource(R.string.st_site_depot),
+                                icone = Iv.Warehouse,
+                                options = sites.map { it.id to it.nom },
+                                selection = siteId,
+                                onSelection = { siteId = it },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        Spacer(Modifier.height(6.dp))
+                    }
                 }
+                Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     MissaBoutonSecondaire(
                         texte = "← ${stringResource(R.string.st_retour)}",
@@ -694,7 +682,6 @@ fun ProductFormScreen(
                     )
                 }
             }
-            Spacer(Modifier.height(14.dp))
         }
     }
     }

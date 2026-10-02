@@ -1,5 +1,6 @@
 package com.missa.b360.ui.sales
 
+import com.missa.b360.ui.components.MissaCarteSection
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -421,116 +422,123 @@ private fun FormulaireVente(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
-            item { MissaFormSectionTitre(stringResource(R.string.form_client), numero = 1) }
             item {
-                SelecteurClient(
-                    selectedClient = ui.selectedClient,
-                    clients = clients,
-                    onSelect = vm::selectClient,
-                    onOpenClientCreate = { dialogueNouveauClient = true },
-                    onSelectCashCustomer = { vm.selectCashClient(context.getString(R.string.sales_cash_customer)) },
-                )
-            }
-            val clientChoisi = ui.selectedClient
-            if (clientChoisi != null && clientChoisi.id > 0L) {
-                item {
-                    com.missa.b360.ui.clients.components.ClientCreditBanner(
-                        client = clientChoisi,
-                        balance = soldeClient,
-                        montantVente = totals.total,
-                        montantRegle = (ui.paidInput.toMoneyOrNull() ?: totals.total).coerceIn(0.0, totals.total),
-                        devise = devise.orEmpty(),
+                MissaCarteSection(titre = stringResource(R.string.form_client), numero = 1) {
+                    SelecteurClient(
+                        selectedClient = ui.selectedClient,
+                        clients = clients,
+                        onSelect = vm::selectClient,
+                        onOpenClientCreate = { dialogueNouveauClient = true },
+                        onSelectCashCustomer = { vm.selectCashClient(context.getString(R.string.sales_cash_customer)) },
                     )
-                }
-            }
-            if (clients.isEmpty()) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = BleuVente.copy(alpha = 0.26f),
-                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauClient = true },
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+
+                    val clientChoisi = ui.selectedClient
+                    if (clientChoisi != null && clientChoisi.id > 0L) {
+                        com.missa.b360.ui.clients.components.ClientCreditBanner(
+                            client = clientChoisi,
+                            balance = soldeClient,
+                            montantVente = totals.total,
+                            montantRegle = (ui.paidInput.toMoneyOrNull() ?: totals.total).coerceIn(0.0, totals.total),
+                            devise = devise.orEmpty(),
+                        )
+
+                    }
+                    if (clients.isEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = BleuVente.copy(alpha = 0.26f),
+                            modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauClient = true },
                         ) {
-                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.sales_aucun_client),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    color = MissaInk,
-                                )
-                                Text(
-                                    stringResource(R.string.sales_creer_client_invite),
-                                    fontSize = 10.sp,
-                                    color = MissaInk.copy(alpha = 0.8f),
-                                )
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        stringResource(R.string.sales_aucun_client),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = MissaInk,
+                                    )
+                                    Text(
+                                        stringResource(R.string.sales_creer_client_invite),
+                                        fontSize = 10.sp,
+                                        color = MissaInk.copy(alpha = 0.8f),
+                                    )
+                                }
+                                Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                             }
-                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                         }
+
                     }
                 }
             }
-            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
             item {
-                BlocCatalogueVente(
-                    produits = produits,
-                    devise = devise,
-                    onAjouter = vm::addCatalogProduct,
-                )
-            }
-            if (ui.lines.isNotEmpty()) {
-                item {
-                    Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                }
-            }
-            items(ui.lines, key = { "ligne-${it.id}" }) { ligne ->
-                LignePanierVente(
-                    ligne = ligne,
-                    devise = devise,
-                    onQuantite = { delta -> vm.changeQuantity(ligne.id, delta) },
-                    onPrix = { p -> vm.updateLine(ligne.id, ligne.quantity, p) },
-                    onSupprimer = { vm.removeLine(ligne.id) },
-                )
-            }
-            if (ui.lines.isNotEmpty()) {
-                item {
-                    Surface(shape = RoundedCornerShape(12.dp), color = BleuVente.copy(alpha = 0.12f)) {
-                        Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(stringResource(R.string.sales_subtotal), fontSize = 11.sp, color = MissaMuted)
-                                Text(fmtValeur(totals.subtotal, devise), fontSize = 12.sp, color = MissaInk)
-                            }
-                            if (totals.discount > 0.0) {
-                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(stringResource(R.string.sales_client_discount), fontSize = 12.sp, color = MissaMuted)
-                                    Text("−${fmtValeur(totals.discount, devise)}", fontSize = 12.sp, color = Color(0xFF15803D))
-                                }
-                            }
-                            if (totals.taxAmount > 0.0) {
-                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Text(stringResource(R.string.ach_tva_incluse, taxRate), fontSize = 11.sp, color = MissaMuted)
-                                    Text(fmtValeur(totals.taxAmount, devise), fontSize = 12.sp, color = MissaInk)
-                                }
-                            }
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(stringResource(R.string.ach_total), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                                Text(fmtValeur(totals.total, devise), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                            }
+                MissaCarteSection(titre = stringResource(R.string.form_section_article), numero = 2) {
+                    BlocCatalogueVente(
+                        produits = produits,
+                        devise = devise,
+                        onAjouter = vm::addCatalogProduct,
+                    )
+
+                    if (ui.lines.isNotEmpty()) {
+                        Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+
+                    }
+                    ui.lines.forEach { ligne ->
+                        androidx.compose.runtime.key("ligne-${ligne.id}") {
+                            LignePanierVente(
+                                ligne = ligne,
+                                devise = devise,
+                                onQuantite = { delta -> vm.changeQuantity(ligne.id, delta) },
+                                onPrix = { p -> vm.updateLine(ligne.id, ligne.quantity, p) },
+                                onSupprimer = { vm.removeLine(ligne.id) },
+                            )
+
                         }
                     }
+                    if (ui.lines.isNotEmpty()) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = BleuVente.copy(alpha = 0.12f)) {
+                            Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(stringResource(R.string.sales_subtotal), fontSize = 11.sp, color = MissaMuted)
+                                    Text(fmtValeur(totals.subtotal, devise), fontSize = 12.sp, color = MissaInk)
+                                }
+                                if (totals.discount > 0.0) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text(stringResource(R.string.sales_client_discount), fontSize = 12.sp, color = MissaMuted)
+                                        Text("−${fmtValeur(totals.discount, devise)}", fontSize = 12.sp, color = Color(0xFF15803D))
+                                    }
+                                }
+                                if (totals.taxAmount > 0.0) {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Text(stringResource(R.string.ach_tva_incluse, taxRate), fontSize = 11.sp, color = MissaMuted)
+                                        Text(fmtValeur(totals.taxAmount, devise), fontSize = 12.sp, color = MissaInk)
+                                    }
+                                }
+                                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Text(stringResource(R.string.ach_total), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                                    Text(fmtValeur(totals.total, devise), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+                                }
+                            }
+                        }
+
+                    }
                 }
-                item { MissaFormSectionTitre(stringResource(R.string.form_section_paiement), numero = 3) }
+            }
+            if (ui.lines.isNotEmpty()) {
                 item {
-                    MissaChoixPaiement(
-                        moyens = modes,
-                        selection = modePaiement.ifBlank { null },
-                        onSelection = { modePaiement = it },
-                        libelle = stringResource(R.string.ach_mode_paiement),
-                    )
+                    MissaCarteSection(titre = stringResource(R.string.form_section_paiement), numero = 3) {
+                        MissaChoixPaiement(
+                            moyens = modes,
+                            selection = modePaiement.ifBlank { null },
+                            onSelection = { modePaiement = it },
+                            libelle = stringResource(R.string.ach_mode_paiement),
+                        )
+
+                    }
                 }
             }
         }
