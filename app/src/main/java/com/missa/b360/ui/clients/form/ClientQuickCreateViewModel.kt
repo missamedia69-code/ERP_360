@@ -1,6 +1,7 @@
 package com.missa.b360.ui.clients.form
 
 import androidx.compose.runtime.Immutable
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,8 @@ data class ClientQuickCreateUiState(
     val notice: ClientNotice? = null,
     /** Identifiant du client créé : l'écran navigue vers sa fiche, une seule fois. */
     val creeId: Long? = null,
+    /** Cause technique de l'échec (nom de l'exception ou du résultat), affichée sous le bouton. */
+    val detailErreur: String? = null,
 )
 
 /** Création rapide : nom + téléphone seulement ; la fiche naît « à compléter ». */
@@ -103,7 +106,7 @@ class ClientQuickCreateViewModel @Inject constructor(
             _etat.update { it.copy(erreurNom = !nomValide, erreurTelephone = !telephoneValide) }
             return
         }
-        _etat.update { it.copy(enCours = true, doublon = null) }
+        _etat.update { it.copy(enCours = true, doublon = null, detailErreur = null) }
         viewModelScope.launch {
             try {
                 if (!doublonConfirme) {
@@ -125,12 +128,14 @@ class ClientQuickCreateViewModel @Inject constructor(
                         runCatching { clientBalance.recalculer(resultat.clientId) }
                         _etat.update { it.copy(enCours = false, creeId = resultat.clientId) }
                     }
-                    else -> _etat.update { it.copy(enCours = false, notice = resultat.enNotice(), erreurNom = resultat is CreateClientUseCase.Result.NomInvalide || resultat is CreateClientUseCase.Result.NomObligatoire, erreurTelephone = resultat is CreateClientUseCase.Result.TelephoneInvalide || resultat is CreateClientUseCase.Result.TelephoneObligatoire) }
+                    else -> _etat.update { it.copy(enCours = false, detailErreur = resultat.toString(), notice = resultat.enNotice(), erreurNom = resultat is CreateClientUseCase.Result.NomInvalide || resultat is CreateClientUseCase.Result.NomObligatoire, erreurTelephone = resultat is CreateClientUseCase.Result.TelephoneInvalide || resultat is CreateClientUseCase.Result.TelephoneObligatoire) }
                 }
             } catch (e: CancellationException) {
                 throw e
-            } catch (_: Exception) {
-                _etat.update { it.copy(enCours = false, notice = ClientNotice.ERREUR) }
+            } catch (e: Exception) {
+                Log.e("ClientQuickCreate", "Création du client impossible", e)
+                val detail = (e::class.java.simpleName + ": " + (e.message ?: "")).take(300)
+                _etat.update { it.copy(enCours = false, detailErreur = detail, notice = ClientNotice.ERREUR) }
             }
         }
     }

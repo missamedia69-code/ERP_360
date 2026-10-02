@@ -66,6 +66,7 @@ fun ClientQuickCreateSheet(
             enabled = !etat.enCours,
             modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
         ) { Text(stringResource(R.string.cli_creer_client)) }
+        etat.detailErreur?.let { Text(it, modifier = Modifier.padding(top = 4.dp)) }
         SnackbarHost(hote)
     }
     val doublon = etat.doublon
