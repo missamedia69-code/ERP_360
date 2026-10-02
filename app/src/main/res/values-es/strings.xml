@@ -2053,6 +2053,9 @@
     <string name="cli_filtre_incomplets">Incompletos</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
     <string name="cli_trier_par">Ordenar por</string>
+    <string name="cli_resume_temps_reel">En tiempo real</string>
+    <string name="cli_nb_client_un">1 cliente</string>
+    <string name="cli_nb_clients_n">%1$d clientes</string>
     <string name="cli_tri_encours">Pendiente</string>
     <string name="cli_tri_nom">Nombre</string>
     <string name="cli_tri_derniere_vente">Última venta</string>

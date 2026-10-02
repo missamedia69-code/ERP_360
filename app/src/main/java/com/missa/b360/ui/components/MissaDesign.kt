@@ -105,44 +105,60 @@ fun MissaTopAppBar(
     modifier: Modifier = Modifier,
     couleurFond: Color = Color.White,
     actions: @Composable RowScope.() -> Unit = {},
+    titreCentre: Boolean = true,
 ) {
-    // Grammaire de l'écran de référence : flèche discrète à gauche, titre centré en gras, fond blanc.
-    CenterAlignedTopAppBar(
-        modifier = modifier.padding(horizontal = 4.dp),
-        expandedHeight = 56.dp,
-        title = {
-            Text(
-                text = title,
-                color = MissaInk,
-                fontSize = 19.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        navigationIcon = {
-            if (onBack != null) {
-                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                    Icon(
-                        painter = painterResource(Iv.ArrowBack),
-                        contentDescription = stringResource(R.string.ob_retour),
-                        tint = MissaMuted,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
+    // Grammaire de l'écran de référence : flèche discrète à gauche, titre en gras (centré par défaut), fond blanc.
+    val titre: @Composable () -> Unit = {
+        Text(
+            text = title,
+            color = MissaInk,
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+    val retour: @Composable () -> Unit = {
+        if (onBack != null) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    painter = painterResource(Iv.ArrowBack),
+                    contentDescription = stringResource(R.string.ob_retour),
+                    tint = MissaMuted,
+                    modifier = Modifier.size(22.dp),
+                )
             }
-        },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            // L'en-tête est toujours blanc (écran de référence) : [couleurFond] est ignoré,
-            // un fond sombre rendrait le titre encre illisible.
-            containerColor = Color.White,
-            titleContentColor = MissaInk,
-            navigationIconContentColor = MissaMuted,
-            actionIconContentColor = MissaInk,
-        ),
-        windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        }
+    }
+    // L'en-tête est toujours blanc (écran de référence) : [couleurFond] est ignoré,
+    // un fond sombre rendrait le titre encre illisible.
+    val couleurs = TopAppBarDefaults.topAppBarColors(
+        containerColor = Color.White,
+        titleContentColor = MissaInk,
+        navigationIconContentColor = MissaMuted,
+        actionIconContentColor = MissaInk,
     )
+    if (titreCentre) {
+        CenterAlignedTopAppBar(
+            modifier = modifier.padding(horizontal = 4.dp),
+            expandedHeight = 56.dp,
+            title = titre,
+            navigationIcon = retour,
+            actions = actions,
+            colors = couleurs,
+            windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        )
+    } else {
+        androidx.compose.material3.TopAppBar(
+            modifier = modifier.padding(horizontal = 4.dp),
+            expandedHeight = 56.dp,
+            title = titre,
+            navigationIcon = retour,
+            actions = actions,
+            colors = couleurs,
+            windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        )
+    }
 }
 
 /** Carte de contenu neutre, compacte et lisible employée dans les modules génériques. */

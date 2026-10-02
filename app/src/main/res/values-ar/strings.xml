@@ -2053,6 +2053,9 @@
     <string name="cli_filtre_incomplets">غير مكتملين</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
     <string name="cli_trier_par">ترتيب حسب</string>
+    <string name="cli_resume_temps_reel">مباشر</string>
+    <string name="cli_nb_client_un">عميل واحد</string>
+    <string name="cli_nb_clients_n">%1$d عملاء</string>
     <string name="cli_tri_encours">المستحقات</string>
     <string name="cli_tri_nom">الاسم</string>
     <string name="cli_tri_derniere_vente">آخر بيع</string>

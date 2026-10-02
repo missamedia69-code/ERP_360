@@ -2057,6 +2057,9 @@
     <string name="cli_filtre_incomplets">Incomplete</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
     <string name="cli_trier_par">Sort by</string>
+    <string name="cli_resume_temps_reel">Live</string>
+    <string name="cli_nb_client_un">1 client</string>
+    <string name="cli_nb_clients_n">%1$d clients</string>
     <string name="cli_tri_encours">Outstanding</string>
     <string name="cli_tri_nom">Name</string>
     <string name="cli_tri_derniere_vente">Last sale</string>

@@ -3,6 +3,15 @@ package com.missa.b360.ui.clients.list
 import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.semantics.Role
+import com.missa.b360.ui.clients.components.BoutonClient
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,42 +83,46 @@ private fun ClientListSort.libelle(): Int = when (this) {
     ClientListSort.DERNIERE_VENTE -> R.string.cli_tri_derniere_vente
 }
 
-/** Résumé repliable : nombre de clients, encours total et part en retard. */
+/** Résumé repliable « En temps réel » : nombre de clients, encours total et part en retard. */
 @Composable
 internal fun ClientListSummary(etat: ClientListUiState) {
     var ouvert by rememberSaveable { mutableStateOf(true) }
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
-        modifier = Modifier.fillMaxWidth(),
+    val forme = RoundedCornerShape(16.dp)
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(forme)
+            .background(ClientCouleurs.Carte)
+            .border(BorderStroke(1.dp, ClientCouleurs.CarteBord), forme)
+            .padding(horizontal = 14.dp, vertical = 2.dp),
     ) {
-        Column(Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) {
-            Row(
-                Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { ouvert = !ouvert },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    stringResource(R.string.cli_resume_titre),
-                    color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp,
-                    modifier = Modifier.weight(1f),
+        Row(
+            Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { ouvert = !ouvert },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                stringResource(R.string.cli_resume_titre),
+                color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp,
+                modifier = Modifier.weight(1f),
+            )
+            Text(stringResource(R.string.cli_resume_temps_reel), color = MissaMuted, fontSize = 11.sp)
+            Spacer(Modifier.width(6.dp))
+            Icon(
+                painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
+                contentDescription = null, tint = MissaMuted, modifier = Modifier.size(20.dp),
+            )
+        }
+        if (ouvert) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Chiffre(stringResource(R.string.cli_resume_clients), etat.compteurs.total.toString(), MissaInk, Modifier.weight(1f))
+                Chiffre(
+                    stringResource(R.string.cli_resume_encours), clientMoney(etat.encoursTotal, etat.devise),
+                    MissaInk, Modifier.weight(1.4f),
                 )
-                Icon(
-                    painterResource(if (ouvert) Iv.ExpandLess else Iv.ExpandMore),
-                    contentDescription = null, tint = MissaMuted, modifier = Modifier.size(24.dp),
+                Chiffre(
+                    stringResource(R.string.cli_resume_en_retard), clientMoney(etat.enRetardTotal, etat.devise),
+                    if (etat.enRetardTotal > 0.0) RisqueCouleurs.Eleve else MissaInk, Modifier.weight(1.4f),
                 )
-            }
-            if (ouvert) {
-                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Chiffre(stringResource(R.string.cli_resume_clients), etat.compteurs.total.toString(), MissaInk, Modifier.weight(1f))
-                    Chiffre(
-                        stringResource(R.string.cli_resume_encours), clientMoney(etat.encoursTotal, etat.devise),
-                        MissaInk, Modifier.weight(1.4f),
-                    )
-                    Chiffre(
-                        stringResource(R.string.cli_resume_en_retard), clientMoney(etat.enRetardTotal, etat.devise),
-                        if (etat.enRetardTotal > 0.0) RisqueCouleurs.Eleve else MissaInk, Modifier.weight(1.4f),
-                    )
-                }
             }
         }
     }
@@ -117,51 +130,102 @@ internal fun ClientListSummary(etat: ClientListUiState) {
 
 @Composable
 private fun Chiffre(libelle: String, valeur: String, couleur: Color, modifier: Modifier) {
-    Column(modifier) {
-        Text(libelle, color = MissaMuted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(valeur, color = couleur, fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(libelle, color = MissaMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(valeur, color = couleur, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
+/** Filtres rapides : pastille orange pour le filtre courant, contour gris sinon, compteur en pastille. */
 @Composable
 internal fun ClientFilterChips(etat: ClientListUiState, onFiltre: (ClientListFilter) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
         items(ClientListFilter.entries.size) { index ->
             val filtre = ClientListFilter.entries[index]
-            FilterChip(
-                selected = etat.filtre == filtre,
-                onClick = { onFiltre(filtre) },
-                label = {
+            val actif = etat.filtre == filtre
+            val forme = RoundedCornerShape(12.dp)
+            Box(
+                Modifier.heightIn(min = 48.dp).clip(forme).clickable(role = Role.Tab) { onFiltre(filtre) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Row(
+                    Modifier
+                        .heightIn(min = 36.dp)
+                        .clip(forme)
+                        .background(if (actif) ClientCouleurs.Orange else Color.White)
+                        .then(if (actif) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
+                        .padding(horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     Text(
-                        stringResource(R.string.cli_chip_avec_compteur, stringResource(filtre.libelle()), etat.compteurs.pour(filtre)),
-                        fontSize = 14.sp,
+                        stringResource(filtre.libelle()),
+                        color = MissaInk, fontSize = 12.sp,
+                        fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
+                        maxLines = 1,
                     )
-                },
-            )
+                    Box(
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(if (actif) Color(0xFFE06A00) else ClientCouleurs.Pastille)
+                            .padding(horizontal = 6.dp, vertical = 1.dp),
+                    ) {
+                        Text(
+                            etat.compteurs.pour(filtre).toString(),
+                            color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+            }
         }
     }
 }
 
+/** Ligne « 1 client » à gauche, menu « Trier par … » à droite. */
 @Composable
-internal fun ClientSortChips(tri: ClientListSort, onTri: (ClientListSort) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        item { Text(stringResource(R.string.cli_trier_par), color = MissaMuted, fontSize = 14.sp) }
-        items(ClientListSort.entries.size) { index ->
-            val choix = ClientListSort.entries[index]
-            FilterChip(
-                selected = tri == choix,
-                onClick = { onTri(choix) },
-                label = { Text(stringResource(choix.libelle()), fontSize = 14.sp) },
-            )
+internal fun ClientListeEntete(etat: ClientListUiState, onTri: (ClientListSort) -> Unit) {
+    var menuOuvert by remember { mutableStateOf(false) }
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        val nombre = etat.lignes.size
+        Text(
+            if (nombre == 1) stringResource(R.string.cli_nb_client_un) else stringResource(R.string.cli_nb_clients_n, nombre),
+            color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 14.sp,
+            modifier = Modifier.weight(1f),
+        )
+        Box {
+            BoutonClient(onClick = { menuOuvert = true }, plein = false) {
+                Text(stringResource(R.string.cli_trier_par), color = MissaMuted, fontSize = 12.sp)
+                Text(stringResource(etat.tri.libelle()), color = MissaInk, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Icon(painterResource(Iv.ExpandMore), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+            }
+            DropdownMenu(expanded = menuOuvert, onDismissRequest = { menuOuvert = false }) {
+                ClientListSort.entries.forEach { choix ->
+                    DropdownMenuItem(
+                        text = { Text(stringResource(choix.libelle())) },
+                        onClick = {
+                            menuOuvert = false
+                            onTri(choix)
+                        },
+                        modifier = Modifier.heightIn(min = 48.dp),
+                    )
+                }
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ClientListRow(ligne: ClientListItem, devise: String, onClick: () -> Unit) {
+internal fun ClientListRow(
+    ligne: ClientListItem,
+    devise: String,
+    onClick: () -> Unit,
+    onAppeler: () -> Unit = {},
+    onWhatsApp: () -> Unit = {},
+) {
     val client = ligne.client
     val compte = ligne.balance
+    var detailOuvert by rememberSaveable(client.id) { mutableStateOf(false) }
     val risque = remember(client.statut, client.limiteCredit, compte) {
         CreditPolicy.evaluate(
             CreditInput(
@@ -176,33 +240,65 @@ internal fun ClientListRow(ligne: ClientListItem, devise: String, onClick: () ->
     val aRelancerDescription = stringResource(R.string.cli_a_relancer_desc)
     Card(
         onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp),
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            ClientAvatar(client.nom)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(client.nom, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${client.code} · ${client.telephone}", color = MissaMuted, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    ClientStatusChip(client.statut)
-                    if (risque != RiskLevel.NORMAL) RiskBadge(risque)
+        Column(Modifier.padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 4.dp)) {
+            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ClientAvatar(client.nom, taille = 48.dp)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(client.nom, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(client.code, color = MissaMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Icon(painterResource(Iv.Call), contentDescription = null, tint = MissaMuted, modifier = Modifier.size(12.dp))
+                        Text(client.telephone, color = MissaMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        ClientStatusChip(client.statut)
+                        if (risque != RiskLevel.NORMAL) RiskBadge(risque)
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    IconButton(onClick = { detailOuvert = !detailOuvert }, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            painterResource(if (detailOuvert) Iv.ExpandLess else Iv.ExpandMore),
+                            contentDescription = null, tint = MissaMuted, modifier = Modifier.size(20.dp),
+                        )
+                    }
+                    if (ligne.encours > 0.0) {
+                        Text(clientMoney(ligne.encours, devise), color = RisqueCouleurs.Eleve, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1, modifier = Modifier.padding(end = 8.dp))
+                        val retard = compte?.joursRetardMax ?: 0
+                        if (retard > 0) Text(stringResource(R.string.cli_retard_jours, retard), color = RisqueCouleurs.Eleve, fontSize = 11.sp, modifier = Modifier.padding(end = 8.dp))
+                    }
+                    if (ligne.aRelancer) {
+                        Icon(
+                            painterResource(Iv.Notifications), contentDescription = null, tint = RisqueCouleurs.Attention,
+                            modifier = Modifier.padding(end = 8.dp).size(20.dp).semantics { contentDescription = aRelancerDescription },
+                        )
+                    }
                 }
             }
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                if (ligne.encours > 0.0) {
-                    Text(clientMoney(ligne.encours, devise), color = RisqueCouleurs.Eleve, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
-                    val retard = compte?.joursRetardMax ?: 0
-                    if (retard > 0) Text(stringResource(R.string.cli_retard_jours, retard), color = RisqueCouleurs.Eleve, fontSize = 13.sp)
-                } else {
-                    Text("—", color = MissaMuted, fontSize = 16.sp)
-                }
-                if (ligne.aRelancer) {
-                    Icon(
-                        painterResource(Iv.Notifications), contentDescription = null, tint = RisqueCouleurs.Attention,
-                        modifier = Modifier.size(20.dp).semantics { contentDescription = aRelancerDescription },
-                    )
+            if (detailOuvert) {
+                Column(Modifier.padding(top = 4.dp, end = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Chiffre(stringResource(R.string.cli_kpi_encours), clientMoney(compte?.encours ?: 0.0, devise), MissaInk, Modifier.weight(1f))
+                        Chiffre(
+                            stringResource(R.string.cli_kpi_en_retard), clientMoney(compte?.enRetard ?: 0.0, devise),
+                            if ((compte?.enRetard ?: 0.0) > 0.0) RisqueCouleurs.Eleve else MissaInk, Modifier.weight(1f),
+                        )
+                    }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        BoutonClient(onClick = onAppeler, modifier = Modifier.weight(1f)) {
+                            Icon(painterResource(Iv.Call), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.cli_appeler), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+                        BoutonClient(onClick = onWhatsApp, modifier = Modifier.weight(1f)) {
+                            Icon(painterResource(Iv.Chat), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.cli_whatsapp), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             }
         }
@@ -238,7 +334,7 @@ internal fun ClientSwipeRow(
         backgroundContent = {
             val appel = etat.dismissDirection == SwipeToDismissBoxValue.StartToEnd
             Row(
-                Modifier.fillMaxSize().clip(RoundedCornerShape(14.dp))
+                Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
                     .background(if (appel) RisqueCouleurs.Normal else Color(0xFF128C7E)).padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = if (appel) Arrangement.Start else Arrangement.End,
@@ -251,6 +347,6 @@ internal fun ClientSwipeRow(
             }
         },
     ) {
-        ClientListRow(ligne, devise, onClick)
+        ClientListRow(ligne, devise, onClick, onAppeler, onWhatsApp)
     }
 }

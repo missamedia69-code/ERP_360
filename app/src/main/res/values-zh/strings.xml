@@ -2053,6 +2053,9 @@
     <string name="cli_filtre_incomplets">资料不全</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
     <string name="cli_trier_par">排序</string>
+    <string name="cli_resume_temps_reel">实时</string>
+    <string name="cli_nb_client_un">1 位客户</string>
+    <string name="cli_nb_clients_n">%1$d 位客户</string>
     <string name="cli_tri_encours">未结金额</string>
     <string name="cli_tri_nom">名称</string>
     <string name="cli_tri_derniere_vente">最近销售</string>

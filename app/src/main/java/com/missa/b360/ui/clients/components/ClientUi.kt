@@ -184,8 +184,13 @@ internal fun ClientAvatar(nom: String, modifier: Modifier = Modifier, taille: Dp
 }
 
 @Composable
-internal fun ClientTopBar(titre: String, onBack: () -> Unit, actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {}) {
-    MissaTopAppBar(title = titre, onBack = onBack, couleurFond = AppModule.CLIENTS.couleurPale, actions = actions)
+internal fun ClientTopBar(
+    titre: String,
+    onBack: () -> Unit,
+    titreCentre: Boolean = true,
+    actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
+) {
+    MissaTopAppBar(title = titre, onBack = onBack, couleurFond = AppModule.CLIENTS.couleurPale, actions = actions, titreCentre = titreCentre)
 }
 
 @Composable

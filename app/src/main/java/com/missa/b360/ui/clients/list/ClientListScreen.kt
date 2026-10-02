@@ -8,11 +8,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.missa.b360.ui.clients.components.BoutonClient
+import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.theme.MissaInk
 import androidx.compose.foundation.layout.heightIn
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Text
@@ -104,24 +113,27 @@ internal fun ClientListContent(
         containerColor = MissaCanvas,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            ClientTopBar(titre = stringResource(R.string.clients_flow_list_title), onBack = onBack) {
+            ClientTopBar(titre = stringResource(R.string.clients_flow_list_title), onBack = onBack, titreCentre = false) {
                 IconButton(onClick = onRelances) {
-                    Icon(painterResource(Iv.Notifications), stringResource(R.string.cli_ouvrir_relances), tint = AppModule.CLIENTS.couleur)
+                    Icon(painterResource(Iv.Notifications), stringResource(R.string.cli_ouvrir_relances), tint = MissaInk)
                 }
                 IconButton(onClick = onImporter) {
-                    Icon(painterResource(Iv.UploadSimple), stringResource(R.string.clients_flow_import), tint = AppModule.CLIENTS.couleur)
+                    Icon(painterResource(Iv.UploadSimple), stringResource(R.string.clients_flow_import), tint = MissaInk)
                 }
             }
         },
         floatingActionButton = {
             // Marge basse : la barre de modules flottante recouvre les 56 dp du bas de l'écran.
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = onNouveau,
-                containerColor = AppModule.CLIENTS.couleur,
+                containerColor = ClientCouleurs.Nuit,
                 contentColor = Color.White,
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.padding(bottom = 56.dp),
             ) {
-                Icon(painterResource(Iv.Add), stringResource(R.string.clients_nouveau))
+                Icon(painterResource(Iv.Add), contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.clients_nouveau), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         },
     ) { padding ->
@@ -143,14 +155,18 @@ internal fun ClientListContent(
                             icone = Iv.Search,
                             modifier = Modifier.weight(1f),
                         )
-                        OutlinedButton(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 52.dp)) {
-                            val actifs = etat.avance.actifs
-                            Text(stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else "")
+                        val actifs = etat.avance.actifs
+                        BoutonClient(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 52.dp), plein = false) {
+                            Icon(painterResource(Iv.Sliders), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                            Text(
+                                stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else "",
+                                color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                 }
                 item { ClientFilterChips(etat, onFiltre) }
-                item { ClientSortChips(etat.tri, onTri) }
+                item { ClientListeEntete(etat, onTri) }
                 when {
                     etat.aucunClient -> item {
                         MissaEmptyState(
