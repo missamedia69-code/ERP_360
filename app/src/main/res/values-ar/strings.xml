@@ -2094,6 +2094,7 @@
     <string name="cli_voir_activite">كل النشاط</string>
     <string name="cli_voir_compte">فتح الحساب</string>
     <string name="cli_aucune_activite">لا يوجد نشاط بعد.</string>
+    <string name="cli_aucune_activite_desc">ستظهر الإجراءات القادمة هنا.</string>
     <string name="cli_aucun_contact">لا توجد جهات اتصال أو عناوين.</string>
     <string name="cli_aucune_note">لا توجد ملاحظات.</string>
     <string name="cli_contact_principal">جهة الاتصال الرئيسية</string>

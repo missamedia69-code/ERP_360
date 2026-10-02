@@ -63,7 +63,7 @@ internal fun ClientPricesCard(
     var editorOpen by rememberSaveable { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.followups
 
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -103,7 +104,7 @@ fun ClientFollowupsScreen(
                         val montant = promesse.promesseMontant
                         Card(
                             shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+                            colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
                             border = BorderStroke(1.dp, RisqueCouleurs.Eleve),
                             modifier = Modifier.fillMaxWidth(),
                             onClick = { onOuvrirClient(promesse.clientId) },
@@ -166,7 +167,7 @@ private fun LigneRelance(
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
         onClick = onOuvrir,
     ) {

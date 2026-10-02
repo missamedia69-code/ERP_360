@@ -2141,6 +2141,7 @@
     <string name="cli_voir_activite">Toute l\'activité</string>
     <string name="cli_voir_compte">Ouvrir le compte</string>
     <string name="cli_aucune_activite">Aucune activité pour l\'instant.</string>
+    <string name="cli_aucune_activite_desc">Les prochaines actions apparaîtront ici.</string>
     <string name="cli_aucun_contact">Aucun contact ni adresse enregistrés.</string>
     <string name="cli_aucune_note">Aucune note.</string>
     <string name="cli_contact_principal">Contact principal</string>

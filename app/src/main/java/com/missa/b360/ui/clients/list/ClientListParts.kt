@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.list
 
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -79,7 +80,7 @@ internal fun ClientListSummary(etat: ClientListUiState) {
     var ouvert by rememberSaveable { mutableStateOf(true) }
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(horizontal = 14.dp, vertical = 4.dp)) {
@@ -176,7 +177,7 @@ internal fun ClientListRow(ligne: ClientListItem, devise: String, onClick: () ->
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp),
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {

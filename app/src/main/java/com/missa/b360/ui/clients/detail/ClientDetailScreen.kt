@@ -35,6 +35,7 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.domain.usecase.ClientLifecycleRules
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
+import com.missa.b360.ui.clients.components.ClientOnglets
 import com.missa.b360.ui.clients.components.ClientReminderDialog
 import com.missa.b360.ui.clients.components.ClientTopBar
 import com.missa.b360.ui.clients.components.EtatChargement
@@ -131,16 +132,12 @@ fun ClientDetailScreen(
                     )
                 }
                 item {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(ClientTab.entries.size) { index ->
-                            val onglet = ClientTab.entries[index]
-                            FilterChip(
-                                selected = etat.onglet == onglet,
-                                onClick = { viewModel.changerOnglet(onglet) },
-                                label = { Text(stringResource(onglet.libelle())) },
-                            )
-                        }
-                    }
+                    ClientOnglets(
+                        onglets = ClientTab.entries,
+                        courant = etat.onglet,
+                        libelle = { it.libelle() },
+                        onChoix = { onglet -> viewModel.changerOnglet(onglet) },
+                    )
                 }
                 ongletClient(
                     etat = etat,

@@ -2094,6 +2094,7 @@
     <string name="cli_voir_activite">全部动态</string>
     <string name="cli_voir_compte">打开账户</string>
     <string name="cli_aucune_activite">暂无动态。</string>
+    <string name="cli_aucune_activite_desc">接下来的操作将显示在这里。</string>
     <string name="cli_aucun_contact">尚无联系人或地址。</string>
     <string name="cli_aucune_note">暂无备注。</string>
     <string name="cli_contact_principal">主要联系人</string>

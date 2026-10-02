@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.activity
 
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -130,7 +131,7 @@ private fun LigneActivite(entree: ActivityEntry, devise: String) {
     }
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {

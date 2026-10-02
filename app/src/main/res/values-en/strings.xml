@@ -2098,6 +2098,7 @@
     <string name="cli_voir_activite">All activity</string>
     <string name="cli_voir_compte">Open the account</string>
     <string name="cli_aucune_activite">No activity yet.</string>
+    <string name="cli_aucune_activite_desc">Upcoming actions will appear here.</string>
     <string name="cli_aucun_contact">No contacts or addresses saved.</string>
     <string name="cli_aucune_note">No notes.</string>
     <string name="cli_contact_principal">Main contact</string>

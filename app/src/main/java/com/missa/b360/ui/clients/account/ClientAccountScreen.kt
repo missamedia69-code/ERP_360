@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.account
 
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -105,7 +106,7 @@ fun ClientAccountScreen(
                 item {
                     Card(
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+                        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -154,7 +155,7 @@ fun ClientAccountScreen(
                     item {
                         Card(
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+                            colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
                             border = BorderStroke(1.dp, RisqueCouleurs.Attention),
                             modifier = Modifier.fillMaxWidth(),
                         ) {

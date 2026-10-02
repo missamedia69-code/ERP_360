@@ -80,7 +80,7 @@ internal fun ClientCreditBanner(
     val couleur = risque.couleur()
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         border = BorderStroke(1.dp, couleur),
         modifier = modifier.fillMaxWidth(),
     ) {

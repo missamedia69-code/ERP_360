@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ProductEntity
+import com.missa.b360.ui.clients.components.BoutonClient
+import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientVideActivite
 import com.missa.b360.ui.clients.components.ClientPricesCard
 import com.missa.b360.ui.clients.components.ClientFollowupRow
 import com.missa.b360.ui.clients.components.LigneInfo
@@ -45,7 +48,8 @@ private const val APERCU_ACTIVITE = 5
 private fun CarteClient(contenu: @Composable () -> Unit) {
     Card(
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { contenu() } }
 }
@@ -71,16 +75,18 @@ internal fun LazyListScope.ongletClient(
         ClientTab.ACTIVITE -> {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    OutlinedButton(onClick = onNote, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
-                        Text(stringResource(R.string.cli_ajouter_note))
+                    BoutonClient(onClick = onNote, modifier = Modifier.weight(1f)) {
+                        Icon(painterResource(Iv.Add), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                        Text(stringResource(R.string.cli_ajouter_note), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
-                    OutlinedButton(onClick = onVoirActivite, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
-                        Text(stringResource(R.string.cli_voir_activite))
+                    BoutonClient(onClick = onVoirActivite, modifier = Modifier.weight(1f), plein = false) {
+                        Text(stringResource(R.string.cli_voir_activite), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Icon(painterResource(Iv.ExpandMore), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
                     }
                 }
             }
             if (etat.suivis.isEmpty()) {
-                item { Vide(R.string.cli_aucune_activite) }
+                item { ClientVideActivite() }
             } else {
                 items(etat.suivis.take(APERCU_ACTIVITE).size) { index ->
                     ClientFollowupRow(etat.suivis[index], etat.devise)

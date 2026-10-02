@@ -18,6 +18,7 @@ import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -91,14 +92,19 @@ internal fun String.initiales(): String = trim().split(Regex("\\s+")).filter { i
 @Composable
 internal fun RiskBadge(risque: RiskLevel, modifier: Modifier = Modifier) {
     val couleur = risque.couleur()
-    Surface(modifier = modifier, shape = RoundedCornerShape(8.dp), color = couleur.copy(alpha = 0.12f)) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, couleur.copy(alpha = 0.45f)),
+    ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(painterResource(risque.icone()), contentDescription = null, tint = couleur, modifier = Modifier.size(16.dp))
-            Text(stringResource(risque.libelle()), color = couleur, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Icon(painterResource(risque.icone()), contentDescription = null, tint = couleur, modifier = Modifier.size(14.dp))
+            Text(stringResource(risque.libelle()), color = MissaInk, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -125,15 +131,18 @@ internal fun ClientStatusChip(statut: ClientStatus, modifier: Modifier = Modifie
         ClientStatus.BROUILLON, ClientStatus.A_COMPLETER -> MissaInk
         ClientStatus.INACTIF, ClientStatus.DESACTIVE, ClientStatus.ARCHIVE -> MissaMuted
     }
+    val neutre = statut == ClientStatus.BROUILLON || statut == ClientStatus.A_COMPLETER ||
+        statut == ClientStatus.INACTIF || statut == ClientStatus.DESACTIVE || statut == ClientStatus.ARCHIVE
+    val fondChip = if (neutre) ClientCouleurs.Pastille else couleur.copy(alpha = 0.12f)
     val bloque = statut == ClientStatus.BLOQUE_CREDIT || statut == ClientStatus.BLOQUE_ADMINISTRATIF
-    Surface(modifier = modifier, shape = RoundedCornerShape(8.dp), color = couleur.copy(alpha = 0.10f)) {
+    Surface(modifier = modifier, shape = RoundedCornerShape(8.dp), color = fondChip) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             if (bloque) Icon(painterResource(Iv.Lock), null, tint = couleur, modifier = Modifier.size(14.dp))
-            Text(stringResource(libelle), color = couleur, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(libelle), color = couleur, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -146,7 +155,7 @@ internal fun CreditGauge(utilisationPct: Double?, risque: RiskLevel, modifier: M
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.clients_flow_credit_usage),
-                color = MissaMuted, fontSize = 14.sp, modifier = Modifier.weight(1f),
+                color = MissaMuted, fontSize = 13.sp, modifier = Modifier.weight(1f),
             )
             Text(
                 text = when {
@@ -154,7 +163,7 @@ internal fun CreditGauge(utilisationPct: Double?, risque: RiskLevel, modifier: M
                     utilisationPct.isInfinite() -> stringResource(R.string.cli_limite_depassee)
                     else -> stringResource(R.string.cli_pourcentage, utilisationPct.toInt())
                 },
-                color = risque.couleur(), fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                color = if (risque == RiskLevel.NORMAL) MissaInk else risque.couleur(), fontSize = 15.sp, fontWeight = FontWeight.Bold,
             )
         }
         if (ratio != null) {
@@ -167,7 +176,7 @@ internal fun CreditGauge(utilisationPct: Double?, risque: RiskLevel, modifier: M
 
 @Composable
 internal fun ClientAvatar(nom: String, modifier: Modifier = Modifier, taille: Dp = 44.dp) {
-    Surface(modifier = modifier.size(taille), shape = CircleShape, color = AppModule.CLIENTS.couleur) {
+    Surface(modifier = modifier.size(taille), shape = CircleShape, color = ClientCouleurs.Nuit) {
         Box(contentAlignment = Alignment.Center) {
             Text(nom.initiales(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = (taille.value * 0.36f).sp)
         }
