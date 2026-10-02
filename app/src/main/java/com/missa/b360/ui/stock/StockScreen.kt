@@ -2,7 +2,7 @@ package com.missa.b360.ui.stock
 
 import androidx.compose.material3.ButtonDefaults
 
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 
 import com.missa.b360.ui.navigation.AppModule
 
