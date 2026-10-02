@@ -2,7 +2,11 @@ package com.missa.b360.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.semantics.Role
+import com.missa.b360.ui.theme.MissaMuted
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -96,7 +100,7 @@ fun MissaBarreModules(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(58.dp)
+                    .height(if (moduleCourant == AppModule.CLIENTS) 64.dp else 58.dp)
                     .padding(horizontal = 7.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
@@ -106,7 +110,7 @@ fun MissaBarreModules(
                         element = element,
                         actif = index == indexActif,
                         couleurActive = if (moduleCourant == AppModule.CLIENTS) Color(0xFFFF7A00) else null,
-                        modifier = if (index == indexActif) Modifier.weight(1.55f) else Modifier.weight(1f),
+                        modifier = if (index == indexActif && moduleCourant != AppModule.CLIENTS) Modifier.weight(1.55f) else Modifier.weight(1f),
                     )
                 }
             }
@@ -128,6 +132,34 @@ private fun BarreOnglet(
     couleurActive: Color? = null,
 ) {
     val forme = RoundedCornerShape(16.dp)
+    if (couleurActive != null) {
+        // Variante Clients (maquette) : icône au-dessus du libellé pour tous les onglets, pastille orange pour l'actif.
+        Column(
+            modifier = modifier
+                .height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(if (actif) couleurActive else Color.Transparent)
+                .clickable(role = Role.Tab, onClick = element.onClick),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
+        ) {
+            Icon(
+                painter = painterResource(element.icone),
+                contentDescription = null,
+                tint = if (actif) MissaInk else MissaMuted,
+                modifier = Modifier.size(22.dp),
+            )
+            Text(
+                text = stringResource(element.libelle),
+                color = if (actif) MissaInk else MissaMuted,
+                fontSize = 10.sp,
+                fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        return
+    }
     Box(
         modifier = modifier
             .height(46.dp)
