@@ -243,9 +243,9 @@ internal fun ClientListRow(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
-        modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp),
     ) {
-        Column(Modifier.padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 4.dp)) {
+        Column(Modifier.padding(start = 10.dp, top = 8.dp, bottom = 8.dp, end = 2.dp)) {
             Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ClientAvatar(client.nom, taille = 48.dp)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {

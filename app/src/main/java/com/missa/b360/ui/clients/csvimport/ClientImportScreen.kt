@@ -88,7 +88,7 @@ fun ClientImportScreen(
                             if (etat.lectureImpossible) {
                                 Text(stringResource(R.string.cli_import_lecture_impossible), color = RisqueCouleurs.Eleve, fontWeight = FontWeight.Medium)
                             }
-                            Button(onClick = { lanceur.launch(types) }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                            Button(onClick = { lanceur.launch(types) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                                 Text(stringResource(R.string.cli_import_choisir))
                             }
                         }
@@ -119,7 +119,7 @@ fun ClientImportScreen(
                             Button(
                                 onClick = viewModel::confirmer,
                                 enabled = etat.apercu.valides.isNotEmpty(),
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                             ) { Text(stringResource(R.string.cli_import_confirmer, etat.apercu.valides.size)) }
                             OutlinedButton(onClick = { lanceur.launch(types) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                                 Text(stringResource(R.string.cli_import_autre_fichier))
@@ -145,7 +145,7 @@ fun ClientImportScreen(
                                     Text(stringResource(R.string.cli_import_interrompu), color = RisqueCouleurs.Eleve, fontWeight = FontWeight.Medium)
                                 }
                             }
-                            Button(onClick = onVoirListe, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                            Button(onClick = onVoirListe, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                                 Text(stringResource(R.string.cli_import_voir_liste))
                             }
                             OutlinedButton(onClick = viewModel::recommencer, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {

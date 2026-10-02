@@ -62,11 +62,11 @@ internal fun ClientSheet(
             Column {
                 Column(
                     modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                        .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.weight(1f))
+                        Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                         IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
                             Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = MissaInk)
                         }
@@ -76,7 +76,7 @@ internal fun ClientSheet(
                 // Le bouton principal reste visible, comme le « Suivant » de la configuration.
                 if (pied != null) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 10.dp),
+                        modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                         content = pied,
                     )

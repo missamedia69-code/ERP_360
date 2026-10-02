@@ -45,7 +45,7 @@ fun ClientEditSheet(
         Button(
             onClick = viewModel::enregistrer,
             enabled = !etat.enCours,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         ) { Text(stringResource(R.string.cli_enregistrer)) }
         SnackbarHost(hote)
     }
@@ -61,7 +61,7 @@ fun ClientEditSheet(
             etat.erreur -> EtatErreur(onReessayer = viewModel::charger, modifier = Modifier.heightIn(max = 240.dp))
             etat.chargement -> EtatChargement(Modifier.heightIn(max = 160.dp))
             etat.introuvable -> Text(stringResource(R.string.cli_fiche_introuvable))
-            else -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            else -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 // Même grammaire que « Informations sur votre entreprise » : cartes numérotées, toujours ouvertes.
                 ClientSection.entries.forEachIndexed { index, section ->
                     val enErreur = etat.erreurs.any { it.section == section }

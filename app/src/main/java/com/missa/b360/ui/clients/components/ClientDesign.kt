@@ -43,6 +43,7 @@ import com.missa.b360.ui.theme.MissaMuted
  * Palette « nuit · gris · orange » du module Clients (maquettes fiche et liste) :
  * encre nuit pour le texte et l'avatar, gris bleuté pour les cartes et tuiles, orange pour
  * l'action principale et l'onglet courant. La couleur de risque reste réservée aux états.
+ * Référence complète : `docs/DESIGN_CLIENTS.md`.
  */
 internal object ClientCouleurs {
     val Nuit = Color(0xFF101C43)

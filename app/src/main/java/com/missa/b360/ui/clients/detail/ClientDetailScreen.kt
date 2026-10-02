@@ -114,8 +114,8 @@ fun ClientDetailScreen(
             )
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 140.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 item { ClientDetailHeader(etat) }
                 item {

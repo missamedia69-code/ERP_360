@@ -52,7 +52,7 @@ fun ClientQuickCreateSheet(
         Button(
             onClick = { viewModel.enregistrer() },
             enabled = !etat.enCours,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         ) { Text(stringResource(R.string.cli_creer_client)) }
         SnackbarHost(hote)
     }

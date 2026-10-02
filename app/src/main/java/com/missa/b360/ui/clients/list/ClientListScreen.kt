@@ -142,8 +142,8 @@ internal fun ClientListContent(
             etat.chargement -> EtatChargement(Modifier.padding(padding))
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 140.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 item { ClientListSummary(etat) }
                 item {
@@ -156,7 +156,7 @@ internal fun ClientListContent(
                             modifier = Modifier.weight(1f),
                         )
                         val actifs = etat.avance.actifs
-                        BoutonClient(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 52.dp), plein = false) {
+                        BoutonClient(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 48.dp), plein = false) {
                             Icon(painterResource(Iv.Sliders), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
                             Text(
                                 stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else "",

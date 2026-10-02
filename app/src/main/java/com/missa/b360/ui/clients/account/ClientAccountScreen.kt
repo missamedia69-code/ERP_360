@@ -100,8 +100,8 @@ fun ClientAccountScreen(
             )
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 140.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 item {
                     Card(
@@ -109,21 +109,21 @@ fun ClientAccountScreen(
                         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text(client.nom, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(client.nom, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                             val risque = etat.evaluation?.risque
                             if (risque != null) CreditGauge(etat.evaluation?.utilisationPct, risque)
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.cli_kpi_encours), color = MissaMuted, fontSize = 13.sp)
-                                    Text(clientMoney(etat.balance?.encours ?: 0.0, etat.devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                                    Text(stringResource(R.string.cli_kpi_encours), color = MissaMuted, fontSize = 11.sp)
+                                    Text(clientMoney(etat.balance?.encours ?: 0.0, etat.devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 }
                                 Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.cli_kpi_en_retard), color = MissaMuted, fontSize = 13.sp)
+                                    Text(stringResource(R.string.cli_kpi_en_retard), color = MissaMuted, fontSize = 11.sp)
                                     Text(
                                         clientMoney(etat.balance?.enRetard ?: 0.0, etat.devise),
                                         color = if ((etat.balance?.enRetard ?: 0.0) > 0.0) RisqueCouleurs.Eleve else MissaInk,
-                                        fontWeight = FontWeight.Bold, fontSize = 17.sp,
+                                        fontWeight = FontWeight.Bold, fontSize = 15.sp,
                                     )
                                 }
                             }
@@ -134,11 +134,11 @@ fun ClientAccountScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
                             onClick = { viewModel.ouvrirEncaissement() },
-                            modifier = Modifier.weight(1f).heightIn(min = 52.dp),
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         ) { Text(stringResource(R.string.cli_encaisser)) }
                         OutlinedButton(
                             onClick = viewModel::ouvrirPromesse,
-                            modifier = Modifier.weight(1f).heightIn(min = 52.dp),
+                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         ) { Text(stringResource(R.string.cli_type_promesse), maxLines = 1) }
                     }
                 }

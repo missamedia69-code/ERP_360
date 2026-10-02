@@ -72,8 +72,10 @@ internal fun ChoixClient(
     valeurAffichee: String,
     options: List<Pair<String, String>>,
     onChoix: (String) -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth(),
 ) {
     MissaSelecteurLigne(
+        modifier = modifier,
         label = stringResource(libelle),
         options = options.map { (cle, texte) -> MissaOption(cle = cle, titre = texte) },
         selectionCle = options.firstOrNull { it.second == valeurAffichee }?.first,

@@ -58,8 +58,8 @@ internal fun ClientDetailHeader(etat: ClientDetailUiState) {
             .clip(forme)
             .background(ClientCouleurs.Carte)
             .border(BorderStroke(1.dp, ClientCouleurs.CarteBord), forme)
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
             ClientAvatar(client.nom, taille = 52.dp)
@@ -148,15 +148,15 @@ private fun ActionClient(
     }
     Column(
         modifier
-            .heightIn(min = 64.dp)
+            .heightIn(min = 56.dp)
             .clip(forme)
             .background(fond)
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
+            .padding(vertical = 6.dp, horizontal = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
     ) {
-        Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(22.dp))
+        Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp))
         Text(
             stringResource(libelle), color = MissaInk, fontSize = 12.sp,
             fontWeight = if (claire) FontWeight.Medium else FontWeight.Bold,

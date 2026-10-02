@@ -82,9 +82,9 @@ internal fun ClientFilterSheet(
                 OutlinedButton(
                     onClick = { onChange(ClientAdvancedFilter()) },
                     enabled = filtre.actifs > 0,
-                    modifier = Modifier.weight(1f).heightIn(min = 52.dp),
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                 ) { Text(stringResource(R.string.cli_filtre_reinitialiser)) }
-                Button(onClick = onClose, modifier = Modifier.weight(1f).heightIn(min = 52.dp)) {
+                Button(onClick = onClose, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
                     Text(stringResource(R.string.cli_filtre_appliquer))
                 }
             }
