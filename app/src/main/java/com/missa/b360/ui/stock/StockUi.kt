@@ -259,7 +259,8 @@ fun StockSearchField(valeur: String, onValeur: (String) -> Unit, placeholderRes:
         placeholder = { Text(stringResource(placeholderRes), fontSize = 12.sp, color = MissaMuted) },
         leadingIcon = { Icon(painterResource(StockIv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = com.missa.b360.ui.components.missaChampCouleurs(),
     )
 }
 

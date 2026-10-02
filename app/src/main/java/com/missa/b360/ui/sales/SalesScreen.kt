@@ -654,7 +654,8 @@ private fun BlocCatalogueVente(
         label = { Text(stringResource(R.string.ach_rechercher), fontSize = 11.sp, color = MissaMuted) },
         leadingIcon = { Icon(painterResource(Iv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = com.missa.b360.ui.components.missaChampCouleurs(),
         modifier = Modifier.fillMaxWidth(),
     )
     val filtres = produits.filter {

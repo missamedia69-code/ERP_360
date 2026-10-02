@@ -134,7 +134,9 @@ fun MissaTopAppBar(
         },
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = couleurFond,
+            // L'en-tête est toujours blanc (écran de référence) : [couleurFond] est ignoré,
+            // un fond sombre rendrait le titre encre illisible.
+            containerColor = Color.White,
             titleContentColor = MissaInk,
             navigationIconContentColor = MissaMuted,
             actionIconContentColor = MissaInk,

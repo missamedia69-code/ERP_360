@@ -538,7 +538,8 @@ private fun ListeFournisseurs(
                 Icon(painterResource(Iv.Search), null, tint = MissaInk, modifier = Modifier.size(18.dp))
             },
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(10.dp),
+        colors = com.missa.b360.ui.components.missaChampCouleurs(),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
         )
         Row(

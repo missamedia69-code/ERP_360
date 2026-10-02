@@ -11,8 +11,9 @@ Un seul module Gradle (`app`). Cinq langues : `values` (fr), `values-en`, `value
 - **Toutes les icônes en NOIR** (`tint = MissaInk`). La couleur du module colore uniquement
   le header et le fond de la barre du bas. « Achats » = `Iv.CartArrowDown`.
 - **Palette globale monochrome (validée propriétaire)** : tous les modules et l’onboarding utilisent
-  le bleu nuit Stock `MissaInk` (`#101C43`) sur `MissaCanvas` (`#F8F9FD`), cartes blanches,
-  bordures gris-bleu `MissaBorder` (`#CBD5E8`) et surfaces pâles `#F1F3F7`.
+  le bleu nuit Stock `MissaInk` (`#101C43`) sur `MissaCanvas` (blanc `#FFFFFF`), cartes grises
+  `OnbConfigCard` (`#F1F3F7`, sans bordure, rayon 12 dp), champs blancs contournés `MissaBorder`
+  (`#CBD5E8`, rayon 10 dp).
   `AppModule.couleur` reste la source unique et vaut actuellement `MissaInk` pour chaque module ;
   `couleurPale` est une dilution à 10 % et `couleurDouce` à 26 %. Les futures différenciations
   colorées doivent être locales, explicites et validées, jamais réintroduites globalement.
@@ -31,6 +32,15 @@ Un seul module Gradle (`app`). Cinq langues : `values` (fr), `values-en`, `value
   - barre de titre 52 dp ;
   - formulaires via le kit `ui/components/MissaFormulaire.kt` : champs d'environ 44 dp avec le libellé au-dessus de la valeur, deux champs par rangée (`MissaRangee`), boutons 44 dp.
   - Ne pas réintroduire d'espacements de 16 à 24 dp, ni de champs `OutlinedTextField` de 56 dp.
+
+## Design de référence (écran « Informations sur votre entreprise »)
+
+Tout écran suit cet écran : fond blanc ; en-tête = flèche discrète à gauche + titre centré 19 sp gras
+(`MissaTopAppBar`, toujours blanc, le paramètre `couleurFond` est ignoré) ; contenu en cartes grises
+`MissaCarteSection` (titre numéroté ①②③, pastille « À compléter » ou « Valeur invalide », champs blancs) ;
+listes de choix = `MissaSelecteurLigne` ; bouton principal `MissaBoutonPrincipal` (48 dp, désactivé = couleur à 35 %)
+épinglé en bas (`MissaFormPied`) ; cartes de liste = `OnbConfigCard` sans bordure (`MissaPanel`). Une bordure de
+carte n'est conservée que si elle porte un sens (niveau de risque).
 
 ## Formulaires (spécification validée)
 
