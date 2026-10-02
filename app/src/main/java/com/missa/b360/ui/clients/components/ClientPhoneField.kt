@@ -19,6 +19,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.missa.b360.ui.theme.MissaMuted
+import com.missa.b360.ui.theme.MissaBorder
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,9 +67,22 @@ internal fun ClientPhoneField(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
     ) {
-        OutlinedButton(onClick = { selecteurOuvert = true }, modifier = Modifier.width(112.dp).height(56.dp)) {
-            Text(choisi?.indicatif ?: "…", fontSize = 15.sp)
-            Icon(painterResource(Iv.ArrowDropDown), null, modifier = Modifier.size(18.dp))
+        // Même cadre que les champs du kit : blanc, contour fin, coins de 10 dp.
+        Surface(
+            onClick = { selecteurOuvert = true },
+            shape = RoundedCornerShape(10.dp),
+            color = Color.White,
+            border = BorderStroke(1.dp, MissaBorder),
+            modifier = Modifier.width(112.dp).height(56.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(choisi?.indicatif ?: "…", fontSize = 15.sp, color = MissaInk)
+                Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+            }
         }
         MissaChampTexte(
             valeur = telephoneLocal,

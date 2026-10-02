@@ -34,44 +34,12 @@ import androidx.compose.ui.unit.sp
 import com.missa.b360.R
 import com.missa.b360.ui.components.MissaChampTexte
 import com.missa.b360.ui.components.MissaClavier
+import com.missa.b360.ui.components.MissaOption
+import com.missa.b360.ui.components.MissaSelecteurLigne
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
-
-/** Section pliable : l'en-tête est une cible de 48 dp, une pastille rouge signale une erreur cachée. */
-@Composable
-internal fun SectionPliable(
-    titre: String,
-    ouverte: Boolean,
-    enErreur: Boolean,
-    onBascule: () -> Unit,
-    contenu: @Composable () -> Unit,
-) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, if (enErreur) Color(0xFFDC2626) else MissaBorder),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) {
-            Row(
-                Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClick = onBascule),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                if (enErreur) Icon(painterResource(Iv.Warning), null, tint = Color(0xFFDC2626), modifier = Modifier.size(20.dp))
-                Icon(
-                    painterResource(if (ouverte) Iv.ExpandLess else Iv.ExpandMore),
-                    contentDescription = null, tint = MissaMuted, modifier = Modifier.size(24.dp),
-                )
-            }
-            if (ouverte) {
-                Column(Modifier.padding(bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { contenu() }
-            }
-        }
-    }
-}
 
 /** Champ texte avec message d'erreur générique quand le champ est invalide. */
 @Composable
@@ -97,7 +65,7 @@ internal fun ChampClient(
     )
 }
 
-/** Choix dans une courte liste (type, catégorie, badge) via un menu déroulant. */
+/** Choix dans une courte liste (type, catégorie, badge, mode) : le sélecteur du kit, comme « Pays » à la configuration. */
 @Composable
 internal fun ChoixClient(
     libelle: Int,
@@ -105,29 +73,13 @@ internal fun ChoixClient(
     options: List<Pair<String, String>>,
     onChoix: (String) -> Unit,
 ) {
-    var ouvert by rememberSaveable { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(stringResource(libelle), color = MissaMuted, fontSize = 13.sp)
-        Box {
-            OutlinedButton(
-                onClick = { ouvert = true },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-            ) {
-                Text(valeurAffichee, color = MissaInk, modifier = Modifier.weight(1f))
-                Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaMuted)
-            }
-            DropdownMenu(expanded = ouvert, onDismissRequest = { ouvert = false }) {
-                options.forEach { (cle, texte) ->
-                    DropdownMenuItem(
-                        text = { Text(texte) },
-                        onClick = {
-                            ouvert = false
-                            onChoix(cle)
-                        },
-                        modifier = Modifier.heightIn(min = 48.dp),
-                    )
-                }
-            }
-        }
-    }
+    MissaSelecteurLigne(
+        label = stringResource(libelle),
+        options = options.map { (cle, texte) -> MissaOption(cle = cle, titre = texte) },
+        selectionCle = options.firstOrNull { it.second == valeurAffichee }?.first,
+        onSelection = onChoix,
+        placeholder = valeurAffichee,
+        couleurCarte = Color.White,
+        paddingVertical = 10.dp,
+    )
 }

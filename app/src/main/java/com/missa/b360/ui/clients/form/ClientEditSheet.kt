@@ -2,6 +2,7 @@ package com.missa.b360.ui.clients.form
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
+import com.missa.b360.core.data.entity.ClientType
+import com.missa.b360.core.domain.usecase.ClientLifecycleRules
+import com.missa.b360.ui.components.MissaCarteSection
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
 import com.missa.b360.ui.clients.components.EtatChargement
 import com.missa.b360.ui.clients.components.EtatErreur
@@ -34,24 +38,42 @@ fun ClientEditSheet(
     val hote = remember { SnackbarHostState() }
     ClientNoticeEffect(etat.notice, hote, viewModel::noticeLue)
     LaunchedEffect(etat.sauve) { if (etat.sauve) onSauve() }
+    val pret = !etat.erreur && !etat.chargement && !etat.introuvable
+    val aCompleter = stringResource(R.string.obn_section_a_completer)
+    val invalide = stringResource(R.string.form_valeur_invalide)
+    val piedEnregistrer: @Composable ColumnScope.() -> Unit = {
+        Button(
+            onClick = viewModel::enregistrer,
+            enabled = !etat.enCours,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+        ) { Text(stringResource(R.string.cli_enregistrer)) }
+        SnackbarHost(hote)
+    }
     ClientSheet(
         titre = stringResource(R.string.clients_modifier),
         onDismiss = {
             viewModel.abandonner()
             onClose()
         },
+        pied = if (pret) piedEnregistrer else null,
     ) {
         when {
             etat.erreur -> EtatErreur(onReessayer = viewModel::charger, modifier = Modifier.heightIn(max = 240.dp))
             etat.chargement -> EtatChargement(Modifier.heightIn(max = 160.dp))
             etat.introuvable -> Text(stringResource(R.string.cli_fiche_introuvable))
-            else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (section in ClientSection.entries) {
-                    SectionPliable(
+            else -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Même grammaire que « Informations sur votre entreprise » : cartes numérotées, toujours ouvertes.
+                ClientSection.entries.forEachIndexed { index, section ->
+                    val enErreur = etat.erreurs.any { it.section == section }
+                    MissaCarteSection(
                         titre = stringResource(section.titre()),
-                        ouverte = section in etat.ouvertes,
-                        enErreur = etat.erreurs.any { it.section == section },
-                        onBascule = { viewModel.basculerSection(section) },
+                        numero = index + 1,
+                        etiquette = when {
+                            enErreur -> invalide
+                            section.essentielManque(etat.draft) -> aCompleter
+                            else -> null
+                        },
+                        etiquetteEnErreur = enErreur,
                     ) {
                         when (section) {
                             ClientSection.IDENTITE -> SectionIdentite(etat, viewModel::modifier)
@@ -62,15 +84,19 @@ fun ClientEditSheet(
                         }
                     }
                 }
-                Button(
-                    onClick = viewModel::enregistrer,
-                    enabled = !etat.enCours,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(top = 4.dp),
-                ) { Text(stringResource(R.string.cli_enregistrer)) }
-                SnackbarHost(hote)
             }
         }
     }
+}
+
+/** Pastille « À compléter » : l'essentiel de la section manque (jamais bloquant). */
+private fun ClientSection.essentielManque(d: ClientDraft): Boolean = when (this) {
+    ClientSection.IDENTITE -> d.nom.isBlank() || (d.telephoneLocal.isBlank() && d.email.isBlank())
+    ClientSection.FISCALITE -> {
+        val type = ClientType.entries.firstOrNull { it.name == d.type } ?: ClientType.PARTICULIER
+        ClientLifecycleRules.informationsFiscalesRequises(type) && d.nif.isBlank()
+    }
+    else -> false
 }
 
 private fun ClientSection.titre(): Int = when (this) {

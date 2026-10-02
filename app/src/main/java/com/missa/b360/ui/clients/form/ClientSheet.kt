@@ -2,6 +2,7 @@ package com.missa.b360.ui.clients.form
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -41,6 +42,7 @@ import com.missa.b360.ui.theme.MissaInk
 internal fun ClientSheet(
     titre: String,
     onDismiss: () -> Unit,
+    pied: (@Composable ColumnScope.() -> Unit)? = null,
     contenu: @Composable ColumnScope.() -> Unit,
 ) {
     Box(
@@ -57,17 +59,28 @@ internal fun ClientSheet(
             modifier = Modifier.fillMaxWidth().heightIn(max = 640.dp).navigationBarsPadding()
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {}),
         ) {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
-            ) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.weight(1f))
-                    IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
-                        Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = MissaInk)
+            Column {
+                Column(
+                    modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.weight(1f))
+                        IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
+                            Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = MissaInk)
+                        }
                     }
+                    contenu()
                 }
-                contenu()
+                // Le bouton principal reste visible, comme le « Suivant » de la configuration.
+                if (pied != null) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 10.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        content = pied,
+                    )
+                }
             }
         }
     }
