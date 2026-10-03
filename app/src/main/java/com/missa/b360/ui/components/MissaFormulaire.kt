@@ -150,7 +150,7 @@ internal fun filtrerSaisie(clavier: MissaClavier, saisie: String): String = when
 
 @Composable
 fun missaChampCouleurs(): TextFieldColors {
-    val couleur = LocalCouleurFormulaire.current
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     return OutlinedTextFieldDefaults.colors(
         focusedBorderColor = couleur,
         unfocusedBorderColor = MissaBorder,
@@ -297,7 +297,7 @@ private fun CadreChamp(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icone != null) {
-                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
             }
             Column(Modifier.weight(1f)) {
@@ -638,7 +638,7 @@ fun <T> MissaChoixTuiles(
     colonnes: Int = 4,
     enabled: Boolean = true,
 ) {
-    val couleur = LocalCouleurFormulaire.current
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     // Les longs libellés ne sont jamais écrasés dans une grille de 3–4 colonnes :
     // deux colonnes gardent le bouton proche de son texte et lisible en traduction.
     val libelleLong = options.any { it.libelle.length > 14 || it.libelle.count { c -> c == ' ' } >= 2 }
@@ -662,7 +662,7 @@ fun <T> MissaChoixTuiles(
                             verticalArrangement = Arrangement.Center,
                         ) {
                             tuile.icone?.let {
-                                Icon(painterResource(it), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                                Icon(painterResource(it), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.size(2.dp))
                             }
                             Text(
@@ -762,7 +762,8 @@ fun MissaFormSectionTitre(
     modifier: Modifier = Modifier.fillMaxWidth(),
     icone: Int? = null,
 ) {
-    val couleur = LocalCouleurFormulaire.current
+    // Le module peut imposer sa couleur à la pastille numérotée (Clients : violet).
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     Row(modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
         when {
             numero != null -> Box(
@@ -771,7 +772,7 @@ fun MissaFormSectionTitre(
             ) {
                 Text("$numero", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = couleur.contenuLisible())
             }
-            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
         }
         if (numero != null || icone != null) Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
@@ -951,10 +952,10 @@ fun MissaFormDialogue(
                     ) {
                         if (icone != null) {
                             Box(
-                                Modifier.size(30.dp).background(couleur.copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
+                                Modifier.size(30.dp).background((LocalCouleurSelection.current ?: couleur).copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
                             }
                             Spacer(Modifier.width(10.dp))
                         }
