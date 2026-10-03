@@ -1,6 +1,7 @@
 package com.missa.b360.ui.clients
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -16,6 +17,8 @@ import com.missa.b360.ui.clients.followups.ClientFollowupsScreen
 import com.missa.b360.ui.clients.form.ClientEditSheet
 import com.missa.b360.ui.clients.form.ClientQuickCreateSheet
 import com.missa.b360.ui.clients.list.ClientListScreen
+import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.components.LocalCouleurSelection
 import com.missa.b360.ui.navigation.AppModule
 
 private val ARGUMENT_ID = listOf(navArgument(ClientRoutes.ARG_ID) { type = NavType.LongType })
@@ -29,13 +32,17 @@ fun NavGraphBuilder.clientsGraph(
     navController: NavController,
     garde: @Composable (contenu: @Composable () -> Unit) -> Unit,
 ) {
+    // La sélection (listes, sélecteurs) est violette dans tout le module, sans toucher aux boutons d'action.
+    val gardeViolette: @Composable (@Composable () -> Unit) -> Unit = { contenu ->
+        garde { CompositionLocalProvider(LocalCouleurSelection provides ClientCouleurs.Violet, content = contenu) }
+    }
     val retour: () -> Unit = { navController.popBackStack() }
 
     composable(
         route = ClientRoutes.LISTE,
         arguments = listOf(navArgument(ClientRoutes.ARG_CREATE) { type = NavType.BoolType; defaultValue = false }),
     ) { entree ->
-        garde {
+        gardeViolette {
             ClientListScreen(
                 onBack = retour,
                 onOuvrirClient = { id -> navController.navigate(ClientRoutes.fiche(id)) },
@@ -47,7 +54,7 @@ fun NavGraphBuilder.clientsGraph(
         }
     }
     composable(route = ClientRoutes.FICHE, arguments = ARGUMENT_ID) {
-        garde {
+        gardeViolette {
             ClientDetailScreen(
                 onBack = retour,
                 onModifier = { id -> navController.navigate(ClientRoutes.edition(id)) { launchSingleTop = true } },
@@ -58,13 +65,13 @@ fun NavGraphBuilder.clientsGraph(
         }
     }
     composable(route = ClientRoutes.COMPTE, arguments = ARGUMENT_ID) {
-        garde { ClientAccountScreen(onBack = retour) }
+        gardeViolette { ClientAccountScreen(onBack = retour) }
     }
     composable(route = ClientRoutes.ACTIVITE, arguments = ARGUMENT_ID) {
-        garde { ClientActivityScreen(onBack = retour) }
+        gardeViolette { ClientActivityScreen(onBack = retour) }
     }
     composable(route = ClientRoutes.RELANCES) {
-        garde {
+        gardeViolette {
             ClientFollowupsScreen(
                 onBack = retour,
                 onOuvrirClient = { id -> navController.navigate(ClientRoutes.fiche(id)) },
@@ -72,7 +79,7 @@ fun NavGraphBuilder.clientsGraph(
         }
     }
     composable(route = ClientRoutes.IMPORT) {
-        garde {
+        gardeViolette {
             ClientImportScreen(
                 onBack = retour,
                 onVoirListe = { navController.popBackStack(ClientRoutes.LISTE, inclusive = false) },
@@ -80,7 +87,7 @@ fun NavGraphBuilder.clientsGraph(
         }
     }
     dialog(route = ClientRoutes.NOUVEAU, dialogProperties = DialogProperties(usePlatformDefaultWidth = false)) {
-        garde {
+        gardeViolette {
             ClientQuickCreateSheet(
                 onClose = retour,
                 onCree = { id ->
@@ -97,6 +104,6 @@ fun NavGraphBuilder.clientsGraph(
         arguments = ARGUMENT_ID,
         dialogProperties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
-        garde { ClientEditSheet(onClose = retour, onSauve = retour) }
+        gardeViolette { ClientEditSheet(onClose = retour, onSauve = retour) }
     }
 }

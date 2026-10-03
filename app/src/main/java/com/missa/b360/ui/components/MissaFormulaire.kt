@@ -116,6 +116,12 @@ import java.util.TimeZone
 /** Couleur du module courant pour les formulaires (bordure active, pastilles, bouton). */
 val LocalCouleurFormulaire = staticCompositionLocalOf { BrandBlue }
 
+/**
+ * Couleur imposée par un module à l'état « sélectionné » des listes et sélecteurs ; `null` = couleur
+ * de marque. Le module Clients la fixe au violet pour se distinguer des autres modules.
+ */
+val LocalCouleurSelection = staticCompositionLocalOf<Color?> { null }
+
 @Composable
 fun MissaFormulaireTheme(couleur: Color, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalCouleurFormulaire provides couleur, content = content)
@@ -387,6 +393,7 @@ fun <T> MissaChampListe(
 ) {
     var ouvert by remember { mutableStateOf(false) }
     val texte = options.firstOrNull { it.first == selection }?.second.orEmpty()
+    val couleurSelection = LocalCouleurSelection.current
     Box(modifier) {
         ChampCliquable(
             valeur = texte,
@@ -419,10 +426,23 @@ fun <T> MissaChampListe(
                 )
             }
             options.forEach { (valeur, libelleOption) ->
+                val choisie = valeur == selection
                 DropdownMenuItem(
-                    text = { Text(libelleOption, fontSize = 13.sp, color = MissaInk) },
-                    trailingIcon = if (valeur == selection) {
-                        { Icon(painterResource(Iv.Check), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp)) }
+                    text = {
+                        Text(
+                            libelleOption,
+                            fontSize = 13.sp,
+                            fontWeight = if (choisie && couleurSelection != null) FontWeight.Bold else FontWeight.Normal,
+                            color = if (choisie && couleurSelection != null) couleurSelection else MissaInk,
+                        )
+                    },
+                    modifier = if (choisie && couleurSelection != null) {
+                        Modifier.background(couleurSelection.copy(alpha = 0.10f))
+                    } else {
+                        Modifier
+                    },
+                    trailingIcon = if (choisie) {
+                        { Icon(painterResource(Iv.Check), contentDescription = null, tint = couleurSelection ?: MissaInk, modifier = Modifier.size(16.dp)) }
                     } else {
                         null
                     },
