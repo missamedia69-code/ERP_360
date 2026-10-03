@@ -261,6 +261,13 @@
     <string name="ach_erreur_fournisseur_non_actif">المورد غير نشط: يجب الموافقة قبل الطلب</string>
     <string name="ach_erreur_fournisseur_doublon">يوجد مورد مشابه بالفعل. راجعه في قسم الموردين قبل إنشاء سجل آخر.</string>
     <string name="ach_erreur_paiement_bloque">الدفع محظور لهذا المورد</string>
+    <string name="ach_garde_plafond">هذا المبلغ يتجاوز حد الدفع المحدد لهذا المورد.</string>
+    <string name="ach_garde_compte_requis">لا يوجد حساب دفع للمورد يطابق هذه الطريقة. أضِفه في صفحة المورد.</string>
+    <string name="ach_garde_compte_non_verifie">لم يتم التحقق من حساب الدفع الخاص بالمورد.</string>
+    <string name="ach_garde_compte_rejete">تم رفض حساب الدفع الخاص بالمورد. صحّحه في صفحة المورد.</string>
+    <string name="ach_garde_compte_recent">تم تعديل حساب الدفع الخاص بالمورد منذ أقل من 7 أيام ولم يتم التحقق منه. تحقق منه قبل الدفع.</string>
+    <string name="ach_garde_confirmer_titre">تأكيد الدفع؟</string>
+    <string name="ach_garde_confirmer_action">ادفع على أي حال</string>
     <string name="four_a_payer">مستحق الدفع</string>
     <string name="four_a_traiter">قيد المعالجة</string>
     <string name="four_a_valider">بانتظار الاعتماد</string>

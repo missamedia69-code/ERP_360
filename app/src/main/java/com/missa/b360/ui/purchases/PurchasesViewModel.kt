@@ -24,6 +24,7 @@ import com.missa.b360.core.domain.usecase.ReglerAchatUseCase
 import com.missa.b360.core.domain.usecase.SaveCommandeAchatUseCase
 import com.missa.b360.core.domain.usecase.SaveReceptionAchatUseCase
 import com.missa.b360.core.domain.usecase.ObserveFournisseursUseCase
+import com.missa.b360.core.domain.model.PaymentGuardReason
 import com.missa.b360.core.domain.usecase.ObservePaymentMethodsUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductStockUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
@@ -112,6 +113,11 @@ class PurchasesViewModel @Inject constructor(
         data object StockModuleInactif : SaveResult
         data object SiteIntrouvable : SaveResult
         data object ReceptionRequise : SaveResult
+        data object SoldeInsuffisant : SaveResult
+        data class PaiementRefuse(val motif: PaymentGuardReason) : SaveResult
+
+        /** Le montant réglé demande une confirmation : la validation est à relancer avec confirmation. */
+        data class ConfirmationPaiement(val motif: PaymentGuardReason) : SaveResult
         data object Error : SaveResult
     }
 
@@ -324,7 +330,7 @@ class PurchasesViewModel @Inject constructor(
      * **transactionnelle** (spec §6) : pièce + entrées de stock + journal.
      * Le passif fournisseur = total − réglé.
      */
-    fun save(paymentMethod: String, draft: Boolean) {
+    fun save(paymentMethod: String, draft: Boolean, confirmePaiement: Boolean = false) {
         if (_busy.value) return
         _saveResult.value = null
         val state = _uiState.value
@@ -363,7 +369,12 @@ class PurchasesViewModel @Inject constructor(
                     commandeRecordId = state.commandeRecordId,
                     attachments = state.attachments,
                 )
-                when (val result = savePurchase(recordId = state.editingRecordId, payload = payload, draft = draft)) {
+                when (val result = savePurchase(
+                        recordId = state.editingRecordId,
+                        payload = payload,
+                        draft = draft,
+                        confirmePaiement = confirmePaiement,
+                    )) {
                     is SavePurchaseUseCase.Result.Succes -> {
                         _saveResult.value = SaveResult.Saved(result.reference, draft)
                         clearCart()
@@ -376,6 +387,11 @@ class PurchasesViewModel @Inject constructor(
                     SavePurchaseUseCase.Result.SiteIntrouvable -> _saveResult.value = SaveResult.SiteIntrouvable
                     SavePurchaseUseCase.Result.ReceptionRequise -> _saveResult.value = SaveResult.ReceptionRequise
                     SavePurchaseUseCase.Result.BrouillonIntrouvable -> _saveResult.value = SaveResult.Error
+                    SavePurchaseUseCase.Result.SoldeInsuffisant -> _saveResult.value = SaveResult.SoldeInsuffisant
+                    is SavePurchaseUseCase.Result.PaiementRefuse ->
+                        _saveResult.value = SaveResult.PaiementRefuse(result.motif)
+                    is SavePurchaseUseCase.Result.ConfirmationPaiementRequise ->
+                        _saveResult.value = SaveResult.ConfirmationPaiement(result.motif)
                 }
             } catch (exception: CancellationException) {
                 throw exception
@@ -415,6 +431,7 @@ class PurchasesViewModel @Inject constructor(
         data object ModuleStockInactif : ActionAchatResult
         data object SiteIntrouvable : ActionAchatResult
         data object PaiementBloque : ActionAchatResult
+        data class PaiementRefuse(val motif: PaymentGuardReason) : ActionAchatResult
         data object LectureSeule : ActionAchatResult
         data object Erreur : ActionAchatResult
     }
@@ -726,7 +743,28 @@ class PurchasesViewModel @Inject constructor(
 
     // --- Règlement ultérieur et annulation ---
 
-    fun reglerFacture(recordId: Long, montantInput: String, modePaiement: String) {
+    /** Règlement en attente de confirmation de l'utilisateur (compte non vérifié, plafond dépassé). */
+    data class ReglementAConfirmer(
+        val recordId: Long,
+        val montantInput: String,
+        val modePaiement: String,
+        val motif: PaymentGuardReason,
+    )
+
+    private val _reglementAConfirmer = MutableStateFlow<ReglementAConfirmer?>(null)
+    val reglementAConfirmer: StateFlow<ReglementAConfirmer?> = _reglementAConfirmer
+
+    fun annulerConfirmationReglement() {
+        _reglementAConfirmer.value = null
+    }
+
+    fun confirmerReglement() {
+        val attente = _reglementAConfirmer.value ?: return
+        _reglementAConfirmer.value = null
+        reglerFacture(attente.recordId, attente.montantInput, attente.modePaiement, confirme = true)
+    }
+
+    fun reglerFacture(recordId: Long, montantInput: String, modePaiement: String, confirme: Boolean = false) {
         if (_busy.value) return
         val montant = montantInput.toMoneyOrNull()
         if (montant == null || montant <= 0.0 || modePaiement.isBlank()) {
@@ -736,7 +774,7 @@ class PurchasesViewModel @Inject constructor(
         viewModelScope.launch {
             _busy.value = true
             try {
-                when (reglerAchat(recordId, montant, modePaiement)) {
+                when (val resultat = reglerAchat(recordId, montant, modePaiement, confirme = confirme)) {
                     is ReglerAchatUseCase.Result.Succes -> _actionResult.value = ActionAchatResult.ReglementEnregistre
                     ReglerAchatUseCase.Result.LectureSeule -> _actionResult.value = ActionAchatResult.LectureSeule
                     ReglerAchatUseCase.Result.Introuvable -> _actionResult.value = ActionAchatResult.Erreur
@@ -745,6 +783,11 @@ class PurchasesViewModel @Inject constructor(
                     ReglerAchatUseCase.Result.SoldeInsuffisant -> _actionResult.value = ActionAchatResult.SoldeInsuffisant
                     ReglerAchatUseCase.Result.DejaEnregistre -> _actionResult.value = ActionAchatResult.Erreur
                     ReglerAchatUseCase.Result.PaiementBloque -> _actionResult.value = ActionAchatResult.PaiementBloque
+                    is ReglerAchatUseCase.Result.Refuse ->
+                        _actionResult.value = ActionAchatResult.PaiementRefuse(resultat.motif)
+                    is ReglerAchatUseCase.Result.ConfirmationRequise ->
+                        _reglementAConfirmer.value =
+                            ReglementAConfirmer(recordId, montantInput, modePaiement, resultat.motif)
                 }
             } catch (exception: CancellationException) {
                 throw exception

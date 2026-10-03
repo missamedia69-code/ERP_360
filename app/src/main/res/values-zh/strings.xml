@@ -261,6 +261,13 @@
     <string name="ach_erreur_fournisseur_non_actif">供应商未激活：下单前需批准</string>
     <string name="ach_erreur_fournisseur_doublon">已存在类似供应商。请先在供应商名录中核对，再创建新记录。</string>
     <string name="ach_erreur_paiement_bloque">该供应商付款已冻结</string>
+    <string name="ach_garde_plafond">该金额超过了为此供应商设定的付款上限。</string>
+    <string name="ach_garde_compte_requis">供应商没有与此付款方式匹配的收款账户。请在供应商页面添加。</string>
+    <string name="ach_garde_compte_non_verifie">供应商的收款账户尚未核实。</string>
+    <string name="ach_garde_compte_rejete">供应商的收款账户已被拒绝。请在供应商页面更正。</string>
+    <string name="ach_garde_compte_recent">供应商的收款账户在 7 天内被修改且尚未核实。请先核实再付款。</string>
+    <string name="ach_garde_confirmer_titre">确认付款？</string>
+    <string name="ach_garde_confirmer_action">仍然付款</string>
     <string name="four_a_payer">待付款</string>
     <string name="four_a_traiter">待处理</string>
     <string name="four_a_valider">待审批</string>

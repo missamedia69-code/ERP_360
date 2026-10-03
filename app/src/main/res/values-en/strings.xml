@@ -261,6 +261,13 @@
     <string name="ach_erreur_fournisseur_non_actif">Supplier not active: approval required before ordering</string>
     <string name="ach_erreur_fournisseur_doublon">A similar supplier already exists. Review it in Suppliers before creating another record.</string>
     <string name="ach_erreur_paiement_bloque">Payment blocked for this supplier</string>
+    <string name="ach_garde_plafond">This amount exceeds the payment limit set for this supplier.</string>
+    <string name="ach_garde_compte_requis">No supplier payment account matches this method. Add one on the supplier\'s page.</string>
+    <string name="ach_garde_compte_non_verifie">The supplier\'s payment account has not been verified.</string>
+    <string name="ach_garde_compte_rejete">The supplier\'s payment account was rejected. Correct it on the supplier\'s page.</string>
+    <string name="ach_garde_compte_recent">The supplier\'s payment account was changed less than 7 days ago and is not verified. Verify it before paying.</string>
+    <string name="ach_garde_confirmer_titre">Confirm the payment?</string>
+    <string name="ach_garde_confirmer_action">Pay anyway</string>
     <string name="four_a_payer">Due</string>
     <string name="four_a_traiter">To process</string>
     <string name="four_a_valider">To approve</string>

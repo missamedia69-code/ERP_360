@@ -261,6 +261,13 @@
     <string name="ach_erreur_fournisseur_non_actif">Proveedor no activo: se requiere aprobación antes de pedir</string>
     <string name="ach_erreur_fournisseur_doublon">Ya existe un proveedor similar. Revíselo en Proveedores antes de crear otro registro.</string>
     <string name="ach_erreur_paiement_bloque">Pago bloqueado para este proveedor</string>
+    <string name="ach_garde_plafond">Este importe supera el límite de pago fijado para este proveedor.</string>
+    <string name="ach_garde_compte_requis">Ninguna cuenta de pago del proveedor corresponde a este modo. Añádala en su ficha.</string>
+    <string name="ach_garde_compte_non_verifie">La cuenta de pago del proveedor no ha sido verificada.</string>
+    <string name="ach_garde_compte_rejete">La cuenta de pago del proveedor fue rechazada. Corríjala en su ficha.</string>
+    <string name="ach_garde_compte_recent">La cuenta de pago del proveedor se modificó hace menos de 7 días y no está verificada. Verifíquela antes de pagar.</string>
+    <string name="ach_garde_confirmer_titre">¿Confirmar el pago?</string>
+    <string name="ach_garde_confirmer_action">Pagar de todos modos</string>
     <string name="four_a_payer">Por pagar</string>
     <string name="four_a_traiter">Por procesar</string>
     <string name="four_a_valider">Por validar</string>

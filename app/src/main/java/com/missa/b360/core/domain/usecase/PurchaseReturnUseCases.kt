@@ -2,6 +2,7 @@ package com.missa.b360.core.domain.usecase
 import androidx.room.withTransaction
 
 import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -20,6 +21,8 @@ import com.missa.b360.core.data.entity.OperationStatus
 import com.missa.b360.core.data.entity.SensMouvement
 import com.missa.b360.core.data.entity.StockMovementEntity
 import com.missa.b360.core.data.entity.StockMovementType
+import com.missa.b360.core.domain.model.AchatTresorerieRules
+import com.missa.b360.core.domain.model.DecaissementAchat
 import com.missa.b360.core.domain.model.InventoryRules
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.CommandeAchatCodec
@@ -27,6 +30,9 @@ import com.missa.b360.core.domain.model.PurchaseRecordPayload
 import com.missa.b360.core.domain.model.PurchaseLine
 import com.missa.b360.core.domain.model.ReceptionCodec
 import com.missa.b360.core.domain.model.FournisseurRules
+import com.missa.b360.core.domain.model.PaymentDecision
+import com.missa.b360.core.domain.model.PaymentGuardReason
+import com.missa.b360.core.domain.model.SupplierPaymentDecision
 import com.missa.b360.core.domain.model.PurchaseStockEffects
 import com.missa.b360.core.domain.model.ReglesGroupesArticles
 import com.missa.b360.core.domain.model.SaleLine
@@ -57,6 +63,7 @@ import kotlin.math.abs
 class SavePurchaseUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val fournisseurDao: FournisseurDao,
+    private val compteFournisseurDao: FournisseurCompteBancaireDao,
     private val productDao: ProductDao,
     private val siteDao: SiteDao,
     private val groupeDao: GroupeArticleDao,
@@ -80,6 +87,13 @@ class SavePurchaseUseCase @Inject constructor(
         data object SiteIntrouvable : Result()
         data object ReceptionRequise : Result()
         data object BrouillonIntrouvable : Result()
+        data object SoldeInsuffisant : Result()
+
+        /** Le montant réglé à la validation exige une confirmation (compte non vérifié, plafond dépassé). */
+        data class ConfirmationPaiementRequise(val motif: PaymentGuardReason) : Result()
+
+        /** Le montant réglé à la validation est refusé : compte absent, rejeté ou récent, fournisseur bloqué. */
+        data class PaiementRefuse(val motif: PaymentGuardReason) : Result()
     }
 
     private class TransactionRefusee(val resultat: Result) : RuntimeException()
@@ -89,6 +103,7 @@ class SavePurchaseUseCase @Inject constructor(
         payload: PurchaseRecordPayload,
         draft: Boolean,
         now: Long = System.currentTimeMillis(),
+        confirmePaiement: Boolean = false,
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         if (payload.lines.isEmpty() || !payload.total.isFinite() || payload.total <= 0.0 ||
@@ -285,25 +300,54 @@ class SavePurchaseUseCase @Inject constructor(
                 }
             }
 
-            // 4. Le fournisseur rembourse ce qui avait déjà été réglé : l'annulation
-            //    fait rentrer ces fonds une seule fois, sur le compte d'origine du paiement.
+            // 4. Ce qui est réglé à la validation SORT de la trésorerie : la garde de paiement et le
+            //    solde du compte s'appliquent comme pour un règlement ultérieur. Le contrôle précède
+            //    toute écriture : un refus annule la transaction (aucune pièce, aucun stock).
             val referenceDecaissement = TresorerieRules.referenceEncaissement(reference)
             val compteDecaissement = TresorerieRules.compteCible(
                 payload.paymentMethod,
                 comptesTresorerieDao.getAll(),
             )
-            val montantDecaisse = TresorerieRules.encaissementAEnregistrer(
+            if (payload.paidAmount > QUANTITE_EPSILON) {
+                when (
+                    val decision = SupplierPaymentDecision.decider(
+                        fournisseur = fournisseur,
+                        montant = payload.paidAmount,
+                        modePaiement = payload.paymentMethod,
+                        comptes = compteFournisseurDao.listeParFournisseur(fournisseur.id),
+                        compteId = null,
+                        confirme = confirmePaiement,
+                        now = now,
+                    )
+                ) {
+                    is PaymentDecision.Proceed -> decision.confirmeMotif?.let {
+                        journalManager.log(
+                            "ACHATS",
+                            "REGLEMENT_CONFIRME",
+                            "Facture $reference confirmée malgré : $it",
+                        )
+                    }
+                    is PaymentDecision.NeedConfirmation ->
+                        throw TransactionRefusee(Result.ConfirmationPaiementRequise(decision.motif))
+                    is PaymentDecision.Reject ->
+                        throw TransactionRefusee(Result.PaiementRefuse(decision.motif))
+                }
+            }
+            val decaissement = AchatTresorerieRules.decaissementALaValidation(
                 montantPaye = payload.paidAmount,
                 dejaEnregistre = mouvementsTresorerieDao.compterParReference(referenceDecaissement) > 0,
-                compteDisponible = compteDecaissement != null,
+                compteId = compteDecaissement?.id,
+                soldeCourant = compteDecaissement?.let { comptesTresorerieDao.soldeCourant(it.id) },
             )
-            if (montantDecaisse != null && compteDecaissement != null) {
-                mouvementsTresorerieDao.insert(
+            when (decaissement) {
+                DecaissementAchat.Aucun -> Unit
+                DecaissementAchat.SoldeInsuffisant -> throw TransactionRefusee(Result.SoldeInsuffisant)
+                is DecaissementAchat.Sortie -> mouvementsTresorerieDao.insert(
                     MouvementTresorerieEntity(
-                        compteId = compteDecaissement.id,
+                        compteId = decaissement.compteId,
                         date = now,
-                        sens = SensMouvement.IN.name,
-                        montant = montantDecaisse,
+                        sens = decaissement.sens.name,
+                        montant = decaissement.montant,
                         categorie = CategorieTresorerie.ACHAT.name,
                         libelle = payload.supplierName,
                         tiers = payload.supplierName,

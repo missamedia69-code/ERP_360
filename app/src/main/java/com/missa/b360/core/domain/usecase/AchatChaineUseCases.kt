@@ -2,6 +2,7 @@ package com.missa.b360.core.domain.usecase
 
 import androidx.room.withTransaction
 import com.missa.b360.core.data.dao.CompteTresorerieDao
+import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -24,12 +25,15 @@ import com.missa.b360.core.domain.model.AchatCommandeRules
 import com.missa.b360.core.domain.model.CommandeAchatCodec
 import com.missa.b360.core.domain.model.CommandeAchatPayload
 import com.missa.b360.core.domain.model.FournisseurRules
+import com.missa.b360.core.domain.model.PaymentDecision
+import com.missa.b360.core.domain.model.PaymentGuardReason
 import com.missa.b360.core.domain.model.PurchaseRecordCodec
 import com.missa.b360.core.domain.model.PurchaseStockEffects
 import com.missa.b360.core.domain.model.ReceptionCodec
 import com.missa.b360.core.domain.model.ReceptionLigne
 import com.missa.b360.core.domain.model.ReceptionPayload
 import com.missa.b360.core.domain.model.ReglesGroupesArticles
+import com.missa.b360.core.domain.model.SupplierPaymentDecision
 import com.missa.b360.core.domain.model.TresorerieRules
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
@@ -397,6 +401,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
 class ReglerAchatUseCase @Inject constructor(
     private val operationDao: OperationRecordDao,
     private val fournisseurDao: FournisseurDao,
+    private val compteFournisseurDao: FournisseurCompteBancaireDao,
     private val comptesTresorerieDao: CompteTresorerieDao,
     private val mouvementsTresorerieDao: MouvementTresorerieDao,
     private val appNotifier: AppNotifier,
@@ -414,6 +419,12 @@ class ReglerAchatUseCase @Inject constructor(
         data object SoldeInsuffisant : Result()
         data object DejaEnregistre : Result()
         data object PaiementBloque : Result()
+
+        /** Le règlement exige une confirmation explicite (compte non vérifié, plafond dépassé). */
+        data class ConfirmationRequise(val motif: PaymentGuardReason) : Result()
+
+        /** Refus que rien ne lève : compte absent, rejeté ou trop récent, montant invalide. */
+        data class Refuse(val motif: PaymentGuardReason) : Result()
     }
 
     suspend operator fun invoke(
@@ -421,6 +432,8 @@ class ReglerAchatUseCase @Inject constructor(
         montant: Double,
         modePaiement: String,
         now: Long = System.currentTimeMillis(),
+        confirme: Boolean = false,
+        compteBeneficiaireId: Long? = null,
     ): Result {
         if (licenceManager.isReadOnly()) return Result.LectureSeule
         val facture = operationDao.getById(factureRecordId)
@@ -433,16 +446,41 @@ class ReglerAchatUseCase @Inject constructor(
         if (!AchatCommandeRules.reglementEstValide(payload.total, payload.paidAmount, montant)) {
             return Result.MontantInvalide
         }
-        // Spec Fournisseurs §3.1 : paiement possible uniquement pour ACTIF, SUSPENDU
-        // ou BLOQUE (obligations déjà validées) ; jamais brouillon/archivé.
-        val fournisseur = fournisseurDao.getById(payload.supplierId)
-        if (fournisseur != null && !FournisseurRules.peutEtrePaye(fournisseur.statut)) {
-            return Result.PaiementBloque
-        }
         val compte = TresorerieRules.compteCible(modePaiement, comptesTresorerieDao.getAll())
             ?: return Result.CompteIntrouvable
 
         return database.withTransaction {
+            // Garde de paiement (Spec Fournisseurs §3.1) : statut, blocage, compte, plafond.
+            // Un fournisseur supprimé de la base ne peut plus être contrôlé : le règlement reste possible.
+            var motifConfirme: PaymentGuardReason? = null
+            val fournisseur = fournisseurDao.getById(payload.supplierId)
+            if (fournisseur != null) {
+                val decision = SupplierPaymentDecision.decider(
+                    fournisseur = fournisseur,
+                    montant = montant,
+                    modePaiement = modePaiement,
+                    comptes = compteFournisseurDao.listeParFournisseur(fournisseur.id),
+                    compteId = compteBeneficiaireId,
+                    confirme = confirme,
+                    now = now,
+                )
+                when (decision) {
+                    is PaymentDecision.Proceed -> motifConfirme = decision.confirmeMotif
+                    is PaymentDecision.NeedConfirmation ->
+                        return@withTransaction Result.ConfirmationRequise(decision.motif)
+                    is PaymentDecision.Reject -> {
+                        journalManager.log(
+                            "ACHATS",
+                            "REGLEMENT_REFUSE",
+                            "Règlement ${facture.reference} — ${payload.supplierName} refusé (${decision.motif})",
+                        )
+                        return@withTransaction when (decision.motif) {
+                            PaymentGuardReason.STATUT_INTERDIT, PaymentGuardReason.PAIEMENT_BLOQUE -> Result.PaiementBloque
+                            else -> Result.Refuse(decision.motif)
+                        }
+                    }
+                }
+            }
             val numero = mouvementsTresorerieDao.compterParReferenceCommencant(facture.reference) + 1
             val referenceMouvement = AchatCommandeRules.referenceReglement(facture.reference, numero)
             if (mouvementsTresorerieDao.compterParReference(referenceMouvement) > 0) {
@@ -485,6 +523,13 @@ class ReglerAchatUseCase @Inject constructor(
                 "REGLEMENT_ACHAT",
                 "Règlement #$numero ${facture.reference} — ${payload.supplierName} ($montant via $modePaiement)",
             )
+            if (motifConfirme != null) {
+                journalManager.log(
+                    "ACHATS",
+                    "REGLEMENT_CONFIRME",
+                    "Règlement #$numero ${facture.reference} confirmé malgré : $motifConfirme",
+                )
+            }
             fournisseurCache.rafraichir(payload.supplierId, now)
             Result.Succes(referenceMouvement)
         }

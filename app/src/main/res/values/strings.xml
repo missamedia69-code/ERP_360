@@ -261,6 +261,13 @@
     <string name="ach_erreur_fournisseur_non_actif">Fournisseur non actif : approbation requise avant de commander</string>
     <string name="ach_erreur_fournisseur_doublon">Un fournisseur similaire existe déjà. Vérifiez le référentiel avant de le créer.</string>
     <string name="ach_erreur_paiement_bloque">Paiement bloqué pour ce fournisseur</string>
+    <string name="ach_garde_plafond">Ce montant dépasse le plafond de paiement fixé pour ce fournisseur.</string>
+    <string name="ach_garde_compte_requis">Aucun compte de paiement du fournisseur ne correspond à ce mode. Ajoutez-le dans sa fiche.</string>
+    <string name="ach_garde_compte_non_verifie">Le compte de paiement du fournisseur n\'a pas été vérifié.</string>
+    <string name="ach_garde_compte_rejete">Le compte de paiement du fournisseur a été rejeté. Corrigez-le dans sa fiche.</string>
+    <string name="ach_garde_compte_recent">Le compte de paiement du fournisseur a été modifié il y a moins de 7 jours et n\'est pas vérifié. Vérifiez-le avant de payer.</string>
+    <string name="ach_garde_confirmer_titre">Confirmer le paiement ?</string>
+    <string name="ach_garde_confirmer_action">Payer quand même</string>
     <string name="four_a_payer">À payer</string>
     <string name="four_a_traiter">À traiter</string>
     <string name="four_a_valider">À valider</string>

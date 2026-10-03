@@ -136,6 +136,9 @@ interface FournisseurCompteBancaireDao {
     @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE id = :id")
     suspend fun getById(id: Long): FournisseurCompteBancaireEntity?
 
+    @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE fournisseurId = :fournisseurId")
+    suspend fun listeParFournisseur(fournisseurId: Long): List<FournisseurCompteBancaireEntity>
+
     @Query("UPDATE fournisseur_comptes_bancaires SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerComptePrincipal(fournisseurId: Long)
 

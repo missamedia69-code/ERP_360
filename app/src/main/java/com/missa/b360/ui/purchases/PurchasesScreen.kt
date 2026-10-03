@@ -192,6 +192,16 @@ fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false, openPending
         }
     }
 
+    // --- Garde de paiement : confirmation explicite d'un règlement signalé ---
+    val reglementAConfirmer by vm.reglementAConfirmer.collectAsStateWithLifecycle()
+    reglementAConfirmer?.let { attente ->
+        DialogueConfirmationPaiement(
+            motif = attente.motif,
+            onConfirmer = { vm.confirmerReglement() },
+            onAnnuler = { vm.annulerConfirmationReglement() },
+        )
+    }
+
     // --- Annulation avec confirmation explicite ---
     pieceAAnnuler?.let { piece ->
         AlertDialog(
@@ -433,6 +443,7 @@ private fun messageAction(resultat: PurchasesViewModel.ActionAchatResult): Strin
     PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
     PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
     PurchasesViewModel.ActionAchatResult.PaiementBloque -> stringResource(R.string.ach_erreur_paiement_bloque)
+    is PurchasesViewModel.ActionAchatResult.PaiementRefuse -> stringResource(resultat.motif.messageRes())
     PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
     PurchasesViewModel.ActionAchatResult.Erreur -> stringResource(R.string.ach_erreur)
 }
@@ -822,6 +833,14 @@ private fun FormulaireAchat(
         }
     }
 
+    (resultat as? PurchasesViewModel.SaveResult.ConfirmationPaiement)?.let { confirmation ->
+        DialogueConfirmationPaiement(
+            motif = confirmation.motif,
+            onConfirmer = { vm.save(modePaiement, draft = false, confirmePaiement = true) },
+            onAnnuler = { vm.clearSaveResult() },
+        )
+    }
+
     val total = vm.total()
     val tauxApplique = ui.taxTaux ?: tauxDefaut
     val tva = if (tauxApplique == 0.0) 0.0 else total * tauxApplique / (100.0 + tauxApplique)
@@ -1018,7 +1037,7 @@ private fun FormulaireAchat(
             libelleDroite = stringResource(R.string.ach_valider),
             droiteActive = peutValider,
             onDroite = { vm.save(modePaiement, draft = false) },
-            erreur = when (resultat) {
+            erreur = when (val saisie = resultat) {
                 PurchasesViewModel.SaveResult.MissingSupplier -> stringResource(R.string.ach_erreur_fournisseur)
                 PurchasesViewModel.SaveResult.EmptyCart -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
@@ -1029,6 +1048,8 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.ReceptionRequise -> stringResource(R.string.ach_erreur_reception_requise)
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
+                PurchasesViewModel.SaveResult.SoldeInsuffisant -> stringResource(R.string.tre_solde_insuffisant)
+                is PurchasesViewModel.SaveResult.PaiementRefuse -> stringResource(saisie.motif.messageRes())
                 else -> null
             },
         )
