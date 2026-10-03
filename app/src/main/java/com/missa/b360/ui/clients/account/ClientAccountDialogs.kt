@@ -20,6 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.missa.b360.ui.clients.components.BoutonClientPlein as Button
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
+import com.missa.b360.ui.clients.components.BoutonClient
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
+import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.clients.components.ClientEncadre
 import com.missa.b360.ui.clients.components.ClientFeuille
@@ -67,8 +72,9 @@ internal fun EncaissementDialog(
         titre = stringResource(if (cibleFacture) R.string.cli_encaisser_facture else R.string.cli_encaisser),
         onFermer = onDismiss,
         actions = {
-            OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(stringResource(R.string.cli_annuler)) }
-            Button(onClick = { onValider(montant, mode, note) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+            BoutonClient(onClick = onDismiss, modifier = Modifier.weight(0.75f), plein = false) { Text(stringResource(R.string.cli_annuler), color = MissaInk) }
+            Button(onClick = { onValider(montant, mode, note) }, modifier = Modifier.weight(1.25f).heightIn(min = 48.dp)) {
+                Icon(painterResource(Iv.Check), contentDescription = null, modifier = Modifier.size(15.dp))
                 Text(stringResource(R.string.cli_enregistrer))
             }
         },
@@ -90,9 +96,16 @@ internal fun EncaissementDialog(
 
 @Composable
 private fun EncadreResteDu(montant: Double, devise: String) {
-    ClientEncadre {
-        Text(stringResource(R.string.cli_reste_du_libelle), color = MissaMuted, fontSize = 11.sp)
-        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFFF6F3FC))
+            .padding(horizontal = 11.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(stringResource(R.string.cli_reste_du_libelle), color = MissaMuted, fontSize = 10.sp, modifier = Modifier.weight(1f))
+        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
 
@@ -126,12 +139,15 @@ internal fun PromesseDialog(
         sousTitre = sousTitre,
         onFermer = onDismiss,
         actions = {
-            OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(stringResource(R.string.cli_annuler)) }
+            BoutonClient(onClick = onDismiss, modifier = Modifier.weight(0.75f), plein = false) { Text(stringResource(R.string.cli_annuler), color = MissaInk) }
             Button(
                 onClick = { onValider(montant, if (choix == ECHEANCE_DATE) date?.let { joursJusquau(it) } ?: 0 else choix) },
                 enabled = !dateRequise,
-                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Text(stringResource(R.string.cli_enregistrer)) }
+                modifier = Modifier.weight(1.25f).heightIn(min = 48.dp),
+            ) {
+                Icon(painterResource(Iv.Check), contentDescription = null, modifier = Modifier.size(15.dp))
+                Text(stringResource(R.string.cli_enregistrer))
+            }
         },
     ) {
         EncadreResteDu(encours, devise)
@@ -139,7 +155,7 @@ internal fun PromesseDialog(
             valeur = montant, onValeur = { montant = it }, libelle = stringResource(R.string.cli_montant_promis),
             clavier = MissaClavier.DECIMAL, requis = true,
         )
-        Text(stringResource(R.string.cli_promesse_delai), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
+        Text(stringResource(R.string.cli_promesse_delai), color = Color(0xFF626D83), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
         ECHEANCES.chunked(2).forEach { ligne ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ligne.forEach { echeance ->
@@ -163,7 +179,7 @@ internal fun PromesseDialog(
 
 @Composable
 private fun CaseEcheance(libelle: String, actif: Boolean, onClick: () -> Unit, modifier: Modifier) {
-    val forme = RoundedCornerShape(14.dp)
+    val forme = RoundedCornerShape(11.dp)
     Box(
         modifier
             .heightIn(min = 48.dp)
@@ -175,7 +191,7 @@ private fun CaseEcheance(libelle: String, actif: Boolean, onClick: () -> Unit, m
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            libelle, color = if (actif) ClientCouleurs.Violet else MissaInk, fontSize = 13.sp,
+            libelle, color = if (actif) ClientCouleurs.VioletProfond else Color(0xFF5D6880), fontSize = 10.sp,
             fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center, maxLines = 2,
         )
     }

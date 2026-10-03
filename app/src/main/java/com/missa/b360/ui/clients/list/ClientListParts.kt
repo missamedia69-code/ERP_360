@@ -5,6 +5,7 @@ import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -93,40 +94,40 @@ internal fun ClientListSummary(etat: ClientListUiState) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.cli_resume_titre),
-                color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp,
+                color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
                 modifier = Modifier.weight(1f),
             )
             Box(Modifier.size(7.dp).clip(CircleShape).background(Color(0xFF4ADE80)))
             Spacer(Modifier.width(6.dp))
-            Text(stringResource(R.string.cli_resume_temps_reel), color = Color(0xFFC3CBE0), fontSize = 11.sp)
+            Text(stringResource(R.string.cli_resume_temps_reel), color = Color(0xFFC3CBE0), fontSize = 10.sp)
         }
         Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Chiffre(stringResource(R.string.cli_resume_clients), etat.compteurs.total.toString(), Color.White, Modifier.weight(1f))
+            Chiffre(stringResource(R.string.cli_resume_clients), etat.compteurs.total.toString(), Color.White, Modifier.weight(0.72f), grande = true)
             Chiffre(
                 stringResource(R.string.cli_resume_encours), clientMoney(etat.encoursTotal, etat.devise),
-                Color.White, Modifier.weight(1.4f),
+                Color.White, Modifier.weight(1.1f),
             )
             Chiffre(
                 stringResource(R.string.cli_resume_en_retard), clientMoney(etat.enRetardTotal, etat.devise),
-                if (etat.enRetardTotal > 0.0) Color(0xFFFFB4A8) else Color.White, Modifier.weight(1.4f),
+                if (etat.enRetardTotal > 0.0) Color(0xFFFFB4A8) else Color.White, Modifier.weight(1.1f),
             )
         }
     }
 }
 
 @Composable
-private fun Chiffre(libelle: String, valeur: String, couleur: Color, modifier: Modifier) {
-    val forme = RoundedCornerShape(14.dp)
+private fun Chiffre(libelle: String, valeur: String, couleur: Color, modifier: Modifier, grande: Boolean = false) {
+    val forme = RoundedCornerShape(12.dp)
     Column(
         modifier
             .clip(forme)
-            .background(Color.White.copy(alpha = 0.10f))
+            .background(Color.White.copy(alpha = 0.09f))
             .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.14f)), forme)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+            .padding(horizontal = 8.dp, vertical = 9.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(libelle, color = Color(0xFFC3CBE0), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(valeur, color = couleur, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(valeur, color = couleur, fontSize = if (grande) 18.sp else 12.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -144,30 +145,30 @@ internal fun ClientFilterChips(etat: ClientListUiState, onFiltre: (ClientListFil
             ) {
                 Row(
                     Modifier
-                        .heightIn(min = 36.dp)
+                        .heightIn(min = 33.dp)
                         .clip(forme)
                         .background(if (actif) ClientCouleurs.Violet else Color.White)
                         .then(if (actif) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
-                        .padding(start = 12.dp, end = 6.dp),
+                        .padding(start = 10.dp, end = 7.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(7.dp),
                 ) {
                     Text(
                         stringResource(filtre.libelle()),
-                        color = if (actif) Color.White else ClientCouleurs.NeutreTexte, fontSize = 12.sp,
+                        color = if (actif) Color.White else ClientCouleurs.NeutreTexte, fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                     )
                     Box(
                         Modifier
-                            .size(22.dp)
+                            .size(18.dp)
                             .clip(CircleShape)
-                            .background(if (actif) Color.White.copy(alpha = 0.22f) else ClientCouleurs.Neutre),
+                            .background(if (actif) Color(0x40000000).copy(alpha = 0.25f) else Color(0xFFEEF0F4)),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             etat.compteurs.pour(filtre).toString(),
-                            color = if (actif) Color.White else ClientCouleurs.NeutreTexte, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
+                            color = if (actif) Color.White else Color(0xFF667188), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold,
                         )
                     }
                 }
@@ -184,13 +185,13 @@ internal fun ClientListeEntete(etat: ClientListUiState, onTri: (ClientListSort) 
         val nombre = etat.lignes.size
         Text(
             if (nombre == 1) stringResource(R.string.cli_nb_client_un) else stringResource(R.string.cli_nb_clients_n, nombre),
-            color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
+            color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp,
             modifier = Modifier.weight(1f),
         )
         Box {
             BoutonClient(onClick = { menuOuvert = true }, plein = false) {
-                Text(stringResource(R.string.cli_trier_par), color = MissaMuted, fontSize = 12.sp)
-                Text(stringResource(etat.tri.libelle()), color = MissaInk, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                Text(stringResource(R.string.cli_trier_par), color = MissaMuted, fontSize = 10.sp)
+                Text(stringResource(etat.tri.libelle()), color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                 Icon(painterResource(Iv.ExpandMore), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(16.dp))
             }
             DropdownMenu(expanded = menuOuvert, onDismissRequest = { menuOuvert = false }) {
@@ -232,20 +233,21 @@ internal fun ClientListRow(
     val aRelancerDescription = stringResource(R.string.cli_a_relancer_desc)
     ClientCarte(onClick = onClick, modifier = Modifier.heightIn(min = 64.dp)) {
         Row(
-            Modifier.padding(start = 12.dp, top = 11.dp, bottom = 11.dp, end = 6.dp),
+            Modifier.padding(12.dp),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(11.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             ClientAvatar(client.nom, taille = 47.dp)
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(client.nom, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(client.code, color = MissaMuted, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                Text(client.nom, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(client.code, color = MissaMuted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Row(Modifier.padding(top = 3.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     Icon(painterResource(Iv.Call), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(13.dp))
-                    Text(client.telephone, color = ClientCouleurs.NeutreTexte, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(client.telephone, color = Color(0xFF59657B), fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
+                HorizontalDivider(color = Color(0xFFEFF1F5), modifier = Modifier.padding(top = 4.dp))
                 Row(
-                    Modifier.padding(top = 2.dp),
+                    Modifier.fillMaxWidth().padding(top = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -254,28 +256,28 @@ internal fun ClientListRow(
                     Spacer(Modifier.weight(1f))
                     val encours = ligne.encours
                     Text(
-                        stringResource(R.string.cli_kpi_encours) + " " + clientMoney(encours, devise),
-                        color = if (encours > 0.0) RisqueCouleurs.Eleve else ClientCouleurs.NeutreTexte,
-                        fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                        stringResource(R.string.cli_kpi_encours) + " ",
+                        color = MissaMuted, fontSize = 10.sp, maxLines = 1,
+                    )
+                    Text(
+                        clientMoney(encours, devise),
+                        color = if (encours > 0.0) RisqueCouleurs.Eleve else MissaInk,
+                        fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1,
                     )
                 }
                 val retard = compte?.joursRetardMax ?: 0
                 if (retard > 0) {
-                    Text(stringResource(R.string.cli_retard_jours, retard), color = RisqueCouleurs.Eleve, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.cli_retard_jours, retard), color = RisqueCouleurs.Eleve, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Column(
-                Modifier.heightIn(min = 47.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (ligne.aRelancer) {
                     Icon(
                         painterResource(Iv.Notifications), contentDescription = null, tint = ClientCouleurs.Alerte,
-                        modifier = Modifier.size(18.dp).semantics { contentDescription = aRelancerDescription },
+                        modifier = Modifier.size(16.dp).semantics { contentDescription = aRelancerDescription },
                     )
                 }
-                Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(22.dp))
+                Icon(painterResource(Iv.ChevronRight), contentDescription = null, tint = Color(0xFF8993A6), modifier = Modifier.size(16.dp))
             }
         }
     }

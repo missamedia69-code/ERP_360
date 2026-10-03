@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.ui.clients.components.ClientPhoneField
+import com.missa.b360.ui.clients.components.ClientBoutonAjout
+import androidx.compose.ui.unit.sp
 import com.missa.b360.ui.clients.labelRes
 import com.missa.b360.ui.components.MissaRangee
 import com.missa.b360.ui.components.MissaFormulaireTheme
@@ -127,6 +129,7 @@ internal fun SectionConditions(etat: ClientEditUiState, modifier: (ClientDraft.(
 internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() -> ClientDraft) -> Unit) {
     val d = etat.draft
     val err = etat.erreurs
+    Text(stringResource(R.string.cli_form_note_contacts), color = com.missa.b360.ui.theme.MissaMuted, fontSize = 10.sp, lineHeight = 15.sp)
     d.contacts.forEachIndexed { index, c ->
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -153,10 +156,10 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
             }
         }
     }
-    OutlinedButton(
+    ClientBoutonAjout(
+        libelle = stringResource(R.string.cli_ajouter_contact),
         onClick = { modifier { copy(contacts = contacts + ContactDraft(principal = contacts.isEmpty())) } },
-        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-    ) { Text(stringResource(R.string.cli_ajouter_contact)) }
+    )
 
     d.adresses.forEachIndexed { index, a ->
         Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 6.dp)) {
@@ -182,14 +185,15 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
             }
         }
     }
-    OutlinedButton(
+    ClientBoutonAjout(
+        libelle = stringResource(R.string.cli_ajouter_adresse),
         onClick = { modifier { copy(adresses = adresses + AddressDraft(principale = adresses.isEmpty())) } },
-        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-    ) { Text(stringResource(R.string.cli_ajouter_adresse)) }
+    )
 }
 
 @Composable
 internal fun SectionNotes(etat: ClientEditUiState, modifier: (ClientDraft.() -> ClientDraft) -> Unit) {
+    Text(stringResource(R.string.cli_form_note_notes), color = com.missa.b360.ui.theme.MissaMuted, fontSize = 10.sp, lineHeight = 15.sp)
     ChampClient(etat.draft.notes, { v -> modifier { copy(notes = v.take(1000)) } }, R.string.clients_notes, DraftField.NOTES in etat.erreurs, lignes = 4)
 }
 

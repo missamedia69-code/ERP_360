@@ -45,6 +45,15 @@ import com.missa.b360.ui.clients.components.ClientEtatVide
 import com.missa.b360.ui.clients.components.BoutonClientDoux
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.layout.Box
+import com.missa.b360.ui.clients.components.ClientEtatVideCompact
+import com.missa.b360.ui.clients.components.BoutonClient
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
 import com.missa.b360.ui.clients.components.ClientTopBar
 import com.missa.b360.ui.clients.components.CreditGauge
@@ -94,7 +103,15 @@ fun ClientAccountScreen(
         containerColor = ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(hote) },
-        topBar = { ClientTopBar(titre = stringResource(R.string.cli_compte_titre), onBack = onBack) },
+        topBar = {
+            ClientTopBar(titre = stringResource(R.string.cli_compte_titre), onBack = onBack) {
+                if (client != null) {
+                    IconButton(onClick = { lanceurPdf.launch("releve-${client.code}.pdf") }) {
+                        Icon(painterResource(Iv.Download), stringResource(R.string.cli_releve_pdf), tint = MissaInk)
+                    }
+                }
+            }
+        },
     ) { padding ->
         when {
             etat.erreur -> EtatErreur(onReessayer = viewModel::reessayer, modifier = Modifier.padding(padding))
@@ -111,30 +128,32 @@ fun ClientAccountScreen(
             ) {
                 item {
                     ClientHero {
-                        Text(
-                            stringResource(R.string.cli_compte_de, client.nom),
-                            color = Color(0xFFC3CBE0), fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1,
-                        )
+                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Icon(painterResource(Iv.Payments), contentDescription = null, tint = Color(0xFFC7A8FF), modifier = Modifier.size(13.dp))
+                            Text(
+                                stringResource(R.string.cli_compte_de, client.nom),
+                                color = Color(0xFFC3CBE0), fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                            )
+                        }
                         Text(
                             clientMoney(etat.balance?.encours ?: 0.0, etat.devise),
                             color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, maxLines = 1,
-                            modifier = Modifier.padding(top = 2.dp),
+                            modifier = Modifier.padding(top = 8.dp),
                         )
-                        Text(stringResource(R.string.cli_reste_du_libelle), color = Color(0xFFC3CBE0), fontSize = 11.sp)
+                        val risque = etat.evaluation?.risque
                         val enRetard = etat.balance?.enRetard ?: 0.0
-                        Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Column(Modifier.weight(1f)) {
-                                Text(stringResource(R.string.cli_kpi_en_retard), color = Color(0xFFC3CBE0), fontSize = 11.sp)
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.15f), modifier = Modifier.padding(top = 13.dp, bottom = 10.dp))
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Text(stringResource(R.string.cli_reste_du_libelle), color = Color(0xFFC3CBE0), fontSize = 10.sp, modifier = Modifier.weight(1f))
+                            if (enRetard > 0.0) {
                                 Text(
-                                    clientMoney(enRetard, etat.devise),
-                                    color = if (enRetard > 0.0) Color(0xFFFFB4A8) else Color.White,
-                                    fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
+                                    stringResource(R.string.cli_kpi_en_retard) + " " + clientMoney(enRetard, etat.devise),
+                                    color = Color(0xFFFFB4A8), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold,
                                 )
                             }
                         }
-                        val risque = etat.evaluation?.risque
                         if (risque != null) {
-                            Box(Modifier.padding(top = 10.dp)) { CreditGauge(etat.evaluation?.utilisationPct, risque, surFonce = true) }
+                            Box(Modifier.padding(top = 8.dp)) { CreditGauge(etat.evaluation?.utilisationPct, risque, surFonce = true) }
                         }
                     }
                 }
@@ -144,20 +163,29 @@ fun ClientAccountScreen(
                             onClick = { viewModel.ouvrirEncaissement() },
                             couleur = ClientCouleurs.Nuit,
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                        ) { Text(stringResource(R.string.cli_encaisser)) }
+                        ) {
+                            Icon(painterResource(Iv.Payments), contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(7.dp))
+                            Text(stringResource(R.string.cli_encaisser))
+                        }
                         BoutonClientDoux(
                             onClick = viewModel::ouvrirPromesse,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1.25f),
                         ) {
-                            Text(stringResource(R.string.cli_type_promesse), color = ClientCouleurs.Violet, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                            Icon(painterResource(Iv.Schedule), contentDescription = null, tint = ClientCouleurs.VioletProfond, modifier = Modifier.size(16.dp))
+                            Text(stringResource(R.string.cli_type_promesse), color = ClientCouleurs.VioletProfond, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
                         }
                     }
                 }
                 item {
-                    OutlinedButton(
+                    BoutonClient(
                         onClick = { lanceurPdf.launch("releve-${client.code}.pdf") },
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                    ) { Text(stringResource(R.string.cli_telecharger_releve)) }
+                        modifier = Modifier.fillMaxWidth(),
+                        plein = false,
+                    ) {
+                        Icon(painterResource(Iv.Download), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(15.dp))
+                        Text(stringResource(R.string.cli_releve_pdf), color = MissaInk)
+                    }
                 }
                 val promesse = etat.promesse
                 val dateAPromettre = promesse?.promesseDate
@@ -184,7 +212,7 @@ fun ClientAccountScreen(
                     }
                 }
                 if (compte.factures.isEmpty()) {
-                    item { ClientEtatVide(Iv.CheckCircle, stringResource(R.string.cli_aucune_facture_ouverte), "") }
+                    item { ClientEtatVideCompact(Iv.Description, stringResource(R.string.cli_aucune_facture_ouverte)) }
                 } else {
                     items(compte.factures.size) { index ->
                         val facture = compte.factures[index]
@@ -197,13 +225,13 @@ fun ClientAccountScreen(
                     }
                 }
                 if (compte.paiements.isEmpty()) {
-                    item { ClientEtatVide(Iv.Payments, stringResource(R.string.cli_aucun_encaissement), "") }
+                    item { ClientEtatVideCompact(Iv.Payments, stringResource(R.string.cli_aucun_encaissement)) }
                 } else {
                     items(compte.paiements.take(10).size) { index ->
                         val paiement = compte.paiements[index]
                         Row(Modifier.fillMaxWidth().heightIn(min = 40.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            Text("${clientDate(paiement.paiementAt)} · ${paiement.modePaiement}", color = MissaMuted, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                            Text(clientMoney(paiement.montant, etat.devise), color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Text("${clientDate(paiement.paiementAt)} · ${paiement.modePaiement}", color = MissaMuted, fontSize = 10.sp, modifier = Modifier.weight(1f))
+                            Text(clientMoney(paiement.montant, etat.devise), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
                         }
                     }
                 }
@@ -227,7 +255,7 @@ fun ClientAccountScreen(
             devise = etat.devise,
             onValider = { montant, jours -> viewModel.promettre(montant, jours) },
             onDismiss = viewModel::fermerDialogue,
-            sousTitre = client?.nom,
+            sousTitre = client?.let { stringResource(R.string.cli_client_point, it.nom) },
         )
         null -> Unit
     }

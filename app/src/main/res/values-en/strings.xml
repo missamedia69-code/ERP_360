@@ -2064,7 +2064,7 @@
     <string name="cli_filtre_nouveaux">New</string>
     <string name="cli_filtre_incomplets">Incomplete</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
-    <string name="cli_trier_par">Sort by</string>
+    <string name="cli_trier_par">Sort:</string>
     <string name="cli_resume_temps_reel">Live</string>
     <string name="cli_nb_client_un">1 client</string>
     <string name="cli_nb_clients_n">%1$d clients</string>
@@ -2107,7 +2107,7 @@
     <string name="cli_onglet_conditions">Terms</string>
     <string name="cli_onglet_notes">Notes</string>
     <string name="cli_voir_activite">All activity</string>
-    <string name="cli_voir_compte">Open the account</string>
+    <string name="cli_voir_compte">Open client account</string>
     <string name="cli_aucune_activite">No activity yet.</string>
     <string name="cli_aucune_activite_desc">Upcoming actions will appear here.</string>
     <string name="cli_aucun_contact">No contacts or addresses saved.</string>
@@ -2229,7 +2229,7 @@
     <string name="cli_montant">Amount</string>
     <string name="cli_montant_promis">Promised amount</string>
     <string name="cli_note_facultative">Note (optional)</string>
-    <string name="cli_promesse_delai">Promised deadline</string>
+    <string name="cli_promesse_delai">When is it due?</string>
     <string name="cli_promesse_ouverte">Open promise: %1$s before %2$s</string>
     <string name="cli_promesses_non_tenues">Broken promises</string>
     <string name="cli_relances_vide_desc">No client has an overdue payment and no promise went unkept.</string>
@@ -2389,9 +2389,18 @@
     <string name="cli_continuer">Continue</string>
     <string name="cli_choisir_date">Pick a date</string>
     <string name="cli_dans_jours_long">In %1$d days</string>
-    <string name="cli_liste_astuce">Tap a client to open the file.</string>
+    <string name="cli_liste_astuce">Tap a client to open the file and history.</string>
     <string name="cli_fiche_titre">Client file</string>
     <string name="cli_compte_de">Account of %1$s</string>
     <string name="cli_reste_du_libelle">Balance due</string>
     <string name="cli_section_contacts">Contacts and addresses</string>
+    <string name="cli_client_point">Client · %1$s</string>
+    <string name="cli_form_sous_titre_1">Main client information</string>
+    <string name="cli_form_sous_titre_n">Additional information</string>
+    <string name="cli_form_note_contacts">A client can have several contacts and addresses. Mark a main contact and a main address for documents.</string>
+    <string name="cli_form_note_notes">Add an internal note useful for following up this client.</string>
+    <string name="cli_toute_activite">See all activity</string>
+    <string name="cli_releve_pdf">Account statement (PDF)</string>
+    <string name="cli_nouvelle_note">New note</string>
+    <string name="cli_ajouter_note_court">Add</string>
 </resources>

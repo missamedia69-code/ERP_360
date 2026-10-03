@@ -105,7 +105,7 @@ internal fun ClientTitreSection(
 ) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
         ClientSymbole(icone)
-        Text(titre, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, modifier = Modifier.weight(1f))
+        Text(titre, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
         fin?.invoke()
     }
 }
@@ -113,8 +113,11 @@ internal fun ClientTitreSection(
 /** Compteur arrondi (nombre de factures, d'encaissements…). */
 @Composable
 internal fun ClientCompteur(texte: String) {
-    Box(Modifier.clip(RoundedCornerShape(999.dp)).background(ClientCouleurs.Neutre).padding(horizontal = 9.dp, vertical = 3.dp)) {
-        Text(texte, color = ClientCouleurs.NeutreTexte, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+    Box(
+        Modifier.heightIn(min = 21.dp).clip(RoundedCornerShape(8.dp)).background(Color(0xFFECEFF5)).padding(horizontal = 7.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(texte, color = Color(0xFF667188), fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
     }
 }
 
@@ -139,7 +142,7 @@ internal fun ClientPastille(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (icone != null) Icon(painterResource(icone), contentDescription = null, tint = couleurTexte, modifier = Modifier.size(13.dp))
-        Text(texte, color = couleurTexte, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Text(texte, color = couleurTexte, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
     }
 }
 
@@ -185,18 +188,17 @@ internal fun ClientFeuille(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(titre, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                    if (sousTitre != null) Text(sousTitre, color = MissaMuted, fontSize = 12.sp)
+                    if (sousTitre != null) Text(sousTitre, color = MissaMuted, fontSize = 10.sp)
                 }
                 IconButton(
                     onClick = onFermer,
                     modifier = Modifier.size(48.dp),
                 ) {
                     Box(
-                        Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(ClientCouleurs.Surface)
-                            .border(BorderStroke(1.dp, ClientCouleurs.Trait), RoundedCornerShape(11.dp)),
+                        Modifier.size(31.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFFF2F3F7)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Icon(painterResource(Iv.Close), stringResource(R.string.cli_annuler), tint = MissaInk, modifier = Modifier.size(18.dp))
+                        Icon(painterResource(Iv.Close), stringResource(R.string.cli_annuler), tint = MissaInk, modifier = Modifier.size(17.dp))
                     }
                 }
             }
@@ -219,4 +221,87 @@ internal fun ClientEncadre(contenu: @Composable ColumnScope.() -> Unit) {
         verticalArrangement = Arrangement.spacedBy(2.dp),
         content = contenu,
     )
+}
+
+/** État vide compact d'une section du compte : cadre plein, petit symbole violet pâle et une phrase. */
+@Composable
+internal fun ClientEtatVideCompact(icone: Int, texte: String, modifier: Modifier = Modifier) {
+    val forme = RoundedCornerShape(13.dp)
+    Row(
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 51.dp)
+            .clip(forme)
+            .background(Color.White)
+            .border(BorderStroke(1.dp, ClientCouleurs.Trait), forme)
+            .padding(horizontal = 11.dp, vertical = 9.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(9.dp),
+    ) {
+        ClientSymbole(icone, taille = 31.dp)
+        Text(texte, color = MissaMuted, fontSize = 10.sp, modifier = Modifier.weight(1f))
+    }
+}
+
+/** Bouton d'ajout en pointillés (« Ajouter un contact », « Ajouter une adresse »). */
+@Composable
+internal fun ClientBoutonAjout(libelle: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val trait = ClientCouleurs.TraitFort
+    Row(
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(11.dp))
+            .background(Color(0xFFFAFBFE))
+            .drawBehind {
+                drawRoundRect(
+                    color = trait,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(11.dp.toPx()),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(
+                        width = 1.dp.toPx(),
+                        pathEffect = androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(8f, 6f)),
+                    ),
+                )
+            }
+            .clickable(role = Role.Button, onClick = onClick),
+        horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(painterResource(Iv.Add), contentDescription = null, tint = ClientCouleurs.VioletProfond, modifier = Modifier.size(15.dp))
+        Text(libelle, color = ClientCouleurs.VioletProfond, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+    }
+}
+
+/** Champ de recherche du répertoire : 48 dp, contour gris, loupe violette, texte de 11 sp. */
+@Composable
+internal fun ClientRecherche(
+    valeur: String,
+    onValeur: (String) -> Unit,
+    indication: String,
+    modifier: Modifier = Modifier,
+) {
+    val forme = RoundedCornerShape(13.dp)
+    Row(
+        modifier
+            .heightIn(min = 48.dp)
+            .clip(forme)
+            .background(Color.White)
+            .border(BorderStroke(1.dp, ClientCouleurs.TraitFort), forme)
+            .padding(horizontal = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(painterResource(Iv.Search), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(17.dp))
+        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+            if (valeur.isEmpty()) Text(indication, color = Color(0xFF9099AA), fontSize = 11.sp, maxLines = 1)
+            androidx.compose.foundation.text.BasicTextField(
+                value = valeur,
+                onValueChange = onValeur,
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(color = MissaInk, fontSize = 11.sp),
+                cursorBrush = androidx.compose.ui.graphics.SolidColor(ClientCouleurs.Violet),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
 }

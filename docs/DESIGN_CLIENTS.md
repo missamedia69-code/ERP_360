@@ -62,6 +62,15 @@ Champs 46–48 dp, grille 2 colonnes. Textes : titre de carte 15 sp gras, valeur
 Champs en grille 2 colonnes (`MissaRangee`), nom et adresses sur toute la largeur. Les numéros de bloc, les icônes (champ, chevron, croix, indicatif)
 et la bordure active des champs suivent le violet via `LocalCouleurSelection`, fourni par `clientsGraph`.
 
+## Passe de fidélité (E2)
+
+Tailles de la maquette reprises : boutons 11 sp ExtraBold, onglets 11 sp (barre fixe au défilement), titres de section 13 sp, texte secondaire 10 sp,
+barre haute blanche de 53 dp (`ClientTopBar`), avatar à une lettre, puces 33 dp. Fiche : indicateurs avec icônes, actions de 61 dp, contacts en tuiles ;
+Contacts avec « + Contact / + Adresse » ; Notes et états vides en pointillés (`ClientEtatVide`, `ClientEtatVideCompact`).
+Compte : reste dû dans le héros, Encaisser (1) + Promesse (1,25), relevé PDF pleine largeur et icône de téléchargement en barre haute, balance âgée en boîtes (barre 4 dp).
+Promesse : sous-titre « Client · nom », rappel du reste dû sur fond `#F6F3FC`, boutons 0,75 / 1,25 avec coche. Formulaire : croix en barre haute,
+pastilles d'étape carrées de 20 dp (zone tactile 48 dp de haut), notes d'aide aux étapes 4 et 5, boutons « Ajouter » en pointillés (`ClientBoutonAjout`), pied avec icônes.
+
 ## À valider sur appareil
 
 Aucune capture n'a été produite hors appareil : les espacements, la lisibilité du bouton « Nouveau client » au-dessus de la barre de modules

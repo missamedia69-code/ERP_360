@@ -5,6 +5,7 @@ import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.ui.graphics.Brush
 import com.missa.b360.ui.clients.components.ClientCarte
+import com.missa.b360.ui.clients.components.BoutonClient
 import com.missa.b360.ui.clients.components.ClientTitreSection
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.material3.CardDefaults
@@ -47,23 +49,31 @@ import com.missa.b360.ui.theme.MissaMuted
 internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
     val maximum = AgingBucket.entries.maxOf { balance.montant(it) }.takeIf { it > 0.0 } ?: 1.0
     ClientCarte {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             ClientTitreSection(Iv.Schedule, stringResource(R.string.cli_balance_agee)) {
-                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
             }
             for (tranche in AgingBucket.entries) {
                 val montant = balance.montant(tranche)
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ClientCouleurs.Surface)
+                        .border(BorderStroke(1.dp, Color(0xFFEFF1F5)), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 8.dp, vertical = 7.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     Row {
-                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 10.sp, modifier = Modifier.weight(1f))
+                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     }
-                    Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(ClientCouleurs.Neutre)) {
+                    Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0xFFE5E9F1))) {
                         if (montant > 0.0) {
                             Box(
-                                Modifier.fillMaxWidth((montant / maximum).toFloat().coerceIn(0.03f, 1f)).height(8.dp)
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(Brush.horizontalGradient(listOf(ClientCouleurs.Violet, ClientCouleurs.VioletProfond))),
+                                Modifier.fillMaxWidth((montant / maximum).toFloat().coerceIn(0.03f, 1f)).height(4.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(ClientCouleurs.Violet),
                             )
                         }
                     }
@@ -87,24 +97,24 @@ internal fun OpenInvoiceRow(facture: ClientOpenInvoiceLine, devise: String, onEn
                 Column(Modifier.weight(1f)) {
                     Text(
                         facture.reference.ifBlank { clientDate(facture.issuedAt) },
-                        color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         stringResource(R.string.cli_echeance_le, clientDate(facture.dueAt)),
-                        color = if (facture.joursRetard > 0) RisqueCouleurs.Eleve else MissaMuted, fontSize = 12.sp,
+                        color = if (facture.joursRetard > 0) RisqueCouleurs.Eleve else MissaMuted, fontSize = 10.sp,
                     )
                     if (facture.joursRetard > 0) {
-                        Text(stringResource(R.string.cli_retard_jours, facture.joursRetard), color = RisqueCouleurs.Eleve, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.cli_retard_jours, facture.joursRetard), color = RisqueCouleurs.Eleve, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(clientMoney(facture.outstanding, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    Text(stringResource(R.string.cli_sur_total, clientMoney(facture.total, devise)), color = MissaMuted, fontSize = 12.sp)
+                    Text(clientMoney(facture.outstanding, devise), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                    Text(stringResource(R.string.cli_sur_total, clientMoney(facture.total, devise)), color = MissaMuted, fontSize = 10.sp)
                 }
             }
             if (facture.recordId != null) {
-                OutlinedButton(onClick = onEncaisser, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.cli_encaisser_facture))
+                BoutonClient(onClick = onEncaisser, modifier = Modifier.fillMaxWidth(), plein = false) {
+                    Text(stringResource(R.string.cli_encaisser_facture), color = MissaInk)
                 }
             }
         }

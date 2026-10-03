@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import com.missa.b360.ui.clients.components.BoutonClientPlein as Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Surface
@@ -92,12 +94,12 @@ internal fun String.initiales(): String = trim().split(Regex("\\s+")).filter { i
     .take(2).joinToString("") { it.first().uppercase() }.ifBlank { "?" }
 
 @Composable
-internal fun RiskBadge(risque: RiskLevel, modifier: Modifier = Modifier) {
+internal fun RiskBadge(risque: RiskLevel, modifier: Modifier = Modifier, surFonce: Boolean = false) {
     val couleur = if (risque == RiskLevel.NORMAL) ClientCouleurs.Succes else risque.couleur()
     ClientPastille(
         texte = stringResource(risque.libelle()),
-        fond = couleur.copy(alpha = 0.12f),
-        couleurTexte = couleur,
+        fond = if (surFonce) couleur.copy(alpha = 0.22f) else couleur.copy(alpha = 0.12f),
+        couleurTexte = if (surFonce) (if (risque == RiskLevel.NORMAL) Color(0xFFB9F3D2) else Color(0xFFFFD2CC)) else couleur,
         modifier = modifier,
         icone = risque.icone(),
     )
@@ -115,8 +117,12 @@ internal fun ClientStatus.libelle(): Int = when (this) {
 }
 
 @Composable
-internal fun ClientStatusChip(statut: ClientStatus, modifier: Modifier = Modifier) {
+internal fun ClientStatusChip(statut: ClientStatus, modifier: Modifier = Modifier, surFonce: Boolean = false) {
     val libelle = stringResource(statut.libelle())
+    if (surFonce && statut != ClientStatus.ACTIF && statut != ClientStatus.BLOQUE_CREDIT && statut != ClientStatus.BLOQUE_ADMINISTRATIF && statut != ClientStatus.SOUS_SURVEILLANCE) {
+        ClientPastille(libelle, Color.White.copy(alpha = 0.14f), Color.White, modifier)
+        return
+    }
     when (statut) {
         ClientStatus.ACTIF -> ClientPastille(
             libelle, ClientCouleurs.SuccesPale, ClientCouleurs.Succes, modifier,
@@ -137,10 +143,11 @@ internal fun ClientStatusChip(statut: ClientStatus, modifier: Modifier = Modifie
 internal fun CreditGauge(utilisationPct: Double?, risque: RiskLevel, modifier: Modifier = Modifier, surFonce: Boolean = false) {
     val ratio = utilisationPct?.takeIf { !it.isNaN() }?.let { (it / 100.0).coerceIn(0.0, 1.0) }
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            if (surFonce) Icon(painterResource(Iv.Payments), contentDescription = null, tint = Color(0xFFC7A8FF), modifier = Modifier.size(14.dp))
             Text(
                 stringResource(R.string.clients_flow_credit_usage),
-                color = if (surFonce) Color(0xFFC3CBE0) else MissaMuted, fontSize = 12.sp, modifier = Modifier.weight(1f),
+                color = if (surFonce) Color(0xFFC3CBE0) else MissaMuted, fontSize = 11.sp, modifier = Modifier.weight(1f),
             )
             Text(
                 text = when {
@@ -148,12 +155,12 @@ internal fun CreditGauge(utilisationPct: Double?, risque: RiskLevel, modifier: M
                     utilisationPct.isInfinite() -> stringResource(R.string.cli_limite_depassee)
                     else -> stringResource(R.string.cli_pourcentage, utilisationPct.toInt())
                 },
-                color = if (risque == RiskLevel.NORMAL) (if (surFonce) Color.White else MissaInk) else risque.couleur(), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold,
+                color = if (risque == RiskLevel.NORMAL) (if (surFonce) Color.White else MissaInk) else risque.couleur(), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
             )
         }
         if (ratio != null) {
-            Box(Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)).background(if (surFonce) Color.White.copy(alpha = 0.18f) else MissaBorder)) {
-                Box(Modifier.fillMaxWidth(ratio.toFloat().coerceAtLeast(0.02f)).height(10.dp).background(risque.couleur()))
+            Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(if (surFonce) Color.White.copy(alpha = 0.18f) else MissaBorder)) {
+                Box(Modifier.fillMaxWidth(ratio.toFloat().coerceAtLeast(0.02f)).height(8.dp).background(risque.couleur()))
             }
         }
     }
@@ -168,10 +175,11 @@ internal fun ClientAvatar(nom: String, modifier: Modifier = Modifier, taille: Dp
             .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(ClientCouleurs.Violet, ClientCouleurs.VioletProfond))),
         contentAlignment = Alignment.Center,
     ) {
-        Text(nom.initiales(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = (taille.value * 0.36f).sp)
+        Text(nom.trim().take(1).uppercase().ifBlank { "?" }, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = (taille.value * 0.4f).sp)
     }
 }
 
+/** Barre haute du module : fond blanc, 53 dp, titre de 15 sp gras à gauche, filet fin dessous. */
 @Composable
 internal fun ClientTopBar(
     titre: String,
@@ -179,7 +187,24 @@ internal fun ClientTopBar(
     titreCentre: Boolean = true,
     actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
 ) {
-    MissaTopAppBar(title = titre, onBack = onBack, couleurFond = AppModule.CLIENTS.couleurPale, actions = actions, titreCentre = titreCentre)
+    Column(Modifier.fillMaxWidth().background(Color.White).statusBarsPadding()) {
+        Row(
+            Modifier.fillMaxWidth().height(53.dp).padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(painterResource(Iv.ArrowBack), stringResource(R.string.ob_retour), tint = MissaInk, modifier = Modifier.size(20.dp))
+            }
+            Text(
+                titre, color = MissaInk, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold,
+                maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            actions()
+        }
+        androidx.compose.material3.HorizontalDivider(color = Color(0xFFEFF1F5))
+    }
 }
 
 @Composable
@@ -213,9 +238,9 @@ internal fun LigneInfo(libelle: String, valeur: String, modifier: Modifier = Mod
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(libelle, color = MissaMuted, fontSize = 13.sp, modifier = Modifier.weight(0.45f))
+        Text(libelle, color = MissaMuted, fontSize = 10.sp, modifier = Modifier.weight(0.45f))
         Spacer(Modifier.width(8.dp))
-        Text(valeur, color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, modifier = Modifier.weight(0.55f))
+        Text(valeur, color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.End, modifier = Modifier.weight(0.55f))
     }
 }
 

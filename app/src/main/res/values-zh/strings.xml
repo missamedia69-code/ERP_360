@@ -2060,7 +2060,7 @@
     <string name="cli_filtre_nouveaux">新客户</string>
     <string name="cli_filtre_incomplets">资料不全</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
-    <string name="cli_trier_par">排序</string>
+    <string name="cli_trier_par">排序：</string>
     <string name="cli_resume_temps_reel">实时</string>
     <string name="cli_nb_client_un">1 位客户</string>
     <string name="cli_nb_clients_n">%1$d 位客户</string>
@@ -2103,7 +2103,7 @@
     <string name="cli_onglet_conditions">条款</string>
     <string name="cli_onglet_notes">备注</string>
     <string name="cli_voir_activite">全部动态</string>
-    <string name="cli_voir_compte">打开账户</string>
+    <string name="cli_voir_compte">打开客户账户</string>
     <string name="cli_aucune_activite">暂无动态。</string>
     <string name="cli_aucune_activite_desc">接下来的操作将显示在这里。</string>
     <string name="cli_aucun_contact">尚无联系人或地址。</string>
@@ -2225,7 +2225,7 @@
     <string name="cli_montant">金额</string>
     <string name="cli_montant_promis">承诺金额</string>
     <string name="cli_note_facultative">备注（可选）</string>
-    <string name="cli_promesse_delai">承诺期限</string>
+    <string name="cli_promesse_delai">预计何时支付？</string>
     <string name="cli_promesse_ouverte">进行中的承诺：%1$s，截止 %2$s</string>
     <string name="cli_promesses_non_tenues">未兑现的承诺</string>
     <string name="cli_relances_vide_desc">没有客户逾期未付，也没有未兑现的承诺。</string>
@@ -2385,9 +2385,18 @@
     <string name="cli_continuer">继续</string>
     <string name="cli_choisir_date">选择日期</string>
     <string name="cli_dans_jours_long">%1$d 天后</string>
-    <string name="cli_liste_astuce">点击客户以打开其档案。</string>
+    <string name="cli_liste_astuce">点击客户以打开其档案和历史记录。</string>
     <string name="cli_fiche_titre">客户档案</string>
     <string name="cli_compte_de">%1$s 的账户</string>
     <string name="cli_reste_du_libelle">应付余额</string>
     <string name="cli_section_contacts">联系人和地址</string>
+    <string name="cli_client_point">客户 · %1$s</string>
+    <string name="cli_form_sous_titre_1">客户主要信息</string>
+    <string name="cli_form_sous_titre_n">补充信息</string>
+    <string name="cli_form_note_contacts">一个客户可以有多个联系人和地址。请为单据指定主要联系人和主要地址。</string>
+    <string name="cli_form_note_notes">添加有助于跟进该客户的内部备注。</string>
+    <string name="cli_toute_activite">查看全部活动</string>
+    <string name="cli_releve_pdf">账户对账单 (PDF)</string>
+    <string name="cli_nouvelle_note">新备注</string>
+    <string name="cli_ajouter_note_court">添加</string>
 </resources>

@@ -2060,7 +2060,7 @@
     <string name="cli_filtre_nouveaux">جدد</string>
     <string name="cli_filtre_incomplets">غير مكتملين</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
-    <string name="cli_trier_par">ترتيب حسب</string>
+    <string name="cli_trier_par">ترتيب:</string>
     <string name="cli_resume_temps_reel">مباشر</string>
     <string name="cli_nb_client_un">عميل واحد</string>
     <string name="cli_nb_clients_n">%1$d عملاء</string>
@@ -2103,7 +2103,7 @@
     <string name="cli_onglet_conditions">الشروط</string>
     <string name="cli_onglet_notes">ملاحظات</string>
     <string name="cli_voir_activite">كل النشاط</string>
-    <string name="cli_voir_compte">فتح الحساب</string>
+    <string name="cli_voir_compte">فتح حساب العميل</string>
     <string name="cli_aucune_activite">لا يوجد نشاط بعد.</string>
     <string name="cli_aucune_activite_desc">ستظهر الإجراءات القادمة هنا.</string>
     <string name="cli_aucun_contact">لا توجد جهات اتصال أو عناوين.</string>
@@ -2225,7 +2225,7 @@
     <string name="cli_montant">المبلغ</string>
     <string name="cli_montant_promis">المبلغ الموعود</string>
     <string name="cli_note_facultative">ملاحظة (اختياري)</string>
-    <string name="cli_promesse_delai">الأجل الموعود</string>
+    <string name="cli_promesse_delai">ما هو موعد الاستحقاق؟</string>
     <string name="cli_promesse_ouverte">وعد قائم: %1$s قبل %2$s</string>
     <string name="cli_promesses_non_tenues">وعود غير منفذة</string>
     <string name="cli_relances_vide_desc">لا يوجد عميل متأخر في الدفع ولا وعد لم يُنفَّذ.</string>
@@ -2385,9 +2385,18 @@
     <string name="cli_continuer">متابعة</string>
     <string name="cli_choisir_date">اختر تاريخًا</string>
     <string name="cli_dans_jours_long">بعد %1$d أيام</string>
-    <string name="cli_liste_astuce">المس عميلاً لفتح ملفه.</string>
+    <string name="cli_liste_astuce">المس عميلاً لفتح ملفه وسجله.</string>
     <string name="cli_fiche_titre">ملف العميل</string>
     <string name="cli_compte_de">حساب %1$s</string>
     <string name="cli_reste_du_libelle">المبلغ المستحق</string>
     <string name="cli_section_contacts">جهات الاتصال والعناوين</string>
+    <string name="cli_client_point">العميل · %1$s</string>
+    <string name="cli_form_sous_titre_1">المعلومات الرئيسية للعميل</string>
+    <string name="cli_form_sous_titre_n">معلومات إضافية</string>
+    <string name="cli_form_note_contacts">يمكن أن يكون للعميل عدة جهات اتصال وعناوين. حدّد جهة اتصال وعنوانًا رئيسيين للمستندات.</string>
+    <string name="cli_form_note_notes">أضف ملاحظة داخلية مفيدة لمتابعة هذا العميل تجاريًا.</string>
+    <string name="cli_toute_activite">عرض كل النشاط</string>
+    <string name="cli_releve_pdf">كشف الحساب (PDF)</string>
+    <string name="cli_nouvelle_note">ملاحظة جديدة</string>
+    <string name="cli_ajouter_note_court">إضافة</string>
 </resources>

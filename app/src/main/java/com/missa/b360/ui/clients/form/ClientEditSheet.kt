@@ -49,13 +49,14 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.core.domain.usecase.ClientLifecycleRules
 import com.missa.b360.ui.clients.components.BoutonClientPlein as Button
+import com.missa.b360.ui.clients.components.BoutonClient
+import androidx.compose.material3.IconButton
 import com.missa.b360.ui.clients.components.ClientCarte
 import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
 import com.missa.b360.ui.clients.components.ClientTopBar
 import com.missa.b360.ui.clients.components.EtatChargement
 import com.missa.b360.ui.clients.components.EtatErreur
-import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -92,25 +93,33 @@ fun ClientEditSheet(
         containerColor = ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(hote) },
-        topBar = { ClientTopBar(titre = stringResource(R.string.clients_modifier), onBack = abandonner) },
+        topBar = {
+            ClientTopBar(titre = stringResource(R.string.clients_modifier), onBack = abandonner) {
+                IconButton(onClick = abandonner) {
+                    Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = MissaInk, modifier = Modifier.size(18.dp))
+                }
+            }
+        },
         bottomBar = {
             if (pret) {
                 Column(Modifier.fillMaxWidth().background(Color.White).navigationBarsPadding()) {
                     HorizontalDivider(color = ClientCouleurs.Trait)
                     Row(Modifier.fillMaxWidth().padding(horizontal = 13.dp, vertical = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(
+                        BoutonClient(
                             onClick = { if (etape == 0) abandonner() else etape -= 1 },
-                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                        ) { Text(stringResource(if (etape == 0) R.string.cli_annuler else R.string.cli_precedent), fontWeight = FontWeight.ExtraBold) }
+                            modifier = Modifier.weight(0.8f),
+                            plein = false,
+                        ) {
+                            if (etape > 0) Icon(painterResource(Iv.ArrowBack), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(15.dp))
+                            Text(stringResource(if (etape == 0) R.string.cli_annuler else R.string.cli_precedent), color = MissaInk)
+                        }
                         Button(
                             onClick = { if (derniere) viewModel.enregistrer() else etape += 1 },
                             enabled = !etat.enCours,
-                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                            modifier = Modifier.weight(1.2f).heightIn(min = 48.dp),
                         ) {
-                            Text(
-                                stringResource(if (derniere) R.string.cli_enregistrer else R.string.cli_continuer),
-                                fontWeight = FontWeight.ExtraBold,
-                            )
+                            Text(stringResource(if (derniere) R.string.cli_enregistrer else R.string.cli_continuer))
+                            Icon(painterResource(if (derniere) Iv.Check else Iv.ChevronRight), contentDescription = null, modifier = Modifier.size(15.dp))
                         }
                     }
                 }
@@ -126,6 +135,8 @@ fun ClientEditSheet(
                 val enErreur = etat.erreurs.any { it.section == section }
                 val aCompleter = stringResource(R.string.obn_section_a_completer)
                 val invalide = stringResource(R.string.form_valeur_invalide)
+                val sousTitreUn = stringResource(R.string.cli_form_sous_titre_1)
+                val sousTitreN = stringResource(R.string.cli_form_sous_titre_n)
                 Column(
                     Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState())
                         .padding(start = 13.dp, end = 13.dp, top = 10.dp, bottom = 16.dp),
@@ -139,25 +150,30 @@ fun ClientEditSheet(
                         onEtape = { etape = it },
                     )
                     ClientCarte {
-                        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Column(Modifier.padding(13.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                                 Box(
-                                    Modifier.size(34.dp).clip(RoundedCornerShape(11.dp)).background(ClientCouleurs.Violet),
+                                    Modifier.size(29.dp).clip(RoundedCornerShape(10.dp)).background(ClientCouleurs.Violet),
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    Text((etape + 1).toString(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                                    Text((etape + 1).toString(), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
                                 }
                                 Column(Modifier.weight(1f)) {
-                                    Text(stringResource(section.titre()), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                                    Text(stringResource(section.titre()), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                                     val sousTitre = when {
                                         enErreur -> invalide
                                         section.essentielManque(etat.draft) -> aCompleter
-                                        else -> null
+                                        etape == 0 -> sousTitreUn
+                                        else -> sousTitreN
                                     }
                                     if (sousTitre != null) {
                                         Text(
-                                            sousTitre, fontSize = 11.sp, fontWeight = FontWeight.Bold,
-                                            color = if (enErreur) com.missa.b360.ui.clients.components.RisqueCouleurs.Eleve else ClientCouleurs.Alerte,
+                                            sousTitre, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                                            color = when (sousTitre) {
+                                                invalide -> com.missa.b360.ui.clients.components.RisqueCouleurs.Eleve
+                                                aCompleter -> ClientCouleurs.Alerte
+                                                else -> MissaMuted
+                                            },
                                         )
                                     }
                                 }
@@ -189,55 +205,53 @@ private fun CarteProgression(
     onEtape: (Int) -> Unit,
 ) {
     ClientCarte {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(titre, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                Text(stringResource(R.string.cli_etape_n_sur, etape + 1, total), color = MissaMuted, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(titre, color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.cli_etape_n_sur, etape + 1, total), color = ClientCouleurs.Violet, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
             }
-            Box(Modifier.fillMaxWidth().height(7.dp).clip(CircleShape).background(ClientCouleurs.Neutre)) {
+            Box(Modifier.fillMaxWidth().padding(top = 4.dp).height(5.dp).clip(CircleShape).background(Color(0xFFECEEF4))) {
                 Box(
                     Modifier
                         .fillMaxWidth((etape + 1).toFloat() / total)
-                        .height(7.dp)
+                        .height(5.dp)
                         .clip(CircleShape)
-                        .background(Brush.horizontalGradient(listOf(ClientCouleurs.Violet, ClientCouleurs.VioletProfond))),
+                        .background(Brush.horizontalGradient(listOf(ClientCouleurs.Violet, Color(0xFFA679F2)))),
                 )
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                 for (i in 0 until total) {
                     val courant = i == etape
                     val fait = i < etape
                     val erreur = i in etapesEnErreur
                     Box(
                         Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
+                            .size(width = 26.dp, height = 48.dp)
                             .clickable(role = Role.Tab) { onEtape(i) },
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = Alignment.CenterStart,
                     ) {
                         Box(
                             Modifier
-                                .size(30.dp)
-                                .clip(CircleShape)
+                                .size(20.dp)
+                                .clip(RoundedCornerShape(7.dp))
                                 .background(
                                     when {
-                                        courant -> ClientCouleurs.Violet
                                         erreur -> Color(0xFFFDE8E8)
-                                        fait -> ClientCouleurs.VioletPale
-                                        else -> ClientCouleurs.Neutre
+                                        courant || fait -> ClientCouleurs.Violet
+                                        else -> Color(0xFFEDF0F5)
                                     },
                                 ),
                             contentAlignment = Alignment.Center,
                         ) {
                             if (fait && !erreur) {
-                                Icon(painterResource(Iv.Check), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(16.dp))
+                                Icon(painterResource(Iv.Check), contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
                             } else {
                                 Text(
-                                    (i + 1).toString(), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold,
+                                    (i + 1).toString(), fontSize = 9.sp, fontWeight = FontWeight.ExtraBold,
                                     color = when {
-                                        courant -> Color.White
                                         erreur -> com.missa.b360.ui.clients.components.RisqueCouleurs.Eleve
-                                        else -> ClientCouleurs.NeutreTexte
+                                        courant -> Color.White
+                                        else -> Color(0xFF7C879C)
                                     },
                                 )
                             }

@@ -1,6 +1,9 @@
 package com.missa.b360.ui.clients.detail
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +54,7 @@ import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.theme.MissaInk
 
 /** Route `clients/{id}` : fiche 360 ; l'identifiant vient des arguments de navigation. */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun ClientDetailScreen(
     onBack: () -> Unit,
@@ -132,13 +136,15 @@ fun ClientDetailScreen(
                         onSms = { contexte.envoyerSms(client.telephone) },
                     )
                 }
-                item {
-                    ClientOnglets(
-                        onglets = ClientTab.entries,
-                        courant = etat.onglet,
-                        libelle = { it.libelle() },
-                        onChoix = { onglet -> viewModel.changerOnglet(onglet) },
-                    )
+                stickyHeader {
+                    Box(Modifier.fillMaxWidth().background(ClientCouleurs.Fond)) {
+                        ClientOnglets(
+                            onglets = ClientTab.entries,
+                            courant = etat.onglet,
+                            libelle = { it.libelle() },
+                            onChoix = { onglet -> viewModel.changerOnglet(onglet) },
+                        )
+                    }
                 }
                 ongletClient(
                     etat = etat,
@@ -150,6 +156,7 @@ fun ClientDetailScreen(
                     produits = produits,
                     onPrixDefini = viewModel::definirPrix,
                     onPrixRetire = viewModel::retirerPrix,
+                    onModifier = { onModifier(client.id) },
                 )
             }
         }

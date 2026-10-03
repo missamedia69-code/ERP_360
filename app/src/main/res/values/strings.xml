@@ -2107,7 +2107,7 @@
     <string name="cli_filtre_nouveaux">Nouveaux</string>
     <string name="cli_filtre_incomplets">Incomplets</string>
     <string name="cli_chip_avec_compteur">%1$s (%2$d)</string>
-    <string name="cli_trier_par">Trier par</string>
+    <string name="cli_trier_par">Trier :</string>
     <string name="cli_resume_temps_reel">En temps réel</string>
     <string name="cli_nb_client_un">1 client</string>
     <string name="cli_nb_clients_n">%1$d clients</string>
@@ -2150,7 +2150,7 @@
     <string name="cli_onglet_conditions">Conditions</string>
     <string name="cli_onglet_notes">Notes</string>
     <string name="cli_voir_activite">Toute l\'activité</string>
-    <string name="cli_voir_compte">Ouvrir le compte</string>
+    <string name="cli_voir_compte">Ouvrir le compte client</string>
     <string name="cli_aucune_activite">Aucune activité pour l\'instant.</string>
     <string name="cli_aucune_activite_desc">Les prochaines actions apparaîtront ici.</string>
     <string name="cli_aucun_contact">Aucun contact ni adresse enregistrés.</string>
@@ -2272,7 +2272,7 @@
     <string name="cli_montant">Montant</string>
     <string name="cli_montant_promis">Montant promis</string>
     <string name="cli_note_facultative">Note (facultatif)</string>
-    <string name="cli_promesse_delai">Délai promis</string>
+    <string name="cli_promesse_delai">À quelle échéance ?</string>
     <string name="cli_promesse_ouverte">Promesse en cours : %1$s avant le %2$s</string>
     <string name="cli_promesses_non_tenues">Promesses non tenues</string>
     <string name="cli_relances_vide_desc">Aucun client n\'a de retard de paiement et aucune promesse n\'est restée sans suite.</string>
@@ -2432,9 +2432,18 @@
     <string name="cli_continuer">Continuer</string>
     <string name="cli_choisir_date">Choisir une date</string>
     <string name="cli_dans_jours_long">Dans %1$d jours</string>
-    <string name="cli_liste_astuce">Touchez un client pour ouvrir sa fiche.</string>
+    <string name="cli_liste_astuce">Touchez un client pour ouvrir sa fiche et son historique.</string>
     <string name="cli_fiche_titre">Fiche client</string>
     <string name="cli_compte_de">Compte de %1$s</string>
     <string name="cli_reste_du_libelle">Reste dû</string>
     <string name="cli_section_contacts">Contacts et adresses</string>
+    <string name="cli_client_point">Client · %1$s</string>
+    <string name="cli_form_sous_titre_1">Informations principales du client</string>
+    <string name="cli_form_sous_titre_n">Informations complémentaires</string>
+    <string name="cli_form_note_contacts">Un client peut avoir plusieurs contacts et adresses. Désignez un contact et une adresse principaux pour les documents.</string>
+    <string name="cli_form_note_notes">Ajoutez une note interne utile pour le suivi commercial de ce client.</string>
+    <string name="cli_toute_activite">Voir toute l\'activité</string>
+    <string name="cli_releve_pdf">Relevé de compte (PDF)</string>
+    <string name="cli_nouvelle_note">Nouvelle note</string>
+    <string name="cli_ajouter_note_court">Ajouter</string>
 </resources>

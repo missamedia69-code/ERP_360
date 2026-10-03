@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.missa.b360.ui.clients.components.BoutonClient
 import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientRecherche
 import com.missa.b360.ui.clients.components.ClientEtatVide
 import com.missa.b360.ui.theme.MissaInk
 import androidx.compose.foundation.layout.heightIn
@@ -141,7 +142,7 @@ internal fun ClientListContent(
                 ) {
                     Icon(painterResource(Iv.Add), contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.clients_nouveau), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                    Text(stringResource(R.string.clients_nouveau), fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
                 }
                 Spacer(Modifier.height(64.dp))
             }
@@ -158,11 +159,10 @@ internal fun ClientListContent(
                 item { ClientListSummary(etat) }
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        MissaChampTexte(
+                        ClientRecherche(
                             valeur = etat.requete,
                             onValeur = onRequete,
-                            libelle = stringResource(R.string.clients_recherche),
-                            icone = Iv.Search,
+                            indication = stringResource(R.string.clients_recherche),
                             modifier = Modifier.weight(1f),
                         )
                         val actifs = etat.avance.actifs
@@ -210,7 +210,7 @@ internal fun ClientListContent(
                     item {
                         Text(
                             stringResource(R.string.cli_liste_astuce),
-                            color = MissaMuted, fontSize = 11.sp, textAlign = TextAlign.Center,
+                            color = MissaMuted, fontSize = 10.sp, textAlign = TextAlign.Start,
                             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         )
                     }

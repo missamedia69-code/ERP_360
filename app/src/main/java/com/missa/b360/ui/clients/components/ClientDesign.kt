@@ -96,7 +96,12 @@ internal fun BoutonClient(
             .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
-    ) { contenu() }
+    ) {
+        val ligne = this
+        ProvideTextStyle(
+            TextStyle(fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = if (plein) Color.White else MissaInk),
+        ) { ligne.contenu() }
+    }
 }
 
 /** Pastille sélectionnable : violette quand elle est sélectionnée, blanche à contour gris sinon (zone tactile ≥ 48 dp). */
@@ -165,7 +170,7 @@ internal fun <T> ClientOnglets(
                     Text(
                         stringResource(libelle(onglet)),
                         color = if (actif) ClientCouleurs.Violet else ClientCouleurs.NeutreTexte,
-                        fontSize = 13.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.ExtraBold,
                         maxLines = 1,
                     )
@@ -201,8 +206,8 @@ internal fun ClientEtatVide(icone: Int, titre: String, description: String, modi
             Icon(painterResource(icone), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(20.dp))
         }
         Column {
-            Text(titre, color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            if (description.isNotBlank()) Text(description, color = MissaMuted, fontSize = 11.sp)
+            Text(titre, color = MissaInk, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+            if (description.isNotBlank()) Text(description, color = MissaMuted, fontSize = 10.sp)
         }
     }
 }
@@ -244,6 +249,6 @@ internal fun BoutonClientPlein(
         contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp),
     ) {
         val ligne = this
-        ProvideTextStyle(TextStyle(fontWeight = FontWeight.Bold)) { ligne.content() }
+        ProvideTextStyle(TextStyle(fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)) { ligne.content() }
     }
 }
