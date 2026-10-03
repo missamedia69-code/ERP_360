@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.form
 
+import com.missa.b360.ui.components.LocalCouleurSelection
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -135,7 +136,7 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
                     modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = { modifier { copy(contacts = contacts.filterIndexed { i, _ -> i != index }) } }, modifier = Modifier.size(48.dp)) {
-                    Icon(painterResource(Iv.Close), stringResource(R.string.cli_retirer), tint = com.missa.b360.ui.theme.MissaMuted)
+                    Icon(painterResource(Iv.Close), stringResource(R.string.cli_retirer), tint = LocalCouleurSelection.current ?: com.missa.b360.ui.theme.MissaMuted)
                 }
             }
             MissaRangee {
@@ -165,7 +166,7 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
                     R.string.cli_adresse_libelle, modifier = Modifier.weight(1f),
                 )
                 IconButton(onClick = { modifier { copy(adresses = adresses.filterIndexed { i, _ -> i != index }) } }, modifier = Modifier.size(48.dp)) {
-                    Icon(painterResource(Iv.Close), stringResource(R.string.cli_retirer), tint = com.missa.b360.ui.theme.MissaMuted)
+                    Icon(painterResource(Iv.Close), stringResource(R.string.cli_retirer), tint = LocalCouleurSelection.current ?: com.missa.b360.ui.theme.MissaMuted)
                 }
             }
             MissaRangee {

@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.components
 
+import com.missa.b360.ui.components.LocalCouleurSelection
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -81,7 +82,7 @@ internal fun ClientPhoneField(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(choisi?.indicatif ?: "…", fontSize = 15.sp, color = MissaInk)
-                Icon(painterResource(Iv.ArrowDropDown), null, tint = MissaMuted, modifier = Modifier.size(18.dp))
+                Icon(painterResource(Iv.ArrowDropDown), null, tint = LocalCouleurSelection.current ?: MissaMuted, modifier = Modifier.size(18.dp))
             }
         }
         MissaChampTexte(
@@ -113,7 +114,7 @@ internal fun ClientPhoneField(
                         ) {
                             Text(p.indicatif, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.width(64.dp))
                             Text("${p.nom} (${p.code})", color = MissaInk, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                            if (p.code == codePays) Icon(painterResource(Iv.Check), null, tint = MissaInk)
+                            if (p.code == codePays) Icon(painterResource(Iv.Check), null, tint = LocalCouleurSelection.current ?: MissaInk)
                         }
                     }
                 }

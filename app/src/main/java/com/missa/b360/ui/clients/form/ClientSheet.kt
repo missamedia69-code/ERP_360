@@ -1,5 +1,6 @@
 package com.missa.b360.ui.clients.form
 
+import com.missa.b360.ui.components.LocalCouleurSelection
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -68,7 +69,7 @@ internal fun ClientSheet(
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(titre, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 18.sp, modifier = Modifier.weight(1f))
                         IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
-                            Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = MissaInk)
+                            Icon(painterResource(Iv.Close), stringResource(R.string.cli_fermer), tint = LocalCouleurSelection.current ?: MissaInk)
                         }
                     }
                     contenu()

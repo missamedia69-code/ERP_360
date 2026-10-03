@@ -317,7 +317,7 @@ private fun CadreChamp(
             }
             if (iconeFin != null) {
                 Spacer(Modifier.width(6.dp))
-                Icon(painterResource(iconeFin), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Icon(painterResource(iconeFin), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
             }
         }
         (erreur ?: aide)?.let { texte ->
@@ -964,7 +964,7 @@ fun MissaFormDialogue(
                             sousTitre?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
                         }
                         IconButton(onClick = onFermer) {
-                            Icon(painterResource(Iv.Close), contentDescription = stringResource(R.string.st_annuler), tint = MissaInk, modifier = Modifier.size(20.dp))
+                            Icon(painterResource(Iv.Close), contentDescription = stringResource(R.string.st_annuler), tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(20.dp))
                         }
                     }
                     HorizontalDivider(color = MissaBorder.copy(alpha = 0.6f))
