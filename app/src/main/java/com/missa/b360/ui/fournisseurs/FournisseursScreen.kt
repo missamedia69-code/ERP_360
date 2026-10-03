@@ -96,8 +96,6 @@ import com.missa.b360.ui.components.*
 /** Marron caractéristique du module Fournisseurs — source unique : [AppModule.FOURNISSEURS]. */
 private val CouleurFournisseurs: Color get() = AppModule.FOURNISSEURS.couleur
 
-/** Écran interne du module : hub, liste, fiche ou formulaire — sans nouvelle route. */
-private enum class EcranFournisseur { HUB, LISTE, FICHE, FORMULAIRE }
 
 private val PAYS = listOf("CM", "SN", "CI", "GA", "GN", "MA", "FR", "BE", "AE", "NG", "KE", "GH", "CA")
 private val DEVISES = listOf("XAF", "XOF", "EUR", "USD", "MAD", "NGN", "CAD")
@@ -105,74 +103,33 @@ private val INCOTERMS = listOf("EXW", "FOB", "CIF", "DAP", "DDP")
 private val OPERATEURS_MOBILE = listOf("MTN", "Orange", "Moov", "Wave", "M-Pesa", "Airtel")
 
 /**
- * Module Fournisseurs — référentiel maître du cycle d'achat (spécification §4) :
- * hub avec indicateurs, liste filtrable, fiche complète à sections repliables et
- * formulaire de création en 7 étapes adapté au type et au pays.
+ * Route `fournisseur_fiche/{id}` : fiche d'un fournisseur (refonte « Fiche 360 » prévue en F5).
+ * Chaque destination a son propre ViewModel : la fiche est ouverte à l'entrée de la route.
  */
 @Composable
-fun FournisseursScreen(onBack: () -> Unit, openCreate: Boolean = false) {
+fun FournisseurFicheRoute(
+    id: Long,
+    onBack: () -> Unit,
+    onModifier: (Long) -> Unit,
+) {
     val vm: FournisseursViewModel = hiltViewModel()
-    var ecran by remember {
-        mutableStateOf(if (openCreate) EcranFournisseur.FORMULAIRE else EcranFournisseur.HUB)
-    }
+    LaunchedEffect(id) { vm.ouvrirFiche(id) }
+    FicheFournisseurEcran(vm = vm, onBack = onBack, onModifier = { fournisseur -> onModifier(fournisseur.id) })
+}
 
-    BackHandler(enabled = ecran != EcranFournisseur.HUB) {
-        ecran = when (ecran) {
-            EcranFournisseur.LISTE, EcranFournisseur.FICHE, EcranFournisseur.FORMULAIRE -> EcranFournisseur.HUB
-            EcranFournisseur.HUB -> EcranFournisseur.HUB
-        }
-    }
-
-    when (ecran) {
-        EcranFournisseur.HUB -> HubFournisseurs(
-            vm = vm,
-            onBack = onBack,
-            onNouveau = {
-                vm.ouvrirFormulaire(null)
-                ecran = EcranFournisseur.FORMULAIRE
-            },
-            onListe = { statut ->
-                vm.setFiltreStatut(statut)
-                ecran = EcranFournisseur.LISTE
-            },
-            onOuvrir = { id ->
-                vm.ouvrirFiche(id)
-                ecran = EcranFournisseur.FICHE
-            },
-            onRechercher = { query ->
-                vm.setRecherche(query)
-                ecran = EcranFournisseur.LISTE
-            },
-        )
-
-        EcranFournisseur.LISTE -> ListeFournisseurs(
-            vm = vm,
-            onBack = { ecran = EcranFournisseur.HUB },
-            onNouveau = {
-                vm.ouvrirFormulaire(null)
-                ecran = EcranFournisseur.FORMULAIRE
-            },
-            onOuvrir = { id ->
-                vm.ouvrirFiche(id)
-                ecran = EcranFournisseur.FICHE
-            },
-        )
-
-        EcranFournisseur.FICHE -> FicheFournisseurEcran(
-            vm = vm,
-            onBack = { ecran = EcranFournisseur.HUB },
-            onModifier = { fournisseur ->
-                vm.ouvrirFormulaire(fournisseur)
-                ecran = EcranFournisseur.FORMULAIRE
-            },
-        )
-
-        EcranFournisseur.FORMULAIRE -> FormulaireFournisseur(
-            vm = vm,
-            onBack = { ecran = EcranFournisseur.HUB },
-            onTermine = { ecran = EcranFournisseur.FICHE },
-        )
-    }
+/**
+ * Route `fournisseur_edition/{id}` : formulaire en 7 étapes ; [id] 0 = création.
+ * [onTermine] reçoit l'identifiant du fournisseur enregistré.
+ */
+@Composable
+fun FournisseurEditionRoute(
+    id: Long,
+    onBack: () -> Unit,
+    onTermine: (Long?) -> Unit,
+) {
+    val vm: FournisseursViewModel = hiltViewModel()
+    LaunchedEffect(id) { vm.ouvrirEdition(id) }
+    FormulaireFournisseur(vm = vm, onBack = onBack, onTermine = onTermine)
 }
 
 // ======================================================================
@@ -324,342 +281,6 @@ private fun couleurStatut(statut: FournisseurStatus): Color = when (statut) {
 
 private fun fmtDate(millis: Long?): String =
     if (millis == null) "—" else SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(millis))
-
-// ======================================================================
-// Hub (spec §4)
-// ======================================================================
-
-@Composable
-private fun HubFournisseurs(
-    vm: FournisseursViewModel,
-    onBack: () -> Unit,
-    onNouveau: () -> Unit,
-    onListe: (FournisseurStatus?) -> Unit,
-    onOuvrir: (Long) -> Unit,
-    onRechercher: (String) -> Unit,
-) {
-    val hub by vm.hub.collectAsStateWithLifecycle()
-    val devise by vm.devise.collectAsStateWithLifecycle()
-    var query by remember { mutableStateOf("") }
-
-    Column(Modifier.fillMaxSize().background(Color.White)) {
-        MissaTopAppBar(
-            title = stringResource(R.string.module_fournisseurs),
-            onBack = onBack,
-            couleurFond = CouleurFournisseurs,
-        )
-        LazyColumn(
-            Modifier.fillMaxSize(),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
-        ) {
-            item {
-                MissaChampTexte(query, { query = it }, stringResource(R.string.four_rechercher), icone = Iv.Search)
-                Spacer(Modifier.height(4.dp))
-                TextButton(onClick = { onRechercher(query) }) {
-                    Text(stringResource(R.string.four_lancer_recherche), fontSize = 12.sp, color = MissaInk)
-                }
-            }
-
-            // --- Indicateurs ---
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    IndicateurHub(
-                        titre = stringResource(R.string.four_actifs),
-                        valeur = hub.actifs.toString(),
-                        icone = Iv.CheckCircle,
-                        modifier = Modifier.weight(1f),
-                    ) { onListe(FournisseurStatus.ACTIF) }
-                    IndicateurHub(
-                        titre = stringResource(R.string.four_a_valider),
-                        valeur = hub.aValider.toString(),
-                        icone = Iv.Schedule,
-                        modifier = Modifier.weight(1f),
-                    ) { onListe(FournisseurStatus.A_VALIDER) }
-                }
-            }
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    IndicateurHub(
-                        titre = stringResource(R.string.four_a_payer),
-                        valeur = fmtValeur(hub.soldeTotal, devise),
-                        icone = Iv.Payments,
-                        modifier = Modifier.weight(1f),
-                    ) { onListe(null) }
-                    IndicateurHub(
-                        titre = stringResource(R.string.four_commandes_ouvertes),
-                        valeur = hub.commandesOuvertes.toString(),
-                        icone = Iv.CartArrowDown,
-                        modifier = Modifier.weight(1f),
-                    ) { onListe(null) }
-                }
-            }
-
-            // --- Actions ---
-            item {
-                Button(
-                    onClick = onNouveau,
-                    colors = ButtonDefaults.buttonColors(containerColor = CouleurFournisseurs, contentColor = Color.White),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(painterResource(Iv.PersonAdd), null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.four_nouveau), color = Color.White)
-                }
-            }
-
-            // --- À traiter ---
-            if (hub.comptesAVerifier > 0 || hub.documentsExpirants > 0 || hub.sansIdentifiantFiscal > 0) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = OnbConfigCard,
-                    ) {
-                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                            Text(
-                                stringResource(R.string.four_a_traiter),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MissaInk,
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            if (hub.comptesAVerifier > 0) {
-                                LigneATraiter(
-                                    icone = Iv.Bank,
-                                    texte = stringResource(R.string.four_comptes_a_verifier, hub.comptesAVerifier),
-                                )
-                            }
-                            if (hub.documentsExpirants > 0) {
-                                LigneATraiter(
-                                    icone = Iv.Warning,
-                                    texte = stringResource(R.string.four_docs_expirants, hub.documentsExpirants),
-                                )
-                            }
-                            if (hub.sansIdentifiantFiscal > 0) {
-                                LigneATraiter(
-                                    icone = Iv.Info,
-                                    texte = stringResource(R.string.four_sans_fiscal, hub.sansIdentifiantFiscal),
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // --- Récents ---
-            item {
-                Text(
-                    stringResource(R.string.four_recents),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MissaInk,
-                )
-            }
-            if (hub.recents.isEmpty()) {
-                item {
-                    MissaEmptyState(
-                        icon = Iv.Handshake,
-                        title = stringResource(R.string.four_aucun),
-                        description = stringResource(R.string.four_aucun_desc),
-                    )
-                }
-            } else {
-                items(hub.recents, key = { it.id }) { fournisseur ->
-                    CarteFournisseur(
-                        fournisseur = fournisseur,
-                        devise = devise,
-                        onOuvrir = { onOuvrir(fournisseur.id) },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun IndicateurHub(
-    titre: String,
-    valeur: String,
-    icone: Int,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = OnbConfigCard,
-        modifier = modifier.clickable(onClick = onClick),
-    ) {
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(icone), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-            Spacer(Modifier.width(6.dp))
-            Column {
-                Text(titre, fontSize = 10.sp, color = MissaMuted)
-                Text(valeur, fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-            }
-        }
-    }
-}
-
-@Composable
-private fun LigneATraiter(icone: Int, texte: String) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 3.dp)) {
-        Icon(painterResource(icone), null, tint = Color(0xFFB45309), modifier = Modifier.size(16.dp))
-        Spacer(Modifier.width(6.dp))
-        Text(texte, fontSize = 12.sp, color = MissaInk)
-    }
-}
-
-// ======================================================================
-// Liste filtrable (spec §5)
-// ======================================================================
-
-@Composable
-private fun ListeFournisseurs(
-    vm: FournisseursViewModel,
-    onBack: () -> Unit,
-    onNouveau: () -> Unit,
-    onOuvrir: (Long) -> Unit,
-) {
-    val liste by vm.listeFiltree.collectAsStateWithLifecycle()
-    val filtre by vm.filtreStatut.collectAsStateWithLifecycle()
-    val recherche by vm.recherche.collectAsStateWithLifecycle()
-    val devise by vm.devise.collectAsStateWithLifecycle()
-
-    Column(Modifier.fillMaxSize().background(Color.White)) {
-        MissaTopAppBar(
-            title = stringResource(R.string.module_fournisseurs),
-            onBack = onBack,
-            couleurFond = CouleurFournisseurs,
-        )
-        OutlinedTextField(
-            value = recherche,
-            onValueChange = vm::setRecherche,
-            label = { Text(stringResource(R.string.four_rechercher), fontSize = 12.sp, color = MissaMuted) },
-            leadingIcon = {
-                Icon(painterResource(Iv.Search), null, tint = MissaInk, modifier = Modifier.size(18.dp))
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(10.dp),
-        colors = com.missa.b360.ui.components.missaChampCouleurs(),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-        )
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            val statuts = listOf<FournisseurStatus?>(
-                null,
-                FournisseurStatus.ACTIF,
-                FournisseurStatus.A_VALIDER,
-                FournisseurStatus.SUSPENDU,
-                FournisseurStatus.BLOQUE,
-                FournisseurStatus.ARCHIVE,
-            )
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                // Chips dans une ligne scrollable horizontalement.
-                androidx.compose.foundation.lazy.LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    items(statuts.size) { index ->
-                        val statut = statuts[index]
-                        FilterChip(
-                            selected = filtre == statut,
-                            onClick = { vm.setFiltreStatut(statut) },
-                            label = {
-                                Text(
-                                    if (statut == null) {
-                                        stringResource(R.string.four_tous)
-                                    } else {
-                                        libelleStatut(statut)
-                                    },
-                                    fontSize = 11.sp,
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = CouleurFournisseurs,
-                                selectedLabelColor = Color.White,
-                            ),
-                        )
-                    }
-                }
-            }
-        }
-        if (liste.isEmpty()) {
-            MissaEmptyState(
-                icon = Iv.Handshake,
-                title = stringResource(R.string.four_aucun),
-                description = stringResource(R.string.four_aucun_desc),
-                modifier = Modifier.padding(12.dp),
-                action = {
-                    Button(
-                        onClick = onNouveau,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = CouleurFournisseurs,
-                            contentColor = Color.White,
-                        ),
-                    ) { Text(stringResource(R.string.four_nouveau), color = Color.White) }
-                },
-            )
-        } else {
-            LazyColumn(
-                Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                items(liste, key = { it.id }) { fournisseur ->
-                    CarteFournisseur(
-                        fournisseur = fournisseur,
-                        devise = devise,
-                        onOuvrir = { onOuvrir(fournisseur.id) },
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CarteFournisseur(
-    fournisseur: FournisseurEntity,
-    devise: String,
-    onOuvrir: () -> Unit,
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = OnbConfigCard,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onOuvrir),
-    ) {
-        Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier.size(32.dp).background(CouleurFournisseurs.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(painterResource(Iv.Handshake), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-            }
-            Spacer(Modifier.width(7.dp))
-            Column(Modifier.weight(1f)) {
-                Text(fournisseur.nom, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                Text(
-                    buildString {
-                        append(fournisseur.code)
-                        append(" · ")
-                        append(fournisseur.pays)
-                        fournisseur.noteEvaluation?.let {
-                            append(" · ★ ")
-                            append(String.format(Locale.getDefault(), "%.1f", it))
-                        }
-                    },
-                    fontSize = 11.sp,
-                    color = MissaMuted,
-                )
-            }
-            BadgeStatut(fournisseur.statut)
-        }
-    }
-}
 
 @Composable
 private fun BadgeStatut(statut: FournisseurStatus) {
@@ -1684,7 +1305,7 @@ private fun DialogueEvaluation(
 private fun FormulaireFournisseur(
     vm: FournisseursViewModel,
     onBack: () -> Unit,
-    onTermine: () -> Unit,
+    onTermine: (Long?) -> Unit,
 ) {
     val form by vm.form.collectAsStateWithLifecycle()
     val modes by vm.modesPaiement.collectAsStateWithLifecycle()
@@ -1692,8 +1313,9 @@ private fun FormulaireFournisseur(
 
     LaunchedEffect(form.enregistre) {
         if (form.enregistre) {
+            val idEnregistre = form.idEnregistre
             vm.ouvrirFormulaire(null)
-            onTermine()
+            onTermine(idEnregistre)
         }
     }
 

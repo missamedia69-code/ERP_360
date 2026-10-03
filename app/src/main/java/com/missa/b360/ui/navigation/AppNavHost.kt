@@ -74,7 +74,7 @@ import com.missa.b360.ui.admin.ReferentielsScreen
 import com.missa.b360.ui.clients.clientsGraph
 import com.missa.b360.ui.comptabilite.ComptabiliteScreen
 import com.missa.b360.ui.crm.CrmScreen
-import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.fournisseurs.fournisseursGraph
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.livraison.LivraisonScreen
 import com.missa.b360.ui.logistique.LogistiqueScreen
@@ -287,16 +287,8 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
         clientsGraph(navController) { contenu ->
             GuardedModule(AppModule.CLIENTS, activation, navController, contenu)
         }
-        composable(
-            route = "${AppModule.FOURNISSEURS.route}?create={create}",
-            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
-        ) { entry ->
-            GuardedModule(AppModule.FOURNISSEURS, activation, navController) {
-                FournisseursScreen(
-                    onBack = { navController.popBackStack() },
-                    openCreate = entry.arguments?.getBoolean("create") == true,
-                )
-            }
+        fournisseursGraph(navController) { contenu ->
+            GuardedModule(AppModule.FOURNISSEURS, activation, navController, contenu)
         }
         // Stock
         composable(

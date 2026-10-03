@@ -107,6 +107,13 @@ interface FournisseurContactDao {
     @Query("UPDATE fournisseur_contacts SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerRôlePrincipal(fournisseurId: Long)
 
+    /** Fournisseurs qui ont un contact principal actif et joignable (même règle que [compterPrincipauxContactablesActifs]). */
+    @Query(
+        "SELECT DISTINCT fournisseurId FROM fournisseur_contacts WHERE actif = 1 AND principal = 1 AND TRIM(nom) != '' " +
+            "AND ((telephone IS NOT NULL AND TRIM(telephone) != '') OR (email IS NOT NULL AND TRIM(email) != ''))",
+    )
+    fun observeFournisseursAvecContactPrincipal(): Flow<List<Long>>
+
     @Query("SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId AND actif = 1")
     suspend fun compterActifs(fournisseurId: Long): Int
 
@@ -133,6 +140,9 @@ interface FournisseurCompteBancaireDao {
     @Update
     suspend fun update(compte: FournisseurCompteBancaireEntity)
 
+    @Query("SELECT * FROM fournisseur_comptes_bancaires")
+    fun observeTous(): Flow<List<FournisseurCompteBancaireEntity>>
+
     @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE id = :id")
     suspend fun getById(id: Long): FournisseurCompteBancaireEntity?
 
@@ -151,6 +161,10 @@ interface FournisseurCompteBancaireDao {
 interface FournisseurDocumentDao {
     @Query("SELECT * FROM fournisseur_documents WHERE fournisseurId = :fournisseurId AND archive = 0 ORDER BY dateExpiration IS NULL, dateExpiration")
     fun observeParFournisseur(fournisseurId: Long): Flow<List<FournisseurDocumentEntity>>
+
+    /** Tous les documents non archivés, tous fournisseurs confondus (aptitude du portefeuille). */
+    @Query("SELECT * FROM fournisseur_documents WHERE archive = 0")
+    fun observeTousActifs(): Flow<List<FournisseurDocumentEntity>>
 
     /** Documents expirant avant :horizon (ms) ou déjà expirés — pour le hub « À traiter ». */
     @Query(
