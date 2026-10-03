@@ -2049,7 +2049,7 @@
     <string name="cli_liste_vide_desc">Toque + para añadir un cliente con su nombre y teléfono.</string>
     <string name="cli_aucun_resultat">Sin resultados</string>
     <string name="cli_aucun_resultat_desc">Cambie la búsqueda o quite el filtro.</string>
-    <string name="cli_resume_titre">Resumen</string>
+    <string name="cli_resume_titre">Resumen general</string>
     <string name="cli_resume_clients">Clientes</string>
     <string name="cli_resume_encours">Pendiente</string>
     <string name="cli_resume_en_retard">Vencido</string>
@@ -2380,4 +2380,14 @@
     <string name="four_exclu_sans_prix">No recomendado: sin precio válido</string>
     <string name="four_documents_titre">Documentos por renovar</string>
     <string name="four_documents_vide">Ningún documento vence en los próximos 90 días.</string>
+    <string name="cli_etape_n_sur">Paso %1$d de %2$d</string>
+    <string name="cli_precedent">Anterior</string>
+    <string name="cli_continuer">Continuar</string>
+    <string name="cli_choisir_date">Elegir una fecha</string>
+    <string name="cli_dans_jours_long">En %1$d días</string>
+    <string name="cli_liste_astuce">Toque un cliente para abrir su ficha.</string>
+    <string name="cli_fiche_titre">Ficha del cliente</string>
+    <string name="cli_compte_de">Cuenta de %1$s</string>
+    <string name="cli_reste_du_libelle">Saldo pendiente</string>
+    <string name="cli_section_contacts">Contactos y direcciones</string>
 </resources>

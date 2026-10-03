@@ -117,7 +117,7 @@ private fun ClientPriceDialog(
     MissaFormDialogue(
         titre = stringResource(R.string.clients_flow_add_price),
         icone = Iv.Payments,
-        couleur = AppModule.CLIENTS.couleur,
+        couleur = ClientCouleurs.Violet,
         onFermer = onDismiss,
         libelleValider = stringResource(R.string.clients_enregistrer),
         validerActif = productId != null && price != null,

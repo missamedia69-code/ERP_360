@@ -2049,7 +2049,7 @@
     <string name="cli_liste_vide_desc">اضغط + لإضافة عميل باسمه ورقم هاتفه.</string>
     <string name="cli_aucun_resultat">لا توجد نتائج</string>
     <string name="cli_aucun_resultat_desc">غيّر البحث أو أزل التصفية.</string>
-    <string name="cli_resume_titre">ملخص</string>
+    <string name="cli_resume_titre">نظرة عامة</string>
     <string name="cli_resume_clients">العملاء</string>
     <string name="cli_resume_encours">المستحقات</string>
     <string name="cli_resume_en_retard">متأخر</string>
@@ -2380,4 +2380,14 @@
     <string name="four_exclu_sans_prix">غير موصى به: لا يوجد سعر صالح</string>
     <string name="four_documents_titre">المستندات المطلوب تجديدها</string>
     <string name="four_documents_vide">لا توجد مستندات تنتهي صلاحيتها خلال 90 يومًا القادمة.</string>
+    <string name="cli_etape_n_sur">الخطوة %1$d من %2$d</string>
+    <string name="cli_precedent">السابق</string>
+    <string name="cli_continuer">متابعة</string>
+    <string name="cli_choisir_date">اختر تاريخًا</string>
+    <string name="cli_dans_jours_long">بعد %1$d أيام</string>
+    <string name="cli_liste_astuce">المس عميلاً لفتح ملفه.</string>
+    <string name="cli_fiche_titre">ملف العميل</string>
+    <string name="cli_compte_de">حساب %1$s</string>
+    <string name="cli_reste_du_libelle">المبلغ المستحق</string>
+    <string name="cli_section_contacts">جهات الاتصال والعناوين</string>
 </resources>

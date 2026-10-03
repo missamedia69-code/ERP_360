@@ -2053,7 +2053,7 @@
     <string name="cli_liste_vide_desc">Tap + to add a customer with a name and a phone number.</string>
     <string name="cli_aucun_resultat">No results</string>
     <string name="cli_aucun_resultat_desc">Change the search or remove the filter.</string>
-    <string name="cli_resume_titre">Summary</string>
+    <string name="cli_resume_titre">Overview</string>
     <string name="cli_resume_clients">Customers</string>
     <string name="cli_resume_encours">Outstanding</string>
     <string name="cli_resume_en_retard">Overdue</string>
@@ -2384,4 +2384,14 @@
     <string name="four_exclu_sans_prix">Not recommended: no valid price</string>
     <string name="four_documents_titre">Documents to renew</string>
     <string name="four_documents_vide">No document expires in the next 90 days.</string>
+    <string name="cli_etape_n_sur">Step %1$d of %2$d</string>
+    <string name="cli_precedent">Previous</string>
+    <string name="cli_continuer">Continue</string>
+    <string name="cli_choisir_date">Pick a date</string>
+    <string name="cli_dans_jours_long">In %1$d days</string>
+    <string name="cli_liste_astuce">Tap a client to open the file.</string>
+    <string name="cli_fiche_titre">Client file</string>
+    <string name="cli_compte_de">Account of %1$s</string>
+    <string name="cli_reste_du_libelle">Balance due</string>
+    <string name="cli_section_contacts">Contacts and addresses</string>
 </resources>

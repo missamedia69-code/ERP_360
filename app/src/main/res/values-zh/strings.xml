@@ -2380,4 +2380,14 @@
     <string name="four_exclu_sans_prix">不推荐：没有有效价格</string>
     <string name="four_documents_titre">待更新文件</string>
     <string name="four_documents_vide">未来 90 天内没有文件到期。</string>
+    <string name="cli_etape_n_sur">第 %1$d 步，共 %2$d 步</string>
+    <string name="cli_precedent">上一步</string>
+    <string name="cli_continuer">继续</string>
+    <string name="cli_choisir_date">选择日期</string>
+    <string name="cli_dans_jours_long">%1$d 天后</string>
+    <string name="cli_liste_astuce">点击客户以打开其档案。</string>
+    <string name="cli_fiche_titre">客户档案</string>
+    <string name="cli_compte_de">%1$s 的账户</string>
+    <string name="cli_reste_du_libelle">应付余额</string>
+    <string name="cli_section_contacts">联系人和地址</string>
 </resources>

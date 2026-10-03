@@ -55,7 +55,7 @@ internal fun ClientSheet(
         contentAlignment = Alignment.BottomCenter,
     ) {
         Surface(
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+            shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp),
             color = Color.White,
             modifier = Modifier.fillMaxWidth().heightIn(max = 640.dp).navigationBarsPadding()
                 .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = {}),

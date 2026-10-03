@@ -99,11 +99,7 @@ fun NavGraphBuilder.clientsGraph(
             )
         }
     }
-    dialog(
-        route = ClientRoutes.EDITION,
-        arguments = ARGUMENT_ID,
-        dialogProperties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
+    composable(route = ClientRoutes.EDITION, arguments = ARGUMENT_ID) {
         gardeViolette { ClientEditSheet(onClose = retour, onSauve = retour) }
     }
 }

@@ -2096,7 +2096,7 @@
     <string name="cli_liste_vide_desc">Touchez + pour ajouter un client avec son nom et son téléphone.</string>
     <string name="cli_aucun_resultat">Aucun résultat</string>
     <string name="cli_aucun_resultat_desc">Modifiez la recherche ou retirez le filtre.</string>
-    <string name="cli_resume_titre">Résumé</string>
+    <string name="cli_resume_titre">Vue d\'ensemble</string>
     <string name="cli_resume_clients">Clients</string>
     <string name="cli_resume_encours">Encours</string>
     <string name="cli_resume_en_retard">En retard</string>
@@ -2427,4 +2427,14 @@
     <string name="four_exclu_sans_prix">Non recommandé : aucun prix valable</string>
     <string name="four_documents_titre">Documents à renouveler</string>
     <string name="four_documents_vide">Aucun document n\'expire dans les 90 prochains jours.</string>
+    <string name="cli_etape_n_sur">Étape %1$d sur %2$d</string>
+    <string name="cli_precedent">Précédent</string>
+    <string name="cli_continuer">Continuer</string>
+    <string name="cli_choisir_date">Choisir une date</string>
+    <string name="cli_dans_jours_long">Dans %1$d jours</string>
+    <string name="cli_liste_astuce">Touchez un client pour ouvrir sa fiche.</string>
+    <string name="cli_fiche_titre">Fiche client</string>
+    <string name="cli_compte_de">Compte de %1$s</string>
+    <string name="cli_reste_du_libelle">Reste dû</string>
+    <string name="cli_section_contacts">Contacts et adresses</string>
 </resources>

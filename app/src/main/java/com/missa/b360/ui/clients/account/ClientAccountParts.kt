@@ -14,6 +14,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.ui.graphics.Brush
+import com.missa.b360.ui.clients.components.ClientCarte
+import com.missa.b360.ui.clients.components.ClientTitreSection
+import com.missa.b360.ui.icons.Iv
 import androidx.compose.material3.CardDefaults
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Text
@@ -38,41 +42,28 @@ import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 
-private fun AgingBucket.couleur(): Color = when (this) {
-    AgingBucket.NON_ECHU -> RisqueCouleurs.Normal
-    AgingBucket.JOURS_1_30 -> RisqueCouleurs.Attention
-    AgingBucket.JOURS_31_60 -> Color(0xFFEA580C)
-    AgingBucket.JOURS_61_90 -> RisqueCouleurs.Eleve
-    AgingBucket.PLUS_90 -> RisqueCouleurs.Bloque
-}
-
-/** Balance âgée en barres horizontales (jamais un tableau défilant) : une ligne par tranche. */
+/** Balance âgée en barres horizontales (jamais un tableau défilant) : une ligne par tranche, barre violette. */
 @Composable
 internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
     val maximum = AgingBucket.entries.maxOf { balance.montant(it) }.takeIf { it > 0.0 } ?: 1.0
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
-        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.cli_balance_agee), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+    ClientCarte {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            ClientTitreSection(Iv.Schedule, stringResource(R.string.cli_balance_agee)) {
+                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
             }
             for (tranche in AgingBucket.entries) {
                 val montant = balance.montant(tranche)
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row {
-                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
                     }
-                    Box(Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)).background(MissaBorder.copy(alpha = 0.5f))) {
+                    Box(Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(ClientCouleurs.Neutre)) {
                         if (montant > 0.0) {
                             Box(
-                                Modifier.fillMaxWidth((montant / maximum).toFloat().coerceIn(0.03f, 1f)).height(10.dp)
-                                    .background(tranche.couleur()),
+                                Modifier.fillMaxWidth((montant / maximum).toFloat().coerceIn(0.03f, 1f)).height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(Brush.horizontalGradient(listOf(ClientCouleurs.Violet, ClientCouleurs.VioletProfond))),
                             )
                         }
                     }

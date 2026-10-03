@@ -34,6 +34,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientStatus
 import com.missa.b360.core.domain.usecase.ClientLifecycleRules
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
 import com.missa.b360.ui.clients.components.ClientOnglets
 import com.missa.b360.ui.clients.components.ClientReminderDialog
@@ -47,7 +48,6 @@ import com.missa.b360.ui.clients.components.libelle
 import com.missa.b360.ui.clients.components.ouvrirWhatsApp
 import com.missa.b360.ui.components.MissaChampTexte
 import com.missa.b360.ui.icons.Iv
-import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 
 /** Route `clients/{id}` : fiche 360 ; l'identifiant vient des arguments de navigation. */
@@ -73,14 +73,14 @@ fun ClientDetailScreen(
     ClientNoticeEffect(etat.notice, hote, viewModel::noticeLue)
 
     Scaffold(
-        containerColor = MissaCanvas,
+        containerColor = ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(hote) },
         topBar = {
-            ClientTopBar(titre = client?.nom ?: stringResource(R.string.clients_flow_detail_title), onBack = onBack) {
+            ClientTopBar(titre = stringResource(R.string.cli_fiche_titre), onBack = onBack) {
                 if (client != null) {
                     IconButton(onClick = { onModifier(client.id) }) {
-                        Icon(painterResource(Iv.Edit), stringResource(R.string.clients_modifier), tint = MissaInk)
+                        Icon(painterResource(Iv.Edit), stringResource(R.string.clients_modifier), tint = ClientCouleurs.Violet)
                     }
                     if (etat.transitions.isNotEmpty()) {
                         IconButton(onClick = { menuOuvert = true }) {
@@ -114,10 +114,11 @@ fun ClientDetailScreen(
             )
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(start = 13.dp, end = 13.dp, top = 10.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 item { ClientDetailHeader(etat) }
+                item { ClientDetailMetriques(etat) }
                 item {
                     ClientDetailActions(
                         onVendre = { onVendre(client.id) },

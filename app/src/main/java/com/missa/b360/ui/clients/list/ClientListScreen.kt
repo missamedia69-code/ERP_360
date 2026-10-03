@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -31,6 +30,16 @@ import androidx.compose.ui.platform.LocalContext
 import com.missa.b360.core.domain.model.ClientAdvancedFilter
 import com.missa.b360.ui.clients.components.appeler
 import com.missa.b360.ui.clients.components.ouvrirWhatsApp
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import com.missa.b360.ui.clients.components.BoutonClientPlein
+import com.missa.b360.ui.theme.MissaMuted
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,7 +61,6 @@ import com.missa.b360.ui.components.MissaChampTexte
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.icons.Iv
 import com.missa.b360.ui.navigation.AppModule
-import com.missa.b360.ui.theme.MissaCanvas
 
 /** Route `clients` : la liste lit uniquement `client_balances` (montants identiques à la fiche et au compte). */
 @Composable
@@ -111,7 +119,7 @@ internal fun ClientListContent(
 ) {
     var filtresOuverts by rememberSaveable { mutableStateOf(false) }
     Scaffold(
-        containerColor = MissaCanvas,
+        containerColor = ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             ClientTopBar(titre = stringResource(R.string.clients_flow_list_title), onBack = onBack, titreCentre = false) {
@@ -123,18 +131,19 @@ internal fun ClientListContent(
                 }
             }
         },
-        floatingActionButton = {
-            // Marge basse : la barre de modules flottante recouvre les 56 dp du bas de l'écran.
-            ExtendedFloatingActionButton(
-                onClick = onNouveau,
-                containerColor = ClientCouleurs.Nuit,
-                contentColor = Color.White,
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.padding(bottom = 56.dp),
-            ) {
-                Icon(painterResource(Iv.Add), contentDescription = null, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.clients_nouveau), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        bottomBar = {
+            // Bouton « Nouveau client » pleine largeur ; la marge basse laisse la place à la barre de modules flottante.
+            Column(Modifier.fillMaxWidth().background(Color.White)) {
+                HorizontalDivider(color = ClientCouleurs.Trait)
+                BoutonClientPlein(
+                    onClick = onNouveau,
+                    modifier = Modifier.fillMaxWidth().padding(start = 13.dp, end = 13.dp, top = 9.dp).heightIn(min = 48.dp),
+                ) {
+                    Icon(painterResource(Iv.Add), contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.clients_nouveau), fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                }
+                Spacer(Modifier.height(64.dp))
             }
         },
     ) { padding ->
@@ -143,8 +152,8 @@ internal fun ClientListContent(
             etat.chargement -> EtatChargement(Modifier.padding(padding))
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(start = 13.dp, end = 13.dp, top = 10.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 item { ClientListSummary(etat) }
                 item {
@@ -157,11 +166,15 @@ internal fun ClientListContent(
                             modifier = Modifier.weight(1f),
                         )
                         val actifs = etat.avance.actifs
-                        BoutonClient(onClick = { filtresOuverts = true }, modifier = Modifier.heightIn(min = 48.dp), plein = false) {
-                            Icon(painterResource(Iv.Sliders), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                            Text(
-                                stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else "",
-                                color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                        val titreFiltres = stringResource(R.string.cli_filtres_titre) + if (actifs > 0) " ($actifs)" else ""
+                        BoutonClient(
+                            onClick = { filtresOuverts = true },
+                            modifier = Modifier.size(48.dp).semantics { contentDescription = titreFiltres },
+                            plein = actifs > 0,
+                        ) {
+                            Icon(
+                                painterResource(Iv.Sliders), contentDescription = null,
+                                tint = if (actifs > 0) Color.White else ClientCouleurs.Violet, modifier = Modifier.size(20.dp),
                             )
                         }
                     }
@@ -190,6 +203,15 @@ internal fun ClientListContent(
                             onClick = { onOuvrirClient(ligne.client.id) },
                             onAppeler = { onAppeler(ligne.client.telephone) },
                             onWhatsApp = { onWhatsApp(ligne.client.telephone) },
+                        )
+                    }
+                }
+                if (etat.lignes.isNotEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.cli_liste_astuce),
+                            color = MissaMuted, fontSize = 11.sp, textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         )
                     }
                 }

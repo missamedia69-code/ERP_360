@@ -1,82 +1,68 @@
-# Design du module Clients — référence « nuit · gris · violet »
+# Design du module Clients — refonte « nuit · violet »
 
-Référence validée par le propriétaire (captures « fiche client » et « liste des clients », 2 octobre 2026).
-Elle s'applique à **tout écran, formulaire, feuille et dialogue lié au client** : `ui/clients/*`, bandeau de
-crédit dans Ventes (`ClientCreditBanner`), sélection d'un client dans Ventes/Devis, fiches client du CRM et
-notifications clients. Les autres modules gardent le design de l'écran « Informations sur votre entreprise »
-(voir `docs/CONVENTIONS.md`). Les jetons vivent dans un seul fichier :
-`app/src/main/java/com/missa/b360/ui/clients/components/ClientDesign.kt` (`ClientCouleurs`, `BoutonClient`,
-`ClientOnglets`, `ClientVideActivite`). **Ne jamais écrire une teinte en dur dans un écran Clients.**
+Référence de la refonte visuelle du module Clients (octobre 2026), tirée de la maquette « Refonte UI — ERP Mobile · Clients ».
+Elle remplace la référence précédente (boutons d'action bleu nuit, violet réservé à la sélection). Les jetons vivent
+dans `ClientCouleurs` (`ui/clients/components/ClientDesign.kt`) ; les composants partagés dans `ClientDesign.kt` et
+`ClientDesignBlocs.kt`. Aucun écran Clients n'écrit de teinte en dur.
 
 ## Principe
 
-Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité et le texte. **Trois rôles de
-couleur, jamais mélangés :**
+- Le **violet** marque les actions principales, les icônes, la sélection et les états actifs.
+- Le **bleu nuit** porte l'identité (textes, cartes d'en-tête) et les actions de suivi (« Encaisser », « Ouvrir le compte »).
+- **Vert et orange** sont réservés aux statuts métier (statut actif, risque, retard, alerte) ; rouge pour retard et blocage.
+- Fond d'écran gris clair, cartes blanches finement contournées ; aucune ombre lourde.
 
-1. **Bleu nuit = bouton d'action** : tout bouton qui déclenche une action (Vendre, Encaisser, Relancer, Appeler,
-   WhatsApp, SMS, Ajouter une note, Créer, Enregistrer, Importer, Appliquer, « + Nouveau client ») est plein bleu
-   nuit à contenu blanc en gras (`BoutonClientPlein`, `BoutonClient`). Les boutons secondaires sont blancs à
-   contour gris (`BoutonContourMissa`, `BoutonClient(plein = false)`). Désactivé = bleu nuit à 35 %.
-2. **Violet = élément sélectionnable à l'état sélectionné** : onglet courant, filtre ou puce choisie, onglet actif
-   de la barre du bas, interrupteur et case cochés. Jamais décoratif ; jamais sur un bouton d'action.
-3. **Vert, ambre, rouge = niveau de risque ou état**, toujours avec une icône.
-
-Aucun écran du module n'a de couleur propre : puces `ClientPuce`, états vides `ClientEtatVide`, cartes
-`ClientCouleurs.Carte` + `CarteBord`. Pas de `FilterChip` ni de `MissaEmptyState` Material par défaut.
-
-## Palette (`ClientCouleurs`)
+## Palette
 
 | Jeton | Valeur | Usage |
 |---|---|---|
-| `Nuit` | `#101C43` | texte, avatar, icônes, **fond des boutons d'action** |
-| `Violet` / `VioletProfond` | `#7C3AED` / `#5B21B6` | **uniquement** l'élément sélectionné : onglet ou filtre courant, onglet actif de la barre du bas |
-| `Carte` / `CarteBord` | `#EAEDF2` / `#D5DAE3` | résumé, en-tête de fiche, cartes clients, cartes de section |
-| `Tuile` / `TuileClaire` | `#E3E6EC` / `#EBEDF1` | actions, boutons secondaires pleins |
-| `Pastille` | `#DDE1E8` | pastilles neutres (statut, compteurs) |
-| `Trait` | `#D5DAE3` | séparateurs, contours des boutons blancs |
-| Texte secondaire | `MissaMuted` | libellés, code, téléphone |
+| `Nuit` / `Nuit2` | `#172247` / `#24335F` | Textes forts, cartes d'en-tête en dégradé, boutons « suivi » |
+| `Violet` / `VioletProfond` / `VioletPale` | `#7B3FE4` / `#682ED0` / `#F1EAFE` | Actions, icônes, onglet actif, filtre actif, barres |
+| `Fond` / `Surface` | `#F4F6FA` / `#F8F9FC` | Fond d'écran, bandes et encadrés |
+| `Trait` / `TraitFort` | `#E1E5EE` / `#CDD4E0` | Filets des cartes / contours des boutons |
+| `Succes` / `SuccesPale` | `#188252` / `#EAF7F0` | Statut actif, risque normal |
+| `Alerte` / `AlertePale` | `#A85A12` / `#FFF3E4` | Retard, relance, attention |
+| `Neutre` / `NeutreTexte` | `#EDF0F5` / `#59647A` | Pastilles neutres (« À compléter »), compteurs |
 
-## Typographie et dimensions
+## Dimensions
 
-- Écrans secondaires (compte, relances, activité, prix négociés, bandeau de crédit) : texte 12 à 15 sp,
-  remplissage 10 à 12 dp.
-- Titre d'écran 19 sp gras (centré sur la fiche, aligné à gauche sur la liste) ; nom du client 16 à 18 sp gras ;
-  code, téléphone, libellés de chiffres 11 sp ; valeur d'un chiffre 14 à 15 sp gras ; boutons 12 à 13 sp gras ;
-  pastilles et onglets 10 à 12 sp.
-- Cartes : rayon 14 à 16 dp, contour 1 dp, aucune ombre ; remplissage 10 à 12 dp ; espacement vertical 6 dp
-  entre éléments d'une liste, 8 dp dans une carte.
-- Cibles tactiles **≥ 48 dp** (un onglet visuel de 36 à 38 dp est entouré d'une zone cliquable de 48 dp).
-- Défilement vertical uniquement ; jamais de tableau horizontal.
+Rayons : cartes 16, cartes d'en-tête 20, boutons 13, feuilles basses 25 (haut). Boutons ≥ 48 dp de zone tactile.
+Champs 46–48 dp, grille 2 colonnes. Textes : titre de carte 15 sp gras, valeur chiffrée 14–15 sp, montant du compte 26 sp, libellés 11–12 sp.
 
 ## Composants
 
-- **Barre haute** : `ClientTopBar` (fond toujours blanc ; `titreCentre = false` pour la liste).
-- **Fiche** : carte d'en-tête (avatar 52 dp, nom, `code · téléphone`, pastilles statut + risque, utilisation du
-  crédit, grille 2×2 En cours / En retard / CA 12 mois / Dernière vente) ; grille d'actions 3×2 (« Vendre »
-  en gras ; les six en boutons bleu nuit à contenu blanc ; icône « SMS » = bulle de message, distincte de
-  l'appel) ; onglets (`ClientOnglets`) ; « + Ajouter une note » et « Toute
-  l'activité ⌄ » (`BoutonClient`) ; état vide en pointillés (`ClientVideActivite`).
-- **Liste** : carte « Résumé » repliable avec « En temps réel » ; recherche + bouton « Filtres » ; pastilles de
-  filtre avec compteur ; ligne « N clients » + menu « Trier par … ⌄ » ; carte client dépliable (encours, retard,
-  Appeler, WhatsApp) ; bouton flottant bleu nuit « + Nouveau client ».
-- **Barre de modules** dans Clients : icône au-dessus du libellé pour tous les onglets, carré violet (icône et libellé blancs) pour l'actif.
-- **Risque** : `RiskBadge` (contour et icône de la couleur de risque, texte nuit) ; `ClientStatusChip`
-  (gris neutre, couleur seulement pour actif, surveillance et blocages ; cadenas pour les blocages).
+- `ClientCarte` : carte blanche (rayon 16, filet, ombre légère), cliquable en option.
+- `ClientHero` : carte d'en-tête en dégradé nuit avec grand cercle violet translucide (Vue d'ensemble, fiche, compte).
+- `ClientSymbole` / `ClientTitreSection` : symbole violet pâle 27 dp et titre de section avec compteur (`ClientCompteur`).
+- `ClientPastille` (+ `ClientStatusChip`, `RiskBadge`) : pastilles arrondies de statut et de risque.
+- `BoutonClientPlein` / `BoutonClient` : plein violet par défaut, `couleur = ClientCouleurs.Nuit` pour Encaisser et « Ouvrir le compte client » ;
+  `BoutonClientDoux` (violet pâle, Promesse de paiement) ; contour blanc pour les actions secondaires.
+- `ClientOnglets` : onglets soulignés (texte violet gras + trait violet pour l'onglet courant).
+- `ClientPuce` / filtres : pastille arrondie, active = violet plein, compteur dans un rond.
+- `ClientAvatar` : carré arrondi en dégradé violet.
+- `ClientFeuille` : feuille basse (poignée, titre, sous-titre, croix, contenu, Annuler + action violette) pour la promesse de paiement et l'encaissement.
+- `ClientEtatVide` : cadre en pointillés, symbole violet pâle.
+
+## Écrans
+
+1. **Répertoire** : barre haute, carte « Vue d'ensemble » (clients, encours, retard), recherche + bouton de filtres (plein violet s'il y a des filtres actifs),
+   filtres rapides, « N clients » + tri, cartes client (avatar, nom, code, téléphone, statut, encours, chevron), bouton « + Nouveau client » en bas.
+   Glisser une carte appelle (droite) ou ouvre WhatsApp (gauche).
+2. **Fiche** (Activité, Compte, Contacts, Conditions, Notes) : héros nuit (identité, statut, risque, utilisation du crédit), grille 2 × 2 d'indicateurs,
+   trois actions carrées (Vendre, Encaisser, Relancer), bande de contact (Appeler, WhatsApp, SMS), onglets soulignés.
+3. **Compte client** : héros (reste dû 26 sp, retard, utilisation du crédit), Encaisser (nuit) + Promesse de paiement (doux), relevé PDF,
+   balance âgée (barres violettes), factures ouvertes et encaissements avec compteur.
+4. **Promesse de paiement** : feuille basse — reste dû, montant promis, échéances en grille 2 × 2 (Aujourd'hui, Dans 3 jours, Dans 7 jours, Choisir une date).
+5. **Formulaire client en 5 étapes** (Identité et coordonnées, Fiscalité, Conditions commerciales, Contacts et adresses, Notes) : carte de progression
+   (« Étape n sur 5 », barre violette, pastilles numérotées ou cochées, touchables), carte d'étape avec badge violet, pied Précédent/Annuler + Continuer ;
+   Enregistrer à la dernière étape ; une validation en échec renvoie à la première étape en erreur. Aucune étape n'est bloquante.
 
 ## Formulaires : structure matricielle compacte
 
-- Un formulaire = cartes `MissaCarteSection` numérotées, toujours ouvertes.
-- **Deux colonnes** (`MissaRangee`, `Modifier.weight(1f)`) pour tous les champs courts qui vont ensemble :
-  type | e-mail, NIF | type d'identifiant, délai | limite, remise | remise max, catégorie | badge, commercial |
-  grille, segment | canal, territoire | compte comptable, fonction | téléphone, adresse | ville, les deux
-  interrupteurs TVA.
-- **Pleine largeur** pour les champs longs ou composites : nom, téléphone avec indicatif, adresse seule, motif
-  d'exonération, conditions de paiement, notes (4 lignes).
-- Feuille modale : remplissage 12 dp, espacement 8 dp, titre 18 sp ; bouton principal épinglé en bas (48 dp).
-- Création rapide : deux champs seulement (nom, téléphone) ; le reste se complète dans l'édition.
+Champs en grille 2 colonnes (`MissaRangee`), nom et adresses sur toute la largeur. Les numéros de bloc, les icônes (champ, chevron, croix, indicatif)
+et la bordure active des champs suivent le violet via `LocalCouleurSelection`, fourni par `clientsGraph`.
 
-## Hors périmètre de la référence (à valider sur appareil)
+## À valider sur appareil
 
-Écrans compte, relances, import, création et édition : alignés sur la palette sans maquette dédiée. Aucune
-maquette n'existe pour l'arabe (droite à gauche), les états de chargement et d'erreur, ni le risque élevé ou
-bloqué : à vérifier visuellement avant de les considérer comme validés.
+Aucune capture n'a été produite hors appareil : les espacements, la lisibilité du bouton « Nouveau client » au-dessus de la barre de modules
+et le défilement des onglets sont à contrôler sur écran réel. Les autres modules gardent leur couleur de marque et seront redessinés un par un.

@@ -5,6 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,38 +45,53 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 
 /**
- * Palette « nuit · gris · violet » du module Clients (maquettes fiche et liste) :
- * encre nuit pour le texte, l'avatar et les actions principales, gris bleuté pour les cartes et tuiles,
- * violet réservé aux éléments sélectionnables à l'état sélectionné (onglet, filtre, barre du bas). La couleur de risque reste réservée aux états.
+ * Palette « bleu nuit · violet » du module Clients (refonte d'octobre 2026) : fond gris clair, cartes blanches
+ * finement contournées, bleu nuit pour l'identité et les cartes d'en-tête, violet pour les actions principales,
+ * les icônes, la sélection et les états actifs. Vert et orange restent réservés aux états métier.
  * Référence complète : `docs/DESIGN_CLIENTS.md`.
  */
 internal object ClientCouleurs {
-    val Nuit = Color(0xFF101C43)
-    val Violet = Color(0xFF7C3AED)
-    val VioletProfond = Color(0xFF5B21B6)
-    val Carte = Color(0xFFEAEDF2)
-    val CarteBord = Color(0xFFD5DAE3)
-    val Tuile = Color(0xFFE3E6EC)
-    val TuileClaire = Color(0xFFEBEDF1)
-    val Trait = Color(0xFFD5DAE3)
-    val Pastille = Color(0xFFDDE1E8)
+    val Nuit = Color(0xFF172247)
+    val Nuit2 = Color(0xFF24335F)
+    val Violet = Color(0xFF7B3FE4)
+    val VioletProfond = Color(0xFF682ED0)
+    val VioletPale = Color(0xFFF1EAFE)
+    val VioletBord = Color(0xFFE8DAFC)
+    val Fond = Color(0xFFF4F6FA)
+    val Surface = Color(0xFFF8F9FC)
+    val Trait = Color(0xFFE1E5EE)
+    val TraitFort = Color(0xFFCDD4E0)
+    val Succes = Color(0xFF188252)
+    val SuccesPale = Color(0xFFEAF7F0)
+    val Alerte = Color(0xFFA85A12)
+    val AlertePale = Color(0xFFFFF3E4)
+    val Neutre = Color(0xFFEDF0F5)
+    val NeutreTexte = Color(0xFF59647A)
+
+    // Anciens jetons : conservés pour les écrans secondaires, alignés sur la nouvelle palette.
+    val Carte = Color.White
+    val CarteBord = Trait
+    val Tuile = Color(0xFFEDF0F6)
+    val TuileClaire = Surface
+    val Pastille = Neutre
 }
 
-/** Bouton de la fiche : cible ≥ 48 dp ; plein = bouton d'action bleu nuit (contenu blanc), sinon contour blanc. */
+/** Bouton de la fiche : cible ≥ 48 dp ; plein = bouton d'action violet par défaut (bleu nuit si demandé), sinon contour blanc. */
 @Composable
 internal fun BoutonClient(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     plein: Boolean = true,
+    couleur: Color = ClientCouleurs.Violet,
     contenu: @Composable RowScope.() -> Unit,
 ) {
-    val forme = RoundedCornerShape(12.dp)
+    val forme = RoundedCornerShape(13.dp)
     Row(
         modifier = modifier
             .heightIn(min = 48.dp)
             .clip(forme)
-            .background(if (plein) ClientCouleurs.Nuit else Color.White)
-            .then(if (plein) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
+            .background(if (plein) couleur else Color.White)
+            .then(if (plein) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.TraitFort), forme))
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -92,18 +108,18 @@ internal fun ClientPuce(
     modifier: Modifier = Modifier,
     role: Role = Role.Tab,
 ) {
-    val forme = RoundedCornerShape(12.dp)
+    val forme = RoundedCornerShape(999.dp)
     Box(
         modifier.heightIn(min = 48.dp).clip(forme).clickable(role = role, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             Modifier
-                .heightIn(min = 38.dp)
+                .heightIn(min = 36.dp)
                 .clip(forme)
                 .background(if (actif) ClientCouleurs.Violet else Color.White)
                 .then(if (actif) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
-                .padding(horizontal = 14.dp, vertical = 6.dp),
+                .padding(horizontal = 12.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -118,7 +134,7 @@ internal fun ClientPuce(
     }
 }
 
-/** Onglets de la fiche : pastille violette pour l'onglet courant, contour gris pour les autres. */
+/** Onglets de la fiche : texte gras violet souligné pour l'onglet courant, gris pour les autres, filet continu dessous. */
 @Composable
 internal fun <T> ClientOnglets(
     onglets: List<T>,
@@ -126,9 +142,36 @@ internal fun <T> ClientOnglets(
     libelle: (T) -> Int,
     onChoix: (T) -> Unit,
 ) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        items(onglets) { onglet ->
-            ClientPuce(libelle = stringResource(libelle(onglet)), actif = onglet == courant, onClick = { onChoix(onglet) })
+    val trait = ClientCouleurs.Trait
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .drawBehind { drawLine(trait, androidx.compose.ui.geometry.Offset(0f, size.height), androidx.compose.ui.geometry.Offset(size.width, size.height), 1.dp.toPx()) }
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        onglets.forEach { onglet ->
+            val actif = onglet == courant
+            Column(
+                Modifier
+                    .heightIn(min = 48.dp)
+                    .clickable(role = Role.Tab) { onChoix(onglet) }
+                    .padding(horizontal = 2.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                Box(Modifier.heightIn(min = 46.dp), contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(libelle(onglet)),
+                        color = if (actif) ClientCouleurs.Violet else ClientCouleurs.NeutreTexte,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        maxLines = 1,
+                    )
+                }
+                Box(Modifier.fillMaxWidth().height(2.dp).background(if (actif) ClientCouleurs.Violet else Color.Transparent))
+            }
         }
     }
 }
@@ -142,8 +185,8 @@ internal fun ClientEtatVide(icone: Int, titre: String, description: String, modi
             .fillMaxWidth()
             .drawBehind {
                 drawRoundRect(
-                    color = trait,
-                    cornerRadius = CornerRadius(14.dp.toPx()),
+                    color = ClientCouleurs.TraitFort,
+                    cornerRadius = CornerRadius(16.dp.toPx()),
                     style = Stroke(width = 1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f))),
                 )
             }
@@ -152,14 +195,14 @@ internal fun ClientEtatVide(icone: Int, titre: String, description: String, modi
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).background(ClientCouleurs.Tuile),
+            Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)).background(ClientCouleurs.VioletPale),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(icone), contentDescription = null, tint = MissaMuted, modifier = Modifier.size(20.dp))
+            Icon(painterResource(icone), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(20.dp))
         }
         Column {
-            Text(titre, color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-            Text(description, color = MissaMuted, fontSize = 11.sp)
+            Text(titre, color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            if (description.isNotBlank()) Text(description, color = MissaMuted, fontSize = 11.sp)
         }
     }
 }
@@ -175,7 +218,7 @@ internal fun ClientVideActivite() {
 }
 
 /**
- * Bouton d'action du module Clients : fond bleu nuit, texte blanc en gras, bleu nuit, texte blanc (jamais violet : le violet est réservé à la sélection).
+ * Bouton d'action du module Clients : fond violet (action principale) ou bleu nuit (action de suivi), texte blanc en gras.
  * Mêmes paramètres que `BoutonMissa`, importé sous le nom `Button` dans les écrans Clients.
  */
 @Composable
@@ -183,17 +226,18 @@ internal fun BoutonClientPlein(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    couleur: Color = ClientCouleurs.Violet,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.heightIn(min = 48.dp),
         enabled = enabled,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(13.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = ClientCouleurs.Nuit,
+            containerColor = couleur,
             contentColor = Color.White,
-            disabledContainerColor = ClientCouleurs.Nuit.copy(alpha = 0.35f),
+            disabledContainerColor = couleur.copy(alpha = 0.35f),
             disabledContentColor = Color.White.copy(alpha = 0.9f),
         ),
         elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),

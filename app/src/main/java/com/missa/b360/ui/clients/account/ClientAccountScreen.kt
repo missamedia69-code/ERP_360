@@ -38,6 +38,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.missa.b360.R
 import com.missa.b360.core.domain.model.MentionsLegales
+import com.missa.b360.ui.clients.components.ClientHero
+import com.missa.b360.ui.clients.components.ClientTitreSection
+import com.missa.b360.ui.clients.components.ClientCompteur
+import com.missa.b360.ui.clients.components.ClientEtatVide
+import com.missa.b360.ui.clients.components.BoutonClientDoux
+import com.missa.b360.ui.icons.Iv
+import androidx.compose.foundation.layout.Box
 import com.missa.b360.ui.clients.components.ClientNoticeEffect
 import com.missa.b360.ui.clients.components.ClientTopBar
 import com.missa.b360.ui.clients.components.CreditGauge
@@ -47,7 +54,6 @@ import com.missa.b360.ui.clients.components.RisqueCouleurs
 import com.missa.b360.ui.clients.components.clientDate
 import com.missa.b360.ui.clients.components.clientMoney
 import com.missa.b360.ui.theme.MissaBorder
-import com.missa.b360.ui.theme.MissaCanvas
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +91,7 @@ fun ClientAccountScreen(
     ClientNoticeEffect(etat.notice, hote, viewModel::noticeLue)
 
     Scaffold(
-        containerColor = MissaCanvas,
+        containerColor = ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(hote) },
         topBar = { ClientTopBar(titre = stringResource(R.string.cli_compte_titre), onBack = onBack) },
@@ -100,34 +106,35 @@ fun ClientAccountScreen(
             )
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 132.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(start = 13.dp, end = 13.dp, top = 10.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 item {
-                    Card(
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
-                        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(client.nom, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                            val risque = etat.evaluation?.risque
-                            if (risque != null) CreditGauge(etat.evaluation?.utilisationPct, risque)
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.cli_kpi_encours), color = MissaMuted, fontSize = 11.sp)
-                                    Text(clientMoney(etat.balance?.encours ?: 0.0, etat.devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                }
-                                Column(Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.cli_kpi_en_retard), color = MissaMuted, fontSize = 11.sp)
-                                    Text(
-                                        clientMoney(etat.balance?.enRetard ?: 0.0, etat.devise),
-                                        color = if ((etat.balance?.enRetard ?: 0.0) > 0.0) RisqueCouleurs.Eleve else MissaInk,
-                                        fontWeight = FontWeight.Bold, fontSize = 15.sp,
-                                    )
-                                }
+                    ClientHero {
+                        Text(
+                            stringResource(R.string.cli_compte_de, client.nom),
+                            color = Color(0xFFC3CBE0), fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1,
+                        )
+                        Text(
+                            clientMoney(etat.balance?.encours ?: 0.0, etat.devise),
+                            color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, maxLines = 1,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
+                        Text(stringResource(R.string.cli_reste_du_libelle), color = Color(0xFFC3CBE0), fontSize = 11.sp)
+                        val enRetard = etat.balance?.enRetard ?: 0.0
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Column(Modifier.weight(1f)) {
+                                Text(stringResource(R.string.cli_kpi_en_retard), color = Color(0xFFC3CBE0), fontSize = 11.sp)
+                                Text(
+                                    clientMoney(enRetard, etat.devise),
+                                    color = if (enRetard > 0.0) Color(0xFFFFB4A8) else Color.White,
+                                    fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
+                                )
                             }
+                        }
+                        val risque = etat.evaluation?.risque
+                        if (risque != null) {
+                            Box(Modifier.padding(top = 10.dp)) { CreditGauge(etat.evaluation?.utilisationPct, risque, surFonce = true) }
                         }
                     }
                 }
@@ -135,12 +142,15 @@ fun ClientAccountScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
                             onClick = { viewModel.ouvrirEncaissement() },
+                            couleur = ClientCouleurs.Nuit,
                             modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         ) { Text(stringResource(R.string.cli_encaisser)) }
-                        OutlinedButton(
+                        BoutonClientDoux(
                             onClick = viewModel::ouvrirPromesse,
-                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                        ) { Text(stringResource(R.string.cli_type_promesse), maxLines = 1) }
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.cli_type_promesse), color = ClientCouleurs.Violet, fontWeight = FontWeight.ExtraBold, maxLines = 1)
+                        }
                     }
                 }
                 item {
@@ -169,10 +179,12 @@ fun ClientAccountScreen(
                 }
                 item { AgedBalanceBars(compte.balanceAgee, etat.devise) }
                 item {
-                    Text(stringResource(R.string.cli_factures_ouvertes), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    ClientTitreSection(Iv.Description, stringResource(R.string.cli_factures_ouvertes)) {
+                        ClientCompteur(compte.factures.size.toString())
+                    }
                 }
                 if (compte.factures.isEmpty()) {
-                    item { Text(stringResource(R.string.cli_aucune_facture_ouverte), color = MissaMuted) }
+                    item { ClientEtatVide(Iv.CheckCircle, stringResource(R.string.cli_aucune_facture_ouverte), "") }
                 } else {
                     items(compte.factures.size) { index ->
                         val facture = compte.factures[index]
@@ -180,10 +192,12 @@ fun ClientAccountScreen(
                     }
                 }
                 item {
-                    Text(stringResource(R.string.cli_encaissements), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    ClientTitreSection(Iv.Payments, stringResource(R.string.cli_encaissements)) {
+                        ClientCompteur(compte.paiements.size.toString())
+                    }
                 }
                 if (compte.paiements.isEmpty()) {
-                    item { Text(stringResource(R.string.cli_aucun_encaissement), color = MissaMuted) }
+                    item { ClientEtatVide(Iv.Payments, stringResource(R.string.cli_aucun_encaissement), "") }
                 } else {
                     items(compte.paiements.take(10).size) { index ->
                         val paiement = compte.paiements[index]
@@ -213,6 +227,7 @@ fun ClientAccountScreen(
             devise = etat.devise,
             onValider = { montant, jours -> viewModel.promettre(montant, jours) },
             onDismiss = viewModel::fermerDialogue,
+            sousTitre = client?.nom,
         )
         null -> Unit
     }

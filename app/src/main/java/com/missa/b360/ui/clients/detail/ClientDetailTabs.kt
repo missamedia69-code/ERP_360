@@ -31,7 +31,9 @@ import com.missa.b360.R
 import com.missa.b360.core.data.entity.ClientEntity
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.ui.clients.components.BoutonClient
+import com.missa.b360.ui.clients.components.ClientCarte
 import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientTitreSection
 import com.missa.b360.ui.clients.components.ClientVideActivite
 import com.missa.b360.ui.clients.components.ClientPricesCard
 import com.missa.b360.ui.clients.components.ClientFollowupRow
@@ -46,12 +48,7 @@ private const val APERCU_ACTIVITE = 5
 
 @Composable
 private fun CarteClient(contenu: @Composable () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
-        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
-        modifier = Modifier.fillMaxWidth(),
-    ) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { contenu() } }
+    ClientCarte { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { contenu() } }
 }
 
 @Composable
@@ -71,13 +68,23 @@ internal fun LazyListScope.ongletClient(
     onPrixDefini: (Long, Double) -> Unit,
     onPrixRetire: (Long) -> Unit,
 ) {
+    item {
+        val (icone, titre) = when (etat.onglet) {
+            ClientTab.ACTIVITE -> Iv.History to R.string.cli_onglet_activite
+            ClientTab.COMPTE -> Iv.Payments to R.string.cli_onglet_compte
+            ClientTab.CONTACTS -> Iv.Group to R.string.cli_onglet_contacts
+            ClientTab.CONDITIONS -> Iv.Description to R.string.cli_onglet_conditions
+            ClientTab.NOTES -> Iv.Edit to R.string.cli_onglet_notes
+        }
+        ClientTitreSection(icone, stringResource(titre))
+    }
     when (etat.onglet) {
         ClientTab.ACTIVITE -> {
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     BoutonClient(onClick = onNote, modifier = Modifier.weight(1f)) {
                         Icon(painterResource(Iv.Add), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Text(stringResource(R.string.cli_ajouter_note), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.cli_ajouter_note), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
                     }
                     BoutonClient(onClick = onVoirActivite, modifier = Modifier.weight(1f), plein = false) {
                         Text(stringResource(R.string.cli_voir_activite), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -100,7 +107,7 @@ internal fun LazyListScope.ongletClient(
                 LigneInfo(stringResource(R.string.cli_kpi_en_retard), clientMoney(compte?.enRetard ?: 0.0, etat.devise))
                 LigneInfo(stringResource(R.string.cli_kpi_retard_max), stringResource(R.string.cli_jours, compte?.joursRetardMax ?: 0))
                 LigneInfo(stringResource(R.string.cli_kpi_nb_ventes), (compte?.nbVentes ?: 0).toString())
-                Button(onClick = onVoirCompte, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                Button(onClick = onVoirCompte, couleur = ClientCouleurs.Nuit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                     Text(stringResource(R.string.cli_voir_compte))
                 }
             }
@@ -121,7 +128,7 @@ internal fun LazyListScope.ongletClient(
                         val tel = contact.telephone
                         if (!tel.isNullOrBlank()) {
                             IconButton(onClick = { onAppelerContact(tel) }, modifier = Modifier.size(48.dp)) {
-                                Icon(painterResource(Iv.Call), stringResource(R.string.cli_appeler), tint = MissaInk)
+                                Icon(painterResource(Iv.Call), stringResource(R.string.cli_appeler), tint = ClientCouleurs.Violet)
                             }
                         }
                     }
@@ -131,7 +138,7 @@ internal fun LazyListScope.ongletClient(
                 val adresse = etat.adresses[index]
                 CarteClient {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Icon(painterResource(Iv.Place), contentDescription = null, tint = MissaMuted, modifier = Modifier.size(24.dp))
+                        Icon(painterResource(Iv.Place), contentDescription = null, tint = ClientCouleurs.Violet, modifier = Modifier.size(24.dp))
                         Column {
                             if (adresse.libelle.isNotBlank()) Text(adresse.libelle, color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                             Text(listOfNotNull(adresse.adresse, adresse.ville).joinToString(", "), color = MissaMuted, fontSize = 14.sp)

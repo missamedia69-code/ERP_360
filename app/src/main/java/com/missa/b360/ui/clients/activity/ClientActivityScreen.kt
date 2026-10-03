@@ -74,7 +74,7 @@ fun ClientActivityScreen(
 ) {
     val etat by viewModel.etat.collectAsState()
     Scaffold(
-        containerColor = MissaCanvas,
+        containerColor = com.missa.b360.ui.clients.components.ClientCouleurs.Fond,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = { ClientTopBar(titre = stringResource(R.string.cli_onglet_activite), onBack = onBack) },
     ) { padding ->
