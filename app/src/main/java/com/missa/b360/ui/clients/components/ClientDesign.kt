@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -145,5 +149,35 @@ internal fun ClientVideActivite() {
             Text(stringResource(R.string.cli_aucune_activite), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Medium)
             Text(stringResource(R.string.cli_aucune_activite_desc), color = MissaMuted, fontSize = 11.sp)
         }
+    }
+}
+
+/**
+ * Bouton principal du module Clients : tuile grise, texte nuit en gras, jamais de fond bleu nuit ni orange.
+ * Mêmes paramètres que `BoutonMissa`, importé sous le nom `Button` dans les écrans Clients.
+ */
+@Composable
+internal fun BoutonClientPlein(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 48.dp),
+        enabled = enabled,
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ClientCouleurs.Tuile,
+            contentColor = MissaInk,
+            disabledContainerColor = ClientCouleurs.TuileClaire,
+            disabledContentColor = MissaMuted,
+        ),
+        elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp, 0.dp, 0.dp, 0.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        val ligne = this
+        ProvideTextStyle(TextStyle(fontWeight = FontWeight.Bold)) { ligne.content() }
     }
 }

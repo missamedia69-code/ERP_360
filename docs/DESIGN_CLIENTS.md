@@ -10,8 +10,9 @@ notifications clients. Les autres modules gardent le design de l'écran « Infor
 
 ## Principe
 
-Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité, le texte et les actions
-principales (« Vendre », « Nouveau client »). **L'orange sert uniquement aux éléments sélectionnables, dans leur
+Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité et le texte. **Aucun bouton
+n'est bleu nuit ni orange** : tous les boutons sont des tuiles grises à texte nuit en gras (`BoutonClientPlein`,
+`BoutonClient`, `ClientCouleurs.Tuile`), ou blancs à contour gris. **L'orange sert uniquement aux éléments sélectionnables, dans leur
 état sélectionné** : onglet courant, filtre courant, onglet actif de la barre du bas. Jamais décoratif (ni texte,
 ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent réservés aux états et sont
 **toujours accompagnés d'une icône**.
@@ -20,7 +21,7 @@ ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent
 
 | Jeton | Valeur | Usage |
 |---|---|---|
-| `Nuit` | `#101C43` | texte, avatar, icônes, bouton « Nouveau client » |
+| `Nuit` | `#101C43` | texte, avatar, icônes (jamais un fond de bouton) |
 | `Orange` | `#FF7A00` | **uniquement** l'élément sélectionné : onglet ou filtre courant, onglet actif de la barre du bas |
 | `Carte` / `CarteBord` | `#EAEDF2` / `#D5DAE3` | résumé, en-tête de fiche, cartes clients, cartes de section |
 | `Tuile` / `TuileClaire` | `#E3E6EC` / `#EBEDF1` | actions, boutons secondaires pleins |
@@ -45,12 +46,12 @@ ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent
 - **Barre haute** : `ClientTopBar` (fond toujours blanc ; `titreCentre = false` pour la liste).
 - **Fiche** : carte d'en-tête (avatar 52 dp, nom, `code · téléphone`, pastilles statut + risque, utilisation du
   crédit, grille 2×2 En cours / En retard / CA 12 mois / Dernière vente) ; grille d'actions 3×2 (« Vendre »
-  en bleu nuit, texte blanc ; les cinq autres en tuiles grises ; icône « SMS » = bulle de message, distincte de
+  en gras ; les six en tuiles grises ; icône « SMS » = bulle de message, distincte de
   l'appel) ; onglets (`ClientOnglets`) ; « + Ajouter une note » et « Toute
   l'activité ⌄ » (`BoutonClient`) ; état vide en pointillés (`ClientVideActivite`).
 - **Liste** : carte « Résumé » repliable avec « En temps réel » ; recherche + bouton « Filtres » ; pastilles de
   filtre avec compteur ; ligne « N clients » + menu « Trier par … ⌄ » ; carte client dépliable (encours, retard,
-  Appeler, WhatsApp) ; bouton flottant nuit « + Nouveau client ».
+  Appeler, WhatsApp) ; bouton flottant gris « + Nouveau client ».
 - **Barre de modules** dans Clients : icône au-dessus du libellé pour tous les onglets, carré orange pour l'actif.
 - **Risque** : `RiskBadge` (contour et icône de la couleur de risque, texte nuit) ; `ClientStatusChip`
   (gris neutre, couleur seulement pour actif, surveillance et blocages ; cadenas pour les blocages).

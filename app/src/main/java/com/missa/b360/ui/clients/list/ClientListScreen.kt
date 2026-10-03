@@ -126,8 +126,8 @@ internal fun ClientListContent(
             // Marge basse : la barre de modules flottante recouvre les 56 dp du bas de l'écran.
             ExtendedFloatingActionButton(
                 onClick = onNouveau,
-                containerColor = ClientCouleurs.Nuit,
-                contentColor = Color.White,
+                containerColor = ClientCouleurs.Tuile,
+                contentColor = MissaInk,
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.padding(bottom = 56.dp),
             ) {

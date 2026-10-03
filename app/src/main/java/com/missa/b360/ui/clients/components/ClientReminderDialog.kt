@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import com.missa.b360.ui.components.BoutonMissa as Button
+import com.missa.b360.ui.clients.components.BoutonClientPlein as Button
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
