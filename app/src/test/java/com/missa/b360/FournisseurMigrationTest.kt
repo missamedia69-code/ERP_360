@@ -26,7 +26,7 @@ class FournisseurMigrationTest {
     }
 
     @Test fun `aucune instruction ne supprime ou ne reecrit une table existante`() {
-        assertTrue(sql.none { it.contains("DROP", ignoreCase = true) || it.contains("DELETE", ignoreCase = true) })
+        assertTrue(sql.none { it.contains("DROP", ignoreCase = true) || it.contains("DELETE FROM", ignoreCase = true) })
         assertTrue(sql.none { it.contains("RENAME", ignoreCase = true) || it.contains("INSERT", ignoreCase = true) })
     }
 

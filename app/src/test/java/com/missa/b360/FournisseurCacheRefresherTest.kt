@@ -164,14 +164,14 @@ class FournisseurCacheRefresherTest {
         refresher.reconstruireTout(now)
         assertTrue(refresher.verifierCoherence(now + 3_600_000L).isEmpty())
 
-        val juste = m.balances.getValue(1L)
+        val juste = FournisseurCacheRules.balance(fournisseurs[0], pieces, now)
         m.balances[1L] = juste.copy(dette = juste.dette + 40.0)
         m.balances.remove(2L)
         val corrigees = refresher.verifierCoherence(now)
         assertEquals(setOf(1L, 2L), corrigees.map { it.first }.toSet())
         assertEquals(juste.dette + 40.0, corrigees.first { it.first == 1L }.second!!.dette, 0.001)
         assertNull(corrigees.first { it.first == 2L }.second)
-        assertEquals(juste.copy(majAt = now), m.balances[1L])
+        assertEquals(juste, m.balances[1L])
         assertNotNull(m.balances[2L])
     }
 
