@@ -7,8 +7,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.missa.b360.ui.fournisseurs.action.FournisseurActionScreen
+import com.missa.b360.ui.fournisseurs.comparateur.FournisseurComparateurScreen
 import com.missa.b360.ui.fournisseurs.compte.FournisseurCompteScreen
 import com.missa.b360.ui.fournisseurs.conformite.FournisseurConformiteScreen
+import com.missa.b360.ui.fournisseurs.documents.FournisseurDocumentsScreen
 import com.missa.b360.ui.fournisseurs.echeancier.FournisseurEcheancierScreen
 import com.missa.b360.ui.fournisseurs.fiche.FournisseurFicheScreen
 import com.missa.b360.ui.fournisseurs.list.FournisseurListScreen
@@ -46,6 +48,8 @@ fun NavGraphBuilder.fournisseursGraph(
                 onBack = retour,
                 onOuvrirFournisseur = { id -> navController.navigate(FournisseurRoutes.fiche(id)) },
                 onEcheancier = { navController.navigate(FournisseurRoutes.ECHEANCIER) { launchSingleTop = true } },
+                onComparateur = { navController.navigate(FournisseurRoutes.comparateur()) { launchSingleTop = true } },
+                onDocuments = { navController.navigate(FournisseurRoutes.DOCUMENTS) { launchSingleTop = true } },
             )
         }
     }
@@ -87,6 +91,25 @@ fun NavGraphBuilder.fournisseursGraph(
             FournisseurEcheancierScreen(
                 onBack = retour,
                 onOuvrirFournisseur = { cible -> navController.navigate(FournisseurRoutes.fiche(cible)) },
+            )
+        }
+    }
+    composable(
+        route = FournisseurRoutes.COMPARATEUR,
+        arguments = listOf(navArgument(FournisseurRoutes.ARG_PRODUIT) { type = NavType.LongType; defaultValue = 0L }),
+    ) {
+        garde {
+            FournisseurComparateurScreen(
+                onBack = retour,
+                onOuvrirFournisseur = { cible -> navController.navigate(FournisseurRoutes.fiche(cible)) },
+            )
+        }
+    }
+    composable(route = FournisseurRoutes.DOCUMENTS) {
+        garde {
+            FournisseurDocumentsScreen(
+                onBack = retour,
+                onOuvrirConformite = { cible -> navController.navigate(FournisseurRoutes.conformite(cible)) },
             )
         }
     }

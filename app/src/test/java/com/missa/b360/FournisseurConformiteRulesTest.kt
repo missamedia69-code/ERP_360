@@ -52,4 +52,13 @@ class FournisseurConformiteRulesTest {
         )
         assertEquals(listOf(3L, 2L, 1L), tries.map { it.id })
     }
+
+    @Test fun `les documents a renouveler s arretent a l horizon et passent les expires d abord`() {
+        val liste = FournisseurConformiteRules.aRenouveler(
+            listOf(doc(1, now + 120 * jour), doc(2, now + 10 * jour), doc(3, now - 4 * jour), doc(4), doc(5, now + 5 * jour, archive = true)),
+            now,
+        )
+        assertEquals(listOf(3L, 2L), liste.map { it.id })
+        assertEquals(listOf(3L, 2L, 1L), FournisseurConformiteRules.aRenouveler(listOf(doc(1, now + 120 * jour), doc(2, now + 10 * jour), doc(3, now - 4 * jour)), now, 200).map { it.id })
+    }
 }

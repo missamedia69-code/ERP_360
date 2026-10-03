@@ -38,4 +38,19 @@ object FournisseurConformiteRules {
     fun trier(documents: List<FournisseurDocumentEntity>): List<FournisseurDocumentEntity> =
         documents.filterNot { it.archive }
             .sortedWith(compareBy<FournisseurDocumentEntity> { it.dateExpiration == null }.thenBy { it.dateExpiration ?: 0L }.thenBy { it.id })
+
+    /**
+     * Documents à renouveler : non archivés, avec une échéance, expirés ou arrivant à terme dans
+     * [horizonJours] jours ; les plus urgents (déjà expirés, puis les plus proches) en premier.
+     */
+    fun aRenouveler(
+        documents: List<FournisseurDocumentEntity>,
+        now: Long,
+        horizonJours: Int = 90,
+    ): List<FournisseurDocumentEntity> {
+        val limite = now + horizonJours * 86_400_000L
+        return documents
+            .filter { !it.archive && (it.dateExpiration ?: Long.MAX_VALUE) <= limite }
+            .sortedWith(compareBy<FournisseurDocumentEntity> { it.dateExpiration ?: 0L }.thenBy { it.id })
+    }
 }

@@ -48,6 +48,8 @@ fun FournisseurActionScreen(
     onBack: () -> Unit,
     onOuvrirFournisseur: (Long) -> Unit,
     onEcheancier: () -> Unit,
+    onComparateur: () -> Unit,
+    onDocuments: () -> Unit,
     viewModel: FournisseurActionViewModel = hiltViewModel(),
 ) {
     val etat by viewModel.etat.collectAsStateWithLifecycle()
@@ -67,7 +69,13 @@ fun FournisseurActionScreen(
                 }
             }
             item {
-                BoutonFournisseur(stringResource(R.string.four_fiche_echeancier), Modifier.fillMaxWidth(), plein = false, onClick = onEcheancier)
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BoutonFournisseur(stringResource(R.string.four_fiche_echeancier), Modifier.fillMaxWidth(), plein = false, onClick = onEcheancier)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        BoutonFournisseur(stringResource(R.string.four_action_comparer), Modifier.weight(1f), plein = false, onClick = onComparateur)
+                        BoutonFournisseur(stringResource(R.string.four_action_documents), Modifier.weight(1f), plein = false, onClick = onDocuments)
+                    }
+                }
             }
             if (!etat.chargement && t.vide) {
                 item {

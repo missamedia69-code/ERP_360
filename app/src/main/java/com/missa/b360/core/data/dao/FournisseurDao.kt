@@ -196,6 +196,10 @@ interface FournisseurItemDao {
     )
     fun observeParFournisseur(fournisseurId: Long): Flow<List<FournisseurItemEntity>>
 
+    /** Toutes les liaisons actives, tous fournisseurs confondus (comparateur). */
+    @Query("SELECT * FROM fournisseur_items WHERE actif = 1")
+    fun observeActifs(): Flow<List<FournisseurItemEntity>>
+
     @Query("SELECT * FROM fournisseur_items WHERE fournisseurId = :fournisseurId AND productId = :productId AND actif = 1 LIMIT 1")
     suspend fun getLiaison(fournisseurId: Long, productId: Long): FournisseurItemEntity?
 

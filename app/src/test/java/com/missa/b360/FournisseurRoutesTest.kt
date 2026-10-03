@@ -24,6 +24,8 @@ class FournisseurRoutesTest {
         assertEquals("fournisseur_compte/{id}", FournisseurRoutes.COMPTE)
         assertEquals("fournisseur_conformite/{id}", FournisseurRoutes.CONFORMITE)
         assertEquals("fournisseurs_echeancier", FournisseurRoutes.ECHEANCIER)
+        assertEquals("fournisseurs_comparateur?produit={produit}", FournisseurRoutes.COMPARATEUR)
+        assertEquals("fournisseurs_documents", FournisseurRoutes.DOCUMENTS)
     }
 
     @Test fun `les routes avec identifiant sont construites sans accolade`() {
@@ -33,6 +35,8 @@ class FournisseurRoutesTest {
         assertEquals("fournisseur_dossier/42", FournisseurRoutes.dossier(42))
         assertEquals("fournisseur_compte/42", FournisseurRoutes.compte(42))
         assertEquals("fournisseur_conformite/42", FournisseurRoutes.conformite(42))
+        assertEquals("fournisseurs_comparateur?produit=7", FournisseurRoutes.comparateur(7))
+        assertFalse(FournisseurRoutes.comparateur().contains('{'))
         listOf(
             FournisseurRoutes.fiche(1), FournisseurRoutes.edition(1), FournisseurRoutes.creation(),
             FournisseurRoutes.dossier(1), FournisseurRoutes.compte(1), FournisseurRoutes.conformite(1),
