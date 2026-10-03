@@ -20,13 +20,23 @@ class FournisseurRoutesTest {
         assertEquals("fournisseurs_action", FournisseurRoutes.ACTION)
         assertEquals("fournisseur_fiche/{id}", FournisseurRoutes.FICHE)
         assertEquals("fournisseur_edition/{id}", FournisseurRoutes.EDITION)
+        assertEquals("fournisseur_dossier/{id}", FournisseurRoutes.DOSSIER)
+        assertEquals("fournisseur_compte/{id}", FournisseurRoutes.COMPTE)
+        assertEquals("fournisseur_conformite/{id}", FournisseurRoutes.CONFORMITE)
+        assertEquals("fournisseurs_echeancier", FournisseurRoutes.ECHEANCIER)
     }
 
     @Test fun `les routes avec identifiant sont construites sans accolade`() {
         assertEquals("fournisseur_fiche/42", FournisseurRoutes.fiche(42))
         assertEquals("fournisseur_edition/42", FournisseurRoutes.edition(42))
         assertEquals("fournisseur_edition/0", FournisseurRoutes.creation())
-        listOf(FournisseurRoutes.fiche(1), FournisseurRoutes.edition(1), FournisseurRoutes.creation())
+        assertEquals("fournisseur_dossier/42", FournisseurRoutes.dossier(42))
+        assertEquals("fournisseur_compte/42", FournisseurRoutes.compte(42))
+        assertEquals("fournisseur_conformite/42", FournisseurRoutes.conformite(42))
+        listOf(
+            FournisseurRoutes.fiche(1), FournisseurRoutes.edition(1), FournisseurRoutes.creation(),
+            FournisseurRoutes.dossier(1), FournisseurRoutes.compte(1), FournisseurRoutes.conformite(1),
+        )
             .forEach { assertFalse(it, it.contains('{')) }
     }
 }

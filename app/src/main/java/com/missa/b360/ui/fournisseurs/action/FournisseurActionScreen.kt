@@ -32,6 +32,7 @@ import com.missa.b360.core.domain.model.FournisseurLigne
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.fournisseurs.components.BadgeAptitude
+import com.missa.b360.ui.fournisseurs.components.BoutonFournisseur
 import com.missa.b360.ui.fournisseurs.components.FournisseurCouleurs
 import com.missa.b360.ui.fournisseurs.components.formatDate
 import com.missa.b360.ui.fournisseurs.components.libelleRes
@@ -46,6 +47,7 @@ import com.missa.b360.ui.theme.OnbConfigCard
 fun FournisseurActionScreen(
     onBack: () -> Unit,
     onOuvrirFournisseur: (Long) -> Unit,
+    onEcheancier: () -> Unit,
     viewModel: FournisseurActionViewModel = hiltViewModel(),
 ) {
     val etat by viewModel.etat.collectAsStateWithLifecycle()
@@ -63,6 +65,9 @@ fun FournisseurActionScreen(
                     Kpi(stringResource(R.string.four_kpi_retard), fmtValeur(t.enRetard, etat.devise), Modifier.weight(1f), t.enRetard > 0.0)
                     Kpi(stringResource(R.string.four_kpi_sous_7j), fmtValeur(t.aPayerSousSeptJours, etat.devise), Modifier.weight(1f))
                 }
+            }
+            item {
+                BoutonFournisseur(stringResource(R.string.four_fiche_echeancier), Modifier.fillMaxWidth(), plein = false, onClick = onEcheancier)
             }
             if (!etat.chargement && t.vide) {
                 item {

@@ -12,6 +12,9 @@ import com.missa.b360.core.data.dao.ProductStockDao
 import com.missa.b360.core.data.dao.SiteDao
 import com.missa.b360.core.data.dao.StockMovementDao
 import com.missa.b360.core.data.db.AppDatabase
+import com.missa.b360.core.data.dao.FournisseurPaiementPlanifieDao
+import com.missa.b360.core.domain.model.PaymentPlanRules
+import com.missa.b360.core.domain.model.PlanStatut
 import com.missa.b360.core.data.entity.CategorieTresorerie
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
 import com.missa.b360.core.data.entity.OperationDirection
@@ -409,6 +412,7 @@ class ReglerAchatUseCase @Inject constructor(
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
     private val fournisseurCache: FournisseurCacheUseCase,
+    private val planDao: FournisseurPaiementPlanifieDao,
 ) {
     sealed class Result {
         data class Succes(val referenceMouvement: String) : Result()
@@ -529,6 +533,12 @@ class ReglerAchatUseCase @Inject constructor(
                     "REGLEMENT_CONFIRME",
                     "Règlement #$numero ${facture.reference} confirmé malgré : $motifConfirme",
                 )
+            }
+            // Les paiements planifiés entièrement couverts par ce règlement passent à PAYE.
+            val plans = planDao.getParFacture(factureRecordId)
+            val payes = PaymentPlanRules.plansPayes(plans.map { it.versPlan() }, factureRecordId, montant).toSet()
+            plans.filter { it.id in payes }.forEach {
+                planDao.update(it.copy(statut = PlanStatut.PAYE, referenceMouvement = referenceMouvement))
             }
             fournisseurCache.rafraichir(payload.supplierId, now)
             Result.Succes(referenceMouvement)

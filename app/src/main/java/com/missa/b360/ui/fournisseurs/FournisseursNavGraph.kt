@@ -7,7 +7,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.missa.b360.ui.fournisseurs.action.FournisseurActionScreen
+import com.missa.b360.ui.fournisseurs.compte.FournisseurCompteScreen
+import com.missa.b360.ui.fournisseurs.conformite.FournisseurConformiteScreen
+import com.missa.b360.ui.fournisseurs.echeancier.FournisseurEcheancierScreen
+import com.missa.b360.ui.fournisseurs.fiche.FournisseurFicheScreen
 import com.missa.b360.ui.fournisseurs.list.FournisseurListScreen
+import com.missa.b360.ui.navigation.AppModule
 
 private val ARGUMENT_ID = listOf(navArgument(FournisseurRoutes.ARG_ID) { type = NavType.LongType })
 
@@ -40,16 +45,48 @@ fun NavGraphBuilder.fournisseursGraph(
             FournisseurActionScreen(
                 onBack = retour,
                 onOuvrirFournisseur = { id -> navController.navigate(FournisseurRoutes.fiche(id)) },
+                onEcheancier = { navController.navigate(FournisseurRoutes.ECHEANCIER) { launchSingleTop = true } },
             )
         }
     }
-    composable(route = FournisseurRoutes.FICHE, arguments = ARGUMENT_ID) { entree ->
+    composable(route = FournisseurRoutes.FICHE, arguments = ARGUMENT_ID) {
+        garde {
+            FournisseurFicheScreen(
+                onBack = retour,
+                onModifier = { cible -> navController.navigate(FournisseurRoutes.edition(cible)) { launchSingleTop = true } },
+                onCompte = { cible -> navController.navigate(FournisseurRoutes.compte(cible)) },
+                onConformite = { cible -> navController.navigate(FournisseurRoutes.conformite(cible)) },
+                onEcheancier = { navController.navigate(FournisseurRoutes.ECHEANCIER) { launchSingleTop = true } },
+                onDossier = { cible -> navController.navigate(FournisseurRoutes.dossier(cible)) },
+            )
+        }
+    }
+    composable(route = FournisseurRoutes.DOSSIER, arguments = ARGUMENT_ID) { entree ->
         val id = entree.arguments?.getLong(FournisseurRoutes.ARG_ID) ?: 0L
         garde {
-            FournisseurFicheRoute(
+            FournisseurDossierRoute(
                 id = id,
                 onBack = retour,
                 onModifier = { cible -> navController.navigate(FournisseurRoutes.edition(cible)) { launchSingleTop = true } },
+            )
+        }
+    }
+    composable(route = FournisseurRoutes.COMPTE, arguments = ARGUMENT_ID) {
+        garde {
+            FournisseurCompteScreen(
+                onBack = retour,
+                onPayer = { navController.navigate(AppModule.ACHATS.route) { launchSingleTop = true } },
+            )
+        }
+    }
+    composable(route = FournisseurRoutes.CONFORMITE, arguments = ARGUMENT_ID) {
+        garde { FournisseurConformiteScreen(onBack = retour) }
+    }
+    composable(route = FournisseurRoutes.ECHEANCIER) {
+        garde {
+            FournisseurEcheancierScreen(
+                onBack = retour,
+                onOuvrirFournisseur = { cible -> navController.navigate(FournisseurRoutes.fiche(cible)) },
             )
         }
     }

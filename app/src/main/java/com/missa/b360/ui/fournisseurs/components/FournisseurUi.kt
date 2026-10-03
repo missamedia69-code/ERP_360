@@ -151,3 +151,64 @@ internal fun LigneFournisseur(ligne: FournisseurLigne, devise: String, onClick: 
         }
     }
 }
+
+/** Bouton d'action du module : navy plein, ou contour navy pour les actions secondaires. */
+@Composable
+internal fun BoutonFournisseur(
+    texte: String,
+    modifier: Modifier = Modifier,
+    plein: Boolean = true,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(10.dp),
+        color = if (plein) FournisseurCouleurs.Nuit else Color.White,
+        border = if (plein) null else BorderStroke(1.dp, FournisseurCouleurs.Trait),
+        modifier = modifier.heightIn(min = 44.dp),
+    ) {
+        Box(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
+            Text(
+                texte,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (plein) Color.White else MissaInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+/** Carte grise d'un bloc d'information : titre, contenu. */
+@Composable
+internal fun CarteFournisseur(titre: String, modifier: Modifier = Modifier, contenu: @Composable () -> Unit) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard, modifier = modifier.fillMaxWidth()) {
+        Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(titre, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+            contenu()
+        }
+    }
+}
+
+/** Ligne « libellé … valeur » d'une carte. */
+@Composable
+internal fun LigneValeur(libelle: String, valeur: String, couleur: Color = MissaInk) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(libelle, fontSize = 11.5.sp, color = MissaMuted, modifier = Modifier.weight(1f))
+        Text(valeur, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = couleur)
+    }
+}
+
+/** Message d'état d'un écran (code stable du ViewModel) : vert pour un succès, rouge pour une erreur. */
+@Composable
+internal fun MessageEtat(code: String?, modifier: Modifier = Modifier) {
+    if (code == null) return
+    Text(
+        libelleMessageFournisseur(code),
+        modifier = modifier,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        color = if (code.startsWith("err_")) FournisseurCouleurs.Bloque else FournisseurCouleurs.Pret,
+    )
+}
