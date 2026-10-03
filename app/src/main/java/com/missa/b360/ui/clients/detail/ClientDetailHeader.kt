@@ -107,7 +107,7 @@ private fun Indicateur(libelle: String, valeur: String, couleur: Color, modifier
     }
 }
 
-/** Six actions à un geste : « Vendre » en orange, les autres en tuiles grises ; icône et libellé ensemble. */
+/** Six actions à un geste : « Vendre » en bleu nuit (action principale), les autres en tuiles grises ; icône et libellé ensemble. */
 @Composable
 internal fun ClientDetailActions(
     onVendre: () -> Unit,
@@ -126,7 +126,7 @@ internal fun ClientDetailActions(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ActionClient(Iv.Call, R.string.cli_appeler, onAppeler, Modifier.weight(1f), claire = true)
             ActionClient(Iv.Chat, R.string.cli_whatsapp, onWhatsApp, Modifier.weight(1f), claire = true)
-            ActionClient(Iv.Smartphone, R.string.cli_sms, onSms, Modifier.weight(1f), claire = true)
+            ActionClient(Iv.Sms, R.string.cli_sms, onSms, Modifier.weight(1f), claire = true)
         }
     }
 }
@@ -142,10 +142,11 @@ private fun ActionClient(
 ) {
     val forme = RoundedCornerShape(14.dp)
     val fond = when {
-        principale -> ClientCouleurs.Orange
+        principale -> ClientCouleurs.Nuit
         claire -> ClientCouleurs.TuileClaire
         else -> ClientCouleurs.Tuile
     }
+    val contenu = if (principale) Color.White else MissaInk
     Column(
         modifier
             .heightIn(min = 56.dp)
@@ -156,9 +157,9 @@ private fun ActionClient(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
     ) {
-        Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(20.dp))
+        Icon(painterResource(icone), contentDescription = null, tint = contenu, modifier = Modifier.size(20.dp))
         Text(
-            stringResource(libelle), color = MissaInk, fontSize = 12.sp,
+            stringResource(libelle), color = contenu, fontSize = 12.sp,
             fontWeight = if (claire) FontWeight.Medium else FontWeight.Bold,
             textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis,
         )
