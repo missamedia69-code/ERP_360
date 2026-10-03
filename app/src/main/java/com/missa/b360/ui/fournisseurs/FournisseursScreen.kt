@@ -272,6 +272,7 @@ private fun libelleEvenement(type: FournisseurEvenementType): String = stringRes
         FournisseurEvenementType.REACTIVATION -> R.string.four_evt_reactivation
         FournisseurEvenementType.ARCHIVAGE -> R.string.four_evt_archivage
         FournisseurEvenementType.COMPTE_AJOUTE -> R.string.four_evt_compte_ajoute
+        FournisseurEvenementType.COMPTE_MODIFIE -> R.string.four_evt_compte_modifie
         FournisseurEvenementType.COMPTE_VERIFIE -> R.string.four_evt_compte_verifie
         FournisseurEvenementType.COMPTE_REJETE -> R.string.four_evt_compte_rejete
         FournisseurEvenementType.DOCUMENT_AJOUTE -> R.string.four_evt_doc_ajoute

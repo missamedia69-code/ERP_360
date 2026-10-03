@@ -338,6 +338,7 @@
     <string name="four_evt_article_lie">رُبطت المادة</string>
     <string name="four_evt_blocage">حظر</string>
     <string name="four_evt_compte_ajoute">أُضيف حساب</string>
+    <string name="four_evt_compte_modifie">تم تعديل الحساب</string>
     <string name="four_evt_compte_rejete">رُفض الحساب</string>
     <string name="four_evt_compte_verifie">تم التحقق من الحساب</string>
     <string name="four_evt_creation">إنشاء</string>

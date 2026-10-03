@@ -338,6 +338,7 @@
     <string name="four_evt_article_lie">Article lié</string>
     <string name="four_evt_blocage">Blocage</string>
     <string name="four_evt_compte_ajoute">Compte ajouté</string>
+    <string name="four_evt_compte_modifie">Compte modifié</string>
     <string name="four_evt_compte_rejete">Compte rejeté</string>
     <string name="four_evt_compte_verifie">Compte vérifié</string>
     <string name="four_evt_creation">Création</string>

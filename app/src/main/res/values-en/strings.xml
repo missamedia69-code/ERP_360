@@ -338,6 +338,7 @@
     <string name="four_evt_article_lie">Item linked</string>
     <string name="four_evt_blocage">Blocked</string>
     <string name="four_evt_compte_ajoute">Account added</string>
+    <string name="four_evt_compte_modifie">Account modified</string>
     <string name="four_evt_compte_rejete">Account rejected</string>
     <string name="four_evt_compte_verifie">Account verified</string>
     <string name="four_evt_creation">Created</string>

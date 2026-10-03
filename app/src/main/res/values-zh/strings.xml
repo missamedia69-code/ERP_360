@@ -338,6 +338,7 @@
     <string name="four_evt_article_lie">商品已关联</string>
     <string name="four_evt_blocage">冻结</string>
     <string name="four_evt_compte_ajoute">账户已添加</string>
+    <string name="four_evt_compte_modifie">账户已修改</string>
     <string name="four_evt_compte_rejete">账户已拒绝</string>
     <string name="four_evt_compte_verifie">账户已核验</string>
     <string name="four_evt_creation">创建</string>
