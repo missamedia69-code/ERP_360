@@ -53,6 +53,12 @@ data class PurchaseRecordPayload(
     val commandeRecordId: Long? = null,
     /** Chemins internes des pièces jointes (photos compressées, PDF). */
     val attachments: List<String> = emptyList(),
+    /**
+     * Échéance de règlement choisie à la saisie (début de journée ou instant libre).
+     * Absente des anciennes factures : l'échéance se déduit alors de la date de la pièce
+     * et du délai du fournisseur.
+     */
+    val dateEcheance: Long? = null,
 )
 
 object PurchaseRecordCodec {

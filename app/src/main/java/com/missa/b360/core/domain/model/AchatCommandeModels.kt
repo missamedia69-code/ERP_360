@@ -43,6 +43,8 @@ data class CommandeAchatPayload(
     val supplierName: String,
     val lines: List<CommandeAchatLigne>,
     val note: String? = null,
+    /** Livraison promise par le fournisseur ; absente des anciennes commandes (ponctualité non mesurable). */
+    val dateLivraisonPrevue: Long? = null,
 )
 
 object CommandeAchatCodec {
