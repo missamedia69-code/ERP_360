@@ -113,6 +113,35 @@ app/src/main/java/com/missa/b360/
 - Modification sensible d'un fournisseur ACTIF (fiscal, raison sociale, pays, conditions de
   paiement) → retour automatique en `A_VALIDER`.
 
+## Module Fournisseurs
+
+Trois questions guident le module : *peut-on commander / payer ?* (sécurité), *qui payer, quand ?*
+(trésorerie), *quel fournisseur choisir ?* (choix).
+
+- **Routes** (`ui/fournisseurs/FournisseurRoutes.kt`, graphe `fournisseursGraph`) :
+  `module_fournisseurs?create=` (liste, entrée de l'Accueil), `fournisseurs_action`,
+  `fournisseur_fiche/{id}` (fiche 360), `fournisseur_dossier/{id}` (dossier complet),
+  `fournisseur_compte/{id}`, `fournisseur_conformite/{id}`, `fournisseur_edition/{id}` (0 = création),
+  `fournisseurs_echeancier`, `fournisseurs_comparateur?produit=`, `fournisseurs_documents`.
+  Un écran = une route = un ViewModel ; une route n'est déclarée qu'avec son écran.
+- **Règles pures testées** (`core/domain/model`) : `SupplierReadinessRules` (aptitude),
+  `PaymentGuard` (garde de paiement), `SupplierScorecard` (fiabilité 0–100, `null` sous 3 mesures),
+  `SourcingRules` (classement), `PaymentPlanRules` + `FournisseurEcheancierRules` (échéancier),
+  `FournisseurConformiteRules`, `FournisseurComparateurRules`, `FournisseurPortefeuilleRules`,
+  `FournisseurActionRules`. L'écran ne calcule rien : il affiche.
+- **Soldes et scores** : cache `fournisseur_soldes` / `fournisseur_scores` rafraîchi par
+  `FournisseurCacheUseCase` (règlement, réception, worker) ; la dette vient des pièces d'achat.
+- **Règlement** : toujours par `ReglerAchatUseCase`, qui applique la garde (montant → statut →
+  paiement bloqué → compte → plafond). Refus = journal ; dépassement de plafond ou compte non
+  vérifié ancien = confirmation explicite. *Planifier* un paiement ne paie rien ; un règlement qui
+  couvre un plan le passe à `PAYE`.
+- **Jamais de suppression** : report = ancienne ligne `REPORTE` + nouvelle ligne ; annulation =
+  statut `ANNULE` ; document retiré = `archive = 1`.
+- **Données bancaires** : affichées masquées (`SupplierAccountRules.masquer`, 4 derniers caractères) ;
+  jamais d'IBAN complet dans le journal, une notification ou un message d'erreur.
+- **Limites connues** : pas d'avoirs fournisseurs ; le comparateur n'utilise pas le dernier prix payé
+  (non tracé) : un prix de liaison absent ou expiré écarte le fournisseur « sans prix ».
+
 ## Tests & CI
 
 - Tests JVM : `./gradlew testDebugUnitTest` (règles pures, codecs, migrations logiques).
