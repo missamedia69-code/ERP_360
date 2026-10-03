@@ -77,29 +77,29 @@ internal fun ClientFollowupRow(suivi: ClientFollowupEntity, devise: String, modi
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = modifier.fillMaxWidth(),
     ) {
-        Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+        Row(Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
             Icon(painterResource(suivi.type.icone()), contentDescription = null, tint = MissaInk, modifier = Modifier.size(24.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 val canal = suivi.canal?.let { " · " + stringResource(it.libelle()) }.orEmpty()
                 Text(
                     stringResource(suivi.type.libelle()) + canal,
-                    color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
+                    color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
                 )
-                Text(clientDate(suivi.createdAt), color = MissaMuted, fontSize = 13.sp)
+                Text(clientDate(suivi.createdAt), color = MissaMuted, fontSize = 12.sp)
                 val date = suivi.promesseDate
                 val montant = suivi.promesseMontant
                 if (suivi.type == FollowupType.PROMESSE && date != null && montant != null) {
                     Text(
                         stringResource(R.string.cli_promesse_ligne, clientMoney(montant, devise), clientDate(date)),
-                        color = MissaInk, fontSize = 14.sp,
+                        color = MissaInk, fontSize = 13.sp,
                     )
                 }
-                suivi.message?.takeIf { it.isNotBlank() }?.let { Text(it, color = MissaInk, fontSize = 14.sp) }
+                suivi.message?.takeIf { it.isNotBlank() }?.let { Text(it, color = MissaInk, fontSize = 13.sp) }
             }
             if (suivi.type == FollowupType.PROMESSE) {
                 Text(
                     stringResource(suivi.statut.libelle()),
-                    color = suivi.statut.couleur(), fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+                    color = suivi.statut.couleur(), fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
                 )
             }
         }

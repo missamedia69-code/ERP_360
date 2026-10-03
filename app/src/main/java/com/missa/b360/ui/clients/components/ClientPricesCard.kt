@@ -66,19 +66,19 @@ internal fun ClientPricesCard(
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.clients_flow_negotiated_prices), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.clients_flow_negotiated_prices), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             if (prices.isEmpty()) {
-                Text(stringResource(R.string.clients_flow_no_prices), color = MissaMuted, fontSize = 14.sp)
+                Text(stringResource(R.string.clients_flow_no_prices), color = MissaMuted, fontSize = 13.sp)
             } else {
                 prices.forEach { price ->
                     Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(
                                 products.firstOrNull { it.id == price.produitId }?.nom ?: stringResource(R.string.clients_flow_unknown_product),
-                                color = MissaInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+                                color = MissaInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                             )
-                            Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 14.sp)
+                            Text(fmtValeur(price.prix, devise), color = MissaMuted, fontSize = 13.sp)
                         }
                         IconButton(onClick = { onDelete(price.produitId) }, modifier = Modifier.size(48.dp)) {
                             Icon(painterResource(Iv.DeleteOutline), stringResource(R.string.clients_flow_remove_price), tint = MissaInk)

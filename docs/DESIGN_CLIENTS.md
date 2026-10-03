@@ -28,6 +28,8 @@ l'élément courant ou à l'action principale. Vert, orange et rouge de risque r
 
 ## Typographie et dimensions
 
+- Écrans secondaires (compte, relances, activité, prix négociés, bandeau de crédit) : texte 12 à 15 sp,
+  remplissage 10 à 12 dp.
 - Titre d'écran 19 sp gras (centré sur la fiche, aligné à gauche sur la liste) ; nom du client 16 à 18 sp gras ;
   code, téléphone, libellés de chiffres 11 sp ; valeur d'un chiffre 14 à 15 sp gras ; boutons 12 à 13 sp gras ;
   pastilles et onglets 10 à 12 sp.

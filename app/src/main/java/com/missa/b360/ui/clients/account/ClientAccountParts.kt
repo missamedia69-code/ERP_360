@@ -55,17 +55,17 @@ internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.cli_balance_agee), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.weight(1f))
-                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.cli_balance_agee), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                Text(clientMoney(balance.total, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             }
             for (tranche in AgingBucket.entries) {
                 val montant = balance.montant(tranche)
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row {
-                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(tranche.libelleReleve()), color = MissaMuted, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                        Text(clientMoney(montant, devise), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                     Box(Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)).background(MissaBorder.copy(alpha = 0.5f))) {
                         if (montant > 0.0) {
@@ -89,23 +89,23 @@ internal fun OpenInvoiceRow(facture: ClientOpenInvoiceLine, devise: String, onEn
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
                         facture.reference.ifBlank { clientDate(facture.issuedAt) },
-                        color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         stringResource(R.string.cli_echeance_le, clientDate(facture.dueAt)),
-                        color = if (facture.joursRetard > 0) RisqueCouleurs.Eleve else MissaMuted, fontSize = 13.sp,
+                        color = if (facture.joursRetard > 0) RisqueCouleurs.Eleve else MissaMuted, fontSize = 12.sp,
                     )
                     if (facture.joursRetard > 0) {
-                        Text(stringResource(R.string.cli_retard_jours, facture.joursRetard), color = RisqueCouleurs.Eleve, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                        Text(stringResource(R.string.cli_retard_jours, facture.joursRetard), color = RisqueCouleurs.Eleve, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text(clientMoney(facture.outstanding, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(clientMoney(facture.outstanding, devise), color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     Text(stringResource(R.string.cli_sur_total, clientMoney(facture.total, devise)), color = MissaMuted, fontSize = 12.sp)
                 }
             }

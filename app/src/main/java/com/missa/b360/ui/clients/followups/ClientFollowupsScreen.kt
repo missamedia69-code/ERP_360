@@ -109,12 +109,12 @@ fun ClientFollowupsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = { onOuvrirClient(promesse.clientId) },
                         ) {
-                            Column(Modifier.padding(12.dp)) {
-                                Text(etat.noms[promesse.clientId].orEmpty(), color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                            Column(Modifier.padding(10.dp)) {
+                                Text(etat.noms[promesse.clientId].orEmpty(), color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                                 if (date != null && montant != null) {
                                     Text(
                                         stringResource(R.string.cli_promesse_ligne, clientMoney(montant, etat.devise), clientDate(date)),
-                                        color = RisqueCouleurs.Eleve, fontSize = 14.sp,
+                                        color = RisqueCouleurs.Eleve, fontSize = 13.sp,
                                     )
                                 }
                             }
@@ -154,7 +154,7 @@ fun ClientFollowupsScreen(
 
 @Composable
 private fun Titre(texte: String) {
-    Text(texte, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(top = 6.dp))
+    Text(texte, color = MissaInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp))
 }
 
 @Composable
@@ -171,14 +171,14 @@ private fun LigneRelance(
         modifier = Modifier.fillMaxWidth(),
         onClick = onOuvrir,
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(ligne.client.nom, color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(ligne.client.nom, color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
                     clientMoney(ligne.enRetard, devise) + " · " + stringResource(R.string.cli_retard_jours, ligne.balance?.joursRetardMax ?: 0),
-                    color = RisqueCouleurs.Eleve, fontSize = 14.sp, fontWeight = FontWeight.Medium,
+                    color = RisqueCouleurs.Eleve, fontSize = 13.sp, fontWeight = FontWeight.Medium,
                 )
-                if (!ligne.aRelancer) Text(stringResource(R.string.cli_deja_suivi), color = MissaMuted, fontSize = 13.sp)
+                if (!ligne.aRelancer) Text(stringResource(R.string.cli_deja_suivi), color = MissaMuted, fontSize = 12.sp)
             }
             IconButton(onClick = onAppeler, modifier = Modifier.size(48.dp)) {
                 Icon(painterResource(Iv.Call), stringResource(R.string.cli_appeler), tint = MissaInk)

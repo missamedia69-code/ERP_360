@@ -84,16 +84,16 @@ internal fun ClientCreditBanner(
         border = BorderStroke(1.dp, couleur),
         modifier = modifier.fillMaxWidth(),
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(painterResource(risque.icone()), contentDescription = null, tint = couleur, modifier = Modifier.size(24.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(stringResource(risque.libelle()), color = couleur, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                if (raison != null) Text(stringResource(raison.message()), color = MissaInk, fontSize = 14.sp)
+                Text(stringResource(risque.libelle()), color = couleur, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                if (raison != null) Text(stringResource(raison.message()), color = MissaInk, fontSize = 13.sp)
                 val limite = client.limiteCredit
                 Text(
                     stringResource(R.string.cli_banniere_encours, clientMoney(entree.encours, devise)) +
                         if (limite != null) " · " + stringResource(R.string.cli_banniere_limite, clientMoney(limite, devise)) else "",
-                    color = MissaMuted, fontSize = 13.sp,
+                    color = MissaMuted, fontSize = 12.sp,
                 )
             }
         }

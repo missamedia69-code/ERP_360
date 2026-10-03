@@ -134,13 +134,13 @@ private fun LigneActivite(entree: ActivityEntry, devise: String) {
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             androidx.compose.foundation.layout.Column(Modifier.weight(1f)) {
-                Text(stringResource(entree.kind.libelle()), color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(entree.kind.libelle()), color = MissaInk, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 val reference = entree.reference.orEmpty()
                 Text(
                     clientDate(entree.date) + if (reference.isNotBlank()) " · $reference" else "",
-                    color = MissaMuted, fontSize = 13.sp,
+                    color = MissaMuted, fontSize = 12.sp,
                 )
             }
             val montant = entree.montant
@@ -149,7 +149,7 @@ private fun LigneActivite(entree: ActivityEntry, devise: String) {
                 Text(
                     signe + clientMoney(montant, devise),
                     color = if (entree.kind == ActivityKind.VENTE) MissaInk else RisqueCouleurs.Normal,
-                    fontWeight = FontWeight.Bold, fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold, fontSize = 14.sp,
                 )
             }
         }
