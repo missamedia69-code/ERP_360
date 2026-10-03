@@ -291,12 +291,12 @@ internal fun ClientListRow(
                     }
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         BoutonClient(onClick = onAppeler, modifier = Modifier.weight(1f)) {
-                            Icon(painterResource(Iv.Call), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                            Text(stringResource(R.string.cli_appeler), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Icon(painterResource(Iv.Call), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.cli_appeler), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                         BoutonClient(onClick = onWhatsApp, modifier = Modifier.weight(1f)) {
-                            Icon(painterResource(Iv.Chat), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                            Text(stringResource(R.string.cli_whatsapp), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Icon(painterResource(Iv.Chat), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Text(stringResource(R.string.cli_whatsapp), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -335,7 +335,7 @@ internal fun ClientSwipeRow(
             val appel = etat.dismissDirection == SwipeToDismissBoxValue.StartToEnd
             Row(
                 Modifier.fillMaxSize().clip(RoundedCornerShape(16.dp))
-                    .background(if (appel) RisqueCouleurs.Normal else Color(0xFF128C7E)).padding(horizontal = 20.dp),
+                    .background(ClientCouleurs.Nuit).padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = if (appel) Arrangement.Start else Arrangement.End,
             ) {

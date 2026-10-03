@@ -64,6 +64,7 @@ internal fun ClientPricesCard(
     Card(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

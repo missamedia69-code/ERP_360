@@ -53,6 +53,7 @@ internal fun AgedBalanceBars(balance: AgedBalance, devise: String) {
     Card(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -87,6 +88,7 @@ internal fun OpenInvoiceRow(facture: ClientOpenInvoiceLine, devise: String, onEn
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

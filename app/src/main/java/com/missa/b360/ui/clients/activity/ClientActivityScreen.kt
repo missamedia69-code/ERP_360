@@ -16,6 +16,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import com.missa.b360.ui.clients.components.ClientEtatVide
+import com.missa.b360.ui.clients.components.ClientPuce
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -96,19 +98,19 @@ fun ClientActivityScreen(
                     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(ActivityFilter.entries.size) { index ->
                             val filtre = ActivityFilter.entries[index]
-                            FilterChip(
-                                selected = etat.filtre == filtre,
+                            ClientPuce(
+                                libelle = stringResource(filtre.libelle()),
+                                actif = etat.filtre == filtre,
                                 onClick = { viewModel.choisirFiltre(filtre) },
-                                label = { Text(stringResource(filtre.libelle())) },
                             )
                         }
                     }
                 }
                 if (etat.entrees.isEmpty()) {
                     item {
-                        MissaEmptyState(
-                            icon = Iv.History,
-                            title = stringResource(R.string.cli_activite_vide_titre),
+                        ClientEtatVide(
+                            icone = Iv.History,
+                            titre = stringResource(R.string.cli_activite_vide_titre),
                             description = stringResource(R.string.cli_activite_vide_desc),
                         )
                     }
@@ -132,6 +134,7 @@ private fun LigneActivite(entree: ActivityEntry, devise: String) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {

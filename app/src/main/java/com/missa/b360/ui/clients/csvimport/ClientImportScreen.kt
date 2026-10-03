@@ -164,6 +164,7 @@ private fun Carte(contenu: @Composable () -> Unit) {
     Card(
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { contenu() }
@@ -187,6 +188,7 @@ private fun LigneErreur(erreur: ClientImportIssue) {
     Card(
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(10.dp)) {

@@ -107,7 +107,7 @@ private fun Indicateur(libelle: String, valeur: String, couleur: Color, modifier
     }
 }
 
-/** Six actions à un geste : « Vendre » en gras (action principale), toutes en tuiles grises ; icône et libellé ensemble. */
+/** Six actions à un geste : « Vendre » en gras (action principale) ; toutes en boutons bleu nuit à contenu blanc ; icône et libellé ensemble. */
 @Composable
 internal fun ClientDetailActions(
     onVendre: () -> Unit,
@@ -141,12 +141,8 @@ private fun ActionClient(
     claire: Boolean = false,
 ) {
     val forme = RoundedCornerShape(14.dp)
-    val fond = when {
-        principale -> ClientCouleurs.Tuile
-        claire -> ClientCouleurs.TuileClaire
-        else -> ClientCouleurs.Tuile
-    }
-    val contenu = MissaInk
+    val fond = ClientCouleurs.Nuit
+    val contenu = Color.White
     Column(
         modifier
             .heightIn(min = 56.dp)

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.semantics.Role
+import com.missa.b360.ui.clients.components.ClientPuce
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -101,12 +103,11 @@ internal fun PromesseDialog(
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(DELAIS_JOURS.size) { index ->
                         val delai = DELAIS_JOURS[index]
-                        FilterChip(
-                            selected = jours == delai,
+                        ClientPuce(
+                            libelle = if (delai == 0) stringResource(R.string.cli_aujourdhui) else stringResource(R.string.cli_dans_jours, delai),
+                            actif = jours == delai,
                             onClick = { jours = delai },
-                            label = {
-                                Text(if (delai == 0) stringResource(R.string.cli_aujourdhui) else stringResource(R.string.cli_dans_jours, delai))
-                            },
+                            role = Role.RadioButton,
                         )
                     }
                 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.missa.b360.ui.clients.components.BoutonClient
 import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientEtatVide
 import com.missa.b360.ui.theme.MissaInk
 import androidx.compose.foundation.layout.heightIn
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
@@ -126,8 +127,8 @@ internal fun ClientListContent(
             // Marge basse : la barre de modules flottante recouvre les 56 dp du bas de l'écran.
             ExtendedFloatingActionButton(
                 onClick = onNouveau,
-                containerColor = ClientCouleurs.Tuile,
-                contentColor = MissaInk,
+                containerColor = ClientCouleurs.Nuit,
+                contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.padding(bottom = 56.dp),
             ) {
@@ -169,16 +170,16 @@ internal fun ClientListContent(
                 item { ClientListeEntete(etat, onTri) }
                 when {
                     etat.aucunClient -> item {
-                        MissaEmptyState(
-                            icon = Iv.Group,
-                            title = stringResource(R.string.cli_liste_vide_titre),
+                        ClientEtatVide(
+                            icone = Iv.Group,
+                            titre = stringResource(R.string.cli_liste_vide_titre),
                             description = stringResource(R.string.cli_liste_vide_desc),
                         )
                     }
                     etat.aucunResultat -> item {
-                        MissaEmptyState(
-                            icon = Iv.Search,
-                            title = stringResource(R.string.cli_aucun_resultat),
+                        ClientEtatVide(
+                            icone = Iv.Search,
+                            titre = stringResource(R.string.cli_aucun_resultat),
                             description = stringResource(R.string.cli_aucun_resultat_desc),
                         )
                     }

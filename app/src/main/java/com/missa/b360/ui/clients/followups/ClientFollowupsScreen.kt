@@ -1,6 +1,7 @@
 package com.missa.b360.ui.clients.followups
 
 import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientEtatVide
 import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -79,9 +80,9 @@ fun ClientFollowupsScreen(
         when {
             etat.erreur -> EtatErreur(onReessayer = viewModel::reessayer, modifier = Modifier.padding(padding))
             etat.chargement -> EtatChargement(Modifier.padding(padding))
-            etat.vide -> MissaEmptyState(
-                icon = Iv.CheckCircle,
-                title = stringResource(R.string.cli_relances_vide_titre),
+            etat.vide -> ClientEtatVide(
+                icone = Iv.CheckCircle,
+                titre = stringResource(R.string.cli_relances_vide_titre),
                 description = stringResource(R.string.cli_relances_vide_desc),
                 modifier = Modifier.padding(padding).padding(12.dp),
             )
@@ -168,6 +169,7 @@ private fun LigneRelance(
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = Modifier.fillMaxWidth(),
         onClick = onOuvrir,
     ) {

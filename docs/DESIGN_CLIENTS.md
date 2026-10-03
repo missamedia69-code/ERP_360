@@ -10,18 +10,25 @@ notifications clients. Les autres modules gardent le design de l'écran « Infor
 
 ## Principe
 
-Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité et le texte. **Aucun bouton
-n'est bleu nuit ni violet** : tous les boutons sont des tuiles grises à texte nuit en gras (`BoutonClientPlein`,
-`BoutonClient`, `ClientCouleurs.Tuile`), ou blancs à contour gris. **Le violet sert uniquement aux éléments sélectionnables, dans leur
-état sélectionné** : onglet courant, filtre courant, onglet actif de la barre du bas. Jamais décoratif (ni texte,
-ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent réservés aux états et sont
-**toujours accompagnés d'une icône**.
+Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité et le texte. **Trois rôles de
+couleur, jamais mélangés :**
+
+1. **Bleu nuit = bouton d'action** : tout bouton qui déclenche une action (Vendre, Encaisser, Relancer, Appeler,
+   WhatsApp, SMS, Ajouter une note, Créer, Enregistrer, Importer, Appliquer, « + Nouveau client ») est plein bleu
+   nuit à contenu blanc en gras (`BoutonClientPlein`, `BoutonClient`). Les boutons secondaires sont blancs à
+   contour gris (`BoutonContourMissa`, `BoutonClient(plein = false)`). Désactivé = bleu nuit à 35 %.
+2. **Violet = élément sélectionnable à l'état sélectionné** : onglet courant, filtre ou puce choisie, onglet actif
+   de la barre du bas, interrupteur et case cochés. Jamais décoratif ; jamais sur un bouton d'action.
+3. **Vert, ambre, rouge = niveau de risque ou état**, toujours avec une icône.
+
+Aucun écran du module n'a de couleur propre : puces `ClientPuce`, états vides `ClientEtatVide`, cartes
+`ClientCouleurs.Carte` + `CarteBord`. Pas de `FilterChip` ni de `MissaEmptyState` Material par défaut.
 
 ## Palette (`ClientCouleurs`)
 
 | Jeton | Valeur | Usage |
 |---|---|---|
-| `Nuit` | `#101C43` | texte, avatar, icônes (jamais un fond de bouton) |
+| `Nuit` | `#101C43` | texte, avatar, icônes, **fond des boutons d'action** |
 | `Violet` / `VioletProfond` | `#7C3AED` / `#5B21B6` | **uniquement** l'élément sélectionné : onglet ou filtre courant, onglet actif de la barre du bas |
 | `Carte` / `CarteBord` | `#EAEDF2` / `#D5DAE3` | résumé, en-tête de fiche, cartes clients, cartes de section |
 | `Tuile` / `TuileClaire` | `#E3E6EC` / `#EBEDF1` | actions, boutons secondaires pleins |
@@ -46,12 +53,12 @@ ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent
 - **Barre haute** : `ClientTopBar` (fond toujours blanc ; `titreCentre = false` pour la liste).
 - **Fiche** : carte d'en-tête (avatar 52 dp, nom, `code · téléphone`, pastilles statut + risque, utilisation du
   crédit, grille 2×2 En cours / En retard / CA 12 mois / Dernière vente) ; grille d'actions 3×2 (« Vendre »
-  en gras ; les six en tuiles grises ; icône « SMS » = bulle de message, distincte de
+  en gras ; les six en boutons bleu nuit à contenu blanc ; icône « SMS » = bulle de message, distincte de
   l'appel) ; onglets (`ClientOnglets`) ; « + Ajouter une note » et « Toute
   l'activité ⌄ » (`BoutonClient`) ; état vide en pointillés (`ClientVideActivite`).
 - **Liste** : carte « Résumé » repliable avec « En temps réel » ; recherche + bouton « Filtres » ; pastilles de
   filtre avec compteur ; ligne « N clients » + menu « Trier par … ⌄ » ; carte client dépliable (encours, retard,
-  Appeler, WhatsApp) ; bouton flottant gris « + Nouveau client ».
+  Appeler, WhatsApp) ; bouton flottant bleu nuit « + Nouveau client ».
 - **Barre de modules** dans Clients : icône au-dessus du libellé pour tous les onglets, carré violet (icône et libellé blancs) pour l'actif.
 - **Risque** : `RiskBadge` (contour et icône de la couleur de risque, texte nuit) ; `ClientStatusChip`
   (gris neutre, couleur seulement pour actif, surveillance et blocages ; cadenas pour les blocages).

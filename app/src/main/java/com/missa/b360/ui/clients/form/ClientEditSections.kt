@@ -22,6 +22,8 @@ import com.missa.b360.core.data.entity.ClientType
 import com.missa.b360.ui.clients.components.ClientPhoneField
 import com.missa.b360.ui.clients.labelRes
 import com.missa.b360.ui.components.MissaRangee
+import com.missa.b360.ui.components.MissaFormulaireTheme
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.components.MissaCaseACocher
 import com.missa.b360.ui.components.MissaClavier
 import com.missa.b360.ui.components.MissaInterrupteur
@@ -66,9 +68,11 @@ internal fun SectionFiscalite(etat: ClientEditUiState, modifier: (ClientDraft.()
         ChampClient(d.numeroTva, { v -> modifier { copy(numeroTva = v.take(80)) } }, R.string.cli_fiscal_numero_tva, modifier = Modifier.weight(1f))
         ChampClient(d.tauxTva, { v -> modifier { copy(tauxTva = v) } }, R.string.cli_fiscal_taux, DraftField.TAUX_TVA in err, MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
     }
+    MissaFormulaireTheme(ClientCouleurs.Violet) {
     MissaRangee {
         MissaInterrupteur(actif = d.assujettiTva, onChange = { v -> modifier { copy(assujettiTva = v) } }, libelle = stringResource(R.string.cli_fiscal_assujetti), modifier = Modifier.weight(1f))
         MissaInterrupteur(actif = d.exonereTva, onChange = { v -> modifier { copy(exonereTva = v) } }, libelle = stringResource(R.string.cli_fiscal_exonere), modifier = Modifier.weight(1f))
+    }
     }
     if (d.exonereTva) {
         ChampClient(d.motifExoneration, { v -> modifier { copy(motifExoneration = v.take(240)) } }, R.string.cli_fiscal_motif, DraftField.MOTIF_EXONERATION in err)
@@ -139,11 +143,13 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
                 ChampClient(c.telephone, { v -> modifier { copy(contacts = contacts.replace(index) { it.copy(telephone = v) }) } }, R.string.clients_telephone, DraftField.CONTACTS in err, MissaClavier.TELEPHONE, modifier = Modifier.weight(1f))
             }
             ChampClient(c.email, { v -> modifier { copy(contacts = contacts.replace(index) { it.copy(email = v) }) } }, R.string.clients_email, DraftField.CONTACTS in err, MissaClavier.EMAIL)
+            MissaFormulaireTheme(ClientCouleurs.Violet) {
             MissaCaseACocher(
                 coche = c.principal,
                 onChange = { v -> modifier { copy(contacts = contacts.mapIndexed { i, x -> x.copy(principal = v && i == index) }) } },
                 libelle = stringResource(R.string.cli_contact_principal),
             )
+            }
         }
     }
     OutlinedButton(
@@ -166,11 +172,13 @@ internal fun SectionContacts(etat: ClientEditUiState, modifier: (ClientDraft.() 
                 ChampClient(a.adresse, { v -> modifier { copy(adresses = adresses.replace(index) { it.copy(adresse = v.take(250)) }) } }, R.string.clients_adresse, DraftField.ADRESSES in err && a.adresse.trim().length < 2, modifier = Modifier.weight(1f))
                 ChampClient(a.ville, { v -> modifier { copy(adresses = adresses.replace(index) { it.copy(ville = v.take(100)) }) } }, R.string.cli_adresse_ville, modifier = Modifier.weight(1f))
             }
+            MissaFormulaireTheme(ClientCouleurs.Violet) {
             MissaCaseACocher(
                 coche = a.principale,
                 onChange = { v -> modifier { copy(adresses = adresses.mapIndexed { i, x -> x.copy(principale = v && i == index) }) } },
                 libelle = stringResource(R.string.cli_adresse_principale),
             )
+            }
         }
     }
     OutlinedButton(

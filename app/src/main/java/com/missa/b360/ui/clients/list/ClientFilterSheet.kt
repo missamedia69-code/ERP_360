@@ -17,6 +17,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ModalBottomSheet
 import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.ui.semantics.Role
+import com.missa.b360.ui.clients.components.ClientCouleurs
+import com.missa.b360.ui.clients.components.ClientPuce
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,28 +55,28 @@ internal fun ClientFilterSheet(
             Text(stringResource(R.string.cli_filtre_statut), color = MissaInk, fontWeight = FontWeight.SemiBold)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (statut in ClientStatus.entries) {
-                    FilterChip(
-                        selected = statut in filtre.statuts,
+                    ClientPuce(
+                        libelle = stringResource(statut.libelle()),
+                        actif = statut in filtre.statuts,
                         onClick = {
                             val suite = if (statut in filtre.statuts) filtre.statuts - statut else filtre.statuts + statut
                             onChange(filtre.copy(statuts = suite))
                         },
-                        label = { Text(stringResource(statut.libelle())) },
-                        modifier = Modifier.heightIn(min = 48.dp),
+                        role = Role.Checkbox,
                     )
                 }
             }
             Text(stringResource(R.string.cli_filtre_type), color = MissaInk, fontWeight = FontWeight.SemiBold)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (type in ClientType.entries) {
-                    FilterChip(
-                        selected = type in filtre.types,
+                    ClientPuce(
+                        libelle = stringResource(type.labelRes()),
+                        actif = type in filtre.types,
                         onClick = {
                             val suite = if (type in filtre.types) filtre.types - type else filtre.types + type
                             onChange(filtre.copy(types = suite))
                         },
-                        label = { Text(stringResource(type.labelRes())) },
-                        modifier = Modifier.heightIn(min = 48.dp),
+                        role = Role.Checkbox,
                     )
                 }
             }
@@ -96,6 +100,16 @@ internal fun ClientFilterSheet(
 private fun InterrupteurLigne(libelle: String, valeur: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(libelle, color = MissaInk, fontSize = 15.sp, modifier = Modifier.weight(1f))
-        Switch(checked = valeur, onCheckedChange = onChange)
+        Switch(
+            checked = valeur,
+            onCheckedChange = onChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = ClientCouleurs.Violet,
+                uncheckedThumbColor = Color.White,
+                uncheckedTrackColor = ClientCouleurs.Pastille,
+                uncheckedBorderColor = ClientCouleurs.Trait,
+            ),
+        )
     }
 }

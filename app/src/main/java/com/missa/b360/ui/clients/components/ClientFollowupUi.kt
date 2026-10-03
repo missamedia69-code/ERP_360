@@ -75,6 +75,7 @@ internal fun ClientFollowupRow(suivi: ClientFollowupEntity, devise: String, modi
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ClientCouleurs.Carte),
+        border = BorderStroke(1.dp, ClientCouleurs.CarteBord),
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(Modifier.padding(10.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {

@@ -76,8 +76,8 @@ internal fun LazyListScope.ongletClient(
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     BoutonClient(onClick = onNote, modifier = Modifier.weight(1f)) {
-                        Icon(painterResource(Iv.Add), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                        Text(stringResource(R.string.cli_ajouter_note), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        Icon(painterResource(Iv.Add), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                        Text(stringResource(R.string.cli_ajouter_note), color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     }
                     BoutonClient(onClick = onVoirActivite, modifier = Modifier.weight(1f), plein = false) {
                         Text(stringResource(R.string.cli_voir_activite), color = MissaInk, fontSize = 13.sp, fontWeight = FontWeight.Bold)
