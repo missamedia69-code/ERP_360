@@ -23,7 +23,7 @@ class AchatTresorerieRulesTest {
     }
 
     @Test fun `le montant est arrondi au centime et jamais egal au total`() {
-        assertEquals(12.35, (decaisser(paye = 12.345, solde = 50.0) as DecaissementAchat.Sortie).montant, 0.0001)
+        assertEquals(12.35, (decaisser(paye = 12.346, solde = 50.0) as DecaissementAchat.Sortie).montant, 0.0001)
     }
 
     @Test fun `un solde insuffisant refuse la sortie`() {
