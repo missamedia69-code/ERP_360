@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -38,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -103,61 +105,60 @@ fun MissaTopAppBar(
     modifier: Modifier = Modifier,
     couleurFond: Color = Color.White,
     actions: @Composable RowScope.() -> Unit = {},
+    titreCentre: Boolean = true,
 ) {
-    CenterAlignedTopAppBar(
-        modifier = modifier.padding(horizontal = 8.dp),
-        expandedHeight = 58.dp,
-        title = {
-            // Design n°2 validé : cartouche sombre arrondi, compact et très lisible.
-            Surface(
-                shape = RoundedCornerShape(18.dp),
-                color = MissaInk,
-                tonalElevation = 0.dp,
-                shadowElevation = 3.dp,
-            ) {
-                Text(
-                    text = title,
-                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 11.dp),
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+    // Grammaire de l'écran de référence : flèche discrète à gauche, titre en gras (centré par défaut), fond blanc.
+    val titre: @Composable () -> Unit = {
+        Text(
+            text = title,
+            color = MissaInk,
+            fontSize = 19.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+    val retour: @Composable () -> Unit = {
+        if (onBack != null) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    painter = painterResource(Iv.ArrowBack),
+                    contentDescription = stringResource(R.string.ob_retour),
+                    tint = MissaMuted,
+                    modifier = Modifier.size(22.dp),
                 )
             }
-        },
-        navigationIcon = {
-            if (onBack != null) {
-                Surface(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape),
-                    shape = CircleShape,
-                    color = MissaBorder,
-                    shadowElevation = 4.dp,
-                    onClick = onBack,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            painter = painterResource(Iv.ArrowBack),
-                            contentDescription = null,
-                            // Charte projet : les pictogrammes restent noirs.
-                            tint = MissaInk,
-                            modifier = Modifier.size(21.dp),
-                        )
-                    }
-                }
-            }
-        },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = couleurFond,
-            titleContentColor = Color.White,
-            navigationIconContentColor = MissaInk,
-            actionIconContentColor = MissaInk,
-        ),
-        windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        }
+    }
+    // L'en-tête est toujours blanc (écran de référence) : [couleurFond] est ignoré,
+    // un fond sombre rendrait le titre encre illisible.
+    val couleurs = TopAppBarDefaults.topAppBarColors(
+        containerColor = Color.White,
+        titleContentColor = MissaInk,
+        navigationIconContentColor = MissaMuted,
+        actionIconContentColor = MissaInk,
     )
+    if (titreCentre) {
+        CenterAlignedTopAppBar(
+            modifier = modifier.padding(horizontal = 4.dp),
+            expandedHeight = 56.dp,
+            title = titre,
+            navigationIcon = retour,
+            actions = actions,
+            colors = couleurs,
+            windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        )
+    } else {
+        androidx.compose.material3.TopAppBar(
+            modifier = modifier.padding(horizontal = 4.dp),
+            expandedHeight = 56.dp,
+            title = titre,
+            navigationIcon = retour,
+            actions = actions,
+            colors = couleurs,
+            windowInsets = androidx.compose.foundation.layout.WindowInsets.statusBars,
+        )
+    }
 }
 
 /** Carte de contenu neutre, compacte et lisible employée dans les modules génériques. */
@@ -170,8 +171,8 @@ fun MissaPanel(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(MissaLayout.cardRadius),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, accent?.copy(alpha = .30f) ?: MissaBorder),
+        colors = CardDefaults.cardColors(containerColor = OnbConfigCard),
+        border = accent?.let { BorderStroke(1.dp, it.copy(alpha = .30f)) },
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(

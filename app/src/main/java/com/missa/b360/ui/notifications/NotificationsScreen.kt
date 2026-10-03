@@ -1,5 +1,6 @@
 package com.missa.b360.ui.notifications
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -122,8 +123,8 @@ private fun NotificationLigne(notification: NotificationEntity, onClick: () -> U
     Surface(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-        color = if (notification.lue) Color.White else MissaSoftBlue,
-        border = BorderStroke(1.dp, if (notification.lue) MissaBorder else MissaInk.copy(alpha = .28f)),
+        color = if (notification.lue) OnbConfigCard else Color.White,
+        border = if (notification.lue) null else BorderStroke(1.dp, MissaInk.copy(alpha = .28f)),
     ) {
         Row(Modifier.padding(10.dp), verticalAlignment = Alignment.Top) {
             Surface(

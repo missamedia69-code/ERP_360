@@ -1,5 +1,6 @@
 package com.missa.b360.ui.comptabilite
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,7 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -160,7 +161,7 @@ fun ComptabiliteScreen(
 
             if (registre.accounts.isEmpty()) {
                 item {
-                    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
                         Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(stringResource(R.string.cpt_aucun_plan), fontWeight = FontWeight.SemiBold, color = MissaInk)
                             Text(stringResource(R.string.cpt_aucun_plan_desc), fontSize = 11.sp, color = MissaMuted)
@@ -245,8 +246,7 @@ fun ComptabiliteScreen(
             item {
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color.White,
-                    border = BorderStroke(1.dp, MissaBorder),
+                    color = OnbConfigCard,
                 ) {
                     Column(Modifier.fillMaxWidth().padding(8.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -463,7 +463,7 @@ private fun NouvelleEcritureDialog(
 private fun CartePieceComptable(voucher: AccountingVoucherEntity, devise: String, onPost: () -> Unit) {
     val dateLabel = remember(voucher.accountingDate) { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(voucher.accountingDate)) }
     val posted = voucher.status == AccountingVoucherStatus.POSTED.name || voucher.status == AccountingVoucherStatus.REVERSED.name
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(voucher.reference, modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = MissaInk)
@@ -487,8 +487,7 @@ private fun CarteEcriture(ecriture: EcritureComptable, devise: String) {
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Row(
             Modifier.fillMaxWidth().padding(8.dp),

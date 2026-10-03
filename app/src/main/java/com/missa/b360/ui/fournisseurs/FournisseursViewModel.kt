@@ -33,9 +33,8 @@ import com.missa.b360.core.domain.usecase.LierArticleFournisseurUseCase
 import com.missa.b360.core.domain.usecase.ObservePaymentMethodsUseCase
 import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.data.entity.ProductEntity
-import com.missa.b360.core.domain.usecase.ScannerDocumentsExpirantsUseCase
 import com.missa.b360.core.domain.usecase.SoumettreFournisseurUseCase
-import com.missa.b360.core.domain.usecase.SupprimerDocumentFournisseurUseCase
+import com.missa.b360.core.domain.usecase.ArchiverDocumentFournisseurUseCase
 import com.missa.b360.core.domain.usecase.UpdateFournisseurUseCase
 import com.missa.b360.core.domain.usecase.VerifierCompteBancaireUseCase
 import com.missa.b360.core.util.Iso4217
@@ -44,6 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -67,18 +67,6 @@ data class DocumentSaisi(
     val cheminFichier: String? = null,
     val dateEmission: Long? = null,
     val dateExpiration: Long? = null,
-)
-
-/** Indicateurs du hub fournisseur (spec §4). */
-data class HubFournisseurs(
-    val actifs: Int = 0,
-    val aValider: Int = 0,
-    val soldeTotal: Double = 0.0,
-    val commandesOuvertes: Int = 0,
-    val comptesAVerifier: Int = 0,
-    val documentsExpirants: Int = 0,
-    val sansIdentifiantFiscal: Int = 0,
-    val recents: List<FournisseurEntity> = emptyList(),
 )
 
 /** Fiche fournisseur complète : entité + enfants + KPI calculés. */
@@ -138,6 +126,8 @@ data class FournisseurFormState(
     val manquants: List<String>? = null,
     val erreur: String? = null,
     val enregistre: Boolean = false,
+    /** Identifiant du fournisseur enregistré (création ou modification), pour rouvrir sa fiche. */
+    val idEnregistre: Long? = null,
     val busy: Boolean = false,
 ) {
     val typeIdentifiantAttendu: String? get() = FournisseurRules.identifiantFiscalRequis(pays)
@@ -166,14 +156,13 @@ class FournisseursViewModel @Inject constructor(
     private val ajouterCompte: AjouterCompteBancaireUseCase,
     private val verifierCompteUseCase: VerifierCompteBancaireUseCase,
     private val ajouterDocument: AjouterDocumentFournisseurUseCase,
-    private val supprimerDocument: SupprimerDocumentFournisseurUseCase,
+    private val archiverDocument: ArchiverDocumentFournisseurUseCase,
     private val lierArticle: LierArticleFournisseurUseCase,
     private val delierArticle: DelierArticleFournisseurUseCase,
     private val evaluerFournisseur: EvaluerFournisseurUseCase,
-    private val scannerDocuments: ScannerDocumentsExpirantsUseCase,
     observeProducts: ObserveProductsUseCase,
     observePaymentMethods: ObservePaymentMethodsUseCase,
-    getEnterprise: GetEnterpriseUseCase,
+    private val getEnterprise: GetEnterpriseUseCase,
 ) : ViewModel() {
 
     val modesPaiement: StateFlow<List<String>> = observePaymentMethods()
@@ -188,73 +177,16 @@ class FournisseursViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), Iso4217.DEVISE_REPLI)
 
     // ------------------------------------------------------------------
-    // Liste filtrable + hub
+    // Données partagées
     // ------------------------------------------------------------------
-
-    private val _filtreStatut = MutableStateFlow<FournisseurStatus?>(null)
-    val filtreStatut: StateFlow<FournisseurStatus?> = _filtreStatut
-    fun setFiltreStatut(statut: FournisseurStatus?) {
-        _filtreStatut.value = statut
-    }
-
-    private val _recherche = MutableStateFlow("")
-    val recherche: StateFlow<String> = _recherche
-    fun setRecherche(value: String) {
-        _recherche.value = value
-    }
 
     private val tousFournisseurs: StateFlow<List<FournisseurEntity>> = fournisseurDao.observeTous()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    val listeFiltree: StateFlow<List<FournisseurEntity>> =
-        combine(tousFournisseurs, _filtreStatut, _recherche) { tous, statut, query ->
-            tous.filter { f ->
-                val terme = query.trim()
-                (statut == null || f.statut == statut) &&
-                    (terme.isBlank() || listOfNotNull(
-                        f.nom,
-                        f.nomCommercial,
-                        f.code,
-                        f.telephone,
-                        f.telephone2,
-                        f.email,
-                        f.adresse,
-                        f.identifiantFiscal,
-                        f.typeIdentifiantFiscal,
-                        f.rccm,
-                        f.numTva,
-                        f.categoriesFournies,
-                    ).any { it.contains(terme, ignoreCase = true) })
-            }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Pièces d'achat (BC/RE/FA) — source des KPI et des soldes fournisseurs. */
     private val piecesAchat: StateFlow<List<com.missa.b360.core.data.entity.OperationRecordEntity>> =
         operationDao.observeByModule(OperationModule.ACHATS.name)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    val hub: StateFlow<HubFournisseurs> = combine(
-        tousFournisseurs,
-        compteDao.observeComptesAVerifier(),
-        piecesAchat,
-    ) { tous, comptesAVerifier, pieces ->
-        val soldeTotal = FournisseurAchatMetrics.soldeTotal(pieces)
-        val commandesOuvertes = FournisseurAchatMetrics.commandesOuvertes(pieces)
-        HubFournisseurs(
-            actifs = tous.count { it.statut == FournisseurStatus.ACTIF },
-            aValider = tous.count { it.statut == FournisseurStatus.A_VALIDER },
-            soldeTotal = soldeTotal,
-            commandesOuvertes = commandesOuvertes,
-            comptesAVerifier = comptesAVerifier,
-            documentsExpirants = scannerDocuments.documentsExpirants().size,
-            sansIdentifiantFiscal = tous.count {
-                it.statut == FournisseurStatus.ACTIF &&
-                    FournisseurRules.identifiantFiscalObligatoire(it.pays, it.type) &&
-                    it.identifiantFiscal.isNullOrBlank()
-            },
-            recents = tous.sortedByDescending { it.createdAt }.take(5),
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HubFournisseurs())
 
     // ------------------------------------------------------------------
     // Fiche fournisseur
@@ -342,6 +274,18 @@ class FournisseursViewModel @Inject constructor(
     val form: StateFlow<FournisseurFormState> = _form
     fun updateForm(transform: (FournisseurFormState) -> FournisseurFormState) {
         _form.value = transform(_form.value)
+    }
+
+    /** Entrée de la route d'édition : [id] 0 = création (devise de l'entreprise), sinon fiche à modifier. */
+    fun ouvrirEdition(id: Long) {
+        viewModelScope.launch {
+            if (id == 0L) {
+                val deviseEntreprise = getEnterprise.observer().first()?.devise ?: Iso4217.DEVISE_REPLI
+                _form.value = FournisseurFormState(devise = deviseEntreprise)
+            } else {
+                fournisseurDao.getById(id)?.let { ouvrirFormulaire(it) }
+            }
+        }
     }
 
     fun ouvrirFormulaire(fournisseur: FournisseurEntity?) {
@@ -513,6 +457,7 @@ class FournisseursViewModel @Inject constructor(
                             _form.value = _form.value.copy(
                                 busy = false,
                                 enregistre = true,
+                                idEnregistre = resultat.fournisseurId,
                                 manquants = soumis.champs,
                             )
                             _message.value = "err_dossier_incomplet"
@@ -520,7 +465,7 @@ class FournisseursViewModel @Inject constructor(
                             return@launch
                         }
                     }
-                    _form.value = _form.value.copy(busy = false, enregistre = true)
+                    _form.value = _form.value.copy(busy = false, enregistre = true, idEnregistre = resultat.fournisseurId)
                     _message.value = "msg_fournisseur_enregistre"
                     ouvrirFiche(resultat.fournisseurId)
                 }
@@ -562,7 +507,7 @@ class FournisseursViewModel @Inject constructor(
                 dateEvaluation = existant.dateEvaluation,
             )
             val ok = updateFournisseur(modifie)
-            _form.value = _form.value.copy(busy = false, enregistre = ok)
+            _form.value = _form.value.copy(busy = false, enregistre = ok, idEnregistre = if (ok) id else null)
             _message.value = if (ok) "msg_fournisseur_modifie" else "err_modification"
         }
     }
@@ -702,9 +647,9 @@ class FournisseursViewModel @Inject constructor(
         }
     }
 
-    fun supprimerDocumentFiche(documentId: Long) {
+    fun archiverDocumentFiche(documentId: Long) {
         viewModelScope.launch {
-            _message.value = if (supprimerDocument(documentId)) {
+            _message.value = if (archiverDocument(documentId)) {
                 "msg_document_retire"
             } else {
                 "err_document_retire"

@@ -3,6 +3,7 @@ package com.missa.b360.ui.navigation
 import com.missa.b360.core.domain.model.ActivationProfil
 import com.missa.b360.core.domain.model.ModuleCode
 import com.missa.b360.core.domain.model.ModuleSousElements
+import com.missa.b360.ui.clients.ClientRoutes
 
 /**
  * Ce qu'une fonctionnalité de module sait faire aujourd'hui.
@@ -51,7 +52,8 @@ object DestinationsFonctions {
         "Commandes clients" to Routes.DEVIS_COMMANDE,
         "Livraisons" to AppModule.LIVRAISON.route,
         "Factures clients" to AppModule.VENTE.route,
-        "Relances clients" to AppModule.CRM.route,
+        "Relances clients" to ClientRoutes.RELANCES,
+        "Balance âgée" to ClientRoutes.RELANCES,
 
         // --- Stock ---
         "Articles" to AppModule.STOCK.route,

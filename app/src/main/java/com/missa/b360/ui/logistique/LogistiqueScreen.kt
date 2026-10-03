@@ -1,5 +1,6 @@
 package com.missa.b360.ui.logistique
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -272,8 +273,7 @@ private fun CarteStockSite(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -322,8 +322,7 @@ private fun CarteTransfert(
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

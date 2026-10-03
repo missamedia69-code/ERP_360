@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -82,8 +83,7 @@ fun LazyListScope.sectionFonctionsModule(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(13.dp),
-                color = MissaSurface,
-                border = BorderStroke(1.dp, MissaBorder),
+                color = OnbConfigCard,
             ) {
                 Text(
                     text = aVenir.joinToString(" · ") { it.libelle },
@@ -101,8 +101,7 @@ private fun LigneFonction(fonction: FonctionModule, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        color = MissaSurface,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),

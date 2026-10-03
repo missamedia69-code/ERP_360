@@ -23,6 +23,21 @@ interface OperationRecordDao {
     @Query("SELECT * FROM operation_records WHERE module = :module ORDER BY createdAt DESC")
     suspend fun getByModule(module: String): List<OperationRecordEntity>
 
+    /** Ventes et avoirs validés, base du calcul des comptes clients. */
+    @Query("SELECT * FROM operation_records WHERE module = 'VENTE' AND status = 'VALIDATED'")
+    suspend fun getVentesValidees(): List<OperationRecordEntity>
+
+    /**
+     * Ventes validées d'un client. Les avoirs de retour n'ont pas de `tiersId` : on les retrouve
+     * par le `clientId` de leur détail JSON (clé suivie d'une virgule, pour ne pas confondre 5
+     * et 52). L'appelant filtre ensuite sur le client du détail décodé.
+     */
+    @Query(
+        "SELECT * FROM operation_records WHERE module = 'VENTE' AND status = 'VALIDATED' " +
+            "AND (tiersId = :clientId OR (tiersId IS NULL AND notes LIKE '%\"clientId\":' || :clientId || ',%'))",
+    )
+    suspend fun getVentesValideesPourClient(clientId: Long): List<OperationRecordEntity>
+
     @Insert
     suspend fun insert(record: OperationRecordEntity): Long
 

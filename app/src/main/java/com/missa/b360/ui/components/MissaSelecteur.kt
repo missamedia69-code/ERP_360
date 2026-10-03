@@ -1,5 +1,6 @@
 package com.missa.b360.ui.components
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.ui.icons.Iv
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,7 +110,7 @@ fun MissaSelecteurLigne(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = rayonCarte,
-        color = if (enabled) couleurCarte else MissaCanvas,
+        color = if (enabled) couleurCarte else OnbConfigCard,
         border = bordureCarte,
     ) {
     Row(
@@ -289,6 +291,7 @@ fun MissaSelecteurDialogue(
             ).contains(filtre)
         }
     }
+    val couleurSelection = LocalCouleurSelection.current ?: BrandBlue
     val etatListe = rememberLazyListState()
     val indexCourant = visibles.indexOfFirst { it.cle == selectionCle }
     LaunchedEffect(Unit) {
@@ -334,9 +337,9 @@ fun MissaSelecteurDialogue(
                         },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = BrandBlue,
+                            focusedBorderColor = couleurSelection,
                             unfocusedBorderColor = MissaBorder,
-                            cursorColor = BrandBlue,
+                            cursorColor = couleurSelection,
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -392,17 +395,19 @@ private fun MissaOptionLigne(
     actif: Boolean,
     onClick: () -> Unit,
 ) {
+    val imposee = LocalCouleurSelection.current
+    val marque = imposee ?: BrandBlue
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 3.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(if (actif) MissaSoftBlue else MissaSurface)
+            .background(if (actif) (imposee?.copy(alpha = 0.10f)?.compositeOver(Color.White) ?: MissaSoftBlue) else MissaSurface)
             // Liseré de marque sur la ligne active : la sélection se lit
             // instantanément, même dans une liste longue.
             .border(
                 if (actif) 1.dp else 0.dp,
-                if (actif) BrandBlue.copy(alpha = 0.45f) else Color.Transparent,
+                if (actif) marque.copy(alpha = 0.45f) else Color.Transparent,
                 RoundedCornerShape(10.dp),
             )
             .clickable(onClick = onClick)
@@ -415,7 +420,7 @@ private fun MissaOptionLigne(
                     text = option.badge,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (actif) BrandBlue else MissaInk,
+                    color = if (actif) marque else MissaInk,
                 )
                 if (option.badgeSecondaire != null) {
                     Text(
@@ -446,7 +451,7 @@ private fun MissaOptionLigne(
             Icon(
                 painter = painterResource(Iv.Check),
                 contentDescription = null,
-                tint = BrandBlue,
+                tint = marque,
                 modifier = Modifier.size(20.dp),
             )
         }

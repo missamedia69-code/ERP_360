@@ -116,6 +116,12 @@ import java.util.TimeZone
 /** Couleur du module courant pour les formulaires (bordure active, pastilles, bouton). */
 val LocalCouleurFormulaire = staticCompositionLocalOf { BrandBlue }
 
+/**
+ * Couleur imposée par un module à l'état « sélectionné » des listes et sélecteurs ; `null` = couleur
+ * de marque. Le module Clients la fixe au violet pour se distinguer des autres modules.
+ */
+val LocalCouleurSelection = staticCompositionLocalOf<Color?> { null }
+
 @Composable
 fun MissaFormulaireTheme(couleur: Color, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalCouleurFormulaire provides couleur, content = content)
@@ -144,7 +150,7 @@ internal fun filtrerSaisie(clavier: MissaClavier, saisie: String): String = when
 
 @Composable
 fun missaChampCouleurs(): TextFieldColors {
-    val couleur = LocalCouleurFormulaire.current
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     return OutlinedTextFieldDefaults.colors(
         focusedBorderColor = couleur,
         unfocusedBorderColor = MissaBorder,
@@ -291,7 +297,7 @@ private fun CadreChamp(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icone != null) {
-                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(8.dp))
             }
             Column(Modifier.weight(1f)) {
@@ -311,7 +317,7 @@ private fun CadreChamp(
             }
             if (iconeFin != null) {
                 Spacer(Modifier.width(6.dp))
-                Icon(painterResource(iconeFin), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                Icon(painterResource(iconeFin), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
             }
         }
         (erreur ?: aide)?.let { texte ->
@@ -387,6 +393,7 @@ fun <T> MissaChampListe(
 ) {
     var ouvert by remember { mutableStateOf(false) }
     val texte = options.firstOrNull { it.first == selection }?.second.orEmpty()
+    val couleurSelection = LocalCouleurSelection.current
     Box(modifier) {
         ChampCliquable(
             valeur = texte,
@@ -419,10 +426,23 @@ fun <T> MissaChampListe(
                 )
             }
             options.forEach { (valeur, libelleOption) ->
+                val choisie = valeur == selection
                 DropdownMenuItem(
-                    text = { Text(libelleOption, fontSize = 13.sp, color = MissaInk) },
-                    trailingIcon = if (valeur == selection) {
-                        { Icon(painterResource(Iv.Check), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp)) }
+                    text = {
+                        Text(
+                            libelleOption,
+                            fontSize = 13.sp,
+                            fontWeight = if (choisie && couleurSelection != null) FontWeight.Bold else FontWeight.Normal,
+                            color = if (choisie && couleurSelection != null) couleurSelection else MissaInk,
+                        )
+                    },
+                    modifier = if (choisie && couleurSelection != null) {
+                        Modifier.background(couleurSelection.copy(alpha = 0.10f))
+                    } else {
+                        Modifier
+                    },
+                    trailingIcon = if (choisie) {
+                        { Icon(painterResource(Iv.Check), contentDescription = null, tint = couleurSelection ?: MissaInk, modifier = Modifier.size(16.dp)) }
                     } else {
                         null
                     },
@@ -618,7 +638,7 @@ fun <T> MissaChoixTuiles(
     colonnes: Int = 4,
     enabled: Boolean = true,
 ) {
-    val couleur = LocalCouleurFormulaire.current
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     // Les longs libellés ne sont jamais écrasés dans une grille de 3–4 colonnes :
     // deux colonnes gardent le bouton proche de son texte et lisible en traduction.
     val libelleLong = options.any { it.libelle.length > 14 || it.libelle.count { c -> c == ' ' } >= 2 }
@@ -642,7 +662,7 @@ fun <T> MissaChoixTuiles(
                             verticalArrangement = Arrangement.Center,
                         ) {
                             tuile.icone?.let {
-                                Icon(painterResource(it), contentDescription = null, tint = MissaInk, modifier = Modifier.size(18.dp))
+                                Icon(painterResource(it), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.size(2.dp))
                             }
                             Text(
@@ -742,7 +762,8 @@ fun MissaFormSectionTitre(
     modifier: Modifier = Modifier.fillMaxWidth(),
     icone: Int? = null,
 ) {
-    val couleur = LocalCouleurFormulaire.current
+    // Le module peut imposer sa couleur à la pastille numérotée (Clients : violet).
+    val couleur = LocalCouleurSelection.current ?: LocalCouleurFormulaire.current
     Row(modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
         when {
             numero != null -> Box(
@@ -751,7 +772,7 @@ fun MissaFormSectionTitre(
             ) {
                 Text("$numero", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = couleur.contenuLisible())
             }
-            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+            icone != null -> Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
         }
         if (numero != null || icone != null) Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
@@ -761,7 +782,7 @@ fun MissaFormSectionTitre(
     }
 }
 
-/** Section complète : titre numéroté + contenu espacé de 12 dp. */
+/** Section complète : carte grise numérotée de l'écran de référence (titre, pastille, champs blancs). */
 @Composable
 fun MissaFormSection(
     titre: String,
@@ -771,10 +792,14 @@ fun MissaFormSection(
     icone: Int? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        MissaFormSectionTitre(titre = titre, numero = numero, sousTitre = sousTitre, icone = icone)
-        content()
-    }
+    MissaCarteSection(
+        titre = titre,
+        modifier = modifier,
+        numero = numero,
+        icone = icone,
+        sousTitre = sousTitre,
+        contenu = content,
+    )
 }
 
 /** Deux (ou trois) champs courts côte à côte ; les enfants prennent `Modifier.weight(1f)`. */
@@ -804,11 +829,11 @@ fun MissaBoutonPrincipal(
         colors = ButtonDefaults.buttonColors(
             containerColor = couleur,
             contentColor = contenu,
-            disabledContainerColor = Color(0xFFE3E8F1),
-            disabledContentColor = MissaMuted,
+            disabledContainerColor = couleur.copy(alpha = 0.35f),
+            disabledContentColor = contenu.copy(alpha = 0.9f),
         ),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
-        modifier = modifier.heightIn(min = 44.dp),
+        modifier = modifier.heightIn(min = 48.dp),
     ) {
         if (enCours) {
             CircularProgressIndicator(color = contenu, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
@@ -876,7 +901,7 @@ fun MissaFormPied(
     secondaireActif: Boolean = true,
     erreur: String? = null,
 ) {
-    Surface(color = Color.White, shadowElevation = 10.dp, modifier = modifier) {
+    Surface(color = Color.White, shadowElevation = 4.dp, modifier = modifier) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             MissaFormErreur(erreur)
             if (secondaire != null) {
@@ -927,10 +952,10 @@ fun MissaFormDialogue(
                     ) {
                         if (icone != null) {
                             Box(
-                                Modifier.size(30.dp).background(couleur.copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
+                                Modifier.size(30.dp).background((LocalCouleurSelection.current ?: couleur).copy(alpha = 0.18f).compositeOver(Color.White), CircleShape),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(painterResource(icone), contentDescription = null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                Icon(painterResource(icone), contentDescription = null, tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(16.dp))
                             }
                             Spacer(Modifier.width(10.dp))
                         }
@@ -939,7 +964,7 @@ fun MissaFormDialogue(
                             sousTitre?.let { Text(it, fontSize = 11.sp, color = MissaMuted) }
                         }
                         IconButton(onClick = onFermer) {
-                            Icon(painterResource(Iv.Close), contentDescription = stringResource(R.string.st_annuler), tint = MissaInk, modifier = Modifier.size(20.dp))
+                            Icon(painterResource(Iv.Close), contentDescription = stringResource(R.string.st_annuler), tint = LocalCouleurSelection.current ?: MissaInk, modifier = Modifier.size(20.dp))
                         }
                     }
                     HorizontalDivider(color = MissaBorder.copy(alpha = 0.6f))

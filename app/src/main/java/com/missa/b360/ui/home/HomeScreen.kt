@@ -1,5 +1,6 @@
 package com.missa.b360.ui.home
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import com.missa.b360.core.domain.model.PointJour
 
 import com.missa.b360.core.domain.model.CockpitRules
@@ -57,7 +58,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -695,8 +696,7 @@ private fun AccueilActionCard(
             .height(60.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder.copy(alpha = 0.55f)),
+        color = OnbConfigCard,
     ) {
         Column(
             modifier = Modifier
@@ -760,8 +760,7 @@ private fun AccueilResumeCard(state: HomeUiState, currency: String, onSelectionJ
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder),
+        color = OnbConfigCard,
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -900,8 +899,7 @@ private fun AccueilActivitesRecentesCard(state: HomeUiState, currency: String, o
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder),
+        color = OnbConfigCard,
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -1018,8 +1016,7 @@ private fun AccueilRappelsCard(state: HomeUiState, onNavigate: (String) -> Unit)
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = if (hasAlert) HomeBackground else Color.White,
-        border = BorderStroke(1.dp, HomeBorder),
+        color = OnbConfigCard,
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1100,8 +1097,7 @@ private fun AccueilTachesCard(state: HomeUiState, onNavigate: (String) -> Unit) 
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, HomeBorder),
+        color = OnbConfigCard,
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -1229,8 +1225,7 @@ internal fun MissaBusinessDrawer(
                     .fillMaxWidth()
                     .clickable { onCompanyFiche() },
                 shape = RoundedCornerShape(14.dp),
-                color = Blue90,
-                border = BorderStroke(1.dp, HomeBorder),
+                color = OnbConfigCard,
             ) {
                 Row(
                     modifier = Modifier.padding(8.dp),

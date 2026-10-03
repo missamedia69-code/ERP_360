@@ -39,6 +39,8 @@ object Iv {
     val Email = R.drawable.ph_envelope
     val ExpandLess = R.drawable.ph_caret_up
     val ExpandMore = R.drawable.ph_caret_down
+    val Sliders = R.drawable.ph_sliders_horizontal
+    val Sms = R.drawable.ph_sms
     val Gavel = R.drawable.ph_gavel
     val Group = R.drawable.ph_users_three
     val Groups = R.drawable.ph_users_three

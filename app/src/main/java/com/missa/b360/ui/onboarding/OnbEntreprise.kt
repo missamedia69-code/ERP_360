@@ -547,46 +547,14 @@ private fun OnbCompactCarte(
     etiquetteEnErreur: Boolean = false,
     contenu: @Composable ColumnScope.() -> Unit,
 ) {
-    Surface(
-        color = OnbConfigCard,
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 7.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                MissaFormSectionTitre(
-                    titre = stringResource(titreRes),
-                    numero = numero,
-                    icone = if (numero == null) icone else null,
-                    modifier = Modifier.weight(1f),
-                )
-                if (etiquette != null) {
-                    Surface(
-                        color = if (etiquetteEnErreur) {
-                            Red40.copy(alpha = 0.08f)
-                        } else {
-                            BrandBlue.copy(alpha = 0.08f)
-                        },
-                        shape = RoundedCornerShape(5.dp),
-                    ) {
-                        Text(
-                            text = etiquette,
-                            fontSize = 9.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = if (etiquetteEnErreur) Red40 else BrandBlue,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 1.5.dp),
-                        )
-                    }
-                }
-            }
-            contenu()
-        }
-    }
+    MissaCarteSection(
+        titre = stringResource(titreRes),
+        numero = numero,
+        icone = icone,
+        etiquette = etiquette,
+        etiquetteEnErreur = etiquetteEnErreur,
+        contenu = contenu,
+    )
 }
 
 /**

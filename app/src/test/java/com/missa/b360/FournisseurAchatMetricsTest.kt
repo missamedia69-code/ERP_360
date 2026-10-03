@@ -89,4 +89,11 @@ class FournisseurAchatMetricsTest {
         assertEquals(1, FournisseurAchatMetrics.commandesOuvertes(listOf(commande, reception(4.0, 11))))
         assertEquals(0, FournisseurAchatMetrics.commandesOuvertes(listOf(commande, reception(4.0, 11), reception(6.0, 12))))
     }
+
+    @Test
+    fun `une facture n est jamais comptee comme une commande ouverte`() {
+        val pieces = listOf(piece(1, "FFR-2026-0001", PurchaseRecordCodec.encode(facture(7, 120.0, 20.0))))
+        assertEquals(0, FournisseurAchatMetrics.commandesOuvertes(pieces))
+        assertEquals(0, FournisseurAchatMetrics.pourFournisseur(7, pieces).nombreCommandes)
+    }
 }

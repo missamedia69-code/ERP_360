@@ -29,7 +29,7 @@ Les micro-entreprises, artisans, commerçants, industriels et PME en Afrique sub
 ### 2.1 Stack Technologique
 * **Langage :** Kotlin 100% (Coroutines, StateFlow, Flow réactifs).
 * **UI / Rendu :** Jetpack Compose, Material 3 adapté, Charte propriétaire MISSA UI (Flat monochrome + contrastes vifs).
-* **Persistance locale :** Room Database (SQLite), version courante : 21 (migrations 1→21, 67 tables).
+* **Persistance locale :** Room Database (SQLite), version courante : 22 (migrations 1→22, 71 entités).
 * **Injection de dépendances :** Dagger Hilt.
 * **Architecture applicative :** Clean Architecture (Data → Domain / Use Cases → Presentation / ViewModel / Compose).
 * **Internationalisation :** 5 locales complètes (`values`, `values-en`, `values-es`, `values-zh`, `values-ar`).

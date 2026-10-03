@@ -1,6 +1,7 @@
 package com.missa.b360.ui.home
 
 import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 import org.junit.Assert.assertEquals
@@ -50,7 +51,7 @@ class HomeNavigationTest {
 
     @Test
     fun remindersOpenTheirOwningWorkflows() {
-        assertEquals("${AppModule.VENTE.route}?overdue=true", HomeNavigation.rappel(HomeNavigation.Rappel.FACTURES_EN_RETARD))
+        assertEquals(ClientRoutes.RELANCES, HomeNavigation.rappel(HomeNavigation.Rappel.FACTURES_EN_RETARD))
         assertEquals("${AppModule.ACHATS.route}?pending=true", HomeNavigation.rappel(HomeNavigation.Rappel.COMMANDES_FOURNISSEUR))
         assertEquals(Routes.STOCK_ALERTES, HomeNavigation.rappel(HomeNavigation.Rappel.RUPTURES_STOCK))
         assertEquals(AppModule.QUALITE.route, HomeNavigation.rappel(HomeNavigation.Rappel.NON_CONFORMITES))

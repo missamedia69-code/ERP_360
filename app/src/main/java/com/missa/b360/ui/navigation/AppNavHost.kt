@@ -71,10 +71,10 @@ import com.missa.b360.ui.admin.AdminSauvegardeScreen
 import com.missa.b360.ui.admin.AdminSitesScreen
 import com.missa.b360.ui.admin.AdminUtilisateursScreen
 import com.missa.b360.ui.admin.ReferentielsScreen
-import com.missa.b360.ui.clients.ClientsScreen
+import com.missa.b360.ui.clients.clientsGraph
 import com.missa.b360.ui.comptabilite.ComptabiliteScreen
 import com.missa.b360.ui.crm.CrmScreen
-import com.missa.b360.ui.fournisseurs.FournisseursScreen
+import com.missa.b360.ui.fournisseurs.fournisseursGraph
 import com.missa.b360.ui.home.HomeScreen
 import com.missa.b360.ui.livraison.LivraisonScreen
 import com.missa.b360.ui.logistique.LogistiqueScreen
@@ -284,28 +284,11 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
         }
 
         // Clients & Fournisseurs
-        composable(
-            route = "${AppModule.CLIENTS.route}?create={create}",
-            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
-        ) { entry ->
-            GuardedModule(AppModule.CLIENTS, activation, navController) {
-                ClientsScreen(
-                    onBack = { navController.popBackStack() },
-                    openCreate = entry.arguments?.getBoolean("create") == true,
-                    onNavigate = { route -> navController.navigate(route) },
-                )
-            }
+        clientsGraph(navController) { contenu ->
+            GuardedModule(AppModule.CLIENTS, activation, navController, contenu)
         }
-        composable(
-            route = "${AppModule.FOURNISSEURS.route}?create={create}",
-            arguments = listOf(navArgument("create") { type = NavType.BoolType; defaultValue = false }),
-        ) { entry ->
-            GuardedModule(AppModule.FOURNISSEURS, activation, navController) {
-                FournisseursScreen(
-                    onBack = { navController.popBackStack() },
-                    openCreate = entry.arguments?.getBoolean("create") == true,
-                )
-            }
+        fournisseursGraph(navController) { contenu ->
+            GuardedModule(AppModule.FOURNISSEURS, activation, navController, contenu)
         }
         // Stock
         composable(
@@ -465,10 +448,11 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
         }
         // Vente
         composable(
-            route = "${AppModule.VENTE.route}?create={create}&overdue={overdue}",
+            route = "${AppModule.VENTE.route}?create={create}&overdue={overdue}&clientId={clientId}",
             arguments = listOf(
                 navArgument("create") { type = NavType.BoolType; defaultValue = false },
                 navArgument("overdue") { type = NavType.BoolType; defaultValue = false },
+                navArgument("clientId") { type = NavType.LongType; defaultValue = 0L },
             ),
         ) { entry ->
             GuardedModule(AppModule.VENTE, activation, navController) {
@@ -477,6 +461,7 @@ private fun MainNavHost(notificationRoute: String?, onNotificationRouteConsumed:
                     onOpenClientCreate = { navController.navigate("${AppModule.CLIENTS.route}?create=true") },
                     openCreate = entry.arguments?.getBoolean("create") == true,
                     openOverdue = entry.arguments?.getBoolean("overdue") == true,
+                    clientIdInitial = entry.arguments?.getLong("clientId") ?: 0L,
                 )
             }
         }

@@ -15,7 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.missa.b360.R
-import com.missa.b360.ui.navigation.AppModule
+import com.missa.b360.ui.clients.components.ClientCouleurs
 import com.missa.b360.ui.theme.MissaBorder
 import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
@@ -40,7 +40,7 @@ fun CategoriesDialog(
     MissaFormDialogue(
         titre = stringResource(R.string.clients_categories),
         icone = Iv.Category,
-        couleur = AppModule.CLIENTS.couleur,
+        couleur = ClientCouleurs.Violet,
         onFermer = onDismiss,
         libelleValider = stringResource(R.string.clients_ajouter_categorie),
         libelleAnnuler = stringResource(R.string.ob_terminer),
@@ -105,7 +105,7 @@ fun BadgesDialog(
     MissaFormDialogue(
         titre = stringResource(R.string.clients_badges),
         icone = Iv.Star,
-        couleur = AppModule.CLIENTS.couleur,
+        couleur = ClientCouleurs.Violet,
         onFermer = onDismiss,
         libelleValider = stringResource(R.string.clients_ajouter_badge),
         libelleAnnuler = stringResource(R.string.ob_terminer),

@@ -195,15 +195,23 @@ object TresorerieRules {
     ): CompteTresorerieEntity? {
         val ouverts = comptes.filter { it.actif }
         if (ouverts.isEmpty()) return null
+        val vise = typeCompteVise(modePaiement)
+        if (vise != null) return ouverts.firstOrNull { it.type == vise.name }
+        return ouverts.first()
+    }
+
+    /**
+     * Type de compte visé par un mode de règlement libre (caisse, mobile, banque), ou null
+     * s'il ne ressemble à rien de connu. Source unique du rapprochement par mots-clés.
+     */
+    fun typeCompteVise(modePaiement: String?): TypeCompteTresorerie? {
         val texte = modePaiement.orEmpty().lowercase(java.util.Locale.ROOT)
-        val vise = when {
+        return when {
             MOTS_CAISSE.any { texte.contains(it) } -> TypeCompteTresorerie.CAISSE
             MOTS_MOBILE.any { texte.contains(it) } -> TypeCompteTresorerie.MOBILE_MONEY
             MOTS_BANQUE.any { texte.contains(it) } -> TypeCompteTresorerie.BANQUE
             else -> null
         }
-        if (vise != null) return ouverts.firstOrNull { it.type == vise.name }
-        return ouverts.first()
     }
 
     private val MOTS_CAISSE = listOf("espèce", "espece", "cash", "caisse", "liquide")

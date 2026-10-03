@@ -7,18 +7,24 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.missa.b360.core.data.dao.AbsenceDao
 import com.missa.b360.core.data.dao.AccountingDao
 import com.missa.b360.core.data.dao.BackupDao
+import com.missa.b360.core.data.dao.ClientBalanceDao
 import com.missa.b360.core.data.dao.ClientDao
+import com.missa.b360.core.data.dao.ClientFollowupDao
+import com.missa.b360.core.data.dao.ClientPaymentDao
 import com.missa.b360.core.data.dao.CompteTresorerieDao
 import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EquipementDao
 import com.missa.b360.core.data.dao.GroupeArticleDao
 import com.missa.b360.core.data.dao.EnterpriseDao
+import com.missa.b360.core.data.dao.FournisseurBalanceDao
 import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
 import com.missa.b360.core.data.dao.FournisseurContactDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.FournisseurDocumentDao
 import com.missa.b360.core.data.dao.FournisseurEvenementDao
 import com.missa.b360.core.data.dao.FournisseurItemDao
+import com.missa.b360.core.data.dao.FournisseurPaiementPlanifieDao
+import com.missa.b360.core.data.dao.FournisseurScoreDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -53,8 +59,11 @@ import com.missa.b360.core.data.entity.BackupEntity
 import com.missa.b360.core.data.entity.BadgeLoyaltyEntity
 import com.missa.b360.core.data.entity.CategoryClientEntity
 import com.missa.b360.core.data.entity.ClientAddressEntity
+import com.missa.b360.core.data.entity.ClientBalanceEntity
 import com.missa.b360.core.data.entity.ClientContactEntity
 import com.missa.b360.core.data.entity.ClientEntity
+import com.missa.b360.core.data.entity.ClientFollowupEntity
+import com.missa.b360.core.data.entity.ClientPaymentEntity
 import com.missa.b360.core.data.entity.CompteTresorerieEntity
 import com.missa.b360.core.data.entity.KitComposantEntity
 import com.missa.b360.core.data.entity.ProductConsignationEntity
@@ -71,12 +80,15 @@ import com.missa.b360.core.data.entity.GroupeProductionEntity
 import com.missa.b360.core.data.entity.GroupeStockEntity
 import com.missa.b360.core.data.entity.GroupeVenteEntity
 import com.missa.b360.core.data.entity.EnterpriseEntity
+import com.missa.b360.core.data.entity.FournisseurBalanceEntity
 import com.missa.b360.core.data.entity.FournisseurCompteBancaireEntity
 import com.missa.b360.core.data.entity.FournisseurContactEntity
 import com.missa.b360.core.data.entity.FournisseurDocumentEntity
 import com.missa.b360.core.data.entity.FournisseurEntity
 import com.missa.b360.core.data.entity.FournisseurEvenementEntity
 import com.missa.b360.core.data.entity.FournisseurItemEntity
+import com.missa.b360.core.data.entity.FournisseurPaiementPlanifieEntity
+import com.missa.b360.core.data.entity.FournisseurScoreEntity
 import com.missa.b360.core.data.entity.JournalEntryEntity
 import com.missa.b360.core.data.entity.LicenceEntity
 import com.missa.b360.core.data.entity.MouvementTresorerieEntity
@@ -191,8 +203,14 @@ import com.missa.b360.core.data.entity.UserEntity
         SyncOutboxEntity::class,
         SyncInboxEntity::class,
         SyncConflictEntity::class,
+        ClientBalanceEntity::class,
+        ClientFollowupEntity::class,
+        ClientPaymentEntity::class,
+        FournisseurBalanceEntity::class,
+        FournisseurScoreEntity::class,
+        FournisseurPaiementPlanifieEntity::class,
     ],
-    version = 22,
+    version = 24,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -234,6 +252,12 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun interventionDao(): InterventionDao
     abstract fun groupeArticleDao(): GroupeArticleDao
     abstract fun syncDao(): SyncDao
+    abstract fun clientBalanceDao(): ClientBalanceDao
+    abstract fun clientFollowupDao(): ClientFollowupDao
+    abstract fun clientPaymentDao(): ClientPaymentDao
+    abstract fun fournisseurBalanceDao(): FournisseurBalanceDao
+    abstract fun fournisseurScoreDao(): FournisseurScoreDao
+    abstract fun fournisseurPaiementPlanifieDao(): FournisseurPaiementPlanifieDao
 
     companion object {
         /** v1 → v2 (Phase D) : table fournisseurs. */
@@ -925,5 +949,132 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             }
         }
+
+        /**
+         * v22 → v23 (module Clients) : situation de compte dérivée, journal de suivi et
+         * encaissements postérieurs à la facture. Aucune donnée existante n'est modifiée ;
+         * `client_balances` est remplie au premier lancement par `ClientBalanceUseCase`.
+         */
+        val MIGRATION_22_23 = object : Migration(22, 23) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                CLIENT_ACCOUNT_STATEMENTS.forEach { db.execSQL(it) }
+            }
+        }
+
+        /** Instructions de [MIGRATION_22_23], exposées pour le test de conformité au schéma exporté. */
+        val CLIENT_ACCOUNT_STATEMENTS: List<String> = listOf(
+            "CREATE TABLE IF NOT EXISTS `client_balances` (" +
+                "`clientId` INTEGER NOT NULL, " +
+                "`encours` REAL NOT NULL DEFAULT 0, " +
+                "`enRetard` REAL NOT NULL DEFAULT 0, " +
+                "`joursRetardMax` INTEGER NOT NULL DEFAULT 0, " +
+                "`ca12Mois` REAL NOT NULL DEFAULT 0, " +
+                "`derniereVenteAt` INTEGER, " +
+                "`nbVentes` INTEGER NOT NULL DEFAULT 0, " +
+                "`majAt` INTEGER NOT NULL DEFAULT 0, " +
+                "PRIMARY KEY(`clientId`), " +
+                "FOREIGN KEY(`clientId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE INDEX IF NOT EXISTS `index_client_balances_encours` ON `client_balances` (`encours`)",
+            "CREATE INDEX IF NOT EXISTS `index_client_balances_enRetard` ON `client_balances` (`enRetard`)",
+            "CREATE TABLE IF NOT EXISTS `client_followups` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`clientId` INTEGER NOT NULL, " +
+                "`type` TEXT NOT NULL, " +
+                "`canal` TEXT, " +
+                "`message` TEXT, " +
+                "`promesseDate` INTEGER, " +
+                "`promesseMontant` REAL, " +
+                "`statut` TEXT NOT NULL DEFAULT 'OUVERT', " +
+                "`createdAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`clientId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE INDEX IF NOT EXISTS `index_client_followups_clientId_createdAt` " +
+                "ON `client_followups` (`clientId`, `createdAt`)",
+            "CREATE INDEX IF NOT EXISTS `index_client_followups_type_statut` " +
+                "ON `client_followups` (`type`, `statut`)",
+            "CREATE TABLE IF NOT EXISTS `client_payments` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`clientId` INTEGER NOT NULL, " +
+                "`invoiceRecordId` INTEGER, " +
+                "`montant` REAL NOT NULL, " +
+                "`modePaiement` TEXT NOT NULL, " +
+                "`reference` TEXT NOT NULL, " +
+                "`paiementAt` INTEGER NOT NULL, " +
+                "`contrePassationDe` INTEGER, " +
+                "`note` TEXT, " +
+                "`createdAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`clientId`) REFERENCES `clients`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE INDEX IF NOT EXISTS `index_client_payments_clientId_paiementAt` " +
+                "ON `client_payments` (`clientId`, `paiementAt`)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_client_payments_reference` ON `client_payments` (`reference`)",
+            "CREATE INDEX IF NOT EXISTS `index_client_payments_invoiceRecordId` " +
+                "ON `client_payments` (`invoiceRecordId`)",
+        )
+
+        /**
+         * 23 → 24 (module Fournisseurs) : trois nouvelles tables dérivées (`fournisseur_balances`,
+         * `fournisseur_scores`, `fournisseur_paiements_planifies`) et deux colonnes ajoutées avec une
+         * valeur par défaut (`fournisseur_documents.archive`, `fournisseur_comptes_bancaires.modifieLe`).
+         * Aucune table existante n'est réécrite ni supprimée ; les caches sont remplis au premier
+         * lancement par `FournisseurCacheUseCase`.
+         */
+        val MIGRATION_23_24 = object : Migration(23, 24) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                FOURNISSEUR_STATEMENTS.forEach { db.execSQL(it) }
+            }
+        }
+
+        /** Instructions de [MIGRATION_23_24], exposées pour le test de conformité au schéma exporté. */
+        val FOURNISSEUR_STATEMENTS: List<String> = listOf(
+            "ALTER TABLE `fournisseur_documents` ADD COLUMN `archive` INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE `fournisseur_comptes_bancaires` ADD COLUMN `modifieLe` INTEGER NOT NULL DEFAULT 0",
+            "CREATE TABLE IF NOT EXISTS `fournisseur_balances` (" +
+                "`fournisseurId` INTEGER NOT NULL, " +
+                "`dette` REAL NOT NULL DEFAULT 0, " +
+                "`enRetard` REAL NOT NULL DEFAULT 0, " +
+                "`joursRetardMax` INTEGER NOT NULL DEFAULT 0, " +
+                "`nbFacturesOuvertes` INTEGER NOT NULL DEFAULT 0, " +
+                "`nbCommandesOuvertes` INTEGER NOT NULL DEFAULT 0, " +
+                "`achats12Mois` REAL NOT NULL DEFAULT 0, " +
+                "`derniereFactureAt` INTEGER, " +
+                "`prochaineEcheanceAt` INTEGER, " +
+                "`majAt` INTEGER NOT NULL DEFAULT 0, " +
+                "PRIMARY KEY(`fournisseurId`), " +
+                "FOREIGN KEY(`fournisseurId`) REFERENCES `fournisseurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE TABLE IF NOT EXISTS `fournisseur_scores` (" +
+                "`fournisseurId` INTEGER NOT NULL, " +
+                "`ponctualite` REAL, " +
+                "`conformite` REAL, " +
+                "`prix` REAL, " +
+                "`score` INTEGER, " +
+                "`nbCommandesMesurees` INTEGER NOT NULL DEFAULT 0, " +
+                "`delaiMoyenReelJours` REAL, " +
+                "`majAt` INTEGER NOT NULL DEFAULT 0, " +
+                "PRIMARY KEY(`fournisseurId`), " +
+                "FOREIGN KEY(`fournisseurId`) REFERENCES `fournisseurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE TABLE IF NOT EXISTS `fournisseur_paiements_planifies` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`fournisseurId` INTEGER NOT NULL, " +
+                "`factureRecordId` INTEGER NOT NULL, " +
+                "`datePrevue` INTEGER NOT NULL, " +
+                "`montant` REAL NOT NULL, " +
+                "`statut` TEXT NOT NULL DEFAULT 'PLANIFIE', " +
+                "`referenceMouvement` TEXT, " +
+                "`createdAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`fournisseurId`) REFERENCES `fournisseurs`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+            "CREATE INDEX IF NOT EXISTS `index_fournisseur_paiements_planifies_fournisseurId_datePrevue` " +
+                "ON `fournisseur_paiements_planifies` (`fournisseurId`, `datePrevue`)",
+            "CREATE INDEX IF NOT EXISTS `index_fournisseur_paiements_planifies_statut_datePrevue` " +
+                "ON `fournisseur_paiements_planifies` (`statut`, `datePrevue`)",
+        )
+
+
+        /** Toutes les migrations, dans l'ordre : `DatabaseModule` les enregistre telles quelles. */
+        val ALL_MIGRATIONS: Array<Migration> = arrayOf(
+            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+            MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
+            MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17,
+            MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22,
+            MIGRATION_22_23, MIGRATION_23_24,
+        )
     }
 }

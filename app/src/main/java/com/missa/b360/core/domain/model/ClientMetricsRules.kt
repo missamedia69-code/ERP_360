@@ -17,6 +17,17 @@ data class ClientLedgerMetrics(
     val overdueCount: Int = 0,
     val dueSoonCount: Int = 0,
     val lastSaleAt: Long? = null,
+    /** Retard de la plus ancienne échéance impayée, en jours entiers (0 si rien n'est échu). */
+    val joursRetardMax: Int = 0,
+)
+
+/** Facture encore ouverte après rapprochement des avoirs et des règlements. */
+data class ClientOpenInvoice(
+    val recordId: Long?,
+    val issuedAt: Long,
+    val dueAt: Long,
+    val total: Double,
+    val outstanding: Double,
 )
 
 /** Calcul pur du tableau Clients : les avoirs sont d'abord rapprochés de leur facture source. */
@@ -30,11 +41,17 @@ object ClientMetricsRules {
         var outstanding: Double,
     )
 
-    fun calculate(items: List<ClientLedgerItem>, paymentDays: Int, now: Long): ClientLedgerMetrics {
-        val valid = items.filter {
-            it.total.isFinite() && it.total >= 0.0 && it.paid.isFinite() && it.paid >= 0.0 &&
-                it.paid <= it.total + EPSILON
-        }
+    internal fun valides(items: List<ClientLedgerItem>): List<ClientLedgerItem> = items.filter {
+        it.total.isFinite() && it.total >= 0.0 && it.paid.isFinite() && it.paid >= 0.0 &&
+            it.paid <= it.total + EPSILON
+    }
+
+    /**
+     * Factures encore ouvertes, triées par échéance, après rapprochement des avoirs.
+     * Source unique de l'encours, des retards et de la balance âgée.
+     */
+    fun openInvoices(items: List<ClientLedgerItem>, paymentDays: Int): List<ClientOpenInvoice> {
+        val valid = valides(items)
         val jours = paymentDays.coerceIn(0, 365)
         val invoices = valid.filterNot { it.creditNote }
             .map { item ->
@@ -68,7 +85,20 @@ object ClientMetricsRules {
             }
         }
 
-        val openInvoices = invoices.filter { it.outstanding > EPSILON }
+        return invoices.filter { it.outstanding > EPSILON }.map {
+            ClientOpenInvoice(
+                recordId = it.item.recordId,
+                issuedAt = it.item.issuedAt,
+                dueAt = it.dueAt,
+                total = it.item.total,
+                outstanding = it.outstanding,
+            )
+        }
+    }
+
+    fun calculate(items: List<ClientLedgerItem>, paymentDays: Int, now: Long): ClientLedgerMetrics {
+        val valid = valides(items)
+        val openInvoices = openInvoices(items, paymentDays)
         val overdue = openInvoices.filter { it.dueAt < now }
         val dueSoon = openInvoices.count { it.dueAt >= now && it.dueAt <= now + 7L * DAY_MS }
         return ClientLedgerMetrics(
@@ -78,6 +108,7 @@ object ClientMetricsRules {
             overdueCount = overdue.size,
             dueSoonCount = dueSoon,
             lastSaleAt = valid.filterNot { it.creditNote }.maxOfOrNull { it.issuedAt },
+            joursRetardMax = overdue.maxOfOrNull { AgedBalanceRules.joursDeRetard(it.dueAt, now) } ?: 0,
         )
     }
 }

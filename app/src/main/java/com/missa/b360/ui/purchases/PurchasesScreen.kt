@@ -1,5 +1,7 @@
 package com.missa.b360.ui.purchases
 
+import com.missa.b360.ui.components.MissaCarteSection
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -32,7 +34,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -188,6 +190,16 @@ fun PurchasesScreen(onBack: () -> Unit, openCreate: Boolean = false, openPending
         } else {
             pieceARegler = null
         }
+    }
+
+    // --- Garde de paiement : confirmation explicite d'un règlement signalé ---
+    val reglementAConfirmer by vm.reglementAConfirmer.collectAsStateWithLifecycle()
+    reglementAConfirmer?.let { attente ->
+        DialogueConfirmationPaiement(
+            motif = attente.motif,
+            onConfirmer = { vm.confirmerReglement() },
+            onAnnuler = { vm.annulerConfirmationReglement() },
+        )
     }
 
     // --- Annulation avec confirmation explicite ---
@@ -431,6 +443,7 @@ private fun messageAction(resultat: PurchasesViewModel.ActionAchatResult): Strin
     PurchasesViewModel.ActionAchatResult.ModuleStockInactif -> stringResource(R.string.ach_erreur_module_stock_inactif)
     PurchasesViewModel.ActionAchatResult.SiteIntrouvable -> stringResource(R.string.ach_erreur_site_introuvable)
     PurchasesViewModel.ActionAchatResult.PaiementBloque -> stringResource(R.string.ach_erreur_paiement_bloque)
+    is PurchasesViewModel.ActionAchatResult.PaiementRefuse -> stringResource(resultat.motif.messageRes())
     PurchasesViewModel.ActionAchatResult.LectureSeule -> stringResource(R.string.ach_erreur_lecture_seule)
     PurchasesViewModel.ActionAchatResult.Erreur -> stringResource(R.string.ach_erreur)
 }
@@ -470,8 +483,7 @@ private fun CartePiece(
     }
     Surface(
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -679,8 +691,7 @@ private fun BlocCatalogue(
     filtres.take(30).forEach { produit ->
         Surface(
             shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, MissaBorder),
+            color = OnbConfigCard,
             modifier = Modifier.fillMaxWidth().clickable { onAjouter(produit) },
         ) {
             Row(
@@ -822,6 +833,14 @@ private fun FormulaireAchat(
         }
     }
 
+    (resultat as? PurchasesViewModel.SaveResult.ConfirmationPaiement)?.let { confirmation ->
+        DialogueConfirmationPaiement(
+            motif = confirmation.motif,
+            onConfirmer = { vm.save(modePaiement, draft = false, confirmePaiement = true) },
+            onAnnuler = { vm.clearSaveResult() },
+        )
+    }
+
     val total = vm.total()
     val tauxApplique = ui.taxTaux ?: tauxDefaut
     val tva = if (tauxApplique == 0.0) 0.0 else total * tauxApplique / (100.0 + tauxApplique)
@@ -851,157 +870,160 @@ private fun FormulaireAchat(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
-            // Rattachement : la facture sur réception ne regénère aucun stock.
-            if (ui.receptionReference != null) {
-                item {
-                    Surface(shape = RoundedCornerShape(12.dp), color = Color(0xFFDCFCE7)) {
-                        Text(
-                            stringResource(R.string.ach_facture_sur_reception) + " — " + ui.receptionReference,
-                            fontSize = 11.sp,
-                            color = MissaInk,
-                            modifier = Modifier.padding(7.dp),
-                        )
-                    }
-                }
-            }
-            item { MissaFormSectionTitre(stringResource(R.string.ach_fournisseur), numero = 1) }
+                        // Rattachement : la facture sur réception ne regénère aucun stock.
+                        if (ui.receptionReference != null) {
+                            item {
+                                Surface(shape = RoundedCornerShape(12.dp), color = Color(0xFFDCFCE7)) {
+                                    Text(
+                                        stringResource(R.string.ach_facture_sur_reception) + " — " + ui.receptionReference,
+                                        fontSize = 11.sp,
+                                        color = MissaInk,
+                                        modifier = Modifier.padding(7.dp),
+                                    )
+                                }
+                            }
+                        }
             item {
-                Selecteur(
-                    libelle = stringResource(R.string.ach_fournisseur),
-                    icone = Iv.Handshake,
-                    requis = true,
-                    valeur = ui.supplier?.nom,
-                    options = fournisseurs.map { it.nom },
-                    onChoix = { index -> vm.selectSupplier(fournisseurs[index]) },
-                    onNouveau = { dialogueNouveauFournisseur = true },
-                    nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
-                )
-            }
-            if (fournisseurs.isEmpty()) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = JauneAchats.copy(alpha = 0.26f),
-                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.ach_aucun_fournisseur),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    color = MissaInk,
-                                )
-                                Text(
-                                    stringResource(R.string.ach_creer_fournisseur_invite),
-                                    fontSize = 10.sp,
-                                    color = MissaInk.copy(alpha = 0.8f),
-                                )
-                            }
-                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
-                        }
-                    }
-                }
-            }
-
-            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
-            item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProduct) }
-
-            if (ui.lines.isNotEmpty()) {
-                item {
-                    Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                }
-            }
-            items(ui.lines, key = { "ligne-${it.id}" }) { ligne ->
-                LignePanier(
-                    ligne = ligne,
-                    liaison = ligne.productId?.let { itemsFournisseur[it] },
-                    devise = devise,
-                    ouvert = ligneOuverte == ligne.id,
-                    onToggle = { ligneOuverte = if (ligneOuverte == ligne.id) null else ligne.id },
-                    onQuantite = { delta -> vm.changeQuantity(ligne.id, delta) },
-                    onPrix = { prix -> vm.updateLine(ligne.id, ligne.quantity, prix) },
-                    onSupprimer = { vm.removeLine(ligne.id) },
-                    onTrace = { lot, serie, peremption -> vm.updateLineTrace(ligne.id, lot, serie, peremption) },
-                )
-            }
-
-            if (ui.lines.isNotEmpty()) {
-                item { MissaFormSectionTitre(stringResource(R.string.form_section_paiement), numero = 3) }
-                // --- TVA : taux choisi par facture ---
-                item {
-                    val optionsTaxe = taxes.map { "${it.nom} (${it.taux} %)" }
-                    val libelleActuel = ui.taxTaux
-                        ?.let { taux -> "${stringResource(R.string.ach_tva)} $taux %" }
-                        ?: "${stringResource(R.string.ach_taux_defaut)} ($tauxDefaut %)"
+                MissaCarteSection(titre = stringResource(R.string.ach_fournisseur), numero = 1) {
                     Selecteur(
-                        libelle = stringResource(R.string.ach_tva),
-                        icone = Iv.Percent,
-                        valeur = libelleActuel,
-                        options = optionsTaxe,
-                        onChoix = { index -> vm.setTaxTaux(taxes[index].taux) },
+                        libelle = stringResource(R.string.ach_fournisseur),
+                        icone = Iv.Handshake,
+                        requis = true,
+                        valeur = ui.supplier?.nom,
+                        options = fournisseurs.map { it.nom },
+                        onChoix = { index -> vm.selectSupplier(fournisseurs[index]) },
+                        onNouveau = { dialogueNouveauFournisseur = true },
+                        nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
                     )
-                }
-                // --- Pièces jointes ---
-                item {
-                    Text(
-                        stringResource(R.string.ach_pieces_jointes),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MissaInk,
-                    )
-                }
-                item {
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        OutlinedButton(
-                            onClick = {
-                                pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                            },
+
+                    if (fournisseurs.isEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = JauneAchats.copy(alpha = 0.26f),
+                            modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
                         ) {
-                            Icon(painterResource(Iv.Image), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.ach_photo), color = MissaInk, fontSize = 12.sp)
-                        }
-                        OutlinedButton(onClick = { pickPdf.launch(arrayOf("application/pdf")) }) {
-                            Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.ach_pdf), color = MissaInk, fontSize = 12.sp)
-                        }
-                    }
-                }
-                items(ui.attachments, key = { it }) { chemin ->
-                    VignettePieceJointe(path = chemin, onSupprimer = { vm.removeAttachment(chemin) })
-                }
-                item {
-                    MissaChoixPaiement(
-                        moyens = modes,
-                        selection = modePaiement.ifBlank { null },
-                        onSelection = { modePaiement = it },
-                        libelle = stringResource(R.string.ach_mode_paiement),
-                    )
-                }
-                item {
-                    MissaRangee {
-                        MissaChampTexte(ui.paidInput, vm::updatePaid, stringResource(R.string.ach_montant_regle), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
-                        MissaChampTexte(ui.note, vm::updateNote, stringResource(R.string.ach_note), icone = Iv.Description, modifier = Modifier.weight(1f))
-                    }
-                }
-                item {
-                    Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                            LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
-                            if (tauxApplique > 0.0) {
-                                LigneSynthese(
-                                    stringResource(R.string.ach_tva_incluse, tauxApplique),
-                                    fmtValeur(tva, devise),
-                                )
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        stringResource(R.string.ach_aucun_fournisseur),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = MissaInk,
+                                    )
+                                    Text(
+                                        stringResource(R.string.ach_creer_fournisseur_invite),
+                                        fontSize = 10.sp,
+                                        color = MissaInk.copy(alpha = 0.8f),
+                                    )
+                                }
+                                Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                             }
                         }
+
+                    }
+                }
+            }
+            item {
+                MissaCarteSection(titre = stringResource(R.string.form_section_article), numero = 2) {
+                    BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProduct) 
+                    if (ui.lines.isNotEmpty()) {
+                        Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+
+                    }
+                    ui.lines.forEach { ligne ->
+                        androidx.compose.runtime.key("ligne-${ligne.id}") {
+                            LignePanier(
+                                ligne = ligne,
+                                liaison = ligne.productId?.let { itemsFournisseur[it] },
+                                devise = devise,
+                                ouvert = ligneOuverte == ligne.id,
+                                onToggle = { ligneOuverte = if (ligneOuverte == ligne.id) null else ligne.id },
+                                onQuantite = { delta -> vm.changeQuantity(ligne.id, delta) },
+                                onPrix = { prix -> vm.updateLine(ligne.id, ligne.quantity, prix) },
+                                onSupprimer = { vm.removeLine(ligne.id) },
+                                onTrace = { lot, serie, peremption -> vm.updateLineTrace(ligne.id, lot, serie, peremption) },
+                            )
+
+                        }
+                    }
+                }
+            }
+            if (ui.lines.isNotEmpty()) {
+                item {
+                    MissaCarteSection(titre = stringResource(R.string.form_section_paiement), numero = 3) {
+                        // --- TVA : taux choisi par facture ---
+                        val optionsTaxe = taxes.map { "${it.nom} (${it.taux} %)" }
+                        val libelleActuel = ui.taxTaux
+                            ?.let { taux -> "${stringResource(R.string.ach_tva)} $taux %" }
+                            ?: "${stringResource(R.string.ach_taux_defaut)} ($tauxDefaut %)"
+                        Selecteur(
+                            libelle = stringResource(R.string.ach_tva),
+                            icone = Iv.Percent,
+                            valeur = libelleActuel,
+                            options = optionsTaxe,
+                            onChoix = { index -> vm.setTaxTaux(taxes[index].taux) },
+                        )
+
+                        // --- Pièces jointes ---
+                        Text(
+                            stringResource(R.string.ach_pieces_jointes),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MissaInk,
+                        )
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            OutlinedButton(
+                                onClick = {
+                                    pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                },
+                            ) {
+                                Icon(painterResource(Iv.Image), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text(stringResource(R.string.ach_photo), color = MissaInk, fontSize = 12.sp)
+                            }
+                            OutlinedButton(onClick = { pickPdf.launch(arrayOf("application/pdf")) }) {
+                                Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text(stringResource(R.string.ach_pdf), color = MissaInk, fontSize = 12.sp)
+                            }
+                        }
+
+                        ui.attachments.forEach { chemin ->
+                            androidx.compose.runtime.key(chemin) {
+                                VignettePieceJointe(path = chemin, onSupprimer = { vm.removeAttachment(chemin) })
+
+                            }
+                        }
+                        MissaChoixPaiement(
+                            moyens = modes,
+                            selection = modePaiement.ifBlank { null },
+                            onSelection = { modePaiement = it },
+                            libelle = stringResource(R.string.ach_mode_paiement),
+                        )
+
+                        MissaRangee {
+                            MissaChampTexte(ui.paidInput, vm::updatePaid, stringResource(R.string.ach_montant_regle), icone = Iv.Payments, clavier = MissaClavier.DECIMAL, modifier = Modifier.weight(1f))
+                            MissaChampTexte(ui.note, vm::updateNote, stringResource(R.string.ach_note), icone = Iv.Description, modifier = Modifier.weight(1f))
+                        }
+
+                        Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                            Column(Modifier.fillMaxWidth().padding(8.dp)) {
+                                LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
+                                if (tauxApplique > 0.0) {
+                                    LigneSynthese(
+                                        stringResource(R.string.ach_tva_incluse, tauxApplique),
+                                        fmtValeur(tva, devise),
+                                    )
+                                }
+                            }
+                        }
+
                     }
                 }
             }
@@ -1015,7 +1037,7 @@ private fun FormulaireAchat(
             libelleDroite = stringResource(R.string.ach_valider),
             droiteActive = peutValider,
             onDroite = { vm.save(modePaiement, draft = false) },
-            erreur = when (resultat) {
+            erreur = when (val saisie = resultat) {
                 PurchasesViewModel.SaveResult.MissingSupplier -> stringResource(R.string.ach_erreur_fournisseur)
                 PurchasesViewModel.SaveResult.EmptyCart -> stringResource(R.string.ach_erreur_panier)
                 PurchasesViewModel.SaveResult.InvalidAmount -> stringResource(R.string.ach_erreur_montant)
@@ -1026,6 +1048,8 @@ private fun FormulaireAchat(
                 PurchasesViewModel.SaveResult.ReceptionRequise -> stringResource(R.string.ach_erreur_reception_requise)
                 PurchasesViewModel.SaveResult.ReadOnly -> stringResource(R.string.ach_erreur_lecture_seule)
                 PurchasesViewModel.SaveResult.Error -> stringResource(R.string.ach_erreur)
+                PurchasesViewModel.SaveResult.SoldeInsuffisant -> stringResource(R.string.tre_solde_insuffisant)
+                is PurchasesViewModel.SaveResult.PaiementRefuse -> stringResource(saisie.motif.messageRes())
                 else -> null
             },
         )
@@ -1057,7 +1081,7 @@ private fun VignettePieceJointe(path: String, onSupprimer: () -> Unit) {
     LaunchedEffect(path) {
         if (!PieceJointeAchat.estPdf(path)) bitmap = PieceJointeAchat.charger(path)
     }
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Row(Modifier.fillMaxWidth().padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
             if (PieceJointeAchat.estPdf(path)) {
                 Icon(painterResource(Iv.PictureAsPdf), null, tint = MissaInk, modifier = Modifier.size(24.dp))
@@ -1100,8 +1124,7 @@ private fun LignePanier(
 ) {
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1254,76 +1277,80 @@ private fun FormulaireCommande(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp),
         ) {
-            item { MissaFormSectionTitre(stringResource(R.string.ach_fournisseur), numero = 1) }
             item {
-                Selecteur(
-                    libelle = stringResource(R.string.ach_fournisseur),
-                    icone = Iv.Handshake,
-                    requis = true,
-                    valeur = ui.supplier?.nom,
-                    options = fournisseurs.map { it.nom },
-                    onChoix = { index -> vm.selectSupplierCommande(fournisseurs[index]) },
-                    onNouveau = { dialogueNouveauFournisseur = true },
-                    nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
-                )
-            }
-            if (fournisseurs.isEmpty()) {
-                item {
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = JauneAchats.copy(alpha = 0.26f),
-                        modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                MissaCarteSection(titre = stringResource(R.string.ach_fournisseur), numero = 1) {
+                    Selecteur(
+                        libelle = stringResource(R.string.ach_fournisseur),
+                        icone = Iv.Handshake,
+                        requis = true,
+                        valeur = ui.supplier?.nom,
+                        options = fournisseurs.map { it.nom },
+                        onChoix = { index -> vm.selectSupplierCommande(fournisseurs[index]) },
+                        onNouveau = { dialogueNouveauFournisseur = true },
+                        nouveauLibelle = stringResource(R.string.ach_nouveau_fournisseur_rapide),
+                    )
+
+                    if (fournisseurs.isEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = JauneAchats.copy(alpha = 0.26f),
+                            modifier = Modifier.fillMaxWidth().clickable { dialogueNouveauFournisseur = true },
                         ) {
-                            Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.ach_aucun_fournisseur),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp,
-                                    color = MissaInk,
-                                )
-                                Text(
-                                    stringResource(R.string.ach_creer_fournisseur_invite),
-                                    fontSize = 10.sp,
-                                    color = MissaInk.copy(alpha = 0.8f),
-                                )
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(painterResource(Iv.PersonAdd), null, tint = MissaInk, modifier = Modifier.size(20.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        stringResource(R.string.ach_aucun_fournisseur),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = MissaInk,
+                                    )
+                                    Text(
+                                        stringResource(R.string.ach_creer_fournisseur_invite),
+                                        fontSize = 10.sp,
+                                        color = MissaInk.copy(alpha = 0.8f),
+                                    )
+                                }
+                                Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                             }
-                            Icon(painterResource(Iv.Add), null, tint = MissaInk, modifier = Modifier.size(18.dp))
                         }
+
                     }
                 }
             }
-            item { MissaFormSectionTitre(stringResource(R.string.form_section_article), numero = 2) }
-            item { BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProductCommande) }
-            if (ui.lines.isNotEmpty()) {
-                item {
-                    Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
-                }
-            }
-            items(ui.lines, key = { "cmd-${it.id}" }) { ligne ->
-                LigneCommande(
-                    ligne = ligne,
-                    liaison = ligne.productId?.let { itemsFournisseur[it] },
-                    devise = devise,
-                    onQuantite = { delta -> vm.changeQuantityCommande(ligne.id, delta) },
-                    onPrix = { prix -> vm.updateLineCommande(ligne.id, ligne.quantity, prix) },
-                    onSupprimer = { vm.removeLineCommande(ligne.id) },
-                )
-            }
             item {
-                MissaChampTexte(ui.note, vm::updateNoteCommande, stringResource(R.string.ach_note), icone = Iv.Description)
-            }
-            if (ui.lines.isNotEmpty()) {
-                item {
-                    Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
-                        Column(Modifier.fillMaxWidth().padding(8.dp)) {
-                            LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
+                MissaCarteSection(titre = stringResource(R.string.form_section_article), numero = 2) {
+                    BlocCatalogue(produits = produits, devise = devise, onAjouter = vm::addCatalogProductCommande) 
+                    if (ui.lines.isNotEmpty()) {
+                        Text(stringResource(R.string.ach_panier), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MissaInk)
+
+                    }
+                    ui.lines.forEach { ligne ->
+                        androidx.compose.runtime.key("cmd-${ligne.id}") {
+                            LigneCommande(
+                                ligne = ligne,
+                                liaison = ligne.productId?.let { itemsFournisseur[it] },
+                                devise = devise,
+                                onQuantite = { delta -> vm.changeQuantityCommande(ligne.id, delta) },
+                                onPrix = { prix -> vm.updateLineCommande(ligne.id, ligne.quantity, prix) },
+                                onSupprimer = { vm.removeLineCommande(ligne.id) },
+                            )
+
                         }
+                    }
+                    MissaChampTexte(ui.note, vm::updateNoteCommande, stringResource(R.string.ach_note), icone = Iv.Description)
+
+                    if (ui.lines.isNotEmpty()) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = JauneAchats.copy(alpha = 0.26f)) {
+                            Column(Modifier.fillMaxWidth().padding(8.dp)) {
+                                LigneSynthese(stringResource(R.string.ach_total), fmtValeur(total, devise))
+                            }
+                        }
+
                     }
                 }
             }
@@ -1378,7 +1405,7 @@ private fun LigneCommande(
     onPrix: (Double) -> Unit,
     onSupprimer: () -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ligne.name, fontSize = 13.sp, color = MissaInk, modifier = Modifier.weight(1f))
@@ -1506,7 +1533,7 @@ private fun LigneReception(
     onToggle: () -> Unit,
     onMaj: (quantite: Double, lot: String, serie: String, peremption: Long?) -> Unit,
 ) {
-    Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+    Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -1686,7 +1713,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
                 }
             }
             items(top, key = { it.nom }) { ligne ->
-                Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
                     Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(ligne.nom, fontSize = 12.sp, color = MissaInk, modifier = Modifier.weight(1f))
                         Text(
@@ -1708,7 +1735,7 @@ private fun EcranReporting(vm: PurchasesViewModel, onBack: () -> Unit) {
                 )
             }
             item {
-                Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, MissaBorder)) {
+                Surface(shape = RoundedCornerShape(12.dp), color = OnbConfigCard) {
                     Column(Modifier.fillMaxWidth().padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         mois.forEach { point ->
                             Row(verticalAlignment = Alignment.CenterVertically) {

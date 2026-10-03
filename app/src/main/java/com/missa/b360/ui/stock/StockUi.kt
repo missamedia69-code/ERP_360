@@ -1,5 +1,6 @@
 package com.missa.b360.ui.stock
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -163,8 +164,7 @@ fun CarteStock(
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         shape = RoundedCornerShape(14.dp),
-        color = MissaSurface,
-        border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.6f)),
+        color = OnbConfigCard,
     ) {
         Column(modifier = Modifier.padding(10.dp), content = content)
     }
@@ -210,8 +210,7 @@ fun StatTile(
     Surface(
         modifier = modifier.then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         shape = RoundedCornerShape(12.dp),
-        color = MissaSurface,
-        border = BorderStroke(1.dp, MissaBorder.copy(alpha = 0.6f)),
+        color = OnbConfigCard,
     ) {
         Row(
             modifier = Modifier.padding(8.dp),
@@ -260,7 +259,8 @@ fun StockSearchField(valeur: String, onValeur: (String) -> Unit, placeholderRes:
         placeholder = { Text(stringResource(placeholderRes), fontSize = 12.sp, color = MissaMuted) },
         leadingIcon = { Icon(painterResource(StockIv.Search), null, tint = MissaMuted, modifier = Modifier.size(18.dp)) },
         singleLine = true,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
+        colors = com.missa.b360.ui.components.missaChampCouleurs(),
     )
 }
 

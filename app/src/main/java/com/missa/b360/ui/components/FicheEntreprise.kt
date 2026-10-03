@@ -21,11 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.core.content.FileProvider
 import com.missa.b360.core.util.FicheEntreprisePdf
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
+import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

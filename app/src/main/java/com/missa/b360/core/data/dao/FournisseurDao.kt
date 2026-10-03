@@ -44,6 +44,9 @@ interface FournisseurDao {
     @Query("SELECT * FROM fournisseurs WHERE id = :id")
     suspend fun getById(id: Long): FournisseurEntity?
 
+    @Query("SELECT * FROM fournisseurs")
+    suspend fun getAll(): List<FournisseurEntity>
+
     @Query("SELECT * FROM fournisseurs WHERE code = :code LIMIT 1")
     suspend fun getByCode(code: String): FournisseurEntity?
 
@@ -104,6 +107,13 @@ interface FournisseurContactDao {
     @Query("UPDATE fournisseur_contacts SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerRôlePrincipal(fournisseurId: Long)
 
+    /** Fournisseurs qui ont un contact principal actif et joignable (même règle que [compterPrincipauxContactablesActifs]). */
+    @Query(
+        "SELECT DISTINCT fournisseurId FROM fournisseur_contacts WHERE actif = 1 AND principal = 1 AND TRIM(nom) != '' " +
+            "AND ((telephone IS NOT NULL AND TRIM(telephone) != '') OR (email IS NOT NULL AND TRIM(email) != ''))",
+    )
+    fun observeFournisseursAvecContactPrincipal(): Flow<List<Long>>
+
     @Query("SELECT COUNT(*) FROM fournisseur_contacts WHERE fournisseurId = :fournisseurId AND actif = 1")
     suspend fun compterActifs(fournisseurId: Long): Int
 
@@ -130,8 +140,14 @@ interface FournisseurCompteBancaireDao {
     @Update
     suspend fun update(compte: FournisseurCompteBancaireEntity)
 
+    @Query("SELECT * FROM fournisseur_comptes_bancaires")
+    fun observeTous(): Flow<List<FournisseurCompteBancaireEntity>>
+
     @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE id = :id")
     suspend fun getById(id: Long): FournisseurCompteBancaireEntity?
+
+    @Query("SELECT * FROM fournisseur_comptes_bancaires WHERE fournisseurId = :fournisseurId")
+    suspend fun listeParFournisseur(fournisseurId: Long): List<FournisseurCompteBancaireEntity>
 
     @Query("UPDATE fournisseur_comptes_bancaires SET principal = 0 WHERE fournisseurId = :fournisseurId")
     suspend fun retirerComptePrincipal(fournisseurId: Long)
@@ -143,13 +159,17 @@ interface FournisseurCompteBancaireDao {
 /** Documents de conformité — échéances suivies pour les alertes d'expiration. */
 @Dao
 interface FournisseurDocumentDao {
-    @Query("SELECT * FROM fournisseur_documents WHERE fournisseurId = :fournisseurId ORDER BY dateExpiration IS NULL, dateExpiration")
+    @Query("SELECT * FROM fournisseur_documents WHERE fournisseurId = :fournisseurId AND archive = 0 ORDER BY dateExpiration IS NULL, dateExpiration")
     fun observeParFournisseur(fournisseurId: Long): Flow<List<FournisseurDocumentEntity>>
+
+    /** Tous les documents non archivés, tous fournisseurs confondus (aptitude du portefeuille). */
+    @Query("SELECT * FROM fournisseur_documents WHERE archive = 0")
+    fun observeTousActifs(): Flow<List<FournisseurDocumentEntity>>
 
     /** Documents expirant avant :horizon (ms) ou déjà expirés — pour le hub « À traiter ». */
     @Query(
         "SELECT d.* FROM fournisseur_documents d INNER JOIN fournisseurs f ON f.id = d.fournisseurId " +
-            "WHERE d.dateExpiration IS NOT NULL AND d.dateExpiration <= :horizon AND f.statut NOT IN ('ARCHIVE', 'BLOQUE') " +
+            "WHERE d.archive = 0 AND d.dateExpiration IS NOT NULL AND d.dateExpiration <= :horizon AND f.statut NOT IN ('ARCHIVE', 'BLOQUE') " +
             "ORDER BY d.dateExpiration",
     )
     fun observeExpirants(horizon: Long): Flow<List<FournisseurDocumentEntity>>
@@ -163,9 +183,9 @@ interface FournisseurDocumentDao {
     @Query("SELECT * FROM fournisseur_documents WHERE id = :id")
     suspend fun getById(id: Long): FournisseurDocumentEntity?
 
-    /** Seule exception à C7 : un document joint peut être retiré — l'audit garde la trace. */
-    @Query("DELETE FROM fournisseur_documents WHERE id = :id")
-    suspend fun deleteById(id: Long): Int
+    /** Retrait = archivage : la ligne reste en base (C7, jamais de DELETE) mais n'est plus affichée. */
+    @Query("UPDATE fournisseur_documents SET archive = 1 WHERE id = :id AND archive = 0")
+    suspend fun archiver(id: Long): Int
 }
 
 /** Liaison fournisseur ↔ article : prix, délai, quantité minimum, préféré. */
@@ -175,6 +195,10 @@ interface FournisseurItemDao {
         "SELECT * FROM fournisseur_items WHERE fournisseurId = :fournisseurId AND actif = 1 ORDER BY reference",
     )
     fun observeParFournisseur(fournisseurId: Long): Flow<List<FournisseurItemEntity>>
+
+    /** Toutes les liaisons actives, tous fournisseurs confondus (comparateur). */
+    @Query("SELECT * FROM fournisseur_items WHERE actif = 1")
+    fun observeActifs(): Flow<List<FournisseurItemEntity>>
 
     @Query("SELECT * FROM fournisseur_items WHERE fournisseurId = :fournisseurId AND productId = :productId AND actif = 1 LIMIT 1")
     suspend fun getLiaison(fournisseurId: Long, productId: Long): FournisseurItemEntity?

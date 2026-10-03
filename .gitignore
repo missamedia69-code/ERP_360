@@ -37,3 +37,7 @@ local.properties
 
 # Outillage local (génération d'icônes, scripts d'audit) — hors dépôt par défaut
 /tools/
+
+# Outillage d'assistants IA — hors dépôt
+/.claude/
+/CLAUDE.md

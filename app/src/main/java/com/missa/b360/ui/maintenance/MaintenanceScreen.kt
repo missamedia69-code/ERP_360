@@ -1,5 +1,6 @@
 package com.missa.b360.ui.maintenance
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,14 +19,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
+import com.missa.b360.ui.components.BoutonContourMissa as OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -215,8 +216,7 @@ private fun CarteEquipement(
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

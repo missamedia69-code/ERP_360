@@ -2,7 +2,7 @@ package com.missa.b360.ui.stock
 
 import androidx.compose.material3.ButtonDefaults
 
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 
 import com.missa.b360.ui.navigation.AppModule
 
@@ -97,7 +97,8 @@ fun StockEquipementsScreen(onBack: () -> Unit, onNavigate: (String) -> Unit = {}
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(10.dp),
+        colors = com.missa.b360.ui.components.missaChampCouleurs(),
             )
             Spacer(Modifier.height(7.dp))
             Row(

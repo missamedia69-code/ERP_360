@@ -1,6 +1,7 @@
 package com.missa.b360.ui.home
 
 import com.missa.b360.core.data.entity.OperationModule
+import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.navigation.Routes
 
@@ -35,7 +36,7 @@ internal object HomeNavigation {
     }
 
     fun rappel(rappel: Rappel): String = when (rappel) {
-        Rappel.FACTURES_EN_RETARD -> "${AppModule.VENTE.route}?overdue=true"
+        Rappel.FACTURES_EN_RETARD -> ClientRoutes.RELANCES
         Rappel.COMMANDES_FOURNISSEUR -> "${AppModule.ACHATS.route}?pending=true"
         Rappel.RUPTURES_STOCK -> Routes.STOCK_ALERTES
         Rappel.NON_CONFORMITES -> AppModule.QUALITE.route

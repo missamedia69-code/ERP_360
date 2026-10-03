@@ -2,7 +2,11 @@ package com.missa.b360.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.semantics.Role
+import com.missa.b360.ui.theme.MissaMuted
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -56,7 +60,7 @@ fun MissaBarreModules(
     val racine = routeCourante?.substringBefore('?')
     val moduleCourant = when {
         racine == AppModule.STOCK.route || racine?.startsWith("stock") == true -> AppModule.STOCK
-        racine == AppModule.CLIENTS.route || racine?.startsWith("clients") == true -> AppModule.CLIENTS
+        racine == AppModule.CLIENTS.route || racine?.startsWith("module_clients") == true -> AppModule.CLIENTS
         else -> AppModule.entries.firstOrNull { it.route == racine }
     }
     val visibles = modules.take(AppModule.MAX_ONGLETS)
@@ -96,7 +100,7 @@ fun MissaBarreModules(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(58.dp)
+                    .height(if (moduleCourant == AppModule.CLIENTS) 64.dp else 58.dp)
                     .padding(horizontal = 7.dp, vertical = 6.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +109,8 @@ fun MissaBarreModules(
                     BarreOnglet(
                         element = element,
                         actif = index == indexActif,
-                        modifier = if (index == indexActif) Modifier.weight(1.55f) else Modifier.weight(1f),
+                        couleurActive = if (moduleCourant == AppModule.CLIENTS) Color(0xFF7C3AED) else null,
+                        modifier = if (index == indexActif && moduleCourant != AppModule.CLIENTS) Modifier.weight(1.55f) else Modifier.weight(1f),
                     )
                 }
             }
@@ -124,8 +129,37 @@ private fun BarreOnglet(
     element: BarreElement,
     actif: Boolean,
     modifier: Modifier = Modifier,
+    couleurActive: Color? = null,
 ) {
     val forme = RoundedCornerShape(16.dp)
+    if (couleurActive != null) {
+        // Variante Clients (maquette) : icône au-dessus du libellé pour tous les onglets, pastille violette pour l'actif.
+        Column(
+            modifier = modifier
+                .height(52.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(if (actif) couleurActive else Color.Transparent)
+                .clickable(role = Role.Tab, onClick = element.onClick),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(3.dp, Alignment.CenterVertically),
+        ) {
+            Icon(
+                painter = painterResource(element.icone),
+                contentDescription = null,
+                tint = if (actif) Color.White else MissaMuted,
+                modifier = Modifier.size(22.dp),
+            )
+            Text(
+                text = stringResource(element.libelle),
+                color = if (actif) Color.White else MissaMuted,
+                fontSize = 10.sp,
+                fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        return
+    }
     Box(
         modifier = modifier
             .height(46.dp)
@@ -148,7 +182,7 @@ private fun BarreOnglet(
             horizontalArrangement = Arrangement.Center,
         ) {
             Surface(
-                color = if (actif) MissaInk else Color.Transparent,
+                color = if (actif) (couleurActive ?: MissaInk) else Color.Transparent,
                 shape = forme,
             ) {
                 Row(
@@ -161,14 +195,14 @@ private fun BarreOnglet(
                     Icon(
                         painter = painterResource(element.icone),
                         contentDescription = stringResource(element.libelle),
-                        tint = if (actif) Color.White else MissaInk,
+                        tint = if (actif) (if (couleurActive != null) MissaInk else Color.White) else MissaInk,
                         modifier = Modifier.size(22.dp),
                     )
                     if (actif) {
                         Spacer(Modifier.width(7.dp))
                         Text(
                             text = stringResource(element.libelle),
-                            color = Color.White,
+                            color = if (couleurActive != null) MissaInk else Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,

@@ -87,9 +87,11 @@ class SettingsStore @Inject constructor(
 
     suspend fun getLong(key: String): Long? {
         val prefs = context.dataStore.data.first()
-        // Nouveau format typé Long + fallback ancien format String pour migration
-        prefs[longPreferencesKey(key)]?.let { return it }
-        return prefs[stringPreferencesKey(key)]?.toLongOrNull()
+        // Une même clé peut être stockée en Long (nouveau format) ou en String (ancien format) :
+        // `prefs[longPreferencesKey(key)]` lève ClassCastException si la valeur est une String
+        // (c'est le cas de CURRENT_USER_ID, écrit par `set`). On lit donc la valeur brute par son nom.
+        val brut = prefs.asMap().entries.firstOrNull { it.key.name == key }?.value
+        return longDepuisValeurBrute(brut)
     }
 
     suspend fun set(key: String, value: String) = write(key, value)
@@ -154,6 +156,15 @@ class SettingsStore @Inject constructor(
             }
         } else {
             setLong(Keys.PIN_LOCK_UNTIL, timestamp)
+        }
+    }
+
+    companion object {
+        /** Long stocké tel quel, ou String numérique de l'ancien format ; sinon null. */
+        internal fun longDepuisValeurBrute(valeur: Any?): Long? = when (valeur) {
+            is Long -> valeur
+            is String -> valeur.trim().toLongOrNull()
+            else -> null
         }
     }
 

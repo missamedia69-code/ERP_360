@@ -1,5 +1,6 @@
 package com.missa.b360.ui.crm
 
+import com.missa.b360.ui.theme.OnbConfigCard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import com.missa.b360.ui.components.BoutonMissa as Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -39,6 +40,7 @@ import com.missa.b360.core.domain.model.SegmentClient
 import com.missa.b360.ui.components.MissaEmptyState
 import com.missa.b360.ui.components.MissaTopAppBar
 import com.missa.b360.ui.icons.Iv
+import com.missa.b360.ui.clients.ClientRoutes
 import com.missa.b360.ui.navigation.AppModule
 import com.missa.b360.ui.stock.fmtValeur
 import com.missa.b360.ui.theme.MissaBorder
@@ -215,7 +217,7 @@ fun CrmScreen(
                     CarteFicheCrm(
                         fiche = fiche,
                         devise = devise,
-                        onConsulter = { onNaviguer(AppModule.CLIENTS.route) },
+                        onConsulter = { onNaviguer(ClientRoutes.fiche(fiche.client.id)) },
                     )
                 }
             }
@@ -277,8 +279,7 @@ private fun CarteFicheCrm(
 
     Surface(
         shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, MissaBorder),
+        color = OnbConfigCard,
     ) {
         Column(Modifier.fillMaxWidth().padding(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

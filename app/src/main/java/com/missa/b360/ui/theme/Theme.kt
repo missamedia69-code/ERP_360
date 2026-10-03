@@ -32,6 +32,15 @@ private val LightColors = lightColorScheme(
     onSurfaceVariant = MissaMuted,
     outline = MissaBorder,
     outlineVariant = MissaBorder,
+    // Modèle de design par défaut (écran « Informations sur votre entreprise ») : fenêtres, menus et
+    // feuilles blancs ; toute carte Material sans couleur explicite est grise, sans teinte.
+    surfaceTint = White,
+    surfaceBright = White,
+    surfaceContainerLowest = White,
+    surfaceContainerLow = White,
+    surfaceContainer = White,
+    surfaceContainerHigh = White,
+    surfaceContainerHighest = OnbConfigCard,
 )
 
 private val DarkColors = darkColorScheme(
