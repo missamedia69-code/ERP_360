@@ -1,5 +1,6 @@
 package com.missa.b360.core.data.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -58,6 +59,7 @@ enum class FournisseurEvenementType {
     REACTIVATION,
     ARCHIVAGE,
     COMPTE_AJOUTE,
+    COMPTE_MODIFIE,
     COMPTE_VERIFIE,
     COMPTE_REJETE,
     DOCUMENT_AJOUTE,
@@ -186,6 +188,11 @@ data class FournisseurCompteBancaireEntity(
     val verification: VerificationStatut = VerificationStatut.A_VERIFIER,
     val verifieLe: Long? = null,
     val notes: String? = null,
+    /**
+     * Dernière modification des coordonnées (titulaire, IBAN, numéro de compte, numéro mobile) :
+     * un compte récemment modifié et non vérifié ne reçoit pas de paiement. 0 = inconnue.
+     */
+    @ColumnInfo(defaultValue = "0") val modifieLe: Long = 0,
 )
 
 /** Document de conformité (spec §6.9) — échéance suivie : J-90 / J-30 / J-7 / expiré. */
@@ -204,6 +211,8 @@ data class FournisseurDocumentEntity(
     val dateExpiration: Long? = null,
     val verification: VerificationStatut = VerificationStatut.A_VERIFIER,
     val notes: String? = null,
+    /** Document retiré : archivé (jamais supprimé), il reste en base et dans l'audit. */
+    @ColumnInfo(defaultValue = "0") val archive: Boolean = false,
 )
 
 /**

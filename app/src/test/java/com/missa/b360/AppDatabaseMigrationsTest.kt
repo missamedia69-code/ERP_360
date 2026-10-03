@@ -9,9 +9,9 @@ import org.junit.Test
 
 class AppDatabaseMigrationsTest {
 
-    @Test fun `la chaine de migrations est contigue de la version 1 a la version 23`() {
+    @Test fun `la chaine de migrations est contigue de la version 1 a la version 24`() {
         val migrations = AppDatabase.ALL_MIGRATIONS
-        assertEquals(22, migrations.size)
+        assertEquals(23, migrations.size)
         migrations.forEachIndexed { index, migration ->
             assertEquals("début de la migration n°${index + 1}", index + 1, migration.startVersion)
             assertEquals("fin de la migration n°${index + 1}", index + 2, migration.endVersion)

@@ -35,7 +35,7 @@ import com.missa.b360.core.domain.usecase.ObserveProductsUseCase
 import com.missa.b360.core.data.entity.ProductEntity
 import com.missa.b360.core.domain.usecase.ScannerDocumentsExpirantsUseCase
 import com.missa.b360.core.domain.usecase.SoumettreFournisseurUseCase
-import com.missa.b360.core.domain.usecase.SupprimerDocumentFournisseurUseCase
+import com.missa.b360.core.domain.usecase.ArchiverDocumentFournisseurUseCase
 import com.missa.b360.core.domain.usecase.UpdateFournisseurUseCase
 import com.missa.b360.core.domain.usecase.VerifierCompteBancaireUseCase
 import com.missa.b360.core.util.Iso4217
@@ -166,7 +166,7 @@ class FournisseursViewModel @Inject constructor(
     private val ajouterCompte: AjouterCompteBancaireUseCase,
     private val verifierCompteUseCase: VerifierCompteBancaireUseCase,
     private val ajouterDocument: AjouterDocumentFournisseurUseCase,
-    private val supprimerDocument: SupprimerDocumentFournisseurUseCase,
+    private val archiverDocument: ArchiverDocumentFournisseurUseCase,
     private val lierArticle: LierArticleFournisseurUseCase,
     private val delierArticle: DelierArticleFournisseurUseCase,
     private val evaluerFournisseur: EvaluerFournisseurUseCase,
@@ -702,9 +702,9 @@ class FournisseursViewModel @Inject constructor(
         }
     }
 
-    fun supprimerDocumentFiche(documentId: Long) {
+    fun archiverDocumentFiche(documentId: Long) {
         viewModelScope.launch {
-            _message.value = if (supprimerDocument(documentId)) {
+            _message.value = if (archiverDocument(documentId)) {
                 "msg_document_retire"
             } else {
                 "err_document_retire"

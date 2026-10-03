@@ -68,6 +68,7 @@ class SavePurchaseUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val fournisseurCache: FournisseurCacheUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -338,6 +339,7 @@ class SavePurchaseUseCase @Inject constructor(
                     "${payload.paidAmount}, passif $passif, réceptions ${receptions.size}, " +
                     "imputations directes $imputationsDirectes)",
             )
+            fournisseurCache.rafraichir(payload.supplierId, now)
             Result.Succes(recordIdFinal, reference)
             }
         } catch (refusee: TransactionRefusee) {

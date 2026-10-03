@@ -143,13 +143,24 @@ object FournisseurAchatMetrics {
         )
     }
 
+    /** Factures validées (toutes, ouvertes ou soldées) d'un fournisseur, avec leur pièce. */
+    fun facturesDuFournisseur(
+        pieces: List<OperationRecordEntity>,
+        fournisseurId: Long,
+    ): List<Pair<OperationRecordEntity, PurchaseRecordPayload>> =
+        piecesAchatsValidees(pieces).mapNotNull { piece ->
+            val facture = PurchaseRecordCodec.decode(piece.notes) ?: return@mapNotNull null
+            if (facture.supplierId != fournisseurId) null else piece to facture
+        }
+
     fun soldeTotal(pieces: List<OperationRecordEntity>): Double =
         piecesAchatsValidees(pieces).sumOf { piece ->
             val facture = PurchaseRecordCodec.decode(piece.notes) ?: return@sumOf 0.0
             resteDu(facture)
         }
 
-    fun commandesOuvertes(pieces: List<OperationRecordEntity>): Int {
+    /** Commandes validées pas encore soldées par des réceptions ; [fournisseurId] filtre sur un fournisseur. */
+    fun commandesOuvertes(pieces: List<OperationRecordEntity>, fournisseurId: Long? = null): Int {
         val validees = piecesAchatsValidees(pieces)
         val receptionsParCommande = validees.mapNotNull { piece ->
             val reception = ReceptionCodec.decode(piece.notes) ?: return@mapNotNull null
@@ -160,6 +171,7 @@ object FournisseurAchatMetrics {
         return validees.count { piece ->
             if (nature(piece) != PieceAchatNature.COMMANDE) return@count false
             val commande = CommandeAchatCodec.decode(piece.notes) ?: return@count false
+            if (fournisseurId != null && commande.supplierId != fournisseurId) return@count false
             val commandees = commande.lines
                 .filter { it.productId != null && it.quantity > 0.0 && it.quantity.isFinite() }
                 .groupBy { it.productId!! }

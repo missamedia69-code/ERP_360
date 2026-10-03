@@ -1079,7 +1079,7 @@ private fun FicheFournisseurEcran(
                         Text(stringResource(R.string.four_aucun_document), fontSize = 11.sp, color = MissaMuted)
                     }
                     fiche.documents.forEach { document ->
-                        LigneDocument(document = document, onSupprimer = { vm.supprimerDocumentFiche(document.id) })
+                        LigneDocument(document = document, onSupprimer = { vm.archiverDocumentFiche(document.id) })
                     }
                 }
             }

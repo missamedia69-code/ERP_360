@@ -59,6 +59,8 @@ class SaveCommandeAchatUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val database: AppDatabase,
+    private val fournisseurCache: FournisseurCacheUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -114,7 +116,8 @@ class SaveCommandeAchatUseCase @Inject constructor(
 
         val statut = if (draft) OperationStatus.DRAFT.name else OperationStatus.VALIDATED.name
         val total = payload.lines.sumOf { it.total }.coerceAtLeast(0.0)
-        return when (val id = recordId) {
+        return database.withTransaction {
+        when (val id = recordId) {
             null -> {
                 val reference = sequenceManager.next(DocType.BON_COMMANDE)
                 val newId = operationDao.insert(
@@ -134,6 +137,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
                     if (draft) "BROUILLON_COMMANDE" else "COMMANDE_VALIDEE",
                     "Commande $reference — ${payload.supplierName} ($total)",
                 )
+                if (!draft) fournisseurCache.rafraichir(payload.supplierId, now)
                 Result.Succes(newId, reference)
             }
             else -> {
@@ -141,7 +145,7 @@ class SaveCommandeAchatUseCase @Inject constructor(
                 if (existant == null || existant.module != OperationModule.ACHATS.name ||
                     existant.status != OperationStatus.DRAFT.name
                 ) {
-                    return Result.BrouillonIntrouvable
+                    return@withTransaction Result.BrouillonIntrouvable
                 }
                 operationDao.update(
                     existant.copy(
@@ -157,8 +161,10 @@ class SaveCommandeAchatUseCase @Inject constructor(
                     if (draft) "BROUILLON_COMMANDE" else "COMMANDE_VALIDEE",
                     "Commande ${existant.reference} — ${payload.supplierName} ($total)",
                 )
+                if (!draft) fournisseurCache.rafraichir(payload.supplierId, now)
                 Result.Succes(id, existant.reference)
             }
+        }
         }
     }
 }
@@ -180,6 +186,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
     private val sequenceManager: SequenceManager,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val fournisseurCache: FournisseurCacheUseCase,
 ) {
     sealed class Result {
         data class Succes(val recordId: Long, val reference: String) : Result()
@@ -364,6 +371,7 @@ class SaveReceptionAchatUseCase @Inject constructor(
                 "Réception $reference — ${payload.supplierName} ($articlesRecus article(s)" +
                     (payload.commandeReference?.let { ", commande $it" } ?: "") + ")",
             )
+            if (!draft) fournisseurCache.rafraichir(payload.supplierId, now)
             Result.Succes(recordIdFinal, reference)
             }
         } catch (refusee: TransactionRefusee) {
@@ -395,6 +403,7 @@ class ReglerAchatUseCase @Inject constructor(
     private val database: AppDatabase,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val fournisseurCache: FournisseurCacheUseCase,
 ) {
     sealed class Result {
         data class Succes(val referenceMouvement: String) : Result()
@@ -476,6 +485,7 @@ class ReglerAchatUseCase @Inject constructor(
                 "REGLEMENT_ACHAT",
                 "Règlement #$numero ${facture.reference} — ${payload.supplierName} ($montant via $modePaiement)",
             )
+            fournisseurCache.rafraichir(payload.supplierId, now)
             Result.Succes(referenceMouvement)
         }
     }
@@ -501,6 +511,7 @@ class AnnulerAchatUseCase @Inject constructor(
     private val database: AppDatabase,
     private val licenceManager: LicenceManager,
     private val journalManager: JournalManager,
+    private val fournisseurCache: FournisseurCacheUseCase,
 ) {
     sealed class Result {
         data object Succes : Result()
@@ -612,6 +623,8 @@ class AnnulerAchatUseCase @Inject constructor(
             }
 
             operationDao.update(piece.copy(status = OperationStatus.CANCELLED.name))
+            val fournisseurId = achat?.supplierId ?: reception?.supplierId ?: commande?.supplierId
+            if (fournisseurId != null) fournisseurCache.rafraichir(fournisseurId, now)
             appNotifier.notifier(
                 type = "ACHATS",
                 titre = "Pièce annulée",

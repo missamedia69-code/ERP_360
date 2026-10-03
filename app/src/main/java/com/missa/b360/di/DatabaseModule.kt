@@ -16,12 +16,15 @@ import com.missa.b360.core.data.dao.InterventionDao
 import com.missa.b360.core.data.dao.NonConformiteDao
 import com.missa.b360.core.data.dao.EmployeeDao
 import com.missa.b360.core.data.dao.EnterpriseDao
+import com.missa.b360.core.data.dao.FournisseurBalanceDao
 import com.missa.b360.core.data.dao.FournisseurCompteBancaireDao
 import com.missa.b360.core.data.dao.FournisseurContactDao
 import com.missa.b360.core.data.dao.FournisseurDao
 import com.missa.b360.core.data.dao.FournisseurDocumentDao
 import com.missa.b360.core.data.dao.FournisseurEvenementDao
 import com.missa.b360.core.data.dao.FournisseurItemDao
+import com.missa.b360.core.data.dao.FournisseurPaiementPlanifieDao
+import com.missa.b360.core.data.dao.FournisseurScoreDao
 import com.missa.b360.core.data.dao.JournalDao
 import com.missa.b360.core.data.dao.LicenceDao
 import com.missa.b360.core.data.dao.MouvementTresorerieDao
@@ -63,6 +66,10 @@ object DatabaseModule {
 
     @Provides fun provideSyncDao(db: AppDatabase): SyncDao = db.syncDao()
     @Provides fun provideClientBalanceDao(db: AppDatabase): ClientBalanceDao = db.clientBalanceDao()
+    @Provides fun provideFournisseurBalanceDao(db: AppDatabase): FournisseurBalanceDao = db.fournisseurBalanceDao()
+    @Provides fun provideFournisseurScoreDao(db: AppDatabase): FournisseurScoreDao = db.fournisseurScoreDao()
+    @Provides fun provideFournisseurPaiementPlanifieDao(db: AppDatabase): FournisseurPaiementPlanifieDao =
+        db.fournisseurPaiementPlanifieDao()
     @Provides fun provideClientFollowupDao(db: AppDatabase): ClientFollowupDao = db.clientFollowupDao()
     @Provides fun provideClientPaymentDao(db: AppDatabase): ClientPaymentDao = db.clientPaymentDao()
     @Provides fun provideGroupeArticleDao(db: AppDatabase): GroupeArticleDao = db.groupeArticleDao()

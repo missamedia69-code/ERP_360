@@ -44,6 +44,9 @@ interface FournisseurDao {
     @Query("SELECT * FROM fournisseurs WHERE id = :id")
     suspend fun getById(id: Long): FournisseurEntity?
 
+    @Query("SELECT * FROM fournisseurs")
+    suspend fun getAll(): List<FournisseurEntity>
+
     @Query("SELECT * FROM fournisseurs WHERE code = :code LIMIT 1")
     suspend fun getByCode(code: String): FournisseurEntity?
 
@@ -143,13 +146,13 @@ interface FournisseurCompteBancaireDao {
 /** Documents de conformité — échéances suivies pour les alertes d'expiration. */
 @Dao
 interface FournisseurDocumentDao {
-    @Query("SELECT * FROM fournisseur_documents WHERE fournisseurId = :fournisseurId ORDER BY dateExpiration IS NULL, dateExpiration")
+    @Query("SELECT * FROM fournisseur_documents WHERE fournisseurId = :fournisseurId AND archive = 0 ORDER BY dateExpiration IS NULL, dateExpiration")
     fun observeParFournisseur(fournisseurId: Long): Flow<List<FournisseurDocumentEntity>>
 
     /** Documents expirant avant :horizon (ms) ou déjà expirés — pour le hub « À traiter ». */
     @Query(
         "SELECT d.* FROM fournisseur_documents d INNER JOIN fournisseurs f ON f.id = d.fournisseurId " +
-            "WHERE d.dateExpiration IS NOT NULL AND d.dateExpiration <= :horizon AND f.statut NOT IN ('ARCHIVE', 'BLOQUE') " +
+            "WHERE d.archive = 0 AND d.dateExpiration IS NOT NULL AND d.dateExpiration <= :horizon AND f.statut NOT IN ('ARCHIVE', 'BLOQUE') " +
             "ORDER BY d.dateExpiration",
     )
     fun observeExpirants(horizon: Long): Flow<List<FournisseurDocumentEntity>>
@@ -163,9 +166,9 @@ interface FournisseurDocumentDao {
     @Query("SELECT * FROM fournisseur_documents WHERE id = :id")
     suspend fun getById(id: Long): FournisseurDocumentEntity?
 
-    /** Seule exception à C7 : un document joint peut être retiré — l'audit garde la trace. */
-    @Query("DELETE FROM fournisseur_documents WHERE id = :id")
-    suspend fun deleteById(id: Long): Int
+    /** Retrait = archivage : la ligne reste en base (C7, jamais de DELETE) mais n'est plus affichée. */
+    @Query("UPDATE fournisseur_documents SET archive = 1 WHERE id = :id AND archive = 0")
+    suspend fun archiver(id: Long): Int
 }
 
 /** Liaison fournisseur ↔ article : prix, délai, quantité minimum, préféré. */

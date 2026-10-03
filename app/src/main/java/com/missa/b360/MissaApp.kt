@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.missa.b360.core.workers.ClientBalanceWorker
+import com.missa.b360.core.workers.FournisseurCacheWorker
 import com.missa.b360.core.workers.JournalPurgeWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -35,6 +36,22 @@ class MissaApp : Application(), Configuration.Provider {
         super.onCreate()
         scheduleJournalPurge()
         scheduleClientBalances()
+        scheduleFournisseurCache()
+    }
+
+    /** Soldes et scores fournisseurs : reconstruction au démarrage (après migration) puis recalcul quotidien. */
+    private fun scheduleFournisseurCache() {
+        val workManager = WorkManager.getInstance(this)
+        workManager.enqueueUniqueWork(
+            FournisseurCacheWorker.WORK_NAME_DEMARRAGE,
+            ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequestBuilder<FournisseurCacheWorker>().build(),
+        )
+        workManager.enqueueUniquePeriodicWork(
+            FournisseurCacheWorker.WORK_NAME_QUOTIDIEN,
+            ExistingPeriodicWorkPolicy.KEEP,
+            PeriodicWorkRequestBuilder<FournisseurCacheWorker>(1, TimeUnit.DAYS).build(),
+        )
     }
 
     /** Comptes clients : reconstruction au démarrage (après migration) puis rafraîchissement quotidien. */

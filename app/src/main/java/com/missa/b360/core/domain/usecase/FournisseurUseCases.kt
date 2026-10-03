@@ -16,12 +16,12 @@ import com.missa.b360.core.data.entity.FournisseurItemEntity
 import com.missa.b360.core.data.entity.FournisseurStatus
 import com.missa.b360.core.data.entity.VerificationStatut
 import com.missa.b360.core.domain.model.FournisseurRules
+import com.missa.b360.core.domain.model.SupplierAccountRules
 import com.missa.b360.core.journal.JournalManager
 import com.missa.b360.core.licensing.LicenceManager
 import com.missa.b360.core.notifications.AppNotifier
 import com.missa.b360.core.numbering.DocType
 import com.missa.b360.core.numbering.SequenceManager
-import com.missa.b360.core.util.PieceJointeAchat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -290,7 +290,7 @@ class AjouterCompteBancaireUseCase @Inject constructor(
         if (!numeroRenseigne) return null
         if (compte.principal) compteDao.retirerComptePrincipal(compte.fournisseurId)
         val id = compteDao.insert(
-            compte.copy(verification = VerificationStatut.A_VERIFIER, verifieLe = null),
+            compte.copy(verification = VerificationStatut.A_VERIFIER, verifieLe = null, modifieLe = now),
         )
         evenementDao.insert(
             FournisseurEvenementEntity(
@@ -384,26 +384,100 @@ class AjouterDocumentFournisseurUseCase @Inject constructor(
     }
 }
 
-/** Retrait d'un document (seule suppression physique — l'audit conserve la trace). */
-class SupprimerDocumentFournisseurUseCase @Inject constructor(
+/**
+ * Retrait d'un document = **archivage** : la ligne reste en base et le fichier joint est conservé
+ * (jamais de suppression physique). L'audit garde l'événement `DOCUMENT_SUPPRIME`, libellé « retiré ».
+ */
+class FournisseurDocumentArchiver(
     private val documentDao: FournisseurDocumentDao,
     private val evenementDao: FournisseurEvenementDao,
-    private val licenceManager: LicenceManager,
 ) {
-    suspend operator fun invoke(documentId: Long, now: Long = System.currentTimeMillis()): Boolean {
-        if (licenceManager.isReadOnly()) return false
+    suspend fun archiver(documentId: Long, now: Long): Boolean {
         val document = documentDao.getById(documentId) ?: return false
-        if (documentDao.deleteById(documentId) == 0) return false
-        document.cheminFichier?.let(PieceJointeAchat::supprimer)
+        if (document.archive) return false
+        if (documentDao.archiver(documentId) == 0) return false
         evenementDao.insert(
             FournisseurEvenementEntity(
                 fournisseurId = document.fournisseurId,
                 date = now,
                 type = FournisseurEvenementType.DOCUMENT_SUPPRIME,
-                details = "Document ${document.typeDocument.name} retiré",
+                details = "Document ${document.typeDocument.name} retiré (archivé)",
             ),
         )
         return true
+    }
+}
+
+class ArchiverDocumentFournisseurUseCase @Inject constructor(
+    documentDao: FournisseurDocumentDao,
+    evenementDao: FournisseurEvenementDao,
+    private val licenceManager: LicenceManager,
+) {
+    private val archiver = FournisseurDocumentArchiver(documentDao, evenementDao)
+
+    suspend operator fun invoke(documentId: Long, now: Long = System.currentTimeMillis()): Boolean {
+        if (licenceManager.isReadOnly()) return false
+        return archiver.archiver(documentId, now)
+    }
+}
+
+/**
+ * Modification d'un compte de paiement. Un changement de titulaire, d'IBAN, de numéro de compte ou
+ * de numéro mobile date la modification (`modifieLe`) et repasse le compte à vérifier ; le reste
+ * (banque, notes, principal) ne remet pas la vérification en cause. L'audit ne contient jamais un
+ * numéro de compte.
+ */
+class FournisseurCompteEditor(
+    private val compteDao: FournisseurCompteBancaireDao,
+    private val evenementDao: FournisseurEvenementDao,
+) {
+    /** `null` = refusé ; sinon vrai si la vérification a été remise à zéro. */
+    suspend fun modifier(compte: FournisseurCompteBancaireEntity, now: Long): Boolean? {
+        if (!SupplierAccountRules.valide(compte)) return null
+        val existant = compteDao.getById(compte.id) ?: return null
+        if (existant.fournisseurId != compte.fournisseurId) return null
+        val sensible = SupplierAccountRules.coordonneesModifiees(existant, compte)
+        if (compte.principal) compteDao.retirerComptePrincipal(compte.fournisseurId)
+        compteDao.update(
+            compte.copy(
+                verification = if (sensible) VerificationStatut.A_VERIFIER else existant.verification,
+                verifieLe = if (sensible) null else existant.verifieLe,
+                modifieLe = if (sensible) now else existant.modifieLe,
+            ),
+        )
+        evenementDao.insert(
+            FournisseurEvenementEntity(
+                fournisseurId = compte.fournisseurId,
+                date = now,
+                type = FournisseurEvenementType.COMPTE_MODIFIE,
+                details = "Compte ${compte.banque ?: compte.operateurMobile ?: "bancaire"} modifié" +
+                    if (sensible) " — à vérifier" else "",
+            ),
+        )
+        return sensible
+    }
+}
+
+class ModifierCompteBancaireUseCase @Inject constructor(
+    compteDao: FournisseurCompteBancaireDao,
+    evenementDao: FournisseurEvenementDao,
+    private val licenceManager: LicenceManager,
+    private val notifier: AppNotifier,
+) {
+    private val editor = FournisseurCompteEditor(compteDao, evenementDao)
+
+    /** Vrai si le compte repasse à vérifier, faux s'il est resté vérifié ; `null` si la modification est refusée. */
+    suspend operator fun invoke(compte: FournisseurCompteBancaireEntity, now: Long = System.currentTimeMillis()): Boolean? {
+        if (licenceManager.isReadOnly()) return null
+        val resultat = editor.modifier(compte, now)
+        if (resultat == true) {
+            notifier.notifier(
+                "FOURNISSEUR",
+                "RIB à vérifier",
+                "Un compte de paiement a été modifié et attend une nouvelle vérification.",
+            )
+        }
+        return resultat
     }
 }
 
