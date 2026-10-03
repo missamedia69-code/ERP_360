@@ -143,7 +143,7 @@ les pull requests :
 |---|---|
 | [`docs/PRD_MISSA_BUSINESS_360.md`](docs/PRD_MISSA_BUSINESS_360.md) | Exigences produit |
 | [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) | Conventions de code, d'interface et de base de données |
-| [`docs/DESIGN_CLIENTS.md`](docs/DESIGN_CLIENTS.md) | Design de référence du module Clients (nuit, gris, orange) |
+| [`docs/DESIGN_CLIENTS.md`](docs/DESIGN_CLIENTS.md) | Design de référence du module Clients (nuit, gris, violet) |
 | [`docs/fiscalite-multizones.md`](docs/fiscalite-multizones.md) | Fiscalité multi-zones et identifiants uniques |
 | [`docs/ARCHITECTURE_STOCK.md`](docs/ARCHITECTURE_STOCK.md) | Module Stock |
 | [`docs/ARCHITECTURE_PRODUCTION.md`](docs/ARCHITECTURE_PRODUCTION.md) | Module Production |

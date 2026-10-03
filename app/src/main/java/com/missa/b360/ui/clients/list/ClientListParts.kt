@@ -136,7 +136,7 @@ private fun Chiffre(libelle: String, valeur: String, couleur: Color, modifier: M
     }
 }
 
-/** Filtres rapides : pastille orange pour le filtre courant, contour gris sinon, compteur en pastille. */
+/** Filtres rapides : pastille violette pour le filtre courant, contour gris sinon, compteur en pastille. */
 @Composable
 internal fun ClientFilterChips(etat: ClientListUiState, onFiltre: (ClientListFilter) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -152,7 +152,7 @@ internal fun ClientFilterChips(etat: ClientListUiState, onFiltre: (ClientListFil
                     Modifier
                         .heightIn(min = 36.dp)
                         .clip(forme)
-                        .background(if (actif) ClientCouleurs.Orange else Color.White)
+                        .background(if (actif) ClientCouleurs.Violet else Color.White)
                         .then(if (actif) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
                         .padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -160,19 +160,19 @@ internal fun ClientFilterChips(etat: ClientListUiState, onFiltre: (ClientListFil
                 ) {
                     Text(
                         stringResource(filtre.libelle()),
-                        color = MissaInk, fontSize = 12.sp,
+                        color = if (actif) Color.White else MissaInk, fontSize = 12.sp,
                         fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
                         maxLines = 1,
                     )
                     Box(
                         Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(if (actif) Color(0xFFE06A00) else ClientCouleurs.Pastille)
+                            .background(if (actif) ClientCouleurs.VioletProfond else ClientCouleurs.Pastille)
                             .padding(horizontal = 6.dp, vertical = 1.dp),
                     ) {
                         Text(
                             etat.compteurs.pour(filtre).toString(),
-                            color = MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
+                            color = if (actif) Color.White else MissaInk, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
                         )
                     }
                 }

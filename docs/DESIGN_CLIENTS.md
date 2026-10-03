@@ -1,4 +1,4 @@
-# Design du module Clients — référence « nuit · gris · orange »
+# Design du module Clients — référence « nuit · gris · violet »
 
 Référence validée par le propriétaire (captures « fiche client » et « liste des clients », 2 octobre 2026).
 Elle s'applique à **tout écran, formulaire, feuille et dialogue lié au client** : `ui/clients/*`, bandeau de
@@ -11,8 +11,8 @@ notifications clients. Les autres modules gardent le design de l'écran « Infor
 ## Principe
 
 Fond blanc, cartes gris bleuté finement contournées, bleu nuit pour l'identité et le texte. **Aucun bouton
-n'est bleu nuit ni orange** : tous les boutons sont des tuiles grises à texte nuit en gras (`BoutonClientPlein`,
-`BoutonClient`, `ClientCouleurs.Tuile`), ou blancs à contour gris. **L'orange sert uniquement aux éléments sélectionnables, dans leur
+n'est bleu nuit ni violet** : tous les boutons sont des tuiles grises à texte nuit en gras (`BoutonClientPlein`,
+`BoutonClient`, `ClientCouleurs.Tuile`), ou blancs à contour gris. **Le violet sert uniquement aux éléments sélectionnables, dans leur
 état sélectionné** : onglet courant, filtre courant, onglet actif de la barre du bas. Jamais décoratif (ni texte,
 ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent réservés aux états et sont
 **toujours accompagnés d'une icône**.
@@ -22,7 +22,7 @@ ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent
 | Jeton | Valeur | Usage |
 |---|---|---|
 | `Nuit` | `#101C43` | texte, avatar, icônes (jamais un fond de bouton) |
-| `Orange` | `#FF7A00` | **uniquement** l'élément sélectionné : onglet ou filtre courant, onglet actif de la barre du bas |
+| `Violet` / `VioletProfond` | `#7C3AED` / `#5B21B6` | **uniquement** l'élément sélectionné : onglet ou filtre courant, onglet actif de la barre du bas |
 | `Carte` / `CarteBord` | `#EAEDF2` / `#D5DAE3` | résumé, en-tête de fiche, cartes clients, cartes de section |
 | `Tuile` / `TuileClaire` | `#E3E6EC` / `#EBEDF1` | actions, boutons secondaires pleins |
 | `Pastille` | `#DDE1E8` | pastilles neutres (statut, compteurs) |
@@ -52,7 +52,7 @@ ni icône, ni contour, ni fond d'action). Vert, ambre et rouge de risque restent
 - **Liste** : carte « Résumé » repliable avec « En temps réel » ; recherche + bouton « Filtres » ; pastilles de
   filtre avec compteur ; ligne « N clients » + menu « Trier par … ⌄ » ; carte client dépliable (encours, retard,
   Appeler, WhatsApp) ; bouton flottant gris « + Nouveau client ».
-- **Barre de modules** dans Clients : icône au-dessus du libellé pour tous les onglets, carré orange pour l'actif.
+- **Barre de modules** dans Clients : icône au-dessus du libellé pour tous les onglets, carré violet (icône et libellé blancs) pour l'actif.
 - **Risque** : `RiskBadge` (contour et icône de la couleur de risque, texte nuit) ; `ClientStatusChip`
   (gris neutre, couleur seulement pour actif, surveillance et blocages ; cadenas pour les blocages).
 

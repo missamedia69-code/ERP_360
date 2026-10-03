@@ -44,14 +44,15 @@ import com.missa.b360.ui.theme.MissaInk
 import com.missa.b360.ui.theme.MissaMuted
 
 /**
- * Palette « nuit · gris · orange » du module Clients (maquettes fiche et liste) :
+ * Palette « nuit · gris · violet » du module Clients (maquettes fiche et liste) :
  * encre nuit pour le texte, l'avatar et les actions principales, gris bleuté pour les cartes et tuiles,
- * orange réservé aux éléments sélectionnables à l'état sélectionné (onglet, filtre, barre du bas). La couleur de risque reste réservée aux états.
+ * violet réservé aux éléments sélectionnables à l'état sélectionné (onglet, filtre, barre du bas). La couleur de risque reste réservée aux états.
  * Référence complète : `docs/DESIGN_CLIENTS.md`.
  */
 internal object ClientCouleurs {
     val Nuit = Color(0xFF101C43)
-    val Orange = Color(0xFFFF7A00)
+    val Violet = Color(0xFF7C3AED)
+    val VioletProfond = Color(0xFF5B21B6)
     val Carte = Color(0xFFEAEDF2)
     val CarteBord = Color(0xFFD5DAE3)
     val Tuile = Color(0xFFE3E6EC)
@@ -82,7 +83,7 @@ internal fun BoutonClient(
     ) { contenu() }
 }
 
-/** Onglets de la fiche : pastille orange pour l'onglet courant, contour gris pour les autres. */
+/** Onglets de la fiche : pastille violette pour l'onglet courant, contour gris pour les autres. */
 @Composable
 internal fun <T> ClientOnglets(
     onglets: List<T>,
@@ -102,7 +103,7 @@ internal fun <T> ClientOnglets(
                     Modifier
                         .heightIn(min = 38.dp)
                         .clip(forme)
-                        .background(if (actif) ClientCouleurs.Orange else Color.White)
+                        .background(if (actif) ClientCouleurs.Violet else Color.White)
                         .then(if (actif) Modifier else Modifier.border(BorderStroke(1.dp, ClientCouleurs.Trait), forme))
                         .padding(horizontal = 14.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center,
@@ -153,7 +154,7 @@ internal fun ClientVideActivite() {
 }
 
 /**
- * Bouton principal du module Clients : tuile grise, texte nuit en gras, jamais de fond bleu nuit ni orange.
+ * Bouton principal du module Clients : tuile grise, texte nuit en gras, jamais de fond bleu nuit ni violet.
  * Mêmes paramètres que `BoutonMissa`, importé sous le nom `Button` dans les écrans Clients.
  */
 @Composable

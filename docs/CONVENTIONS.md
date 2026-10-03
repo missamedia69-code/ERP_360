@@ -95,7 +95,7 @@ app/src/main/java/com/missa/b360/
   ne sont jamais supprimées ; une erreur d'encaissement se corrige par une contre-passation.
 - **Interface** : la couleur porte le risque mais toujours avec une icône (cadenas pour BLOQUE) ; cibles
   ≥ 48 dp ; pas de tableau à défilement horizontal ; icônes `Iv` ; montants dans la devise de l'entreprise.
-- **Design** : tout ce qui touche au client suit la référence « nuit · gris · orange » de
+- **Design** : tout ce qui touche au client suit la référence « nuit · gris · violet » de
   [`docs/DESIGN_CLIENTS.md`](DESIGN_CLIENTS.md) (jetons `ClientCouleurs` dans `ClientDesign.kt`, formulaires en
   deux colonnes). Elle remplace, pour ce module seulement, les cartes `OnbConfigCard` sans bordure.
 - **Intégrations** : Ventes affiche `ClientCreditBanner` (risque + verdict) et lit l'encours de

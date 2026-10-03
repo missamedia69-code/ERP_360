@@ -109,7 +109,7 @@ fun MissaBarreModules(
                     BarreOnglet(
                         element = element,
                         actif = index == indexActif,
-                        couleurActive = if (moduleCourant == AppModule.CLIENTS) Color(0xFFFF7A00) else null,
+                        couleurActive = if (moduleCourant == AppModule.CLIENTS) Color(0xFF7C3AED) else null,
                         modifier = if (index == indexActif && moduleCourant != AppModule.CLIENTS) Modifier.weight(1.55f) else Modifier.weight(1f),
                     )
                 }
@@ -133,7 +133,7 @@ private fun BarreOnglet(
 ) {
     val forme = RoundedCornerShape(16.dp)
     if (couleurActive != null) {
-        // Variante Clients (maquette) : icône au-dessus du libellé pour tous les onglets, pastille orange pour l'actif.
+        // Variante Clients (maquette) : icône au-dessus du libellé pour tous les onglets, pastille violette pour l'actif.
         Column(
             modifier = modifier
                 .height(52.dp)
@@ -146,12 +146,12 @@ private fun BarreOnglet(
             Icon(
                 painter = painterResource(element.icone),
                 contentDescription = null,
-                tint = if (actif) MissaInk else MissaMuted,
+                tint = if (actif) Color.White else MissaMuted,
                 modifier = Modifier.size(22.dp),
             )
             Text(
                 text = stringResource(element.libelle),
-                color = if (actif) MissaInk else MissaMuted,
+                color = if (actif) Color.White else MissaMuted,
                 fontSize = 10.sp,
                 fontWeight = if (actif) FontWeight.Bold else FontWeight.Medium,
                 maxLines = 1,
