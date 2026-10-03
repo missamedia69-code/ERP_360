@@ -165,7 +165,7 @@ class SupplierScorecardTest {
 
     @Test
     fun `quantites invalides sont ignorees`() {
-        val s = calcul(listOf(commande(1, 700, quantite = Double.NaN), reception(1, 710, 10.0)))
+        val s = calcul(listOf(commande(1, 700, quantite = -5.0), reception(1, 710, 10.0)))
         assertEquals(0, s.nbCommandesMesurees)
         val libre = calcul(listOf(commande(2, 700, produit = null), reception(2, 710, 10.0)))
         assertEquals(0, libre.nbCommandesMesurees)
